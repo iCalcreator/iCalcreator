@@ -1,0 +1,18 @@
+2.10.1 ###################### Thanks Nathan
+adaptation for PHP STRICT error_reporting
+
+2.10.2 ######################
+function parse, ensure (vtimezone) standard/daylight component order
+
+2.10.3 ######################
+update function createTimezone, creating RRULEs
+
+2.10.4 ######################
+update iCalUtilityFunctions::_setDate
+
+2.10.5 ######################
+new function iCalUtilityFunctions::transformDateTime
+transforms a datetime from a timezone to another using PHP DateTime and DateTimeZone class (PHP >= PHP 5.2.0)
+
+
+
