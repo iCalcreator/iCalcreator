@@ -1,0 +1,15 @@
+2.10.16 ###################### Thanks Jan
+xcal (xml) format update
+
+2.10.17 ###################### Thanks Jorge
+bug function selectComponents and last arguments (false, true, false)
+
+2.10.18 ######################
+update function setConfig (component level), setting 'nl' always before 'format'
+
+2.10.19 ######################
+bug in function iCalUtilityFunctions::_recur2date, FREQ=YEARLY + BYDAY - combination
+
+2.10.20 ###################### Thanks Hermann
+function returnCalendar, removing Content-Length header
+
