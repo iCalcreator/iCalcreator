@@ -2,7 +2,7 @@
    "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.10.15 summary</title>
+<title>iCalcreator 2.10.20 summary</title>
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult" />
 <meta name="copyright"   content="2007-2011 Kjell-Inge Gustafsson - kigkonsult" />
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create" />
@@ -40,8 +40,8 @@ h4 {
 </style>
 </head>
 <body>
-<h1>iCalcreator v2.10.15</h1>
-iCalcreator class v2.10.15<br />
+<h1>iCalcreator v2.10.20</h1>
+iCalcreator class v2.10.20<br />
 copyright (c) 2007-2011 Kjell-Inge Gustafsson, kigkonsult<br />
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se/iCalcreator</a><br />
 ical@kigkonsult.se<br />
@@ -70,17 +70,35 @@ obsoletes, respectively,
 All functions calls are made as simple as possible BUT (, !!!,) read these rfc's properly!<br />
 
 
-<h4>Contact</h4>
+<h4>SUPPORT</h4>
 The main support channel is using iCalcreator
-<a title="Sourceforge" href="http://sourceforge.net/projects/icalcreator/forums/" target="_blank"><u>Sourceforge</u></a> forum.
-For specific queries, improvement and development issues, proposals and ideas, please contact <a href="http://kigkonsult.se/contact/index.php"><u>page</u></a>.
-Please note that paid support or consulting service has a higher priority.
+<a title="Sourceforge" href="http://sourceforge.net/projects/icalcreator/forums/" target="_blank">Sourceforge</a> forum.
+<br />
+<br />
+Our services are available for support and designing and developing customizations,
+adaptations and other <i>PHP</i>/MySQL solutions with a special focus on software utility and reliability,
+supported through our iterative acquire/design/transition process modell.
+
+<h4>DONATE</h4>
+You can show your appreciation for our free software,
+and can support future development by making a donation to the kigkonsult GPL/LGPL projects.
+<br />
+<br />
+Make a donation of any size by clicking <a href="http://kigkonsult.se/contact/index.php#Donate" title="Donate" target="_blank">here</a>.
+Thanks in advance!
+
+<h4>Contact</h4>
+Use the contact <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">page</a>
+for queries, improvement/development issues or professional support and development.
+Please note that paid support or consulting service has the highest priority.
+
 <h4>Downloads</h4>
 Download
 <a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank"><b>complete manual</b></a>
 and
 <a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator coding samples" target="_blank"><b>coding samples</b></a>.
 from <a href="http://kigkonsult.se/index.php" title="kigkonsult" target="_blank">kigkonsult.se</a>.
+
 <h4>INSTALL</h4>
 Unpack to any folder<br />
 - add this folder to your include-path<br />
@@ -100,7 +118,7 @@ To really boost perfomance, visit kigkonsult.se contact <a href="http://kigkonsu
 <h2>CREATE</h2>
 
 <p class="code">require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;icaldomain.com&quot; );        // <span class="comment">set Your unique id</span>
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar instance</span>
 
 $v->setProperty( &quot;method&quot;, &quot;PUBLISH&quot; );                    // <span class="comment">required of some calendar software</span>
@@ -136,7 +154,7 @@ $v->returnCalendar();                                      // <span class="comme
 </p>
 <h2>PARSE</h2>
 <p class="code">require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;icaldomain.com&quot; );        // <span class="comment">set Your unique id, required if any component UID is missing</span>
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id, required if any component UID is missing</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar instance</span>
 
  /* start parse of local file */
@@ -159,7 +177,7 @@ $v->sort();                                                // <span class="comme
 </p>
 <h2>EDIT</h2>
 <p class="code">require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;icaldomain.com&quot;, &quot;directory&quot; =&gt; &quot;calendar&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;directory&quot; =&gt; &quot;calendar&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
                                                            // <span class="comment">set Your unique id, import directory and file name</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar instance</span>
 
@@ -194,7 +212,7 @@ while( $vevent = $v->getComponent( &quot;vevent&quot; )) {           // <span cl
 </p>
 <h2>SELECT</h2>
 <p class="code">require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;icaldomain.com&quot; );        // <span class="comment">set Your unique id</span>
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar instance</span>
 
 $v->setConfig( &quot;url&quot;, &quot;http://www.aDomain.net/file.ics&quot; ); // <span class="comment">iCalcreator also support remote files</span>
@@ -216,7 +234,7 @@ foreach( $eventArray as $year =&gt; $yearArray) {
     $currddate = $event->getProperty( &quot;x-current-dtstart&quot; );
                                                            // <span class="comment">if member of a recurrence set (2nd occurence etc)</span>
                                                            // <span class="comment">returns array( &quot;x-current-dtstart&quot;</span>
-                                                           // <span class="comment">                  , &lt;(string) date(&quot;Y-m-d [H:i:s][timezone/UTC offset]&quot;)&gt;)</span>
+                                                           // <span class="comment">      , &lt;(string) date(&quot;Y-m-d [H:i:s][timezone/UTC offset]&quot;)&gt;)</span>
     $dtstart = $vevent->getProperty( &quot;dtstart&quot; );          // <span class="comment">dtstart required, one occurence, (orig. start date)</span>
     $summary = $vevent->getProperty( &quot;summary&quot; );
     $description = $vevent->getProperty( &quot;description&quot; );
@@ -228,23 +246,26 @@ foreach( $eventArray as $year =&gt; $yearArray) {
 }
 </p>
 <h4>Select specific property values</h4>
-<p class="code">$valueOcurr = $v->getProperty( &quot;CATEGORIES&quot; );             // <span class="comment">fetch specific property (unique) values and number of ocurrencies</span>
-                                                           // <span class="comment">ATTENDEE, CATEGORIES, DTSTART, LOCATION, ORGANIZER, PRIORITY, RESOURCES, STATUS, SUMMARY, UID</span>
-foreach( $valueOcurr as $uniqueValue =&gt; $ocurr ) {
+<p class="code">$valueOccurr = $v->getProperty( &quot;CATEGORIES&quot; );            // <span class="comment">fetch specific property (unique) values and ocurrences</span>
+                                                           // <span class="comment">ATTENDEE, CATEGORIES, DTSTART, LOCATION,</span>
+                                                           // <span class="comment">ORGANIZER, PRIORITY, RESOURCES, STATUS,</span>
+                                                           // <span class="comment">SUMMARY, UID</span>
+foreach( $valueOccurr as $uniqueValue =&gt; $occurr ) {
   .. .
 }
 </p>
 <h4>Specific property value select</h4>
 <p class="code">$selectSpec = array( &quot;CATEGORIES&quot; =&gt; &quot;course1&quot; );
 $specComps = $v->selectComponents( $selectSpec );          // <span class="comment">selects components based on specific property value(-s)</span>
-                                                           // <span class="comment">ATTENDEE, CATEGORIES, LOCATION, ORGANIZER, PRIORITY, RESOURCES, STATUS, SUMMARY, UID</span>
+                                                           // <span class="comment">ATTENDEE, CATEGORIES, LOCATION, ORGANIZER,</span>
+                                                           // <span class="comment">PRIORITY, RESOURCES, STATUS, SUMMARY, UID</span>
 foreach( $specComps as $comp ) {
  .. .
 }
 </p>
 <h2>OUTPUT</h2>
 <p class="code">require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;icaldomain.com&quot; );        // <span class="comment">set Your unique id</span>
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar instance</span>
 
 $v->setProperty( &quot;method&quot;, &quot;PUBLISH&quot; );                    // <span class="comment">required of some calendar software</span>
@@ -275,7 +296,7 @@ $v->saveCalendar();                                        // <span class="comme
 <h2>COPYRIGHT AND LICENSE</h2>
 
 <h4>Copyright</h4>
-iCalcreator v2.10.15<br />
+iCalcreator v2.10.20<br />
 copyright (c) 2007-2011 Kjell-Inge Gustafsson, kigkonsult<br />
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se/iCalcreator</a><br />
 ical@kigkonsult.se<br />
