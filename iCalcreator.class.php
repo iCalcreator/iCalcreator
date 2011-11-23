@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************/
 /**
- * iCalcreator v2.10.20
+ * iCalcreator v2.10.23
  * copyright (c) 2007-2011 Kjell-Inge Gustafsson kigkonsult
  * kigkonsult.se/iCalcreator/index.php
  * ical@kigkonsult.se
@@ -55,7 +55,7 @@ if( substr( phpversion(), 0, 3 ) >= '5.1' )
 require_once 'iCalUtilityFunctions.class.php';
 /*********************************************************************************/
 /*         version, do NOT remove!!                                              */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.10.20' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.10.23' );
 /*********************************************************************************/
 /*********************************************************************************/
 /**
@@ -1025,7 +1025,7 @@ class vcalendar {
  * No date controls occurs.
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.10.17 - 2011-10-30
+ * @since 2.10.22 - 2011-11-19
  * @param mixed $startY optional, start Year, default current Year ALT. array selecOptions
  * @param int $startM optional,   start Month, default current Month
  * @param int $startD optional,   start Day, default current Day
@@ -1093,7 +1093,7 @@ class vcalendar {
             /* select due when dtstart is missing */
       if( empty( $start ) && ( $component->objName == 'vtodo' ) && ( FALSE === ( $start = $component->getProperty( 'due' ))))
         continue;
-      $dtendExist = $dueExist = $durationExist = $endAllDayEvent = FALSE;
+      $dtendExist = $dueExist = $durationExist = $endAllDayEvent = $recurrid = FALSE;
       unset( $end, $startWdate, $endWdate, $rdurWsecs, $rdur, $exdatelist, $workstart, $workend, $endDateFormat ); // clean up
       $startWdate = iCalUtilityFunctions::_date2timestamp( $start );
       $startDateFormat = ( isset( $start['hour'] )) ? 'Y-m-d H:i:s' : 'Y-m-d';
@@ -1147,17 +1147,37 @@ class vcalendar {
       while( FALSE !== ( $exdate = $component->getProperty( 'exdate' ))) {  // check exdate
         foreach( $exdate as $theExdate ) {
           $exWdate = iCalUtilityFunctions::_date2timestamp( $theExdate );
-          $exWdate = mktime( 0, 0, 0, date( 'm', $exWdate ), date( 'd', $exWdate ), date( 'Y', $exWdate ) ); // on a day-basis !!!
+          $exWdate = mktime( 0, 0, 0, date( 'm', $exWdate ), date( 'd', $exWdate ), date( 'Y', $exWdate )); // on a day-basis !!!
           if((( $startDate - $rdurWsecs ) <= $exWdate ) && ( $endDate >= $exWdate ))
             $exdatelist[$exWdate] = TRUE;
         } // end - foreach( $exdate as $theExdate )
       }  // end - check exdate
+      $compUID    = $component->getProperty( 'UID' );
+            /* check reccurrence-id (with sequence), remove hit with reccurr-id date */
+      if(( FALSE !== ( $recurrid = $component->getProperty( 'recurrence-id' ))) &&
+         ( FALSE !== ( $sequence = $component->getProperty( 'sequence' )))   ) {
+        $recurrid = iCalUtilityFunctions::_date2timestamp( $recurrid );
+        $recurrid = mktime( 0, 0, 0, date( 'm', $recurrid ), date( 'd', $recurrid ), date( 'Y', $recurrid )); // on a day-basis !!!
+        $endD     = $recurrid + $rdurWsecs;
+        do {
+          if( date( 'Ymd', $startWdate ) != date( 'Ymd', $recurrid ))
+            $exdatelist[$recurrid] = TRUE; // exclude all other days than startdate
+          $wd = getdate( $recurrid );
+          if( isset( $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] ))
+              unset( $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] ); // remove from output, dtstart etc added below
+          if( $split && ( $recurrid <= $endD ))
+            $recurrid = mktime( 0, 0, 0, date( 'm', $recurrid ), date( 'd', $recurrid ) + 1, date( 'Y', $recurrid )); // step one day
+          else
+            break;
+        } while( TRUE );
+      } // end recurrence-id test
             /* select only components with startdate within period */
       if(( $startWdate >= $startDate ) && ( $startWdate <= $endDate )) {
             /* add the selected component (WITHIN valid dates) to output array */
-        $compUID    = $component->getProperty( 'UID' );
-        if( $flat )  // any=true/false, ignores split
-          $result[$compUID] = $component->copy(); // copy original to output;
+        if( $flat ) { // any=true/false, ignores split
+          if( !$recurrid )
+            $result[$compUID] = $component->copy(); // copy original to output (but not anyone with recurrence-id)
+        }
         elseif( $split ) { // split the original component
           if( $endWdate > $endDate )
             $endWdate = $endDate;     // use period end date
@@ -1197,6 +1217,8 @@ class vcalendar {
             $rstart = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
           } // end while( $rstart <= $endWdate )
         } // end if( $split )   -  else use component date
+        elseif( $recurrid && !$flat && !$any && !$split )
+          $continue = TRUE;
         else { // !$flat && !$split, i.e. no flat array and DTSTART within period
           $checkDate = mktime( 0, 0, 0, date( 'm', $startWdate ), date( 'd', $startWdate ), date( 'Y', $startWdate ) ); // on a day-basis !!!
           if( !$any || !isset( $exdatelist[$checkDate] )) { // exclude any recurrence date, found in exdatelist
@@ -1336,14 +1358,29 @@ class vcalendar {
     elseif( !$flat ) {
       foreach( $result as $y => $yeararr ) {
         foreach( $yeararr as $m => $montharr ) {
-          foreach( $montharr as $d => $dayarr )
-            $result[$y][$m][$d] = array_values( $dayarr ); // skip tricky UID-index, hoping they are in hour order.. .
-          ksort( $result[$y][$m] );
+          foreach( $montharr as $d => $dayarr ) {
+            if( empty( $result[$y][$m][$d] ))
+                unset( $result[$y][$m][$d] );
+            else
+              $result[$y][$m][$d] = array_values( $dayarr ); // skip tricky UID-index, hoping they are in hour order.. .
+          }
+          if( empty( $result[$y][$m] ))
+              unset( $result[$y][$m] );
+          else
+            ksort( $result[$y][$m] );
         }
-        ksort( $result[$y] );
+        if( empty( $result[$y] ))
+            unset( $result[$y] );
+        else
+          ksort( $result[$y] );
       }
-      ksort( $result );
+      if( empty( $result ))
+          unset( $result );
+      else
+        ksort( $result );
     } // end elseif( !$flat )
+    if( 0 >= count( $result ))
+      return FALSE;
     return $result;
   }
 /**

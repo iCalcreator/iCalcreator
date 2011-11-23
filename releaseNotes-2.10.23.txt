@@ -1,0 +1,8 @@
+2.10.21 ###################### Thanks Pasi
+updated user guide, clarification about UTC timezone usage
+
+2.10.22 ###################### Thanks johns
+bug in function selectComponents; RECURRENCE-ID management
+
+2.10.23 ######################
+updated user guide, relationship between getProperty/selectComponents functions, other minor clarifications

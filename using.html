@@ -2,11 +2,11 @@
    "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.10.20 manual</title>
+<title>iCalcreator 2.10.23 manual</title>
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult">
 <meta name="copyright"   content="2007-2011 Kjell-Inge Gustafsson - kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.10.20">
+<meta name="description" content="using iCalcreator v2.10.23">
 <style type="text/css">
 * {
   BACKGROUND-COLOR: white;
@@ -142,8 +142,8 @@ span.comment {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator 2.10.20</p>
-iCalcreator class v2.10.20<br>
+<p class="header">iCalcreator 2.10.23</p>
+iCalcreator class v2.10.23<br>
 copyright (c) 2007-2011 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se/iCalcreator</a><br>
 ical@kigkonsult.se<br>
@@ -276,7 +276,7 @@ When creating a new <i>calendar</i>/component instance, review <a href="#Calenda
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
 <a name="Boost"></a><h3>1.6.2 Boost performance</h3>
-To really boost perfomance, kigkonsult can now offer <i>PHP</i> (4 and 5) packages (iCalcreator etc) in byte coded files,
+To really boost performance, kigkonsult can now offer <i>PHP</i> (4 and 5) packages (iCalcreator etc) in byte coded files,
 using <a href="http://www.ioncube.com" target="_blank"><u>ionCube</u></a> encoder.
 <br>
 <br>
@@ -333,7 +333,7 @@ Download iCalcreator <a title="download iCalcreator coding samples" href="http:/
 <p>
 If you are downloading the iCalcreatorusing sub-package, there are free iCal/xCal icons in the images directory, to use as buttons on a web page.
 </p>
-The <i>PHP</i> codings in this document or &quot;coding samples&quot; (above) are only for display of usage, recommendation is to use a
+The <i>PHP</i> coding in this document or &quot;coding samples&quot; (above) are only for display of usage, recommendation is to use a
 coding standard, the following, incomplete, list is a good start;
 <dl>
 <dd><a href="http://www.dagbladet.no/development/phpcodingstandard/" target="_blank">http://www.dagbladet.no/development/phpcodingstandard/</a>
@@ -1169,12 +1169,11 @@ A comprehensive table showing relation between <i>calendar</i> components and pr
 </tr>
 </table>
 <p>
-If not set, <a href="#DTSTART">DTSTART</a> and <a href="#UID">UID</a>
-are created automatic by iCalcreator for <a href="#VEVENT">vevent</a>,
-<a href="#VTODO">vtodo</a>, <a href="#VJOURNAL">vjournal</a> and <a href="#VFREEBUSY">vfreebusy</a> components
-when using <i>calendar</i> functions <a href="#saveCalendar">saveCalendar</a> or <a href="#returnCalendar">returnCalendar</a>
-or when fetching DTSTART/UID property value with
-component function <a href="#getProperty">getProperty</a>.
+If not set, the <a href="#DTSTAMP">DTSTAMP</a> and <a href="#UID">UID</a> properties
+are automatically created by iCalcreator<br>
+for <a href="#VEVENT">vevent</a>,<a href="#VTODO">vtodo</a>, <a href="#VJOURNAL">vjournal</a> and <a href="#VFREEBUSY">vfreebusy</a> components<br>
+when using <i>calendar</i> functions <a href="#saveCalendar">saveCalendar</a> or <a href="#returnCalendar">returnCalendar</a><br>
+or when fetching DTSTAMP/UID property value with the component function <a href="#getProperty_PROP">getProperty</a>.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_Component_list">[up]</a>
@@ -1345,6 +1344,10 @@ $vcalendar->setComponent( $vevent );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
 
 <a name="vtimezone"></a><h4>3.1.1.7 vtimezone</h4>
+<p>
+The vtimezone component describe, at a minimum, the base offset from <b>UTC</b> for the time zone.
+For dates with UTC DATE-TIME, read <a href="#DATE_WITH_UTC_TIME">this</a>!
+</p>
 <p class="label">Format 1</p>
 Create a new <a href="#VTIMEZONE">VTIMEZONE</a> object using a <i>calendar</i> factory-method, returning a reference to the new component.
 <p class="format">newComponent( &quot;vtimezone&quot; )</p>
@@ -1472,7 +1475,7 @@ order    - if missing 1st/next occurrence,
            used with multiple (property) occurrences
 </p>
 <p class="label">Example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 if( !$vcalendar->deleteProperty( &quot;method&quot; ))
@@ -1496,30 +1499,50 @@ complete - FALSE (default) : output only property value
       array( &quot;value&quot;=&gt; &lt;value&gt; ,&quot;params&quot; =&gt; &lt;parameter array&gt;)
 </p>
 <p class="label">Example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 $calscale = $vcalendar->getProperty( &quot;calscale&quot; );
 .. .
 </p>
 <p class="label">Example 2</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
-while( $xprop = $vcalendar->getProperty( )) { // <span class="ref">get x-properties in order.. .</span>
+while( $xprop = $vcalendar->getProperty( )) { // <span class="ref">get x-properties</span>
 .. .
 </p>
+<a name="getProperty2">
 <p class="label">Format 2</p>
-Ability to fetch specific property (unique) values and number of ocurrencies,
+Ability to fetch specific property (unique) values and number of occurrences. Supported properties are
 <a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#DTSTART">DTSTART</a>, <a href="#LOCATION">LOCATION</a>, <a href="#ORGANIZER">ORGANIZER</a>, <a href="#PRIORITY">PRIORITY</a>, <a href="#RESOURCES">RESOURCES</a>,
-<a href="#STATUS">STATUS</a>, <a href="#SUMMARY">SUMMARY</a>, <a href="#UID">UID</a> or &quot;RECURRENCE-ID-UID&quot; (alt. &quot;R-UID&quot; ) from <b>ALL</b> components within <i>calendar</i>.<br>
-Outputs an array( *[&lt;unique-property-value&gt; =&gt; &lt;number of occurrence&gt;] )<br>or an empty array if no hits.<br>
-If a property contains multiple values (ex. &quot;RESOURCES:pc,developer&quot; or &quot;CATAGORIES:course1,courseB&quot;), they are split into unique values.
+<a href="#STATUS">STATUS</a>, <a href="#SUMMARY">SUMMARY</a>, <a href="#UID">UID</a> or &quot;RECURRENCE-ID-UID&quot; (alt. &quot;R-UID&quot; ).
+The search includes in <b>ALL</b> components within <i>calendar</i>.
+<br><br>
+Outputs an array( *[&lt;unique-property-value&gt; =&gt; &lt;number of occurrence&gt;] )<br>or an empty array if no hits.
+The array is sorted by (asc.) key.
+<br><br>
+If a property contains multiple values (ex. &quot;CATAGORIES:course1,courseB&quot, &quot;LOCATION:London,Paris&quot; or &quot;RESOURCES:pc,developer&quot;), they are split into unique values.
+<br><br>
+To select components based on property values, see <a href="#selectComponents2">selectComponents</a> (Format 2).
 <p class="format">getProperty( string PropName )</p>
-<p class="comment">propName - case independent, above
+<p class="comment">propName - case independent
 <a href="#DTSTART">DTSTART</a> as argument returns dates, in format &quot;YYYYMMDD&quot;,
 &quot;RECURRENCE-ID-UID&quot;returns <a href="#UID">UID</a> values for component(-s) where <a href="#RECURRENCE-ID">RECURRENCE-ID</a> is set.
-<a href="#ATTENDEE">ATTENDEE</a> and <a href="#ORGANIZER">ORGANIZER</a> values are prefixed by protocol ex.&quot;MAILTO:chair@ical.net&quot;.
+<a href="#ATTENDEE">ATTENDEE</a> and <a href="#ORGANIZER">ORGANIZER</a> values are prefixed by protocol like
+&quot;MAILTO:chair@kigkonsult.se&quot;.
+</p>
+<p class="label">Example 1</p>
+<p class="example">.. .
+$attendees = $vcalendar->getProperty( &quot;ATTENDEE&quot; );
+foreach( $attendees as $attendee => $occurrCount ) {
+.. .
+</p>
+<p class="label">Example 2</p>
+<p class="example">.. .
+$startDates = $vcalendar->getProperty( &quot;DTSTART&quot; );
+foreach( $startDates as $startDate => $occurrCount ) {
+.. .
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_property_functions">[up]</a>
@@ -1531,7 +1554,7 @@ A successful update returns TRUE.
 <p class="format">setProperty( string PropName, mixed Proparg_1 *[, mixed Proparg_n] )</p>
 propName case independent, strict rfc2445 <i>calendar</i> property names, unknown propName will be regarded as <a href="#X-PROPERTY">X-property</a>.
 <p class="label">Example</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config ); // <span class="ref">initiate new CALENDAR</span>
 $vcalendar->setProperty( &quot;calscale&quot;, &quot;GREGORIAN&quot; );
 </p>
@@ -1553,7 +1576,7 @@ Fetch property value.
 <p class="label">Format</p>
 <p class="format">getProperty( &quot;calscale&quot; )</p>
 <p class="label">Example</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 $calscale = $vcalendar->getProperty( &quot;calscale&quot; );
@@ -1592,7 +1615,7 @@ Fetch property value.
 <p class="label">Format</p>
 <p class="format">getProperty( &quot;method&quot; );</p>
 <p class="label">Example</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 $method = $vcalendar->getProperty( &quot;method&quot; )
@@ -1620,7 +1643,7 @@ Fetch property value.
 <p class="label">Format</p>
 <p class="format">getProperty( &quot;version&quot; )</p>
 <p class="label">Example</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 $version = $vcalendar->getProperty( &quot;version&quot; )
@@ -1668,7 +1691,7 @@ getProperty( &quot;&lt;X-PROPERTY&gt;&quot; )</p>
                      , &quot;params&quot; =&gt; params<span class="ref">&nbsp;3</span>))
 </p>
 <p class="label">Example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 while( $xprop = $vcalendar->getProperty( )) { //<span class="ref">read all x-props in a loop</span>
@@ -1676,7 +1699,7 @@ while( $xprop = $vcalendar->getProperty( )) { //<span class="ref">read all x-pro
 </p>
 <p class="comment">$xprop = array( propertyName<span class="ref">1</span>, propertyData<span class="ref">2</span> )</p>
 <p class="label">Example 2</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 if( $xprop = $vcalendar->getProperty( &quot;X-WR-TIMEZONE&quot; )) {
@@ -1685,7 +1708,7 @@ if( $xprop = $vcalendar->getProperty( &quot;X-WR-TIMEZONE&quot; )) {
 </p>
 <p class="comment">$xprop = array( &quot;X-WR-TIMEZONE&quot;, propertyData<span class="ref">2</span> )</p>
 <p class="label">Example 3</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 while( $xprop = $vcalendar->getProperty( FALSE, FALSE, TRUE )) {
@@ -1732,24 +1755,24 @@ Remove component with <a href="#UID">UID</a>. N.B <a href="#UID">UID</a> is NOT 
 <a href="#VALARM">ALARM</a> / <a href="#VTIMEZONE">TIMEZONE</a> components.
 <p class="format">deleteComponent( string <a href="#UID">UID</a> )</p>
 <p class="label">Example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
-$vcalendar = new vcalendar( $config );
-$vcalendar->parse();
-$vcalendar->deleteComponent( 1 );
-$vcalendar->deleteComponent( &quot;vtodo&quot;, 2 );
-$vcalendar->deleteComponent( &quot;20070803T194810CEST-0123U3PXiX@domain.com&quot;);
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
+$vcal = new vcalendar( $config );
+$vcal->parse();
+$vcal->deleteComponent( 1 );
+$vcal->deleteComponent( &quot;vtodo&quot;, 2 );
+$vcal->deleteComponent( &quot;20070803T194810CEST-0123U3PXiX@kigkonsult.se&quot;);
 .. .
 </p>
 <p class="label">Example 2</p>
 Deleting all components, using format 2 without order number.
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
-$vcalendar = new vcalendar( $config );
-$vcalendar->parse();
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
+$vcal = new vcalendar( $config );
+$vcal->parse();
 .. .
-while( $vcalendar->deleteComponent( &quot;vevent&quot;))
+while( $vcal->deleteComponent( &quot;vevent&quot;))
   continue;
 .. .
-$vtodo = $vcalendar->getComponent( &quot;vtodo&quot; );
+$vtodo = $vcal->getComponent( &quot;vtodo&quot; );
 while( $vtodo->deleteComponent( &quot;valarm&quot;))
   continue;
 .. .
@@ -1794,7 +1817,7 @@ propertyData = unique property value (strict case),
                datetime format &quot;YYYYMMDDTHHMMSS&quot;
 </p>
 <p class="label">Example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 while( $comp = $vcalendar->getComponent()) {
@@ -1803,7 +1826,7 @@ while( $comp = $vcalendar->getComponent()) {
 .. .
 </p>
 <p class="label">Example 2</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 if( $comp = $vcalendar->getComponent( 1 )) {
@@ -1812,7 +1835,7 @@ if( $comp = $vcalendar->getComponent( 1 )) {
 .. .
 </p>
 <p class="label">Example 3</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 if( $comp = $vcalendar->getComponent( &quot;vtodo&quot;, 2 ) {
@@ -1821,10 +1844,10 @@ if( $comp = $vcalendar->getComponent( &quot;vtodo&quot;, 2 ) {
 .. .
 </p>
 <p class="label">Example 4</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
-$uid = &quot;20070803T194810CEST-0123U3PXiX@domain.com&quot;;
+$uid = &quot;20070803T194810CEST-0123U3PXiX@kigkonsult.se&quot;;
 if($comp = $vcalendar->getComponent( $uid ){
 .. .
 }
@@ -1855,11 +1878,18 @@ Selects  <a href="#VEVENT">EVENT</a> / <a href="#VTODO">VTODO</a> / <a href="#VJ
 along with the <a href="#RRULE">RRULE</a>, <a href="#RDATE">RDATE</a>, <a href="#EXDATE">EXDATE</a> and <a href="#EXRULE">EXRULE</a> properties in the component.
 If property <a href="#DTSTART">DTSTART</a> is missing in a <a href="#VTODO">VTODO</a> component then <a href="#DTSTART">DUE</a> is used.<br>
 <br>
-Limitation; if using component properties <a href="#UID">UID</a> in combination with <a href="#SEQUENCE">SEQUENCE</a> and <a href="#RECURRENCE-ID">RECURRENCE-ID</a> (i.e an individual instance within the recurrence set),
-the use of recurrence-id parameter &quot;RANGE&quot; (&quot;THISANDPRIOR&quot; and/or &quot;THISANDFUTURE&quot;) has no effect.<br>
-<br>
-This function requires <i>calendar</i> components in order, i.e. execute <a href="#sort">sort</a> before &quot;selectComponents&quot;, notice example below.<br>
-<br>
+Limitations:
+<ul>
+<li>The values &quot;SECONDLY&quot; / &quot;MINUTELY&quot; / &quot;HOURLY&quot; in the &quot;FREQ&quot; rule part are NOT supported.
+<li>If using components with properties<br />
+<a href="#UID">UID</a> in combination with <a href="#SEQUENCE">SEQUENCE</a> and <a href="#RECURRENCE-ID">RECURRENCE-ID</a><br />
+(i.e. an individual instance within the recurrence set),<br />
+the <a href="#RECURRENCE-ID">RECURRENCE-ID</a> parameter &quot;RANGE&quot; (&quot;THISANDPRIOR&quot; / &quot;THISANDFUTURE&quot;) is NOT supported.<br>
+</ul>
+Requirement:
+<ul>
+<li><a href="#sort">sort</a> <b>MUST</b> be executed before &quot;selectComponents&quot;, notice example below.
+</ul>
 FALSE is returned if no selected component exists.
 <p class="format">selectComponents([ int startYear, int startMonth, int startDay
                 [, int endYear,   int endMonth,   int endDay
@@ -1920,13 +1950,17 @@ foreach( $events_arr as $year =&gt; $year_arr ) {
         $description = $event->getProperty( &quot;description&quot; );
         .. .
 </p>
+<a name="selectComponents2"></a>
 <p class="label">format 2</p>
 Using this format, the function selects components based on specific property value(-s),
 <a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#LOCATION">LOCATION</a>, <a href="#ORGANIZER">ORGANIZER</a>, <a href="#PRIORITY">PRIORITY</a>, <a href="#RESOURCES">RESOURCES</a>, <a href="#STATUS">STATUS</a>, <a href="#SUMMARY">SUMMARY</a> or <a href="#UID">UID</a>.
 For the property &quot;SUMMARY&quot; ,if a search value (any case) exists within property value, a hit is found.
 For the other properties an exact (strict case) match is required.<br>
 <a href="#ATTENDEE">ATTENDEE</a> and <a href="#ORGANIZER">ORGANIZER</a> search values must be prefixed by protocol ex. &quot;MAILTO:chair@ical.net&quot;.
-Multiple search properties may coexist. For retrieving property values, see <a href="#getProperty">getProperty</a> (Format 2) on <i>calendar</i> level.
+Multiple search properties may coexist.
+<br>
+<br>
+To retrieve property values, see <a href="#getProperty2">getProperty</a> (Format 2) on <i>calendar</i> level.
 <p class="format">selectComponents( searchArray )</p>
 Outputs an array of matched (unique) components in <a href="#UID">UID</a> order.
 <p class="comment">searchArray   : array( propertyName =&gt; propertyValue )
@@ -1980,7 +2014,7 @@ N.B <a href="#UID">UID</a> is NOT set for <a href="#VALARM">ALARM</a> / <a href=
 If <a href="#UID">UID</a> is not found, component is inserted last in chain.
 <p class="format">setComponent( component, string <a href="#UID">UID</a> )</p>
 <p class="label">Example</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 $vevent = vcalendar->getComponent( 1 );&nbsp;//<span class="comment">fetch first EVENT</span>
@@ -2014,7 +2048,7 @@ If parse error  occurs (like file access error, invalid <i>calendar</i> file or 
               array  calendarContent
                      ex. result from - file( &quot;filename&quot;, FILE_IGNORE_NEW_LINES )</p>
 <p class="label">parse example 1</p>
-<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
+<p class="example">$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar = new vcalendar( $config );
 $vcalendar->parse();
 .. .
@@ -2034,7 +2068,7 @@ $vcalendar = new vcalendar( $config );
 ...
 $str = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//test.org//NONSGML kigkonsult.se iCalcreator 2.10.20//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.10.23//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2175,7 +2209,7 @@ Sort created/parsed <i>calendar</i> components on specific property values and a
 <p class="format">sort( sortArgument )</p>
 <p class="comment">sortArgument: &quot;<a href="#ATTENDEE">ATTENDEE</a>&quot; / &quot;<a href="#CATEGORIES">CATEGORIES</a>&quot; / &quot;<a href="#DTSTAMP">DTSTAMP</a>&quot; / &quot;<a href="#LOCATION">LOCATION"</a>&quot; /
               &quot;<a href="#ORGANIZER">ORGANIZER</a>&quot; /&quot;<a href="#RESOURCES">RESOURCES</a>&quot; / &quot;<a href="#PRIORITY">PRIORITY</a>&quot; / &quot;<a href="#STATUS">STATUS</a>&quot; / &quot;<a href="#SUMMARY">SUMMARY</a>&quot;
-              for a property where multiple ocurrence may exist
+              for a property where multiple occurrence may exist
               (<a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#RESOURCES">RESOURCES</a> ),
               lowest (alphabetic) value is used as sort parameter.
 </p>
@@ -3208,7 +3242,7 @@ Insert property value.
 <br>
 Parameters, if any, will be ordered as prescribed in rcf2445.
 <p class="label">Format</p>
-<p class="format">setproperty( &quot;contact&quot;, contactValue [, params [, propOrderNo ]] )</p>
+<p class="format">setProperty( &quot;contact&quot;, contactValue [, params [, propOrderNo ]] )</p>
 <p class="comment">contactValue<span class="ref">1</span> = Value type TEXT
 params<span class="ref">2</span>       = array ( [&quot;ALTREP&quot; =&gt; &quot;&lt;an alternate text representation, URI&gt;&quot;]
                         [, &quot;LANGUAGE&quot; =&gt; &quot;&lt;lang&gt;&quot;]
@@ -4190,7 +4224,7 @@ completedDate  = int year
 completedDate  = array( int year
                       , int month
                       , int day
-                     [, int hour
+                      [, int hour
                       , int min
                       , int sec
                      [, offset ]] )
@@ -5284,7 +5318,7 @@ Fetch property value.
 <h5>Set TZOFFSETTO</h5>
 Insert property value.
 <p class="label">Format</p>
-<p class="format">setproperty( &quot;tzoffsetto&quot;, tzoffsetto [, xparam ] )</p>
+<p class="format">setProperty( &quot;tzoffsetto&quot;, tzoffsetto [, xparam ] )</p>
 <p class="comment">tzoffsetto<span class="ref">1</span> = (+/-)HHmm[ss], UTC offset
 xparam<span class="ref">2</span>     = array( *[ xparamkey =&gt; xparamvalue ] )</p>
 <p class="label">Example</p>
@@ -5386,7 +5420,7 @@ Do <b>NOT</b> use an integer UID or only a component name in UID (ex. &quot;veve
 <p class="comment">uid<span class="ref">1</span>    = Value type TEXT
 xparam<span class="ref">2</span> = array( *[ xparamkey =&gt; xparamvalue ] )</p>
 <p class="label">Example</p>
-<p class="example">$vevent->setProperty(&quot;uid&quot;,&quot;20070803T194810CEST-0123U3PXiX@domain.com&quot;);</p>
+<p class="example">$vevent->setProperty(&quot;uid&quot;,&quot;20070803T194810CEST-0123U3PXiX@kigkonsult.se&quot;);</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
@@ -5671,6 +5705,10 @@ The function, applied on a iCalcrator instance and using a <i>PHP</i> valid time
 creates simple vtimezone, standard and (opt.) daylight components, based on <i>PHP</i> DateTimeZone class and
 the most recent transition dates for the timezone.<br>
 (<i>PHP</i> 5 >= 5.2.0)
+<br>
+<br>
+Note, only when timezone NOT is UTC.
+For dates with UTC DATE-TIME, read <a href="#DATE_WITH_UTC_TIME">this</a>!
 <br>
 <br>
 FALSE is returned if not using a <i>PHP</i> valid timezone.

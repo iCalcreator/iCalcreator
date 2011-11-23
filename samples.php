@@ -1,6 +1,6 @@
 <?php
 /**
- * iCalcreator v2.10.20
+ * iCalcreator v2.10.23
  * copyright (c) 2007-2011 Kjell-Inge Gustafsson, kigkonsult
  * kigkonsult.se/iCalcreator/index.php
  * ical@kigkonsult.se
