@@ -13,7 +13,7 @@ in iCalcreator.class.php file
 
 ######################------------------------##################################
 2.10.27 - fixed, tested
-parsing extended (MS outlook) time zones
+parsing dates with extended (MS outlook) time zones
 
 ######################------------------------##################################
 2.10.28 - fixed, tested
@@ -26,19 +26,19 @@ ny function ms2phpTZ
 
 ######################------------------------##################################
 2.10.30 - testing + pending external verification
-external (iCalUtilityFunctions) helper contributions
+external (iCalUtilityFunctions) time zone helper contributions
 
 ######################------------------------##################################
 ######################------------------------##################################
 2.11.1 - fixed, tested
-new  (helper) function iCal2XML ('inner' _addXMLchild),
-creation of rfc6321 XML output
+creation of rfc6321 XML output, input iCalcreator instance
+new (helper) function iCal2XML ('inner' _addXMLchild),
 
 ######################------------------------##################################
 2.11.2 - fixed - tested
+parse of rfc6321 XML input (string/file), output iCalcreator instance
 new (helper) functions: XMLstr2iCal, XMLfile2iCal, XML2iCal
 ('inner' functions:_getXMLParams, _getXMLComponents, _getXMLProperties)
-  parse of rfc6321 XML input (string/file), output iCalcreator instance
 
 ######################------------------------##################################
 2.11.3 - fixed, tested
@@ -62,12 +62,17 @@ adapt for "http://ietfreport.isoc.org/all-ids/draft-hare-xcalendar-03.txt"
 bug in function getConfig, 'directory' or 'filename' couldn't be '0' (zero)
 
 ######################------------------------##################################
-2.11.8 - fixed - tested BUT will be reworked
-upd createTimezone (_setTZrrule), fixing from/to UTC offset and rrule until
+2.11.8 - fixed - tested BUT subject to be reworked
+upd createTimezone (_setTZrrule), fixing from/to UTC offset and rdate(-s)
+
+parsing datetime on time zone transition date
+upd functions: _format_date_time, _setDate, _setDate2, setRdate, setExdate, 
+               _setRexrule, _isArrayDate
+new function:  _strDate2arr
 
 ######################------------------------##################################
 2.11.9 - fixed - tested
-check x-props, start with 'x-'/'X-'
+check x-props names, start with 'x-'/'X-'
 
 ######################------------------------##################################
 2.11.10 - fixed - tested
@@ -82,3 +87,7 @@ always update PRODID when (re-)setting 'unique_id'
 update management of (Attendee) parameter value lists
 update rfc5545 parameters with 'DQUOTE' settings
 function createAttendee and _createParams
+
+######################------------------------##################################
+2.11.13 - fixed - tested
+upd _size75, correct line break when property content ends with '0' at pos 76
