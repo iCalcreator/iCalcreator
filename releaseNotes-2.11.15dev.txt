@@ -12,7 +12,7 @@ Concatenate iCalcreator, utilityFunction and helper functions
 in iCalcreator.class.php file
 
 ######################------------------------##################################
-2.10.27 - fixed, tested
+2.10.27 - (re-)fixed, (re-)tested
 parsing dates with extended (MS outlook) time zones
 
 ######################------------------------##################################
@@ -91,3 +91,11 @@ function createAttendee and _createParams
 ######################------------------------##################################
 2.11.13 - fixed - tested
 upd _size75, correct line break when property content ends with '0' at pos 76
+
+######################------------------------##################################
+2.11.14 - fixed - tested
+upd function transformDateTime, now accepting input date in array format
+
+######################------------------------##################################
+2.11.15 - fixed - tested
+bug in function _setRexrule, UNTIL in DATE format
