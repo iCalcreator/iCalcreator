@@ -54,7 +54,7 @@ updated _setDate _setDate2, setExdate, setRdate, utc offset management
 if TZID=GMT/UTC, date-time(-s) are always suffixed by 'Z'
 
 ######################------------------------##################################
-2.11.6 delayed
+2.11.6 deferred
 adapt for "http://ietfreport.isoc.org/all-ids/draft-hare-xcalendar-03.txt"
 
 ######################------------------------##################################
@@ -99,3 +99,30 @@ upd function transformDateTime, now accepting input date in array format
 ######################------------------------##################################
 2.11.15 - fixed - tested
 bug in function _setRexrule, UNTIL in DATE format
+
+######################------------------------##################################
+2.11.16 - fixed -  + pending external verification
+property ATTACH and large file attachments
+
+######################------------------------##################################
+2.11.17  - fixed - tested
+bug in ATTENDEE, parsing error
+
+######################------------------------##################################
+2.11.18 - rejected
+
+######################------------------------##################################
+2.11.19 - fixing
+upd using.html
+
+######################------------------------##################################
+2.11.20 - fixed - tested
+upd createComponent, sorting standard/daylight subComponents
+
+######################------------------------##################################
+2.11.21 - fixed - tested
+bug in selectComponents: long 'event' starting before period
+
+######################------------------------##################################
+2.11.22 - fixed - tested
+bug in selectComponents, allDayEvent mgnt
