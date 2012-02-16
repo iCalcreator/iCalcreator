@@ -1,8 +1,8 @@
 <?php
 /*********************************************************************************/
 /**
- * iCalcreator v2.11.22dev
- * copyright (c) 2007-2011 Kjell-Inge Gustafsson kigkonsult
+ * iCalcreator v2.12rc1
+ * copyright (c) 2007-2012 Kjell-Inge Gustafsson kigkonsult
  * kigkonsult.se/iCalcreator/index.php
  * ical@kigkonsult.se
  *
@@ -52,7 +52,7 @@ if( substr( phpversion(), 0, 3 ) >= '5.1' )
   date_default_timezone_set( 'Europe/Stockholm' );
 /*********************************************************************************/
 /*         version, do NOT remove!!                                              */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.11.22dev' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.12rc1' );
 /*********************************************************************************/
 /*********************************************************************************/
 /**
@@ -1026,7 +1026,7 @@ class vcalendar {
  * No date controls occurs.
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.11.22 - 2012-02-10
+ * @since 2.11.22 - 2012-02-13
  * @param mixed $startY optional, start Year,  default current Year ALT. array selecOptions ( *[ <propName> => <uniqueValue> ] )
  * @param int   $startM optional, start Month, default current Month
  * @param int   $startD optional, start Day,   default current Day
@@ -1176,8 +1176,8 @@ class vcalendar {
         } while( TRUE );
       } // end recurrence-id test
             /* select only components with.. . */
-      if(( !$any && ( $startWdate >= $startDate ) && ( $startWdate <= $endDate )) || // (dt)start within period
-         (  $any && ( $startWdate < $endDate ) && ( $endWdate < $endDate ))) {       // occurs within the period
+      if(( !$any && ( $startWdate >= $startDate ) && ( $startWdate <= $endDate )) || // (dt)start within the period
+         (  $any && ( $startWdate < $endDate ) && ( $endWdate >= $startDate ))) {    // occurs within the period
             /* add the selected component (WITHIN valid dates) to output array */
         if( $flat ) { // any=true/false, ignores split
           if( !$recurrid )
@@ -2121,7 +2121,6 @@ class calendarComponent {
  * creates formatted output for calendar component property attach
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 0.9.7 - 2006-11-23
  * @since 2.11.16 - 2012-02-04
  * @return string
  */
@@ -2131,7 +2130,6 @@ class calendarComponent {
     foreach( $this->attach as $attachPart ) {
       if( !empty( $attachPart['value'] )) {
         $attributes = $this->_createParams( $attachPart['params'] );
-/* 2.11.16 try-out fix, start */
         if(( 'xcal' != $this->format ) && isset( $attachPart['params']['VALUE'] ) && ( 'BINARY' == $attachPart['params']['VALUE'] )) {
           $attributes = str_replace( $this->intAttrDelimiter, $this->attributeDelimiter, $attributes );
           $str        = 'ATTACH'.$attributes.$this->valueInit.$attachPart['value'];
@@ -2144,7 +2142,6 @@ class calendarComponent {
             $output  .= $this->nl;
           return $output;
         }
-/* 2.11.16 try-out fix, end */
         $output    .= $this->_createElement( 'ATTACH', $attributes, $attachPart['value'] );
       }
       elseif( $this->getConfig( 'allowEmpty' )) $output .= $this->_createElement( 'ATTACH' );
@@ -6296,7 +6293,7 @@ class calendarComponent {
  * Fix uses var $breakAtChar=75 and breaks the line at $breakAtChar-1 if need be.
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since   - 2012-01-20
+ * @since 2.11.13 - 2012-02-14
  * @param string $value
  * @return string
  */
@@ -6366,6 +6363,8 @@ class calendarComponent {
       else
         $tmp  = ' '.$tmp;
     } // end while
+    if( '\n'.$this->nl == substr( $string, ( 0 - strlen( '\n'.$this->nl ))))
+      $string = substr( $string, 0, ( strlen( $string ) - strlen( '\n'.$this->nl ))).$this->nl;
     return $string;
   }
 /**
@@ -7233,7 +7232,7 @@ class iCalUtilityFunctions {
     catch( Exception $e ) {
       return FALSE;
     }
-    if( !empty( $to ))
+    if( empty( $to ))
       $dates             = array_keys( $calendar->getProperty( 'dtstart' ));
     $transCnt            = 2; // number of transitions in output if empty input $from/$to and an empty dates-array
     $dateFrom            = new DateTime( 'now' );
@@ -7249,8 +7248,10 @@ class iCalUtilityFunctions {
     if( !empty( $to ))
       $dateTo->setTimestamp( $to );
     else {
-      if( !empty( $dates ))
+      if( !empty( $dates )) {
         $dateTo          = new DateTime( end( $dates ));         // set highest date to the highest dtstart date
+        $to              = $dateTo->getTimestamp();              // set mark that a highest date is found
+      }
       $dateTo->modify( '+1 year' );                              // set $dateTo to one year after the highest date
     }
     $dateTo->setTimezone( $utcTz );                              // convert local date to UTC
@@ -7260,7 +7261,8 @@ class iCalUtilityFunctions {
     $date = new DateTime( 'now', $utcTz );
     foreach( $transitions as $tix => $trans ) {                  // all transitions in date-time order!!
       $date->setTimestamp( $trans['ts'] );                       // set transition date (UTC)
-      if ( !empty( $from ) && ( $date < $dateFrom )) {
+//      if ( !empty( $from ) && ( $date < $dateFrom )) {
+      if ( $date < $dateFrom ) {
         $prevOffsetfrom  = $trans['offset'];                     // previous trans offset will be 'next' trans offsetFrom
         continue;
       }
@@ -7303,7 +7305,7 @@ class iCalUtilityFunctions {
         }
         $dlghtIx         = $tix;
         $dlghtCnt       += 1;
-      } // edn daylight timezone
+      } // end daylight timezone
       if( empty( $to ) && ( $transCnt == count( $transTemp ))) { // store only $transCnt transitions
         if( TRUE !== $transTemp[0]['isdst'] )
           $stdCnt       -= 1;

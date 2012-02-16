@@ -4,9 +4,6 @@ upd returnCalendar, only create header 'content-length'
 when gziping output
 
 ######################------------------------##################################
-2.10.25 no error, input typo
-
-######################------------------------##################################
 2.10.26       - fixed, tested
 Concatenate iCalcreator, utilityFunction and helper functions 
 in iCalcreator.class.php file
@@ -27,6 +24,8 @@ ny function ms2phpTZ
 ######################------------------------##################################
 2.10.30 - testing + pending external verification
 external (iCalUtilityFunctions) time zone helper contributions
+
+will be included after verification!
 
 ######################------------------------##################################
 ######################------------------------##################################
@@ -54,15 +53,11 @@ updated _setDate _setDate2, setExdate, setRdate, utc offset management
 if TZID=GMT/UTC, date-time(-s) are always suffixed by 'Z'
 
 ######################------------------------##################################
-2.11.6 deferred
-adapt for "http://ietfreport.isoc.org/all-ids/draft-hare-xcalendar-03.txt"
-
-######################------------------------##################################
 2.11.7- fixed - tested
-bug in function getConfig, 'directory' or 'filename' couldn't be '0' (zero)
+bug in function getConfig, 'directory' or 'filename' couldn't accept '0' (zero)
 
 ######################------------------------##################################
-2.11.8 - fixed - tested BUT subject to be reworked
+2.11.8 - fixed - tested, reworked/retested.. .
 upd createTimezone (_setTZrrule), fixing from/to UTC offset and rdate(-s)
 
 parsing datetime on time zone transition date
@@ -107,9 +102,6 @@ property ATTACH and large file attachments
 ######################------------------------##################################
 2.11.17  - fixed - tested
 bug in ATTENDEE, parsing error
-
-######################------------------------##################################
-2.11.18 - rejected
 
 ######################------------------------##################################
 2.11.19 - fixing
