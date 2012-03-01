@@ -1,5 +1,5 @@
 ######################------------------------##################################
-2.10.24 - fixed, testing, pending external verification
+2.10.24 - fixed, tested
 upd returnCalendar, only create header 'content-length'
 when gziping output
 
@@ -23,9 +23,8 @@ ny function ms2phpTZ
 
 ######################------------------------##################################
 2.10.30 - testing + pending external verification
-external (iCalUtilityFunctions) time zone helper contributions
-
-will be included after verification!
+external (iCalUtilityFunctions) time zone helper contributions:
+getTimezonesAsDateArrays (expandTimezoneDates) and getTzOffsetForDate funvtions
 
 ######################------------------------##################################
 ######################------------------------##################################
@@ -96,7 +95,7 @@ upd function transformDateTime, now accepting input date in array format
 bug in function _setRexrule, UNTIL in DATE format
 
 ######################------------------------##################################
-2.11.16 - fixed -  + pending external verification
+2.11.16 - fixed - tested
 property ATTACH and large file attachments
 
 ######################------------------------##################################
@@ -116,5 +115,11 @@ upd createComponent, sorting standard/daylight subComponents
 bug in selectComponents: long 'event' starting before period
 
 ######################------------------------##################################
-2.11.22 - fixed - tested
-bug in selectComponents, allDayEvent mgnt
+2.11.23 - fixed - tested
+bug: create FREEBUSY, empty property
+
+######################------------------------##################################
+2.11.24 - fixed - tested
+bug: set/create RELATED-TO mgnt
+
+######################------------------------##################################
