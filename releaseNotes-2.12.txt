@@ -1,0 +1,88 @@
+2.10.24 ######################
+upd returnCalendar, only create header 'content-length' when gziping output
+
+2.10.26 ######################
+Concatenate iCalcreator, utilityFunction and helper functions in iCalcreator.class.php file
+
+2.10.27 ######################
+parsing dates with extended (MS outlook) time zones
+
+2.10.28 ######################
+bug in function selectComponents, (continue if) missing dtstart
+
+2.10.29 ######################
+new function ms2phpTZ, (very) simple mapping of MS outlook time zones to PHP
+
+2.10.30 ###################### thanks Yitzchok
+external (iCalUtilityFunctions) time zone helper contributions:getTimezonesAsDateArrays (expandTimezoneDates) and getTzOffsetForDate functions
+
+2.11.1 ######################
+creation of rfc6321 XML output, input iCalcreator instance
+new (helper) function iCal2XML ('inner' _addXMLchild),
+
+2.11.2 ######################
+parse of rfc6321 XML input (string/file), output iCalcreator instance
+new (helper) functions: XMLstr2iCal, XMLfile2iCal, XML2iCal
+('inner' functions:_getXMLParams, _getXMLComponents, _getXMLProperties)
+
+2.11.3 ######################
+bug in getProperty, management of properties with multiple ocurrences
+
+2.11.4 ######################
+bug in _tz2offset, plus/minus error
+
+2.11.5 ######################
+updated _setDate _setDate2, setExdate, setRdate, utc offset management, Z-suffix
+
+2.11.7 ######################
+bug in function getConfig, 'directory' or 'filename' couldn't accept '0' (zero)
+
+2.11.8 ######################
+upd createTimezone (_setTZrrule), fixing from/to UTC offset and rdate(-s)
+upd functions: _format_date_time, _setDate, _setDate2, setRdate, setExdate, 
+               _setRexrule, _isArrayDate
+new function:  _strDate2arr
+
+2.11.9 ######################
+check x-props names, start with 'x-'/'X-'
+
+2.11.10 ######################
+function parse, management of list content in TEXT properties
+
+2.11.11 ######################
+always update PRODID when (re-)setting 'unique_id'
+
+2.11.12 ######################
+update management of (Attendee) parameter value lists
+update rfc5545 parameters with 'DQUOTE' settings
+function createAttendee and _createParams
+
+2.11.13 ######################
+upd _size75, correct line break when property content ends with '0' at pos 76
+
+2.11.14 ######################
+upd function transformDateTime, now accepting input date in array format
+
+2.11.15 ######################
+bug in function _setRexrule, UNTIL in DATE format
+
+2.11.16 ######################
+property ATTACH and large file attachments
+
+2.11.17 ######################
+bug in ATTENDEE, parsing error
+
+2.11.19 ######################
+upd using.html
+
+2.11.20 ######################
+upd createComponent, sorting standard/daylight subComponents
+
+2.11.21 ######################
+bug in selectComponents: long 'event' starting before period
+
+2.11.23 ######################
+bug: create FREEBUSY, empty property
+
+2.11.24 ######################
+bug: set/create RELATED-TO mgnt
