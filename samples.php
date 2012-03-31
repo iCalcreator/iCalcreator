@@ -1,9 +1,9 @@
 <?php
 /**
- * iCalcreator v2.10.23
- * copyright (c) 2007-2011 Kjell-Inge Gustafsson, kigkonsult
+ * iCalcreator v2.12
+ * copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult
  * kigkonsult.se/iCalcreator/index.php
- * ical@kigkonsult.se
+ * kigkonsult.se/contact/index.php
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
