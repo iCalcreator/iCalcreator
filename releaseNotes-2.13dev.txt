@@ -1,0 +1,84 @@
+######################------------------------##################################
+2.12.1 - fixed
+NEW: adapted for hiphop
+http://php.webtutor.pl/en/2011/05/10/hiphop-for-php-unimplemented-functions-and-features/
+function iCal2XML and XML2iCal NOT supported (using SimpleXML)
+
+######################------------------------##################################
+2.12.2 - fixed - tested
+NEW: export ATTENDEEs, ORGANIZERs and CONTACTs (if internet email format) as vcard
+new functions iCal2vCard, iCal2vCards
+
+######################------------------------##################################
+2.12.3 - fixed - tested
+BUG: Typo error in function iCal2XML
+
+######################------------------------##################################
+2.12.4 - fixed - tested
+NEW: function getProperty: added argument 'GEOLOCATION'
+if GEO is set, will give output supporting
+ISO6709 "Standard representation of geographic point location by coordinates"
+
+######################------------------------##################################
+2.12.5 - fixed - tested
+BUG: function setGEO, latitude/longitud input format
+accepts zero (0) as input, int input converted to float
+
+######################------------------------##################################
+2.12.6 - fixed - tested
+UPDATE: function createGEO, latitude/longitud output format
+output: latitude: two digits, up to six decimal fractions
+        longitude: one digit up to six decimal fractions
+
+######################------------------------##################################
+2.12.7 - fixed - tested
+BUG: function getProperty (_getProperties): empty properties mngnt
+
+######################------------------------##################################
+2.12.8 - fixed - tested
+NEW: functions getProperty, getComponent and selectComponents, argument CONTACT
+
+######################------------------------##################################
+2.12.9 - fixed - tested
+NEW: functions getProperty, getComponent and selectComponents, argument URL
+
+######################------------------------##################################
+2.12.10 - rejected
+
+######################------------------------##################################
+2.12.11 - fixed - tested
+BUG: wrap PRODID at 75 pos
+
+######################------------------------##################################
+2.12.12 - fixed - tested
+BUG: language, set at calendar level, must affect the PRODID property
+
+######################------------------------##################################
+2.12.13 - rejected
+
+######################------------------------##################################
+2.12.14 - fixed - tested
+UPDATE: removed default_timezone setting
+
+######################------------------------##################################
+2.12.15 - ongoing
+Updating using.html
+
+######################------------------------##################################
+2.12.16 - fixed - tested
+UPDATE: optimized method _size75
+
+######################------------------------##################################
+2.12.17 - fixed - tested
+UPDATE: managing (mixed) EOLs when parsing files
+"non rfc5545/rfc2445 line ending characters"
+functions parse
+
+######################------------------------##################################
+2.12.18 - fixed - tested
+BUG: functions setAttendee/setOrganizer, managing prefix MAILTO
+
+######################------------------------##################################
+2.13.1 - ongoing
+updating test platform
+
