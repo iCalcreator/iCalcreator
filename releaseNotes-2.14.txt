@@ -1,0 +1,55 @@
+Release main points are 
+ enhance management of Relationship Component Properties
+  ATTENDEE, CONTACT, ORGANIZER, RECURRENCE-ID, RELATED-TO, URL, UID
+ updated file parse mgnt
+ line 75 pos char. split functionality
+ GEOLOCATION and vCard exports
+2.12.1 ######################
+NEW: hiphop adaptations, http://php.webtutor.pl/en/2011/05/10/hiphop-for-php-unimplemented-functions-and-features/
+     function iCal2XML and XML2iCal NOT supported (using SimpleXML)
+2.12.2 ######################
+NEW: export ATTENDEEs, ORGANIZERs and CONTACTs (if formatted as internet email) as vcard
+     new functions iCal2vCard, iCal2vCards
+2.12.3 ######################
+BUG: Typo error in function iCal2XML
+2.12.4 ######################
+NEW: function getProperty: added argument 'GEOLOCATION' will give output supporting
+     ISO6709 "Standard representation of geographic point location by coordinates"
+2.12.5 ######################
+BUG: function setGEO input format, accepts 0 (zero) as input
+2.12.6 ######################
+BUG: function createGEO output format
+2.12.7 ######################
+BUG: function getProperty (_getProperties): empty properties mngnt
+2.12.8 ######################
+UPDATE: expand functions getProperty, (_getProperties,) getComponent, selectComponents and sort with CONTACTs
+2.12.9 ######################
+UPDATE: expand functions getProperty, (_getProperties,) getComponent, selectComponents and sort with URLs
+2.12.10 ######################
+rejected
+2.12.11 ###################### thanks Patrick L
+BUG: function createPRODID, wrap PRODID at 75 pos
+2.12.12 ###################### thanks Patrick L
+BUG: language, set at calendar level, MUST affect the PRODID property
+2.12.13 ###################### thanks Joachim P
+BUG: function _size75, string split problems
+2.12.14 ######################
+UPDATE: removed default_timezone setting inside class file
+2.12.15 ######################
+UPDATE: using.html
+2.12.16 ######################
+UPDATE: optimized method _size75 (removed mbstring part)
+2.12.17 ###################### thanks Yani I
+UPDATE: function parse, line endings + empty lines mgnt
+2.12.18 ######################
+BUG: function setAttendee/setOrganizer, mgnt prefix MAILTO
+2.13.1 ######################
+UPDATE: test platform
+2.13.2 ###################### thanks jpirkey
+UPDATE: function createTimezone, mgnt no match within date period
+2.13.3 ######################
+BUG: function sort (_cmpfcn), sorting on argument, properties allowing multiple values, datetime
+2.13.4 ######################
+UPDATE: expand functions getProperty, (_getProperties,) getComponent, selectComponents and sort with RELATED-TOs
+2.13.5 ######################
+BUG: function getComponents, multiple property search values
