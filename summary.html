@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.14 summary</title>
+<title>iCalcreator 2.16 summary</title>
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult" />
 <meta name="copyright"   content="2007-2012 Kjell-Inge Gustafsson - kigkonsult" />
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create" />
@@ -53,9 +53,9 @@ pre {
 </head>
 <body>
 
-<h1>iCalcreator v2.14</h1>
+<h1>iCalcreator v2.16</h1>
 <p>
-iCalcreator v2.14<br>
+iCalcreator v2.16<br>
 copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">kigkonsult.se contact</a>
@@ -143,7 +143,7 @@ Use the <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/co
 <p>
 At <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult iCalcreator" target="_blank">kigkonsult.se</a> you can download the 
 <a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank">complete manual</a>
-and review and explore the iCalcreator 
+and review and explore iCalcreator usage at the 
 <a href="http://kigkonsult.se/test/index.php" title="kigkonsult.se iCalcreator implement and test examples" target="_blank">coding and test</a> pages.
 </p>
 
@@ -178,10 +178,11 @@ To really boost performance, visit kigkonsult.se contact <a href="http://kigkons
 <pre>&lt;?php
 .. .
 require_once( &quot;iCalcreator.class.php&quot; );
-$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id, </span>
-.. .                                                       // <span class="comment">required if any component UID is missing</span>
-$v = new vcalendar( $config );                             // <span class="comment">create a new calendar object instance</span>
 $tz = &quot;Europe/Stockholm&quot;;                                  // <span class="comment">define time zone</span>
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,           // <span class="comment">set Your unique id, </span>
+                                                           // <span class="comment">required if any component UID is missing</span>
+                 &quot;TZID&quot;      =&gt; $tz );                     // <span class="comment">opt. set &quot;calendar&quot; timezone</span>
+$v = new vcalendar( $config );                             // <span class="comment">create a new calendar object instance</span>
 
 $v->setProperty( &quot;method&quot;, &quot;PUBLISH&quot; );                    // <span class="comment">required of some <strong>calendar</strong> software</span>
 $v->setProperty( &quot;x-wr-calname&quot;, &quot;Calendar Sample&quot; );      // <span class="comment">required of some <strong>calendar</strong> software</span>
@@ -477,7 +478,7 @@ $mlstr = iCal2XML( $v );                                   // <span class="comme
 
 <h4>Copyright</h4>
 <p>
-iCalcreator v2.14<br>
+iCalcreator v2.16<br>
 copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">kigkonsult.se contact</a><br>

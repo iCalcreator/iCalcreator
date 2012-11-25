@@ -1,0 +1,67 @@
+Release focus are PHP 5.2 dateTime adaptions
+2.14.1 ######################
+BUG: dateTime and timestamp mgnt, sourceforge.net/tracker:3566702
+     iCalcreator now requires PHP >= 5.2
+     updated functions:
+       _makeDtstamp
+       _chkdatecfg
+       _setDate
+       _setDate2
+       _strdate2date
+       _date2timestamp
+       _duration2date
+       _date2strdate
+       _isOffset
+       _setRexrule
+       _stepdate
+       _timestamp2date
+       _tz2offset
+       createTimezone
+       transformDateTime
+       ms2phpTZ
+       iCal2XML
+     changed function names:
+       _date_time_string to _strdate2date
+       _format_date_time to _date2strdate
+       _date_time_arraye to _chkDateArr
+       _duration_array   to _duration2arr
+       _duration_string  to _durationStr2arr
+       _format_duration  to _duration2str
+2.14.2 ######################
+UPDATE using.html when and where using setConfig and 'TZID'
+2.14.3 ######################
+BUG: function createTimezone
+2.14.4 ######################
+UPDATE: moving the config setting of TZID from property create- to set-functions (DTSTART, DTEND, DUE, 'RECURRENCE-ID)
+2.14.5 ######################
+UPDATE: using.html , document all iCalUtilityFunctions date(-time)/timestamp-functions
+2.14.6 ######################
+removed the unused iCalUtilityFunctions::_date2duration function
+2.15.1 ######################
+BUG: PHP 5.2 adaption (dateTime and timestamp)
+     functions: createTimezone, _timestamp2date, transformDateTime
+2.15.2 ######################
+UPDATE: test resources, new jquery version
+2.15.3 ######################
+UPDATE: using.doc specifically PHP >= 5.2.0."
+2.15.4 ######################
+UPDATE: optimization function copy
+2.15.5 ######################
+UPDATE: optimization, iCal2XML, _addXMLchild
+2.15.6 ######################
+NEW: config directive setPropertyNames
+     returns array of property names for all set properties in component
+     functions: getConfig, iCal2XML
+2.15.7 ######################
+- rejected
+2.15.8 ######################
+UPDATE: allow (empty) hour/minute/second parts in trigger/duration, github issues 2
+        function _duration2str
+2.15.9 ######################
+- rejected
+2.15.10 ######################
+BUG: function parse, ignoring all non-standard iCal properties, github issues 1
+2.15.11 ######################
+UPDATE: test resources
+2.15.12 ######################
+BUG: function _duration2date

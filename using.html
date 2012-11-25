@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.14 manual</title>
+<title>iCalcreator 2.16 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult">
 <meta name="copyright"   content="2007-2012 Kjell-Inge Gustafsson - kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.14">
+<meta name="description" content="using iCalcreator v2.16">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -14,15 +14,14 @@
   COLOR           : black;
   FONT-SIZE       : small;
 }
-a.ref {
-  BACKGROUND-COLOR: inherit;
-  xFONT-FAMILY     : Areal;
-  FONT-SIZE       : 8pt;
-  LETTER-SPACING  : 0.1em;
-}
 body {
   MARGIN-LEFT     : 10px;
   WIDTH           : 750px;
+}
+a.ref {
+  BACKGROUND-COLOR: inherit;
+  FONT-SIZE       : 8pt;
+  LETTER-SPACING  : 0.1em;
 }
 h1 {
   BACKGROUND-COLOR: silver;
@@ -140,9 +139,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.14</p>
+<p class="header">iCalcreator v2.16</p>
 <p>
-iCalcreator v2.14<br>
+iCalcreator v2.16<br>
 copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
@@ -153,7 +152,7 @@ copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
 iCalcreator is a <em>PHP</em> implementation of RFC2445/RFC2446 to manage iCal/xCal formatted files.
 </p>
 
-<a name="INTRO"></a><h1>1. INTRO</h1>
+<a name="INTRO"></a><h1>1 INTRO</h1>
 <p>
 iCalcreator is a <em>PHP</em> class package managing iCal files, supporting (non-)<strong>calendar</strong>
 systems and applications to process and communicate <strong>calendar</strong> information like
@@ -164,14 +163,14 @@ iCalcreator features create, parse, edit and select <strong>calendar</strong> an
 </p>
 <p>
 The iCalcreator package, built of a <strong>calendar</strong> class with support of a function class and helper functions,
-are <strong>calendar</strong> component property oriented. Development environment is <em>PHP</em> version 5.x
-but coding is done to meet 4.x backward compatibility and may work. Some functions requires <em>PHP</em> >= 5.2.0.
+are <strong>calendar</strong> component property oriented. For iCalcreator 2.16 version (and later), 
+<em>PHP</em> version &gt;= 5.2.0 is required, due to the use of <em>PHP</em> DateTime class (and related functions) .
 </p>
 <p>
 The iCalcreator main class, utility class and helper functions are all included in the &quot;iCalcreator.class.php&quot; file.
 </p>
 <p>
-More iCalcreator supplementary and &quot;howto&quot; information will be found at
+More iCalcreator supplementary, &quot;howto&quot; and coding support information will be found at
 kigkonsult.se iCalcreator implement examples and test <a href="http://kigkonsult.se/test/index.php" title="kigkonsult.se iCalcreator implement howto" target="_blank">pages</a>.
 A strong recommendation is to have this document open in parallell when exploiting the link.
 </p>
@@ -351,11 +350,14 @@ may be required when importing iCal files into some calendaring software (MS etc
 <dd><a href="#X-PROPERTY">X-LIC-LOCATION</a> x-property
 </dl>
 <p class="label">Example</p>
-<p>Recommendation is also to set <a href="#Unique_id">unique_id</a>, creating a new vcalendar/component instance,
-to ensure accurate setting of all components <a href="#UID">UID</a> property, especially before <a href="#parse_merge">parse</a>.</p>
+<p>
+A strong recommendation is also to set config <a href="#Unique_id">unique_id</a>, creating a new vcalendar/component instance,
+to ensure accurate setting of all components <a href="#UID">UID</a> property, especially before <a href="#parse_merge">parse</a>.
+Also setting of config timezone (&quot;TZID&quot; and &quot;X-WR-TIMEZONE&quot; below) is to recommend.
+</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 $vcalendar-&gt;setProperty( &quot;method&quot;,        &quot;PUBLISH&quot; )
 $vcalendar-&gt;setProperty( &quot;x-wr-calname&quot;,  &quot;Calendar Sample&quot; );
@@ -403,7 +405,7 @@ coding standard, the following, incomplete, list is a good start;
 
 <a name="INDEX"></a><h2>1.9 INDEX</h2>
 
-<a href="#INTRO">1. INTRO</a><br>
+<a href="#INTRO">1 INTRO</a><br>
 <br>
 <a href="#Standards">1.1 Standards</a><br>
 <a href="#This_manual">1.2 This manual</a><br>
@@ -417,7 +419,7 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#Addendum">1.8 Addendum</a><br>
 <a href="#INDEX">1.9 INDEX</a><br>
 <br>
-<a href="#Calendar_Component_list">2. Calendar Component list</a><br>
+<a href="#Calendar_Component_list">2 Calendar Component list</a><br>
 <br>
 <a href="#VCALENDAR">2.1  VCALENDAR</a><br>
 <a href="#VEVENT">2.2  VEVENT</a><br>
@@ -428,7 +430,7 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#VTIMEZONE">2.7  VTIMEZONE</a><br>
 <a href="#CalProps">2.8  Component Properties</a><br>
 <br>
-<a href="#Function_list">3. Function list</a><br>
+<a href="#Function_list">3 Function list</a><br>
 <br>
 <a href="#iCalcreator_object_methods">3.1 iCalcreator object methods</a><br>
 <br>
@@ -482,9 +484,10 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#Format">3.1.5.12 Format</a><br>
 <a href="#Language">3.1.5.13 Language</a><br>
 <a href="#NewlineChar">3.1.5.14 NewlineChar</a><br>
-<a href="#dTZID">3.1.5.15 TZID</a><br>
-<a href="#Unique_id">3.1.5.16 Unique_id</a><br>
-<a href="#configURL">3.1.5.17 URL</a><br>
+<a href="#setPropertyNames">3.1.5.15 setPropertyNames</a><br>
+<a href="#dTZID">3.1.5.16 TZID</a><br>
+<a href="#Unique_id">3.1.5.17 Unique_id</a><br>
+<a href="#configURL">3.1.5.18 URL</a><br>
 <br>
 <a href="#Calendar_component_object_property_function_list">3.2 Calendar component property method list</a><br>
 <br>
@@ -600,13 +603,15 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#newComponent_PROP">3.4.3 newComponent</a><br>
 <a href="#setComponent_PROP">3.4.4 setComponent</a><br>
 <br>
-<a href="#iCalUtilityFunctions">4. iCalUtilityFunctions</a><br>
+<a href="#iCalUtilityFunctions">4 iCalUtilityFunctions</a><br>
 <br>
-<a href="#createTimezone">4.1 createTimezone</a><br>
-<a href="#ms2phpTZ">4.2 ms2phpTZ</a><br>
-<a href="#transformDateTime">4.3 transformDateTime</a><br>
+<a href="#convEolChar">4.1 convEolChar</a><br>
+<a href="#createTimezone">4.2 createTimezone</a><br>
+<a href="#ms2phpTZ">4.3 ms2phpTZ</a><br>
+<a href="#transformDateTime">4.4 transformDateTime</a><br>
+<a href="#mddtuf">4.5 Misc. date/duration/timestamp util. functions</a><br>
 <br>
-<a href="#helperFunctions">5. Helper functions</a><br>
+<a href="#helperFunctions">5 Helper functions</a><br>
 <br>
 <a href="#iCal2XML">5.1 iCal2XML</a><br>
 <a href="#XML2iCal">5.2 XML2iCal</a><br>
@@ -620,13 +625,13 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#iCal2vCard">5.4.1 iCal2vCard</a><br>
 <a href="#iCal2vCards">5.4.2 iCal2vCards</a><br>
 <br>
-<a href="#Copyright_and_Licence">5. COPYRIGHT AND LICENSE</a><br>
+<a href="#Copyright_and_Licence">6 COPYRIGHT AND LICENSE</a><br>
 <a href="#Copyright">6.1 Copyright</a><br>
 <a href="#Licence">6.2 License</a><br>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
-<a name="Calendar_Component_list"></a><h1>2. Calendar Component list</h1>
+<a name="Calendar_Component_list"></a><h1>2 Calendar Component list</h1>
 <p>
 Quote from <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (<strong>iCalendar</strong>)!
 (Described in iCal output format, content corresponds to xCal format.)
@@ -1296,7 +1301,7 @@ or when fetching <a href="#DTSTAMP">DTSTAMP</a>/<a href="#UID">UID</a> property 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_Component_list">[up]</a>
 
-<a name="Function_list"></a><h1>3. Function list</h1>
+<a name="Function_list"></a><h1>3 Function list</h1>
 
 <a name="iCalcreator_object_methods"></a><h2>3.1 iCalcreator object methods</h2>
 
@@ -1308,12 +1313,41 @@ or when fetching <a href="#DTSTAMP">DTSTAMP</a>/<a href="#UID">UID</a> property 
 <p class="comment">
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
-<p class="label">Example</p>
+<p class="label">Basic example</p>
 <p class="example">&lt;?php
 .. .
 $config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
 $vcalendar = new vcalendar( $config );
 ...
+</p>
+<p>
+The <strong>calendar</strong> property PRODID and each component property <a href="#UID">UID</a> are AUTOMATICALLY generated in iCalcreator, 
+if not set manually, and based on the configuration <a href="#Unique_id">unique_id</a>. 
+</p>
+<p class="label">Extended example</p>
+<p class="example">&lt;?php
+.. .
+$tz        = &quot;Europe/Stockholm&quot;
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;
+                    &quot;TZID&quot;      =&gt; $tz );
+$vcalendar = new vcalendar( $config );
+$vcalendar-&gt;setProperty( "X-WR-TIMEZONE", $tz );
+.. .
+.. .  // <span class="comment">insert components or parse an iCal file (and edit components)</span>
+.. .
+$xprops    = array( &quot;X-LIC-LOCATION&quot; => $tz );
+iCalUtilityFunctions::createTimezone( $vcalendar, $tz, $xprops );
+.. .
+</p>
+<p>
+The <a href="#dTZID">TZID</a> config key and value (timezone) is supplied when setting <a href="#DTSTART">DTSTART</a>,
+<a href="#DTEND">DTEND</a>, <a href="#DUE">DUE</a> or <a href="#RECURRENCE-ID">RECURRENCE-ID</a>, 
+if not set manually, a TZID <b>auto completion</b>.
+</p>
+<p>
+Some <strong>calendar</strong> software may also require calendar property <a href="#Additional_Descriptors">X-WR-TIMEZONE</a>
+and vtimezone component with property <a href="#Additional_Descriptors">X-LIC-LOCATION</a>,
+review <a href="#createTimezone">createTimezone</a>, a function in iCalUtilityFunctions class.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
@@ -1326,7 +1360,7 @@ $vcalendar = new vcalendar( $config );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
@@ -1342,7 +1376,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $config    = $vcalendar-&gt;getConfig();
@@ -1363,7 +1397,7 @@ $vcalendar-&gt;setComponent( $vevent );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtodo     = &amp; $vcalendar-&gt;newComponent( &quot;vtodo&quot; );
@@ -1379,7 +1413,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtodo     = new vtodo( $vcalendar-&gt;getConfig());
@@ -1399,7 +1433,7 @@ $vcalendar-&gt;setComponent( $vtodo );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vjournal  = &amp; $vcalendar-&gt;newComponent( &quot;vjournal&quot; );
@@ -1415,7 +1449,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vjournal  = new vjournal( $vcalendar-&gt;getConfig());
@@ -1435,7 +1469,7 @@ $vcalendar-&gt;setComponent( $vjournal );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vfreebusy = &amp; $vcalendar-&gt;newComponent( &quot;vfreebusy&quot; );
@@ -1451,7 +1485,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vfreebusy = new vfreebusy( $vcalendar-&gt;getConfig());
@@ -1471,7 +1505,7 @@ $vcalendar-&gt;setComponent( $vfreebusy );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
@@ -1490,7 +1524,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vevent    = new vevent();
@@ -1519,7 +1553,7 @@ For dates with UTC DATE-TIME, read <a href="#DATE_WITH_UTC_TIME">this</a>!
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = &amp; $vcalendar-&gt;newComponent( &quot;vtimezone&quot; );
@@ -1535,7 +1569,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = new vtimezone( $vcalendar-&gt;getConfig());
@@ -1548,7 +1582,7 @@ $vcalendar-&gt;setComponent( $vtimezone );
 <h5>Creation of timezone components</h5>
 <p>
 It is possible to create timezone components, using a function in iCalUtilityFunctions class, <a href="#createTimezone">createTimezone</a>
-and utilizing The <em>PHP</em> DateTimeZone class (<em>PHP</em> 5 >= 5.2.0).
+and utilizing the <em>PHP</em> DateTimeZone class (<em>PHP</em> 5 >= 5.2.0).
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
@@ -1560,7 +1594,7 @@ and utilizing The <em>PHP</em> DateTimeZone class (<em>PHP</em> 5 >= 5.2.0).
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = &amp; $vcalendar-&gt;newComponent( &quot;vtimezone&quot; );
@@ -1582,7 +1616,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = new vtimezone( $vcalendar-&gt;getConfig());
@@ -1612,7 +1646,7 @@ $vcalendar-&gt;setComponent( $vtimezone );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = &amp; $vcalendar-&gt;newComponent( &quot;vtimezone&quot; );
@@ -1631,7 +1665,7 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vtimezone = new vtimezone( $vcalendar-&gt;getConfig());
@@ -1795,7 +1829,9 @@ Proparg  = (mixed) property argument
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, 
+                    &quot;filename&quot;  =&gt; &quot;file.ics&quot;,
+                    &quot;TZID&quot;      =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
 $vcalendar-&gt;setProperty( &quot;calscale&quot;, &quot;GREGORIAN&quot; );
 ...
@@ -1852,7 +1888,7 @@ $calscale  = $vcalendar-&gt;getProperty( &quot;calscale&quot; );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
 $vcalendar-&gt;setProperty( &quot;calscale&quot;, &quot;GREGORIAN&quot; );
 .. .
@@ -1912,7 +1948,7 @@ $method    = $vcalendar-&gt;getProperty( &quot;method&quot; );
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
 $vcalendar-&gt;setProperty( &quot;method&quot;, &quot;PUBLISH&quot; );
 ...
@@ -1958,7 +1994,7 @@ Only version 2.0 valid, version is <b>AUTO</b> generated at <strong>calendar</st
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
 $vcalendar-&gt;setProperty( &quot;version&quot;, &quot;2.0&quot; );
 ...
@@ -2025,7 +2061,7 @@ while( $vcalendar-&gt;deleteProperty())
 $config       = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot;);
 $vcalendar    = new vcalendar( $config );
 $vcalendar-&gt;parse();
-while( $xprop = $vcalendar-&gt;getProperty( )) { //<span class="comment">$xprop = array( propertyName<sup>1</sup>, propertyData<sup>2</sup> )</span>
+while( $xprop = $vcalendar-&gt;getProperty( )) { // <span class="comment">$xprop = array( propertyName<sup>1</sup>, propertyData<sup>2</sup> )</span>
 .. .
 </p>
 <p class="label">Example 2</p>
@@ -2061,13 +2097,13 @@ PropertyNames are always stored upperCase, ex. x-wr-calname =&gt; X-WR-CALNAME.
 propertyData<sup>2</sup> = (string) Value type TEXT
 params<sup>3</sup>       = (array) ( [&quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;] *[, xparams] )
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo   = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>         = as defined in [RFC5646]
 </p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // initiate new CALENDAR
      // <span class="comment">set some X-properties.. .</span>
 $vcalendar-&gt;setProperty( &quot;x-wr-calname&quot;,  &quot;Calendar Sample&quot; )
@@ -2278,7 +2314,7 @@ using a iCalcreator object factory-method, returning a reference to the new comp
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
@@ -2524,7 +2560,7 @@ Minor errors like non-standard line-endings, initial and trailing empty lines
  are managed.
 </p>
 <p>
-Except the <a href="#X-PROPERTY_PROP">X-properties</a>, non-standard properties are ignored.
+Non-standard iCal properties (except the <a href="#X-PROPERTY_PROP">X-properties</a>) are ignored.
 </p>
 <p class="label">Format</p>
 <p class="format">vcalendar::parse( [ textToParse ] )</p>
@@ -2559,7 +2595,7 @@ $vcalendar = new vcalendar( $config );
 ...
 $str       = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.14//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.16//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2622,7 +2658,7 @@ gzip       = (bool) TRUE:  gzip compressed output
 <p class="label">Example 1</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 .. .
 $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
@@ -2826,6 +2862,12 @@ $vcalendar-&gt;useCachedCalendar();
 <td class="bl bb center">*</td>
 <td class="bl bb center">*</td>
 <td class="bl bb ref">&nbsp;</td>
+</tr>
+<tr>
+<td class="bl bb"><a class="ref" href="#setPropertyNames">setPropertyNames</a></td>
+<td class="bl bb center">&nbsp;</td>
+<td class="bl bb center">*</td>
+<td class="bl bb ref">getConfig only</td>
 </tr>
 <tr>
 <td class="bl bb"><a class="ref" href="#dTZID">TZID</a></td>
@@ -3121,23 +3163,30 @@ Default &quot;\r\n&quot; as defined in [RFC5545].
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
 
-<a name="dTZID"></a><h4>3.1.5.15 TZID</h4>
+<a name="setPropertyNames"></a><h4>3.1.5.15 setPropertyNames</h4>
 <p>
-Will be used if no TZID parameter is supplied when setting <a href="#DTSTART">DTSTART</a>,
+Returns array of property names for all set properties in component. &quot;X-PROP&quot; will be used when <a href="#X-PROPERTY_PROP">X-properties</a> are set.
+</p>
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
+
+<a name="dTZID"></a><h4>3.1.5.16 TZID</h4>
+<p>
+General timezone, will be used if no TZID parameter is supplied when setting <a href="#DTSTART">DTSTART</a>,
 <a href="#DTEND">DTEND</a>, <a href="#DUE">DUE</a> or <a href="#RECURRENCE-ID">RECURRENCE-ID</a>, a TZID <b>auto completion</b>.
 </p>
 <p>
 Default empty.
 </p>
 <p>
-Note, some <strong>calendar</strong> software also require calendar property <a href="#Additional_Descriptors">X-WR-TIMEZONE</a>
+Note, some <strong>calendar</strong> software may also require calendar property <a href="#Additional_Descriptors">X-WR-TIMEZONE</a>
 and vtimezone component property <a href="#Additional_Descriptors">X-LIC-LOCATION</a>
 (to be set manually, examine also the <a href="#createTimezone">createTimezone</a> function).
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
 
-<a name="Unique_id"></a><h4>3.1.5.16 Unique_id</h4>
+<a name="Unique_id"></a><h4>3.1.5.17 Unique_id</h4>
 <p>
 &quot;Unique_id&quot; is used in <strong>calendar</strong> property PRODID and component property <a href="#UID">UID</a>,
 both created automatically (, if not setting <a href="#UID">UID</a> manually.
@@ -3165,7 +3214,7 @@ to ensure accurate creation of all components <a href="#UID">UID</a> property, a
 
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
 
-<a name="configURL"></a><h4>3.1.5.17 URL</h4>
+<a name="configURL"></a><h4>3.1.5.18 URL</h4>
 <p>
 When reading remote files with URL (using the <a href="#parse">parse()</a> method),
 only protocol &quot;http&quot; (&quot;webcal&quot;) is supported,
@@ -3534,7 +3583,8 @@ params<sup>2</sup>      = (array ) ( [ &quot;ENCODING&quot; =&gt; &quot;BASE64&q
 contentType  = (string) The parameter value MUST be the TEXT for either an IANA
                         registered content type or a non-standard content type.
 xparams      = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo  = (int) ordernumber, 1=1st, 2=2nd etc</p>
+propOrderNo  = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
+</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
@@ -3712,7 +3762,7 @@ CN             = &quot;CN&quot; =&gt; (string) &quot;common name to be associate
 DIR            = &quot;DIR&quot; =&gt; (string) &quot;reference to a directory entry associated with
                            the <strong>calendar</strong> user specified by the property&quot;
 xparams        = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo    = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo    = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>          = as defined in [RFC5646]</p>
 <p>
 See rules in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
@@ -3818,7 +3868,7 @@ categoryValue<sup>2</sup> = (string) textual categories or subtypes of the <stro
                 separated by the COMMA character
 params<sup>3</sup>        = (array) ( [&quot;LANGUAGE&quot; =&gt; (string) &quot;&lt;lang<sup>*</sup>&gt;&quot;] *[, xparams] )
 xparams        = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo    = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo    = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>         = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -3962,7 +4012,7 @@ params<sup>2</sup>       = (array) (
                    [, &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;]
                   *[, xparams ] )
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo   = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>         = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -4042,9 +4092,9 @@ completedDate  = (array) ( (int) year
                          , (int) min
                          , (int) sec
                         [, offset ]] )
-completedDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; => offset])
+completedDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">results in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 completedDate  = (string) date/datetime string<sup>*</sup>
-offset         = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+offset         = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 xparams<sup>2</sup>       = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
@@ -4070,7 +4120,7 @@ $vtodo-&gt;setProperty( &quot;completed&quot;, 2006, 8, 10, 10, 0, 0 ); // <span
 .. .
 $date = array(&quot;year&quot; =&gt; 2006, &quot;month&quot; =&gt; 10, &quot;day&quot; =&gt; 10,
               &quot;hour&quot; =&gt; 10, &quot;min&quot; =&gt; 0, &quot;sec&quot; =&gt; 0, &quot;tz&quot; =&gt; &quot;+0200&quot;);
-              // <span class="comment">local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a>DATE-TIME</span>
+              // <span class="comment">local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 $vtodo-&gt;setProperty( &quot;completed&quot;, $date );
 .. .
 </p>
@@ -4152,7 +4202,7 @@ params<sup>2</sup>       = (array) (
                    [, &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;]
                   *[, xparams] )
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo   = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>         = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -4236,9 +4286,9 @@ createdDate  = (array) ( (int) year
                        , (int) min
                        , (int) sec
                       [, offset ]] )
-createdDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; => offset ])
+createdDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">results in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 createdDate  = (string) date/datetime string<sup>*</sup>
-offset       = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+offset       = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 xparams<sup>2</sup>     = array( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
@@ -4264,7 +4314,7 @@ $vtodo-&gt;setProperty( &quot;created&quot;, 2006, 8, 11, 14, 30, 35 ); // <span
 .. .
 $date = array(&quot;year&quot; =&gt; 2006, &quot;month&quot; =&gt; 10, &quot;day&quot; =&gt; 10,
               &quot;hour&quot; =&gt; 10, &quot;min&quot; =&gt; 0, &quot;sec&quot; =&gt; 0, &quot;tz&quot; =&gt; &quot;+0200&quot;);
-              // <span class="comment">local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
+              // <span class="comment">local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 $vtodo-&gt;setProperty( &quot;created&quot;, $date );
 .. .
 </p>
@@ -4350,7 +4400,7 @@ params<sup>2</sup>         = (array) (
                     [, &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;]
                    *[, xparams ] )
 xparams           = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo       = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo       = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>          = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -4450,12 +4500,13 @@ dtendDate     = array( (int) year
                      , (int) sec
                     [, tz ]] )
 dtendDate     = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [,&quot;tz&quot; =&gt; tz])
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 dtendDate     = (string) date/datetime string<sup>*</sup>
-dtendDate     : Within the "VFREEBUSY" <strong>calendar</strong> component,
-                the time MUST be specified in the <a href="#DATE_WITH_UTC_TIME">UTC</a> time format.
+                // <span class="comment">Within the "VFREEBUSY" <strong>calendar</strong> component,</span>
+                // <span class="comment">the time MUST be specified in the <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 tz            = (string) &lt;timezone  identifier&gt; / offset
-                (timezone will be used as tzidparam (below), if tzidparam not set)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam (below), if tzidparam not set</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 params<sup>2</sup>       = (array) ([ tzidparam/datetimeparam/dateparam ] *[,xparams])
 tzidparam     = &quot;TZID&quot; =&gt; (string) &lt;timezone identifier&gt;
                 // <span class="comment">output as local date-time with timezone identifier</span>
@@ -4483,7 +4534,8 @@ $vevent-&gt;setProperty( &quot;dtend&quot;, 2006, 8, 11, 16, 30, 0 ); <span clas
 <p class="example">&lt;?php
 .. .
 $vfreebusy-&gt;setProperty( &quot;dtend&quot;, 2006, 8, 11, 16, 30, 0, &quot;-040000&quot; );
-                         <span class="comment">// 11 august 2006 16.30.00 -040000 : local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
+                         <span class="comment">// 11 august 2006 16.30.00 -040000</span>
+                         <span class="comment">// local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 .. .
 </p>
 <p class="label">Example 3</p>
@@ -4492,7 +4544,16 @@ $vfreebusy-&gt;setProperty( &quot;dtend&quot;, 2006, 8, 11, 16, 30, 0, &quot;-04
 $vevent-&gt;setProperty( &quot;dtend&quot;
                     , array( &quot;year&quot; =&gt;, 2006, &quot;month&quot; =&gt; 8, &quot;day&quot;=&gt; 11 )
                     , array( &quot;VALUE&quot; =&gt; &quot;DATE&quot; ));
-                    <span class="comment">// end of one or more all-day events</span>
+                    <span class="comment">// end of an all-day event</span>
+.. .
+</p>
+<p class="label">Example 4</p>
+<p class="example">&lt;?php
+.. .
+$calendar->setConfig( 'TZID', 'Europe/Stockholm' );
+.. .
+$vevent-&gt;setProperty( &quot;dtend&quot;, 2006, 8, 11, 7, 30, 0 );
+                   <span class="comment">// output: DTEND;TZID=Europe/Stockholm:20060811T073000</span>
 .. .
 </p>
 <br>
@@ -4577,9 +4638,9 @@ dtstampDate  = (array) ( (int) year
                        , (int) min
                        , (int) sec
                       [, offset ]] )
-dtstampDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; => offset ])
+dtstampDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 dtstampDate  = (string) (string) date/datetime string<sup>*</sup>
-offset       = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+offset       = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 xparams<sup>2</sup>     = array( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
@@ -4605,7 +4666,7 @@ $vtodo-&gt;setProperty( &quot;dstamp&quot;, 2006, 8, 11, 7, 30, 1 ); <span class
 .. .
 $date = array(&quot;year&quot; =&gt; 2006, &quot;month&quot; =&gt; 10, &quot;day&quot; =&gt; 10,
               &quot;hour&quot; =&gt; 10, &quot;min&quot; =&gt; 0, &quot;sec&quot; =&gt; 0, &quot;tz&quot; =&gt; &quot;+0200&quot;);
-           // <span class="comment">local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
+           // <span class="comment">local date + UTC offset will result in <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 $vtodo-&gt;setProperty( &quot;dtstamp&quot;, $date );
 .. .
 </p>
@@ -4696,12 +4757,13 @@ dtstartDate   = (array) ( (int) year
                         , (int) sec
                        [, tz ]] )
 dtstartDate   = (array) (&quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; =&gt; tz])
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 dtstartDate   = (string) date/datetime string<sup>*</sup>
-dtstartDate : Within the "VFREEBUSY" <strong>calendar</strong> component,
-              the dtstartDate MUST be specified in the <a href="#DATE_WITH_UTC_TIME">UTC</a> time format.
+                // <span class="comment">Within the "VFREEBUSY" <strong>calendar</strong> component,</span>
+                // <span class="comment">the dtstartDate MUST be specified in the <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 tz            = (string) &lt;timezone identifier&gt; / offset
-                (timezone will be used as tzidparam (below), if tzidparam not set)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam (below), if tzidparam not set</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 params<sup>2</sup>       = (array) ([ tzidparam/datetimeparam/dateparam ] *[, xparams])
 tzidparam     = &quot;TZID&quot; =&gt; (string) &lt;timezone identifier&gt;
                 // <span class="comment">output as local date-time with timezone identifier</span>
@@ -4722,15 +4784,16 @@ xparams       = (string) key =&gt; (string) value // <span class="comment">key p
 <p class="label">Example 1</p>
 <p class="example">&lt;?php
 .. .
-$vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 7, 30, 1 ); <span class="comment">// 11 august 2006 07.30.01 local date</span>
+$vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 7, 30, 1 ); 
+                   <span class="comment">// 11 august 2006 07.30.01 local date</span>
 .. .
 </p>
 <p class="label">Example 2</p>
 <p class="example">&lt;?php
 .. .
 $vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 16, 30, 0, &quot;-040000&quot; );
-                   <span class="comment">// 11 august 2006 16.30.00 -040000,
-                                       // local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
+                   <span class="comment">// 11 august 2006 16.30.00 -040000</span>
+                   <span class="comment">// local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 .. .
 </p>
 <p class="label">Example 3</p>
@@ -4740,6 +4803,15 @@ $vevent-&gt;setProperty( &quot;dtstart&quot;
                     , array( &quot;year&quot; =&gt;, 2006, &quot;month&quot; =&gt; 8, &quot;day&quot;=&gt; 11 )
                     , array( &quot;VALUE&quot; =&gt; &quot;DATE&quot; ));
                    <span class="comment">// start of an all-day event, or a period of (entire) days</span>
+.. .
+</p>
+<p class="label">Example 4</p>
+<p class="example">&lt;?php
+.. .
+$calendar->setConfig( 'TZID', 'Europe/Stockholm' );
+.. .
+$vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 7, 30, 0 );
+                   <span class="comment">// output: DTSTART;TZID=Europe/Stockholm:20060811T073000</span>
 .. .
 </p>
 <br>
@@ -4827,10 +4899,11 @@ dueDate       = (array) ( (int) year
                         , (int) sec
                        [, tz ]] )
 dueDate       = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; =&gt; tz])
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 dueDate       = (string) date/datetime string<sup>*</sup>
 tz            = (string) &lt;timezone identifier&gt; / offset
-                (timezone will be used as tzidparam (below), if tzidparam not set)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam (below), if tzidparam not set)</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in  <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 params<sup>2</sup>       = (array) ([ tzidparam/datetimeparam/dateparam ] *[, xparams])
 tzidparam     = &quot;TZID&quot; =&gt; (string) &lt;timezone identifier&gt;
                 // <span class="comment">output as local date-time with timezone identifier</span>
@@ -4859,7 +4932,8 @@ $vtodo-&gt;setProperty( &quot;due&quot;, 2006, 8, 11, 18, 0, 0 ); <span class="c
 .. .
 $vtodo-&gt;setProperty( &quot;due&quot;
                    , 2006, 8, 11, 16, 30, 0, &quot;-040000&quot; );
-                  <span class="comment">// 11 august 2006 16.30.00 -040000 local date + UTC offset sets <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a>DATE-TIME</span>
+                  <span class="comment">// 11 august 2006 16.30.00 -040000</span>
+                  <span class="comment">// local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 .. .
 </p>
 <p class="label">Example 3</p>
@@ -4869,6 +4943,15 @@ $vtodo-&gt;setProperty( &quot;due&quot;
                     , array( &quot;year&quot; =&gt;, 2006, &quot;month&quot; =&gt; 8, &quot;day&quot;=&gt; 11 )
                     , array( &quot;VALUE&quot; =&gt; &quot;DATE&quot; ));
                    <span class="comment">// due &quot;during the day&quot;</span>
+.. .
+</p>
+<p class="label">Example 4</p>
+<p class="example">&lt;?php
+.. .
+$calendar->setConfig( 'TZID', 'Europe/Stockholm' );
+.. .
+$vevent-&gt;setProperty( &quot;due&quot;, 2006, 8, 11, 7, 30, 0 );
+                   <span class="comment">// output: DUE;TZID=Europe/Stockholm:20060811T073000</span>
 .. .
 </p>
 <br>
@@ -4888,6 +4971,9 @@ $vtodo-&gt;setProperty( &quot;due&quot;
 <dt>In a <a href="#VALARM">VALARM</a>
 <dd>it is OPTIONAL and MUST NOT occur more than once and MUST occur in pair with TRIGGER. If one occurs, so MUST  the other.
 </dl>
+<p>
+If any hour/minute/second duration part is set, all parts are included in output (ex. one hour duration: &quot;PT1H0M0S&quot;).
+</p>
 <h5>Create DURATION</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise FALSE.</p>
 <p class="label">Format</p>
@@ -5042,14 +5128,18 @@ $exdate = $vtodo-&gt;getProperty( &quot;exdate&quot; );
 <h5>Set EXDATE</h5>
 <p>Insert property value.</p>
 <p>
-If &quot;TZID&quot; is set in params, ex. &quot;TZID&quot; = &quot;CET&quot;,
-all timezone or offset in dates are ignored and DATE-TIME value type is set.<br>
 If DATE value type is set in params (&quot;VALUE&quot; = &quot;DATE&quot;), all timezone or offset in dates are ignored.<br>
-If no &quot;VALUE&quot; parameter in params, DATE-TIME (default) value type is set.<br>
-If empty params and offset in 1st date, all remaining dates are set to UTC.<br>
+If no &quot;VALUE&quot; value type is set or if DATE-TIME value type or TZID value is set in params, DATE-TIME (default) value type is set.
+</p>
+<p>
+If &quot;TZID&quot; is set in params,
+all timezone or offset in dates are ignored (note timestamp, below) and DATE-TIME value type is set.<br>
+If empty params and offset in 1st date, all remaining (non-timestamp) dates are set to UTC.<br>
 If no &quot;TZID&quot; is set in params and timezone in 1st date, all remaining dates are within this timezone and param &quot;TZID&quot; is set.<br>
-If none of the above rules are applicable, DATE-TIME and local date is set default.<br>
-Notice, use function <a href="#transformDateTime">transformDateTime</a> to change a datetime from one time zone to another.
+If none of the above rules are applicable, DATE-TIME and local date is set default.
+</p>
+<p>
+Notice, use function <a href="#transformDateTime">transformDateTime</a> to convert a datetime from one time zone to another.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -5070,16 +5160,17 @@ date<sup>1</sup>         = (array) ( &quot;year&quot;  =&gt; (int) year
                         , &quot;sec&quot;   =&gt; (int) sec
                        [, &quot;tz&quot;    =&gt; tz ]] )
 date          = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; =&gt; tz])
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 date          = (string) date/datetime string<sup>*</sup>
 tz            = (string) &lt;timezone identifier&gt; / offset
-                (timezone will be used as tzidparam (below), if tzidparam not set)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam (below), if tzidparam not set</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 params<sup>2</sup>       = (array) ([(datetimeparam/dateparam)&nbsp;/ tzidparam] *[,xparams])
 datetimeparam = &quot;VALUE&quot; =&gt; &quot;DATE-TIME&quot; // <span class="comment">default, output as date-time</span>
 dateparam     = &quot;VALUE&quot; =&gt; &quot;DATE&quot; // <span class="comment">output as DATE</span>
 tzidparam     = &quot;TZID&quot; =&gt; (string) &lt;timezone identifier&gt;
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo   = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
     &quot;20110625051015&quot;,      &quot;20110625 051015&quot;
@@ -5205,14 +5296,14 @@ freq        = &quot;SECONDLY&quot; /
               &quot;WEEKLY&quot;   /
               &quot;MONTHLY&quot;  /
               &quot;YEARLY&quot;
-enddate     = date (a DATE value or a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME value)
+enddate     = date // <span class="comment">a DATE value or a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME value</span>
 date        = (array) ( &quot;year&quot;  =&gt; (int) year
                       , &quot;month&quot; =&gt; (int) month
                       , &quot;day&quot;   =&gt; (int) day
                      [, &quot;hour&quot;  =&gt; (int) hour
                       , &quot;min&quot;   =&gt; (int) min
                       , &quot;sec&quot;   =&gt; (int) sec ])
-date        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp )
+date        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">results in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 date        = (string) date/datetime string<sup>*</sup>
 byseclist   = seconds
 byseclist   = (array) (seconds *(, seconds ))
@@ -5251,7 +5342,7 @@ bysplist    = setposday
 bysplist    = (array) ( setposday *(, setposday ))
 setposday   = yeardaynum
 xparams<sup>2</sup>    = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo = (int) order number                              // <span class="comment">1=1st, 2=2nd etc</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
     &quot;20110625051015&quot;,      &quot;20110625 051015&quot;
@@ -5300,8 +5391,8 @@ $vtodo-&gt;setProperty( >&quot;exrule&quot;
                    , &quot;BYday&quot;       =&gt; array( 5, &quot;DAY&quot; =&gt; &quot;WE&quot; )        // (**)
                    , &quot;X-NAME&quot;      =&gt; &quot;x-value&quot;  )
             , array( &quot;key&quot;   =&gt; &quot;xparamValue&quot; ));
-  //<span class="comment">(*)  single value/array of values</span>
-  //<span class="comment">(**) single value array /array of arrays</span>
+  // <span class="comment">(*)  single value/array of values</span>
+  // <span class="comment">(**) single value array /array of arrays</span>
 .. .
 </p>
 <br>
@@ -5313,7 +5404,7 @@ $vtodo-&gt;setProperty( >&quot;exrule&quot;
 The property defines one or more free or busy time intervals in a <a href="#VFREEBUSY">VFREEBUSY</a>
 <strong>calendar</strong> component.
 <p>
-<p>The value type for FREEBUSY is PERIOD. A PERIOD is a DATE-TIME/DATE-TIME or a DATE-TIME/duration.</p>
+<p>The value type for FREEBUSY is PERIOD. A PERIOD is a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME/DATE-TIME or a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME/duration.</p>
 <h5>Create FREEBUSY</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise FALSE.</p>
 <p class="label">Format</p>
@@ -5394,9 +5485,9 @@ startdate/enddate = (array) ( &quot;year&quot;  =&gt; (int) year
                             , &quot;hour&quot;  =&gt; (int) hour
                             , &quot;min&quot;   =&gt; (int) min
                             , &quot;sec&quot;   =&gt; (int) sec ) // <span class="comment">output format</span>
-startdate/enddate = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp )
+startdate/enddate = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">results in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 startdate/enddate = (string) datetime string<sup>*</sup>
-startdate/enddate : MUST be an <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                    // <span class="comment">startdate/enddate MUST be an <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 duration          = (array) ( (int) week / FALSE
                            [, (int) day / FALSE
                             , (int) hour
@@ -5417,8 +5508,8 @@ dur-hour          = 1*DIGIT &quot;H&quot; [dur-minute]
 dur-minute        = 1*DIGIT &quot;M&quot; [dur-second]
 dur-second        = 1*DIGIT &quot;S&quot;
 dur-day           = 1*DIGIT &quot;D&quot;
-xparams<sup>3</sup>          = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo       = (int) ordernumber, 1=1st, 2=2nd etc
+xparams<sup>3 </sup>          = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
+propOrderNo       = (int) order number                              // <span class="comment">1=1st, 2=2nd etc</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625051015&quot;,      &quot;20110625 051015&quot;
     &quot;20110625T051015&quot;,     &quot;20110625t051015&quot;
@@ -5615,9 +5706,9 @@ moddate        = (array) ( (int) year
                          , (int) min
                          , (int) sec
                         [, offset ]] )
-moddate        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; => offset])
+moddate        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment">results in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 moddate        = (string) date/datetime string<sup>*</sup>
-offset         = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+offset         = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 xparams<sup>2</sup>       = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
@@ -5643,7 +5734,7 @@ $vtodo-&gt;setProperty(&quot;last-modified&quot;, 2006, 8, 14, 12, 1, 2 ); <span
 .. .
 $date = array(&quot;year&quot; =&gt; 2006, &quot;month&quot; =&gt; 10, &quot;day&quot; =&gt; 10,
               &quot;hour&quot; =&gt; 10, &quot;min&quot; =&gt; 0, &quot;sec&quot; =&gt; 0, &quot;tz&quot; =&gt; &quot;+0200&quot;);
-            <span class="comment">// local date + UTC offset =&gt; <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
+            <span class="comment">// local date + UTC offset will result in a <a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 $vtodo-&gt;setProperty( &quot;last-modified&quot;, $date );
 .. .
 </p>
@@ -6003,13 +6094,18 @@ $rdates = $vevent-&gt;getProperty( &quot;RDATE&quot; );
 <h5>Set RDATE</h5>
 <p>Insert property value.</p>
 <p>
-If &quot;TZID&quot; is set in params, ex. &quot;TZID&quot; = &quot;CET&quot;, all timezone or offset in dates are ignored and DATE-TIME value type is set.<br>
 If DATE value type is set in params (&quot;VALUE&quot; = &quot;DATE&quot;), all timezone or offset in dates are ignored.<br>
-If &quot;PERIOD&quot; is set in params (&quot;VALUE&quot; = &quot;PERIOD&quot;), DATE-TIME value type is set.<br>
-If no &quot;VALUE&quot; parameter in params, DATE-TIME (default) value type is set.<br>
-If empty params and offset in 1st date, all remaining dates are set to UTC.<br>
+If no &quot;VALUE&quot; value type is set or if DATE-TIME value type or TZID value is set in params, DATE-TIME (default) value type is set.
+</p>
+<p>
+If &quot;TZID&quot; is set in params,
+all timezone or offset in dates are ignored (note timestamp, below) and DATE-TIME value type is set.<br>
+If empty params and offset in 1st date, all remaining (non-timestamp) dates are set to UTC.<br>
 If no &quot;TZID&quot; is set in params and timezone in 1st date, all remaining dates are within this timezone and param &quot;TZID&quot; is set.<br>
 If none of the above rules are applicable, DATE-TIME and local date is set default.
+</p>
+<p>
+Notice, use function <a href="#transformDateTime">transformDateTime</a> to convert a datetime from one time zone to another.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -6034,10 +6130,11 @@ date          = (array) ( &quot;year&quot;  =&gt; (int) year
                        [, &quot;tz&quot;    =&gt; tz ]] )
                      // <span class="comment">output format</span>
 date          = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; =&gt; tz ] )
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 date          = (string) date/datetime string<sup>*</sup>
 tz            = &lt;timezone identifier&gt; / offset
-                (timezone will be used as tzidparam, if tzidparam not exists)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam, if tzidparam not set</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 duration      = (array) ( (int) week/false
                        [, (int) day/false
                         , (int) hour
@@ -6056,11 +6153,11 @@ tzidparam     = &quot;TZID&quot; =&gt; (string) &lt;timezone identifier&gt;
                 // <span class="comment">output as local DATE-TIME with timezone identifier</span>
                 // <span class="comment">if tzidparam=&quot;GMT&quot;/&quot;UTC&quot; then</span>
                 // <span class="comment">output date-time is suffixed by 'Z'</span>
-datetimeparam = &quot;VALUE&quot; =&gt; &quot;DATE-TIME&quot; // <span class="comment">default, output as DATE-TIME</span>
-dateparam     = &quot;VALUE&quot; =&gt; &quot;DATE&quot; // <span class="comment">output as DATE</span>
-periodparam   = &quot;VALUE&quot; =&gt; &quot;PERIOD&quot; // <span class="comment">output as PERIOD (datetime)</span>
+datetimeparam = &quot;VALUE&quot; =&gt; &quot;DATE-TIME&quot;         // <span class="comment">default, output as DATE-TIME</span>
+dateparam     = &quot;VALUE&quot; =&gt; &quot;DATE&quot;              // <span class="comment">output as DATE</span>
+periodparam   = &quot;VALUE&quot; =&gt; &quot;PERIOD&quot;            // <span class="comment">output as PERIOD (datetime)</span>
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo   = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 <br>date/datetime string<sup>*</sup> recommended formats
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
     &quot;20110625051015&quot;,      &quot;20110625 051015&quot;
@@ -6206,12 +6303,12 @@ recurrIdDate  = (array) ( (int) year
                         , (int) min
                         , (int) sec
                        [, tz ]] )
-recurrIdDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp
-                    [, &quot;tz&quot;        =&gt; tz ] )
+recurrIdDate  = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp [, &quot;tz&quot; =&gt; tz ] )
+                // <span class="comment">timestamp without tz will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 recurrIdDate  = (string) date/datetime string<sup>*</sup>
 tz            = (string) &lt;timezone identifier&gt; / offset
-                (timezone will be used as tzidparam, if tzidparam not exists)
-offset        = (int) (+/-)HHmm[ss], local date + UTC offset =&gt; <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME
+                // <span class="comment">timezone will be used as tzidparam, if tzidparam not set</span>
+offset        = (int) (+/-)HHmm[ss] // <span class="comment">(arr/str) local date + UTC offset will result in a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 params<sup>2</sup>       = (array) ([ datetimeparam/dateparam/tzidparam ] [, rangeparam ] *[, xparams ] )
 datetimeparam = &quot;VALUE&quot; =&gt; &quot;DATE-TIME&quot; // <span class="comment">default, output as DATE-TIME</span>
 dateparam     = &quot;VALUE&quot; =&gt; &quot;DATE&quot; // <span class="comment">output as DATE</span>
@@ -6234,7 +6331,17 @@ xparams       = string) key =&gt; (string) value // <span class="comment">key pr
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$vtodo-&gt;setProperty( &quot;recurrence-id&quot;, &quot;3 March 2003 03.03.03&quot; ); <span class="comment">// 3 march 2003 03.03.03 local time</span>
+$vtodo-&gt;setProperty( &quot;recurrence-id&quot;, &quot;3 March 2003 03.03.03&quot; );
+                  <span class="comment">// 3 march 2003 03.03.03 local time</span>
+.. .
+</p>
+<p class="label">Example 2</p>
+<p class="example">&lt;?php
+.. .
+$calendar->setConfig( 'TZID', 'Europe/Stockholm' );
+.. .
+$vtodo-&gt;setProperty( &quot;recurrence-id&quot;, &quot;3 March 2003 03.03.03&quot; );
+                  <span class="comment">// output: RECURRENCE-ID;TZID=Europe/Stockholm:20030303T030303</span>
 .. .
 </p>
 <br>
@@ -6317,7 +6424,8 @@ reltype     = &quot;RELTYPE&quot; =&gt; (&quot;PARENT&quot; (Default)
                           / (string) iana-token
                           / (string) x-name )
 xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc</p>
+propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
+</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
@@ -6471,7 +6579,7 @@ extraData<sup>3</sup>  = (string) Textual exception data.
              or complete property line.
 params<sup>4</sup>     = (array) ( [&quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;] *[, xparams ] )
 xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>       = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -6562,7 +6670,7 @@ params<sup>2</sup>     = (array) (
                    [, &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;]
                   *[, xparams] )
 xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>       = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -6646,7 +6754,8 @@ For rules example see <a href="#EXRULE">Exrule</a> format and in detail in <a hr
 </p>
 <p class="comment">recur<sup>1</sup>      = see <a href="#EXRULE">Exrule</a>
 xparams<sup>2</sup>    = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc</p>
+propOrderNo = (int) order number                              // <span class="comment">1=1st, 2=2nd etc</span>
+</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
@@ -6932,7 +7041,7 @@ This property specifies when an <a href="#VALARM">ALARM</a> will trigger and is 
 </p>
 <p>
 The default value type is DURATION. The value type can be set to a DATE-TIME value type,
-in which case the value MUST specify an <a href="#DATE_WITH_UTC_TIME">UTC</a> formatted DATE-TIME value.
+in which case the value MUST specify an <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME value.
 </p>
 <h5>Create TRIGGER</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise FALSE.</p>
@@ -7016,7 +7125,7 @@ date<sup>3</sup>        = (array) ( &quot;year&quot;  =&gt; (int) year // <span 
                       [, &quot;hour&quot;  =&gt; (int) hour
                        , &quot;min&quot;   =&gt; (int) min
                        , &quot;sec&quot;   =&gt; (int) sec ])
-date<sup>3</sup>        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment"><a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a>DATE-TIME</span>
+date<sup>3</sup>        = (array) ( &quot;timestamp&quot; =&gt; (int) timestamp ) // <span class="comment"><a class="ref" href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME</span>
 date<sup>3</sup>        = (string) datetime string<sup>*</sup>
 params<sup>4</sup>      = (array) ( [[ reltype [, trigRelparam ]] / datetimeparam ] *[, xparams ] )
 reltyp       = &quot;RELATED&quot; =&gt; &quot;START&quot; (default) / &quot;END&quot;
@@ -7229,7 +7338,7 @@ $tzname = $timezonestandard-&gt;getProperty( &quot;TZNAME&quot; );
 <p class="comment">tzname<sup>1</sup>     = (string) Value type TEXT
 params<sup>2</sup>     = (array) ( [ &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot; ]*[, xparams ] )
 xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo = (int) ordernumber, 1=1st, 2=2nd etc
+propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>       = as defined in [RFC5646]</p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -7292,7 +7401,7 @@ $tzoffsetfrom = $timezonestandard-&gt;getProperty( &quot;TZOFFSETFROM&quot; );
 <p>Insert property value.</p>
 <p class="label">Format</p>
 <p class="format">vtimezone::setProperty( &quot;tzoffsetfrom&quot;, tzoffsetfrom [, xparams ] )</p>
-<p class="comment">tzoffsetfrom<sup>1</sup> = (int) (+/-)HHmm[ss], UTC offset
+<p class="comment">tzoffsetfrom<sup>1</sup> = (int) (+/-)HHmm[ss] // <span class="comment">UTC offset</span>
 xparams<sup>2</sup>      = (array) ( *[ /string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
@@ -7357,7 +7466,7 @@ $tzoffsetto = $timezonestandard-&gt;getProperty( &quot;TZOFFSETTO&quot; );
 <p>Insert property value.</p>
 <p class="label">Format</p>
 <p class="format">vtimezone::setProperty( &quot;tzoffsetto&quot;, tzoffsetto [, xparams ] )</p>
-<p class="comment">tzoffsetto<sup>1</sup> = (int) (+/-)HHmm[ss], UTC offset
+<p class="comment">tzoffsetto<sup>1</sup> = (int) (+/-)HHmm[ss] // <span class="comment">UTC offset</span>
 xparams<sup>2</sup>    = array( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
@@ -7448,7 +7557,7 @@ $vtimezone-&gt;setProperty( &quot;tzurl&quot;, $tz );
 The persistent, globally <b>U</b>nique <b>ID</b>entifier for the <strong>calendar</strong> component.
 The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
 <a href="#VJOURNAL">VJOURNAL</a> and <a href="#VFREEBUSY">VFREEBUSY</a> components.<br>
-However, UID is <b>AUTOMATICALLY</b> generated in iCalcreator and configuration <a href="#Unique_id">unique_id</a>,
+However, UID is <b>AUTOMATICALLY</b> generated in iCalcreator and configuration <a href="#Unique_id">unique_id</a> 
 is used when auto-creating component UID.
 </p>
 <p>UID generated format :</p>
@@ -7828,12 +7937,12 @@ using a component factory-method, returning a reference to the new component.
 <p class="label">Example 1</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; => &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config );
 ...
 $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
-$vevent-&gt;setProperty( &quot;dtstart&quot; // <span class="comment">add some <a href="#VEVENT">EVENT</a> properties</span>
-                    , 2006, 12, 24, 19, 30, 00 );
+             // <span class="comment">add some <a class="ref" href="#VEVENT">EVENT</a> properties</span>
+$vevent-&gt;setProperty( &quot;dtstart&quot;, 2006, 12, 24, 19, 30, 00 );
 $vevent-&gt;setProperty(.. .
 ...
 $valarm    = &amp; $vevent-&gt;newComponent( &quot;valarm&quot; );
@@ -7881,12 +7990,12 @@ if orderNumber is not found, component is inserted last in chain. </p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
 .. .
 $vevent    = new vevent();
-$vevent-&gt;setProperty( &quot;dtstart&quot; // <span class="comment">add some <a href="#VEVENT">EVENT</a> properties</span>
-                    , 2006, 12, 24, 19, 30, 00 );
+            // <span class="comment">add some <a class="ref" href="#VEVENT">EVENT</a> properties</span>
+$vevent-&gt;setProperty( &quot;dtstart&quot;, 2006, 12, 24, 19, 30, 00 );
 $vevent-&gt;setProperty(.. .
 .. .
 $valarm    = new valarm();
@@ -7900,22 +8009,39 @@ $vcalendar-&gt;setComponent( $vevent );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_configuration_methods">[up]</a>
 
 
-<a name="iCalUtilityFunctions"></a><h1>4. iCalUtilityFunctions</h1>
+<a name="iCalUtilityFunctions"></a><h1>4 iCalUtilityFunctions</h1>
 <p>
 iCalUtilityFunctions class contains static functions used by iCalcreator,
 also usable outside the iCalcreator class.
 </p>
 <dl>
-<dt>
-<dd><a href="#createTimezone">4.1 createTimezone</a>
-<dd><a href="#ms2phpTZ">4.2 ms2phpTZ</a>
-<dd><a href="#transformDateTime">4.3 transformDateTime</a>
+<dt>&quot;External&quot; functions
+<dd><a href="#convEolChar">4.1 convEolChar</a>
+<dd><a href="#createTimezone">4.2 createTimezone</a>
+<dd><a href="#ms2phpTZ">4.3 ms2phpTZ</a>
+<dd><a href="#transformDateTime">4.4 transformDateTime</a>
+<dt>&quot;Internal&quot; functions
+<dd><a href="#mddtuf">4.5 Misc. date/duration/timestamp util. functions</a>
 </dl>
-<p>
-Please examine the class to explore other functions.
+
+
+<a name="convEolChar"></a><h4>4.1 convEolChar</h4>
+<p>Removes any line-endings that may include spaces or tabs (\t) 
+and convert all line endings (iCal default &quot;\r\n&quot;), 
+takes care of &quot;\r\n&quot;, &quot;\r&quot; and &quot;\n&quot; and mixed &quot;\r\n&quot;+&quot;\r&quot;, &quot;\r\n&quot;+&quot;\n&quot;.
 </p>
-<p>
-<a name="createTimezone"></a><h4>4.1 createTimezone</h4>
+<p>Returns string with controlled and corrected line endings.</p>
+<p class="label">Format</p>
+<p class="format">iCalUtilityFunctions::convEolChar( str, nl )</p>
+<p class="comment">str = (string) string to adjust
+nl  = line ending to convert to
+</p>
+<br>
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalUtilityFunctions">[up]</a>
+
+
+<a name="createTimezone"></a><h4>4.2 createTimezone</h4>
 <p>
 The function, applied on a iCalcrator object instance and using a <em>PHP</em> valid timezone (as argument)
 creates <a href="#VTIMEZONE">vtimezone</a>, <a href="#STANDARD">standard</a> and <a href="#DAYLIGHT">daylight</a> components,
@@ -7923,7 +8049,7 @@ based on <em>PHP</em> DateTimeZone class and the time zone transition dates.
 (<em>PHP</em> 5 >= 5.2.0)
 </p>
 <p>
-Recommendation is to call the function <b>after</b> editing components (and without period from/to arguments, below),
+Recommendation is to call the function <b>after</b> editing components (and without (period) from/to arguments, below),
  it will automatically create timezone components to fit.
 </p>
 <p>
@@ -7947,14 +8073,13 @@ from     = (int) timestamp, period start date
 to       = (int) timestamp, period end date
            if the &quot;from&quot; and &quot;to&quot; arguments are missing,
              the calendar <a href="#getProperty2">getProperty</a> method (with &quot;<a href="#DTSTART">DTSTART</a>&quot; as argument)
-             is used to get lowest and highest dates (from DTSTART),
-             modified - one month / + one year
+             is used to get the lowest (modified, minus one month) and highest (modified, plus one year) DTSTART dates.
 </p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
 $tz     = &quot;Europe/Stockholm&quot;;
-$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );
+$config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, &quot;TZID&quot; =&gt; $tz );
 $c      = new vcalendar( $config );
 $c-&gt;setProperty( "X-WR-TIMEZONE", $tz );
 .. .
@@ -7988,7 +8113,7 @@ END:VTIMEZONE
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalUtilityFunctions">[up]</a>
 
 
-<a name="ms2phpTZ"></a><h4>4.2 ms2phpTZ</h4>
+<a name="ms2phpTZ"></a><h4>4.3 ms2phpTZ</h4>
 <p>
 Conversion (very simple) of a MS timezone to a <em>PHP</em>5 valid (Date-)timezone,<br>
 matching (MS) UTC offset and time zone descriptors, based on <em>PHP</em> DateTimeZone class.
@@ -8012,11 +8137,16 @@ if( FALSE !== iCalUtilityFunctions::ms2phpTZ( $search ))
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalUtilityFunctions">[up]</a>
 
 
-<a name="transformDateTime"></a><h4>4.3 transformDateTime</h4>
-<p>Transforms a datetime from a time zone to another. (Requires <em>PHP</em> >= 5.2.0 and <em>PHP</em> DateTimeZone acceptable time zones).</p>
+<a name="transformDateTime"></a><h4>4.4 transformDateTime</h4>
+<p>
+Transforms a datetime from a time zone to another. (Requires <em>PHP</em> >= 5.2.0 and <em>PHP</em> DateTimeZone acceptable time zones).
+</p>
 <p>
 FALSE is returned if not using a &quot;strtotime&quot; acceptable datetime string or unacceptable <em>PHP</em> time zones.
 If TRUE, the dateTime argument (below) is converted to the new time zone, otherwise unaltered.
+</p>
+<p>
+A DATE input (&lt;year&gt;&lt;month&gt;&lt;day&gt;) will be expanded to a DATETIME (&lt;year&gt;&lt;month&gt;&lt;day&gt;000000) before transform.
 </p>
 <p class="label">Format</p>
 <p class="format">iCalUtilityFunctions::transformDateTime( dateTime, timezoneFrom [, timezoneTo [, format ]] )</p>
@@ -8061,7 +8191,59 @@ else
 </p>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalUtilityFunctions">[up]</a>
 
-<a name="helperFunctions"></a><h1>5. Helper functions</h1>
+
+<a name="mddtuf"></a><h4>4.5 Misc. date/duration/timestamp util. functions</h4>
+<p>
+iCalUtilityFunctions static date(-time)/timestamp functions. 
+Please examine the class file for more information about arguments and output.
+</p>
+<dl>
+<dt>iCalUtilityFunctions::_chkDateArr( $datetime, $parno=FALSE ) 
+<dd>Returns internal date-time/date formatted (keyed) array for an input date-time/date array (keyed or unkeyed)
+<dd>name changed from _date_time_array (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_chkdatecfg( $theDate, & $parno, & $params )
+<dd>Check date(-time) and params arrays for an opt. timezone and if it is a DATE-TIME or DATE (updates $parno and (opt) $params)
+<dt>iCalUtilityFunctions::_date2strdate( $datetime, $parno=6 )
+<dd>Returns formatted output (string) for calendar component property data value type date/date-time
+<dd>name changed from _format_date_time (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_date2timestamp( $datetime, $wtz=null )
+<dd>Returns a timestamp (int) for a date/datetime (array)
+<dt>iCalUtilityFunctions::_duration2arr( $duration )
+<dd>Returns internal duration formatted (keyed) array for input in array format
+<dd>name changed from _duration_array (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_duration2date( $startdate, $duration )
+<dd>Returns a datetime (keyed) array for a startdate+duration
+<dt>iCalUtilityFunctions::_durationStr2arr( $duration )
+<dd>Returns internal duration formatted (keyed)  array for an input string (iCal) formatted duration
+<dd>name changed from _duration_string (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_duration2str( $duration )
+<dd>Returns a formatted string for a calendar component property data value type duration
+<dd>name changed from _format_duration (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_isArrayDate( $input )
+<dd>Returns bool TRUE if input contains a (array formatted) date/time
+<dt>iCalUtilityFunctions::_isArrayTimestampDate( $input )
+<dd>Returns bool TRUE if input array contains a timestamp date
+<dt>iCalUtilityFunctions::_isOffset( $input )
+<dd>Returns bool TRUE if input string contains (trailing) UTC/iCal offset
+<dt>iCalUtilityFunctions::offsetSec2His( $seconds )
+<dd>Returns iCal offset [-/+]hhmm[ss] (string) from UTC offset seconds
+<dt>iCalUtilityFunctions::_strDate2arr( & $input )
+<dd>Convert a date from specific string to (keyed) array format, returns TRUE on success
+<dt>iCalUtilityFunctions::_strdate2date( $datetime, $parno=FALSE, $wtz=null )
+<dd>Returns internal date-time/date formatted (keyed) array for input date-time/date in string fromat
+<dd>name changed from _date_time_string (exists as alias, may be removed in future versions)
+<dt>iCalUtilityFunctions::_timestamp2date( $timestamp, $parno=6, $wtz=null )
+<dd>Returns internal date-time/date formatted (keyed) array, based on a timestamp, default UTC or adjusted for offset/timezone
+<dt>iCalUtilityFunctions::_timestamp2duration( $timestamp )
+<dd>Returns internal duration formatted (keyed) array for a timestamp (i.e. seconds)
+<dt>iCalUtilityFunctions::_tz2offset( $tz )
+<dd>Returns seconds (int) from an offset, [+/-]HHmm[ss], used when correcting UTC to localtime or v.v.
+</dl>
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalUtilityFunctions">[up]</a>
+
+
+<a name="helperFunctions"></a><h1>5 Helper functions</h1>
 <p>The helper functions extend the utility of iCalcreator.
 </p>
 
@@ -8238,11 +8420,11 @@ ext       = (string) vCard file extension, default &quot;vcf&quot;
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#vCardhelpers">[up]</a>
 
 
-<a name="Copyright_and_Licence"></a><h1>6. COPYRIGHT AND LICENSE</h1>
+<a name="Copyright_and_Licence"></a><h1>6 COPYRIGHT AND LICENSE</h1>
 
 <a name="Copyright"></a><h4>6.1 Copyright</h4>
 <p>
-iCalcreator v2.14<br>
+iCalcreator v2.16<br>
 copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
