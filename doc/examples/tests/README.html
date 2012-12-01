@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+   "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<title>Testing iCalcreator 2.10 get/edit/delete/select functions</title>
+<meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult" />
+<meta name="copyright"   content="2007-2011 Kjell-Inge Gustafsson - kigkonsult" />
+<meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, vcalender, php, create" />
+<meta name="description" content="iCalcreator" />
+<link href="../images/favicon.ico" rel="shortcut icon"/>
+<style>
+.param {font-family: arial; font-size: x-small; afont-style: italic}
+</style>
+</head>
+<body>
+<table width='100%'>
+<tr>
+<td width='30%'><a class="param" title='home page' href='http://www.kigkonsult.se/iCalcreator' target='_blank'>www.kigkonsult.se/iCalcreator</a>
+<td align='center'><td align='center'><a class="param" title='Forum / bug reports at Sourceforge.net' href='http://sourceforge.net/projects/icalcreator/' target='_blank'>Forum / bug reporting</a>
+<td width='30%' align='right'><a class="param" title='rfc2445 in HTML format' href='http://www.kigkonsult.se/iCalDictionary/index.html' target='_blank'>rfc2445</a>
+</table>
+
+<h1>Testing iCalcreator get/edit/delete/select functions</h1>
+
+All test scripts, run in a web server, uses a test file created in createComponent.php,
+saved in a file named &#34;test.ics&#34; (folder must be writeable for web server user) and tests parsing, reading, insert, edit and delete of components in the test file.
+<br />
+Click on the links below to execute tests. Use the browsers 'back'-
+button to return to this page. Open the linked files in a text editor to examine the php code.
+<br />
+<br />
+<b>TEST FILES</b><br />
+<a href="gettest.php">gettest.php</a><br />
+- get component type info from array $types<br />
+- display components in (physical) $types order, fetch component via order number<br />
+- sort file, display after sort, <br />
+<br />
+Can be used to display content of ANY arbitrary calendar file,<br />
+- remove (comment) line with &quot;include_once 'createComponents.php';&quot;<br />
+- change filename or file name<br />
+OR<br />
+http://&lt;. ..path/.. .&gt;gettest.php?f=&lt;. ..path/filename.. .&gt;<br />
+<br />
+<a href="gettest2.php">gettest2.php</a><br />
+ -get components in strict physical order using read-next function calls<br />
+<br />
+Can be used to display content of ANY arbitrary calendar file,<br />
+- remove (comment) line with &quot;include_once 'createComponents.php';&quot;<br />
+- change filename or file name<br />
+OR<br />
+http://&lt;. ..path/.. .&gt;gettest2.php?f=&lt;. ..path/filename.. .&gt;<br />
+<br />
+<a href="gettest3.php">gettest3.php</a><br />
+- get components in reverse order<br />
+- get all event Components in order<br />
+- get all vtodo Components in order<br />
+- get event Component number 2 and remove some properties<br />
+<br />
+<a href="gettest4.php">gettest4.php</a><br />
+- get component type info in array $types<br />
+- get components in random order with uid as key<br />
+<br />
+<a href="gettest5.php">gettest5.php</a><br />
+- components with specific uid and recurrence-id<br />
+<br />
+<a href="deleteTest.php">deleteTest.php</a><br />
+- delete via ordno and uid<br />
+<br />
+<a href="editInsertTest.php">editInsertTest.php</a><br />
+- updates via ordno and uid<br />
+- insert new components (replacement for old function appendCalendar)<br />
+<br />
+<a href="selectComponents.php">selectComponents.php</a><br />
+-&nbsp;41 Recurrence examples from rfc2445, 4.8.5.4 Recurrence Rule
+&nbsp;&nbsp;Displays date and all properties for recurring events 1997-03 - 1998-02' );
+<br />
+Can be used to display content of ANY arbitrary calendar and display period by
+accepting filename and display period (start and end date)<br />
+http://&lt;. ..path/.. .&gt;testSelectComponents.php?f=&lt;. ..path/filename.. .&gt;&amp;pstart=&lt;YYYYMMDD&gt;&amp;pend=&lt;YYYYMMDD&gt;'
+<br />
+<b>HELP FILES</b><br />
+createComponents.php</a><br />
+- create file with components to test, all properties except TZ* are created
+&nbsp;&nbsp;dtstart = random date within period 2000 - 2009
+<br />
+displayProperties.php<br />
+- display functions
+<br />
+test.ics<br />
+- test file created in createComponents.php, input in all test files<br />
+<br /><br />
+<b>OTHER TESTS</b><br />
+<a href="TZ_iCal_test1.php">TZ_iCal_test1.php</a><br />
+<a href="TZ_iCal_test2.php">TZ_iCal_test2.php</a><br />
+- tests creation and parsing timezone components, use browser function for showing source code after executing script to examine the output calendar properly<br />
+<br />
+<br />
+<table width='100%'>
+<tr>
+<td width='30%'><a class="param" title='home page' href='http://www.kigkonsult.se/iCalcreator' target='_blank'>www.kigkonsult.se/iCalcreator</a>
+<td align='center'><td align='center'><a class="param" title='Forum / bug reports at Sourceforge.net' href='http://sourceforge.net/projects/icalcreator/' target='_blank'>Forum / bug reporting</a>
+<td width='30%' align='right'><a class="param" title='rfc2445 in HTML format' href='http://www.kigkonsult.se/iCalDictionary/index.html' target='_blank'>rfc2445</a>
+</table>
+</body>
+</html>
