@@ -1,7 +1,7 @@
 <?php
 /*********************************************************************************/
 /**
- * iCalcreator v2.16
+ * iCalcreator v2.16.1
  * copyright (c) 2007-2012 Kjell-Inge Gustafsson kigkonsult
  * kigkonsult.se/iCalcreator/index.php
  * ical@kigkonsult.se
@@ -45,7 +45,7 @@ if ($pos   !== false) {
 */
 /*********************************************************************************/
 /*         version, do NOT remove!!                                              */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.16' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.16.1' );
 /*********************************************************************************/
 /*********************************************************************************/
 /**
@@ -7370,7 +7370,7 @@ class iCalUtilityFunctions {
  * END:VTIMEZONE
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.15.1 - 2012-10-22
+ * @since 2.16.1 - 2012-11-26
  * Generates components for all transitions in a date range, based on contribution by Yitzchok Lavi <icalcreator@onebigsystem.com>
  * Additional changes jpirkey
  * @param object $calendar, reference to an iCalcreator calendar instance
@@ -7402,33 +7402,35 @@ class iCalUtilityFunctions {
       $dateFrom          = new DateTime( "@$from" );             // set lowest date (UTC)
     else {
       $from              = reset( $dates );                      // set lowest date to the lowest dtstart date
-      $dateFrom          = DateTime::createFromFormat( 'Ymd', $from, $dtz );
+      $dateFrom          = new DateTime( $from.'T000000', $dtz );
       $dateFrom->modify( '-1 month' );                           // set $dateFrom to one month before the lowest date
       $dateFrom->setTimezone( $utcTz );                          // convert local date to UTC
     }
+    $dateFromYmd         = $dateFrom->format('Y-m-d' );
     if( !empty( $to ))
       $dateTo            = new DateTime( "@$to" );               // set end date (UTC)
     else {
       $to                = end( $dates );                        // set highest date to the highest dtstart date
-      $dateTo            = DateTime::createFromFormat( 'Ymd', $to, $dtz );
-//      $to                = mktime( 0, 0, 0, (int) substr( $d, 4, 2 ), (int) substr( $d, 6, 2 ), (int) substr( $d, 0, 4 ));
+      $dateTo            = new DateTime( $to.'T235959', $dtz );
       $dateTo->modify( '+1 year' );                              // set $dateTo to one year after the highest date
       $dateTo->setTimezone( $utcTz );                            // convert local date to UTC
     }
+    $dateToYmd           = $dateTo->format('Y-m-d' );
     unset( $dtz );
     $transTemp           = array();
     $prevOffsetfrom      = 0;
     $stdIx  = $dlghtIx   = null;
     $prevTrans           = FALSE;
     foreach( $transitions as $tix => $trans ) {                  // all transitions in date-time order!!
-      $date = new DateTime( "@{$trans['ts']}" );                 // set transition date (UTC)
-      if ( $date->format('Y-m-d' ) < $dateFrom->format('Y-m-d' ) ) {
+      $date              = new DateTime( "@{$trans['ts']}" );    // set transition date (UTC)
+      $transDateYmd      = $date->format('Y-m-d' );
+      if ( $transDateYmd < $dateFromYmd ) {
         $prevOffsetfrom  = $trans['offset'];                     // previous trans offset will be 'next' trans offsetFrom
         $prevTrans       = $trans;                               // save it in case we don't find any that match
         $prevTrans['offsetfrom'] = ( 0 < $tix ) ? $transitions[$tix-1]['offset'] : 0;
         continue;
       }
-      if( $date->format('Y-m-d' ) > $dateTo->format('Y-m-d' ) )
+      if( $transDateYmd > $dateToYmd )
         break;                                                   // loop always (?) breaks here
       if( !empty( $prevOffsetfrom ) || ( 0 == $prevOffsetfrom )) {
         $trans['offsetfrom'] = $prevOffsetfrom;                  // i.e. set previous offsetto as offsetFrom
