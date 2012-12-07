@@ -15,7 +15,6 @@ class iCalCreator_TestCase extends PHPUnit_Framework_TestCase
 	public function assertEqualIcals( $expected, $actual, $message = null )
 	{
 		$constraint = new PHPUnit_Framework_Constraint_icalsEqual($expected);
-		
 		$this->assertThat( $actual, $constraint, $message );
 	}
 	
