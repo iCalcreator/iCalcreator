@@ -1,9 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.16 summary</title>
+<title>iCalcreator 2.16.6 summary</title>
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult" />
-<meta name="copyright"   content="2007-2012 Kjell-Inge Gustafsson - kigkonsult" />
+<meta name="copyright"   content="2007-2013 Kjell-Inge Gustafsson - kigkonsult" />
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create" />
 <meta name="description" content="iCalcreator summary" />
 <style type="text/css">
@@ -53,16 +53,16 @@ pre {
 </head>
 <body>
 
-<h1>iCalcreator v2.16</h1>
+<h1>iCalcreator v2.16.6</h1>
 <p>
-iCalcreator v2.16<br>
-copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
+iCalcreator v2.16.6<br>
+copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">kigkonsult.se contact</a>
 </p>
 <p>
-iCalcreator is a <em>PHP</em> class package managing iCal files, supporting (non-)<strong>calendar</strong> 
-systems and applications to process and communicate <strong>calendar</strong> information like 
+iCalcreator is a <em>PHP</em> class package managing iCal files, supporting (non-)<strong>calendar</strong>
+systems and applications to process and communicate <strong>calendar</strong> information like
 events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
@@ -77,7 +77,7 @@ to meet 4.x backward compatibility and may work. Some functions requires <em>PHP
 The iCalcreator main class, utility class and helper functions are included in the &quot;iCalcreator.class.php&quot; file.
 </p>
 <p>
-More iCalcreator supplementary, usage and &quot;howto&quot; information will be found at kigkonsult.se iCalcreator 
+More iCalcreator supplementary, usage and &quot;howto&quot; information will be found at kigkonsult.se iCalcreator
  <a href="http://kigkonsult.se/test/index.php" title="kigkonsult.se iCalcreator implement and test examples" target="_blank">coding and test</a> pages.
  A strong recommendation is to have the document
  <a href="http://kigkonsult.se/iCalcreator/docs/using.html" title="iCalcreator user's Manual" target="_blank">user's manual</a>
@@ -117,7 +117,7 @@ The main support channel is using iCalcreator
 <a title="Sourceforge" href="http://sourceforge.net/projects/icalcreator/forums/" target="_blank">Sourceforge</a> forum.
 </p>
 <p>
-kigkonsult offer services for software support, design and development of customizations and adaptations of <em>PHP</em>/<em>MySQL</em> solutions 
+kigkonsult offer services for software support, design and development of customizations and adaptations of <em>PHP</em>/<em>MySQL</em> solutions
 with a special focus on software long term utility and reliability,
 supported through our agile acquire/design/transition process model.
 </p>
@@ -141,9 +141,9 @@ Use the <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/co
 
 <h4>Downloads and usage examples</h4>
 <p>
-At <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult iCalcreator" target="_blank">kigkonsult.se</a> you can download the 
+At <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult iCalcreator" target="_blank">kigkonsult.se</a> you can download the
 <a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank">complete manual</a>
-and review and explore iCalcreator usage at the 
+and review and explore iCalcreator usage at the
 <a href="http://kigkonsult.se/test/index.php" title="kigkonsult.se iCalcreator implement and test examples" target="_blank">coding and test</a> pages.
 </p>
 
@@ -267,7 +267,8 @@ $v->parse();
 $v->setConfig( &quot;url&quot;, &quot;http://www.aDomain.net/file.ics&quot; ); // <span class="comment">supporting parse of remote files</span>
 $v->parse();
 .. .
-$v->sort();                                                // <span class="comment">ensure start date order (opt.)</span>
+$v->sort();                                                // <span class="comment">ensure start date order</span>
+.. .                                                       // <span class="comment">(opt., <b>NOT</b> required after parse)</span>
 .. .
 .. .                                                       // <span class="comment">continue process (edit, parse,select)</span>
 .. .                                                       // <span class="comment"> the iCalcreator object instance</span>
@@ -302,7 +303,7 @@ require_once( &quot;iCalcreator.class.php&quot; );
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;            // <span class="comment">set Your unique id,</span>
                , &quot;directory&quot; =&gt; &quot;calendar&quot;                 // <span class="comment">import directory</span>
                , &quot;filename&quot; =&gt; &quot;file.ics&quot; );               // <span class="comment"> and file name</span>
-                                                           
+
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar object instance</span>
 
 $v->parse();
@@ -348,7 +349,6 @@ $v = new vcalendar( $config );                             // <span class="comme
 
 $v->setConfig( &quot;url&quot;, &quot;http://www.aDomain.net/file.ics&quot; ); // <span class="comment">iCalcreator also support remote files</span>
 $v->parse();
-$v->sort();                                                // <span class="comment">ensure start date order</span>
 
 $v->setProperty( &quot;method&quot;, &quot;PUBLISH&quot; );                    // <span class="comment">required of some <strong>calendar</strong> software</span>
 $v->setProperty( &quot;x-wr-calname&quot;, &quot;Calendar Sample&quot; );      // <span class="comment">required of some <strong>calendar</strong> software</span>
@@ -396,7 +396,7 @@ $valueOccur = $v->getProperty( &quot;RESOURCES&quot; );              // <span cl
                                                            // <span class="comment">DTSTART, LOCATION, ORGANIZER,</span>
                                                            // <span class="comment">PRIORITY, RESOURCES, STATUS,</span>
                                                            // <span class="comment">SUMMARY, UID, URL,</span>
-                                                           // <span class="comment">GEOLOCATION<sup>*</sup></span> 
+                                                           // <span class="comment">GEOLOCATION<sup>*</sup></span>
 foreach( $valueOccur as $uniqueValue =&gt; $occurCnt ) {
   echo &quot;The RESOURCES value &lt;b&gt;$uniqueValue&lt;/b&gt; occurs &lt;b&gt;$occurCnt&lt;/b&gt; times&lt;br /&gt;&quot;;
   .. .
@@ -407,7 +407,7 @@ foreach( $valueOccur as $uniqueValue =&gt; $occurCnt ) {
 <p>
 <sup>*</sup>) Using the non-standard directive "GEOLOCATION", iCalcreator returns output supporting
 ISO6709 "Standard representation of geographic point location by coordinates",
-by combining the "LOCATION" and "GEO" property values (only if "GEO" is set). 
+by combining the "LOCATION" and "GEO" property values (only if "GEO" is set).
 </p>
 <h4>Select components based on specific property value</h4>
 <pre>&lt;?php
@@ -478,8 +478,8 @@ $mlstr = iCal2XML( $v );                                   // <span class="comme
 
 <h4>Copyright</h4>
 <p>
-iCalcreator v2.16<br>
-copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
+iCalcreator v2.16.6<br>
+copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">kigkonsult.se contact</a><br>
 </p>

@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.16 manual</title>
+<title>iCalcreator 2.16.6 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson - kigkonsult">
-<meta name="copyright"   content="2007-2012 Kjell-Inge Gustafsson - kigkonsult">
+<meta name="copyright"   content="2007-2013 Kjell-Inge Gustafsson - kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.16">
+<meta name="description" content="using iCalcreator v2.16.6">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -139,10 +139,10 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.16</p>
+<p class="header">iCalcreator v2.16.6</p>
 <p>
-iCalcreator v2.16<br>
-copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
+iCalcreator v2.16.6<br>
+copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
@@ -163,7 +163,7 @@ iCalcreator features create, parse, edit and select <strong>calendar</strong> an
 </p>
 <p>
 The iCalcreator package, built of a <strong>calendar</strong> class with support of a function class and helper functions,
-are <strong>calendar</strong> component property oriented. For iCalcreator 2.16 version (and later), 
+are <strong>calendar</strong> component property oriented. For iCalcreator 2.16 version (and later),
 <em>PHP</em> version &gt;= 5.2.0 is required, due to the use of <em>PHP</em> DateTime class (and related functions) .
 </p>
 <p>
@@ -1321,8 +1321,8 @@ $vcalendar = new vcalendar( $config );
 ...
 </p>
 <p>
-The <strong>calendar</strong> property PRODID and each component property <a href="#UID">UID</a> are AUTOMATICALLY generated in iCalcreator, 
-if not set manually, and based on the configuration <a href="#Unique_id">unique_id</a>. 
+The <strong>calendar</strong> property PRODID and each component property <a href="#UID">UID</a> are AUTOMATICALLY generated in iCalcreator,
+if not set manually, and based on the configuration <a href="#Unique_id">unique_id</a>.
 </p>
 <p class="label">Extended example</p>
 <p class="example">&lt;?php
@@ -1341,7 +1341,7 @@ iCalUtilityFunctions::createTimezone( $vcalendar, $tz, $xprops );
 </p>
 <p>
 The <a href="#dTZID">TZID</a> config key and value (timezone) is supplied when setting <a href="#DTSTART">DTSTART</a>,
-<a href="#DTEND">DTEND</a>, <a href="#DUE">DUE</a> or <a href="#RECURRENCE-ID">RECURRENCE-ID</a>, 
+<a href="#DTEND">DTEND</a>, <a href="#DUE">DUE</a> or <a href="#RECURRENCE-ID">RECURRENCE-ID</a>,
 if not set manually, a TZID <b>auto completion</b>.
 </p>
 <p>
@@ -1829,7 +1829,7 @@ Proparg  = (mixed) property argument
 <p class="label">Example</p>
 <p class="example">&lt;?php
 .. .
-$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;, 
+$config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,
                     &quot;filename&quot;  =&gt; &quot;file.ics&quot;,
                     &quot;TZID&quot;      =&gt; &quot;Europe/Stockholm&quot; );
 $vcalendar = new vcalendar( $config ); // <span class="comment">initiate new CALENDAR</span>
@@ -2279,7 +2279,7 @@ For the other, non-date, properties an exact (strict case) match is required.
 To select components based on property values, use <a href="#selectComponents2">selectComponents</a> (Format 2).
 </p>
 <p>
-To retrieve specific iCalcreator instance property values, searching <b>ALL</b> components, 
+To retrieve specific iCalcreator instance property values, searching <b>ALL</b> components,
 use <a href="#getProperty2">getProperty</a> (Format 2).
 </p>
 <p class="format">vcalendar::getComponent( search )</p>
@@ -2335,8 +2335,7 @@ and <a href="#EXRULE">EXRULE</a> properties in the component.
 </p>
 <p>Requirement:</p>
 <ul>
-<li>The property <a href="#DTSTART">DTSTART</a> is required.<br>If missing in a <a href="#VTODO">VTODO</a> component then <a href="#DTSTART">DUE</a> is used.<br>
-<li><a href="#sort">sort</a> <b>MUST</b> be executed before &quot;selectComponents&quot;, notice example below.
+<li>The property <a href="#DTSTART">DTSTART</a> is required. If missing in a <a href="#VTODO">VTODO</a> component, <a href="#DTSTART">DUE</a> is used.<br>
 </ul>
 <p>Limitations:</p>
 <ul>
@@ -2394,7 +2393,6 @@ $config     = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,
                      &quot;filename&quot;  =&gt; &quot;file.ics&quot; );
 $vcalendar  = new vcalendar( $config );
 $vcalendar-&gt;parse();
-$vcalendar-&gt;sort();
 $events_arr = $vcalendar-&gt;selectComponents( 2007, 11, 1, 2007, 11, 30, &quot;vevent&quot; );
  // <span class="comment">select all events occurring 1-30 nov. 2007</span>
 foreach( $events_arr as $year =&gt; $year_arr ) {
@@ -2442,7 +2440,7 @@ For the property <a href="#SUMMARY">SUMMARY</a>, if a search value (any case) ex
 For the other properties an exact (strict case) match is required. Multiple search properties may coexist.
 </p>
 <p>
-To retrieve specific iCalcreator instance property values, searching <b>ALL</b> components, 
+To retrieve specific iCalcreator instance property values, searching <b>ALL</b> components,
 use <a href="#getProperty2">getProperty</a> (Format 2).
 </p>
 <p>
@@ -2462,7 +2460,6 @@ $config        = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,
                         &quot;filename&quot;  =&gt; &quot;file.ics&quot; );
 $vcalendar     = new vcalendar( $config );
 $vcalendar-&gt;parse();
-$vcalendar-&gt;sort();
 $searchArray   = array( &quot;PRIORITY&quot; =&gt; array( 1, 2, 3, 4 ));
 $highPrioArr   = $vcalendar-&gt;selectComponents( $searchArray );
  // <span class="comment">select all components with PRIORITY set to high (1-4)</span>
@@ -2595,7 +2592,7 @@ $vcalendar = new vcalendar( $config );
 ...
 $str       = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.16//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.16.6//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2621,7 +2618,6 @@ $vcalendar-&gt;parse();
 $vcalendar-&gt;setConfig( &quot;filename&quot;,&nbsp;&nbsp;&quot;file2.ics&quot; );
 $vcalendar-&gt;parse();
 
-$vcalendar-&gt;sort();
 $vcalendar-&gt;setConfig( &quot;directory&quot;,&nbsp;&quot;export&quot; );
 $vcalendar-&gt;setConfig( &quot;filename&quot;,&nbsp;&nbsp;&quot;icalmerge.ics&quot; );
 $vcalendar-&gt;saveCalendar();
@@ -2749,23 +2745,21 @@ $config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,
                     &quot;filename&quot;  =&gt; &quot;file.ics&quot; );
 $vcalendar = new vcalendar( $config );
 $vcalendar-&gt;parse();
-$vcalendar-&gt;sort();
 $vcalendar-&gt;returnCalendar();
 ...
 </p>
 
 <p class="label">Format 2</p>
 <p>
-Sort created/parsed <strong>calendar</strong> components on specific property values and ascending order.
+Sort created/parsed <strong>calendar</strong> components based on specific property values and ascending order.
  If a property is not set in component, an empty sort key is used (i.e. sorted first).
 </p>
 <p class="format">vcalendar::sort( sortArgument )</p>
-<p class="comment">sortArgument: (string) &quot;<a href="#ATTENDEE">ATTENDEE</a>&quot; / &quot;<a href="#CATEGORIES">CATEGORIES</a>&quot; / &quot;<a href="#CONTACT">CONTACT</a>&quot; / &quot;<a href="#DTSTAMP">DTSTAMP</a>&quot; /
+<p class="comment">sortArgument: (string) &quot;<a href="#ATTENDEE">ATTENDEE</a>&quot; <sup>*</sup> / &quot;<a href="#CATEGORIES">CATEGORIES</a>&quot; <sup>*</sup> / &quot;<a href="#CONTACT">CONTACT</a>&quot; <sup>*</sup> / &quot;<a href="#DTSTAMP">DTSTAMP</a>&quot; /
                        &quot;<a href="#LOCATION">LOCATION"</a>&quot; / &quot;<a href="#ORGANIZER">ORGANIZER</a>&quot; / &quot;<a href="#PRIORITY">PRIORITY</a>&quot; /
-                       &quot;<a href="#RESOURCES">RESOURCES</a>&quot; / &quot;<a href="#STATUS">STATUS</a>&quot; / &quot;<a href="#SUMMARY">SUMMARY</a>&quot; / &quot;<a href="#URL">URL</a>&quot;.
-                       For a property where multiple occurrence may exist
-                       (<a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#CONTACT">CONTACT</a>, <a href="#RESOURCES">RESOURCES</a>)
-                       lowest (alphabetic) value is used as sort key.</p>
+                       &quot;<a href="#RESOURCES">RESOURCES</a>&quot; <sup>*</sup> / &quot;<a href="#STATUS">STATUS</a>&quot; / &quot;<a href="#SUMMARY">SUMMARY</a>&quot; / &quot;<a href="#URL">URL</a>&quot; / &quot;<a href="#UID">UID</a>&quot; <sup>**</sup>.
+<p class="comment"><sup>*) </sup> For a property where multiple occurrence may exist (<a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#CONTACT">CONTACT</a>, <a href="#RESOURCES">RESOURCES</a>) lowest (alphabetic) value is used as sort key.</p>
+<p class="comment"><sup>**)</sup> For multiple components with the same <a href="#UID">UID</a>, components with <a href="#RECURRENCE-ID">RECURRENCE-ID</a> / <a href="#SEQUENCE">SEQUENCE</a> set are sorted first (on asc. values).</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
 
@@ -4784,7 +4778,7 @@ xparams       = (string) key =&gt; (string) value // <span class="comment">key p
 <p class="label">Example 1</p>
 <p class="example">&lt;?php
 .. .
-$vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 7, 30, 1 ); 
+$vevent-&gt;setProperty( &quot;dstart&quot;, 2006, 8, 11, 7, 30, 1 );
                    <span class="comment">// 11 august 2006 07.30.01 local date</span>
 .. .
 </p>
@@ -5137,6 +5131,9 @@ all timezone or offset in dates are ignored (note timestamp, below) and DATE-TIM
 If empty params and offset in 1st date, all remaining (non-timestamp) dates are set to UTC.<br>
 If no &quot;TZID&quot; is set in params and timezone in 1st date, all remaining dates are within this timezone and param &quot;TZID&quot; is set.<br>
 If none of the above rules are applicable, DATE-TIME and local date is set default.
+</p>
+<p>
+Inserted EXDATEs are automatically sorted in ascending order (Y-m-d[-H-i-s]).
 </p>
 <p>
 Notice, use function <a href="#transformDateTime">transformDateTime</a> to convert a datetime from one time zone to another.
@@ -7557,7 +7554,7 @@ $vtimezone-&gt;setProperty( &quot;tzurl&quot;, $tz );
 The persistent, globally <b>U</b>nique <b>ID</b>entifier for the <strong>calendar</strong> component.
 The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
 <a href="#VJOURNAL">VJOURNAL</a> and <a href="#VFREEBUSY">VFREEBUSY</a> components.<br>
-However, UID is <b>AUTOMATICALLY</b> generated in iCalcreator and configuration <a href="#Unique_id">unique_id</a> 
+However, UID is <b>AUTOMATICALLY</b> generated in iCalcreator and configuration <a href="#Unique_id">unique_id</a>
 is used when auto-creating component UID.
 </p>
 <p>UID generated format :</p>
@@ -8026,8 +8023,8 @@ also usable outside the iCalcreator class.
 
 
 <a name="convEolChar"></a><h4>4.1 convEolChar</h4>
-<p>Removes any line-endings that may include spaces or tabs (\t) 
-and convert all line endings (iCal default &quot;\r\n&quot;), 
+<p>Removes any line-endings that may include spaces or tabs (\t)
+and convert all line endings (iCal default &quot;\r\n&quot;),
 takes care of &quot;\r\n&quot;, &quot;\r&quot; and &quot;\n&quot; and mixed &quot;\r\n&quot;+&quot;\r&quot;, &quot;\r\n&quot;+&quot;\n&quot;.
 </p>
 <p>Returns string with controlled and corrected line endings.</p>
@@ -8053,7 +8050,7 @@ Recommendation is to call the function <b>after</b> editing components (and with
  it will automatically create timezone components to fit.
 </p>
 <p>
-If no time zone transition exists within date arguments or within the &quot;<a href="#DTSTART">DTSTART</a>&quot;s span, 
+If no time zone transition exists within date arguments or within the &quot;<a href="#DTSTART">DTSTART</a>&quot;s span,
 then the time zone transition with the highest transistion date before &quot;from&quot; date is used as base.
 If still missing,a timezone standard component are created, using current date.
 </p>
@@ -8194,11 +8191,11 @@ else
 
 <a name="mddtuf"></a><h4>4.5 Misc. date/duration/timestamp util. functions</h4>
 <p>
-iCalUtilityFunctions static date(-time)/timestamp functions. 
+iCalUtilityFunctions static date(-time)/timestamp functions.
 Please examine the class file for more information about arguments and output.
 </p>
 <dl>
-<dt>iCalUtilityFunctions::_chkDateArr( $datetime, $parno=FALSE ) 
+<dt>iCalUtilityFunctions::_chkDateArr( $datetime, $parno=FALSE )
 <dd>Returns internal date-time/date formatted (keyed) array for an input date-time/date array (keyed or unkeyed)
 <dd>name changed from _date_time_array (exists as alias, may be removed in future versions)
 <dt>iCalUtilityFunctions::_chkdatecfg( $theDate, & $parno, & $params )
@@ -8424,8 +8421,8 @@ ext       = (string) vCard file extension, default &quot;vcf&quot;
 
 <a name="Copyright"></a><h4>6.1 Copyright</h4>
 <p>
-iCalcreator v2.16<br>
-copyright (c) 2007-2012 Kjell-Inge Gustafsson, kigkonsult<br>
+iCalcreator v2.16.6<br>
+copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>

@@ -1,8 +1,8 @@
 <?php
 /*********************************************************************************/
 /**
- * iCalcreator v2.16.1
- * copyright (c) 2007-2012 Kjell-Inge Gustafsson kigkonsult
+ * iCalcreator v2.16.6
+ * copyright (c) 2007-2013 Kjell-Inge Gustafsson kigkonsult
  * kigkonsult.se/iCalcreator/index.php
  * ical@kigkonsult.se
  *
@@ -45,7 +45,7 @@ if ($pos   !== false) {
 */
 /*********************************************************************************/
 /*         version, do NOT remove!!                                              */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.16.1' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.16.6' );
 /*********************************************************************************/
 /*********************************************************************************/
 /**
@@ -294,7 +294,7 @@ class vcalendar {
  * creates formatted output for calendar property x-prop, iCal format only
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.10.16 - 2011-11-01
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createXprop() {
@@ -310,11 +310,11 @@ class vcalendar {
       $attributes = $toolbox->_createParams( $xpropPart['params'], array( 'LANGUAGE' ));
       if( is_array( $xpropPart['value'] )) {
         foreach( $xpropPart['value'] as $pix => $theXpart )
-          $xpropPart['value'][$pix] = $toolbox->_strrep( $theXpart );
+          $xpropPart['value'][$pix] = iCalUtilityFunctions::_strrep( $theXpart, $this->format, $this->nl );
         $xpropPart['value']  = implode( ',', $xpropPart['value'] );
       }
       else
-        $xpropPart['value'] = $toolbox->_strrep( $xpropPart['value'] );
+        $xpropPart['value'] = iCalUtilityFunctions::_strrep( $xpropPart['value'], $this->format, $this->nl );
       $output    .= $toolbox->_createElement( $label, $attributes, $xpropPart['value'] );
       if( is_array( $toolbox->xcaldecl ) && ( 0 < count( $toolbox->xcaldecl ))) {
         foreach( $toolbox->xcaldecl as $localxcaldecl )
@@ -1044,7 +1044,7 @@ class vcalendar {
  * No date controls occurs.
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.11.22 - 2012-02-13
+ * @since 2.16.4 - 2012-12-13
  * @param mixed $startY optional, start Year,  default current Year ALT. array selecOptions ( *[ <propName> => <uniqueValue> ] )
  * @param int   $startM optional, start Month, default current Month
  * @param int   $startD optional, start Day,   default current Day
@@ -1075,7 +1075,7 @@ class vcalendar {
     if( !$endM )   $endM   = $startM;
     if( !$endD )   $endD   = $startD;
     $endDate   = mktime( 23, 59, 59, $endM, $endD, $endY );
-//echo 'selectComp arg='.date( 'Y-m-d H:i:s', $startDate).' -- '.date( 'Y-m-d H:i:s', $endDate)."<br />\n"; $tcnt = 0;// test ###
+// echo 'selectComp arg='.date( 'Y-m-d H:i:s', $startDate).' -- '.date( 'Y-m-d H:i:s', $endDate)."<br />\n"; $tcnt = 0;// test ###
             /* check component types */
     $validTypes = array('vevent', 'vtodo', 'vjournal', 'vfreebusy' );
     if( is_array( $cType )) {
@@ -1102,7 +1102,10 @@ class vcalendar {
     if(( TRUE === $flat ) && ( TRUE === $split )) // invalid combination
       $split = FALSE;
             /* iterate components */
-    $result = array();
+    $result       = array();
+    $this->sort( 'UID' );
+    $compUIDcmp   = null;
+    $recurridList = array();
     foreach ( $this->components as $cix => $component ) {
       if( empty( $component )) continue;
       unset( $start );
@@ -1115,8 +1118,13 @@ class vcalendar {
         continue;
       if( empty( $start ))
         continue;
+      $compUID      = $component->getProperty( 'UID' );
+      if( $compUIDcmp != $compUID ) {
+        $compUIDcmp = $compUID;
+        unset( $exdatelist, $recurridList );
+      }
       $dtendExist = $dueExist = $durationExist = $endAllDayEvent = $recurrid = FALSE;
-      unset( $end, $startWdate, $endWdate, $rdurWsecs, $rdur, $exdatelist, $workstart, $workend, $endDateFormat ); // clean up
+      unset( $end, $startWdate, $endWdate, $rdurWsecs, $rdur, $workstart, $workend, $endDateFormat ); // clean up
       $startWdate = iCalUtilityFunctions::_date2timestamp( $start );
       $startDateFormat = ( isset( $start['hour'] )) ? 'Y-m-d H:i:s' : 'Y-m-d';
             /* get end date from dtend/due/duration properties */
@@ -1174,24 +1182,13 @@ class vcalendar {
             $exdatelist[$exWdate] = TRUE;
         } // end - foreach( $exdate as $theExdate )
       }  // end - check exdate
-      $compUID    = $component->getProperty( 'UID' );
             /* check recurrence-id (with sequence), remove hit with reccurr-id date */
       if(( FALSE !== ( $recurrid = $component->getProperty( 'recurrence-id' ))) &&
          ( FALSE !== ( $sequence = $component->getProperty( 'sequence' )))   ) {
+// echo "adding ".$recurrid['year'].'-'.$recurrid['month'].'-'.$recurrid['day']." to recurridList<br>\n"; // test ###
         $recurrid = iCalUtilityFunctions::_date2timestamp( $recurrid );
         $recurrid = mktime( 0, 0, 0, date( 'm', $recurrid ), date( 'd', $recurrid ), date( 'Y', $recurrid )); // on a day-basis !!!
-        $endD     = $recurrid + $rdurWsecs;
-        do {
-          if( date( 'Ymd', $startWdate ) != date( 'Ymd', $recurrid ))
-            $exdatelist[$recurrid] = TRUE; // exclude all other days than startdate
-          $wd = getdate( $recurrid );
-          if( isset( $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] ))
-              unset( $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] ); // remove from output, dtstart etc added below
-          if( $split && ( $recurrid <= $endD ))
-            $recurrid = mktime( 0, 0, 0, date( 'm', $recurrid ), date( 'd', $recurrid ) + 1, date( 'Y', $recurrid )); // step one day
-          else
-            break;
-        } while( TRUE );
+        $recurridList[$recurrid] = TRUE; // no recurring to start this day
       } // end recurrence-id/sequence test
             /* select only components with.. . */
       if(( !$any && ( $startWdate >= $startDate ) && ( $startWdate <= $endDate )) || // (dt)start within the period
@@ -1207,41 +1204,46 @@ class vcalendar {
           $rstart   = $startWdate;
           if( $rstart < $startDate )
             $rstart = $startDate; // use period start date
-          $startYMD = date( 'Ymd', $rstart );
+          $startYMD = $rstartYMD = date( 'Ymd', $rstart );
           $endYMD   = date( 'Ymd', $endWdate );
           $checkDate = mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
-          while( date( 'Ymd', $rstart ) <= $endYMD ) { // iterate
-            $checkDate = mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
-            if( isset( $exdatelist[$checkDate] )) { // exclude any recurrence date, found in exdatelist
-              $rstart = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
-              continue;
-            }
-            if( date( 'Ymd', $rstart ) > $startYMD ) // date after dtstart
-              $datestring = date( $startDateFormat, mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart )));
-            else
-              $datestring = date( $startDateFormat, $rstart );
-            if( isset( $start['tz'] ))
-              $datestring .= ' '.$start['tz'];
-// echo "X-CURRENT-DTSTART 3 = $datestring xRecurrence=$xRecurrence tcnt =".++$tcnt."<br />";$component->setProperty( 'X-CNT', $tcnt ); // test ###
-            $component->setProperty( 'X-CURRENT-DTSTART', $datestring );
-            if( $dtendExist || $dueExist || $durationExist ) {
-              if( date( 'Ymd', $rstart ) < $endYMD ) // not the last day
-                $tend = mktime( 23, 59, 59, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ));
+// echo "start org comp = $rstartYMD, endYMD=$endYMD<br />\n"; // test ###
+          if( !isset( $exdatelist[$checkDate] )) { // exclude any recurrence START date, found in exdatelist
+            while( $rstartYMD <= $endYMD ) { // iterate
+              if( isset( $exdatelist[$checkDate] )) { // exclude any recurrence date, found in exdatelist
+                $rstart = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
+                $rstartYMD = date( 'Ymd', $rstart );
+                continue;
+              }
+              if( $rstartYMD > $startYMD ) // date after dtstart
+                $datestring = date( $startDateFormat, $checkDate ); // mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart )));
               else
-                $tend = mktime( date( 'H', $endWdate ), date( 'i', $endWdate ), date( 's', $endWdate ), date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
-              if( $endAllDayEvent && $dtendExist )
-                $tend += ( 24 * 3600 ); // alldaysevents has an end date 'day after' meaning this day
-              $datestring = date( $endDateFormat, $tend );
-              if( isset( $end['tz'] ))
-                $datestring .= ' '.$end['tz'];
-              $propName = ( !$dueExist ) ? 'X-CURRENT-DTEND' : 'X-CURRENT-DUE';
-              $component->setProperty( $propName, $datestring );
-            } // end if( $dtendExist || $dueExist || $durationExist )
-            $wd = getdate( $rstart );
-            $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] = $component->copy(); // copy to output
-            $rstart = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
-          } // end while( $rstart <= $endWdate )
-        } // end if( $split )   -  else use component date
+                $datestring = date( $startDateFormat, $rstart );
+              if( isset( $start['tz'] ))
+                $datestring .= ' '.$start['tz'];
+// echo "split org comp rstartYMD=$rstartYMD (datestring=$datestring)<br />\n"; // test ###
+              $component->setProperty( 'X-CURRENT-DTSTART', $datestring );
+              if( $dtendExist || $dueExist || $durationExist ) {
+                if( $rstartYMD < $endYMD ) // not the last day
+                  $tend = mktime( 23, 59, 59, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ));
+                else
+                  $tend = mktime( date( 'H', $endWdate ), date( 'i', $endWdate ), date( 's', $endWdate ), date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
+                if( $endAllDayEvent && $dtendExist )
+                  $tend += ( 24 * 3600 ); // alldaysevents has an end date 'day after' meaning this day
+                $datestring = date( $endDateFormat, $tend );
+                if( isset( $end['tz'] ))
+                  $datestring .= ' '.$end['tz'];
+                $propName = ( !$dueExist ) ? 'X-CURRENT-DTEND' : 'X-CURRENT-DUE';
+                $component->setProperty( $propName, $datestring );
+              } // end if( $dtendExist || $dueExist || $durationExist )
+              $wd        = getdate( $rstart );
+              $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] = $component->copy(); // copy to output
+              $rstart    = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
+              $rstartYMD = date( 'Ymd', $rstart );
+              $checkDate = mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
+            } // end while( $rstart <= $endWdate )
+          }
+        } // end elseif( $split )   -  else use component date
         elseif( $recurrid && !$flat && !$any && !$split )
           $continue = TRUE;
         else { // !$flat && !$split, i.e. no flat array and DTSTART within period
@@ -1252,7 +1254,6 @@ class vcalendar {
           }
         }
       } // end if(( $startWdate >= $startDate ) && ( $startWdate <= $endDate ))
-
             /* if 'any' components, check components with reccurrence rules, removing all excluding dates */
       if( TRUE === $any ) {
             /* make a list of optional repeating dates for component occurence, rrule, rdate */
@@ -1286,6 +1287,11 @@ class vcalendar {
             }
           }
         }  // end - check rdate
+        foreach( $recurlist as $recurkey => $durvalue ) { // remove all recurrence START dates found in the exdatelist
+          $checkDate = mktime( 0, 0, 0, date( 'm', $recurkey ), date( 'd', $recurkey ), date( 'Y', $recurkey ) ); // on a day-basis !!!
+          if( isset( $exdatelist[$checkDate] )) // no recurring to start this day
+            unset( $recurlist[$recurkey] );
+        }
         if( 0 < count( $recurlist )) {
           ksort( $recurlist );
           $xRecurrence = 1;
@@ -1296,6 +1302,8 @@ class vcalendar {
             if((( $startDate - $rdurWsecs ) > $recurkey ) || ( $endDate < $recurkey )) // not within period
               continue;
             $checkDate = mktime( 0, 0, 0, date( 'm', $recurkey ), date( 'd', $recurkey ), date( 'Y', $recurkey ) ); // on a day-basis !!!
+            if( isset( $recurridList[$checkDate] )) // no recurring to start this day
+              continue;
             if( isset( $exdatelist[$checkDate] )) // check excluded dates
               continue;
             if( $startWdate >= $recurkey ) // exclude component start date
@@ -1309,27 +1317,30 @@ class vcalendar {
             }
            /* add repeating components within valid dates to output array, one each day */
             elseif( $split ) {
+              $xRecurrence += 1;
               if( $rend > $endDate )
                 $rend = $endDate;
-              $startYMD = date( 'Ymd', $rstart );
+              $startYMD = $rstartYMD = date( 'Ymd', $rstart );
               $endYMD   = date( 'Ymd', $rend );
 // echo "splitStart=".date( 'Y-m-d H:i:s', $rstart ).' end='.date( 'Y-m-d H:i:s', $rend )."<br />\n"; // test ###;
               while( $rstart <= $rend ) { // iterate.. .
                 $checkDate = mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
+                if( isset( $recurridList[$checkDate] )) // no recurring to start this day
+                  break;
                 if( isset( $exdatelist[$checkDate] ))  // exclude any recurrence START date, found in exdatelist
                   break;
 // echo "checking date after startdate=".date( 'Y-m-d H:i:s', $rstart ).' mot '.date( 'Y-m-d H:i:s', $startDate )."<br />"; // test ###;
                 if( $rstart >= $startDate ) {    // date after dtstart
-                  if( date( 'Ymd', $rstart ) > $startYMD ) // date after dtstart
+                  if( $rstartYMD > $startYMD ) // date after dtstart
                     $datestring = date( $startDateFormat, $checkDate );
                   else
                     $datestring = date( $startDateFormat, $rstart );
                   if( isset( $start['tz'] ))
                     $datestring .= ' '.$start['tz'];
-//echo "X-CURRENT-DTSTART 1 = $datestring xRecurrence=$xRecurrence tcnt =".++$tcnt."<br />";$component2->setProperty( 'X-CNT', $tcnt ); // test ###
+// echo "spliting = $datestring<BR>\n"; // test ###
                   $component2->setProperty( 'X-CURRENT-DTSTART', $datestring );
                   if( $dtendExist || $dueExist || $durationExist ) {
-                    if( date( 'Ymd', $rstart ) < $endYMD ) // not the last day
+                    if( $rstartYMD < $endYMD ) // not the last day
                       $tend = mktime( 23, 59, 59, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ));
                     else
                       $tend = mktime( date( 'H', $endWdate ), date( 'i', $endWdate ), date( 's', $endWdate ), date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
@@ -1346,13 +1357,13 @@ class vcalendar {
                   $result[$wd['year']][$wd['mon']][$wd['mday']][$compUID] = $component2->copy(); // copy to output
                 } // end if( $checkDate > $startYMD ) {    // date after dtstart
                 $rstart = mktime( date( 'H', $rstart ), date( 'i', $rstart ), date( 's', $rstart ), date( 'm', $rstart ), date( 'd', $rstart ) + 1, date( 'Y', $rstart ) ); // step one day
+                $rstartYMD = date( 'Ymd', $rstart );
               } // end while( $rstart <= $rend )
-              $xRecurrence += 1;
             } // end elseif( $split )
             elseif( $rstart >= $startDate ) {     // date within period   //* flat=FALSE && split=FALSE => one comp every recur startdate *//
+              $xRecurrence += 1;
               $checkDate = mktime( 0, 0, 0, date( 'm', $rstart ), date( 'd', $rstart ), date( 'Y', $rstart ) ); // on a day-basis !!!
               if( !isset( $exdatelist[$checkDate] )) { // exclude any recurrence START date, found in exdatelist
-                $xRecurrence += 1;
                 $datestring = date( $startDateFormat, $rstart );
                 if( isset( $start['tz'] ))
                   $datestring .= ' '.$start['tz'];
@@ -1378,12 +1389,15 @@ class vcalendar {
               } // end if( !isset( $exdatelist[$checkDate] ))
             } // end elseif( $rstart >= $startDate )
           } // end foreach( $recurlist as $recurkey => $durvalue )
+          unset( $component2 );
         } // end if( 0 < count( $recurlist ))
             /* deselect components with startdate/enddate not within period */
         if(( $endWdate < $startDate ) || ( $startWdate > $endDate ))
           continue;
       } // end if( TRUE === $any )
     } // end foreach ( $this->components as $cix => $component )
+    unset( $dtendExist, $dueExist, $durationExist, $endAllDayEvent, $recurrid, $recurridList,
+           $end, $startWdate, $endWdate, $rdurWsecs, $rdur, $exdatelist, $recurlist, $workstart, $workend, $endDateFormat ); // clean up
     if( 0 >= count( $result )) return FALSE;
     elseif( !$flat ) {
       foreach( $result as $y => $yeararr ) {
@@ -1417,7 +1431,7 @@ class vcalendar {
  * select components from calendar on based on specific property value(-s)
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.13.4 - 2012-08-07
+ * @since 2.16.6 - 2012-12-26
  * @param array $selectOptions, (string) key => (mixed) value, (key=propertyName)
  * @return array
  */
@@ -1436,7 +1450,7 @@ class vcalendar {
         if( !is_array( $pvalue ))
           $pvalue = array( $pvalue );
         if(( 'UID' == $propName ) && in_array( $uid, $pvalue )) {
-          $output[] = $component3->copy();
+          $output[$uid][] = $component3->copy();
           continue;
         }
         elseif(( 'ATTENDEE' == $propName ) || ( 'CATEGORIES' == $propName ) || ( 'CONTACT' == $propName ) || ( 'RELATED-TO' == $propName ) || ( 'RESOURCES' == $propName )) { // multiple occurrence?
@@ -1444,8 +1458,8 @@ class vcalendar {
           $component3->_getProperties( $propName, $propValues );
           $propValues = array_keys( $propValues );
           foreach( $pvalue as $theValue ) {
-            if( in_array( $theValue, $propValues ) && !isset( $output[$uid] )) {
-              $output[$uid] = $component3->copy();
+            if( in_array( $theValue, $propValues )) { //  && !isset( $output[$uid] )) {
+              $output[$uid][] = $component3->copy();
               break;
             }
           }
@@ -1456,24 +1470,29 @@ class vcalendar {
         if( is_array( $d )) {
           foreach( $d as $part ) {
             if( in_array( $part, $pvalue ) && !isset( $output[$uid] ))
-              $output[$uid] = $component3->copy();
+              $output[$uid][] = $component3->copy();
           }
         }
         elseif(( 'SUMMARY' == $propName ) && !isset( $output[$uid] )) {
           foreach( $pvalue as $pval ) {
             if( FALSE !== stripos( $d, $pval )) {
-              $output[$uid] = $component3->copy();
+              $output[$uid][] = $component3->copy();
               break;
             }
           }
         }
         elseif( in_array( $d, $pvalue ) && !isset( $output[$uid] ))
-          $output[$uid] = $component3->copy();
+          $output[$uid][] = $component3->copy();
       } // end foreach( $selectOptions as $propName => $pvalue ) {
     } // end foreach( $this->components as $cix => $component3 ) {
     if( !empty( $output )) {
-      ksort( $output );
-      $output = array_values( $output );
+      ksort( $output ); // uid order
+      $output2 = array();
+      foreach( $output as $uid => $components ) {
+        foreach( $components as $component )
+          $output2[] = $component;
+      }
+      $output = $output2;
     }
     return $output;
   }
@@ -1544,7 +1563,7 @@ class vcalendar {
  * otherwise sorting on specific (argument) property values
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.13.4 - 2012-08-07
+ * @since 2.16.4 - 2012-12-17
  * @param string $sortArg, optional
  * @return void
  *
@@ -1553,7 +1572,7 @@ class vcalendar {
     if( is_array( $this->components )) {
       if( $sortArg ) {
         $sortArg = strtoupper( $sortArg );
-        if( !in_array( $sortArg, array( 'ATTENDEE', 'CATEGORIES', 'CONTACT', 'DTSTAMP', 'LOCATION', 'ORGANIZER', 'PRIORITY', 'RELATED-TO', 'RESOURCES', 'STATUS', 'SUMMARY', 'URL' )))
+        if( !in_array( $sortArg, array( 'ATTENDEE', 'CATEGORIES', 'CONTACT', 'DTSTAMP', 'LOCATION', 'ORGANIZER', 'PRIORITY', 'RELATED-TO', 'RESOURCES', 'STATUS', 'SUMMARY', 'UID', 'URL' )))
           $sortArg = FALSE;
       }
             /* set sort parameters for each component */
@@ -1577,8 +1596,18 @@ class vcalendar {
             elseif( 'RELATED-TO'  == $sortArg )
               $c->srtk[0] = $c->getProperty( 'uid' );
           }
-          elseif( FALSE !== ( $d = $c->getProperty( $sortArg )))
+          elseif( FALSE !== ( $d = $c->getProperty( $sortArg ))) {
             $c->srtk[0] = $d;
+            if( 'UID' == $sortArg ) {
+              if( FALSE !== ( $d = $c->getProperty( 'recurrence-id' ))) {
+                $c->srtk[1] = iCalUtilityFunctions::_date2strdate( $d );
+                if( FALSE === ( $c->srtk[2] = $c->getProperty( 'sequence' )))
+                  $c->srtk[2] = PHP_INT_MAX;
+              }
+              else
+                $c->srtk[1] = $c->srtk[2] = PHP_INT_MAX;
+            }
+          }
           continue;
         }
         if( FALSE !== ( $d = $c->getProperty( 'X-CURRENT-DTSTART' ))) {
@@ -1607,50 +1636,14 @@ class vcalendar {
           $c->srtk[3] = 0;
       } // end foreach( $this->components as & $c
             /* sort */
-      usort( $this->components, array( $this, '_cmpfcn' ));
+      usort( $this->components, array( 'iCalUtilityFunctions', '_cmpfcn' ));
     }
-  }
-  function _cmpfcn( $a, $b ) {
-    if(        empty( $a ))                       return -1;
-    if(        empty( $b ))                       return  1;
-    if( 'vtimezone' == $a->objName ) {
-      if( 'vtimezone' != $b->objName )            return -1;
-      elseif( $a->srtk[0] <= $b->srtk[0] )        return -1;
-      else                                        return  1;
-    }
-    elseif( 'vtimezone' == $b->objName )          return  1;
-    $sortkeys = array( 'year', 'month', 'day', 'hour', 'min', 'sec' );
-    for( $k = 0; $k < 4 ; $k++ ) {
-      if(        empty( $a->srtk[$k] ))           return -1;
-      elseif(    empty( $b->srtk[$k] ))           return  1;
-      if( is_array( $a->srtk[$k] )) {
-        if( is_array( $b->srtk[$k] )) {
-          foreach( $sortkeys as $key ) {
-            if    ( !isset( $a->srtk[$k][$key] )) return -1;
-            elseif( !isset( $b->srtk[$k][$key] )) return  1;
-            if    (  empty( $a->srtk[$k][$key] )) return -1;
-            elseif(  empty( $b->srtk[$k][$key] )) return  1;
-            if    (         $a->srtk[$k][$key] == $b->srtk[$k][$key])
-                                                  continue;
-            if    ((  (int) $a->srtk[$k][$key] ) < ((int) $b->srtk[$k][$key] ))
-                                                  return -1;
-            elseif((  (int) $a->srtk[$k][$key] ) > ((int) $b->srtk[$k][$key] ))
-                                                  return  1;
-          }
-        }
-        else                                      return -1;
-      }
-      elseif( is_array( $b->srtk[$k] ))           return  1;
-      elseif( $a->srtk[$k] < $b->srtk[$k] )       return -1;
-      elseif( $a->srtk[$k] > $b->srtk[$k] )       return  1;
-    }
-    return 0;
   }
 /**
  * parse iCal text/file into vcalendar, components, properties and parameters
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.15.10 - 2012-10-28
+ * @since 2.16.2 - 2012-12-18
  * @param mixed $unparsedtext, optional, strict rfc2445 formatted, single property string or array of property strings
  * @return bool FALSE if error occurs during parsing
  *
@@ -1839,13 +1832,13 @@ class vcalendar {
           }
           if( 1 < count( $content )) {
             foreach( $content as $cix => $contentPart )
-              $content[$cix] = calendarComponent::_strunrep( $contentPart );
+              $content[$cix] = iCalUtilityFunctions::_strunrep( $contentPart );
             $this->setProperty( $propname, $content, $propattr );
             continue;
           }
           else
             $line = reset( $content );
-          $line = calendarComponent::_strunrep( $line );
+          $line = iCalUtilityFunctions::_strunrep( $line );
         }
         $this->setProperty( $propname, rtrim( $line, "\x00..\x1F" ), $propattr );
       } // end - foreach( $this->unparsed.. .
@@ -2373,7 +2366,7 @@ class calendarComponent {
  * creates formatted output for calendar component property categories
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-22
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createCategories() {
@@ -2388,11 +2381,11 @@ class calendarComponent {
       $attributes = $this->_createParams( $category['params'], array( 'LANGUAGE' ));
       if( is_array( $category['value'] )) {
         foreach( $category['value'] as $cix => $categoryPart )
-          $category['value'][$cix] = $this->_strrep( $categoryPart );
+          $category['value'][$cix] = iCalUtilityFunctions::_strrep( $categoryPart, $this->format, $this->nl );
         $content  = implode( ',', $category['value'] );
       }
       else
-        $content  = $this->_strrep( $category['value'] );
+        $content  = iCalUtilityFunctions::_strrep( $category['value'], $this->format, $this->nl );
       $output    .= $this->_createElement( 'CATEGORIES', $attributes, $content );
     }
     return $output;
@@ -2452,7 +2445,7 @@ class calendarComponent {
  * creates formatted output for calendar component property comment
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-22
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createComment() {
@@ -2464,7 +2457,7 @@ class calendarComponent {
         continue;
       }
       $attributes = $this->_createParams( $commentPart['params'], array( 'ALTREP', 'LANGUAGE' ));
-      $content    = $this->_strrep( $commentPart['value'] );
+      $content    = iCalUtilityFunctions::_strrep( $commentPart['value'], $this->format, $this->nl );
       $output    .= $this->_createElement( 'COMMENT', $attributes, $content );
     }
     return $output;
@@ -2544,7 +2537,7 @@ class calendarComponent {
  * creates formatted output for calendar component property contact
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-23
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createContact() {
@@ -2553,7 +2546,7 @@ class calendarComponent {
     foreach( $this->contact as $contact ) {
       if( !empty( $contact['value'] )) {
         $attributes = $this->_createParams( $contact['params'], array( 'ALTREP', 'LANGUAGE' ));
-        $content    = $this->_strrep( $contact['value'] );
+        $content    = iCalUtilityFunctions::_strrep( $contact['value'], $this->format, $this->nl );
         $output    .= $this->_createElement( 'CONTACT', $attributes, $content );
       }
       elseif( $this->getConfig( 'allowEmpty' )) $output .= $this->_createElement( 'CONTACT' );
@@ -2621,7 +2614,7 @@ class calendarComponent {
  * creates formatted output for calendar component property description
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-22
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createDescription() {
@@ -2630,7 +2623,7 @@ class calendarComponent {
     foreach( $this->description as $description ) {
       if( !empty( $description['value'] )) {
         $attributes = $this->_createParams( $description['params'], array( 'ALTREP', 'LANGUAGE' ));
-        $content    = $this->_strrep( $description['value'] );
+        $content    = iCalUtilityFunctions::_strrep( $description['value'], $this->format, $this->nl );
         $output    .= $this->_createElement( 'DESCRIPTION', $attributes, $content );
       }
       elseif( $this->getConfig( 'allowEmpty' )) $output .= $this->_createElement( 'DESCRIPTION' );
@@ -2938,17 +2931,26 @@ class calendarComponent {
  * creates formatted output for calendar component property exdate
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-22
+ * @since 2.16.5 - 2012-12-28
  * @return string
  */
   function createExdate() {
     if( empty( $this->exdate )) return FALSE;
-    $output = null;
-    foreach( $this->exdate as $ex => $theExdate ) {
+    $output  = null;
+    $exdates = array();
+    foreach( $this->exdate as $theExdate ) {
       if( empty( $theExdate['value'] )) {
-        if( $this->getConfig( 'allowEmpty' )) $output .= $this->_createElement( 'EXDATE' );
+        if( $this->getConfig( 'allowEmpty' ))
+          $output .= $this->_createElement( 'EXDATE' );
         continue;
       }
+      if( 1 < count( $theExdate['value'] ))
+        usort( $theExdate['value'], array( 'iCalUtilityFunctions', '_sortExdate1' ));
+      $exdates[] = $theExdate;
+    }
+    if( 1 < count( $exdates ))
+      usort( $exdates, array( 'iCalUtilityFunctions', '_sortExdate2' ));
+    foreach( $exdates as $theExdate ) {
       $content = $attributes = null;
       foreach( $theExdate['value'] as $eix => $exdatePart ) {
         $parno = count( $exdatePart );
@@ -2967,12 +2969,12 @@ class calendarComponent {
           }
           else
             $formatted = str_replace( 'Z', '', $formatted );
-        }
+        } // end if( 0 < $eix )
         $content .= ( 0 < $eix ) ? ','.$formatted : $formatted;
-      }
+      } // end foreach( $theExdate['value'] as $eix => $exdatePart )
       $attributes .= $this->_createParams( $theExdate['params'] );
       $output .= $this->_createElement( 'EXDATE', $attributes, $content );
-    }
+    } // end foreach( $exdates as $theExdate )
     return $output;
   }
 /**
@@ -3295,7 +3297,7 @@ class calendarComponent {
  * creates formatted output for calendar component property location
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-22
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createLocation() {
@@ -3303,7 +3305,7 @@ class calendarComponent {
     if( empty( $this->location['value'] ))
       return ( $this->getConfig( 'allowEmpty' )) ? $this->_createElement( 'LOCATION' ) : FALSE;
     $attributes = $this->_createParams( $this->location['params'], array( 'ALTREP', 'LANGUAGE' ));
-    $content    = $this->_strrep( $this->location['value'] );
+    $content    = iCalUtilityFunctions::_strrep( $this->location['value'], $this->format, $this->nl );
     return $this->_createElement( 'LOCATION', $attributes, $content );
   }
 /**
@@ -3715,7 +3717,7 @@ class calendarComponent {
  * creates formatted output for calendar component property related-to
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.11.24 - 2012-02-23
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createRelatedTo() {
@@ -3723,7 +3725,7 @@ class calendarComponent {
     $output = null;
     foreach( $this->relatedto as $relation ) {
       if( !empty( $relation['value'] ))
-        $output .= $this->_createElement( 'RELATED-TO', $this->_createParams( $relation['params'] ), $this->_strrep( $relation['value'] ) );
+        $output .= $this->_createElement( 'RELATED-TO', $this->_createParams( $relation['params'] ), iCalUtilityFunctions::_strrep( $relation['value'], $this->format, $this->nl ));
       elseif( $this->getConfig( 'allowEmpty' ))
         $output .= $this->_createElement( 'RELATED-TO', $this->_createParams( $relation['params'] ));
     }
@@ -3784,7 +3786,7 @@ class calendarComponent {
 /**
  * creates formatted output for calendar component property request-status
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-23
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createRequestStatus() {
@@ -3797,9 +3799,9 @@ class calendarComponent {
       }
       $attributes  = $this->_createParams( $rstat['params'], array( 'LANGUAGE' ));
       $content     = number_format( (float) $rstat['value']['statcode'], 2, '.', '');
-      $content    .= ';'.$this->_strrep( $rstat['value']['text'] );
+      $content    .= ';'.iCalUtilityFunctions::_strrep( $rstat['value']['text'], $this->format, $this->nl );
       if( isset( $rstat['value']['extdata'] ))
-        $content  .= ';'.$this->_strrep( $rstat['value']['extdata'] );
+        $content  .= ';'.iCalUtilityFunctions::_strrep( $rstat['value']['extdata'], $this->format, $this->nl );
       $output     .= $this->_createElement( 'REQUEST-STATUS', $attributes, $content );
     }
     return $output;
@@ -3832,7 +3834,7 @@ class calendarComponent {
  * creates formatted output for calendar component property resources
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-23
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createResources() {
@@ -3846,11 +3848,11 @@ class calendarComponent {
       $attributes  = $this->_createParams( $resource['params'], array( 'ALTREP', 'LANGUAGE' ));
       if( is_array( $resource['value'] )) {
         foreach( $resource['value'] as $rix => $resourcePart )
-          $resource['value'][$rix] = $this->_strrep( $resourcePart );
+          $resource['value'][$rix] = iCalUtilityFunctions::_strrep( $resourcePart, $this->format, $this->nl );
         $content   = implode( ',', $resource['value'] );
       }
       else
-        $content   = $this->_strrep( $resource['value'] );
+        $content   = iCalUtilityFunctions::_strrep( $resource['value'], $this->format, $this->nl );
       $output     .= $this->_createElement( 'RESOURCES', $attributes, $content );
     }
     return $output;
@@ -3972,7 +3974,7 @@ class calendarComponent {
  * creates formatted output for calendar component property summary
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-21
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createSummary() {
@@ -3980,7 +3982,7 @@ class calendarComponent {
     if( empty( $this->summary['value'] ))
       return ( $this->getConfig( 'allowEmpty' )) ? $this->_createElement( 'SUMMARY' ) : FALSE;
     $attributes = $this->_createParams( $this->summary['params'], array( 'ALTREP', 'LANGUAGE' ));
-    $content    = $this->_strrep( $this->summary['value'] );
+    $content    = iCalUtilityFunctions::_strrep( $this->summary['value'], $this->format, $this->nl );
     return $this->_createElement( 'SUMMARY', $attributes, $content );
   }
 /**
@@ -4180,7 +4182,7 @@ class calendarComponent {
  * creates formatted output for calendar component property tzid
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-21
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createTzid() {
@@ -4188,7 +4190,7 @@ class calendarComponent {
     if( empty( $this->tzid['value'] ))
       return ( $this->getConfig( 'allowEmpty' )) ? $this->_createElement( 'TZID' ) : FALSE;
     $attributes = $this->_createParams( $this->tzid['params'] );
-    return $this->_createElement( 'TZID', $attributes, $this->_strrep( $this->tzid['value'] ));
+    return $this->_createElement( 'TZID', $attributes, iCalUtilityFunctions::_strrep( $this->tzid['value'], $this->format, $this->nl ));
   }
 /**
  * set calendar component property tzid
@@ -4213,7 +4215,7 @@ class calendarComponent {
  * creates formatted output for calendar component property tzname
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.8 - 2008-10-21
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createTzname() {
@@ -4222,7 +4224,7 @@ class calendarComponent {
     foreach( $this->tzname as $theName ) {
       if( !empty( $theName['value'] )) {
         $attributes = $this->_createParams( $theName['params'], array( 'LANGUAGE' ));
-        $output    .= $this->_createElement( 'TZNAME', $attributes, $this->_strrep( $theName['value'] ));
+        $output    .= $this->_createElement( 'TZNAME', $attributes, iCalUtilityFunctions::_strrep( $theName['value'], $this->format, $this->nl ));
       }
       elseif( $this->getConfig( 'allowEmpty' )) $output .= $this->_createElement( 'TZNAME' );
     }
@@ -4430,7 +4432,7 @@ class calendarComponent {
  * creates formatted output for calendar component property x-prop
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.9.3 - 2011-05-14
+ * @since 2.16.2 - 2012-12-18
  * @return string
  */
   function createXprop() {
@@ -4444,11 +4446,11 @@ class calendarComponent {
       $attributes = $this->_createParams( $xpropPart['params'], array( 'LANGUAGE' ));
       if( is_array( $xpropPart['value'] )) {
         foreach( $xpropPart['value'] as $pix => $theXpart )
-          $xpropPart['value'][$pix] = $this->_strrep( $theXpart );
+          $xpropPart['value'][$pix] = iCalUtilityFunctions::_strrep( $theXpart, $this->format, $this->format );
         $xpropPart['value']  = implode( ',', $xpropPart['value'] );
       }
       else
-        $xpropPart['value'] = $this->_strrep( $xpropPart['value'] );
+        $xpropPart['value'] = iCalUtilityFunctions::_strrep( $xpropPart['value'], $this->format, $this->nl );
       $output    .= $this->_createElement( $label, $attributes, $xpropPart['value'] );
     }
     return $output;
@@ -4520,7 +4522,7 @@ class calendarComponent {
  * creates formatted output for calendar component property
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.10.16 - 2011-10-28
+ * @since 2.16.2 - 2012-12-18
  * @param string $label property name
  * @param string $attributes property attributes
  * @param string $content property content (optional)
@@ -4621,7 +4623,7 @@ class calendarComponent {
           break;
         default:
           $output .= $this->elementStart2.$this->valueInit;
-          return $this->_size75( $output );
+          return iCalUtilityFunctions::_size75( $output, $this->nl );
           break;
       }
     }
@@ -4632,7 +4634,7 @@ class calendarComponent {
         return $output.$this->elementEnd1.$label.$this->elementEnd2;
         break;
       default:
-        return $this->_size75( $output );
+        return iCalUtilityFunctions::_size75( $output, $this->nl );
         break;
     }
   }
@@ -5776,7 +5778,7 @@ class calendarComponent {
  * parse component unparsed data into properties
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.15.10 - 2012-10-28
+ * @since 2.16.2 - 2012-12-18
  * @param mixed $unparsedtext, optional, strict rfc2445 formatted, single property string or array of strings
  * @return bool FALSE if error occurs during parsing
  *
@@ -5968,7 +5970,7 @@ class calendarComponent {
             if( 1 < count( $content )) {
               $content = array_values( $content );
               foreach( $content as $cix => $contentPart )
-                $content[$cix] = calendarComponent::_strunrep( $contentPart );
+                $content[$cix] = iCalUtilityFunctions::_strunrep( $contentPart );
               $this->setProperty( $propname, $content, $propattr );
               break;
             }
@@ -5982,12 +5984,12 @@ class calendarComponent {
         case 'SUMMARY':
           if( empty( $line ))
             $propattr = null;
-          $this->setProperty( $propname, calendarComponent::_strunrep( $line ), $propattr );
+          $this->setProperty( $propname, iCalUtilityFunctions::_strunrep( $line ), $propattr );
           break;
         case 'REQUEST-STATUS':
           $values    = explode( ';', $line, 3 );
-          $values[1] = ( !isset( $values[1] )) ? null : calendarComponent::_strunrep( $values[1] );
-          $values[2] = ( !isset( $values[2] )) ? null : calendarComponent::_strunrep( $values[2] );
+          $values[1] = ( !isset( $values[1] )) ? null : iCalUtilityFunctions::_strunrep( $values[1] );
+          $values[2] = ( !isset( $values[2] )) ? null : iCalUtilityFunctions::_strunrep( $values[2] );
           $this->setProperty( $propname
                             , $values[0]  // statcode
                             , $values[1]  // statdesc
@@ -6095,7 +6097,7 @@ class calendarComponent {
         case 'TZID':
         case 'RELATED-TO':
         case 'TZNAME':
-          $line = calendarComponent::_strunrep( $line );
+          $line = iCalUtilityFunctions::_strunrep( $line );
         default:
           $this->setProperty( $propname, $line, $propattr );
           break;
@@ -6361,158 +6363,6 @@ class calendarComponent {
       $output .= $component->createComponent( $this->xcaldecl );
     }
     return $output;
-  }
-/********************************************************************************/
-/**
- * break lines at pos 75
- *
- * Lines of text SHOULD NOT be longer than 75 octets, excluding the line
- * break. Long content lines SHOULD be split into a multiple line
- * representations using a line "folding" technique. That is, a long
- * line can be split between any two characters by inserting a CRLF
- * immediately followed by a single linear white space character (i.e.,
- * SPACE, US-ASCII decimal 32 or HTAB, US-ASCII decimal 9). Any sequence
- * of CRLF followed immediately by a single linear white space character
- * is ignored (i.e., removed) when processing the content type.
- *
- * Edited 2007-08-26 by Anders Litzell, anders@litzell.se to fix bug where
- * the reserved expression "\n" in the arg $string could be broken up by the
- * folding of lines, causing ambiguity in the return string.
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.12.17 - 2012-07-15
- * @param string $value
- * @return string
- */
-  function _size75( $string ) {
-    $tmp             = $string;
-    $string          = '';
-    $cCnt = $x       = 0;
-    while( TRUE ) {
-      if( !isset( $tmp[$x] )) {
-        $string     .= $this->nl;                     // loop breakes here
-        break;
-      }
-      elseif(( 74   <= $cCnt ) && ( '\\'  == $tmp[$x] ) && ( 'n' == $tmp[$x+1] )) {
-        $string     .= $this->nl.' \n';               // don't break lines inside '\n'
-        $x          += 2;
-        if( !isset( $tmp[$x] )) {
-          $string   .= $this->nl;
-          break;
-        }
-        $cCnt        = 3;
-      }
-      elseif( 75    <= $cCnt ) {
-        $string     .= $this->nl.' ';
-        $cCnt        = 1;
-      }
-      $byte          = ord( $tmp[$x] );
-      $string       .= $tmp[$x];
-      switch( TRUE ) { // see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-        case(( $byte >= 0x20 ) && ( $byte <= 0x7F )): // characters U-00000000 - U-0000007F (same as ASCII)
-          $cCnt     += 1;
-          break;                                      // add a one byte character
-        case(( $byte & 0xE0) == 0xC0 ):               // characters U-00000080 - U-000007FF, mask 110XXXXX
-          if( isset( $tmp[$x+1] )) {
-            $cCnt   += 1;
-            $string  .= $tmp[$x+1];
-            $x       += 1;                            // add a two bytes character
-          }
-          break;
-        case(( $byte & 0xF0 ) == 0xE0 ):              // characters U-00000800 - U-0000FFFF, mask 1110XXXX
-          if( isset( $tmp[$x+2] )) {
-            $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2];
-            $x      += 2;                             // add a three bytes character
-          }
-          break;
-        case(( $byte & 0xF8 ) == 0xF0 ):              // characters U-00010000 - U-001FFFFF, mask 11110XXX
-          if( isset( $tmp[$x+3] )) {
-            $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3];
-            $x      += 3;                             // add a four bytes character
-          }
-          break;
-        case(( $byte & 0xFC ) == 0xF8 ):              // characters U-00200000 - U-03FFFFFF, mask 111110XX
-          if( isset( $tmp[$x+4] )) {
-            $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4];
-            $x      += 4;                             // add a five bytes character
-          }
-          break;
-        case(( $byte & 0xFE ) == 0xFC ):              // characters U-04000000 - U-7FFFFFFF, mask 1111110X
-          if( isset( $tmp[$x+5] )) {
-            $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4].$tmp[$x+5];
-            $x      += 5;                             // add a six bytes character
-          }
-        default:                                      // add any other byte without counting up $cCnt
-          break;
-      } // end switch( TRUE )
-      $x         += 1;                                // next 'byte' to test
-    } // end while( TRUE ) {
-    return $string;
-  }
-/**
- * special characters management output
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.12.16 - 2012-07-16
- * @param string $string
- * @return string
- */
-  function _strrep( $string ) {
-    switch( $this->format ) {
-      case 'xcal':
-        $string = str_replace( '\n',  $this->nl, $string);
-        $string = htmlspecialchars( strip_tags( stripslashes( urldecode ( $string ))));
-        break;
-      default:
-        $pos = 0;
-        $specChars = array( 'n', 'N', 'r', ',', ';' );
-        while( isset( $string[$pos] )) {
-          if( FALSE === ( $pos = strpos( $string, "\\", $pos )))
-            break;
-          if( !in_array( substr( $string, $pos, 1 ), $specChars )) {
-            $string = substr( $string, 0, $pos )."\\".substr( $string, ( $pos + 1 ));
-            $pos += 1;
-          }
-          $pos += 1;
-        }
-        if( FALSE !== strpos( $string, '"' ))
-          $string = str_replace('"',   "'",       $string);
-        if( FALSE !== strpos( $string, ',' ))
-          $string = str_replace(',',   '\,',      $string);
-        if( FALSE !== strpos( $string, ';' ))
-          $string = str_replace(';',   '\;',      $string);
-        if( FALSE !== strpos( $string, "\r\n" ))
-          $string = str_replace( "\r\n", '\n',    $string);
-        elseif( FALSE !== strpos( $string, "\r" ))
-          $string = str_replace( "\r", '\n',      $string);
-        elseif( FALSE !== strpos( $string, "\n" ))
-          $string = str_replace( "\n", '\n',      $string);
-        if( FALSE !== strpos( $string, '\N' ))
-          $string = str_replace( '\N', '\n',      $string);
-//        if( FALSE !== strpos( $string, $this->nl ))
-          $string = str_replace( $this->nl, '\n', $string);
-        break;
-    }
-    return $string;
-  }
-/**
- * special characters management input (from iCal file)
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.6.22 - 2010-10-17
- * @param string $string
- * @return string
- */
-  static function _strunrep( $string ) {
-    $string = str_replace( '\\\\', '\\',     $string);
-    $string = str_replace( '\,',   ',',      $string);
-    $string = str_replace( '\;',   ';',      $string);
-//    $string = str_replace( '\n',  $this->nl, $string); // ??
-    return $string;
   }
 }
 /*********************************************************************************/
@@ -7312,6 +7162,51 @@ class iCalUtilityFunctions {
       if( isset( $params['TZID'] ))
         $parno = 6;
     }
+  }
+/**
+ * vcalendar sort callback function
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.16.2 - 2012-12-17
+ * @param array $a
+ * @param array $b
+ * @return int
+ */
+  public static function _cmpfcn( $a, $b ) {
+    if(        empty( $a ))                       return -1;
+    if(        empty( $b ))                       return  1;
+    if( 'vtimezone' == $a->objName ) {
+      if( 'vtimezone' != $b->objName )            return -1;
+      elseif( $a->srtk[0] <= $b->srtk[0] )        return -1;
+      else                                        return  1;
+    }
+    elseif( 'vtimezone' == $b->objName )          return  1;
+    $sortkeys = array( 'year', 'month', 'day', 'hour', 'min', 'sec' );
+    for( $k = 0; $k < 4 ; $k++ ) {
+      if(        empty( $a->srtk[$k] ))           return -1;
+      elseif(    empty( $b->srtk[$k] ))           return  1;
+      if( is_array( $a->srtk[$k] )) {
+        if( is_array( $b->srtk[$k] )) {
+          foreach( $sortkeys as $key ) {
+            if    ( !isset( $a->srtk[$k][$key] )) return -1;
+            elseif( !isset( $b->srtk[$k][$key] )) return  1;
+            if    (  empty( $a->srtk[$k][$key] )) return -1;
+            elseif(  empty( $b->srtk[$k][$key] )) return  1;
+            if    (         $a->srtk[$k][$key] == $b->srtk[$k][$key])
+                                                  continue;
+            if    ((  (int) $a->srtk[$k][$key] ) < ((int) $b->srtk[$k][$key] ))
+                                                  return -1;
+            elseif((  (int) $a->srtk[$k][$key] ) > ((int) $b->srtk[$k][$key] ))
+                                                  return  1;
+          }
+        }
+        else                                      return -1;
+      }
+      elseif( is_array( $b->srtk[$k] ))           return  1;
+      elseif( $a->srtk[$k] < $b->srtk[$k] )       return -1;
+      elseif( $a->srtk[$k] > $b->srtk[$k] )       return  1;
+    }
+    return 0;
   }
 /**
  * byte oriented line folding fix
@@ -8208,7 +8103,7 @@ class iCalUtilityFunctions {
             $updateOK = TRUE;
 // echo "m=$m d=$d day=".$daycnts[$m][$d]['DAY']." yeardayno_up=".$daycnts[$m][$d]['yeardayno_up']." daynoexists:$daynoexists daynosw:$daynosw daynamesw:$daynamesw updateOK:$updateOK<br />\n"; // test ###
           }
-//echo "m=$m d=$d day=".$daycnts[$m][$d]['DAY']." yeardayno_up=".$daycnts[$m][$d]['yeardayno_up']." daynoexists:$daynoexists daynosw:$daynosw daynamesw:$daynamesw updateOK:$updateOK<br />\n"; // test ###
+// echo "m=$m d=$d day=".$daycnts[$m][$d]['DAY']." yeardayno_up=".$daycnts[$m][$d]['yeardayno_up']." daynoexists:$daynoexists daynosw:$daynosw daynamesw:$daynamesw updateOK:$updateOK<br />\n"; // test ###
         }
         else {
           foreach( $recur['BYDAY'] as $bydayvalue ) {
@@ -8776,6 +8671,130 @@ class iCalUtilityFunctions {
     return (0 < count( $input )) ? $input : null;
   }
 /**
+ * break lines at pos 75
+ *
+ * Lines of text SHOULD NOT be longer than 75 octets, excluding the line
+ * break. Long content lines SHOULD be split into a multiple line
+ * representations using a line "folding" technique. That is, a long
+ * line can be split between any two characters by inserting a CRLF
+ * immediately followed by a single linear white space character (i.e.,
+ * SPACE, US-ASCII decimal 32 or HTAB, US-ASCII decimal 9). Any sequence
+ * of CRLF followed immediately by a single linear white space character
+ * is ignored (i.e., removed) when processing the content type.
+ *
+ * Edited 2007-08-26 by Anders Litzell, anders@litzell.se to fix bug where
+ * the reserved expression "\n" in the arg $string could be broken up by the
+ * folding of lines, causing ambiguity in the return string.
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.16.2 - 2012-12-18
+ * @param string $value
+ * @return string
+ */
+  public static function _size75( $string, $nl ) {
+    $tmp             = $string;
+    $string          = '';
+    $cCnt = $x       = 0;
+    while( TRUE ) {
+      if( !isset( $tmp[$x] )) {
+        $string     .= $nl;                           // loop breakes here
+        break;
+      }
+      elseif(( 74   <= $cCnt ) && ( '\\'  == $tmp[$x] ) && ( 'n' == $tmp[$x+1] )) {
+        $string     .= $nl.' \n';                     // don't break lines inside '\n'
+        $x          += 2;
+        if( !isset( $tmp[$x] )) {
+          $string   .= $nl;
+          break;
+        }
+        $cCnt        = 3;
+      }
+      elseif( 75    <= $cCnt ) {
+        $string     .= $nl.' ';
+        $cCnt        = 1;
+      }
+      $byte          = ord( $tmp[$x] );
+      $string       .= $tmp[$x];
+      switch( TRUE ) { // see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
+        case(( $byte >= 0x20 ) && ( $byte <= 0x7F )): // characters U-00000000 - U-0000007F (same as ASCII)
+          $cCnt     += 1;
+          break;                                      // add a one byte character
+        case(( $byte & 0xE0) == 0xC0 ):               // characters U-00000080 - U-000007FF, mask 110XXXXX
+          if( isset( $tmp[$x+1] )) {
+            $cCnt   += 1;
+            $string  .= $tmp[$x+1];
+            $x       += 1;                            // add a two bytes character
+          }
+          break;
+        case(( $byte & 0xF0 ) == 0xE0 ):              // characters U-00000800 - U-0000FFFF, mask 1110XXXX
+          if( isset( $tmp[$x+2] )) {
+            $cCnt   += 1;
+            $string .= $tmp[$x+1].$tmp[$x+2];
+            $x      += 2;                             // add a three bytes character
+          }
+          break;
+        case(( $byte & 0xF8 ) == 0xF0 ):              // characters U-00010000 - U-001FFFFF, mask 11110XXX
+          if( isset( $tmp[$x+3] )) {
+            $cCnt   += 1;
+            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3];
+            $x      += 3;                             // add a four bytes character
+          }
+          break;
+        case(( $byte & 0xFC ) == 0xF8 ):              // characters U-00200000 - U-03FFFFFF, mask 111110XX
+          if( isset( $tmp[$x+4] )) {
+            $cCnt   += 1;
+            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4];
+            $x      += 4;                             // add a five bytes character
+          }
+          break;
+        case(( $byte & 0xFE ) == 0xFC ):              // characters U-04000000 - U-7FFFFFFF, mask 1111110X
+          if( isset( $tmp[$x+5] )) {
+            $cCnt   += 1;
+            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4].$tmp[$x+5];
+            $x      += 5;                             // add a six bytes character
+          }
+        default:                                      // add any other byte without counting up $cCnt
+          break;
+      } // end switch( TRUE )
+      $x         += 1;                                // next 'byte' to test
+    } // end while( TRUE ) {
+    return $string;
+  }
+/**
+ * sort callback functions for exdate
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.16.5 - 2012-12-28
+ * @param array $a
+ * @param array $b
+ * @return int
+ */
+  public static function _sortExdate1( $a, $b ) {
+    $sortkeys = array( 'year', 'month', 'day', 'hour', 'min', 'sec' );
+    for( $k = 0; $k < 4 ; $k++ ) {
+      foreach( $sortkeys as $key ) {
+        if    ( !isset( $a[$key] )) return -1;
+        elseif( !isset( $b[$key] )) return  1;
+        if    (         $a[$key] == $b[$key])
+                                    continue;
+        if    (( (int)  $a[$key] ) < ((int) $b[$key] ))
+                                    return -1;
+        elseif(( (int)  $a[$key] ) > ((int) $b[$key] ))
+                                    return  1;
+      }
+    }
+    return -1;
+  }
+  public static function _sortExdate2( $a, $b ) {
+    $val     = reset( $a['value'] );
+    $aValue  = sprintf( '%04d%02d%02d', $val['year'], $val['month'], $val['day'] );
+    $aValue .= ( isset( $val['hour'] )) ? sprintf( '%02d%02d%02d', $val['hour'], $val['min'], $val['sec'] ) : '000000';
+    $val     = reset( $b['value'] );
+    $bValue  = sprintf( '%04d%02d%02d', $val['year'], $val['month'], $val['day'] );
+    $bValue .= ( isset( $val['hour'] )) ? sprintf( '%02d%02d%02d', $val['hour'], $val['min'], $val['sec'] ) : '000000';
+    return ( $aValue < $bValue ) ? -1 : 1;
+  }
+/**
  * step date, return updated date, array and timpstamp
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
@@ -8972,6 +8991,70 @@ class iCalUtilityFunctions {
     // return original string in the array in case strtotime failed to make sense of it
     $output['unparsedtext'] = $unparseddatetime;
     return $output;
+  }
+/********************************************************************************/
+/**
+ * special characters management output
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.16.2 - 2012-12-18
+ * @param string $string
+ * @param string $format
+ * @param string $nl
+ * @return string
+ */
+  public static function _strrep( $string, $format, $nl ) {
+    switch( $format ) {
+      case 'xcal':
+        $string = str_replace( '\n',  $nl, $string);
+        $string = htmlspecialchars( strip_tags( stripslashes( urldecode ( $string ))));
+        break;
+      default:
+        $pos = 0;
+        $specChars = array( 'n', 'N', 'r', ',', ';' );
+        while( isset( $string[$pos] )) {
+          if( FALSE === ( $pos = strpos( $string, "\\", $pos )))
+            break;
+          if( !in_array( substr( $string, $pos, 1 ), $specChars )) {
+            $string = substr( $string, 0, $pos )."\\".substr( $string, ( $pos + 1 ));
+            $pos += 1;
+          }
+          $pos += 1;
+        }
+        if( FALSE !== strpos( $string, '"' ))
+          $string = str_replace('"',   "'",       $string);
+        if( FALSE !== strpos( $string, ',' ))
+          $string = str_replace(',',   '\,',      $string);
+        if( FALSE !== strpos( $string, ';' ))
+          $string = str_replace(';',   '\;',      $string);
+        if( FALSE !== strpos( $string, "\r\n" ))
+          $string = str_replace( "\r\n", '\n',    $string);
+        elseif( FALSE !== strpos( $string, "\r" ))
+          $string = str_replace( "\r", '\n',      $string);
+        elseif( FALSE !== strpos( $string, "\n" ))
+          $string = str_replace( "\n", '\n',      $string);
+        if( FALSE !== strpos( $string, '\N' ))
+          $string = str_replace( '\N', '\n',      $string);
+//        if( FALSE !== strpos( $string, $nl ))
+          $string = str_replace( $nl, '\n', $string);
+        break;
+    }
+    return $string;
+  }
+/**
+ * special characters management input (from iCal file)
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.16.2 - 2012-12-18
+ * @param string $string
+ * @return string
+ */
+  public static function _strunrep( $string ) {
+    $string = str_replace( '\\\\', '\\',     $string);
+    $string = str_replace( '\,',   ',',      $string);
+    $string = str_replace( '\;',   ';',      $string);
+//    $string = str_replace( '\n',  $nl, $string); // ??
+    return $string;
   }
 /**
  * convert timestamp to date array, default UTC or adjusted for offset/timezone
@@ -10098,7 +10181,7 @@ function getTzOffsetForDate($timezonesarray, $tzid, $timestamp) {
             $timestamp['day'],
             $timestamp['year']
             ) ;
-//echo '<td colspan="4">&nbsp;'."\n".'<tr><td>&nbsp;<td class="r">'.$timestamp.'<td class="r">'.$disp.'<td colspan="4">&nbsp;'."\n".'<tr><td colspan="3">&nbsp;'; // test ###
+// echo '<td colspan="4">&nbsp;'."\n".'<tr><td>&nbsp;<td class="r">'.$timestamp.'<td class="r">'.$disp.'<td colspan="4">&nbsp;'."\n".'<tr><td colspan="3">&nbsp;'; // test ###
     }
     $tzoffset = array();
     // something to return if all goes wrong (such as if $tzid doesn't find us an array of dates)
