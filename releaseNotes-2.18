@@ -1,0 +1,40 @@
+2.16.13 ######################
+BUG: fcn selectComponents, sequence usage
+
+2.16.15 ######################
+BUG: fcn getComponent, making a selection based on a property value
+
+2.16.16 ######################
+BUG: fcn _duration2arr, duration parts management
+
+2.16.17 ######################
+BUG: fcn _duration2arr, array input
+
+2.16.18 ######################
+BUG: fcn setDuration, empty input
+
+2.16.19 ######################
+BUG: fcn sort, sort key setting
+
+2.16.21 ######################
+BUG: mgnt of empty properties
+
+2.16.22 ######################
+NEW: fcn XML2iCal, rewrite from the furure iCalcreator (Pro) 3.0.0
+UPD: fcn iCal2XML, updated from the furure iCalcreator (Pro) 3.0.0
+
+2.16.23 ######################
+BUG: fcn _duration2arr (setTRIGGER), array input
+
+2.16.24 ######################
+UPD: fcn _setDate,  (_chkDateArr, _strdate2date), DTSTART etc
+UPD: fcn _setDate2 (_isArrayDate() DTSTAMP etc
+
+2.16.25  ######################
+UPD: fcn _format_recur, updated from the furure iCalcreator (Pro) 3.0.0
+
+2.16.26  ######################
+BUG: fcn parse, 'X-'-properties in an array of (iCal property) lines
+
+2.16.27  ######################
+NEW: fcn, sort freebusy dates asc
