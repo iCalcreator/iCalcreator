@@ -1,5 +1,5 @@
 {
-    "name": "kigkonsult/iCalcreator",
+    "name": "kigkonsult/icalcreator",
     "type": "library",
     "description": "iCalcreator is a PHP implementation of rfc2445/rfc5545, management of iCal formatted files",
     "license": "LGPL-2.1",
