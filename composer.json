@@ -13,6 +13,9 @@
             "email": "ical@kigkonsult.se"
         }
     ],
+    "autoload": {
+        "files": ["iCalcreator.class.php"]
+    },
     "require": {
         "php": ">=5.2"
     }

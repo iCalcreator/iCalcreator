@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.18 manual</title>
+<title>iCalcreator 2.20 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-<meta name="copyright"   content="2007-2013 Kjell-Inge Gustafsson, kigkonsult">
+<meta name="copyright"   content="2007-2014 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.18">
+<meta name="description" content="using iCalcreator v2.20">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -137,10 +137,10 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.18</p>
+<p class="header">iCalcreator v2.20</p>
 <p>
-iCalcreator v2.18<br>
-Copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.20<br>
+Copyright &copy; 2007-2014 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
@@ -239,7 +239,10 @@ Any references to rfc2445, below, corresponds to rfc5545.
 <p>
 A short xCal description is found at <a href="http://en.wikipedia.org/wiki/XCal" title="xCal on Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
 </p>
-
+<p>
+The older xCal format, as defined in &quot;http://www.ietf.org/internet-drafts/draft-ietf-calsch-many-xcal-01.txt&quot;
+(but no longer found), still works in this version but will not be maintaned and will be removed in future versions.
+</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
@@ -281,8 +284,8 @@ This style is used for <em>PHP</em> coding examples.
 
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
-The main support channel is using iCalcreator
-<a title="Sourceforge" href="http://sourceforge.net/projects/icalcreator/forums/" target="_blank">Sourceforge</a> forum.
+Use the kigkonsult.se standard support <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se/support" target="_blank">page</a>
+exploring iCalcreator use and iCal issues.
 </p>
 <p>
 Support and development is now focused on iCalcreator (Pro) 3.x versions, which, in turn, will affect future releases
@@ -294,10 +297,8 @@ for queries, improvement/development issues or professional support and developm
 Please note that paid support or consulting service has the highest priority.
 </p>
 <p>
-kigkonsult offer services for software support, design and development of customizations and adaptations
-of <em>PHP</em>/<em>MySQL</em> solutions
-with a special focus on software long term utility and reliability,
-supported through our agile acquire/design/transition process model.
+kigkonsult offer professional services for software support, design and new/re-development, customizations and adaptations
+of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle management, including long term utility, reliability and maintainability.
 </p>
 
 <br>
@@ -339,28 +340,6 @@ Creating a new iCalcreator object instance/component instance, review <a href="#
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
 
-<a name="Boost"></a><h3>1.6.2 Boost performance</h3>
-<p>
-To really boost performance, kigkonsult can now offer <em>PHP</em> (4 and 5) packages (iCalcreator etc) in byte coded files,
-using <a href="http://www.ioncube.com" target="_blank"><u>ionCube</u></a> encoder.
-</p>
-<p>
-Encoded files use a platform independent file format, and can be run on any platform for which ionCube supply a (free) Loader.
-Currently supported platforms are Windows (e.g. NT, XP, W2K), Intel Linux, FreeBSD, NetBSD, OpenBSD, OS X, and Sparc Solaris.
-</p>
-<p>
-Visit kigkonsult.se contact <a href="http://kigkonsult.se/contact/index.php" target="_blank"><u>page</u></a> for information and purchase.
-</p>
-<p>
-Use basic install (above), install ionCube Loader (requires an update of &quot;php.ini&quot;
-or additional file in &quot;/etc/php.d&quot; folder AND the execute rights to use the <em>PHP</em> &quot;dl&quot; function)
-and simply replace the <em>PHP</em> class files with the encoded files.
-</p>
-
-<br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a>
-
-
 <a name="Additional_Descriptors"></a><h2>1.7 Additional Descriptors</h2>
 <p>The following properties (as described in <a href="http://en.wikipedia.org/wiki/ICalendar#Calendar_extensions" title="http://en.wikipedia.org/wiki/ICalendar#Calendar_extensions" target="_blank">wikipedia:iCal</a>)
 may be required when importing iCal files into some calendaring software (MS etc.):</p>
@@ -369,7 +348,7 @@ may be required when importing iCal files into some calendaring software (MS etc
 <dd><a href="#METHOD">METHOD</a> property (value PUBLISH etc.)
 <dd><a href="#X-PROPERTY">X-WR-CALNAME</a> x-property
 <dd><a href="#X-PROPERTY">X-WR-CALDESC</a> x-property
-<dd><a href="#X-PROPERTY">X-WR-RELCALID</a> x-property <span class="comment">(a <a href="/wiki/Universally_Unique_Identifier" title="Universally Unique Identifier" class="mw-redirect">UUID</a>.)</span>
+<dd><a href="#X-PROPERTY">X-WR-RELCALID</a> x-property <span class="comment">(Read more info about <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier" title="Universally Unique Identifier">UUID</a>.)</span>
 <dd><a href="#X-PROPERTY">X-WR-TIMEZONE</a> x-property
 <dt>on component level
 <dd><a href="#DTSTAMP">DTSTAMP</a> property (in iCalcreator created automatically, if not set)
@@ -420,11 +399,13 @@ The <em>PHP</em> coding in this document or &quot;coding samples&quot; (above) a
 coding standard, the following, incomplete, list is a good start;
 </p>
 <dl>
-<dd><a href="http://www.dagbladet.no/development/phpcodingstandard/" target="_blank">http://www.dagbladet.no/development/phpcodingstandard/</a>
-<!-- <a href="http://ez.no/ezpublish/documentation/development/standards/php" target="_blank">http://ez.no/ezpublish/documentation/development/standards/php</a> -->
-<dd><a href="http://framework.zend.com/manual/en/coding-standard.overview.html" target="_blank">http://framework.zend.com/manual/en/coding-standard.overview.html</a>
+<dd><a href="http://www.php-fig.org/psr/psr-1/" target="_blank">PHP Framework Interop Group Basic Coding Standard</a>
+<!-- dd><a href="http://www.dagbladet.no/development/phpcodingstandard/" target="_blank">http://www.dagbladet.no/development/phpcodingstandard/</a -->
+<!-- dd><a href="http://ez.no/ezpublish/documentation/development/standards/php" target="_blank">http://ez.no/ezpublish/documentation/development/standards/php</a> -->
 <!-- <a href="http://gforge.org/docman/view.php/1/2/coding-standards.html" target="_blank">http://gforge.org/docman/view.php/1/2/coding-standards.html</a> -->
-<dd><a href="http://pear.php.net/manual/en/standards.php" target="_blank">http://pear.php.net/manual/en/standards.php</a>
+<dd><a href="http://pear.php.net/manual/en/standards.php" target="_blank"> pear Coding standards</a>
+<dd><a href="http://make.wordpress.org/core/handbook/coding-standards/php/" target="_blank">WordPress PHP Coding Standards</a>
+<dd><a href="http://framework.zend.com/manual/1.10/en/coding-standard.html" target="_blank">Zend Framework Coding Standard</a>
 </dl>
 
 <br>
@@ -442,7 +423,6 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#Donate">1.5 Donate</a><br>
 <a href="#INSTALL">1.6 Install</a><br>
 <a href="#Basic">1.6.1 Basic</a><br>
-<a href="#Boost">1.6.2 Boost performance</a><br>
 <a href="#Additional_Descriptors">1.7 Additional_Descriptors</a><br>
 <a href="#Addendum">1.8 Addendum</a><br>
 <a href="#INDEX">1.9 INDEX</a><br>
@@ -486,16 +466,18 @@ coding standard, the following, incomplete, list is a good start;
 <a href="#deleteComponent">3.1.3.1 deleteComponent</a><br>
 <a href="#getComponent">3.1.3.2 getComponent</a><br>
 <a href="#newComponent">3.1.3.3 newComponent</a><br>
-<a href="#selectComponents">3.1.3.4 selectComponents</a><br>
-<a href="#setComponent">3.1.3.5 setComponent</a><br>
+<a href="#replaceComponent">3.1.3.4 replaceComponent</a><br>
+<a href="#selectComponents">3.1.3.5 selectComponents</a><br>
+<a href="#setComponent">3.1.3.6 setComponent</a><br>
 <br>
-<a href="#iCalcreator_inputoutput_methods">3.1.4 iCalcreator input/output methods</a><br>
+<a href="#iCalcreator_calendar_methods">3.1.4 iCalcreator calendar methods</a><br>
 <a href="#parse_merge">3.1.4.1 parse and merge</a><br>
 <a href="#createCalendar">3.1.4.2 createCalendar</a><br>
 <a href="#returnCalendar">3.1.4.3 returnCalendar</a><br>
 <a href="#saveCalendar">3.1.4.4 saveCalendar</a><br>
 <a href="#sort">3.1.4.5 sort</a><br>
 <a href="#useCachedCalendar">3.1.4.6 useCachedCalendar</a><br>
+<a href="#iCalcreatorVersion">3.1.4.7 iCalcreatorVersion</a><br>
 <br>
 <a href="#iCalcreator_configuration_methods">3.1.5 iCalcreator configuration methods</a><br>
 <a href="#configKeys">3.1.5.1 configuration keys</a><br>
@@ -2357,7 +2339,29 @@ $vevent    = &amp; $vcalendar-&gt;newComponent( &quot;vevent&quot; );
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a name="selectComponents"></a><h4>3.1.3.4 selectComponents</h4>
+<a name="replaceComponent"></a><h4>3.1.3.4 replaceComponent</h4>
+<P>
+Replace calendar component in vcalendar based on component property <a href="#UID">UID</a>
+(<a href="#VEVENT">EVENT</a> / <a href="#VTODO">VTODO</a> / <a href="#VJOURNAL">VJOURNAL</a> / <a href="#VFREEBUSY">VFREEBUSY</a>).
+If not found, inserted last in component chain.
+</p>
+<p>
+For a <a href="#VTIMEZONE">VTIMEZONE</a> component, a <a href="#TZID">TZID</a> match is required (returns TRUE) otherwise FALSE is returned.
+</p>
+<p class="label">Format</p>
+<p class="format">vcalendar::replaceComponent( component )</p>
+<p class="comment">component = (object) component object instance</p>
+<p class="label">Example</p>
+<p class="example">&lt;?php
+...
+$vcalendar-&gt;replaceComponent( $component );
+...
+</p>
+
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
+
+<a name="selectComponents"></a><h4>3.1.3.5 selectComponents</h4>
 <p class="label">Format 1</p>
 <p>
 Selects  <a href="#VEVENT">EVENT</a> / <a href="#VTODO">VTODO</a> / <a href="#VJOURNAL">VJOURNAL</a> /
@@ -2389,7 +2393,7 @@ For all recurrent instances of a <strong>calendar</strong> component, an x-prope
 &quot;X-CURRENT-DTSTART&quot; and opt. also &quot;X-CURRENT-DTEND&quot; alt. &quot;X-CURRENT-DUE&quot;,
 has been created with a TEXT content, &quot;Y-m-d&nbsp;[H:i:s][timezone/UTC&nbsp;offset]&quot;
 showing the current start and opt. also end alt. due date.<br>
-Also a &quot;X-RECURRENCE&quot; x-property is set with order number (valid if selectComponents is called from DTSTART date).
+Also a &quot;X-RECURRENCE&quot; x-property is set with order number (valid if selectComponents is invoked using DTSTART date).
 </p>
 <p class="comment">startYear  : (int) start year  (4*digit),   default current year
 startMonth : (int) start month (1-2*digit), default current month
@@ -2417,6 +2421,8 @@ combinations                          (defaults in upper case)
            3  FALSE   false   [false] (split set to false if flat=FALSE and any=false)
            4  true    TRUE    [false] (split set to false if flat=true)
            5  true    false   [false] (split set to false if flat=true)
+
+If flat is set to FALSE, output array is sorted in 'Y-m-d h-i-s' asc. order.
 </p>
 <p class="label">Example</p>
 <p class="example">&lt;?php
@@ -2508,7 +2514,7 @@ if( !empty( $highPrioArr )) {
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a name="setComponent"></a><h4>3.1.3.5 setComponent</h4>
+<a name="setComponent"></a><h4>3.1.3.6 setComponent</h4>
 <p>
 Replace or update component in the iCalcreator object instance.
 Also add a <strong>calendar</strong> component to the iCalcreator object instance
@@ -2562,7 +2568,7 @@ $vcalendar-&gt;setComponent( $vevent, 1 );    // <span class="comment">replace f
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a name="iCalcreator_inputoutput_methods"></a><h3>3.1.4 iCalcreator input/output methods</h3>
+<a name="iCalcreator_calendar_methods"></a><h3>3.1.4 iCalcreator calendar methods</h3>
 
 <a name="parse_merge"></a><h4>3.1.4.1 parse and merge</h4>
 <p>
@@ -2657,7 +2663,7 @@ $vcalendar-&gt;saveCalendar();
 .. .
 </p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
 
 <a name="createCalendar"></a><h4>3.1.4.2 createCalendar</h4>
 Generate and return <strong>calendar</strong> in a string, testing.. .?
@@ -2671,7 +2677,7 @@ echo $str;
 ...
 </p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
 
 <a name="returnCalendar"></a><h4>3.1.4.3 returnCalendar</h4>
 <p>
@@ -2720,7 +2726,7 @@ $vcalendar-&gt;returnCalendar( $utf8Encode, $gzip );
 ...
 </p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
 
 <a name="saveCalendar"></a><h4>3.1.4.4 saveCalendar</h4>
 <p>
@@ -2748,7 +2754,7 @@ if( !$result )
 ...
 </p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
 
 <a name="sort"></a><h4>3.1.4.5 sort</h4>
 <p class="label">Format 1</p>
@@ -2778,6 +2784,7 @@ $config    = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,
                     &quot;filename&quot;  =&gt; &quot;file.ics&quot; );
 $vcalendar = new vcalendar( $config );
 $vcalendar-&gt;parse();
+$vcalendar-&gt;sort();
 $vcalendar-&gt;returnCalendar();
 ...
 </p>
@@ -2794,7 +2801,7 @@ Sort created/parsed <strong>calendar</strong> components based on specific prope
 <p class="comment"><sup>*) </sup> For a property where multiple occurrence may exist (<a href="#ATTENDEE">ATTENDEE</a>, <a href="#CATEGORIES">CATEGORIES</a>, <a href="#CONTACT">CONTACT</a>, <a href="#RESOURCES">RESOURCES</a>) lowest (alphabetic) value is used as sort key.</p>
 <p class="comment"><sup>**)</sup> For multiple components with the same <a href="#UID">UID</a>, components with <a href="#RECURRENCE-ID">RECURRENCE-ID</a> / <a href="#SEQUENCE">SEQUENCE</a> set are sorted first (on asc. values).</p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
 
 <a name="useCachedCalendar"></a><h4>3.1.4.6 useCachedCalendar</h4>
 <p>
@@ -2817,7 +2824,23 @@ $vcalendar-&gt;useCachedCalendar();
 ...
 </p>
 <br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_inputoutput_methods">[up]</a>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
+
+
+<a name="iCalcreatorVersion"></a><h4>3.1.4.7 iCalcreatorVersion</h4>
+<p>
+This static class method returns the iCalcreator class version number (2.20+).
+</p>
+<p>
+There is also a <em>PHP</em> constant &quot;ICALCREATOR_VERSION&quot; (all versions).
+</p>
+<p class="label">Format</p>
+<p class="format">vcalendar::iCalcreatorVersion()</p>
+
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_calendar_methods">[up]</a>
+
+
 
 <a name="iCalcreator_configuration_methods"></a><h3>3.1.5 iCalcreator configuration methods</h3>
 
@@ -3102,6 +3125,7 @@ Default &quot;<b>.</b>&quot;.
 <p>
 Directory <b>must</b> be set BEFORE <a href="#Filename">filename</a> and <b>must</b> exist and be writeable otherwise FALSE is returned.
 If set using an config array and together with <a name="Filename"><u>Filename</u></a>, Directory are set automatically first.
+When setting directory, the <em>PHP</em> realpath function is applied to speed up parse/saveCalendar methods.
 When setting Directory, any previously set <a href="#configURL">URL</a> is removed.
 </p>
 <br>
@@ -3139,7 +3163,7 @@ Filename (and opt. directory) <b>must</b> be readable/writeable otherwise FALSE 
 <a name="Filesize"></a><h4>3.1.5.11 Filesize</h4>
 <p>
 Only when getting configuration (using iCalcreator object method getConfig).<br>
-Returns the size of the file in bytes, to be called<br>
+Returns the size of the file in bytes, to be invoked<br>
 - after &quot;saveCalendar()&quot;<br>
 or<br>
 - after a &quot;setConfig( &quot;directory&quot; / &quot;filename&quot; )&quot; and before/after &quot;parse()&quot;.<br>
@@ -3243,17 +3267,18 @@ to ensure accurate creation of all components <a href="#UID">UID</a> property, a
 
 <a name="configURL"></a><h4>3.1.5.18 URL</h4>
 <p>
-When reading remote files with URL (using the <a href="#parse">parse()</a> method),
-only protocol &quot;http&quot; (&quot;webcal&quot;) is supported,
-i.e. URL <b>must</b> be prefixed by &quot;http://&quot; (&quot;webcal://&quot;) and suffixed by a valid filename.
+When reading remote files or resources with URL (using the <a href="#parse">parse()</a> method),
+protocol &quot;http&quot; (&quot;webcal&quot;) and &quot;https&quot; are supported.
 </p>
 <p>
-When setting URL, any previously set Directory is removed.<br>
-The URL filename part can be retrieved by - getConfig( &quot;filename&quot; ).
+When setting URL, the previously set <a href="#Directory">Directory</a> is removed.
 </p>
 <p>
-When storing a remote iCal file locally, only directory need to be set,
+A remote file is identified by the file suffix &quot;.ics&quot;, otherwise the URL is classified as a resource.
+When setting URL to a remote iCal <u>file</u>, only directory need to be (re-)set,
 filename remains unchanged (i.e. 1. set URL, 2. parse, 3. set directory, 4. saveCalendar).
+The URL remote file <u>file</u> part can be retrieved by the vcalendar method getConfig( &quot;filename&quot; ).
+When using a resource, filename is unset (note <a href="#Filename">filename</a>, above).
 </p>
 <p class="label">Example</p>
 <p>Parse of remote file, then local save in &quot;depot&quot; folder, using original filename</p>
@@ -3691,6 +3716,10 @@ if missing, &quot;mailto:&quot; is set (indicating an internet mail address).
 Also MEMBER and DIR parameters must be prefixed by protocol. DELEGATED-TO, DELEGATED-FROM, SENT-BY parameters
 must use protocol &quot;mailto:&quot;, prefixed if missing (indicating an internet mail address).
 </p>
+<p>
+The CN, ROLE, PARTSTAT, RSVP, CUTYPE, MEMBER, DELEGATED-TO,DELEGATED-FROM, SENT-BY and DIR
+properties are not accepted (i.e. removed) in a "VFREEBUSY" or "VALARM" "ATTENDEE" property content.
+</p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;attendee&quot;, attendeeValue [, params [, propOrderNo ]] )</p>
@@ -3886,7 +3915,7 @@ $categories = $valarm-&gt;getProperty( &quot;categories&quot; );
 <p>Insert property value.</p>
 <p>
 In spite of the fact that CATEGORIES may contain a (comma separated) list of values,
-a strong recommendation is to split a CATEGORIES &quot;list&quot; into multiple single CATEGORIES entrys.
+a strong recommendation is to split a CATEGORIES &quot;list&quot; into multiple single CATEGORIES entries.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -4199,7 +4228,7 @@ Insert property value. Input date is always a <a href="#DATE_WITH_UTC_TIME">UTC<
 if &quot;offset&quot; parameter is used, converted to a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME.
 Notice, use function <a href="#transformDateTime">transformDateTime</a> to change a local datetime to UTC datetime.
 </p>
-<p>The current UTC date-time is set if called without parameters.</p>
+<p>The current UTC date-time is set if invoked without parameters.</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;created&quot;, [ createdDate [, xparams ]] )</p>
 <p class="comment">createdDate<sup>1</sup> = (array) ( &quot;year&quot;  =&gt; (int) year
@@ -4257,7 +4286,7 @@ $vtodo-&gt;setProperty( &quot;created&quot;, $date );
 <p class="label">Example 3</p>
 <p class="example">&lt;?php
 .. .
-$vevent-&gt;setProperty( &quot;created&quot; ); // <span class="comment">current UTC date-time is set if called without parameters</span>
+$vevent-&gt;setProperty( &quot;created&quot; ); // <span class="comment">current UTC date-time is set if invoked without parameters</span>
 .. .
 </p>
 <br>
@@ -4502,7 +4531,7 @@ $vevent-&gt;setProperty( &quot;dtend&quot;, 2006, 8, 11, 7, 30, 0 );
 <p>
 The property indicates the date/time the instance of the <strong>iCalendar</strong> object was created and is OPTIONAL and
 MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>, <a href="#VJOURNAL">VJOURNAL</a>
-and <a href="#VFREEBUSY">VFREEBUSY</a> components. However, DTSTAMP is <b>AUTOMATICALLY GENERATED</b> in iCalcreator when creating a component.
+and <a href="#VFREEBUSY">VFREEBUSY</a> components. However, DTSTAMP is <b>AUTOMATICALL§Y GENERATED</b> in iCalcreator when creating a component.
 </p>
 <p>
 DTSTAMP may be required when importing iCal files into some <strong>calendar</strong> software<br>(MS etc.),
@@ -4736,7 +4765,7 @@ Notice, use function <a href="#transformDateTime">transformDateTime</a> to conve
 <p>EXDATEs are automatically sorted in ascending order (Y-m-d[-H-i-s]).</p>
 <p>
 In spite of the fact that EXDATE may contain a (comma separated) list of values,
-a strong recommendation is to split a EXDATE &quot;list&quot; into multiple single EXDATE entrys.
+a strong recommendation is to split a EXDATE &quot;list&quot; into multiple single EXDATE entries.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -4920,7 +4949,7 @@ ordwk       = 1DIGIT / 2DIGIT ;1 to 53
 weekday     = &quot;SU&quot; / &quot;MO&quot; / &quot;TU&quot; / &quot;WE&quot; / &quot;TH&quot; / &quot;FR&quot; / &quot;SA&quot;
                 ; Corresponding to
                 ; SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY,
-                ; FRIDAY, SATURDAY and SUNDAY days of the week.
+                ; FRIDAY and SATURDAY days of the week.
 bymodaylist = monthdaynum
 bymodaylist = (array) ( monthdaynum *(, monthdaynum ))
 monthdaynum = ( [plus] ordmoday ) / ( minus ordmoday )
@@ -5042,7 +5071,7 @@ while( $vfreebusy-&gt;deleteProperty( &quot;FREEBUSY&quot; ))
 <p>If set, returns property value, otherwise FALSE.</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getProperty( &quot;FREEBUSY&quot; )</p>
-<p class="comment">output = array( &quot;fbtyp&quot; =&gt; freebusytype<sup>1</sup> , periods<sup>2</sup> )</p>
+<p class="comment">output = array( &quot;fbtype&quot; =&gt; freebusytype<sup>1</sup> , periods<sup>2</sup> )</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getProperty( &quot;FREEBUSY&quot;, propOrderNo/FALSE , TRUE )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -5197,7 +5226,7 @@ $vevent-&gt;deleteProperty( &quot;GEO&quot; );
 .. .
 </p>
 <h5>Get GEO</h5>
-<p>If set, returns property value, otherwise FALSE.</p>
+<p>If set, returns GEO property value (latitude/longitude) as prescribed in [RFC5545], otherwise FALSE.</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getProperty( &quot;GEO&quot; )</p>
 <p class="comment">output = array( &quot;latitude&quot;  =&gt; &lt;latitude&gt;
@@ -5607,7 +5636,7 @@ Notice, use function <a href="#transformDateTime">transformDateTime</a> to conve
 <p>RDATEs are automatically sorted in ascending order (Y-m-d[-H-i-s]).</p>
 <p>
 In spite of the fact that RDATE may contain a (comma separated) list of values,
-a strong recommendation is to split a RDATE &quot;list&quot; into multiple single RDATE entrys.
+a strong recommendation is to split a RDATE &quot;list&quot; into multiple single RDATE entries.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -5899,7 +5928,6 @@ MAY occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO
 <dt>a longer return status description component
 <dt>optionally a statusspecific data component
 </dl>
-<p>In output, the components are separated by (BACKSLASHed) SEMICOLON.</p>
 <h5>Create REQUEST-STATUS</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise FALSE.</p>
 <p class="label">Format</p>
@@ -6054,7 +6082,7 @@ $resources = $vtodo-&gt;getProperty( &quot;RESOURCES&quot; );
 <p>Insert property value.</p>
 <p>
 In spite of the fact that RESOURCES may contain a (comma separated) list of values,
-a strong recommendation is to split a RESOURCES &quot;list&quot; into multiple single RESOURCES entrys.
+a strong recommendation is to split a RESOURCES &quot;list&quot; into multiple single RESOURCES entries.
 </p>
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
@@ -6360,7 +6388,7 @@ $summary = $vtodo-&gt;getProperty( &quot;SUMMARY&quot; );
 <p>Parameters, if any, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;summary&quot;, summary [, params ] )</p>
-<p CLASS="comment">summary<span class="comment">1</span> = (string) Value type TEXT,
+<p CLASS="comment">summary<sup>1</sup> = (string) Value type TEXT,
            a short, one line summary about the activity or journal entry.
 params<sup>2</sup>  = array( [&quot;ALTREP&quot;   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;]
                 [, &quot;LANGUAGE&quot; =&gt; (string) &quot;lang<sup>*</sup>&quot;]
@@ -6420,7 +6448,7 @@ $transp = $vtodo-&gt;getProperty( &quot;TRANSP&quot; );
 <p>Insert property value.</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;transp&quot;, transp [, xparams ] )</p>
-<p class="comment">transp<span class="comment">1</span>  = &quot;OPAQUE&quot; / &quot;TRANSPARENT&quot;
+<p class="comment">transp<sup>1</sup>  = &quot;OPAQUE&quot; / &quot;TRANSPARENT&quot;
 xparams<sup>2</sup> = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
@@ -7027,6 +7055,16 @@ xparams<sup>2</sup> = array( *[ (string) key =&gt; (string) value ] ) // <span c
 <p class="example">&lt;?php
 .. .
 $vevent-&gt;setProperty(&quot;uid&quot;,&quot;20070803T194810CEST-0123U3PXiX@kigkonsult.se&quot;);
+.. .
+</p>
+<p>
+BUT, due to poorly created iCal media files, a digit UID is accepted in the setProperty( UID ) and <a href="#parse_merge">parse()</a> methods.
+Do check for component digit UIDs and remove it (will force a (auto) UID recreation) or (re-)set it manually.
+</p>
+<p class="example">&lt;?php
+.. .
+if( ctype_digit( $vevent-&gt;getProperty( &quot;UID&quot; )))
+  $vevent-&gt;deleteProperty( &quot;UID&quot; );
 .. .
 </p>
 <br>
@@ -7648,7 +7686,7 @@ Please examine the class file for more information about arguments and output.
 <a name="XMLhelpers"></a><h3>5.1 iCal and XML helper functions</h3>
 <p>
 The XML helper functions convert iCal into XML and parse XML into iCal.
-XML is defined by rfc6321, &quot;xCal: The XML Format for <strong>iCalendar</strong>&quot;.
+XML is defined by [RFC6321], &quot;xCal: The XML Format for <strong>iCalendar</strong>&quot;.
 </p>
 <a name="iCal2XML"></a><h4>5.1.1 iCal2XML</h4>
 <p>The iCal2XML function converts an iCalcreator object instance to XML.</p>
@@ -7819,9 +7857,10 @@ Returns an array containing time zone data from vtimezone standard/daylight inst
 
 <a name="Copyright"></a><h4>6.1 Copyright</h4>
 <p>
-iCalcreator v2.18<br>
-Copyright (c) 2007-2013 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.20<br>
+Copyright &copy; 2007-2014 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
+<a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se support" target="_blank">kigkonsult.se support</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
 
