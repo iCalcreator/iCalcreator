@@ -8,7 +8,7 @@
  * @link      http://kigkonsult.se/iCalcreator/index.php
  * @license   http://kigkonsult.se/downloads/dl.php?f=LGPL
  * @package   iCalcreator
- * @version   v2.20
+ * @version   v2.20.2
  */
 /**
  * This library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
  * @copyright Copyright (c) 2007-2014 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @license   http://kigkonsult.se/downloads/dl.php?f=LGPL
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.20' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.20.2' );
 /*********************************************************************************/
 /**
  * vcalendar class
@@ -665,7 +665,7 @@ class vcalendar {
  * general vcalendar config setting
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.18.12 - 2013-09-12
+ * @since 2.20.2 - 2014-05-09
  * @param mixed  $config
  * @param string $value
  * @return void
@@ -793,7 +793,7 @@ class vcalendar {
         if( '.ics' != strtolower( substr( $value, -4 )))
           unset( $this->filename );
         else
-          $this->filename = $basename( $value );
+          $this->filename = basename( $value );
         return TRUE;
         break;
       default:  // any unvalid config key.. .
@@ -7088,7 +7088,7 @@ class iCalUtilityFunctions {
  * END:VTIMEZONE
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.18.17 - 2013-12-22
+ * @since 2.20.1 - 2014-05-09
  * Generates components for all transitions in a date range, based on contribution by Yitzchok Lavi <icalcreator@onebigsystem.com>
  * Additional changes jpirkey
  * @param object $calendar, reference to an iCalcreator calendar instance
@@ -7116,8 +7116,10 @@ class iCalUtilityFunctions {
       if( empty( $dates ))
         $dates           = array( date( 'Ymd' ));
     }
-    if( !empty( $from ))
+    if( !empty( $from )) {
       $dateFrom          = new DateTime( "@$from" );             // set lowest date (UTC)
+      $dateFrom->modify( '-7 month' );                           // set $dateFrom to seven month before the lowest date
+    }
     else {
       $from              = reset( $dates );                      // set lowest date to the lowest dtstart date
       $dateFrom          = new DateTime( $from.'T000000', $dtz );
