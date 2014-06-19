@@ -1,0 +1,19 @@
+<phpunit
+	bootstrap="/bootstrap.php"
+	stopOnFailure="false"
+	stopOnIncomplete="false"
+	verbose="true">
+  <testsuites>
+    <testsuite>
+      <directory>vcalendar</directory>
+    </testsuite>
+    <testsuite>
+      <directory>Component</directory>
+    </testsuite>
+    <testsuite>
+      <directory>integration</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+
+
