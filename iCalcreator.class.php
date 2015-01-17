@@ -8357,7 +8357,7 @@ class iCalUtilityFunctions {
       }
       $input['value']  = iCalUtilityFunctions::_timestamp2date( $year, $parno );
     } // end elseif( iCalUtilityFunctions::_isArrayTimestampDate( $year ))
-    elseif( 8 <= strlen( trim( $year ))) { // ex. 2006-08-03 10:12:18 [[[+/-]1234[56]] / timezone]
+    elseif( is_string( $year ) && (8 <= strlen( trim( $year )))) { // ex. 2006-08-03 10:12:18 [[[+/-]1234[56]] / timezone]
       if( $localtime )
         unset( $month['VALUE'], $month['TZID'] );
       elseif( !isset( $month['TZID'] ) && !empty( $tzid ))
@@ -8518,7 +8518,7 @@ class iCalUtilityFunctions {
       $input['params'] = iCalUtilityFunctions::_setParams( $month, array( 'VALUE' => 'DATE-TIME' ));
       unset( $input['params']['VALUE'], $input['params']['TZID']  );
     }
-    elseif( 8 <= strlen( trim( $year ))) { // ex. 2006-08-03 10:12:18
+    elseif( is_string( $year ) && (8 <= strlen( trim( $year )))) { // ex. 2006-08-03 10:12:18
       $input['value']  = iCalUtilityFunctions::_strdate2date( $year, 7 );
       unset( $input['value']['unparsedtext'] );
       $input['params'] = iCalUtilityFunctions::_setParams( $month, array( 'VALUE' => 'DATE-TIME' ));
