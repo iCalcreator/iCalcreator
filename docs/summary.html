@@ -1,10 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.20 summary</title>
+<title>iCalcreator 2.22 summary</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-<meta name="copyright"   content="2007-2014 Kjell-Inge Gustafsson, kigkonsult">
+<meta name="copyright"   content="2007-2015 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
 <meta name="description" content="iCalcreator summary" />
 <style type="text/css">
@@ -54,10 +54,10 @@ pre {
 </head>
 <body>
 
-<h1>iCalcreator v2.20</h1>
+<h1>iCalcreator v2.22</h1>
 <p>
-iCalcreator v2.20<br>
-Copyright (c) 2007-2014 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.22<br>
+Copyright (c) 2007-2015 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
@@ -94,11 +94,7 @@ events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
 The iCalcreator package, built of a <strong>calendar</strong> class with support of a function class and helper functions, are <strong>calendar</strong>
-component property oriented. Development environment is <em>PHP</em> version 5.x but coding is done
-to meet 4.x backward compatibility and may work. Some functions requires <em>PHP</em> >= 5.2.0.
-</p>
-<p>
-The iCalcreator main class, utility class and helper functions are included in the &quot;iCalcreator.class.php&quot; file.
+component property oriented. iCalcreator requires <em>PHP</em> >= 5.3.
 </p>
 <p>
 More iCalcreator supplementary, usage and &quot;howto&quot; information will be found at kigkonsult.se iCalcreator
@@ -177,7 +173,7 @@ and review and explore iCalcreator usage at the
 <h4>INSTALL</h4>
 <dl>
 <dt>Unpack to any folder
-<dd>add this folder to your include-path
+<dd>add iCalcreator folder to your include-path
 <dd>or unpack to your application-(include)-folder<br>
 </dl>
 <p>
@@ -185,13 +181,14 @@ Add
 </p>
 <pre>&lt;?php
 .. .
-require_once './iCalcreator.class.php';
+require_once &quot;[path/]iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 .. .
 ?&gt;
 </pre>
 <p>
 to your php-script.
-</p>
+The iCalcreator invoke has changed since previous version!
+You may also need to set the default timezone.</p>
 <p>
 When creating a new calendar(/component) object instance, review config settings.
 </p>
@@ -201,7 +198,7 @@ When creating a new calendar(/component) object instance, review config settings
 
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $tz = &quot;Europe/Stockholm&quot;;                                  // <span class="comment">define time zone</span>
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;,           // <span class="comment">set Your unique id, </span>
                                                            // <span class="comment">required if any component UID is missing</span>
@@ -213,11 +210,8 @@ $v->setProperty( &quot;x-wr-calname&quot;, &quot;Calendar Sample&quot; );      /
 $v->setProperty( &quot;X-WR-CALDESC&quot;, &quot;Calendar Description&quot; ); // <span class="comment">required of some <strong>calendar</strong> software</span>
 $v->setProperty( &quot;X-WR-TIMEZONE&quot;, $tz );                   // <span class="comment">required of some <strong>calendar</strong> software</span>
 .. .
-$xprops = array( &quot;X-LIC-LOCATION&quot; => $tz );                // <span class="comment">required of some <strong>calendar</strong> software</span>
-iCalUtilityFunctions::createTimezone( $v, $tz, $xprops );  // <span class="comment">create timezone component(-s) <b>opt. 1</b></span>
-.. .                                                       // <span class="comment">based on present date</span>
 .. .
-$vevent = &amp; $v->newComponent( &quot;vevent&quot; );                  // <span class="comment">create an event <strong>calendar</strong> component</span>
+$vevent = $v->newComponent( &quot;vevent&quot; );                    // <span class="comment">create an event <strong>calendar</strong> component</span>
 $vevent->setProperty( &quot;dtstart&quot;, array( &quot;year&quot;  =&gt; 2007
                                       , &quot;month&quot; =&gt;    4
                                       , &quot;day&quot;   =&gt;    1
@@ -236,15 +230,15 @@ $vevent->setProperty( &quot;description&quot;, &quot;This is a description&quot;
 $vevent->setProperty( &quot;comment&quot;, &quot;This is a comment&quot; );
 $vevent->setProperty( &quot;attendee&quot;, &quot;attendee1@icaldomain.net&quot; );
 .. .
-$valarm = &amp; $vevent->newComponent( &quot;valarm&quot; );             // <span class="comment">create an event alarm</span>
+$valarm = $vevent->newComponent( &quot;valarm&quot; );               // <span class="comment">create an event alarm</span>
 $valarm->setProperty(&quot;action&quot;, &quot;DISPLAY&quot; );
 $valarm->setProperty(&quot;description&quot;, $vevent->getProperty( &quot;description&quot; );
 .. .                                                       // <span class="comment">reuse the event description</span>
-$d = sprintf( '%04d%02d%02d %02d%02d%02d', 2007, 3, 31, 15, 0, 0 );
+$d = sprintf( '%04d%02d%02d %02d%02d%02d', 2007, 3, 31, 15, 0, 0 ); // local date
 iCalUtilityFunctions::transformDateTime( $d, $tz, &quot;UTC&quot;, &quot;Ymd\THis\Z&quot;);
 $valarm->setProperty( &quot;trigger&quot;, $d );                     // <span class="comment">create alarm trigger (in UTC datetime)</span>
 .. .
-$vevent = &amp; $v->newComponent( &quot;vevent&quot; );                  // <span class="comment">create next event calendar component</span>
+$vevent = $v->newComponent( &quot;vevent&quot; );                    // <span class="comment">create next event calendar component</span>
 $vevent->setProperty( &quot;dtstart&quot;, &quot;20070401&quot;, array(&quot;VALUE&quot; =&gt; &quot;DATE&quot;));// <span class="comment">alt. date format,</span>
                                                            // <span class="comment"> now for an all-day event</span>
 $vevent->setProperty( &quot;organizer&quot; , &quot;boss@icaldomain.com&quot; );
@@ -258,7 +252,8 @@ $vevent->parse( &quot;LOCATION:1CP Conference Room 4350&quot; );     // <span cl
 .. .// <span class="comment">all calendar components are described in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc5545" title="RFC5545" target="_blank">rfc5545</a></span>
 .. .// <span class="comment">a complete iCalcreator function list (ex. setProperty) in <a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank">iCalcreator manual</a></span>
 .. .
-iCalUtilityFunctions::createTimezone( $v, $tz, $xprops);   // <span class="comment">create timezone component(-s) <b>opt. 2</b></span>
+$xprops = array( &quot;X-LIC-LOCATION&quot; => $tz );                // <span class="comment">required of some <strong>calendar</strong> software</span>
+iCalUtilityFunctions::createTimezone( $v, $tz, $xprops);   // <span class="comment">create timezone component(-s)</span>
                                                            // <span class="comment">based on all start dates in events</span>
                                                            // <span class="comment">(i.e. dtstart)</span>
 .. .
@@ -270,13 +265,13 @@ iCalUtilityFunctions::createTimezone( $v, $tz, $xprops);   // <span class="comme
 <h5>create iCalcreator object instance</h5>
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id, </span>
 .. .                                                       // <span class="comment">required if any component UID is missing</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new <strong>calendar</strong> object instance</span>
 .. .
 </pre>
-<h5>when parse a local iCal file</h5>
+<h5>then parse a local iCal file</h5>
 <pre>.. .
 $config = array( &quot;directory&quot; =&gt; &quot;calendar&quot;, &quot;filename&quot; =&gt; &quot;file.ics&quot; );
 $v->setConfig( $config );                                  // <span class="comment">set directory and file name</span>
@@ -286,6 +281,9 @@ $v->parse();
 .. .
 ?&gt;
 </pre>
+<p>
+On error, the setConfig method returns FALSE (ex. unvalid directory/filename).
+</p>
 <h5>or parse a remote iCal file (resource)</h5>
 <pre>.. .
 $v->setConfig( &quot;url&quot;, &quot;http://www.aDomain.net/file.ics&quot; ); // <span class="comment">supporting parse of remote files</span>
@@ -305,15 +303,15 @@ On error, the parse method returns FALSE.
 <h4>xCal, rfc6321 (XML)</h4>
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id, </span>
 .. .                                                       // <span class="comment">required if any component UID is missing</span>
 .. .
 $filename = 'xmlfile.xml';                                 // <span class="comment">use a local xCal file</span>
-// $filename = 'http://kigkonsult.se/xcal.php?a=1&amp;b=2&amp;c=3';// <span class="comment"> or a remote xCal resource</span>
-if( FALSE === ( $v = XMLfile2iCal(  $filename, $config ))) // <span class="comment">convert the XML resource</span>
-  exit( &quot;Error when parsing $filename&quot; );                  // <span class="comment"> to an iCalcreator object instance</span>
-.. .                                                       // <span class="comment">continue process (edit, parse,select)</span>
+// $filename = 'http://kigkonsult.se/xcal.php?a=1&amp;b=2&amp;c=3';// <span class="comment">  or a remote xCal resource</span>
+if( FALSE === ( $v = XMLfile2iCal( $filename, $config )))  // <span class="comment">convert the XML resource</span>
+  exit( &quot;Error when parsing $filename&quot; );                  // <span class="comment">  to an iCalcreator object instance</span>
+.. .                                                       // <span class="comment">continue process (edit, parse, select)</span>
 .. .                                                       // <span class="comment"> the iCalcreator object instance</span>
 .. .
 ?&gt;
@@ -323,10 +321,10 @@ if( FALSE === ( $v = XMLfile2iCal(  $filename, $config ))) // <span class="comme
 <h2>EDIT</h2>
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot;            // <span class="comment">set Your unique id,</span>
                , &quot;directory&quot; =&gt; &quot;calendar&quot;                 // <span class="comment">import directory</span>
-               , &quot;filename&quot; =&gt; &quot;file.ics&quot; );               // <span class="comment"> and file name</span>
+               , &quot;filename&quot; =&gt; &quot;file.ics&quot; );               // <span class="comment">and file name</span>
 
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar object instance</span>
 
@@ -367,7 +365,7 @@ while( $vevent = $v->getComponent( &quot;vevent&quot; )) {           // <span cl
 <h2>SELECT</h2>
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new <strong>calendar</strong> object instance</span>
 
@@ -393,7 +391,6 @@ foreach( $eventArray as $year =&gt; $yearArray) {
    foreach( $dailyEventsArray as $vevent ) {
     $currddate = $event->getProperty( &quot;x-current-dtstart&quot; );
                                                            // <span class="comment">if member of a recurrence set</span>
-                                                           // <span class="comment">(2nd occurrence etc)</span>
                                                            // <span class="comment">returns array( </span>
                                                            // <span class="comment">    &quot;x-current-dtstart&quot;</span>
                                                            // <span class="comment">  , (string) date(</span>
@@ -437,7 +434,7 @@ by combining the "LOCATION" and "GEO" property values (only if "GEO" is set).
 <pre>&lt;?php
 .. .
 $selectSpec = array( &quot;CATEGORIES&quot; =&gt; &quot;course1&quot; );
-$specComps = $v->selectComponents( $selectSpec );          // <span class="comment">selects components</span>
+$specComps  = $v->selectComponents( $selectSpec );         // <span class="comment">selects components</span>
                                                            // <span class="comment">based on specific property value(-s)</span>
                                                            // <span class="comment">ATTENDEE, CATEGORIES, CONTACT,</span>
                                                            // <span class="comment">LOCATION, ORGANIZER,</span>
@@ -456,7 +453,7 @@ foreach( $specComps as $comp ) {
 <h5>create iCalcreator object instance</h5>
 <pre>&lt;?php
 .. .
-require_once( &quot;iCalcreator.class.php&quot; );
+require_once &quot;iCalcreator-&lt;version&gt;/iCalcreator.php&quot;;
 $config = array( &quot;unique_id&quot; =&gt; &quot;kigkonsult.se&quot; );         // <span class="comment">set Your unique id</span>
 $v = new vcalendar( $config );                             // <span class="comment">create a new calendar object instance</span>
 
@@ -474,7 +471,7 @@ $v->setProperty( &quot;X-WR-TIMEZONE&quot;, &quot;Europe/Stockholm&quot; );    /
 <pre>&lt;?php
 .. .
 $v->returnCalendar();                                      // <span class="comment">redirect calendar file to browser</span>
-?&gt;
+exit;
 </pre>
 
 <h5>opt 2</h5>
@@ -502,8 +499,8 @@ $mlstr = iCal2XML( $v );                                   // <span class="comme
 
 <h4>Copyright</h4>
 <p>
-iCalcreator v2.20<br>
-Copyright (c) 2007-2014 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.22<br>
+Copyright (c) 2007-2015 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
