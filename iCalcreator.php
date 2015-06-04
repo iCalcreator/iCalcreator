@@ -40,13 +40,8 @@
  */
 define( 'ICALCREATOR_VERSION', 'iCalcreator 2.22' );
 /*********************************************************************************/
-/**
- *  @var string iCalcreator lib
- *  @static
- */
-static $iCalLib = null;
-if( empty( $iCalLib ))
-  $iCalLib      = __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+if( !defined( 'ICALCREATOR_LIB_DIR' ))
+  define( 'ICALCREATOR_LIB_DIR', __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR );
 /**
  * iCalLoader
  *
@@ -56,8 +51,7 @@ if( empty( $iCalLib ))
  * @return void
  */
 function iCalLoader( $class ) {
-  global $iCalLib;
-  $file  = $iCalLib . $class . '.class.php';
+  $file  = ICALCREATOR_LIB_DIR . $class . '.class.php';
   if( file_exists( $file ))
     include $file;
 }
@@ -65,6 +59,6 @@ spl_autoload_register( 'iCalLoader' );
 /**
  * iCalcreator add-on functionality functions
  */
-include $iCalLib . 'iCal.XML.inc.php';
-include $iCalLib . 'iCal.vCard.inc.php';
-include $iCalLib . 'iCal.tz.inc.php';
+include ICALCREATOR_LIB_DIR . 'iCal.XML.inc.php';
+include ICALCREATOR_LIB_DIR . 'iCal.vCard.inc.php';
+include ICALCREATOR_LIB_DIR . 'iCal.tz.inc.php';
