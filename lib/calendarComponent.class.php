@@ -58,7 +58,7 @@ class calendarComponent  extends iCalBase {
  * @uses calendarComponent::_createFormat()
  * @uses calendarComponent::_makeDtstamp()
  */
-  function calendarComponent() {
+  function __construct() {
     $this->objName         = ( isset( $this->timezonetype )) ?
                           strtolower( $this->timezonetype )  :  get_class ( $this );
     $this->uid             = array();

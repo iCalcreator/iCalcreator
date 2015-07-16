@@ -70,8 +70,8 @@ class valarm extends calendarComponent {
  * @uses valarm::$xprop
  * @uses calendarComponent::setConfig()
  */
-  function valarm( $config = array()) {
-    $this->calendarComponent();
+  function __construct( $config = array()) {
+    parent::__construct();
     $this->action          = '';
     $this->attach          = '';
     $this->attendee        = '';

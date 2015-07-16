@@ -112,8 +112,8 @@ class vjournal extends calendarComponent {
  * @uses vjournal::$xprop
  * @uses calendarComponent::setConfig()
  */
-  function vjournal( $config = array()) {
-    $this->calendarComponent();
+  function __construct( $config = array()) {
+    parent::__construct();
     $this->attach          = '';
     $this->attendee        = '';
     $this->categories      = '';
