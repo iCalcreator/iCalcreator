@@ -134,8 +134,8 @@ class vevent extends calendarComponent {
  * @uses vevent::$components
  * @uses calendarComponent::setConfig()
  */
-  function vevent( $config = array()) {
-    $this->calendarComponent();
+  function __construct( $config = array()) {
+    parent::__construct();
     $this->attach          = '';
     $this->attendee        = '';
     $this->categories      = '';

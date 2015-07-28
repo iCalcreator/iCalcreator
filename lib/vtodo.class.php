@@ -137,8 +137,8 @@ class vtodo extends calendarComponent {
  * @uses vtodo::$components
  * @uses calendarComponent::setConfig()
  */
-  function vtodo( $config = array()) {
-    $this->calendarComponent();
+  function __construct( $config = array()) {
+    parent::__construct();
     $this->attach          = '';
     $this->attendee        = '';
     $this->categories      = '';

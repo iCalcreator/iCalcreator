@@ -90,7 +90,7 @@ class vcalendar extends iCalBase {
  * @uses vcalendar::$xcaldecl
  * @uses vcalendar::$components
  */
-  function vcalendar ( $config = array()) {
+  function __construct ( $config = array()) {
     $this->_makeVersion();
     $this->calscale   = null;
     $this->method     = null;
