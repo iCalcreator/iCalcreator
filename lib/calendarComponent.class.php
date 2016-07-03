@@ -4389,7 +4389,7 @@ class calendarComponent  extends iCalBase {
  * @return object
  */
   function copy() {
-    return unserialize( serialize( $this ));
+    return clone $this;
  }
 /*********************************************************************************/
 /*********************************************************************************/
