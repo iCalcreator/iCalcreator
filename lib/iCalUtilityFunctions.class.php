@@ -2343,6 +2343,7 @@ class iCalUtilityFunctions {
  * @return string
  */
   public static function _strrep( $string, $format, $nl ) {
+    $string = (String) $string;
     switch( $format ) {
       case 'xcal':
         $string = str_replace( '\n',  $nl, $string);
