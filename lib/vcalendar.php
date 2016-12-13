@@ -1159,7 +1159,7 @@ class vcalendar extends iCalBase {
     $this->sort( 'UID' );
     $compUIDcmp  = null;
     $exdatelist  = $recurridList = array();
-    $intervalP1D = new DateInterval( 'P1D' );
+    $intervalP1D = new \DateInterval( 'P1D' );
     foreach ( $this->components as $cix => $component ) {
       if( empty( $component )) continue;
             /* deselect unvalid type components */
@@ -1385,7 +1385,7 @@ class vcalendar extends iCalBase {
               if( isset( $theRdate[1]['year'] ))           // date-date period end
                 $recurlist[$rdate->key] = $rdate->diff( iCaldateTime::factory( $theRdate[1], $params, $theRdate[1], $dtstartTz ));
               else                                         // period duration
-                $recurlist[$rdate->key] = new DateInterval( iCalUtilityFunctions::_duration2str( $theRdate[1] ));
+                $recurlist[$rdate->key] = new \DateInterval( iCalUtilityFunctions::_duration2str( $theRdate[1] ));
             } // end if( 'PERIOD' == $rdateFmt )
             elseif( 'DATE' == $rdateFmt ) { // single recurrence, date
               $rdate  = iCaldateTime::factory( $theRdate, array_merge( $params, array( 'TZID' => $dtstartTz )), null, $dtstartTz );

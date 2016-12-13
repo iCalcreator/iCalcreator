@@ -102,7 +102,7 @@ class iCaldateTime extends dateTime {
     if( isset( $date['hour'] ))
       $strdate     .= 'T'.sprintf( iCalUtilityFunctions::$fmt['His'], (int) $date['hour'], (int) $date['min'], (int) $date['sec'] );
     try {
-      $timezone     = new DateTimeZone( $tz );
+      $timezone     = new \DateTimeZone( $tz );
       $d            = new iCaldateTime( $strdate, $timezone );
     }
     catch( Exception $e ) {
@@ -113,7 +113,7 @@ class iCaldateTime extends dateTime {
         $dtstartTz  = 'UTC';
       if( $dtstartTz != $d->getTimezoneName()) { // set the same timezone as dtstart
         try {
-          $timezone = new DateTimeZone( $dtstartTz );
+          $timezone = new \DateTimeZone( $dtstartTz );
           $d->setTimezone( $timezone );
         }
         catch( Exception $e ) {}

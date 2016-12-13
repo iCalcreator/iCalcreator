@@ -317,9 +317,9 @@ class iCalUtilityFunctions {
     if( !empty( $to )   && !is_int( $to ))
       return FALSE;
     try {
-      $dtz               = new DateTimeZone( $timezone );
+      $dtz               = new \DateTimeZone( $timezone );
       $transitions       = $dtz->getTransitions();
-      $utcTz             = new DateTimeZone( 'UTC' );
+      $utcTz             = new \DateTimeZone( 'UTC' );
     }
     catch( Exception $e ) { return FALSE; }
     if( empty( $from ) || empty( $to )) {
@@ -328,21 +328,21 @@ class iCalUtilityFunctions {
         $dates           = array( date( 'Ymd' ));
     }
     if( ! empty( $from )) {
-      $dateFrom          = new DateTime( "@$from" );             // set lowest date (UTC)
+      $dateFrom          = new \DateTime( "@$from" );             // set lowest date (UTC)
       $dateFrom->modify( '-7 month' );                           // set $dateFrom to seven month before the lowest date
     }
     else {
       $from              = reset( $dates );                      // set lowest date to the lowest dtstart date
-      $dateFrom          = new DateTime( $from.'T000000', $dtz );
+      $dateFrom          = new \DateTime( $from.'T000000', $dtz );
       $dateFrom->modify( '-7 month' );                           // set $dateFrom to seven month before the lowest date
       $dateFrom->setTimezone( $utcTz );                          // convert local date to UTC
     }
     $dateFromYmd         = $dateFrom->format( iCalUtilityFunctions::$fmt['Ymd2'] );
     if( ! empty( $to ))
-      $dateTo            = new DateTime( "@$to" );               // set end date (UTC)
+      $dateTo            = new \DateTime( "@$to" );               // set end date (UTC)
     else {
       $to                = end( $dates );                        // set highest date to the highest dtstart date
-      $dateTo            = new DateTime( $to.'T235959', $dtz );
+      $dateTo            = new \DateTime( $to.'T235959', $dtz );
       $dateTo->modify( '+18 month' );                            // set $dateTo to 18 month after the highest date
       $dateTo->setTimezone( $utcTz );                            // convert local date to UTC
     }
@@ -353,7 +353,7 @@ class iCalUtilityFunctions {
     $stdIx  = $dlghtIx   = null;
     $prevTrans           = FALSE;
     foreach( $transitions as $tix => $trans ) {                  // all transitions in date-time order!!
-      $date              = new DateTime( "@{$trans['ts']}" );    // set transition date (UTC)
+      $date              = new \DateTime( "@{$trans['ts']}" );    // set transition date (UTC)
       $transDateYmd      = $date->format( iCalUtilityFunctions::$fmt['Ymd2'] );
       if ( $transDateYmd < $dateFromYmd ) {
         $prevOffsetfrom  = $trans['offset'];                     // previous trans offset will be 'next' trans offsetFrom
@@ -402,7 +402,7 @@ class iCalUtilityFunctions {
     }
     if( empty( $transTemp )) {      // if no match found
       if( $prevTrans ) {            // then we use the last transition (before startdate) for the tz info
-        $date            = new DateTime( "@{$prevTrans['ts']}" );// set transition date (UTC)
+        $date            = new \DateTime( "@{$prevTrans['ts']}" );// set transition date (UTC)
         $date->modify( $prevTrans['offsetfrom'].'seconds' );     // convert utc date to local date
         $d               = $date->format( iCalUtilityFunctions::$fmt['YmdHis3'] );
         $d               = explode( '-', $d );                   // set date to array to ease up dtstart setting
@@ -410,7 +410,7 @@ class iCalUtilityFunctions {
         $transTemp[0] = $prevTrans;
       }
       else {                        // or we use the timezone identifier to BUILD the standard tz info (?)
-        $date            = new DateTime( 'now', new DateTimeZone( $timezone ));
+        $date            = new \DateTime( 'now', new \DateTimeZone( $timezone ));
         $transTemp[0]    = array( 'time'       => $date->format( iCalUtilityFunctions::$fmt['YmdTHisO'] ),
                                   'offset'     => $date->format( 'Z' ),
                                   'offsetfrom' => $date->format( 'Z' ),
@@ -471,7 +471,7 @@ class iCalUtilityFunctions {
         $parno  = 7;
         $offset = iCalUtilityFunctions::_tz2offset( $datetime['tz'] );
         try {
-          $d    = new DateTime( $output, new DateTimeZone( 'UTC' ));
+          $d    = new \DateTime( $output, new \DateTimeZone( 'UTC' ));
           if( 0 != $offset ) // adjust för offset
             $d->modify( "$offset seconds" );
           $output = $d->format( 'Ymd\THis' );
@@ -2306,7 +2306,7 @@ class iCalUtilityFunctions {
       if( 0 < substr_count( $datetime, '-' ))
         $datetime = str_replace( '-', '/', $datetime );
       try {
-        $d        = new DateTime( $datetime, new DateTimeZone( $tz ));
+        $d        = new \DateTime( $datetime, new \DateTimeZone( $tz ));
         if( 0  != $offset )  // adjust for offset
           $d->modify( $offset.' seconds' );
         $datestring = $d->format( iCalUtilityFunctions::$fmt['YmdHis3'] );
@@ -2424,11 +2424,11 @@ class iCalUtilityFunctions {
       $offset    = iCalUtilityFunctions::_tz2offset( $tz );
     }
     try {
-      $d         = new DateTime( "@$timestamp" );  // set UTC date
+      $d         = new \DateTime( "@$timestamp" );  // set UTC date
       if(  0 != $offset )                          // adjust for offset
         $d->modify( $offset.' seconds' );
       elseif( 'UTC' != $tz )
-        $d->setTimezone( new DateTimeZone( $tz )); // convert to local date
+        $d->setTimezone( new \DateTimeZone( $tz )); // convert to local date
       $date      = $d->format( iCalUtilityFunctions::$fmt['YmdHis3'] );
       unset( $d );
     }
@@ -2463,8 +2463,8 @@ class iCalUtilityFunctions {
   public static function transformDateTime( & $date, $tzFrom, $tzTo='UTC', $format = 'Ymd\THis' ) {
     if( is_array( $date ) && isset( $date['timestamp'] )) {
       try {
-        $d = new DateTime( "@{$date['timestamp']}" ); // set UTC date
-        $d->setTimezone(new DateTimeZone( $tzFrom )); // convert to 'from' date
+        $d = new \DateTime( "@{$date['timestamp']}" ); // set UTC date
+        $d->setTimezone(new \DateTimeZone( $tzFrom )); // convert to 'from' date
       }
       catch( Exception $e ) { return FALSE; }
     }
@@ -2476,10 +2476,10 @@ class iCalUtilityFunctions {
       }
       if( 'Z' == substr( $date, -1 ))
         $date = substr( $date, 0, ( strlen( $date ) - 2 ));
-      try { $d = new DateTime( $date, new DateTimeZone( $tzFrom )); }
+      try { $d = new \DateTime( $date, new \DateTimeZone( $tzFrom )); }
       catch( Exception $e ) { return FALSE; }
     }
-    try { $d->setTimezone( new DateTimeZone( $tzTo )); }
+    try { $d->setTimezone( new \DateTimeZone( $tzTo )); }
     catch( Exception $e ) { return FALSE; }
     $date = $d->format( $format );
     return TRUE;
