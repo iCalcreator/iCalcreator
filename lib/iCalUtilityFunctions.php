@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.11 - 2015-04-03
  */
+namespace Kigkonsult\iCalcreator;
+
 class iCalUtilityFunctions {
 /** @var string  tmp line delimiter, used in convEolChar (parse) */
   private static $baseDelim = null;

@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.7 - 2015-03-10
  */
+namespace Kigkonsult\iCalcreator;
+
 class iCaldateTime extends dateTime {
 /** @var string default date[-time] format */
   public $dateFormat = 'Y-m-d H:i:s e';

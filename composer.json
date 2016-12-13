@@ -16,7 +16,8 @@
         }
     ],
     "autoload": {
-        "files": ["iCalcreator.php"]
+        "files": ["iCalcreator.php"],
+        "psr-4": {"Kigkonsult\\iCalcreator\\":"lib/"}
     },
     "require": {
         "php": ">=5.3"

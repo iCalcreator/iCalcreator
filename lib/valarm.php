@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.5.1 - 2008-10-12
  */
+namespace Kigkonsult\iCalcreator;
+
 class valarm extends calendarComponent {
 /**
  * @var array $action       component property value

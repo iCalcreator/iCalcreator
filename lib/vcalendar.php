@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.11 - 2015-03-31
  */
+namespace Kigkonsult\iCalcreator;
+
 class vcalendar extends iCalBase {
 /**
  * @var array $calscale  calendar property variable

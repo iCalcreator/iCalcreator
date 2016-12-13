@@ -42,20 +42,7 @@ define( 'ICALCREATOR_VERSION', 'iCalcreator 2.22' );
 /*********************************************************************************/
 if( !defined( 'ICALCREATOR_LIB_DIR' ))
   define( 'ICALCREATOR_LIB_DIR', __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR );
-/**
- * iCalLoader
- *
- * load iCalcreator src and util classes
- *
- * @param string $class
- * @return void
- */
-function iCalLoader( $class ) {
-  $file  = ICALCREATOR_LIB_DIR . $class . '.class.php';
-  if( file_exists( $file ))
-    include $file;
-}
-spl_autoload_register( 'iCalLoader' );
+
 /**
  * iCalcreator add-on functionality functions
  */
