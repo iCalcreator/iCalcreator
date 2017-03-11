@@ -1,12 +1,12 @@
 
-The iCalcreator 2.22 release requires PHP >= 5.3.0 due to major updates in the
+The iCalcreator 2.22.5 release requires PHP >= 5.3.0 due to major updates in the
 selectComponents method.
 The returnCalender/useCachedCalendar methods no longer stops PHP script (die),
   return TRUE on success!
 iCalcreator.class.php is now split into class and function files and need a new
   PHP iCalcreator invoke.
 
-UPDATES
+2.22 UPDATES
  fcn selectComponent() and supporting fcns
    (major REWRITE due to a number of bug reports)
   - selectComponent() now also accepts arg 1 as datetime obj (as fromDate),
@@ -35,10 +35,16 @@ UPDATES
        base class
      NOTE, new iCalcreator PHP invoke
 
-BUG fixes
+2.22 BUG fixes
  fcn iCalUtilityFunctions::createTimezone(), timezone standard/daylight
    (default, date) start
  fcns newComponent(),getComponents(), index settings
  fcns _setDate, _setDate2, input arg sanitize
  fcn getProperty(duration) format 4 will now include timezone from DTSTART
  some code and doc. typo errors.
+
+2.22.5 merged pull requests
+  autoloader upd
+  constructors fixed
+  typo error
+  serialization + fixed field
