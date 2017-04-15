@@ -1,0 +1,138 @@
+<?php
+/**
+ * iCalcreator, a PHP rfc2445/rfc5545 solution.
+ *
+ * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      http://kigkonsult.se/iCalcreator/index.php
+ * @package   iCalcreator
+ * @version   2.23.7
+ * @license   Part 1. This software is for
+ *                    individual evaluation use and evaluation result use only;
+ *                    non assignable, non-transferable, non-distributable,
+ *                    non-commercial and non-public rights, use and result use.
+ *            Part 2. Creative Commons
+ *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *            In case of conflict, Part 1 supercede Part 2.
+ *
+ * This file is a part of iCalcreator.
+ */
+namespace kigkonsult\iCalcreator;
+use kigkonsult\iCalcreator\util\util;
+use kigkonsult\iCalcreator\util\utilAttendee;
+/**
+ * iCalcreator VALARM component class
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.22.23 - 2017-02-02
+ */
+class valarm extends calendarComponent {
+  use traits\ACTIONtrait,
+      traits\ATTACHtrait,
+      traits\ATTENDEEtrait,
+      traits\DESCRIPTIONtrait,
+      traits\DURATIONtrait,
+      traits\REPEATtrait,
+      traits\SUMMARYtrait,
+      traits\TRIGGERtrait;
+/**
+ * Constructor for calendar component VALARM object
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.22.20 - 2017-02-01
+ * @param array $config
+ * @uses calendarComponent::__construct()
+ * @uses calendarComponent::setConfig()
+ */
+  public function __construct( $config = array()) {
+    static $A = 'a';
+    parent::__construct();
+    $this->setConfig( util::initConfig( $config ));
+    $this->cno = $A . parent::getObjectNo();
+  }
+/**
+ * Destructor
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.22.23 - 2017-03-18
+ */
+  public function __destruct() {
+    unset( $this->xprop,
+           $this->components,
+           $this->unparsed,
+           $this->config );
+    unset( $this->objName,
+           $this->cno,
+           $this->propix,
+           $this->propdelix );
+    unset( $this->action,
+           $this->attach,
+           $this->attendee,
+           $this->description,
+           $this->duration,
+           $this->repeat,
+           $this->summary,
+           $this->trigger );
+  }
+/**
+ * Return formatted output for calendar component VALARM object instance
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.5.1 - 2008-10-22
+ * @return string
+ * @uses valarm::createAction()
+ * @uses valarm::createAttach()
+ * @uses valarm::createAttendee()
+ * @uses valarm::createDescription()
+ * @uses valarm::createDuration()
+ * @uses valarm::createRepeat()
+ * @uses valarm::createSummary()
+ * @uses valarm::createTrigger()
+ * @uses calendarComponent::createXprop()
+ */
+  public function createComponent() {
+    $objectname =  strtoupper( $this->objName );
+    $component  = sprintf( util::$FMTBEGIN, $objectname );
+    $component .= $this->createAction();
+    $component .= $this->createAttach();
+    $component .= $this->createAttendee();
+    $component .= $this->createDescription();
+    $component .= $this->createDuration();
+    $component .= $this->createRepeat();
+    $component .= $this->createSummary();
+    $component .= $this->createTrigger();
+    $component .= $this->createXprop();
+    return $component . sprintf( util::$FMTEND, $objectname );
+  }
+/**
+ * Return valarm component property value/params,
+ * if arg $inclParam, return array with keys VALUE/PARAMS.
+ *
+ * @param string  $propName
+ * @param int     $propix   specific property in case of multiply occurences
+ * @param bool    $inclParam
+ * @param bool    $specform
+ * @return mixed
+ * @uses calendarComponent::getProperty()
+ */
+  public function getProperty( $propName=false, $propix=false, $inclParam=false, $specform=false ) {
+    switch( strtoupper( $propName )) {
+      case util::$ACTION:
+        if( isset( $this->action[util::$LCvalue] ))
+          return ( $inclParam ) ? $this->action : $this->action[util::$LCvalue];
+        break;
+      case util::$REPEAT:
+        if( isset( $this->repeat[util::$LCvalue] ))
+          return ( $inclParam ) ? $this->repeat : $this->repeat[util::$LCvalue];
+        break;
+      case util::$TRIGGER:
+        if( isset( $this->trigger[util::$LCvalue] ))
+          return ( $inclParam ) ? $this->trigger : $this->trigger[util::$LCvalue];
+        break;
+      default:
+        return parent::getProperty( $propName, $propix, $inclParam, $specform );
+        break;
+    }
+    return false;
+  }
+}
