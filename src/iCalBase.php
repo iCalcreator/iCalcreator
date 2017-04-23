@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.10
+ * version   2.23.12
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -30,7 +30,7 @@ use kigkonsult\iCalcreator\util\util;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' ))
-  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.10' );
+  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.12' );
 /**
  * iCalcreator base class
  *
@@ -59,7 +59,7 @@ abstract class iCalBase {
  * __clone method
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.10 - 2017-04-20
+ * @since 2.23.12 - 2017-04-20
  */
   public function __clone() {
     foreach( $this->components as $cix => $component )
@@ -199,7 +199,7 @@ abstract class iCalBase {
  * General component config setting
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.10 - 2017-04-22
+ * @since 2.23.12 - 2017-04-22
  * @param mixed   $config
  * @param string  $value
  * @param bool    $softUpdate
