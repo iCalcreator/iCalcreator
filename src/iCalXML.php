@@ -2,23 +2,31 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
+use kigkonsult\iCalcreator\util\utilGeo;
 /**
  * iCalcreator XML (rfc6321) support class
  *
@@ -500,7 +508,7 @@ class iCalXML {
  * Add XML (rfc6321) children to a SimpleXMLelement
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.20.23 - 2017-02-25
+ * @since 2.23.8 - 2017-04-17
  * @param object $parent   reference to a SimpleXMLelement node
  * @param string $name     new element node name
  * @param string $type     content type, subelement(-s) name
@@ -570,7 +578,9 @@ class iCalXML {
     }
   } // end if( ! empty( $params ))
   if(( empty( $content ) && ( util::$ZERO != $content )) ||
-     ( ! is_array( $content) && ( util::$MINUS != substr( $content, 0, 1 ) && ( 0 > $content ))))
+       ( ! is_array( $content) &&
+       ( util::$MINUS != $content[0] ) &&
+       ( 0 > $content )))
     return;
             /** store content */
   switch( $type ) {
@@ -745,8 +755,8 @@ class iCalXML {
       $v = $child->addChild( $type, $content );
       break;
     case self::$utc_offset:
-      if( in_array( substr( $content, 0, 1 ), $PLUSMINUSARR )) {
-        $str     = substr( $content, 0, 1 );
+      if( in_array( $content[0], $PLUSMINUSARR )) {
+        $str     = $content[0];
         $content = substr( $content, 1 );
       }
       else
@@ -818,7 +828,7 @@ class iCalXML {
  * Parse (rfc6321) XML string into iCalcreator components
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.20.23 - 2017-02-25
+ * @since 2.23.8 - 2017-04-14
  * @param object $iCal   iCalcreator vcalendar or component object instance
  * @param string $xml
  * @return object
@@ -834,12 +844,13 @@ class iCalXML {
  private static function XMLgetComps( $iCal, $xml ) {
   static $PROPSTAG   = '<properties>';
   static $COMPSTAG   = '<components>';
+  $len     = strlen( $xml );
   $sx      = 0;
-  while(( false !== substr( $xml, ( $sx + 11 ), 1 )) &&
+  while((( $sx + 12 ) < $len ) &&
         ( $PROPSTAG != substr( $xml, $sx, 12 )) &&
         ( $COMPSTAG != substr( $xml, $sx, 12 )))
     $sx   += 1;
-  if( false === substr( $xml, ( $sx + 11 ), 1 ))
+  if(( $sx + 11 ) >= $len )
     return false;
   if( $PROPSTAG == substr( $xml, $sx, 12 )) {
     $xml2  = self::XMLgetTagContent1( $xml, self::$properties, $endIx );
@@ -1062,7 +1073,7 @@ class iCalXML {
  * Fetch a specific XML tag content
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.20.23 - 2017-02-25
+ * @since 2.23.8 - 2017-04-17
  * @param string $xml
  * @param string $tagName
  * @param int    $endIx
@@ -1074,41 +1085,44 @@ class iCalXML {
   static $FMT0 = '<%s>';
   static $FMT1 = '<%s />';
   static $FMT2 = '<%s/>';
+  static $FMT3 = '</%s>';
   $tagName   = strtolower( $tagName );
-  $strlen    = strlen( $tagName );
+  $strLen    = strlen( $tagName );
+  $xmlLen    = strlen( $xml );
   $sx1       = 0;
-  while( false !== substr( $xml, $sx1, 1 )) {
-    if(( false !== substr( $xml, ( $sx1 + $strlen + 1 ), 1 )) &&
-       ( sprintf( $FMT0, $tagName )   == strtolower( substr( $xml, $sx1, ( $strlen + 2 )))))
+  while( $sx1 < $xmlLen ) {
+    if((( $sx1 + $strLen + 1 ) < $xmlLen ) &&
+       ( sprintf( $FMT0, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 2 )))))
       break;
-    if(( false !== substr( $xml, ( $sx1 + $strlen + 3 ), 1 )) &&
-       ( sprintf( $FMT1, $tagName ) == strtolower( substr( $xml, $sx1, ( $strlen + 4 ))))) { // empty tag
-      $endIx = $strlen + 5;
+    if((( $sx1 + $strLen + 3 ) < $xmlLen ) &&
+       ( sprintf( $FMT1, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 4 ))))) { // empty tag
+      $endIx = $strLen + 5;
       return null;
     }
-    if(( false !== substr( $xml, ( $sx1 + $strlen + 2 ), 1 )) &&
-       ( sprintf( $FMT2, $tagName ) == strtolower( substr( $xml, $sx1, ( $strlen + 3 ))))) { // empty tag
-      $endIx = $strlen + 4;
+    if((( $sx1 + $strLen + 2 ) < $xmlLen ) &&
+       ( sprintf( $FMT2, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 3 ))))) { // empty tag
+      $endIx = $strLen + 4;
       return null;
     }
     $sx1    += 1;
-  }
+  } // end while...
   if( false === substr( $xml, $sx1, 1 )) {
-    $endIx   = ( empty( $sx )) ? 0 : $sx - 1;
+    $endIx   = ( empty( $sx )) ? 0 : $sx - 1; // ??
     return null;
   }
-  if( false === ( $pos = stripos( $xml, "</$tagName>" ))) { // missing end tag??
-    $endIx   = strlen( $xml ) + 1;
+  $endTag    = sprintf( $FMT3, $tagName );
+  if( false === ( $pos = stripos( $xml, $endTag ))) { // missing end tag??
+    $endIx   = $xmlLen + 1;
     return null;
   }
-  $endIx     = $pos + $strlen + 3;
-  return substr( $xml, ( $sx1 + $strlen + 2 ), ( $pos - $sx1 - 2 - $strlen ));
+  $endIx     = $pos + $strLen + 3;
+  return substr( $xml, ( $sx1 + $strLen + 2 ), ( $pos - $sx1 - 2 - $strLen ));
  }
 /**
  * Fetch next (unknown) XML tagname AND content
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.20.23 - 2017-02-25
+ * @since 2.23.8 - 2017-04-17
  * @param string $xml
  * @param string $tagName
  * @param int $endIx
@@ -1125,11 +1139,12 @@ class iCalXML {
   static $DURATIONTAG = '<duration>';
   static $DURENDTAG   = '</duration>';
   static $FMTTAG      = '</%s>';
-  $endIx       = strlen( $xml ) + 1; // just in case.. .
+  $xmlLen      = strlen( $xml );
+  $endIx       = $xmlLen + 1; // just in case.. .
   $sx1         = 0;
-  while( false !== substr( $xml, $sx1, 1 )) {
+  while( $sx1 < $xmlLen ) {
     if( $LT == substr( $xml, $sx1, 1 )) {
-      if(( false !== substr( $xml, ( $sx1 + 3 ), 1 )) &&
+      if((( $sx1 + 3 ) < $xmlLen ) &&
          ( $CMTSTART == substr( $xml, $sx1, 4 ))) // skip comment
         $sx1  += 1;
       else
@@ -1137,11 +1152,11 @@ class iCalXML {
     }
     else
       $sx1    += 1;
-  }
+  } // end while...
   $sx2         = $sx1;
-  while( false !== substr( $xml, $sx2 )) {
-    if(( false !== substr( $xml, ( $sx2 + 1 ), 1 )) &&
-       ( $EMPTYTAGEND == substr( $xml, $sx2, 2 ))) { // empty tag
+  while( $sx2 < $xmlLen ) {
+    if((( $sx2 + 1 ) < $xmlLen ) &&
+       ( $EMPTYTAGEND == substr( $xml, $sx2, 2 ))) { // tag with no content
       $tagName = trim( substr( $xml, ( $sx1 + 1 ), ( $sx2 - $sx1 - 1 )));
       $endIx   = $sx2 + 2;
       return null;
@@ -1149,12 +1164,12 @@ class iCalXML {
     if( $GT == substr( $xml, $sx2, 1 )) // tagname ends here
       break;
     $sx2      += 1;
-  }
+  } // end while...
   $tagName     = substr( $xml, ( $sx1 + 1 ), ( $sx2 - $sx1 - 1 ));
   $endIx       = $sx2 + 1;
-  if( false === substr( $xml, $sx2, 1 ))
+  if( $sx2 >= $xmlLen )
     return null;
-  $strlen      = strlen( $tagName );
+  $strLen      = strlen( $tagName );
   if(( $DURATION == $tagName ) &&
      ( false !== ( $pos1 = stripos( $xml, $DURATIONTAG, $sx1+1  ))) &&
      ( false !== ( $pos2 = stripos( $xml, $DURENDTAG,   $pos1+1 ))) &&
@@ -1163,7 +1178,7 @@ class iCalXML {
     $pos = $pos3;
   elseif( false === ( $pos = stripos( $xml, sprintf( $FMTTAG, $tagName ), $sx2 )))
     return null;
-  $endIx       = $pos + $strlen + 3;
-  return substr( $xml, ( $sx1 + $strlen + 2 ), ( $pos - $strlen - 2 ));
+  $endIx       = $pos + $strLen + 3;
+  return substr( $xml, ( $sx1 + $strLen + 2 ), ( $pos - $strLen - 2 ));
  }
 }

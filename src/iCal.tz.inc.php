@@ -2,17 +2,25 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
@@ -153,12 +161,14 @@ function expandTimezoneDates($vtzc) {
     $tzbefore = array();
     $tzbefore[$OFFSETHIS] = $vtzc->getProperty(util::$TZOFFSETFROM) ;
     $tzbefore[$OFFSETSEC] = util::tz2offset($tzbefore[$OFFSETHIS]);
-    if(( util::$MINUS != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )) && ( util::$PLUS != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )))
+    if(( util::$MINUS != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )) &&
+       ( util::$PLUS  != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )))
       $tzbefore[$OFFSETSEC] = util::$PLUS . $tzbefore[$OFFSETSEC];
     $tzafter = array();
     $tzafter[$OFFSETHIS]  = $vtzc->getProperty(util::$TZOFFSETTO) ;
     $tzafter[$OFFSETSEC]  = util::tz2offset($tzafter[$OFFSETHIS]);
-    if(( util::$MINUS != substr( (string) $tzafter[$OFFSETSEC], 0, 1 )) && ( util::$PLUS != substr( (string) $tzafter[$OFFSETSEC], 0, 1 )))
+    if(( util::$MINUS != substr( (string) $tzafter[$OFFSETSEC], 0, 1 )) &&
+       ( util::$PLUS  != substr( (string) $tzafter[$OFFSETSEC], 0, 1 )))
       $tzafter[$OFFSETSEC] = util::$PLUS . $tzafter[$OFFSETSEC];
     if( false === ( $tzafter[$TZNAME] = $vtzc->getProperty(util::$TZNAME)))
       $tzafter[$TZNAME] = $tzafter[$OFFSETHIS];

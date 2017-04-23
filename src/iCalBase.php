@@ -2,28 +2,35 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
 /**
- *         Do NOT remove or change version!!
+ *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' ))
-  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.7' );
+  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.10' );
 /**
  * iCalcreator base class
  *
@@ -52,17 +59,23 @@ abstract class iCalBase {
  * __clone method
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.7 - 2017-04-14
+ * @since 2.23.10 - 2017-04-20
  */
   public function __clone() {
     foreach( $this->components as $cix => $component )
       $this->components[$cix] = clone $component;
+    if( isset( $this->compix ))
+      $this->compix = array();
+    if( isset( $this->propix ))
+      $this->propix = array();
+    if( isset( $this->propdelix ))
+      $this->propdelix = array();
   }
 /**
  * Return config value or info about subcomponents, false on not found
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.20 - 2017-02-02
+ * @since 2.22.23 - 2017-02-02
  * @param mixed $config
  * @return mixed
  * @uses iCalBase::getConfig()
@@ -186,7 +199,7 @@ abstract class iCalBase {
  * General component config setting
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.20 - 2017-02-02
+ * @since 2.23.10 - 2017-04-22
  * @param mixed   $config
  * @param string  $value
  * @param bool    $softUpdate
@@ -219,8 +232,8 @@ abstract class iCalBase {
         $res    = true;
         break;
       case util::$TZID:
-        $this->config[util::$TZID] = $value;
-        $subcfg = array( util::$TZID => $value );
+        $this->config[util::$TZID] = trim( $value );
+        $subcfg = array( util::$TZID => trim( $value ));
         $res    = true;
         break;
       case util::$UNIQUE_ID:

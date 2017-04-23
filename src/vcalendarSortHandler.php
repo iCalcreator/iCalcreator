@@ -2,18 +2,25 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
@@ -23,60 +30,47 @@ use kigkonsult\iCalcreator\util\util;
  * iCalcreator vcalendarSortHandler class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.5 - 2017-04-13
+ * @since 2.23.9 - 2017-04-22
  */
 class vcalendarSortHandler {
 /**
  * vcalendar sort callback function
  *
+ * @since 2.23.9 - 2017-04-20
  * @param array $a
  * @param array $b
  * @return int
  * @static
  */
   public static function cmpfcn( $a, $b ) {
-    static $SORTKEYS = array( 'year', 'month', 'day', 'hour', 'min', 'dec' );
-    if(        empty( $a ))                        return -1;
-    if(        empty( $b ))                        return  1;
+    if(        empty( $a ))                     return -1;
+    if(        empty( $b ))                     return  1;
     if( util::$LCVTIMEZONE == $a->objName ) {
-      if( util::$LCVTIMEZONE != $b->objName )      return -1;
-      elseif( $a->srtk[0] <= $b->srtk[0] )         return -1;
-      else                                         return  1;
+      if( util::$LCVTIMEZONE != $b->objName )   return -1;
+      elseif( $a->srtk[0] <= $b->srtk[0] )      return -1;
+      else                                      return  1;
     }
-    elseif( util::$LCVTIMEZONE == $b->objName )    return  1;
+    elseif( util::$LCVTIMEZONE == $b->objName ) return  1;
     for( $k = 0; $k < 4 ; $k++ ) {
-      if(        empty( $a->srtk[$k] ))            return -1;
-      elseif(    empty( $b->srtk[$k] ))            return  1;
-      if( is_array( $a->srtk[$k] )) {
-        if( is_array( $b->srtk[$k] )) {
-          foreach( $SORTKEYS as $key ) {
-            if    ( ! isset( $a->srtk[$k][$key] )) return -1;
-            elseif( ! isset( $b->srtk[$k][$key] )) return  1;
-            if    (  empty( $a->srtk[$k][$key] ))  return -1;
-            elseif(  empty( $b->srtk[$k][$key] ))  return  1;
-            if    (         $a->srtk[$k][$key] == $b->srtk[$k][$key])
-                                                   continue;
-            if    ((  (int) $a->srtk[$k][$key] ) < ((int) $b->srtk[$k][$key] ))
-                                                   return -1;
-            elseif((  (int) $a->srtk[$k][$key] ) > ((int) $b->srtk[$k][$key] ))
-                                                   return  1;
-          }
-        }
-        else                                       return -1;
-      }
-      elseif( is_array( $b->srtk[$k] ))            return  1;
-      elseif( $a->srtk[$k] < $b->srtk[$k] )        return -1;
-      elseif( $a->srtk[$k] > $b->srtk[$k] )        return  1;
+      if(        empty( $a->srtk[$k] ))         return -1;
+      elseif(    empty( $b->srtk[$k] ))         return  1;
+      $sortStat = strcmp( $a->srtk[$k], $b->srtk[$k] );
+      if( 0 == $sortStat )
+        continue;
+      return ( 0 < $sortStat ) ? 1 : -1;
     }
     return 0;
   }
 /**
  * Set sort arguments/parameters in component
  *
+ * @since 2.23.19 - 2017-04-22
  * @param object $c       valendar component
  * @param string $sortArg
- * @uses calendarComponent::$getProperty()
+ * @uses calendarComponent::getProperty()
  * @uses calendarComponent::getProperties()
+ * @uses util::isArrayDate()
+ * @uses vcalendarSortHandler::arrDate2str()
  * @uses util::date2strdate()
  * @uses util::strDate2ArrayDate()
  * @static
@@ -90,56 +84,84 @@ class vcalendarSortHandler {
       return;
     }
     elseif( ! is_null( $sortArg )) {
-      if( in_array( $sortArg, util::$MPROPS1 )) {
+      if( in_array( $sortArg, util::$MPROPS1 )) { // all string
         $propValues = array();
         $c->getProperties( $sortArg, $propValues );
         if( ! empty( $propValues )) {
-          $sk         = array_keys( $propValues );
-          $c->srtk[0] = $sk[0];
+          $c->srtk[0] = key( array_slice( $propValues, 0, 1, TRUE ));
           if( util::$RELATED_TO  == $sortArg )
             $c->srtk[0] .= $c->getProperty( util::$UID );
         }
         elseif( util::$RELATED_TO  == $sortArg )
           $c->srtk[0] = $c->getProperty( util::$UID );
-      }
+      } // end if( in_array( $sortArg, util::$MPROPS1 ))
       elseif( false !== ( $d = $c->getProperty( $sortArg ))) {
-        $c->srtk[0] = $d;
+        $c->srtk[0] = ( util::isArrayDate( $d )) ? self::arrDate2str( $d ) : $d;
         if( util::$UID == $sortArg ) {
           if( false !== ( $d = $c->getProperty( util::$RECURRENCE_ID ))) {
-            $c->srtk[1] = util::date2strdate( $d );
+            $c->srtk[1] = self::arrDate2str( $d );
             if( false === ( $c->srtk[2] = $c->getProperty( util::$SEQUENCE )))
               $c->srtk[2] = PHP_INT_MAX;
           }
           else
             $c->srtk[1] = $c->srtk[2] = PHP_INT_MAX;
-        }
-      }
+        } // end if( util::$UID == $sortArg )
+      } // end elseif( false !== ( $d = $c->getProperty( $sortArg )))
       return;
     } // end elseif( $sortArg )
-    if( false !== ( $d = $c->getProperty( util::$X_CURRENT_DTSTART ))) {
-      $c->srtk[0] = util::strDate2ArrayDate( $d[1] );
-      unset( $c->srtk[0][util::$UNPARSEDTEXT] );
+    switch( true ) { // sortkey 0 : dtstart
+      case ( false !== ( $d = $c->getProperty( util::$X_CURRENT_DTSTART ))) :
+        $c->srtk[0] = self::arrDate2str( util::strDate2ArrayDate( $d[1] ));
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$DTSTART ))) :
+        $c->srtk[0] = self::arrDate2str( $d );
+        break;
     }
-    elseif( false === ( $c->srtk[0] = $c->getProperty( util::$DTSTART )))
-      $c->srtk[0] = 0;                                                 // sortkey 0 : dtstart
-    if( false !== ( $d = $c->getProperty( util::$X_CURRENT_DTEND ))) {
-      $c->srtk[1] = util::strDate2ArrayDate( $d[1] );                 // sortkey 1 : dtend/due(/duration)
-      unset( $c->srtk[1][util::$UNPARSEDTEXT] );
+    switch( true ) { // sortkey 1 : dtend/due(/duration)
+      case ( false !== ( $d = $c->getProperty( util::$X_CURRENT_DTEND ))) :
+        $c->srtk[1] = self::arrDate2str( util::strDate2ArrayDate( $d[1] ));
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$DTEND ))) :
+        $c->srtk[1] = self::arrDate2str( $d );
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$X_CURRENT_DUE ))) :
+        $c->srtk[1] = self::arrDate2str( util::strDate2ArrayDate( $d[1] ));
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$DUE ))) :
+        $c->srtk[1] = self::arrDate2str( $d );
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$DURATION, false, false, true ))) :
+        $c->srtk[1] = self::arrDate2str( $d );
+        break;
     }
-    elseif( false === ( $c->srtk[1] = $c->getProperty( util::$DTEND ))) {
-      if( false !== ( $d = $c->getProperty( util::$X_CURRENT_DUE ))) {
-        $c->srtk[1] = util::strDate2ArrayDate( $d[1] );
-        unset( $c->srtk[1][util::$UNPARSEDTEXT] );
-      }
-      elseif( false === ( $c->srtk[1] = $c->getProperty( util::$DUE )))
-        if( false === ( $c->srtk[1] = $c->getProperty( util::$DURATION, false, false, true )))
-          $c->srtk[1] = 0;
+    switch( true ) { // sortkey 2 : created/dtstamp
+      case ( false !== ( $d = $c->getProperty( util::$CREATED ))) :
+        $c->srtk[2] = self::arrDate2str( $d );
+        break;
+      case ( false !== ( $d = $c->getProperty( util::$DTSTAMP ))) :
+        $c->srtk[2] = self::arrDate2str( $d );
+        break;
     }
-    if( false === ( $c->srtk[2] = $c->getProperty( util::$CREATED )))  // sortkey 2 : created/dtstamp
-      if( false === ( $c->srtk[2] = $c->getProperty( util::$DTSTAMP )))
-        $c->srtk[2] = 0;
-    if( false === ( $c->srtk[3] = $c->getProperty( util::$UID )))      // sortkey 3 : uid
+                     // sortkey 3 : uid
+    if( false === ( $c->srtk[3] = $c->getProperty( util::$UID )))
       $c->srtk[3] = 0;
+  }
+/**
+ * Return formatted string from (array) date/datetime
+ */
+  private static function arrDate2str( $adate ) {
+    $str    = sprintf( util::$YMD,
+                       $adate[util::$LCYEAR],
+                       $adate[util::$LCMONTH],
+                       $adate[util::$LCDAY] );
+    if( isset( $adate[util::$LCHOUR] ))
+      $str .= sprintf( util::$HIS,
+                       $adate[util::$LCHOUR],
+                       $adate[util::$LCMIN],
+                       $adate[util::$LCSEC] );
+    if( isset( $adate[util::$LCtz] ) && ! empty( $adate[util::$LCtz] ))
+      $str .= $adate[util::$LCtz];
+    return $str;
   }
 /**
  * Sort callback function for exdate

@@ -1,5 +1,5 @@
 
-iCalcreator 2.23.7 releaseNotes
+iCalcreator 2.23.9 releaseNotes
 
 This is an (unstable) evaluation release,
 please mail your opinion and observations!
@@ -35,3 +35,5 @@ vcalendar::selectComponents()
                index typo
                no 'split' when event end at midnight
 iCalXML::XMLgetProps() X-prop parameter VALUE
+PHP 7 substr adapt
+vcalendar::sort() reworked

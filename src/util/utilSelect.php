@@ -2,18 +2,25 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
@@ -146,7 +153,6 @@ class utilSelect {
     $exdatelist  = $recurrIdList = array();
     $INTERVAL_P1D = new DateInterval( $P1D );
 // echo ' comp ix : ' . implode( ',', ( array_keys( $calendar->components ))) . "<br>\n"; // test ###
-//  foreach( $calendar->components as $cix => $component ) {
     $cix = -1;
     while( $component = $calendar->getComponent()) {
     $cix += 1;
@@ -480,7 +486,7 @@ class utilSelect {
         } // end if( 0 < count( $recurlist ))
       } // end if( true === $any )
       unset( $component );
-    } // end foreach( $calendar->components as $cix => $component )
+    } // end while( $component = $calendar->getComponent())
     if( 0 >= count( $result ))
       return false;
     elseif( ! $flat ) {
@@ -713,7 +719,7 @@ class utilSelect {
                                      array $selectOptions ) {
     $output = array();
     $selectOptions = array_change_key_case( $selectOptions, CASE_UPPER );
-    foreach( $calendar->components as $cix => $component3 ) {
+    while( $component3 = $calendar->getComponent()) {
       if( empty( $component3 ))
         continue;
       if( ! in_array( $component3->objName, util::$VCOMPS ))
@@ -759,7 +765,7 @@ class utilSelect {
         elseif( in_array( $d, $pValue ) && ! isset( $output[$uid] ))
           $output[$uid][] = $component3;
       } // end foreach( $selectOptions as $propName => $pValue )
-    } // end foreach( $calendar->components as $cix => $component3 ) {
+    } // end while( $component3 = $calendar->getComponent()) {
     if( ! empty( $output )) {
       ksort( $output ); // uid order
       $output2 = array();

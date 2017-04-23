@@ -2,18 +2,25 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * @copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @link      http://kigkonsult.se/iCalcreator/index.php
- * @package   iCalcreator
- * @version   2.23.7
- * @license   Part 1. This software is for
- *                    individual evaluation use and evaluation result use only;
- *                    non assignable, non-transferable, non-distributable,
- *                    non-commercial and non-public rights, use and result use.
- *            Part 2. Creative Commons
- *                    Attribution-NonCommercial-NoDerivatives 4.0 International License
- *                    (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *            In case of conflict, Part 1 supercede Part 2.
+ * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * link      http://kigkonsult.se/iCalcreator/index.php
+ * package   iCalcreator
+ * version   2.23.10
+ * license   By obtaining and/or copying the Software, iCalcreator,
+ *           you (the licensee) agree that you have read, understood,
+ *           and will comply with the following terms and conditions.
+ *           a. The above copyright, link, package and version notices,
+ *              this licence notice and
+ *              the [rfc5545] PRODID as implemented and invoked in the software
+ *              shall be included in all copies or substantial portions of the Software.
+ *           b. The Software, iCalcreator, is for
+ *              individual evaluation use and evaluation result use only;
+ *              non assignable, non-transferable, non-distributable,
+ *              non-commercial and non-public rights, use and result use.
+ *           c. Creative Commons
+ *              Attribution-NonCommercial-NoDerivatives 4.0 International License
+ *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+ *           In case of conflict, a and b supercede c.
  *
  * This file is a part of iCalcreator.
  */
@@ -481,18 +488,18 @@ class util {
  * Recount property propix, used at consecutive getProperty calls
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.22 - 2017-02-12
+ * @since 2.23.8 - 2017-04-18
  * @param array  $prop     component (multi-)property
  * @param int    $propix   getter counter
  * @return bool true
  * @static
  */
   public static function recountMvalPropix( & $prop, & $propix ) {
-    if( ! is_array( $prop ))
+    if( ! is_array( $prop ) || empty( $prop ))
       return false;
-    while(( 0 < count( $prop )) &&
-              ! isset( $prop[$propix] ) &&
-       ( $propix < end(( array_keys( $prop )))))
+    $last = key( array_slice( $prop, -1, 1, TRUE ));
+    while( ! isset( $prop[$propix] ) &&
+                ( $last > $propix  ))
       $propix++;
     return true;
   }
@@ -533,7 +540,7 @@ class util {
  * Return datestamp for calendar component object instance dtstamp
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.23 - 2017-02-17
+ * @since 2.22.23 - 2017-02-17
  * @return array
  * @static
  */
@@ -552,7 +559,7 @@ class util {
  * Return an unique id for a calendar component object instance
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.23 - 2017-02-17
+ * @since 2.22.23 - 2017-02-17
  * @param string $unique_id
  * @return array
  * @static
@@ -588,7 +595,7 @@ class util {
  * Return true if a date property has NO date parts
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.23 - 2017-02-17
+ * @since 2.22.23 - 2017-02-17
  * @param array  $content
  * @return bool
  * @static
@@ -605,7 +612,7 @@ class util {
  * Return true if property parameter VALUE is set to argument, otherwise false
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.23 - 2017-02-12
+ * @since 2.22.23 - 2017-02-12
  * @param array  $content
  * @param string $arg
  * @return bool
@@ -646,7 +653,7 @@ class util {
  * Return property name  and  opt.params and property value
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.23 - 2017-04-08
+ * @since 2.23.8 - 2017-04-16
  * @param string $row
  * @return string
  * @uses util::trimTrailNL()
@@ -656,13 +663,13 @@ class util {
     static $COLONSEMICARR = array( ':', ';' );
     $propName = null;
     $cix      = 0;
-    while( isset( $row[$cix] )) {
+    $len      = strlen( $row );
+    while( $cix < $len ) {
       if( in_array( $row[$cix], $COLONSEMICARR ))
         break;
-      else
-        $propName .= $row[$cix];
+      $propName .= $row[$cix];
       $cix++;
-    } // end while
+    } // end while...
     if( isset( $row[$cix] ))
       $row = substr( $row, $cix);
     else {
@@ -675,7 +682,7 @@ class util {
  * Return array from content split by '\,'
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.23 - 2017-02-18
+ * @since 2.23.8 - 2017-04-16
  * @param string $content
  * @return array
  * @uses util::trimTrailNL()
@@ -684,8 +691,9 @@ class util {
   public static function commaSplit( $content ) {
     static $DBBS = "\\";
     $output      = array( 0 => null );
-    $cix = $lix = 0;
-    while( false !== substr( $content, $lix, 1 )) {
+    $cix = $lix  = 0;
+    $len         = strlen( $content );
+    while( $lix < $len ) {
       if(( self::$COMMA  ==  $content[$lix] ) &&
                 ( $DBBS  !=  $content[( $lix - 1 )]))
         $output[++$cix]   = null;
@@ -816,42 +824,43 @@ class util {
         case(( $byte & 0xE0) == 0xC0 ) :   // characters U-00000080 - U-000007FF, mask 110XXXXX
           if( isset( $tmp[$x+1] )) {
             $cCnt   += 1;
-            $string  .= $tmp[$x+1];
-            $x       += 1;                 // add a two bytes character
+            $string .= $tmp[$x+1];
+            $x      += 1;                  // add a two bytes character
           }
           break;
         case(( $byte & 0xF0 ) == 0xE0 ) :  // characters U-00000800 - U-0000FFFF, mask 1110XXXX
           if( isset( $tmp[$x+2] )) {
             $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2];
+            $string .= $tmp[$x+1] . $tmp[$x+2];
             $x      += 2;                  // add a three bytes character
           }
           break;
         case(( $byte & 0xF8 ) == 0xF0 ) :  // characters U-00010000 - U-001FFFFF, mask 11110XXX
           if( isset( $tmp[$x+3] )) {
             $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3];
+            $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3];
             $x      += 3;                  // add a four bytes character
           }
           break;
         case(( $byte & 0xFC ) == 0xF8 ) :  // characters U-00200000 - U-03FFFFFF, mask 111110XX
           if( isset( $tmp[$x+4] )) {
             $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4];
+            $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3] . $tmp[$x+4];
             $x      += 4;                  // add a five bytes character
           }
           break;
         case(( $byte & 0xFE ) == 0xFC ) :  // characters U-04000000 - U-7FFFFFFF, mask 1111110X
           if( isset( $tmp[$x+5] )) {
             $cCnt   += 1;
-            $string .= $tmp[$x+1].$tmp[$x+2].$tmp[$x+3].$tmp[$x+4].$tmp[$x+5];
+            $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3] . $tmp[$x+4] . $tmp[$x+5];
             $x      += 5;                  // add a six bytes character
           }
+          break;
         default:                           // add any other byte without counting up $cCnt
           break;
       } // end switch( true )
       $x            += 1;                  // next 'byte' to test
-    } // end while( true ) {
+    } // end while( true )
     return $string;
   }
 /**
@@ -876,8 +885,9 @@ class util {
     $attrix       = -1;
     $clen         = strlen( $line );
     $WithinQuotes = false;
+    $len          = strlen( $line );
     $cix          = 0;
-    while( false !== substr( $line, $cix, 1 )) {
+    while( $cix < $len ) {
       if(  ! $WithinQuotes  &&   ( self::$COLON == $line[$cix] )            &&
                                  ( substr( $line,$cix,  3 )   != $CSS )     &&
          ( ! in_array( strtolower( substr( $line,$cix - 6, 4 )), $MSTZ ))   &&
@@ -920,7 +930,7 @@ class util {
  * Special characters management output
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.23 - 2017-03-08
+ * @since 2.23.8 - 2017-04-17
  * @param string $string
  * @return string
  * @static
@@ -936,8 +946,9 @@ class util {
     static $QBSLCN   = "\n";
     static $BSUCN    = '\N';
     $string = (string) $string;
+    $strLen = strlen( $string );
     $pos = 0;
-    while( isset( $string[$pos] )) {
+    while( $pos < $strLen ) {
       if( false === ( $pos = strpos( $string, $DBS, $pos )))
         break;
       if( ! in_array( substr( $string, $pos, 1 ), $SPECCHAR )) {
@@ -947,20 +958,20 @@ class util {
       $pos += 1;
     }
     if( false !== strpos( $string, self::$QQ ))
-      $string = str_replace( self::$QQ,    $SQ,      $string);
+      $string   = str_replace( self::$QQ,    $SQ,      $string);
     if( false !== strpos( $string, self::$COMMA ))
-      $string = str_replace( self::$COMMA, $BSCOMMA, $string);
+      $string   = str_replace( self::$COMMA, $BSCOMMA, $string);
     if( false !== strpos( $string, self::$SEMIC ))
-      $string = str_replace( self::$SEMIC, $BSSEMIC, $string);
+      $string   = str_replace( self::$SEMIC, $BSSEMIC, $string);
     if( false !== strpos( $string, self::$CRLF ))
-      $string = str_replace( self::$CRLF,  $BSLCN,   $string);
+      $string   = str_replace( self::$CRLF,  $BSLCN,   $string);
     elseif( false !== strpos( $string, $BSLCR ))
-      $string = str_replace( $BSLCR,       $BSLCN,   $string);
+      $string   = str_replace( $BSLCR,       $BSLCN,   $string);
     elseif( false !== strpos( $string, $QBSLCN ))
-      $string = str_replace( $QBSLCN,      $BSLCN,   $string);
+      $string   = str_replace( $QBSLCN,      $BSLCN,   $string);
     if( false !== strpos( $string, $BSUCN ))
-      $string = str_replace( $BSUCN,       $BSLCN,   $string);
-    $string = str_replace( self::$CRLF, $BSLCN, $string);
+      $string   = str_replace( $BSUCN,       $BSLCN,   $string);
+    $string     = str_replace( self::$CRLF,  $BSLCN,   $string);
     return $string;
   }
 /**
@@ -1751,7 +1762,7 @@ class util {
  * Return array  (in intern format) from string duration
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.14.1 - 2012-09-25
+ * @since 2.23.8 - 2017-04-17
  * @param string $duration
  * @uses util::duration2arr()
  * @return array
@@ -1766,7 +1777,7 @@ class util {
     static $M  = 'M';
     static $S  = 'S';
     $duration  = (string) trim( $duration );
-    while( 0 != strcasecmp( $P, substr( $duration, 0, 1 ))) {
+    while( 0 != strcasecmp( $P, $duration[0] )) {
       if( 0 < strlen( $duration ))
         $duration = substr( $duration, 1 );
       else
@@ -1776,33 +1787,34 @@ class util {
     $duration = str_replace( $Tt, null, $duration );
     $output = array();
     $val    = null;
-    for( $ix=0; $ix < strlen( $duration ); $ix++ ) {
-      switch( strtoupper( substr( $duration, $ix, 1 ))) {
+    $durLen = strlen( $duration );
+    for( $ix=0; $ix < $durLen; $ix++ ) {
+      switch( strtoupper( $duration[$ix] )) {
        case $W :
          $output[self::$LCWEEK] = $val;
-         $val            = null;
+         $val    = null;
          break;
        case $D :
          $output[self::$LCDAY]  = $val;
-         $val            = null;
+         $val    = null;
          break;
        case $H :
          $output[self::$LCHOUR] = $val;
-         $val            = null;
+         $val    = null;
          break;
        case $M :
          $output[self::$LCMIN]  = $val;
-         $val            = null;
+         $val    = null;
          break;
        case $S :
          $output[self::$LCSEC]  = $val;
-         $val            = null;
+         $val    = null;
          break;
        default:
-         if( ! ctype_digit( substr( $duration, $ix, 1 )))
+         if( ! ctype_digit( $duration[$ix] ))
            return false; // unknown duration control character  !?!?
          else
-           $val .= substr( $duration, $ix, 1 );
+           $val .= $duration[$ix];
       }
     }
     return self::duration2arr( $output );
@@ -1933,9 +1945,9 @@ class util {
       $date = $temp;
       return true;
     }
-    if( in_array( substr( $work, 8, 1 ), $ET ))
+    if( in_array( $work[8], $ET ))
       $work =  substr( $work, 9 );
-    elseif( ctype_digit( substr( $work, 8, 1 )))
+    elseif( ctype_digit( $work[8] ))
       $work = substr( $work, 8 );
     else
      return false;
@@ -2011,11 +2023,11 @@ class util {
       return $output;
     }
     else {
-      $cx  = $tx = 0;  //  find any trailing timezone or offset
+      $cx  = $tx = 0;  //  find any TRAILING timezone or offset
       $len = strlen( $datetime );
       for( $cx = -1; $cx > ( 9 - $len ); $cx-- ) {
         $char = substr( $datetime, $cx, 1 );
-        if(( ' ' == $char ) || ctype_digit( $char ))
+        if(( self::$SP1 == $char ) || ctype_digit( $char ))
           break;       // if exists, tz ends here.. . ?
         else
            $tx--;      // tz length counter
@@ -2024,10 +2036,10 @@ class util {
         $tz     = substr( $datetime, $tx );
         $datetime = trim( substr( $datetime, 0, $len + $tx ));
       }
-      if((  ctype_digit( substr( $datetime, 0, 8 )) &&
-          ( self::$T ==  substr( $datetime, 8, 1 )) &&
+      if((  ctype_digit( substr( $datetime,  0, 8 )) &&
+          ( self::$T ==          $datetime[8] )      &&
             ctype_digit( substr( $datetime, -6, 6 ))) ||
-          ( ctype_digit( substr( $datetime, 0, 14 ))))
+          ( ctype_digit( substr( $datetime,  0, 14 ))))
         $tzSts  = true;
     }
     if( empty( $tz ) && ! empty( $wtz ))
@@ -2136,7 +2148,7 @@ class util {
  * Return seconds based on an offset, [+/-]HHmm[ss], used when correcting UTC to localtime or v.v.
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.11.4 - 2012-01-11
+ * @since 2.23.8 - 2017-04-17
  * @param string $tz
  * @return integer
  * @static
@@ -2149,7 +2161,7 @@ class util {
     $tz           = trim( (string) $tz );
     $offset       = 0;
     if(((          5  != strlen( $tz ))       && ( 7  != strlen( $tz ))) ||
-       (( self::$PLUS != substr( $tz, 0, 1 )) && ( self::$MINUS != substr( $tz, 0, 1 ))) ||
+       (  self::$PLUS != $tz[0]               && ( self::$MINUS != $tz[0] )) ||
        ((      $ZERO4 >= substr( $tz, 1, 4 )) && ( $NINE4 < substr( $tz, 1, 4 ))) ||
                 (( 7  == strlen( $tz ))       && ( $ZERO2 > substr( $tz, 5, 2 )) && ( $NINE2 < substr( $tz, 5, 2 ))))
       return $offset;
@@ -2157,7 +2169,7 @@ class util {
     $min2sec      = (int) substr( $tz, 3, 2 ) *   60;
     $sec          = ( 7  == strlen( $tz )) ? (int) substr( $tz, -2 ) : $ZERO2;
     $offset       = $hours2sec + $min2sec + $sec;
-    $offset       = ( self::$MINUS == substr( $tz, 0, 1 )) ? $offset * -1 : $offset;
+    $offset       = ( self::$MINUS == $tz[0] ) ? $offset * -1 : $offset;
     return $offset;
   }
 }
