@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -77,7 +77,11 @@ class timezoneHandler {
  * @uses timezoneHandler::offsetSec2His()
  * @static
  */
-  public static function createTimezone( $calendar, $timezone, $xProp=array(), $from=null, $to=null ) {
+  public static function createTimezone( $calendar,
+                                         $timezone,
+                                         $xProp=array(),
+                                         $from=null,
+                                         $to=null ) {
     static $YMD          = 'Ymd';
     static $T000000      = 'T000000';
     static $MINUS7MONTH  = '-7 month';
@@ -190,8 +194,8 @@ class timezoneHandler {
            ( $transTemp[$stdIx][$ABBR]               == $trans[$ABBR] )               &&
            ( $transTemp[$stdIx][util::$TZOFFSETFROM] == $trans[util::$TZOFFSETFROM] ) &&
            ( $transTemp[$stdIx][self::$OFFSET]       == $trans[self::$OFFSET] )) {
-          $transTemp[$stdIx][util::$RDATE][]          = $trans[self::$TIME]; // check for any repeating rdate's (in order)
-          continue;
+          $transTemp[$stdIx][util::$RDATE][]          = $trans[self::$TIME];
+          continue; // check for any repeating rdate's (in order)
         }
         $stdIx           = $tix;
       } // end standard timezone
@@ -200,8 +204,8 @@ class timezoneHandler {
            ( $transTemp[$dlghtIx][$ABBR]               == $trans[$ABBR] )               &&
            ( $transTemp[$dlghtIx][util::$TZOFFSETFROM] == $trans[util::$TZOFFSETFROM] ) &&
            ( $transTemp[$dlghtIx][self::$OFFSET]       == $trans[self::$OFFSET] )) {
-          $transTemp[$dlghtIx][util::$RDATE][]          = $trans[self::$TIME]; // check for any repeating rdate's (in order)
-          continue;
+          $transTemp[$dlghtIx][util::$RDATE][]          = $trans[self::$TIME];
+          continue; // check for any repeating rdate's (in order)
         }
         $dlghtIx         = $tix;
       } // end daylight timezone
@@ -320,10 +324,14 @@ class timezoneHandler {
     if( false === ( $pos = strpos( $search, $ENDP )))
       return false;
     $searchOffset = substr( $search, 4, ( $pos - 4 ));
-    $searchOffset = util::tz2offset( str_replace( util::$COLON, null, $searchOffset ));
+    $searchOffset = util::tz2offset( str_replace( util::$COLON,
+                                                  null,
+                                                  $searchOffset ));
     while( util::$SP1 == $search[($pos+1)] )
       $pos += 1;
-    $searchText   = trim( str_replace( $REPL2, util::$SP1, substr( $search, ( $pos + 1 )) ));
+    $searchText   = trim( str_replace( $REPL2,
+                                       util::$SP1,
+                                       substr( $search, ( $pos + 1 ))));
     $searchWords  = explode( util::$SP1, $searchText );
     try {
       $timezoneAbbreviations = DateTimeZone::listAbbreviations();
@@ -375,7 +383,6 @@ class timezoneHandler {
   }
 /**
  * Transforms a dateTime from a timezone to another
- * using PHP DateTime and DateTimeZone class (PHP >= PHP 5.2.0)
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-03-04
@@ -389,7 +396,10 @@ class timezoneHandler {
  * @uses util::chkDateArr()
  * @static
  */
-  public static function transformDateTime( & $date, $tzFrom, $tzTo=null, $format=null ) {
+  public static function transformDateTime( & $date,
+                                              $tzFrom,
+                                              $tzTo=null,
+                                              $format=null ) {
     static $YMDTHIS = 'Ymd\THis';
     if( is_null( $tzTo ))
       $tzTo    = util::$UTC;

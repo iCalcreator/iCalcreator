@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -48,8 +48,7 @@ class utilRedirect {
                                    'Cache-Control: max-age=10',
                                  );
 /**
- * Return created, updated and/or parsed calendar,
- * sending a HTTP redirect header.
+ * Return created, updated and/or parsed calendar, sending a HTTP redirect header.
  *
  * @param object $calendar
  * @param bool   $utf8Encode
@@ -95,7 +94,6 @@ class utilRedirect {
   }
 /**
  * If recent version of calendar file exists (default one hour), an HTTP redirect header is sent
- * else false is returned.
  *
  * @param object $calendar
  * @param int    $timeout  default 3600 sec

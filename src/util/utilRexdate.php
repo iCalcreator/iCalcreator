@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -33,6 +33,79 @@ namespace kigkonsult\iCalcreator\util;
  */
 class utilRexdate {
 /**
+ * Check (EXDATE/RDATE) date(-time) and params arrays for an opt. timezone
+ *
+ * If it is a DATE-TIME or DATE, updates $parno and (opt) $params)
+ * @param array $theDate    date to check
+ * @param int   $parno      no of date parts (i.e. year, month.. .)
+ * @param array $params     property parameters
+ * @uses util::isParamsValueSet(
+ * @uses util::isOffset()
+ * @uses util::strDate2ArrayDate()
+ * @access private
+ * @static
+ */
+  private static function chkDateCfg( $theDate, & $parno, & $params ) {
+    $paramsValueIsDATE = util::isParamsValueSet( array( util::$LCparams => $params ),
+                                                 util::$DATE );
+    switch( true ) {
+      case ( isset( $params[util::$TZID] )) :
+        $parno = 6;
+        break;
+      case ( $paramsValueIsDATE ) :
+        $params[util::$VALUE] = util::$DATE;
+        $parno = 3;
+        break;
+      default:
+        if( util::isParamsValueSet( array( util::$LCparams => $params ),
+                                           util::$PERIOD )) {
+          $params[util::$VALUE] = util::$PERIOD;
+          $parno = 7;
+        }
+        switch( true ) {
+          case ( is_array( $theDate )) :
+            if( isset( $theDate[util::$LCTIMESTAMP] ))
+              $tzid = ( isset( $theDate[util::$LCtz] ))
+                    ? $theDate[util::$LCtz] : null;
+            else
+              $tzid = ( isset( $theDate[util::$LCtz] ))
+                    ? $theDate[util::$LCtz] : ( 7 == count( $theDate )) ? end( $theDate ) : null;
+            if( ! empty( $tzid )) {
+              $parno = 7;
+              if( ! util::isOffset( $tzid ))
+                $params[util::$TZID] = $tzid; // save only timezone
+            }
+            elseif( ! $parno &&
+                   ( 3 == count( $theDate )) &&
+                   $paramsValueIsDATE )
+              $parno = 3;
+            else
+              $parno = 6;
+            break;
+          default : // i.e. string
+            $date = trim( $theDate );
+            if( util::$Z == substr( $date, -1 ))
+              $parno = 7; // UTC DATE-TIME
+            elseif((( 8 == strlen( $date ) && ctype_digit( $date )) ||
+                   ( 11 >= strlen( $date )))
+                && $paramsValueIsDATE )
+              $parno = 3;
+            $date = util::strDate2ArrayDate( $date, $parno );
+            unset( $date[util::$UNPARSEDTEXT] );
+            if( ! empty( $date[util::$LCtz] )) {
+              $parno = 7;
+              if( ! util::isOffset( $date[util::$LCtz] ))
+                $params[util::$TZID] = $date[util::$LCtz]; // save only timezone
+            }
+            elseif( empty( $parno ))
+              $parno = 6;
+        } // end switch( true )
+        if( isset( $params[util::$TZID] ))
+          $parno = 6;
+        break;
+    } // end switch( true )
+  }
+/**
  * Return formatted output for calendar component property data value type recur
  *
  * @param array  $exdateData
@@ -45,8 +118,10 @@ class utilRexdate {
  * @static
  */
   public static function formatExdate( $exdateData, $allowEmpty ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortExdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortExdate2' );
+    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortExdate1' );
+    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortExdate2' );
     $output  = null;
     $exdates = array();
     foreach(( array_keys( $exdateData )) as $ex ) {
@@ -99,7 +174,7 @@ class utilRexdate {
  * @param array   $params
  * @return bool
  * @uses util::setParams()
- * @uses util::chkDateCfg()
+ * @uses calendarComponent::chkDateCfg()
  * @uses util::existRem()
  * @uses util::strDate2arr()
  * @uses util::isArrayTimestampDate()
@@ -114,10 +189,14 @@ class utilRexdate {
     $input  = array( util::$LCparams => util::setParams( $params,
                                                          util::$DEFAULTVALUEDATETIME ));
     $toZ = ( isset( $input[util::$LCparams][util::$TZID] ) &&
-             in_array( strtoupper( $input[util::$LCparams][util::$TZID] ), $GMTUTCZARR )) ? true : false;
+             in_array( strtoupper( $input[util::$LCparams][util::$TZID] ),
+                       $GMTUTCZARR ))
+         ? true : false;
             /* ev. check 1:st date and save ev. timezone **/
-    util::chkDateCfg( reset( $exdates ), $parno, $input[util::$LCparams] );
-    util::existRem( $input[util::$LCparams], util::$VALUE, util::$DATE_TIME ); // remove default parameter
+    self::chkDateCfg( reset( $exdates ), $parno, $input[util::$LCparams] );
+    util::existRem( $input[util::$LCparams],
+                    util::$VALUE,
+                    util::$DATE_TIME ); // remove default parameter
     foreach(( array_keys( $exdates )) as $eix ) {
       $theExdate = $exdates[$eix];
       util::strDate2arr( $theExdate );
@@ -154,13 +233,19 @@ class utilRexdate {
         unset( $exdatea[util::$UNPARSEDTEXT] );
       }
       if( 3 == $parno )
-        unset( $exdatea[util::$LCHOUR], $exdatea[util::$LCMIN], $exdatea[util::$LCSEC], $exdatea[util::$LCtz] );
+        unset( $exdatea[util::$LCHOUR],
+               $exdatea[util::$LCMIN],
+               $exdatea[util::$LCSEC],
+               $exdatea[util::$LCtz] );
       elseif( isset( $exdatea[util::$LCtz] ))
         $exdatea[util::$LCtz] = (string) $exdatea[util::$LCtz];
-      if(  isset( $input[util::$LCparams][util::$TZID] ) ||
-         ( isset( $exdatea[util::$LCtz] )     && ! util::isOffset( $exdatea[util::$LCtz] )) ||
-         ( isset( $input[util::$LCvalue][0] ) && ( ! isset( $input[util::$LCvalue][0][util::$LCtz] ))) ||
-         ( isset( $input[util::$LCvalue][0][util::$LCtz] ) && ! util::isOffset( $input[util::$LCvalue][0][util::$LCtz] )))
+      if(  isset( $input[util::$LCparams][util::$TZID] )        ||
+         ( isset( $exdatea[util::$LCtz] ) &&
+          ! util::isOffset( $exdatea[util::$LCtz] ))            ||
+         ( isset( $input[util::$LCvalue][0] ) &&
+         ( ! isset( $input[util::$LCvalue][0][util::$LCtz] )))  ||
+         ( isset( $input[util::$LCvalue][0][util::$LCtz] ) &&
+          ! util::isOffset( $input[util::$LCvalue][0][util::$LCtz] )))
         unset( $exdatea[util::$LCtz] );
       if( $toZ ) // time zone Z
         $exdatea[util::$LCtz] = util::$Z;
@@ -192,8 +277,10 @@ class utilRexdate {
  * @static
  */
   public static function formatRdate( $rdateData, $allowEmpty, $objName ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate2' );
+    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortRdate1' );
+    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortRdate2' );
     $utcTime = ( in_array( $objName, util::$TZCOMPS )) ? true : false;
     $output  = null;
     $rdates  = array();
@@ -281,19 +368,15 @@ class utilRexdate {
  * @param array  $params
  * @param string $objName
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
- * @uses calendarComponent::$rdate
  * @uses util::setParams()
- * @uses calendarComponent::$objName
  * @uses util::isParamsValueSet()
- * @uses util::isArrayDate()
- * @uses util::chkDateCfg()
+ * @uses calendarComponent::chkDateCfg()
  * @uses util::existRem()
  * @uses util::strDate2arr()
  * @uses util::isArrayTimestampDate()
  * @uses util::isOffset()
  * @uses util::timestamp2date()
+ * @uses util::isArrayDate()
  * @uses util::chkDateArr()
  * @uses util::strDate2ArrayDate()
  * @uses util::duration2arr()
@@ -310,7 +393,9 @@ class utilRexdate {
       $input[util::$LCparams][util::$VALUE] = util::$DATE_TIME;
     }
     $toZ = ( isset( $params[util::$TZID] ) &&
-             in_array( strtoupper( $params[util::$TZID] ), $GMTUTCZARR )) ? true : false;
+             in_array( strtoupper( $params[util::$TZID] ),
+                       $GMTUTCZARR ))
+         ? true : false;
             /*  check if PERIOD, if not set */
     if(( ! isset( $input[util::$LCparams][util::$VALUE] ) ||
        ( ! util::isParamsValueSet( $input, util::$DATE ) &&
@@ -327,8 +412,10 @@ class utilRexdate {
     if( isset( $input[util::$LCparams][util::$VALUE] ) &&
        ( util::$PERIOD == $input[util::$LCparams][util::$VALUE] )) // PERIOD
       $date  = reset( $date );
-    util::chkDateCfg( $date, $parno, $input[util::$LCparams] );
-    util::existRem( $input[util::$LCparams], util::$VALUE, util::$DATE_TIME ); // remove default
+    self::chkDateCfg( $date, $parno, $input[util::$LCparams] );
+    util::existRem( $input[util::$LCparams],
+                    util::$VALUE,
+                    util::$DATE_TIME ); // remove default
     foreach( $rdates as $rpix => $theRdate ) {
       $inputa = null;
       util::strDate2arr( $theRdate );
@@ -369,7 +456,8 @@ class utilRexdate {
                 else
                   $inputab = $d;
               } // end elseif( util::isArrayDate( $rPeriod ))
-              elseif (( 1 == count( $rPeriod )) && ( 8 <= strlen( reset( $rPeriod )))) { // text-date
+              elseif(( 1 == count( $rPeriod )) &&
+                     ( 8 <= strlen( reset( $rPeriod )))) { // text-date
                 $inputab   = util::strDate2ArrayDate( reset( $rPeriod ), $parno );
                 unset( $inputab[util::$UNPARSEDTEXT] );
               }
@@ -387,13 +475,17 @@ class utilRexdate {
               unset( $inputab[util::$UNPARSEDTEXT] );
             }
             if(( 0 == $rpix ) && ( 0 == $rix )) {
-              if( isset( $inputab[util::$LCtz] ) && in_array( strtoupper( $inputab[util::$LCtz] ), $GMTUTCZARR )) {
+              if( isset( $inputab[util::$LCtz] ) &&
+                  in_array( strtoupper( $inputab[util::$LCtz] ),
+                            $GMTUTCZARR )) {
                 $inputab[util::$LCtz] = util::$Z;
                 $toZ = true;
               }
             }
             else {
-              if( isset( $inputa[0][util::$LCtz] ) && ( util::$Z == $inputa[0][util::$LCtz] ) && isset( $inputab[util::$LCYEAR] ))
+              if( isset( $inputa[0][util::$LCtz] ) &&
+                 ( util::$Z == $inputa[0][util::$LCtz] ) &&
+                 isset( $inputab[util::$LCYEAR] ))
                 $inputab[util::$LCtz] = util::$Z;
               else
                 unset( $inputab[util::$LCtz] );
@@ -404,7 +496,8 @@ class utilRexdate {
           } // end foreach( $theRdate as $rix => $rPeriod )
         } // PERIOD end
         elseif ( util::isArrayTimestampDate( $theRdate )) {    // timestamp
-          if( isset( $theRdate[util::$LCtz] ) && !util::isOffset( $theRdate[util::$LCtz] )) {
+          if( isset( $theRdate[util::$LCtz] ) &&
+             ! util::isOffset( $theRdate[util::$LCtz] )) {
             if( isset( $input[util::$LCparams][util::$TZID] ))
               $theRdate[util::$LCtz] = $input[util::$LCparams][util::$TZID];
             else
@@ -414,7 +507,9 @@ class utilRexdate {
         }
         else {                                                                  // date[-time]
           $inputa = util::chkDateArr( $theRdate, $parno );
-          if( isset( $inputa[util::$LCtz] ) && ( util::$Z != $inputa[util::$LCtz] ) && util::isOffset( $inputa[util::$LCtz] )) {
+          if( isset( $inputa[util::$LCtz] ) &&
+             ( util::$Z != $inputa[util::$LCtz] ) &&
+               util::isOffset( $inputa[util::$LCtz] )) {
             $inputa  = util::strDate2ArrayDate( sprintf( util::$YMDHISE,
                                                          (int) $inputa[util::$LCYEAR],
                                                          (int) $inputa[util::$LCMONTH],
@@ -438,15 +533,20 @@ class utilRexdate {
          ( util::$PERIOD != $input[util::$LCparams][util::$VALUE] )) { // no PERIOD
         if(( 0 == $rpix ) && !$toZ )
           $toZ = ( isset( $inputa[util::$LCtz] ) &&
-                   in_array( strtoupper( $inputa[util::$LCtz] ), $GMTUTCZARR )) ? true : false;
+                   in_array( strtoupper( $inputa[util::$LCtz] ), $GMTUTCZARR ))
+               ? true : false;
         if( $toZ )
           $inputa[util::$LCtz]    = util::$Z;
         if( 3 == $parno )
-          unset( $inputa[util::$LCHOUR], $inputa[util::$LCMIN], $inputa[util::$LCSEC], $inputa[util::$LCtz] );
+          unset( $inputa[util::$LCHOUR],
+                 $inputa[util::$LCMIN],
+                 $inputa[util::$LCSEC],
+                 $inputa[util::$LCtz] );
         elseif( isset( $inputa[util::$LCtz] ))
           $inputa[util::$LCtz]    = (string) $inputa[util::$LCtz];
         if(  isset( $input[util::$LCparams][util::$TZID] ) ||
-           ( isset( $input[util::$LCvalue][0] ) && ( ! isset( $input[util::$LCvalue][0][util::$LCtz] ))))
+           ( isset( $input[util::$LCvalue][0] ) &&
+            ( ! isset( $input[util::$LCvalue][0][util::$LCtz] ))))
           if( !$toZ )
             unset( $inputa[util::$LCtz] );
       }

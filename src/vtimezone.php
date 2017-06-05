@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -67,7 +67,8 @@ class vtimezone extends calendarComponent {
       $config       = $timezonetype;
       $timezonetype = null;
     }
-    $this->timezonetype = ( empty( $timezonetype )) ? util::$LCVTIMEZONE : strtolower( $timezonetype );
+    $this->timezonetype = ( empty( $timezonetype ))
+                        ? util::$LCVTIMEZONE : strtolower( $timezonetype );
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
     $prf = ( empty( $timezonetype )) ? $TZ : substr( $timezonetype, 0, 1 );
@@ -143,38 +144,49 @@ class vtimezone extends calendarComponent {
   }
 /**
  * Get vtimezone component property value/params
+ *
  * If arg $inclParam, return array with keys VALUE/PARAMS
  * @param string  $propName
  * @param int     $propix   specific property in case of multiply occurences
  * @param bool    $inclParam
  * @param bool    $specform
+ * @return mixed
  * @uses vtimezone::$tzid
  * @uses vtimezone::$tzoffsetfrom
  * @uses vtimezone::$tzoffsetto
  * @uses vtimezone::$tzurl
  * @uses calendarComponent::getProperty()
- * @return mixed
  */
-  public function getProperty( $propName=false, $propix=false, $inclParam=false, $specform=false ) {
+  public function getProperty( $propName=false,
+                               $propix=false,
+                               $inclParam=false,
+                               $specform=false ) {
     switch( strtoupper( $propName )) {
       case util::$TZID:
         if( isset( $this->tzid[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->tzid : $this->tzid[util::$LCvalue];
+          return ( $inclParam ) ? $this->tzid
+                                : $this->tzid[util::$LCvalue];
         break;
       case util::$TZOFFSETFROM:
         if( isset( $this->tzoffsetfrom[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->tzoffsetfrom : $this->tzoffsetfrom[util::$LCvalue];
+          return ( $inclParam ) ? $this->tzoffsetfrom
+                                : $this->tzoffsetfrom[util::$LCvalue];
         break;
       case util::$TZOFFSETTO:
         if( isset( $this->tzoffsetto[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->tzoffsetto : $this->tzoffsetto[util::$LCvalue];
+          return ( $inclParam ) ? $this->tzoffsetto
+                                : $this->tzoffsetto[util::$LCvalue];
         break;
       case util::$TZURL:
         if( isset( $this->tzurl[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->tzurl : $this->tzurl[util::$LCvalue];
+          return ( $inclParam ) ? $this->tzurl
+                                : $this->tzurl[util::$LCvalue];
         break;
       default:
-        return parent::getProperty( $propName, $propix, $inclParam, $specform );
+        return parent::getProperty( $propName,
+                                    $propix,
+                                    $inclParam,
+                                    $specform );
         break;
     }
     return false;

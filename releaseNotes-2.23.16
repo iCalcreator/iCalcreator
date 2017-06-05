@@ -1,5 +1,5 @@
 
-iCalcreator 2.23.9 releaseNotes
+iCalcreator 2.23.16 releaseNotes
 
 This is an (unstable) evaluation release,
 please mail your opinion and observations!
@@ -29,11 +29,23 @@ MAJOR rewrite (but same API)
 - improved performance
 
 Bug fixed and updates
-util::size75() no line break in CRLF
-               preserve opt. trailing CRLF
+util::size75()
+  no line break in CRLF
+  preserve opt. trailing CRLF
 vcalendar::selectComponents()
-               index typo
-               no 'split' when event end at midnight
-iCalXML::XMLgetProps() X-prop parameter VALUE
-PHP 7 substr adapt
-vcalendar::sort() reworked
+  index typo
+  no 'split' when event end at midnight
+iCalXML::XMLgetProps()
+  X-prop parameter VALUE
+PHP 7
+  substr adapt
+vcalendar::sort()
+  reworked
+util::splitContent()
+  attribute split index
+vcalendar::getComponent()
+calendarComponent::getComponent()
+iCalBase::deleteComponent()
+  UID/component name spilt
+autoloader
+  renamed to autoloader

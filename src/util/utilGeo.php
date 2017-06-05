@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -41,7 +41,7 @@ class utilGeo {
   public static $LATITUDE   = 'latitude';
   public static $LONGITUDE  = 'longitude';
 /**
- * mgnt geo part output
+ * Return formatted geo output
  *
  * @param float $ll
  * @param string $format
@@ -54,6 +54,8 @@ class utilGeo {
       $sign   = util::$PLUS;
     else
       $sign   = ( 0.0 > $ll ) ? util::$MINUS : null;
-    return rtrim( rtrim( $sign . sprintf( $format, abs( $ll )), util::$ZERO ), util::$DOT );
+    return rtrim( rtrim( $sign . sprintf( $format, abs( $ll )),
+                                                   util::$ZERO ),
+                                                   util::$DOT );
   }
 }

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -25,18 +25,18 @@
  * This file is a part of iCalcreator.
  */
 /**
- * iCalcreator.php
+ * autoload.php
  *
  * iCalcreator package autoloader
  *
  * @package icalcreator
  * @copyright Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * @since 2.23 - 2017-04-06
+ * @since 2.23.16 - 2017-05-27
  */
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.12' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.16' );
 /**
  * load iCalcreator src and support classes and traits
  */

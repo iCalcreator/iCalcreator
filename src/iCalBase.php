@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -30,11 +30,11 @@ use kigkonsult\iCalcreator\util\util;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' ))
-  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.12' );
+  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.16' );
 /**
  * iCalcreator base class
  *
- * properties and functions shared by vcalendar and calendarComponents
+ * Properties and methods shared by vcalendar and calendarComponents
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-01-30
  */
@@ -203,7 +203,6 @@ abstract class iCalBase {
  * @param mixed   $config
  * @param string  $value
  * @param bool    $softUpdate
- * @return void
  * @uses iCalBase::getConfig()
  */
   public function setConfig( $config, $value=null, $softUpdate=null ) {
@@ -224,7 +223,7 @@ abstract class iCalBase {
         $subcfg = array( util::$ALLOWEMPTY => $value );
         $res    = true;
         break;
-      case util::$LANGUAGE: // set language for calendar component as defined in [RFC 1766]
+      case util::$LANGUAGE: // set language for component as defined in [RFC 1766]
         $value  = trim( $value );
         if( empty( $this->config[util::$LANGUAGE] ) || ! $softUpdate )
           $this->config[util::$LANGUAGE] = $value;
@@ -278,7 +277,9 @@ abstract class iCalBase {
  */
   public function newComponent( $compType ) {
     $config = $this->getConfig();
-    $ix     = ( empty( $this->components )) ? 0 : key( array_slice( $this->components, -1, 1, TRUE )) + 1;
+    $ix     = ( empty( $this->components ))
+            ? 0
+            : key( array_slice( $this->components, -1, 1, TRUE )) + 1;
     switch( strtolower( $compType )) {
       case util::$LCVALARM :
         $this->components[$ix] = new valarm( $config );
@@ -315,15 +316,14 @@ abstract class iCalBase {
  * Delete calendar subcomponent from component container
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.8.8 - 2011-03-15
+ * @since 2.23.12 - 2017-05-06
  * @param mixed  $arg1 ordno / component type / component uid
  * @param mixed  $arg2 ordno if arg1 = component type
- * @return void
+ * @return bool
  * @uses calendarComponent::getProperty()
  */
   public function deleteComponent( $arg1, $arg2=false  ) {
     static $INDEX = 'INDEX';
-    static $AT    = '@';
     if( ! isset( $this->components ))
       return false;
     $argType = $index = null;
@@ -331,7 +331,7 @@ abstract class iCalBase {
       $argType = $INDEX;
       $index   = (int) $arg1 - 1;
     }
-    elseif(( strlen( $arg1 ) <= strlen( util::$LCVFREEBUSY )) && ( false === strpos( $arg1, $AT ))) {
+    elseif( in_array( strtolower( $arg1 ), util::$ALLCOMPS )) {
       $argType = strtolower( $arg1 );
       $index   = ( ! empty( $arg2 ) && ctype_digit( (string) $arg2 )) ? (( int ) $arg2 - 1 ) : 0;
     }
@@ -351,7 +351,8 @@ abstract class iCalBase {
         }
         $cix2dC++;
       }
-      elseif( ! $argType && ( $arg1 == $component->getProperty( util::$UID ))) {
+      elseif( ! $argType &&
+            ( $arg1 == $component->getProperty( util::$UID ))) {
         unset( $this->components[$cix] );
         $remove = true;
         break;

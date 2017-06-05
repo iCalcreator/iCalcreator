@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -37,7 +37,6 @@ class iCalvCard {
  * Convert single ATTENDEE, CONTACT or ORGANIZER (in email format) to vCard
  *
  * Returns vCard/true or if directory (if set) or file write is unvalid, false
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.8 - 2017-04-17
  * @param string  $email
@@ -47,7 +46,10 @@ class iCalvCard {
  * @return mixed, bool true (if directory set and save ok), string (if not), false on error
  * @static
  */
-  public static function iCal2vCard( $email, $version=null, $directory=null, $ext=null ) {
+  public static function iCal2vCard( $email,
+                                     $version=null,
+                                     $directory=null,
+                                     $ext=null ) {
     static $UCMAILTOCOLON = 'MAILTO:';
     static $CRLF     = "\r\n";
     static $FMTFN    = "FN:%s\r\n";

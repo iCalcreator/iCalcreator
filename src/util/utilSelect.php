@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -40,7 +40,6 @@ class utilSelect {
  *
  * DTSTART MUST be set for every component.
  * No check of date.
- *
  * @param object $calendar
  * @param mixed  $startY optional,      (int) start Year,  default current Year
  *                                 ALT. (obj) start date (datetime)
@@ -82,9 +81,16 @@ class utilSelect {
  * @static
  */
   public static function selectComponents( vcalendar $calendar,
-                                           $startY=null, $startM=null, $startD=null,
-                                           $endY=null,   $endM=null,   $endD=null,
-                                           $cType=null,  $flat=null,   $any=null, $split=null ) {
+                                                     $startY=null,
+                                                     $startM=null,
+                                                     $startD=null,
+                                                     $endY=null,
+                                                     $endM=null,
+                                                     $endD=null,
+                                                     $cType=null,
+                                                     $flat=null,
+                                                     $any=null,
+                                                     $split=null ) {
     static $Y           = 'Y';
     static $M           = 'm';
     static $D           = 'd';
@@ -101,7 +107,8 @@ class utilSelect {
     static $PRA         = '%a';
     static $YMD2        = 'Y-m-d';
     static $DAYOFDAYS   = 'day %d of %d';
-    static $SORTER      = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'cmpfcn' );
+    static $SORTER      = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
+                                 'cmpfcn' );
             /* check  if empty calendar */
     if( 1 > $calendar->countComponents())
       return false;
@@ -163,10 +170,14 @@ class utilSelect {
         continue;
       unset( $compStart, $compEnd );
             /* select start from dtstart or due if dtstart is missing */
-      $prop = $component->getProperty( util::$DTSTART, false, true );
+      $prop = $component->getProperty( util::$DTSTART,
+                                       false,
+                                       true );
       if( empty( $prop ) &&
          ( $component->objName == util::$LCVTODO ) &&
-         ( false === ( $prop = $component->getProperty( util::$DUE, false, true ))))
+         ( false === ( $prop = $component->getProperty( util::$DUE,
+                                                        false,
+                                                        true ))))
         continue;
       if( empty( $prop ))
         continue;
@@ -191,7 +202,9 @@ class utilSelect {
                                              (int) $his[2] );
       }
             /* get end date from dtend/due/duration properties */
-      if( false !== ( $prop = $component->getProperty( util::$DTEND, false, true ))) {
+      if( false !== ( $prop = $component->getProperty( util::$DTEND,
+                                                       false,
+                                                       true ))) {
         $compEnd = iCaldateTime::factory( $prop[util::$LCvalue],
                                           $prop[util::$LCparams],
                                           $prop[util::$LCvalue],
@@ -200,7 +213,9 @@ class utilSelect {
       }
       if( empty( $prop ) &&
          ( $component->objName == util::$LCVTODO ) &&
-         ( false !== ( $prop = $component->getProperty( util::$DUE, false, true )))) {
+         ( false !== ( $prop = $component->getProperty( util::$DUE,
+                                                        false,
+                                                        true )))) {
         $compEnd = iCaldateTime::factory( $prop[util::$LCvalue],
                                           $prop[util::$LCparams],
                                           $prop[util::$LCvalue],
@@ -208,7 +223,10 @@ class utilSelect {
         $compEnd->SCbools[$DUEEXIST] = true;
       }
       if( empty( $prop ) &&
-         ( false !== ( $prop = $component->getProperty( util::$DURATION, false, true, true )))) {
+         ( false !== ( $prop = $component->getProperty( util::$DURATION,
+                                                        false,
+                                                        true,
+                                                        true )))) {
         $compEnd = iCaldateTime::factory( $prop[util::$LCvalue],      // in dtend (array) format
                                           $prop[util::$LCparams],
                                           $prop[util::$LCvalue],
@@ -238,12 +256,16 @@ class utilSelect {
             /* check recurrence-id (note, a missing sequence is the same as sequence=0
                so don't test for sequence), to alter when hit in dtstart/recurlist */
       $recurrid   = null;
-      if( false !== ( $prop = $component->getProperty( util::$RECURRENCE_ID, false, true ))) {
+      if( false !== ( $prop = $component->getProperty( util::$RECURRENCE_ID,
+                                                       false,
+                                                       true ))) {
         $recurrid = iCaldateTime::factory( $prop[util::$LCvalue],
                                            $prop[util::$LCparams],
                                            $prop[util::$LCvalue],
                                            $dtstartTz );
-        $rangeSet = ( isset( $prop[util::$LCparams][$RANGE] ) && ( $THISANDFUTURE == $prop[util::$LCparams][$RANGE] )) ? true : false;
+        $rangeSet = ( isset( $prop[util::$LCparams][$RANGE] ) &&
+                     ( $THISANDFUTURE == $prop[util::$LCparams][$RANGE] ))
+                  ? true : false;
         $recurrIdList[$recurrid->key] = array( clone $compStart,
                                                clone $compEnd,
                                                $compDuration,
@@ -321,27 +343,34 @@ class utilSelect {
             while( $rstart->format( $YMD2 ) <= $rend->format( $YMD2 )) {
               $cnt += 1;
               if( 1 < $occurenceDays )
-                $component->setProperty( util::$X_OCCURENCE, sprintf( $DAYOFDAYS, $cnt, $occurenceDays ));
+                $component->setProperty( util::$X_OCCURENCE,
+                                         sprintf( $DAYOFDAYS, $cnt,
+                                                              $occurenceDays ));
               if( 1 < $cnt )
                 $rstart->setTime( 0, 0, 0 );
               else {
                 $rstart->setTime( $startHis[0], $startHis[1], $startHis[2] );
                 $exdatelist[$rstart->key] = $compDuration; // make sure to exclude start day from the recurrence pattern
               }
-              $component->setProperty( util::$X_CURRENT_DTSTART, $rstart->format( $compStart->dateFormat ));
+              $component->setProperty( util::$X_CURRENT_DTSTART,
+                                       $rstart->format( $compStart->dateFormat ));
               $xY = (int) $rstart->format( $Y );
               $xM = (int) $rstart->format( $M );
               $xD = (int) $rstart->format( $D );
               if( false !== $compDuration ) {
-                $propName = ( isset( $compEnd->SCbools[$DUEEXIST] )) ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
+                $propName = ( isset( $compEnd->SCbools[$DUEEXIST] ))
+                          ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
                 if( $cnt < $occurenceDays )
                   $rstart->setTime( 23, 59, 59 );
                 elseif(( $rstart->format( $YMD2 ) < $rend->format( $YMD2 )) &&
-                       ( '00' == $endHis[0] ) && ( '00' == $endHis[1] ) && ( '00' == $endHis[2] )) // end exactly at midnight
+                       ( '00' == $endHis[0] ) &&
+                       ( '00' == $endHis[1] ) &&
+                       ( '00' == $endHis[2] )) // end exactly at midnight
                   $rstart->setTime( 24, 0, 0 );
                 else
                   $rstart->setTime( $endHis[0], $endHis[1], $endHis[2] );
-                $component->setProperty( $propName, $rstart->format( $compEnd->dateFormat ));
+                $component->setProperty( $propName,
+                                         $rstart->format( $compEnd->dateFormat ));
               }
               $result[$xY][$xM][$xD][$compUID] = clone $component;    // copy to output
               $rstart->add( $INTERVAL_P1D );
@@ -352,7 +381,8 @@ class utilSelect {
           unset( $rstart, $rend );
         } // end elseif( $split )   -  else use component date
         else { // !$flat && !$split, i.e. no flat array and DTSTART within period
-          $tstart = ( isset( $recurrIdList[$compStart->key] )) ? clone $recurrIdList[$compStart->key][0] : clone $compStart;
+          $tstart = ( isset( $recurrIdList[$compStart->key] ))
+                  ? clone $recurrIdList[$compStart->key][0] : clone $compStart;
 // echo "going to test comp no:$cix with checkDate={$compStart->key} with recurrIdList=".implode(',',array_keys($recurrIdList)); // test ###
           if( ! $any || ! isset( $exdatelist[$tstart->key] )) {  // exclude any recurrence date, found in exdatelist
 // echo " and copied to output<br>\n"; // test ###
@@ -383,7 +413,8 @@ class utilSelect {
         foreach( $recurrIdList as $rKey => $rVal ) { // check for recurrence-id, i.e. alter recur Ymd[His] and duration
           if( isset( $recurlist[$rKey] )) {
             unset( $recurlist[$rKey] );
-            $recurlist[$rVal[0]->key] = ( false !== $rVal[2] ) ? $rVal[2] : $compDuration;
+            $recurlist[$rVal[0]->key] = ( false !== $rVal[2] )
+                                      ? $rVal[2] : $compDuration;
 // echo "alter recurfrom {$rKey} to {$rVal[0]->key} ";if(false!==$dur)echo " ({$dur->format( '%a days, %h-%i-%s' )})";echo "<br>\n"; // test ###
           }
         }
@@ -436,16 +467,20 @@ class utilSelect {
                 }
                 elseif( 2 == $cnt )
                   $rstart->setTime( 0, 0, 0 );
-                $component2->setProperty(      util::$X_RECURRENCE, $xRecurrence );
+                $component2->setProperty(      util::$X_RECURRENCE,
+                                               $xRecurrence );
                 if( 1 < $occurenceDays )
-                  $component2->setProperty(    util::$X_OCCURENCE, sprintf( $DAYOFDAYS, $cnt, $occurenceDays ));
+                  $component2->setProperty(    util::$X_OCCURENCE,
+                                               sprintf( $DAYOFDAYS, $cnt, $occurenceDays ));
                 else
                   $component2->deleteProperty( util::$X_OCCURENCE );
-                $component2->setProperty(      util::$X_CURRENT_DTSTART, $rstart->format( $compStart->dateFormat ));
+                $component2->setProperty(      util::$X_CURRENT_DTSTART,
+                                               $rstart->format( $compStart->dateFormat ));
                 $xY = (int) $rstart->format( $Y );
                 $xM = (int) $rstart->format( $M );
                 $xD = (int) $rstart->format( $D );
-                $propName = ( isset( $compEnd->SCbools[$DUEEXIST] )) ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
+                $propName = ( isset( $compEnd->SCbools[$DUEEXIST] ))
+                          ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
                 if( false !== $durvalue ) {
                   if( $cnt < $occurenceDays )
                     $rstart->setTime( 23, 59, 59 );
@@ -454,7 +489,8 @@ class utilSelect {
                   $rstart->setTime( 24, 0, 0 );
                   else
                     $rstart->setTime( $endHis[0], $endHis[1], $endHis[2] );
-                  $component2->setProperty( $propName, $rstart->format( $compEnd->dateFormat ));
+                  $component2->setProperty( $propName,
+                                            $rstart->format( $compEnd->dateFormat ));
 // echo "checking date, (day {$cnt} of {$occurenceDays}), _end_=".$rstart->format( 'YmdHis e' )."<br>"; // test ###;
                 }
                 else
@@ -466,12 +502,16 @@ class utilSelect {
             } // end elseif( $split )
             elseif( $rstart->format( $YMD2 ) >= $fcnStart->format( $YMD2 )) {
               $xRecurrence += 1;                                            // date within period, flat=false && split=false => one comp every recur startdate
-              $component2->setProperty( util::$X_RECURRENCE, $xRecurrence );
-              $component2->setProperty( util::$X_CURRENT_DTSTART, $rstart->format( $compStart->dateFormat ));
-              $propName   = ( isset( $compEnd->SCbools[$DUEEXIST] )) ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
+              $component2->setProperty( util::$X_RECURRENCE,
+                                        $xRecurrence );
+              $component2->setProperty( util::$X_CURRENT_DTSTART,
+                                        $rstart->format( $compStart->dateFormat ));
+              $propName   = ( isset( $compEnd->SCbools[$DUEEXIST] ))
+                          ? util::$X_CURRENT_DUE : util::$X_CURRENT_DTEND;
               if( false !== $durvalue ) {
                 $rstart->add( $durvalue );
-                $component2->setProperty( $propName, $rstart->format( $compEnd->dateFormat ));
+                $component2->setProperty( $propName,
+                                          $rstart->format( $compEnd->dateFormat ));
               }
               else
                 $component2->deleteProperty( $propName );
@@ -535,7 +575,11 @@ class utilSelect {
  * @access private
  * @static
  */
-  private static function inScope( $start, $scopeStart, $end, $scopeEnd, $format ) {
+  private static function inScope( $start,
+                                   $scopeStart,
+                                   $end,
+                                   $scopeEnd,
+                                   $format ) {
     return (( $start->format( $format ) >= $scopeStart->format( $format )) &&
             ( $end->format(   $format ) <= $scopeEnd->format(   $format )));
   }
@@ -556,8 +600,12 @@ class utilSelect {
  * @uses util::strDate2arr()
  * @uses utilRecur::recur2date()
  */
-  private static function getAllEXRULEdates( $component, & $exdatelist,
-                                             $dtstartTz, $compStart, $workStart, $workEnd,
+  private static function getAllEXRULEdates( $component,
+                                           & $exdatelist,
+                                             $dtstartTz,
+                                             $compStart,
+                                             $workStart,
+                                             $workEnd,
                                              $compStartHis ) {
     while( false !== ( $prop = $component->getProperty( util::$EXRULE  ))) {
       $exdatelist2 = array();
@@ -570,9 +618,13 @@ class utilSelect {
         util::strDate2arr( $until );
         $prop[util::$UNTIL] = $until;
       }
-      utilRecur::recur2date( $exdatelist2, $prop, $compStart, $workStart, $workEnd );
-      foreach( $exdatelist2 as $k => $v )
-        $exdatelist[$k.$compStartHis] = $v;             // point out exact every excluded ocurrence (incl. opt. His)
+      utilRecur::recur2date( $exdatelist2,
+                             $prop,
+                             $compStart,
+                             $workStart,
+                             $workEnd );
+      foreach( $exdatelist2 as $k => $v ) // point out exact every excluded ocurrence (incl. opt. His)
+        $exdatelist[$k.$compStartHis] = $v;
       unset( $until, $exdatelist2 );
     }
   }
@@ -583,8 +635,12 @@ class utilSelect {
  * @param array  $exdatelist
  * @param string $dtstartTz,
  */
-  private static function getAllEXDATEdates( $component, & $exdatelist, $dtstartTz ) {
-    while( false !== ( $prop = $component->getProperty( util::$EXDATE, false, true ))) {
+  private static function getAllEXDATEdates( $component,
+                                           & $exdatelist,
+                                             $dtstartTz ) {
+    while( false !== ( $prop = $component->getProperty( util::$EXDATE,
+                                                        false,
+                                                        true ))) {
       foreach( $prop[util::$LCvalue] as $exdate ) {
         $exdate  = iCaldateTime::factory( $exdate,
                                           $prop[util::$LCparams],
@@ -613,9 +669,15 @@ class utilSelect {
  * @uses util::strDate2arr()
  * @uses utilRecur::recur2date()
  */
-  private static function getAllRRULEdates( $component, & $recurlist,
-                                            $dtstartTz, $compStart, $workStart, $workEnd,
-                                            $compStartHis, $exdatelist, $compDuration ) {
+  private static function getAllRRULEdates( $component,
+                                          & $recurlist,
+                                            $dtstartTz,
+                                            $compStart,
+                                            $workStart,
+                                            $workEnd,
+                                            $compStartHis,
+                                            $exdatelist,
+                                            $compDuration ) {
     while( false !== ( $prop = $component->getProperty( util::$RRULE ))) {
       $recurlist2 = array();
       if( isset( $prop[util::$UNTIL][util::$LCHOUR] )) { // convert RRULE['UNTIL'] to the same timezone as DTSTART !!
@@ -627,7 +689,11 @@ class utilSelect {
         util::strDate2arr( $until );
         $prop[util::$UNTIL] = $until;
       }
-      utilRecur::recur2date( $recurlist2, $prop, $compStart, $workStart, $workEnd );
+      utilRecur::recur2date( $recurlist2,
+                             $prop,
+                             $compStart,
+                             $workStart,
+                             $workEnd );
       foreach( $recurlist2 as $recurkey => $recurvalue ) { // recurkey=Ymd
         $recurkey .= $compStartHis;                   // add opt His
         if( ! isset( $exdatelist[$recurkey] ))
@@ -654,10 +720,18 @@ class utilSelect {
  * @uses iCaldateTime::diff()
  * @uses util::duration2str()
  */
-  private static function getAllRDATEdates( $component, & $recurlist,
-                                            $dtstartTz, $workStart, $fcnEnd, $format,
-                                            $exdatelist, $compStartHis, $compDuration ) {
-    while( false !== ( $prop = $component->getProperty( util::$RDATE, false, true ))) {
+  private static function getAllRDATEdates( $component,
+                                          & $recurlist,
+                                            $dtstartTz,
+                                            $workStart,
+                                            $fcnEnd,
+                                            $format,
+                                            $exdatelist,
+                                            $compStartHis,
+                                            $compDuration ) {
+    while( false !== ( $prop = $component->getProperty( util::$RDATE,
+                                                        false,
+                                                        true ))) {
       $rdateFmt   = ( isset( $prop[util::$LCparams][util::$VALUE] ))
                            ? $prop[util::$LCparams][util::$VALUE]
                            : util::$DATE_TIME;
@@ -687,8 +761,8 @@ class utilSelect {
                                            null,
                                            $dtstartTz );
           if( self::inScope( $rdate, $workStart, $rdate, $fcnEnd, $format ) &&
-              ! isset( $exdatelist[$rdate->key] ))
-            $recurlist[$rdate->key.$compStartHis] = $compDuration; // set start date for recurrence + DateInterval/false (+opt His)
+              ! isset( $exdatelist[$rdate->key] )) // set start date for recurrence + DateInterval/false (+opt His)
+            $recurlist[$rdate->key.$compStartHis] = $compDuration;
         } // end DATE
         else { // start DATETIME
           $rdate = iCaldateTime::factory( $theRdate,
@@ -716,7 +790,7 @@ class utilSelect {
  * @static
  */
   private static function selectComponents2( vcalendar $calendar,
-                                     array $selectOptions ) {
+                                                 array $selectOptions ) {
     $output = array();
     $selectOptions = array_change_key_case( $selectOptions, CASE_UPPER );
     while( $component3 = $calendar->getComponent()) {

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -290,7 +290,9 @@ class util {
  * @uses util::size75()
  * @static
  */
-  public static function createElement( $label, $attributes=null, $content=null ) {
+  public static function createElement( $label,
+                                        $attributes=null,
+                                        $content=null ) {
     $output    = strtoupper( $label );
     if( ! empty( $attributes ))
       $output .= trim( $attributes );
@@ -308,7 +310,9 @@ class util {
  * @return string
  * @static
  */
-  public static function createParams( $params=null, $ctrKeys=null, $lang=null ) {
+  public static function createParams( $params=null,
+                                       $ctrKeys=null,
+                                       $lang=null ) {
     static $FMTFMTTYPE = ';FMTTYPE=%s%s';
     static $FMTKEQV    = '%s=%s';
     static $ENCODING   = 'ENCODING';
@@ -317,9 +321,17 @@ class util {
     static $RELTYPE    = 'RELTYPE';
     static $PARAMSARRAY = null;
     if( is_null( $PARAMSARRAY ))
-      $PARAMSARRAY  = array( self::$ALTREP, self::$CN, self::$DIR, $ENCODING,
-                             $FMTTYPE, self::$LANGUAGE, $RANGE, $RELTYPE,
-                             self::$SENT_BY, self::$TZID, self::$VALUE );
+      $PARAMSARRAY  = array( self::$ALTREP,
+                             self::$CN,
+                             self::$DIR,
+                             $ENCODING,
+                             $FMTTYPE,
+                             self::$LANGUAGE,
+                             $RANGE,
+                             $RELTYPE,
+                             self::$SENT_BY,
+                             self::$TZID,
+                             self::$VALUE );
     static $FMTQ    = '"%s"';
     static $FMTQTD  = ';%s=%s%s%s';
     static $FMTCMN  = ';%s=%s';
@@ -351,60 +363,83 @@ class util {
     }
     ksort( $xparams, SORT_STRING );
     foreach( $xparams as $paramKey => $paramValue ) {
-/*
-      if( ctype_digit( (string) $paramKey ))
-        $attr2     .= util::$SEMIC.$paramValue;
-      else
-        $attr2     .= util::$SEMIC."$paramKey=$paramValue";
-*/
       $attr2       .= util::$SEMIC;
-      $attr2       .= ( ctype_digit( (string) $paramKey )) ? $paramValue : sprintf( $FMTKEQV, $paramKey, $paramValue );
+      $attr2       .= ( ctype_digit( (string) $paramKey ))
+                    ? $paramValue
+                    : sprintf( $FMTKEQV, $paramKey, $paramValue );
     }
-    if( isset( $params[$FMTTYPE] )  && ! in_array( $FMTTYPE, $ctrKeys )) {
-      $attr1       .= sprintf( $FMTFMTTYPE, $params[$FMTTYPE], $attr2 );
+    if( isset( $params[$FMTTYPE] ) &&
+           ! in_array( $FMTTYPE, $ctrKeys )) {
+      $attr1       .= sprintf( $FMTFMTTYPE, $params[$FMTTYPE],
+                                            $attr2 );
       $attr2        = null;
     }
-    if( isset( $params[$ENCODING] ) && ! in_array( $ENCODING,   $ctrKeys )) {
+    if( isset( $params[$ENCODING] ) &&
+           ! in_array( $ENCODING,   $ctrKeys )) {
       if( !empty( $attr2 )) {
         $attr1     .= $attr2;
         $attr2      = null;
       }
-      $attr1       .= sprintf( $FMTCMN, $ENCODING, $params[$ENCODING] );
+      $attr1       .= sprintf( $FMTCMN, $ENCODING,
+                                        $params[$ENCODING] );
     }
-    if( isset( $params[self::$VALUE] )    && ! in_array( self::$VALUE,   $ctrKeys ))
-      $attr1       .= sprintf( $FMTCMN, self::$VALUE, $params[self::$VALUE] );
-    if( isset( $params[self::$TZID] )     && ! in_array( self::$TZID,    $ctrKeys )) {
-      $attr1       .= sprintf( $FMTCMN, self::$TZID, $params[self::$TZID] );
+    if( isset( $params[self::$VALUE] ) &&
+           ! in_array( self::$VALUE,   $ctrKeys ))
+      $attr1       .= sprintf( $FMTCMN, self::$VALUE,
+                                        $params[self::$VALUE] );
+    if( isset( $params[self::$TZID] ) &&
+           ! in_array( self::$TZID,    $ctrKeys )) {
+      $attr1       .= sprintf( $FMTCMN, self::$TZID,
+                                        $params[self::$TZID] );
     }
-    if( isset( $params[$RANGE] )    && ! in_array( $RANGE,   $ctrKeys ))
-      $attr1       .= sprintf( $FMTCMN, $RANGE, $params[$RANGE] );
-    if( isset( $params[$RELTYPE] )  && ! in_array( $RELTYPE, $ctrKeys ))
-      $attr1       .= sprintf( $FMTCMN, $RELTYPE, $params[$RELTYPE] );
-    if( isset( $params[self::$CN] )       && $hasCNattrKey ) {
-      $attr1        = sprintf( $FMTCMN, self::$CN, $params[self::$CN] );
+    if( isset( $params[$RANGE] ) &&
+           ! in_array( $RANGE,   $ctrKeys ))
+      $attr1       .= sprintf( $FMTCMN, $RANGE,
+                                        $params[$RANGE] );
+    if( isset( $params[$RELTYPE] ) &&
+           ! in_array( $RELTYPE, $ctrKeys ))
+      $attr1       .= sprintf( $FMTCMN, $RELTYPE,
+                                        $params[$RELTYPE] );
+    if( isset( $params[self::$CN] ) &&
+       $hasCNattrKey ) {
+      $attr1        = sprintf( $FMTCMN, self::$CN,
+                                        $params[self::$CN] );
       $CNattrExist  = true;
     }
-    if( isset( $params[self::$DIR] )      && in_array( self::$DIR,      $ctrKeys )) {
-      $delim        = ( false !== strpos( $params[self::$DIR], self::$QQ )) ? null : self::$QQ;
-      $attr1       .= sprintf( $FMTQTD, self::$DIR, $delim, $params[self::$DIR], $delim );
+    if( isset( $params[self::$DIR] ) &&
+             in_array( self::$DIR, $ctrKeys )) {
+      $delim        = ( false !== strpos( $params[self::$DIR], self::$QQ ))
+                    ? null : self::$QQ;
+      $attr1       .= sprintf( $FMTQTD, self::$DIR,
+                                        $delim,
+                                        $params[self::$DIR],
+                                        $delim );
     }
-    if( isset( $params[self::$SENT_BY] )  && in_array( self::$SENT_BY,  $ctrKeys ))
-      $attr1       .= sprintf( $FMTCMN, self::$SENT_BY, $params[self::$SENT_BY] );
-    if( isset( $params[self::$ALTREP] )   && in_array( self::$ALTREP,   $ctrKeys )) {
-      $delim        = ( false !== strpos( $params[self::$ALTREP], self::$QQ )) ? null : self::$QQ;
-      $attr1       .= sprintf( $FMTQTD, self::$ALTREP, $delim, $params[self::$ALTREP], $delim );
+    if( isset( $params[self::$SENT_BY] ) &&
+             in_array( self::$SENT_BY,  $ctrKeys ))
+      $attr1       .= sprintf( $FMTCMN, self::$SENT_BY,
+                                        $params[self::$SENT_BY] );
+    if( isset( $params[self::$ALTREP] ) &&
+             in_array( self::$ALTREP, $ctrKeys )) {
+      $delim        = ( false !== strpos( $params[self::$ALTREP], self::$QQ ))
+                    ? null : self::$QQ;
+      $attr1       .= sprintf( $FMTQTD, self::$ALTREP,
+                                        $delim,
+                                        $params[self::$ALTREP],
+                                        $delim );
     }
     if( isset( $params[self::$LANGUAGE] ) && $hasLANGattrKey )
-      $attrLANG    .= sprintf( $FMTCMN, self::$LANGUAGE, $params[self::$LANGUAGE] );
+      $attrLANG    .= sprintf( $FMTCMN, self::$LANGUAGE,
+                                        $params[self::$LANGUAGE] );
     elseif(( $CNattrExist || $hasLANGattrKey ) && ! empty( $lang ))
-      $attrLANG    .= sprintf( $FMTCMN, self::$LANGUAGE, $lang );
+      $attrLANG    .= sprintf( $FMTCMN, self::$LANGUAGE,
+                                        $lang );
     return $attr1 . $attrLANG . $attr2;
   }
 /**
  * Return (conformed) iCal component property parameters
  *
  * Trim quoted values, default parameters may be set, if missing
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-04-08
  * @param array $params
@@ -448,7 +483,12 @@ class util {
  * @return int
  * @static
  */
-  public static function existRem( & $array, $expkey, $expval=false, $hitVal=null, $elseVal=null, $preSet=null ) {
+  public static function existRem( & $array,
+                                     $expkey,
+                                     $expval=false,
+                                     $hitVal=null,
+                                     $elseVal=null,
+                                     $preSet=null ) {
     if( $preSet )
       return $preSet;
     if( ( 0 == count( $array )) || ! is_array( $array ))
@@ -516,7 +556,11 @@ class util {
  * @uses util::setParams()
  * @static
  */
-  public static function setMval( & $valArr, $value, $params=null, $defaults=null, $index=null ) {
+  public static function setMval( & $valArr,
+                                    $value,
+                                    $params=null,
+                                    $defaults=null,
+                                    $index=null ) {
     if( ! is_array( $valArr ))
       $valArr = array();
     if( ! is_null( $params ))
@@ -731,7 +775,6 @@ class util {
  * Remove any line-endings that may include spaces or tabs
  * and convert all line endings (iCal default '\r\n'),
  * takes care of '\r\n', '\r' and '\n' and mixed '\r\n'+'\r', '\r\n'+'\n'
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-03-01
  * @param string $text
@@ -777,7 +820,6 @@ class util {
  * Edited 2007-08-26 by Anders Litzell, anders@litzell.se to fix bug where
  * the reserved expression "\n" in the arg $string could be broken up by the
  * folding of lines, causing ambiguity in the return string.
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-03-01
  * @param string $string
@@ -819,55 +861,55 @@ class util {
       $string       .= $tmp[$x];
       switch( true ) {
         case(( $byte >= 0x20 ) && ( $byte <= 0x7F )) :
-          $cCnt     += 1;                  // characters U-00000000 - U-0000007F (same as ASCII)
-          break;                           // add a one byte character
-        case(( $byte & 0xE0) == 0xC0 ) :   // characters U-00000080 - U-000007FF, mask 110XXXXX
+          $cCnt     += 1;                 // characters U-00000000 - U-0000007F (same as ASCII)
+          break;                          // add a one byte character
+        case(( $byte & 0xE0) == 0xC0 ) :  // characters U-00000080 - U-000007FF, mask 110XXXXX
           if( isset( $tmp[$x+1] )) {
             $cCnt   += 1;
             $string .= $tmp[$x+1];
-            $x      += 1;                  // add a two bytes character
+            $x      += 1;                 // add a two bytes character
           }
           break;
-        case(( $byte & 0xF0 ) == 0xE0 ) :  // characters U-00000800 - U-0000FFFF, mask 1110XXXX
+        case(( $byte & 0xF0 ) == 0xE0 ) : // characters U-00000800 - U-0000FFFF, mask 1110XXXX
           if( isset( $tmp[$x+2] )) {
             $cCnt   += 1;
             $string .= $tmp[$x+1] . $tmp[$x+2];
-            $x      += 2;                  // add a three bytes character
+            $x      += 2;                 // add a three bytes character
           }
           break;
-        case(( $byte & 0xF8 ) == 0xF0 ) :  // characters U-00010000 - U-001FFFFF, mask 11110XXX
+        case(( $byte & 0xF8 ) == 0xF0 ) : // characters U-00010000 - U-001FFFFF, mask 11110XXX
           if( isset( $tmp[$x+3] )) {
             $cCnt   += 1;
             $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3];
-            $x      += 3;                  // add a four bytes character
+            $x      += 3;                 // add a four bytes character
           }
           break;
-        case(( $byte & 0xFC ) == 0xF8 ) :  // characters U-00200000 - U-03FFFFFF, mask 111110XX
+        case(( $byte & 0xFC ) == 0xF8 ) : // characters U-00200000 - U-03FFFFFF, mask 111110XX
           if( isset( $tmp[$x+4] )) {
             $cCnt   += 1;
             $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3] . $tmp[$x+4];
-            $x      += 4;                  // add a five bytes character
+            $x      += 4;                 // add a five bytes character
           }
           break;
-        case(( $byte & 0xFE ) == 0xFC ) :  // characters U-04000000 - U-7FFFFFFF, mask 1111110X
+        case(( $byte & 0xFE ) == 0xFC ) : // characters U-04000000 - U-7FFFFFFF, mask 1111110X
           if( isset( $tmp[$x+5] )) {
             $cCnt   += 1;
             $string .= $tmp[$x+1] . $tmp[$x+2] . $tmp[$x+3] . $tmp[$x+4] . $tmp[$x+5];
-            $x      += 5;                  // add a six bytes character
+            $x      += 5;                 // add a six bytes character
           }
           break;
-        default:                           // add any other byte without counting up $cCnt
+        default:                          // add any other byte without counting up $cCnt
           break;
       } // end switch( true )
-      $x            += 1;                  // next 'byte' to test
+      $x            += 1;                 // next 'byte' to test
     } // end while( true )
     return $string;
   }
 /**
- * Separate (string) iCal property value and attributes
+ * Separate (string) to iCal property value and attributes
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.18.6 - 2013-08-29
+ * @since 2.23.13 - 2017-05-02
  * @param string $line      property content
  * @param array  $propAttr  property parameters
  * @uses util::$parValPrefix
@@ -914,8 +956,11 @@ class util {
         $WithinQuotes = ! $WithinQuotes;
       if( self::$SEMIC == $line[$cix] ) // ';'
         $attr[++$attrix] = null;
-      else
+      else {
+        if( 0 > $attrix )
+          $attrix = 0;
         $attr[$attrix] .= $line[$cix];
+      }
       $cix++;
     } // end while...
             /* make attributes in array format */
@@ -1037,10 +1082,20 @@ class util {
  * @return array
  * @static
  */
-  public static function setDate( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $tz=null,
-                                   $params=bull, $caller=null, $objName=null, $tzid=null ) {
+  public static function setDate( $year,
+                                  $month=null,
+                                  $day=null,
+                                  $hour=null,
+                                  $min=null,
+                                  $sec=null,
+                                  $tz=null,
+                                  $params=null,
+                                  $caller=null,
+                                  $objName=null,
+                                  $tzid=null ) {
     $input = $parno = null;
-    $localtime = (( self::$DTSTART == $caller ) && in_array( $objName, self::$TZCOMPS )) ? true : false;
+    $localtime = (( self::$DTSTART == $caller ) &&
+                  in_array( $objName, self::$TZCOMPS )) ? true : false;
     self::strDate2arr( $year );
     if( self::isArrayDate( $year )) {
       $input[self::$LCvalue]  = self::chkDateArr( $year );
@@ -1059,12 +1114,23 @@ class util {
         $input[self::$LCvalue][self::$LCtz] = $month[self::$TZID];
         unset( $month[self::$TZID] );
       }
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
       $hitval       = ( isset( $input[self::$LCvalue][self::$LCtz] )) ? 7 : 6;
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE_TIME, $hitval );
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE, 3, count( $input[self::$LCvalue] ), $parno );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE_TIME,
+                                      $hitval );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE,
+                                      3,
+                                      count( $input[self::$LCvalue] ),
+                                      $parno );
       if( 6 > $parno )
-        unset( $input[self::$LCvalue][self::$LCtz], $input[self::$LCparams][self::$TZID], $tzid );
+        unset( $input[self::$LCvalue][self::$LCtz],
+               $input[self::$LCparams][self::$TZID],
+               $tzid );
       if(( 6 <= $parno ) &&
             isset( $input[self::$LCvalue][self::$LCtz] ) &&
           ( self::$Z != $input[self::$LCvalue][self::$LCtz] ) &&
@@ -1077,10 +1143,11 @@ class util {
                                                                     (int) $input[self::$LCvalue][self::$LCMIN],
                                                                     (int) $input[self::$LCvalue][self::$LCSEC],
                                                                           $input[self::$LCvalue][self::$LCtz] ),
-                                                           $parno );
-        unset( $input[self::$LCvalue][self::$UNPARSEDTEXT], $input[self::$LCparams][self::$TZID] );
+                                                          $parno );
+        unset( $input[self::$LCvalue][self::$UNPARSEDTEXT],
+               $input[self::$LCparams][self::$TZID] );
       }
-      if(           isset( $input[self::$LCvalue][self::$LCtz] ) &&
+      if(          isset( $input[self::$LCvalue][self::$LCtz] ) &&
         ! self::isOffset( $input[self::$LCvalue][self::$LCtz] )) {
         $input[self::$LCparams][self::$TZID] = $input[self::$LCvalue][self::$LCtz];
         unset( $input[self::$LCvalue][self::$LCtz] );
@@ -1089,10 +1156,18 @@ class util {
     elseif( self::isArrayTimestampDate( $year )) {
       if( $localtime )
         unset( $month[self::$LCvalue], $month[self::$TZID] );
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE, 3 );
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE,
+                                      3 );
       $hitval       = 7;
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE_TIME, $hitval, $parno );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE_TIME,
+                                      $hitval,
+                                      $parno );
       if( isset( $year[self::$LCtz] ) && ! empty( $year[self::$LCtz] )) {
         if( !self::isOffset( $year[self::$LCtz] )) {
           $input[self::$LCparams][self::$TZID] = $year[self::$LCtz];
@@ -1115,7 +1190,9 @@ class util {
         if( self::isOffset( $input[self::$LCparams][self::$TZID] )) {
           $year[self::$LCtz] = $input[self::$LCparams][self::$TZID];
           unset( $input[self::$LCparams][self::$TZID]);
-          if( isset( $tzid ) && ! empty( $tzid ) && ! self::isOffset( $tzid ))
+          if( isset( $tzid ) &&
+            ! empty( $tzid ) &&
+            ! self::isOffset( $tzid ))
             $input[self::$LCparams][self::$TZID] = $tzid;
         }
       }
@@ -1134,12 +1211,23 @@ class util {
         unset( $month[self::$LCvalue], $month[self::$TZID] );
       elseif( ! isset( $month[self::$TZID] ) && ! empty( $tzid ))
         $month[self::$TZID] = $tzid;
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE_TIME, 7, $parno );
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE, 3, $parno, $parno );
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE_TIME,
+                                      7,
+                                      $parno );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE,
+                                      3,
+                                      $parno,
+                                      $parno );
       $input[self::$LCvalue]  = self::strDate2ArrayDate( $year, $parno );
       if( 3 == $parno )
-        unset( $input[self::$LCvalue][self::$LCtz], $input[self::$LCparams][self::$TZID] );
+        unset( $input[self::$LCvalue][self::$LCtz],
+               $input[self::$LCparams][self::$TZID] );
       unset( $input[self::$LCvalue][self::$UNPARSEDTEXT] );
       if( isset( $input[self::$LCvalue][self::$LCtz] )) {
         if( self::isOffset( $input[self::$LCvalue][self::$LCtz] )) {
@@ -1151,8 +1239,9 @@ class util {
                                                                       (int) $input[self::$LCvalue][self::$LCMIN],
                                                                       (int) $input[self::$LCvalue][self::$LCSEC],
                                                                             $input[self::$LCvalue][self::$LCtz] ),
-                                                             7 );
-          unset( $input[self::$LCvalue][self::$UNPARSEDTEXT], $input[self::$LCparams][self::$TZID] );
+                                                            7 );
+          unset( $input[self::$LCvalue][self::$UNPARSEDTEXT],
+                 $input[self::$LCparams][self::$TZID] );
         }
         else {
           $input[self::$LCparams][self::$TZID] = $input[self::$LCvalue][self::$LCtz];
@@ -1169,26 +1258,33 @@ class util {
                                                                     (int) $input[self::$LCvalue][self::$LCMIN],
                                                                     (int) $input[self::$LCvalue][self::$LCSEC],
                                                                           $input[self::$LCparams][self::$TZID] ),
-                                                           7 );
-        unset( $input[self::$LCvalue][self::$UNPARSEDTEXT], $input[self::$LCparams][self::$TZID] );
+                                                          7 );
+        unset( $input[self::$LCvalue][self::$UNPARSEDTEXT],
+               $input[self::$LCparams][self::$TZID] );
       }
     } // end elseif( 8 <= strlen( trim((string) $year )))
     else { // using all (?) args
       if( 100 > $year )
         $year += 2000;
       if( is_array( $params ))
-        $input[self::$LCparams] = self::setParams( $params, self::$DEFAULTVALUEDATETIME );
+        $input[self::$LCparams] = self::setParams( $params,
+                                                   self::$DEFAULTVALUEDATETIME );
       elseif( is_array( $tz )) {
-        $input[self::$LCparams] = self::setParams( $tz,     self::$DEFAULTVALUEDATETIME );
+        $input[self::$LCparams] = self::setParams( $tz,
+                                                   self::$DEFAULTVALUEDATETIME );
         $tz = false;
       }
       elseif( is_array( $hour )) {
-        $input[self::$LCparams] = self::setParams( $hour,   self::$DEFAULTVALUEDATETIME );
+        $input[self::$LCparams] = self::setParams( $hour,
+                                                   self::$DEFAULTVALUEDATETIME );
         $hour = $min = $sec = $tz = false;
       }
       if( $localtime )
-        unset ( $input[self::$LCparams][self::$LCvalue], $input[self::$LCparams][self::$TZID] );
-      elseif( ! isset( $tz ) && ! isset( $input[self::$LCparams][self::$TZID] ) && ! empty( $tzid ))
+        unset ( $input[self::$LCparams][self::$LCvalue],
+                $input[self::$LCparams][self::$TZID] );
+      elseif( ! isset( $tz ) &&
+              ! isset( $input[self::$LCparams][self::$TZID] ) &&
+              ! empty( $tzid ))
         $input[self::$LCparams][self::$TZID] = $tzid;
       elseif( isset( $tz ) && self::isOffset( $tz ))
         unset( $input[self::$LCparams][self::$TZID] );
@@ -1197,10 +1293,20 @@ class util {
         $tz         = $input[self::$LCparams][self::$TZID];
         unset( $input[self::$LCparams][self::$TZID] );
       }
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE, 3 );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE,
+                                      3 );
       $hitval       = ( self::isOffset( $tz )) ? 7 : 6;
-      $parno        = self::existRem( $input[self::$LCparams], self::$VALUE, self::$DATE_TIME, $hitval, $parno, $parno );
-      $input[self::$LCvalue]  = array( self::$LCYEAR  => $year, self::$LCMONTH => $month, self::$LCDAY   => $day );
+      $parno        = self::existRem( $input[self::$LCparams],
+                                      self::$VALUE,
+                                      self::$DATE_TIME,
+                                      $hitval,
+                                      $parno,
+                                      $parno );
+      $input[self::$LCvalue]  = array( self::$LCYEAR  => $year,
+                                       self::$LCMONTH => $month,
+                                       self::$LCDAY   => $day );
       if( 3 != $parno ) {
         $input[self::$LCvalue][self::$LCHOUR] = ( $hour ) ? $hour : '0';
         $input[self::$LCvalue][self::$LCMIN]  = ( $min )  ? $min  : '0';
@@ -1222,8 +1328,9 @@ class util {
                                                                        (int) $input[self::$LCvalue][self::$LCMIN],
                                                                        (int) $input[self::$LCvalue][self::$LCSEC],
                                                                              $input[self::$LCvalue][self::$LCtz] ),
-                                                               7 );
-            unset( $input[self::$LCvalue][self::$UNPARSEDTEXT], $input[self::$LCparams][self::$TZID] );
+                                                              7 );
+            unset( $input[self::$LCvalue][self::$UNPARSEDTEXT],
+                   $input[self::$LCparams][self::$TZID] );
           }
           else {
             $input[self::$LCparams][self::$TZID] = $input[self::$LCvalue][self::$LCtz];
@@ -1240,8 +1347,9 @@ class util {
                                                                      (int) $input[self::$LCvalue][self::$LCMIN],
                                                                      (int) $input[self::$LCvalue][self::$LCSEC],
                                                                            $input[self::$LCparams][self::$TZID] ),
-                                                             7 );
-          unset( $input[self::$LCvalue][self::$UNPARSEDTEXT], $input[self::$LCparams][self::$TZID] );
+                                                            7 );
+          unset( $input[self::$LCvalue][self::$UNPARSEDTEXT],
+                 $input[self::$LCparams][self::$TZID] );
         }
       }
     } // end else (i.e. using all arguments)
@@ -1273,8 +1381,6 @@ class util {
       else
         unset( $input[self::$LCparams][self::$TZID] );
     }
-//    if( isset( $input[self::$LCparams][self::$TZID] ) && empty( $input[self::$LCparams][self::$TZID] ))
-//      unset( $input[self::$LCparams][self::$TZID] );
     if( $localtime )
       unset( $input[self::$LCvalue][self::$LCtz], $input[self::$LCparams][self::$TZID] );
     return $input;
@@ -1303,7 +1409,13 @@ class util {
  * @return array
  * @static
  */
-  public static function setDate2( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
+  public static function setDate2( $year,
+                                   $month=null,
+                                   $day=null,
+                                   $hour=null,
+                                   $min=null,
+                                   $sec=null,
+                                   $params=null ) {
     $input = null;
     self::strDate2arr( $year );
     if( self::isArrayDate( $year )) {
@@ -1311,7 +1423,8 @@ class util {
       if( isset( $input[self::$LCvalue][self::$LCYEAR] ) &&
          ( 100 > $input[self::$LCvalue][self::$LCYEAR] ))
         $input[self::$LCvalue][self::$LCYEAR] += 2000;
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
       if( isset( $input[self::$LCvalue][self::$LCtz] ) &&
           self::isOffset( $input[self::$LCvalue][self::$LCtz] ))
         $tzid = $input[self::$LCvalue][self::$LCtz];
@@ -1334,7 +1447,8 @@ class util {
       }
     } // end if( self::isArrayDate( $year ))
     elseif( self::isArrayTimestampDate( $year )) {
-      if( isset( $year[self::$LCtz] ) && ! self::isOffset( $year[self::$LCtz] ))
+      if( isset( $year[self::$LCtz] ) &&
+         ! self::isOffset( $year[self::$LCtz] ))
         $year[self::$LCtz]    = self::$UTC;
       elseif( isset( $input[self::$LCparams][self::$TZID] ) &&
         self::isOffset( $input[self::$LCparams][self::$TZID] ))
@@ -1342,14 +1456,18 @@ class util {
       else
         $year[self::$LCtz]    = self::$UTC;
       $input[self::$LCvalue]  = self::timestamp2date( $year, 7 );
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
     } // end elseif( self::isArrayTimestampDate( $year ))
     elseif( 8 <= strlen( trim((string) $year ))) { // ex. 2006-08-03 10:12:18
       $input[self::$LCvalue]  = self::strDate2ArrayDate( $year, 7 );
       unset( $input[self::$LCvalue][self::$UNPARSEDTEXT] );
-      $input[self::$LCparams] = self::setParams( $month, self::$DEFAULTVALUEDATETIME );
-      if(( ! isset( $input[self::$LCvalue][self::$LCtz] ) || empty( $input[self::$LCvalue][self::$LCtz] )) &&
-         isset( $input[self::$LCparams][self::$TZID] ) && self::isOffset( $input[self::$LCparams][self::$TZID] )) {
+      $input[self::$LCparams] = self::setParams( $month,
+                                                 self::$DEFAULTVALUEDATETIME );
+      if(( ! isset( $input[self::$LCvalue][self::$LCtz] ) ||
+             empty( $input[self::$LCvalue][self::$LCtz] )) &&
+         isset( $input[self::$LCparams][self::$TZID] ) &&
+         self::isOffset( $input[self::$LCparams][self::$TZID] )) {
         $input[self::$LCvalue] = self::strDate2ArrayDate( sprintf( self::$YMDHISE,
                                                                     (int) $input[self::$LCvalue][self::$LCYEAR],
                                                                     (int) $input[self::$LCvalue][self::$LCMONTH],
@@ -1385,7 +1503,8 @@ class util {
         $input[self::$LCvalue] = self::strDate2ArrayDate( $strdate, 7 );
         unset( $input[self::$LCvalue][self::$UNPARSEDTEXT] );
       }
-      $input[self::$LCparams] = self::setParams( $params, self::$DEFAULTVALUEDATETIME );
+      $input[self::$LCparams] = self::setParams( $params,
+                                                 self::$DEFAULTVALUEDATETIME );
     } // end else
     unset( $input[self::$LCparams][self::$VALUE], $input[self::$LCparams][self::$TZID]  );
     if( ! isset( $input[self::$LCvalue][self::$LCHOUR] ))
@@ -1477,73 +1596,6 @@ class util {
     return $output;
   }
 /**
- * Check (EXDATE/RDATE) date(-time) and params arrays for an opt. timezone
- * and, if it is a DATE-TIME or DATE, updates $parno and (opt) $params)
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.23 - 2017-02-15
- * @param array $theDate    date to check
- * @param int   $parno      no of date parts (i.e. year, month.. .)
- * @param array $params     property parameters
- * @uses util::strDate2ArrayDate()
- * @uses util::isOffset()
- * @static
- */
-  public static function chkDateCfg( $theDate, & $parno, & $params ) {
-    $paramsValueIsDATE = self::isParamsValueSet( array( self::$LCparams => $params ), self::$DATE );
-    switch( true ) {
-      case ( isset( $params[self::$TZID] )) :
-        $parno = 6;
-        break;
-      case ( $paramsValueIsDATE ) :
-        $params[self::$VALUE] = self::$DATE;
-        $parno = 3;
-        break;
-      default:
-        if( self::isParamsValueSet( array( self::$LCparams => $params ), self::$PERIOD )) {
-          $params[self::$VALUE] = self::$PERIOD;
-          $parno = 7;
-        }
-        switch( true ) {
-          case ( is_array( $theDate )) :
-            if( isset( $theDate[self::$LCTIMESTAMP] ))
-              $tzid = ( isset( $theDate[self::$LCtz] )) ? $theDate[self::$LCtz] : null;
-            else
-              $tzid = ( isset( $theDate[self::$LCtz] )) ? $theDate[self::$LCtz] : ( 7 == count( $theDate )) ? end( $theDate ) : null;
-            if( ! empty( $tzid )) {
-              $parno = 7;
-              if( ! self::isOffset( $tzid ))
-                $params[self::$TZID] = $tzid; // save only timezone
-            }
-            elseif( ! $parno && ( 3 == count( $theDate )) && $paramsValueIsDATE )
-              $parno = 3;
-            else
-              $parno = 6;
-            break;
-          default : // i.e. string
-            $date = trim( $theDate );
-            if( self::$Z == substr( $date, -1 ))
-              $parno = 7; // UTC DATE-TIME
-            elseif((( 8 == strlen( $date ) && ctype_digit( $date )) ||
-                   ( 11 >= strlen( $date )))
-                && $paramsValueIsDATE )
-              $parno = 3;
-            $date = self::strDate2ArrayDate( $date, $parno );
-            unset( $date[self::$UNPARSEDTEXT] );
-            if( ! empty( $date[self::$LCtz] )) {
-              $parno = 7;
-              if( ! self::isOffset( $date[self::$LCtz] ))
-                $params[self::$TZID] = $date[self::$LCtz]; // save only timezone
-            }
-            elseif( empty( $parno ))
-              $parno = 6;
-        } // end switch( true )
-        if( isset( $params[self::$TZID] ))
-          $parno = 6;
-        break;
-    } // end switch( true )
-  }
-/**
  * Return iCal formatted string for (internal array) date/date-time
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
@@ -1602,7 +1654,7 @@ class util {
           catch( Exception $e ) {
             $output = date( $YMDYHIS, mktime( $datetime[self::$LCHOUR],
                                               $datetime[self::$LCMIN],
-                                             ($datetime[self::$LCSEC] - $offset),
+                                            ( $datetime[self::$LCSEC] - $offset ),
                                               $datetime[self::$LCMONTH],
                                               $datetime[self::$LCDAY],
                                               $datetime[self::$LCYEAR] ));
@@ -1647,7 +1699,8 @@ class util {
     }
     $output         = array();
     $output[self::$LCWEEK] = (int) floor( $seconds / ( 60 * 60 * 24 * 7 ));
-    if(( 0 < $output[self::$LCWEEK] ) && ( 0 == ( $seconds % ( 60 * 60 * 24 * 7 ))))
+    if(( 0 < $output[self::$LCWEEK] ) &&
+       ( 0 == ( $seconds % ( 60 * 60 * 24 * 7 ))))
       return $output;
     unset( $output[self::$LCWEEK] );
     $output[self::$LCDAY]  = (int) floor( $seconds / ( 60 * 60 * 24 ));
@@ -1658,8 +1711,12 @@ class util {
     $output[self::$LCSEC]  =            ( $seconds %   60 );
     if( empty( $output[self::$LCDAY] ))
       unset( $output[self::$LCDAY] );
-    if(( 0 == $output[self::$LCHOUR] ) && ( 0 == $output[self::$LCMIN] ) && ( 0 == $output[self::$LCSEC] ))
-      unset( $output[self::$LCHOUR], $output[self::$LCMIN], $output[self::$LCSEC] );
+    if(( 0 == $output[self::$LCHOUR] ) &&
+       ( 0 == $output[self::$LCMIN] ) &&
+       ( 0 == $output[self::$LCSEC] ))
+      unset(  $output[self::$LCHOUR],
+              $output[self::$LCMIN],
+              $output[self::$LCSEC] );
     return $output;
   }
 /**
@@ -1676,9 +1733,12 @@ class util {
     $dateOnly          = ( isset( $startdate[self::$LCHOUR] ) ||
                            isset( $startdate[self::$LCMIN] ) ||
                            isset( $startdate[self::$LCSEC] )) ? false : true;
-    $startdate[self::$LCHOUR] = ( isset( $startdate[self::$LCHOUR] )) ? $startdate[self::$LCHOUR] : 0;
-    $startdate[self::$LCMIN]  = ( isset( $startdate[self::$LCMIN] ))  ? $startdate[self::$LCMIN]  : 0;
-    $startdate[self::$LCSEC]  = ( isset( $startdate[self::$LCSEC] ))  ? $startdate[self::$LCSEC]  : 0;
+    $startdate[self::$LCHOUR] = ( isset( $startdate[self::$LCHOUR] ))
+                              ? $startdate[self::$LCHOUR] : 0;
+    $startdate[self::$LCMIN]  = ( isset( $startdate[self::$LCMIN] ))
+                              ? $startdate[self::$LCMIN]  : 0;
+    $startdate[self::$LCSEC]  = ( isset( $startdate[self::$LCSEC] ))
+                              ? $startdate[self::$LCSEC]  : 0;
     $dtend = 0;
     if(    isset( $duration[self::$LCWEEK] ))
       $dtend += ( $duration[self::$LCWEEK] * 7 * 24 * 60 * 60 );
@@ -1706,8 +1766,13 @@ class util {
                        self::$LCSEC   => $d[5] );
     if( isset( $startdate[self::$LCtz] ))
       $dtend2[self::$LCtz]   = $startdate[self::$LCtz];
-    if( $dateOnly && (( 0 == $dtend2[self::$LCHOUR] ) && ( 0 == $dtend2[self::$LCMIN] ) && ( 0 == $dtend2[self::$LCSEC] )))
-      unset( $dtend2[self::$LCHOUR], $dtend2[self::$LCMIN], $dtend2[self::$LCSEC] );
+    if( $dateOnly &&
+       (( 0 == $dtend2[self::$LCHOUR] ) &&
+        ( 0 == $dtend2[self::$LCMIN] ) &&
+        ( 0 == $dtend2[self::$LCSEC] )))
+      unset( $dtend2[self::$LCHOUR],
+             $dtend2[self::$LCMIN],
+             $dtend2[self::$LCSEC] );
     return $dtend2;
   }
 /**
@@ -1738,21 +1803,29 @@ class util {
        $ok = true;
     else
       return null;
-    if( isset( $duration[self::$LCWEEK] ) && ( 0 < $duration[self::$LCWEEK] ))
+    if( isset( $duration[self::$LCWEEK] ) &&
+         ( 0 < $duration[self::$LCWEEK] ))
       return $P . $duration[self::$LCWEEK] . $W;
     $output = $P;
-    if( isset($duration[self::$LCDAY] ) && ( 0 < $duration[self::$LCDAY] ))
+    if( isset($duration[self::$LCDAY] ) &&
+        ( 0 < $duration[self::$LCDAY] ))
       $output .= $duration[self::$LCDAY] . $D;
-    if(( isset( $duration[self::$LCHOUR]) && ( 0 < $duration[self::$LCHOUR] )) ||
-       ( isset( $duration[self::$LCMIN])  && ( 0 < $duration[self::$LCMIN] ))  ||
-       ( isset( $duration[self::$LCSEC])  && ( 0 < $duration[self::$LCSEC] ))) {
+    if(( isset( $duration[self::$LCHOUR]) &&
+          ( 0 < $duration[self::$LCHOUR] )) ||
+       ( isset( $duration[self::$LCMIN])  &&
+          ( 0 < $duration[self::$LCMIN] ))  ||
+       ( isset( $duration[self::$LCSEC])  &&
+          ( 0 < $duration[self::$LCSEC] ))) {
       $output .= self::$T;
       $output .= ( isset( $duration[self::$LCHOUR]) &&
-                    ( 0 < $duration[self::$LCHOUR] )) ? $duration[self::$LCHOUR] . $H : $OH;
+                    ( 0 < $duration[self::$LCHOUR] ))
+               ? $duration[self::$LCHOUR] . $H : $OH;
       $output .= ( isset( $duration[self::$LCMIN])  &&
-                    ( 0 < $duration[self::$LCMIN] ))  ? $duration[self::$LCMIN]  . $M : $OM;
+                    ( 0 < $duration[self::$LCMIN] ))
+               ? $duration[self::$LCMIN]  . $M : $OM;
       $output .= ( isset( $duration[self::$LCSEC])  &&
-                    ( 0 < $duration[self::$LCSEC] ))  ? $duration[self::$LCSEC]  . $S : $OS;
+                    ( 0 < $duration[self::$LCSEC] ))
+               ? $duration[self::$LCSEC]  . $S : $OS;
     }
     if( $P == $output )
       $output = $PT0H0M0S;
@@ -1863,7 +1936,11 @@ class util {
                    (int) $input[2],
                    (int) $input[0] ))
       return true;
-    $input = self::strDate2ArrayDate( $input[1] . self::$L . $input[2] . self::$L . $input[0], 3 ); //  m - d - Y
+    $input = self::strDate2ArrayDate( $input[1] .
+                                      self::$L .
+                                      $input[2] .
+                                      self::$L .
+                                      $input[0], 3 ); //  m - d - Y
     if( isset( $input[self::$LCYEAR] ) &&
         isset( $input[self::$LCMONTH] ) &&
         isset( $input[self::$LCDAY] ))
@@ -1882,7 +1959,7 @@ class util {
  * @static
  */
   public static function isArrayTimestampDate( $input ) {
-    return ( is_array( $input ) && isset( $input[self::$LCTIMESTAMP] )) ? true : false ;
+    return ( is_array( $input ) && isset( $input[self::$LCTIMESTAMP] ));
   }
 /**
  * Return bool true if input string contains (trailing) UTC/iCal offset
@@ -1991,7 +2068,9 @@ class util {
  * @return array
  * @static
  */
-  public static function strDate2ArrayDate( $datetime, $parno=null, $wtz=null ) {
+  public static function strDate2ArrayDate( $datetime,
+                                            $parno=null,
+                                            $wtz=null ) {
     static $SECONDS = ' seconds';
     $unparseddatetime = $datetime;
     $datetime   = (string) trim( $datetime );
@@ -2092,8 +2171,7 @@ class util {
     return $output;
   }
 /**
- * Return string/array timestamp(+ offset/timezone (default UTC))
- * as array (in internal format, keyed).
+ * Return string/array timestamp(+ offset/timezone (default UTC)) as array (in internal format, keyed).
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.11 - 2015-03-07
@@ -2109,12 +2187,15 @@ class util {
     static $FMTTIMESTAMP = '@%s';
     static $SPSEC        = ' seconds';
     if( is_array( $timestamp )) {
-      $tz        = ( isset( $timestamp[self::$LCtz] )) ? $timestamp[self::$LCtz] : $wtz;
+      $tz        = ( isset( $timestamp[self::$LCtz] ))
+                 ? $timestamp[self::$LCtz] : $wtz;
       $timestamp = $timestamp[self::$LCTIMESTAMP];
     }
     $tz          = ( isset( $tz )) ? $tz : $wtz;
     $offset      = 0;
-    if( empty( $tz ) || ( self::$Z == $tz ) || ( 0 == strcasecmp( self::$GMT, $tz )))
+    if( empty( $tz ) ||
+       ( self::$Z == $tz ) ||
+       ( 0 == strcasecmp( self::$GMT, $tz )))
       $tz        = self::$UTC;
     elseif( self::isOffset( $tz )) {
       $offset    = self::tz2offset( $tz );
@@ -2160,16 +2241,23 @@ class util {
     static $NINE2 = '99';
     $tz           = trim( (string) $tz );
     $offset       = 0;
-    if(((          5  != strlen( $tz ))       && ( 7  != strlen( $tz ))) ||
-       (  self::$PLUS != $tz[0]               && ( self::$MINUS != $tz[0] )) ||
-       ((      $ZERO4 >= substr( $tz, 1, 4 )) && ( $NINE4 < substr( $tz, 1, 4 ))) ||
-                (( 7  == strlen( $tz ))       && ( $ZERO2 > substr( $tz, 5, 2 )) && ( $NINE2 < substr( $tz, 5, 2 ))))
+    if(((          5  != strlen( $tz )) &&
+                 ( 7  != strlen( $tz )))          ||
+      ((  self::$PLUS != $tz[0]  &&
+       ( self::$MINUS != $tz[0] )))               ||
+       ((      $ZERO4 >= substr( $tz, 1, 4 )) &&
+             ( $NINE4 <  substr( $tz, 1, 4 )))    ||
+                (( 7  == strlen( $tz )) &&
+                 ( $ZERO2 > substr( $tz, 5, 2 )) &&
+                 ( $NINE2 < substr( $tz, 5, 2 ))))
       return $offset;
     $hours2sec    = (int) substr( $tz, 1, 2 ) * 3600;
     $min2sec      = (int) substr( $tz, 3, 2 ) *   60;
-    $sec          = ( 7  == strlen( $tz )) ? (int) substr( $tz, -2 ) : $ZERO2;
+    $sec          = ( 7  == strlen( $tz ))
+                  ? (int) substr( $tz, -2 ) : $ZERO2;
     $offset       = $hours2sec + $min2sec + $sec;
-    $offset       = ( self::$MINUS == $tz[0] ) ? $offset * -1 : $offset;
+    $offset       = ( self::$MINUS == $tz[0] )
+                  ? $offset * -1 : $offset;
     return $offset;
   }
 }

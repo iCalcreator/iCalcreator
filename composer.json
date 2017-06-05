@@ -17,7 +17,7 @@
                   "standard",
                   "daylight",
                   "file" ],
-    "time" : "2017-04-23",
+    "time" : "2017-06-05",
     "license": "(proprietary and CC-BY-NC-ND-4.0)",
     "homepage": "http://kigkonsult.se",
     "support": {
@@ -30,7 +30,7 @@
         }
     ],
     "autoload": {
-        "files": ["iCalcreator.php"],
+        "files": ["autoload.php"],
         "psr-4": { "kigkonsult\\iCalcreator\\": ["src/", "src/util", "src/traits"] }
     },
     "require": {

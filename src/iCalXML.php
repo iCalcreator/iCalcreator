@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -35,7 +35,10 @@ use kigkonsult\iCalcreator\util\utilGeo;
  */
 class iCalXML {
   private static $vcalendar      = 'vcalendar';
-  private static $calProps       = array( 'version', 'prodid', 'calscale', 'method' );
+  private static $calProps       = array( 'version',
+                                          'prodid',
+                                          'calscale',
+                                          'method' );
   private static $properties     = 'properties';
   private static $PARAMETERS     = 'parameters';
   private static $components     = 'components';
@@ -101,7 +104,8 @@ class iCalXML {
   static $YMDTHISZ = 'Ymd\THis\Z';
   static $XMLstart = '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- created %s using kigkonsult.se %s iCal2XMl (rfc6321) --></icalendar>';
             /** fix an SimpleXMLElement instance and create root element */
-  $xml          = new \SimpleXMLElement( sprintf( $XMLstart, gmdate( $YMDTHISZ ), ICALCREATOR_VERSION ));
+  $xml          = new \SimpleXMLElement( sprintf( $XMLstart, gmdate( $YMDTHISZ ),
+                                                             ICALCREATOR_VERSION ));
   $vcalendar    = $xml->addChild( self::$vcalendar );
             /** fix calendar properties */
   $properties   = $vcalendar->addChild( self::$properties );
@@ -131,8 +135,11 @@ class iCalXML {
     foreach( $props as $pix => $prop ) {
       switch( strtoupper( $prop )) {
         case util::$ATTACH:          // may occur multiple times, below
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            $type = ( util::isParamsValueSet( $content, util::$BINARY )) ? self::$binary : self::$uri;
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
+            $type = ( util::isParamsValueSet( $content, util::$BINARY ))
+                  ? self::$binary : self::$uri;
             unset( $content[util::$LCparams][util::$VALUE] );
             self::addXMLchild( $properties,
                                $prop,
@@ -142,7 +149,9 @@ class iCalXML {
           }
           break;
         case util::$ATTENDEE:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
             if( isset( $content[util::$LCparams][util::$CN] ) &&
               ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
               if( $langComp )
@@ -158,8 +167,11 @@ class iCalXML {
           }
           break;
         case util::$EXDATE:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            $type = ( util::isParamsValueSet( $content, util::$DATE )) ? self::$date : self::$date_time;
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
+            $type = ( util::isParamsValueSet( $content, util::$DATE ))
+                  ? self::$date : self::$date_time;
             unset( $content[util::$LCparams][util::$VALUE] );
             self::addXMLchild( $properties,
                                $prop,
@@ -169,8 +181,11 @@ class iCalXML {
           }
           break;
         case util::$FREEBUSY:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            if( is_array( $content ) && isset( $content[util::$LCvalue][self::$fbtype] )) {
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
+            if( is_array( $content ) &&
+                isset( $content[util::$LCvalue][self::$fbtype] )) {
               $content[util::$LCparams][self::$FBTYPE] = $content[util::$LCvalue][self::$fbtype];
               unset( $content[util::$LCvalue][self::$fbtype] );
             }
@@ -182,7 +197,9 @@ class iCalXML {
           }
           break;
         case util::$REQUEST_STATUS:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
             if( ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
               if( $langComp )
                 $content[util::$LCparams][util::$LANGUAGE] = $langComp;
@@ -197,7 +214,9 @@ class iCalXML {
           }
           break;
         case util::$RDATE:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
             $type = self::$date_time;
             if(     util::isParamsValueSet( $content, util::$DATE ))
               $type = self::$date;
@@ -217,8 +236,11 @@ class iCalXML {
         case util::$DESCRIPTION:
         case util::$RELATED_TO:
         case util::$RESOURCES:
-          while( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            if(( util::$RELATED_TO != $prop ) && ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
+            if(( util::$RELATED_TO != $prop ) &&
+                ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
               if( $langComp )
                 $content[util::$LCparams][util::$LANGUAGE] = $langComp;
               elseif( $langCal )
@@ -232,7 +254,9 @@ class iCalXML {
           }
           break;
         case util::$X_PROP:
-          while( false !== ( $content = $component->getProperty( $prop, false, true )))
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true )))
             self::addXMLchild( $properties,
                                $content[0],
                                self::$unknown,
@@ -247,10 +271,14 @@ class iCalXML {
         case util::$DTEND:
         case util::$DUE:
         case util::$RECURRENCE_ID:
-          if( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            $type = ( util::isParamsValueSet( $content, util::$DATE ))  ? self::$date : self::$date_time;
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
+            $type = ( util::isParamsValueSet( $content, util::$DATE ))
+                  ? self::$date : self::$date_time;
             unset( $content[util::$LCparams][util::$VALUE] );
-            if(( isset( $content[util::$LCparams][util::$TZID] ) && empty( $content[util::$LCparams][util::$TZID] )) ||
+            if(( isset( $content[util::$LCparams][util::$TZID] ) &&
+                 empty( $content[util::$LCparams][util::$TZID] )) ||
               @is_null( $content[util::$LCparams][util::$TZID] ))
               unset( $content[util::$LCparams][util::$TZID] );
             self::addXMLchild( $properties,
@@ -261,7 +289,9 @@ class iCalXML {
           }
           break;
         case util::$DURATION:
-          if( false !== ( $content = $component->getProperty( $prop, false, true )))
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true )))
             self::addXMLchild( $properties,
                                $prop,
                                strtolower( util::$DURATION ),
@@ -270,7 +300,9 @@ class iCalXML {
           break;
         case util::$EXRULE:
         case util::$RRULE:
-          while( false !== ( $content = $component->getProperty( $prop, false, true )))
+          while( false !== ( $content = $component->getProperty( $prop,
+                                                                 false,
+                                                                 true )))
             self::addXMLchild( $properties,
                                $prop,
                                self::$recur,
@@ -284,8 +316,11 @@ class iCalXML {
         case util::$TRANSP:
         case util::$TZID:
         case util::$UID:
-          if( false !== ( $content = $component->getProperty( $prop, false, true ))) {
-            if((( util::$LOCATION == $prop ) || ( util::$SUMMARY == $prop )) &&
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
+            if((( util::$LOCATION == $prop ) ||
+                ( util::$SUMMARY == $prop )) &&
                  ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
               if( $langComp )
                 $content[util::$LCparams][util::$LANGUAGE] = $langComp;
@@ -300,7 +335,9 @@ class iCalXML {
           }
           break;
         case util::$GEO:
-          if( false !== ( $content = $component->getProperty( $prop, false, true )))
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true )))
             self::addXMLchild( $properties,
                                $prop,
                                strtolower( util::$GEO ),
@@ -308,7 +345,9 @@ class iCalXML {
                                $content[util::$LCparams] );
           break;
         case util::$ORGANIZER:
-          if( false !== ( $content = $component->getProperty( $prop, false, true ))) {
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
             if( isset( $content[util::$LCparams][util::$CN] ) &&
               ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
               if( $langComp )
@@ -326,7 +365,9 @@ class iCalXML {
         case util::$PERCENT_COMPLETE:
         case util::$PRIORITY:
         case util::$SEQUENCE:
-          if( false !== ( $content = $component->getProperty( $prop, false, true )))
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true )))
             self::addXMLchild( $properties,
                                $prop,
                                self::$integer,
@@ -335,7 +376,9 @@ class iCalXML {
           break;
         case util::$TZURL:
         case util::$URL:
-          if( false !== ( $content = $component->getProperty( $prop, false, true )))
+          if( false !== ( $content = $component->getProperty( $prop,
+                                                              false,
+                                                              true )))
             self::addXMLchild( $properties,
                                $prop,
                                self::$uri,
@@ -354,8 +397,11 @@ class iCalXML {
       foreach( $subCompProps as $pix2 => $prop ) {
         switch( strtoupper( $prop )) {
           case util::$ATTACH:          // may occur multiple times, below
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
-              $type = ( util::isParamsValueSet( $content, util::$BINARY )) ? self::$binary : self::$uri;
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
+              $type = ( util::isParamsValueSet( $content, util::$BINARY ))
+                    ? self::$binary : self::$uri;
               unset( $content[util::$LCparams][util::$VALUE] );
               self::addXMLchild( $properties,
                                  $prop,
@@ -365,7 +411,9 @@ class iCalXML {
             }
             break;
           case util::$ATTENDEE:
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
               if( isset( $content[util::$LCparams][util::$CN] ) &&
                 ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
                 if( $langComp )
@@ -382,7 +430,9 @@ class iCalXML {
             break;
           case util::$COMMENT:
           case util::$TZNAME:
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
               if( ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
                 if( $langComp )
                   $content[util::$LCparams][util::$LANGUAGE] = $langComp;
@@ -397,7 +447,9 @@ class iCalXML {
             }
             break;
           case util::$RDATE:
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true ))) {
               $type = self::$date_time;
               if( isset( $content[util::$LCparams][util::$VALUE] )) {
                 if(     util::isParamsValueSet( $content, util::$DATE ))
@@ -414,7 +466,9 @@ class iCalXML {
             }
             break;
           case util::$X_PROP:
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true )))
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true )))
               self::addXMLchild( $properties,
                                  $content[0],
                                  self::$unknown,
@@ -424,7 +478,9 @@ class iCalXML {
           case util::$ACTION:      // single occurence below, if set
           case util::$DESCRIPTION:
           case util::$SUMMARY:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
               if(( util::$ACTION != $prop ) &&
                   ! isset( $content[util::$LCparams][util::$LANGUAGE] )) {
                 if( $langComp )
@@ -440,7 +496,9 @@ class iCalXML {
             }
             break;
           case util::$DTSTART:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
               unset( $content[util::$LCvalue][util::$LCtz],
                      $content[util::$LCparams][util::$VALUE] ); // always local time
               self::addXMLchild( $properties,
@@ -451,7 +509,9 @@ class iCalXML {
             }
             break;
           case util::$DURATION:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true )))
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true )))
               self::addXMLchild( $properties,
                                  $prop,
                                  strtolower( util::$DURATION ),
@@ -459,7 +519,9 @@ class iCalXML {
                                  $content[util::$LCparams] );
             break;
           case util::$REPEAT:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true )))
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true )))
               self::addXMLchild( $properties,
                                  $prop,
                                  self::$integer,
@@ -467,7 +529,9 @@ class iCalXML {
                                  $content[util::$LCparams] );
             break;
           case util::$TRIGGER:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true ))) {
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true ))) {
               if( isset( $content[util::$LCvalue][util::$LCYEAR] )   &&
                   isset( $content[util::$LCvalue][util::$LCMONTH] )  &&
                   isset( $content[util::$LCvalue][util::$LCDAY] ))
@@ -478,12 +542,18 @@ class iCalXML {
                   ( true !== $content[util::$LCvalue][self::$relatedStart] ))
                   $content[util::$LCparams][self::$RELATED] = self::$END;
               }
-              self::addXMLchild( $properties, $prop, $type, $content[util::$LCvalue], $content[util::$LCparams] );
+              self::addXMLchild( $properties,
+                                 $prop,
+                                 $type,
+                                 $content[util::$LCvalue],
+                                 $content[util::$LCparams] );
             }
             break;
           case util::$TZOFFSETFROM:
           case util::$TZOFFSETTO:
-            if( false !== ( $content = $subcomp->getProperty( $prop, false, true )))
+            if( false !== ( $content = $subcomp->getProperty( $prop,
+                                                              false,
+                                                              true )))
               self::addXMLchild( $properties,
                                  $prop,
                                  self::$utc_offset,
@@ -491,7 +561,9 @@ class iCalXML {
                                  $content[util::$LCparams] );
             break;
           case util::$RRULE:
-            while( false !== ( $content = $subcomp->getProperty( $prop, false, true )))
+            while( false !== ( $content = $subcomp->getProperty( $prop,
+                                                                 false,
+                                                                 true )))
               self::addXMLchild( $properties,
                                  $prop,
                                  self::$recur,
@@ -522,7 +594,11 @@ class iCalXML {
  * @access private
  * @static
  */
- private static function addXMLchild( & $parent, $name, $type, $content, $params=array()) {
+ private static function addXMLchild( & $parent,
+                                        $name,
+                                        $type,
+                                        $content,
+                                        $params=array()) {
   static $FMTYMD    = '%04d-%02d-%02d';
   static $FMTYMDHIS = '%04d-%02d-%02dT%02d:%02d:%02d';
   static $PLUSMINUSARR = array( '+', '-' );
@@ -624,16 +700,16 @@ class iCalXML {
     case strtolower( util::$DURATION ):
       $output = (( strtolower( util::$TRIGGER ) == $name ) &&
                  ( false !== $content[$BEFORE] )) ? util::$MINUS : null;
-      $v = $child->addChild( $type, $output . util::duration2str( $content ) );
+      $v = $child->addChild( $type, $output . util::duration2str( $content ));
       break;
     case strtolower( util::$GEO ):
       if( ! empty( $content )) {
         $v1 = $child->addChild( utilGeo::$LATITUDE,
                                 utilGeo::geo2str2( $content[utilGeo::$LATITUDE],
-                                                    utilGeo::$geoLatFmt ));
+                                                            utilGeo::$geoLatFmt ));
         $v1 = $child->addChild( utilGeo::$LONGITUDE,
                                 utilGeo::geo2str2( $content[utilGeo::$LONGITUDE],
-                                                    utilGeo::$geoLongFmt ));
+                                                            utilGeo::$geoLongFmt ));
       }
       break;
     case self::$integer:
@@ -736,7 +812,10 @@ class iCalXML {
       break;
     case self::$rstatus:
       $v = $child->addChild( self::$code,
-                             number_format((float) $content[self::$statcode], 2, util::$DOT, $SP0 ));
+                             number_format((float) $content[self::$statcode],
+                                            2,
+                                            util::$DOT,
+                                            $SP0 ));
       $v = $child->addChild( strtolower( util::$DESCRIPTION ),
                              htmlspecialchars( $content[self::$text] ));
       if( isset( $content[self::$extdata] ))
@@ -934,7 +1013,9 @@ class iCalXML {
       case util::$RESOURCES:
         $tValue      = array();
         while( ! empty( $xml2 )) {
-          $tValue[]  = html_entity_decode( self::XMLgetTagContent2( $xml2, $valueType, $endIx4 ));
+          $tValue[]  = html_entity_decode( self::XMLgetTagContent2( $xml2,
+                                                                    $valueType,
+                                                                    $endIx4 ));
           $xml2      = substr( $xml2, $endIx4 );
         }
         $value       = $tValue;
@@ -945,8 +1026,11 @@ class iCalXML {
           if( self::$date == $valueType )
             $params[util::$VALUE] = util::$DATE;
           $t         = array();
-          while( ! empty( $xml2 ) && ( $DATETAGST == substr( $xml2, 0, 5 ))) {
-            $t[]     = self::XMLgetTagContent2( $xml2, $pType, $endIx4 );
+          while( ! empty( $xml2 ) &&
+                ( $DATETAGST == substr( $xml2, 0, 5 ))) {
+            $t[]     = self::XMLgetTagContent2( $xml2,
+                                                $pType,
+                                                $endIx4 );
             $xml2    = substr( $xml2, $endIx4 );
           }
           $value = $t;
@@ -956,11 +1040,16 @@ class iCalXML {
         if( util::$RDATE == $propName )
           $params[util::$VALUE] = util::$PERIOD;
         $value       = array();
-        while( ! empty( $xml2 ) && ( $PERIODTAG == substr( $xml2, 0, 8 ))) {
-          $xml3      = self::XMLgetTagContent1( $xml2, self::$period, $endIx4 ); // period
+        while( ! empty( $xml2 ) &&
+              ( $PERIODTAG == substr( $xml2, 0, 8 ))) {
+          $xml3      = self::XMLgetTagContent1( $xml2,
+                                                self::$period,
+                                                $endIx4 ); // period
           $t         = array();
           while( ! empty( $xml3 )) {
-            $t[]     = self::XMLgetTagContent2( $xml3, $pType, $endIx5 ); // start - end/duration
+            $t[]     = self::XMLgetTagContent2( $xml3,
+                                                $pType,
+                                                $endIx5 ); // start - end/duration
             $xml3    = substr( $xml3, $endIx5 );
           }
           $value[]   = $t;
@@ -974,7 +1063,8 @@ class iCalXML {
       case util::$GEO:
         $tValue      = array( utilGeo::$LATITUDE => $value );
         $tValue[utilGeo::$LONGITUDE] = self::XMLgetTagContent1( substr( $xml2, $endIx3 ),
-                                                                utilGeo::$LONGITUDE, $endIx3 );
+                                                                utilGeo::$LONGITUDE,
+                                                                $endIx3 );
         $value       = $tValue;
         break;
       case util::$EXRULE:
@@ -983,7 +1073,9 @@ class iCalXML {
         $xml2        = substr( $xml2, $endIx3 );
         $valueType   = false;
         while( ! empty( $xml2 )) {
-          $t         = self::XMLgetTagContent2( $xml2, $valueType, $endIx4 );
+          $t         = self::XMLgetTagContent2( $xml2,
+                                                $valueType,
+                                                $endIx4 );
           switch( strtoupper( $valueType )) {
             case util::$FREQ:
             case util::$COUNT:
@@ -1011,7 +1103,9 @@ class iCalXML {
       case util::$REQUEST_STATUS:
         $tValue      = array();
         while( ! empty( $xml2 )) {
-          $t         = html_entity_decode( self::XMLgetTagContent2( $xml2, $valueType, $endIx4 ));
+          $t         = html_entity_decode( self::XMLgetTagContent2( $xml2,
+                                                                    $valueType,
+                                                                    $endIx4 ));
           $tValue[$valueType] = $t;
           $xml2      = substr( $xml2, $endIx4 );
         }
@@ -1095,14 +1189,14 @@ class iCalXML {
        ( sprintf( $FMT0, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 2 )))))
       break;
     if((( $sx1 + $strLen + 3 ) < $xmlLen ) &&
-       ( sprintf( $FMT1, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 4 ))))) { // empty tag
+       ( sprintf( $FMT1, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 4 ))))) {
       $endIx = $strLen + 5;
-      return null;
+      return null; // empty tag
     }
     if((( $sx1 + $strLen + 2 ) < $xmlLen ) &&
-       ( sprintf( $FMT2, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 3 ))))) { // empty tag
+       ( sprintf( $FMT2, $tagName ) == strtolower( substr( $xml, $sx1, ( $strLen + 3 ))))) {
       $endIx = $strLen + 4;
-      return null;
+      return null; // empty tag
     }
     $sx1    += 1;
   } // end while...

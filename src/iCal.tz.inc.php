@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -28,7 +28,6 @@
  * Additional functions to use with vtimezone components
  *
  * Before calling the functions, set time zone 'GMT' ('date_default_timezone_set')!
- *
  * @author Yitzchok Lavi <icalcreator@onebigsystem.com>
  *         adjusted for iCalcreator Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @version 1.0.2 - 2011-02-24
@@ -36,14 +35,14 @@
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
 /**
- * Returns array with the offset information from UTC for a (UTC) datetime/timestamp in the
+ * Returns array with the offset information
+
+ * From UTC for a (UTC) datetime/timestamp in the
  * timezone, according to the VTIMEZONE information in the input array.
- *
  * @param array  $timezonesarray  output from function getTimezonesAsDateArrays (below)
  * @param string $tzid            time zone identifier
  * @param mixed  $timestamp       timestamp or a UTC datetime (in array format)
  * @return array                  time zone data with keys for $OFFSETHIS, $OFFSETSEC and $TZNAME
- *
  */
 function getTzOffsetForDate($timezonesarray, $tzid, $timestamp) {
   static $OFFSETHIS = 'offsetHis';
@@ -102,9 +101,10 @@ function getTzOffsetForDate($timezonesarray, $tzid, $timestamp) {
  * Returns an array containing all the timezone data in the vcalendar object
  *
  * @param object $vcalendar  iCalcreator calendar instance
- * @return array             time zone transition timestamp, array before(offsetHis, offsetSec), array after(offsetHis, offsetSec, tzname)
+ * @return array             time zone transition timestamp,
+ *                             array before(offsetHis, offsetSec),
+ *                             array after(offsetHis, offsetSec, tzname)
  *                           based on the timezone data in the vcalendar object
- *
  */
 function getTimezonesAsDateArrays($vcalendar) {
     $timezonedata = array();
@@ -128,7 +128,9 @@ function getTimezonesAsDateArrays($vcalendar) {
  * Returns an array containing time zone data from vtimezone standard/daylight instances
  *
  * @param object $vtzc   an iCalcreator calendar standard/daylight instance
- * @return array         time zone data; array before(offsetHis, offsetSec), array after(offsetHis, offsetSec, tzname)
+ * @return array         time zone data;
+ *                         array before(offsetHis, offsetSec),
+ *                         array after(offsetHis, offsetSec, tzname)
  * @todo fix quickfix...
  */
 function expandTimezoneDates($vtzc) {

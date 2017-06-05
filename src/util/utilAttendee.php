@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -36,7 +36,6 @@ class utilAttendee {
  * Return string after a cal-address check, prefix mail address with MAILTO
  *
  * Acceps other prefix ftp://, http://, file://, gopher://, news:, nntp://, telnet://, wais://, prospero:// etc
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-03-06
  * @param string $value
@@ -57,7 +56,7 @@ class utilAttendee {
         $value = $MAILTOCOLON . substr( $value, 7 ); // accept mailto:
         break;
       case( false !== ( $pos = strpos( substr( $value, 0, 9 ), util::$COLON ))) :
-        break;                                       // accept anything (as is) from list above
+        break;                                       // accept (as is) from list above
       case( filter_var( $value, FILTER_VALIDATE_EMAIL )) :
         $value = $MAILTOCOLON . $value;              // accept mail address
         break;
@@ -99,8 +98,8 @@ class utilAttendee {
           continue;
         foreach( $pValue as $pLabel2 => $pValue2 ) { // fix (opt) quotes
           if( is_array( $pValue2 ) ||
-              in_array( $pLabel2, util::$ATTENDEEPARKEYS )) // DELEGATED-FROM, DELEGATED-TO, MEMBER
-            continue;
+              in_array( $pLabel2, util::$ATTENDEEPARKEYS ))
+            continue; // DELEGATED-FROM, DELEGATED-TO, MEMBER
           if(( false !== strpos( $pValue2, util::$COLON )) ||
              ( false !== strpos( $pValue2, util::$SEMIC )) ||
              ( false !== strpos( $pValue2, util::$COMMA )))
@@ -182,6 +181,7 @@ class utilAttendee {
  * Return string of comma-separated quoted array members
  *
  * @param array $list
+ * @return string
  * @access private
  * @static
  */
@@ -198,7 +198,7 @@ class utilAttendee {
 /**
  * Return formatted output for calendar component property attendee
  *
- * @param array  $attendeeData
+ * @param array  $params
  * @param string $objName
  * @param string $lang
  * @return string

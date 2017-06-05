@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -113,8 +113,8 @@ class valarm extends calendarComponent {
   }
 /**
  * Return valarm component property value/params,
- * if arg $inclParam, return array with keys VALUE/PARAMS.
  *
+ * If arg $inclParam, return array with keys VALUE/PARAMS.
  * @param string  $propName
  * @param int     $propix   specific property in case of multiply occurences
  * @param bool    $inclParam
@@ -122,22 +122,31 @@ class valarm extends calendarComponent {
  * @return mixed
  * @uses calendarComponent::getProperty()
  */
-  public function getProperty( $propName=false, $propix=false, $inclParam=false, $specform=false ) {
+  public function getProperty( $propName=false,
+                               $propix=false,
+                               $inclParam=false,
+                               $specform=false ) {
     switch( strtoupper( $propName )) {
       case util::$ACTION:
         if( isset( $this->action[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->action : $this->action[util::$LCvalue];
+          return ( $inclParam ) ? $this->action
+                                : $this->action[util::$LCvalue];
         break;
       case util::$REPEAT:
         if( isset( $this->repeat[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->repeat : $this->repeat[util::$LCvalue];
+          return ( $inclParam ) ? $this->repeat
+                                : $this->repeat[util::$LCvalue];
         break;
       case util::$TRIGGER:
         if( isset( $this->trigger[util::$LCvalue] ))
-          return ( $inclParam ) ? $this->trigger : $this->trigger[util::$LCvalue];
+          return ( $inclParam ) ? $this->trigger
+                                : $this->trigger[util::$LCvalue];
         break;
       default:
-        return parent::getProperty( $propName, $propix, $inclParam, $specform );
+        return parent::getProperty( $propName,
+                                    $propix,
+                                    $inclParam,
+                                    $specform );
         break;
     }
     return false;

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -229,7 +229,8 @@ class vcalendar extends iCalBase {
         break;
       case util::$FILENAME :
         $value   = trim( $value );
-        $dirfile = $this->config[util::$DIRECTORY] . $this->config[util::$DELIMITER] . $value;
+        $dirfile = $this->config[util::$DIRECTORY] .
+                   $this->config[util::$DELIMITER] . $value;
         if( file_exists( $dirfile )) {
             /* local file exists */
           if( is_readable( $dirfile ) || is_writable( $dirfile )) {
@@ -307,9 +308,10 @@ class vcalendar extends iCalBase {
   public function deleteProperty( $propName=false, $propix=false ) {
     $propName = ( $propName ) ? strtoupper( $propName ) : util::$X_PROP;
     if( !$propix )
-      $propix = ( isset( $this->propdelix[$propName] ) && ( util::$X_PROP != $propName ))
-                   ? $this->propdelix[$propName] + 2
-                   : 1;
+      $propix = ( isset( $this->propdelix[$propName] ) &&
+                       ( util::$X_PROP != $propName ))
+               ? $this->propdelix[$propName] + 2
+               : 1;
     $this->propdelix[$propName] = --$propix;
     switch( $propName ) {
       case util::$CALSCALE:
@@ -341,13 +343,17 @@ class vcalendar extends iCalBase {
  * @uses utilGeo::geo2str2()
  * @uses vcalendar::makeProdid()
  */
-  public function getProperty( $propName=false, $propix=false, $inclParam=false ) {
+  public function getProperty( $propName=false,
+                               $propix=false,
+                               $inclParam=false ) {
     static $RECURRENCE_ID_UID = 'RECURRENCE-ID-UID';
     static $R_UID             = 'R-UID';
     $propName = ( $propName ) ? strtoupper( $propName ) : util::$X_PROP;
     if( util::$X_PROP == $propName ) {
       if( empty( $propix ))
-        $propix  = ( isset( $this->propix[$propName] )) ? $this->propix[$propName] + 2 : 1;
+        $propix  = ( isset( $this->propix[$propName] ))
+                 ? $this->propix[$propName] + 2
+                 : 1;
       $this->propix[$propName] = --$propix;
     }
     switch( $propName ) {
@@ -375,18 +381,22 @@ class vcalendar extends iCalBase {
             $component->getProperties( $propName, $output );
             continue;
           }
-          elseif(( 3 < strlen( $propName )) && ( util::$UID == substr( $propName, -3 ))) {
+          elseif(( 3 < strlen( $propName )) &&
+                 ( util::$UID == substr( $propName, -3 ))) {
             if( false !== ( $content = $component->getProperty( util::$RECURRENCE_ID )))
               $content = $component->getProperty( util::$UID );
           }
           elseif( util::$GEOLOCATION == $propName ) {
-            $content = ( false === ( $loc = $component->getProperty( util::$LOCATION )))
-                     ? null
-                     : $loc . util::$SP1;
             if( false === ( $geo = $component->getProperty( util::$GEO )))
               continue;
-            $content .= utilGeo::geo2str2( $geo[utilGeo::$LATITUDE],  utilGeo::$geoLatFmt ) .
-                        utilGeo::geo2str2( $geo[utilGeo::$LONGITUDE], utilGeo::$geoLongFmt ) . utiL::$L;
+            $loc = $component->getProperty( util::$LOCATION );
+            $content = ( empty( $loc ))
+                     ? null
+                     : $loc . util::$SP1;
+            $content .= utilGeo::geo2str2( $geo[utilGeo::$LATITUDE],
+                                                utilGeo::$geoLatFmt ) .
+                        utilGeo::geo2str2( $geo[utilGeo::$LONGITUDE],
+                                                utilGeo::$geoLongFmt ) . utiL::$L;
           }
           elseif( false === ( $content = $component->getProperty( $propName )))
             continue;
@@ -513,7 +523,7 @@ class vcalendar extends iCalBase {
  * Return clone of calendar component
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.3 - 2017-03-19
+ * @since 2.23.14 - 2017-05-02
  * @param mixed $arg1 optional, ordno/component type/ component uid
  * @param mixed $arg2 optional, ordno if arg1 = component type
  * @return object
@@ -528,35 +538,37 @@ class vcalendar extends iCalBase {
  */
   public function getComponent( $arg1=null, $arg2=null ) {
     static $INDEX = 'INDEX';
-    static $AT    = '@';
     $index = $argType = null;
     switch( true ) {
       case ( is_null( $arg1 )) : // first or next in component chain
         $argType = $INDEX;
-        $index   = $this->compix[$INDEX] = ( isset( $this->compix[$INDEX] )) ? $this->compix[$INDEX] + 1 : 1;
+        $index   = $this->compix[$INDEX] = ( isset( $this->compix[$INDEX] ))
+                                         ? $this->compix[$INDEX] + 1 : 1;
         break;
       case ( is_array( $arg1 )) : // array( *[propertyName => propertyValue] )
         $arg2  = implode( util::$MINUS, array_keys( $arg1 ));
-        $index = $this->compix[$arg2] = ( isset( $this->compix[$arg2] )) ? $this->compix[$arg2] + 1 : 1;
+        $index = $this->compix[$arg2] = ( isset( $this->compix[$arg2] ))
+                                      ? $this->compix[$arg2] + 1 : 1;
         break;
       case ( ctype_digit( (string) $arg1 )) : // specific component in chain
         $argType = $INDEX;
         $index   = (int) $arg1;
         unset( $this->compix );
         break;
-      case (( strlen( $arg1 ) <= strlen( util::$LCVFREEBUSY )) &&
-            ( false === strpos( $arg1, $AT ))) : // object class name
+      case ( in_array( strtolower( $arg1 ), util::$MCOMPS ) &&
+                ( 0 != strcasecmp( $arg1,   util::$LCVALARM ))) : // object class name
         unset( $this->compix[$INDEX] );
         $argType = strtolower( $arg1 );
         if( is_null( $arg2 ))
-          $index = $this->compix[$argType] = ( isset( $this->compix[$argType] )) ? $this->compix[$argType] + 1 : 1;
+          $index = $this->compix[$argType] = ( isset( $this->compix[$argType] ))
+                                           ? $this->compix[$argType] + 1 : 1;
         elseif( isset( $arg2 ) && ctype_digit( (string) $arg2 ))
           $index = (int) $arg2;
         break;
-      case (( strlen( $arg1 ) > strlen( util::$LCVFREEBUSY )) &&
-            ( false !== strpos( $arg1, $AT ))) : // UID as 1st argument
+      case ( is_string( $arg1 )) : // assume UID as 1st argument
         if( is_null( $arg2 ))
-          $index = $this->compix[$arg1] = ( isset( $this->compix[$arg1] )) ? $this->compix[$arg1] + 1 : 1;
+          $index = $this->compix[$arg1] = ( isset( $this->compix[$arg1] ))
+                                        ? $this->compix[$arg1] + 1 : 1;
         elseif( isset( $arg2 ) && ctype_digit( (string) $arg2 ))
           $index = (int) $arg2;
         break;
@@ -572,7 +584,7 @@ class vcalendar extends iCalBase {
         continue;
       if(( $INDEX == $argType ) && ( $index == $cix ))
         return clone $this->components[$cix];
-      elseif( $argType == $this->components[$cix]->objName ) {
+      elseif( 0 == strcmp( $argType, $this->components[$cix]->objName )) {
         if( $index == $cix1gC )
           return clone $this->components[$cix];
         $cix1gC++;
@@ -620,7 +632,8 @@ class vcalendar extends iCalBase {
           elseif( !is_array( $value ))
             $value = array( $value );
           foreach( $value as $part ) {
-            $part = ( false !== strpos( $part, util::$COMMA )) ? explode( util::$COMMA, $part ) : array( $part );
+            $part = ( false !== strpos( $part, util::$COMMA ))
+                  ? explode( util::$COMMA, $part ) : array( $part );
             foreach( $part as $subPart ) {
               if( $pValue == $subPart ) {
                 $hit[] = true;
@@ -679,8 +692,7 @@ class vcalendar extends iCalBase {
  * Return selected components from calendar on date or selectOption basis
  *
  * DTSTART MUST be set for every component.
- * No check of date.
- *
+ * No date check.
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.3 - 2017-03-19
  * @param mixed $startY optional,      (int) start Year,  default current Year
@@ -717,7 +729,6 @@ class vcalendar extends iCalBase {
  * Ascending sort on properties (if exist) x-current-dtstart, dtstart,
  * x-current-dtend, dtend, x-current-due, due, duration, created, dtstamp, uid if called without arguments,
  * otherwise sorting on specific (argument) property values
- *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-02-20
  * @param string $sortArg
@@ -775,12 +786,17 @@ class vcalendar extends iCalBase {
     static $CALPROPNAMES    = null;
     static $VERSIONPRODID   = null;
     if( is_null( $CALPROPNAMES ))
-      $CALPROPNAMES         = array( util::$CALSCALE, util::$METHOD, util::$PRODID, util::$VERSION );
+      $CALPROPNAMES         = array( util::$CALSCALE,
+                                     util::$METHOD,
+                                     util::$PRODID,
+                                     util::$VERSION );
     if( is_null( $VERSIONPRODID ))
-      $VERSIONPRODID        = array( util::$VERSION, util::$PRODID );
+      $VERSIONPRODID        = array( util::$VERSION,
+                                     util::$PRODID );
     $arrParse = false;
     if( empty( $unparsedtext )) {
-            /* directory+filename is set previously via setConfig url or directory+filename  */
+            /* directory+filename is set previously
+               via setConfig url or directory+filename  */
       if(   false === ( $file = $this->getConfig( util::$URL ))) {
         if( false === ( $file = $this->getConfig( util::$DIRFILE )))
           return false;               /* err 1 */
@@ -808,7 +824,8 @@ class vcalendar extends iCalBase {
       foreach( $rows as $lix => $row )
         $rows[$lix] = util::trimTrailNL( $row );
     }
-            /* skip leading (empty/invalid) lines (and remove leading BOM chars etc) */
+            /* skip leading (empty/invalid) lines
+               (and remove leading BOM chars etc) */
     foreach( $rows as $lix => $row ) {
       if( false !== stripos( $row, $BEGIN_VCALENDAR )) {
         $rows[$lix] = $BEGIN_VCALENDAR;

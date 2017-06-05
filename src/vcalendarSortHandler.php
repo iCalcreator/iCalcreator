@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.12
+ * version   2.23.16
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -148,6 +148,11 @@ class vcalendarSortHandler {
   }
 /**
  * Return formatted string from (array) date/datetime
+ *
+ * @param array $adate
+ * @return string
+ * @access private
+ * @static
  */
   private static function arrDate2str( $adate ) {
     $str    = sprintf( util::$YMD,
@@ -275,7 +280,13 @@ class vcalendarSortHandler {
       return -1;
     return strcmp( $as, $bs );
   }
-  private static function formatdatePart( $part ) {
+/**
+ * Format date
+ *
+ * @param array $part
+ * @return string
+ */
+  private static function formatdatePart( array $part ) {
     if( isset( $part[util::$LCYEAR] )) {
       $str  = sprintf( util::$YMD, (int) $part[util::$LCYEAR],
                                    (int) $part[util::$LCMONTH],
