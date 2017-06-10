@@ -26,9 +26,7 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
-use kigkonsult\iCalcreator\util\utilRecur;
-use kigkonsult\iCalcreator\util\utilRexdate;
+
 /**
  * iCalcreator VJOURNAL component class
  *
@@ -70,7 +68,7 @@ class vjournal extends calendarComponent {
  * @uses calendarComponent::setConfig()
  * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $J = 'j';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));

@@ -345,8 +345,8 @@ class calendarComponent extends iCalBase {
  * @uses util::duration2date()
  * @uses util::makeUid()
  */
-  public function getProperty( $propName=false,
-                               $propix=false,
+  public function getProperty( $propName=null,
+                               $propix=null,
                                $inclParam=false,
                                $specform=false ) {
     if( 0 == strcasecmp( util::$GEOLOCATION, $propName )) {
@@ -481,8 +481,8 @@ class calendarComponent extends iCalBase {
                     isset( $this->dtstart[util::$LCparams][util::$TZID] ))
                     ? array_merge((array) $this->duration[util::$LCparams], $this->dtstart[util::$LCparams] )
                     : $this->duration[util::$LCparams];
-        return ( $inclParam ) ? array( util::$LCvalue => $value,
-                                       util::$LCparams =>  $params )
+        return ( $inclParam ) ? [util::$LCvalue  => $value,
+                                 util::$LCparams =>  $params]
                               : $value;
         break;
       case util::$EXDATE:
@@ -646,10 +646,10 @@ class calendarComponent extends iCalBase {
         if( $propName != util::$X_PROP ) {
           if( ! isset( $this->xprop[$propName] ))
             return false;
-          return ( $inclParam ) ? array( $propName,
-                                         $this->xprop[$propName] )
-                                : array( $propName,
-                                         $this->xprop[$propName][util::$LCvalue] );
+          return ( $inclParam ) ? [$propName,
+                                         $this->xprop[$propName]]
+                                : [$propName,
+                                         $this->xprop[$propName][util::$LCvalue]];
         }
         else {
           if( empty( $this->xprop ))
@@ -657,10 +657,10 @@ class calendarComponent extends iCalBase {
           $xpropno = 0;
           foreach( $this->xprop as $xpropkey => $xpropvalue ) {
             if( $propix == $xpropno )
-              return ( $inclParam ) ? array( $xpropkey,
-                                             $this->xprop[$xpropkey] )
-                                    : array( $xpropkey,
-                                             $this->xprop[$xpropkey][util::$LCvalue] );
+              return ( $inclParam ) ? [$xpropkey,
+                                             $this->xprop[$xpropkey]]
+                                    : [$xpropkey,
+                                             $this->xprop[$xpropkey][util::$LCvalue]];
             else
               $xpropno++;
           }
@@ -683,7 +683,7 @@ class calendarComponent extends iCalBase {
  */
   public function getProperties( $propName, & $output ) {
     if( empty( $output ))
-      $output = array();
+      $output = [];
     if( ! in_array( strtoupper( $propName ), util::$MPROPS1 ))
       return $output;
     while( false !== ( $content = $this->getProperty( $propName ))) {
@@ -1046,10 +1046,10 @@ class calendarComponent extends iCalBase {
     static $BEGINVALARM   = 'BEGIN:VALARM';
     static $BEGINSTANDARD = 'BEGIN:STANDARD';
     static $BEGINDAYLIGHT = 'BEGIN:DAYLIGHT';
-    static $TEXTPROPS     = array( 'CATEGORIES',
+    static $TEXTPROPS     = ['CATEGORIES',
                                    'COMMENT',
                                    'DESCRIPTION',
-                                   'SUMMARY' );
+                                   'SUMMARY'];
     static $X_            = 'X-';
     static $DBBS          = "\\";
     static $SS            = '/';
@@ -1067,7 +1067,7 @@ class calendarComponent extends iCalBase {
       }
     }
     elseif( ! isset( $this->unparsed ))
-      $rows = array();
+      $rows = [];
     else
       $rows = $this->unparsed;
             /* skip leading (empty/invalid) lines */
@@ -1080,7 +1080,7 @@ class calendarComponent extends iCalBase {
       if(( $NLCHARS == $tst ) || empty( $tst ))
         unset( $rows[$lix] );
     }
-    $this->unparsed = array();
+    $this->unparsed = [];
     $comp           = $this;
     $config         = $this->getConfig();
     $compSync = $subSync = 0;
@@ -1251,7 +1251,7 @@ class calendarComponent extends iCalBase {
         case util::$EXRULE :
         case util::$RRULE :
           $values = explode( util::$SEMIC, $row );
-          $recur = array();
+          $recur = [];
           foreach( $values as $value2 ) {
             if( empty( $value2 ))
               continue; // ;-char in end position ???
@@ -1262,7 +1262,7 @@ class calendarComponent extends iCalBase {
                 $value4 = explode( util::$COMMA, $value3[1] );
                 if( 1 < count( $value4 )) {
                   foreach( $value4 as $v5ix => $value5 ) {
-                    $value6 = array();
+                    $value6 = [];
                     $dayno = $dayname = null;
                     $value5 = trim( (string) $value5 );
                     if(( ctype_alpha( substr( $value5, -1 ))) &&
@@ -1279,7 +1279,7 @@ class calendarComponent extends iCalBase {
                   }
                 }
                 else {
-                  $value4 = array();
+                  $value4 = [];
                   $dayno  = $dayname = null;
                   $value5 = trim( (string) $value3[1] );
                   if(( ctype_alpha( substr( $value5, -1 ))) &&
@@ -1422,7 +1422,7 @@ class calendarComponent extends iCalBase {
     static $DATEKEY = '%04d%02d%02d%02d%02d%02d000';
     $output = null;
     if( util::$LCVTIMEZONE == $this->objName ) { // sort : standard, daylight, in dtstart order
-      $stdarr = $dlarr = array();
+      $stdarr = $dlarr = [];
       foreach( $this->components as $cix => $component ) {
         if( empty( $component ))
           continue;
@@ -1444,7 +1444,7 @@ class calendarComponent extends iCalBase {
           $dlarr[$key] = $component;
         }
       } // end foreach(...
-      $this->components = array();
+      $this->components = [];
       ksort( $stdarr, SORT_NUMERIC );
       foreach( $stdarr as $std )
         $this->components[] = $std;

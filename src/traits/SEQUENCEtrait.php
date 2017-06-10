@@ -72,8 +72,8 @@ trait SEQUENCEtrait {
                  ( -1 < $this->sequence[util::$LCvalue] ))
              ? $this->sequence[util::$LCvalue] + 1
              : util::$ZERO;
-    $this->sequence = array( util::$LCvalue  => $value,
-                             util::$LCparams => util::setParams( $params ));
+    $this->sequence = [util::$LCvalue  => $value,
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

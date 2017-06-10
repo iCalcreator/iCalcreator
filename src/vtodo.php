@@ -75,7 +75,7 @@ class vtodo extends calendarComponent {
  * @uses calendarComponent::setConfig()
  * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $T = 't';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));

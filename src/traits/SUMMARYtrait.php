@@ -62,7 +62,7 @@ trait SUMMARYtrait {
  * Set calendar component property summary
  *
  * @param string  $value
- * @param string  $params
+ * @param string[]  $params
  * @return bool
  * @uses calendarComponent::getConfig()
  * @uses util::setParams()
@@ -74,8 +74,8 @@ trait SUMMARYtrait {
       else
        return false;
     }
-    $this->summary = array( util::$LCvalue  => $value,
-                            util::$LCparams => util::setParams( $params ));
+    $this->summary = [util::$LCvalue  => $value,
+                      util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

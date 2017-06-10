@@ -73,8 +73,8 @@ trait TZIDtrait {
       else
         return false;
     }
-    $this->tzid = array( util::$LCvalue  => trim( util::trimTrailNL( $value )),
-                         util::$LCparams => util::setParams( $params ));
+    $this->tzid = [util::$LCvalue  => trim( util::trimTrailNL( $value )),
+                   util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

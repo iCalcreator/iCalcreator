@@ -73,8 +73,8 @@ trait PRIORITYtrait {
       else
         return false;
     }
-    $this->priority = array( util::$LCvalue  => $value,
-                             util::$LCparams => util::setParams( $params ));
+    $this->priority = [util::$LCvalue  => $value,
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

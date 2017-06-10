@@ -72,14 +72,14 @@ trait GEOtrait {
   public function setGeo( $latitude, $longitude, $params=null ) {
     if( isset( $latitude ) && isset( $longitude )) {
       if( ! is_array( $this->geo ))
-        $this->geo = array();
+        $this->geo = [];
       $this->geo[util::$LCvalue][utilGeo::$LATITUDE]  = floatval( $latitude );
       $this->geo[util::$LCvalue][utilGeo::$LONGITUDE] = floatval( $longitude );
       $this->geo[util::$LCparams] = util::setParams( $params );
     }
     elseif( $this->getConfig( util::$ALLOWEMPTY ))
-      $this->geo = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                          util::$LCparams => util::setParams( $params ) );
+      $this->geo = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                    util::$LCparams => util::setParams( $params )];
     else
       return false;
     return true;

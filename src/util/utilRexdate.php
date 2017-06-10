@@ -46,7 +46,7 @@ class utilRexdate {
  * @static
  */
   private static function chkDateCfg( $theDate, & $parno, & $params ) {
-    $paramsValueIsDATE = util::isParamsValueSet( array( util::$LCparams => $params ),
+    $paramsValueIsDATE = util::isParamsValueSet( [util::$LCparams => $params],
                                                  util::$DATE );
     switch( true ) {
       case ( isset( $params[util::$TZID] )) :
@@ -57,7 +57,7 @@ class utilRexdate {
         $parno = 3;
         break;
       default:
-        if( util::isParamsValueSet( array( util::$LCparams => $params ),
+        if( util::isParamsValueSet( [util::$LCparams => $params],
                                            util::$PERIOD )) {
           $params[util::$VALUE] = util::$PERIOD;
           $parno = 7;
@@ -83,7 +83,7 @@ class utilRexdate {
               $parno = 6;
             break;
           default : // i.e. string
-            $date = trim( $theDate );
+            $date = trim( (string) $theDate );
             if( util::$Z == substr( $date, -1 ))
               $parno = 7; // UTC DATE-TIME
             elseif((( 8 == strlen( $date ) && ctype_digit( $date )) ||
@@ -118,12 +118,12 @@ class utilRexdate {
  * @static
  */
   public static function formatExdate( $exdateData, $allowEmpty ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortExdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortExdate2' );
+    static $SORTER1 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortExdate1'];
+    static $SORTER2 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortExdate2'];
     $output  = null;
-    $exdates = array();
+    $exdates = [];
     foreach(( array_keys( $exdateData )) as $ex ) {
       $theExdate = $exdateData[$ex];
       if( empty( $theExdate[util::$LCvalue] )) {
@@ -172,7 +172,7 @@ class utilRexdate {
  *
  * @param array   $exdates
  * @param array   $params
- * @return bool
+ * @return bool|array
  * @uses util::setParams()
  * @uses calendarComponent::chkDateCfg()
  * @uses util::existRem()
@@ -185,9 +185,9 @@ class utilRexdate {
  * @static
  */
   public static function prepInputExdate( $exdates, $params=null ) {
-    static $GMTUTCZARR = array( 'GMT', 'UTC', 'Z' );
-    $input  = array( util::$LCparams => util::setParams( $params,
-                                                         util::$DEFAULTVALUEDATETIME ));
+    static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
+    $input  = [util::$LCparams => util::setParams( $params,
+                                                         util::$DEFAULTVALUEDATETIME )];
     $toZ = ( isset( $input[util::$LCparams][util::$TZID] ) &&
              in_array( strtoupper( $input[util::$LCparams][util::$TZID] ),
                        $GMTUTCZARR ))
@@ -277,13 +277,13 @@ class utilRexdate {
  * @static
  */
   public static function formatRdate( $rdateData, $allowEmpty, $objName ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortRdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortRdate2' );
+    static $SORTER1 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortRdate1'];
+    static $SORTER2 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                             'sortRdate2'];
     $utcTime = ( in_array( $objName, util::$TZCOMPS )) ? true : false;
     $output  = null;
-    $rdates  = array();
+    $rdates  = [];
     foreach(( array_keys( $rdateData )) as $rpix ) {
       $theRdate = $rdateData[$rpix];
       if( empty( $theRdate[util::$LCvalue] )) {
@@ -367,7 +367,7 @@ class utilRexdate {
  * @param array  $rdates
  * @param array  $params
  * @param string $objName
- * @return bool
+ * @return array
  * @uses util::setParams()
  * @uses util::isParamsValueSet()
  * @uses calendarComponent::chkDateCfg()
@@ -384,10 +384,10 @@ class utilRexdate {
  * @static
  */
   public static function prepInputRdate( $rdates, $params, $objName ) {
-    static $PREFIXARR  = array( 'P', '+', '-' );
-    static $GMTUTCZARR = array( 'GMT', 'UTC', 'Z' );
-    $input = array( util::$LCparams => util::setParams( $params,
-                                                        util::$DEFAULTVALUEDATETIME ));
+    static $PREFIXARR  = ['P', '+', '-'];
+    static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
+    $input = [util::$LCparams => util::setParams( $params,
+                                                        util::$DEFAULTVALUEDATETIME )];
     if( in_array( $objName, util::$TZCOMPS )) {
       unset( $input[util::$LCparams][util::$TZID] );
       $input[util::$LCparams][util::$VALUE] = util::$DATE_TIME;

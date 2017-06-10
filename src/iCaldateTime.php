@@ -46,7 +46,7 @@ class iCaldateTime extends DateTime {
 /**
  * @var array date[-time] origin
  */
-  public $SCbools    = array();
+  public $SCbools    = [];
 /**
  * Return time (His) array
  *
@@ -116,7 +116,7 @@ class iCaldateTime extends DateTime {
       $timezone     = new DateTimeZone( $tz );
       $iCaldateTime = new iCaldateTime( $strdate, $timezone );
     }
-    catch( Exception $e ) {
+    catch( \Exception $e ) {
       $iCaldateTime = new iCaldateTime( $strdate );
     }
     if( ! empty( $dtstartTz )) {
@@ -127,10 +127,10 @@ class iCaldateTime extends DateTime {
           $timezone = new DateTimeZone( $dtstartTz );
           $iCaldateTime->setTimezone( $timezone );
         }
-        catch( Exception $e ) {} // ??
+        catch( \Exception $e ) {} // ??
       }
     }
-    if( util::isParamsValueSet( array( util::$LCparams => $params ), util::$DATE )) {
+    if( util::isParamsValueSet( [util::$LCparams => $params], util::$DATE )) {
       $iCaldateTime->dateFormat = $Y_M_D;
       $iCaldateTime->key        = $iCaldateTime->format( $YMD );
     }

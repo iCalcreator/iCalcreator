@@ -41,7 +41,7 @@ class vcalendar extends iCalBase {
       traits\PRODIDtrait,
       traits\VERSIONtrait;
 /**
- *  @var property output formats, used by CALSCALE, METHOD, PRODID and VERSION
+ *  @var string property output formats, used by CALSCALE, METHOD, PRODID and VERSION
  *  @access private
  *  @static
  */
@@ -55,7 +55,7 @@ class vcalendar extends iCalBase {
  * @uses vcalendar::setConfig()
  * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     $this->setConfig( util::$UNIQUE_ID, ( isset( $_SERVER[util::$SERVER_NAME] ))
                                 ? gethostbyname( $_SERVER[util::$SERVER_NAME] )
                                 : util::$LOCALHOST );
@@ -108,7 +108,7 @@ class vcalendar extends iCalBase {
     static $DOTICS = '.ics';
     static $DOTXML = '.xml';
     if( is_null( $config )) {
-      $return = array();
+      $return = [];
       $return[util::$ALLOWEMPTY]  = $this->getConfig( util::$ALLOWEMPTY );
       $return[util::$DELIMITER]   = $this->getConfig( util::$DELIMITER );
       $return[util::$DIRECTORY]   = $this->getConfig( util::$DIRECTORY );
@@ -140,9 +140,9 @@ class vcalendar extends iCalBase {
                $this->getConfig( util::$FILENAME );
         break;
       case util::$FILEINFO :
-        return array( $this->getConfig( util::$DIRECTORY )
+        return [$this->getConfig( util::$DIRECTORY )
                     , $this->getConfig( util::$FILENAME )
-                    , $this->getConfig( util::$FILESIZE ));
+                    , $this->getConfig( util::$FILESIZE )];
         break;
       case util::$FILENAME :
         if( ! isset( $this->config[util::$FILENAME] ))
@@ -186,7 +186,7 @@ class vcalendar extends iCalBase {
  * @uses calendarComponent::setConfig()
  */
   public function setConfig( $config, $value=null, $arg3=null ) {
-    static $PROTOCOLS    = array( 'HTTP://', 'WEBCAL://', 'webcal://' );
+    static $PROTOCOLS    = ['HTTP://', 'WEBCAL://', 'webcal://'];
     static $PROTOHTTP    = 'http://';
     static $LCPROTOHTTPS = 'https://';
     static $UCPROTOHTTPS = 'HTTPS://';
@@ -255,14 +255,14 @@ class vcalendar extends iCalBase {
         $value   = trim( $value );
         $this->config[util::$LANGUAGE] = $value;
         $this->makeProdid();
-        $subcfg  = array( util::$LANGUAGE => $value );
+        $subcfg  = [util::$LANGUAGE => $value];
         $res     = true;
         break;
       case util::$UNIQUE_ID :
         $value   = trim( $value );
         $this->config[util::$UNIQUE_ID] = $value;
         $this->makeProdid();
-        $subcfg  = array( util::$UNIQUE_ID => $value );
+        $subcfg  = [util::$UNIQUE_ID => $value];
         $res     = true;
         break;
       case util::$URL :
@@ -373,7 +373,7 @@ class vcalendar extends iCalBase {
       case $R_UID:
       case util::$UID:
       case util::$URL:
-        $output  = array();
+        $output  = [];
         foreach( $this->components as $cix => $component) {
           if( ! in_array( $component->objName, util::$VCOMPS ))
             continue;
@@ -448,10 +448,10 @@ class vcalendar extends iCalBase {
         if( $propName != util::$X_PROP ) {
           if( ! isset( $this->xprop[$propName] ))
             return false;
-          return ( $inclParam ) ? array( $propName,
-                                         $this->xprop[$propName] )
-                                : array( $propName,
-                                         $this->xprop[$propName][util::$LCvalue] );
+          return ( $inclParam ) ? [$propName,
+                                         $this->xprop[$propName]]
+                                : [$propName,
+                                         $this->xprop[$propName][util::$LCvalue]];
         }
         else {
           if( empty( $this->xprop ))
@@ -459,10 +459,10 @@ class vcalendar extends iCalBase {
           $xpropno = 0;
           foreach( $this->xprop as $xpropKey => $xpropValue ) {
             if( $propix == $xpropno )
-              return ( $inclParam ) ? array( $xpropKey,
-                                             $xpropValue )
-                                    : array( $xpropKey,
-                                             $xpropValue[util::$LCvalue] );
+              return ( $inclParam ) ? [$xpropKey,
+                                             $xpropValue]
+                                    : [$xpropKey,
+                                             $xpropValue[util::$LCvalue]];
             else
               $xpropno++;
           }
@@ -590,14 +590,14 @@ class vcalendar extends iCalBase {
         $cix1gC++;
       }
       elseif( is_array( $arg1 )) { // array( *[propertyName => propertyValue] )
-        $hit  = array();
+        $hit  = [];
         $arg1 = array_change_key_case( $arg1, CASE_UPPER );
         foreach( $arg1 as $pName => $pValue ) {
           if( ! in_array( $pName, util::$DATEPROPS ) &&
               ! in_array( $pName, util::$OTHERPROPS ))
             continue;
           if( in_array( $pName, util::$MPROPS1 )) { // multiple occurrence
-            $propValues = array();
+            $propValues = [];
             $this->components[$cix]->getProperties( $pName, $propValues );
             $propValues = array_keys( $propValues );
             $hit[]      = ( in_array( $pValue, $propValues ));
@@ -630,10 +630,10 @@ class vcalendar extends iCalBase {
             continue;
           }
           elseif( !is_array( $value ))
-            $value = array( $value );
+            $value = [$value];
           foreach( $value as $part ) {
             $part = ( false !== strpos( $part, util::$COMMA ))
-                  ? explode( util::$COMMA, $part ) : array( $part );
+                  ? explode( util::$COMMA, $part ) : [$part];
             foreach( $part as $subPart ) {
               if( $pValue == $subPart ) {
                 $hit[] = true;
@@ -665,7 +665,7 @@ class vcalendar extends iCalBase {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.11 - 2015-03-21
- * @param object $component calendar component
+ * @param calendarComponent $component calendar component
  * @return bool
  * @uses vcalendar::setComponent()
  * @uses calendarComponent::getProperty()
@@ -737,7 +737,7 @@ class vcalendar extends iCalBase {
  * @uses vcalendarSortHandler::cmpfcn()
  */
   public function sort( $sortArg=null ) {
-    static $SORTER = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'cmpfcn' );
+    static $SORTER = ['kigkonsult\iCalcreator\vcalendarSortHandler', 'cmpfcn'];
     if( 2 > $this->countComponents())
       return;
     if( ! is_null( $sortArg )) {
@@ -775,7 +775,7 @@ class vcalendar extends iCalBase {
     static $NLCHARS         = '\n';
     static $BEGIN_VCALENDAR = 'BEGIN:VCALENDAR';
     static $END_VCALENDAR   = 'END:VCALENDAR';
-    static $ENDSHORTS       = array( 'END:VE', 'END:VF', 'END:VJ', 'END:VT' );
+    static $ENDSHORTS       = ['END:VE', 'END:VF', 'END:VJ', 'END:VT'];
     static $BEGIN_VEVENT    = 'BEGIN:VEVENT';
     static $BEGIN_VFREEBUSY = 'BEGIN:VFREEBUSY';
     static $BEGIN_VJOURNAL  = 'BEGIN:VJOURNAL';
@@ -786,13 +786,13 @@ class vcalendar extends iCalBase {
     static $CALPROPNAMES    = null;
     static $VERSIONPRODID   = null;
     if( is_null( $CALPROPNAMES ))
-      $CALPROPNAMES         = array( util::$CALSCALE,
+      $CALPROPNAMES         = [util::$CALSCALE,
                                      util::$METHOD,
                                      util::$PRODID,
-                                     util::$VERSION );
+                                     util::$VERSION];
     if( is_null( $VERSIONPRODID ))
-      $VERSIONPRODID        = array( util::$VERSION,
-                                     util::$PRODID );
+      $VERSIONPRODID        = [util::$VERSION,
+                                     util::$PRODID];
     $arrParse = false;
     if( empty( $unparsedtext )) {
             /* directory+filename is set previously

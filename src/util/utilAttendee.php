@@ -153,7 +153,7 @@ class utilAttendee {
           $attributes .= sprintf( $FMTKEYVALUE,
                                   util::$LANGUAGE,
                                   $pValue[util::$LANGUAGE] );
-        $xparams = array();
+        $xparams = [];
         foreach( $pValue as $pLabel2 => $pValue2 ) {
           if( ctype_digit( (string) $pLabel2 ))
             $xparams[]  = $pValue2;
@@ -201,7 +201,7 @@ class utilAttendee {
  * @param array  $params
  * @param string $objName
  * @param string $lang
- * @return string
+ * @return string[]
  * @uses util::isXprefixed()
  * @uses util::calAddressCheck()
  * @uses util::existRem()
@@ -210,10 +210,10 @@ class utilAttendee {
   public static function prepAttendeeParams( $params, $objName, $lang ) {
     static $NONXPROPCOMPS = null;
     if( is_null( $NONXPROPCOMPS ))
-      $NONXPROPCOMPS = array( util::$LCVFREEBUSY, util::$LCVALARM );
-    $params2 = array();
+      $NONXPROPCOMPS = [util::$LCVFREEBUSY, util::$LCVALARM];
+    $params2 = [];
     if( is_array( $params )) {
-      $optArr = array();
+      $optArr = [];
       $params = array_change_key_case( $params, CASE_UPPER );
       foreach( $params as $pLabel => $optParamValue ) {
         if( ! util::isXprefixed( $pLabel ) &&
@@ -224,7 +224,7 @@ class utilAttendee {
           case util::$DELEGATED_TO:
           case util::$DELEGATED_FROM:
             if( ! is_array( $optParamValue ))
-              $optParamValue  = array( $optParamValue );
+              $optParamValue  = [$optParamValue];
             foreach(( array_keys( $optParamValue )) as $px )
               $optArr[$pLabel][] = self::calAddressCheck( $optParamValue[$px] );
             break;

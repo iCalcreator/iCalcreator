@@ -59,7 +59,7 @@ trait TRANSPtrait {
  * Set calendar component property transp
  *
  * @param string  $value
- * @param string  $params
+ * @param string[]  $params
  * @return bool
  * @uses calendarComponent::getConfig()
  * @uses util::trimTrailNL()
@@ -72,8 +72,8 @@ trait TRANSPtrait {
       else
         return false;
     }
-    $this->transp = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                           util::$LCparams => util::setParams( $params ));
+    $this->transp = [util::$LCvalue  => util::trimTrailNL( $value ),
+                     util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

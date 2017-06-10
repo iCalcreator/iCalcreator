@@ -26,7 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
 /**
  * iCalcreator VALARM component class
  *
@@ -51,7 +50,7 @@ class valarm extends calendarComponent {
  * @uses calendarComponent::__construct()
  * @uses calendarComponent::setConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $A = 'a';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -122,8 +121,8 @@ class valarm extends calendarComponent {
  * @return mixed
  * @uses calendarComponent::getProperty()
  */
-  public function getProperty( $propName=false,
-                               $propix=false,
+  public function getProperty( $propName=null,
+                               $propix=null,
                                $inclParam=false,
                                $specform=false ) {
     switch( strtoupper( $propName )) {

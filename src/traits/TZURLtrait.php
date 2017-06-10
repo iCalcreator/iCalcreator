@@ -71,8 +71,8 @@ trait TZURLtrait {
       else
         return false;
     }
-    $this->tzurl = array( util::$LCvalue  => $value,
-                          util::$LCparams => util::setParams( $params ));
+    $this->tzurl = [util::$LCvalue  => $value,
+                    util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

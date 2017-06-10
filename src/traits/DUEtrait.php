@@ -77,8 +77,8 @@ trait DUEtrait {
   public function setDue( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->due = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                            util::$LCparams => util::setParams( $params ));
+        $this->due = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                      util::$LCparams => util::setParams( $params )];
         return true;
       }
       else

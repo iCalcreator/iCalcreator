@@ -37,8 +37,8 @@ class vcalendarSortHandler {
  * vcalendar sort callback function
  *
  * @since 2.23.9 - 2017-04-20
- * @param array $a
- * @param array $b
+ * @param object $a
+ * @param object $b
  * @return int
  * @static
  */
@@ -76,7 +76,7 @@ class vcalendarSortHandler {
  * @static
  */
   public static function setSortArgs( $c, $sortArg=null ) {
-    static $INITARR = array( '0', '0', '0', '0' );
+    static $INITARR = ['0', '0', '0', '0'];
     $c->srtk = $INITARR;
     if( util::$LCVTIMEZONE == $c->objName ) {
       if( false === ( $c->srtk[0] = $c->getProperty( util::$TZID )))
@@ -85,7 +85,7 @@ class vcalendarSortHandler {
     }
     elseif( ! is_null( $sortArg )) {
       if( in_array( $sortArg, util::$MPROPS1 )) { // all string
-        $propValues = array();
+        $propValues = [];
         $c->getProperties( $sortArg, $propValues );
         if( ! empty( $propValues )) {
           $c->srtk[0] = key( array_slice( $propValues, 0, 1, TRUE ));

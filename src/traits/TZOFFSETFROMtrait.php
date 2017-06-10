@@ -71,8 +71,8 @@ trait TZOFFSETFROMtrait {
       else
         return false;
     }
-    $this->tzoffsetfrom = array( util::$LCvalue  => $value,
-                                 util::$LCparams => util::setParams( $params ));
+    $this->tzoffsetfrom = [util::$LCvalue  => $value,
+                           util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

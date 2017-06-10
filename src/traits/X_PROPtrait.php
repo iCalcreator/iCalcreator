@@ -70,7 +70,7 @@ trait X_PROPtrait {
         $xpropPart[util::$LCvalue] = util::strrep( $xpropPart[util::$LCvalue] );
       $output     .= util::createElement( $label,
                                           util::createParams( $xpropPart[util::$LCparams],
-                                                              array( util::$LANGUAGE ),
+                                                              [util::$LANGUAGE],
                                                               $lang ),
                                           util::trimTrailNL( $xpropPart[util::$LCvalue] ));
     }
@@ -97,25 +97,28 @@ trait X_PROPtrait {
       else
         return false;
     }
-    $xprop         = array( util::$LCvalue => $value );
+    $xprop         = [util::$LCvalue => $value];
     $xprop[util::$LCparams] = util::setParams( $params );
     if( ! is_array( $this->xprop ))
-      $this->xprop = array();
+      $this->xprop = [];
     $this->xprop[strtoupper( $label )] = $xprop;
     return true;
   }
-/**
- * Delete component property X-prop value
- *
- * @param string $propName
- * @param array  $xProp     component X-property
- * @param int    $propix    removal counter
- * @param array  $propdelix
- * @access protected
- * @static
- */
+
+    /**
+     * Delete component property X-prop value
+     *
+     * @param string $propName
+     * @param array  $xProp  component X-property
+     * @param int    $propix removal counter
+     * @param array  $propdelix
+     *
+     * @access protected
+     * @static
+     * @return bool
+     */
   protected static function deleteXproperty( $propName=null, & $xProp, & $propix, & $propdelix ) {
-    $reduced = array();
+    $reduced = [];
     if( $propName != util::$X_PROP ) {
       if( ! isset( $xProp[$propName] )) {
         unset( $propdelix[$propName] );

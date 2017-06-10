@@ -71,8 +71,8 @@ trait TZOFFSETTOtrait {
       else
         return false;
     }
-    $this->tzoffsetto = array( util::$LCvalue  => $value,
-                               util::$LCparams => util::setParams( $params ));
+    $this->tzoffsetto = [util::$LCvalue  => $value,
+                         util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

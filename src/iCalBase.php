@@ -44,7 +44,7 @@ abstract class iCalBase {
  * @var array container for sub-components
  * @access protected
  */
-  protected $components = array();
+  protected $components = [];
 /**
  * @var array $unparsed  calendar/components in 'raw' text...
  * @access protected
@@ -54,7 +54,7 @@ abstract class iCalBase {
  *  @var array $config  configuration
  *  @access protected
  */
-  protected $config = array();
+  protected $config = [];
 /**
  * __clone method
  *
@@ -65,11 +65,11 @@ abstract class iCalBase {
     foreach( $this->components as $cix => $component )
       $this->components[$cix] = clone $component;
     if( isset( $this->compix ))
-      $this->compix = array();
+      $this->compix = [];
     if( isset( $this->propix ))
-      $this->propix = array();
+      $this->propix = [];
     if( isset( $this->propdelix ))
-      $this->propdelix = array();
+      $this->propdelix = [];
   }
 /**
  * Return config value or info about subcomponents, false on not found
@@ -90,7 +90,7 @@ abstract class iCalBase {
     static $LCPROPS     = 'props';
     static $LCSUB       = 'sub';
     if( empty( $config )) {
-      $return = array();
+      $return = [];
       $return[util::$ALLOWEMPTY]  = $this->getConfig( util::$ALLOWEMPTY );
       if( false !== ( $lang       = $this->getConfig( util::$LANGUAGE )))
         $return[util::$LANGUAGE]  = $lang;
@@ -105,7 +105,7 @@ abstract class iCalBase {
         break;
       case util::$COMPSINFO:
         unset( $this->compix );
-        $info = array();
+        $info = [];
         if( ! empty( $this->components )) {
           foreach( $this->components as $cix => $component ) {
             if( empty( $component ))
@@ -124,7 +124,7 @@ abstract class iCalBase {
           return $this->config[util::$LANGUAGE];
         break;
       case util::$PROPINFO:
-        $output = array();
+        $output = [];
         if( ! in_array( $this->objName, util::$LCSUBCOMPS )) {
           if( empty( $this->uid ))
             $this->uid     = util::makeUid( $this->getConfig( util::$UNIQUE_ID ));
@@ -195,16 +195,20 @@ abstract class iCalBase {
     }
     return false;
   }
-/**
- * General component config setting
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.12 - 2017-04-22
- * @param mixed   $config
- * @param string  $value
- * @param bool    $softUpdate
- * @uses iCalBase::getConfig()
- */
+
+    /**
+     * General component config setting
+     *
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.23.12 - 2017-04-22
+     *
+     * @param mixed  $config
+     * @param string $value
+     * @param bool   $softUpdate
+     *
+     * @uses   iCalBase::getConfig()
+     * @return bool
+     */
   public function setConfig( $config, $value=null, $softUpdate=null ) {
     if( is_null( $softUpdate ))
       $softUpdate = false;
@@ -220,25 +224,25 @@ abstract class iCalBase {
     switch( strtoupper( $config )) {
       case util::$ALLOWEMPTY:
         $this->config[util::$ALLOWEMPTY] = $value;
-        $subcfg = array( util::$ALLOWEMPTY => $value );
+        $subcfg = [util::$ALLOWEMPTY => $value];
         $res    = true;
         break;
       case util::$LANGUAGE: // set language for component as defined in [RFC 1766]
         $value  = trim( $value );
         if( empty( $this->config[util::$LANGUAGE] ) || ! $softUpdate )
           $this->config[util::$LANGUAGE] = $value;
-        $subcfg = array( util::$LANGUAGE => $value );
+        $subcfg = [util::$LANGUAGE => $value];
         $res    = true;
         break;
       case util::$TZID:
         $this->config[util::$TZID] = trim( $value );
-        $subcfg = array( util::$TZID => trim( $value ));
+        $subcfg = [util::$TZID => trim( $value )];
         $res    = true;
         break;
       case util::$UNIQUE_ID:
         $value  = trim( $value );
         $this->config[util::$UNIQUE_ID] = $value;
-        $subcfg = array( util::$UNIQUE_ID => $value );
+        $subcfg = [util::$UNIQUE_ID => $value];
         $res    = true;
         break;
       default:  // any unvalid config key.. .
@@ -273,7 +277,7 @@ abstract class iCalBase {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-04-13
  * @param string $compType component type
- * @return object
+ * @return calendarComponent
  */
   public function newComponent( $compType ) {
     $config = $this->getConfig();
@@ -384,8 +388,8 @@ abstract class iCalBase {
     $component->setConfig( $this->getConfig(), false, true );
     if( ! in_array( strtolower( $component->objName ), util::$LCSUBCOMPS )) {
             /* make sure dtstamp and uid is set */
-      $dummy = $component->getProperty( util::$DTSTAMP );
-      $dummy = $component->getProperty( util::$UID );
+      $component->getProperty( util::$DTSTAMP );
+      $component->getProperty( util::$UID );
     }
     if( ! $arg1 ) { // plain insert, last in chain
       $this->components[] = clone $component;

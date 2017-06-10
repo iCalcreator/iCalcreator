@@ -50,15 +50,19 @@ trait CALSCALEtrait {
            : sprintf( self::$FMTICAL, util::$CALSCALE,
                                       $this->calscale );
   }
-/**
- * Set calendar property calscale
- *
- * @param string $value
- * @uses vcalendar::$calscale
- */
+
+    /**
+     * Set calendar property calscale
+     *
+     * @param string $value
+     *
+     * @uses vcalendar::$calscale
+     * @return bool
+     */
   public function setCalscale( $value ) {
     if( empty( $value ))
       return false;
     $this->calscale = $value;
+    return true;
   }
 }

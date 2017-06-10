@@ -75,8 +75,8 @@ trait URLtrait {
       $value = util::$EMPTYPROPERTY;
     else
       return false;
-    $this->url = array( util::$LCvalue  => $value,
-                        util::$LCparams => util::setParams( $params ));
+    $this->url = [util::$LCvalue  => $value,
+                  util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

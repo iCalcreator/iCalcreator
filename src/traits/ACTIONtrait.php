@@ -72,8 +72,8 @@ trait ACTIONtrait {
       else
         return false;
     }
-    $this->action = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                           util::$LCparams => util::setParams( $params ));
+    $this->action = [util::$LCvalue  => util::trimTrailNL( $value ),
+                     util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

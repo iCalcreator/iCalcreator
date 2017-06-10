@@ -72,8 +72,8 @@ trait REPEATtrait {
       else
         return false;
     }
-    $this->repeat = array( util::$LCvalue  => $value,
-                           util::$LCparams => util::setParams( $params ));
+    $this->repeat = [util::$LCvalue  => $value,
+                     util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

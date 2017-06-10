@@ -79,8 +79,8 @@ trait DTSTARTtrait {
   public function setDtstart( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->dtstart = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                util::$LCparams => util::setParams( $params ));
+        $this->dtstart = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                          util::$LCparams => util::setParams( $params )];
         return true;
       }
       else

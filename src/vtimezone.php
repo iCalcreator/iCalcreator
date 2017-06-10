@@ -26,8 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilRecur;
-use kigkonsult\iCalcreator\util\utilRexdate;
 /**
  * iCalcreator VTIMEZONE component class
  *
@@ -61,7 +59,7 @@ class vtimezone extends calendarComponent {
  * @uses vtimezone::setConfig()
  * @uses util::initConfig(
  */
-  public function __construct( $timezonetype=null, $config = array()) {
+  public function __construct( $timezonetype=null, $config = []) {
     static $TZ = 'tz';
     if( is_array( $timezonetype )) {
       $config       = $timezonetype;
@@ -157,8 +155,8 @@ class vtimezone extends calendarComponent {
  * @uses vtimezone::$tzurl
  * @uses calendarComponent::getProperty()
  */
-  public function getProperty( $propName=false,
-                               $propix=false,
+  public function getProperty( $propName=null,
+                               $propix=null,
                                $inclParam=false,
                                $specform=false ) {
     switch( strtoupper( $propName )) {

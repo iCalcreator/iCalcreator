@@ -67,7 +67,7 @@ trait REQUEST_STATUStrait {
         $content  .= util::$SEMIC . util::strrep( $rStat[util::$LCvalue][$EXTDATA] );
       $output     .= util::createElement( util::$REQUEST_STATUS,
                                           util::createParams( $rStat[util::$LCparams],
-                                                              array( util::$LANGUAGE ),
+                                                              [util::$LANGUAGE],
                                                               $lang ),
                                           $content );
     }
@@ -96,8 +96,8 @@ trait REQUEST_STATUStrait {
       else
         return false;
     }
-    $input = array( $STATCODE => $statcode,
-                    $TEXT     => util::trimTrailNL( $text ));
+    $input = [$STATCODE => $statcode,
+              $TEXT     => util::trimTrailNL( $text )];
     if( $extdata )
       $input[$EXTDATA] = util::trimTrailNL( $extdata );
     util::setMval( $this->requeststatus,

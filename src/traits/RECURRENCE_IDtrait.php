@@ -77,8 +77,8 @@ trait RECURRENCE_IDtrait {
                                    $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->recurrenceid = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                     util::$LCparams => null );
+        $this->recurrenceid = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                               util::$LCparams => null];
         return true;
       }
       else

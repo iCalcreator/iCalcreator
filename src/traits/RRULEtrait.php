@@ -50,16 +50,19 @@ trait RRULEtrait {
                                    $this->rrule,
                                    $this->getConfig( util::$ALLOWEMPTY ));
   }
-/**
- * Set calendar component property rrule
- *
- * @param array    $rruleset
- * @param array    $params
- * @param integer  $index
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
- * @uses utilRecur::setRexrule()
- */
+
+    /**
+     * Set calendar component property rrule
+     *
+     * @param array   $rruleset
+     * @param array   $params
+     * @param integer $index
+     *
+     * @uses calendarComponent::getConfig()
+     * @uses util::setMval()
+     * @uses utilRecur::setRexrule()
+     * @return bool
+     */
   public function setRrule( $rruleset, $params=null, $index=null ) {
     if( empty( $rruleset )) {
       if( $this->getConfig( util::$ALLOWEMPTY ))

@@ -56,7 +56,7 @@ trait TZNAMEtrait {
       if( ! empty( $theName[util::$LCvalue] ))
         $output .= util::createElement( util::$TZNAME,
                                         util::createParams( $theName[util::$LCparams],
-                                                            array( util::$LANGUAGE ),
+                                                            [util::$LANGUAGE],
                                                             $lang ),
                                         util::strrep( $theName[util::$LCvalue] ));
       elseif( $this->getConfig( util::$ALLOWEMPTY ))

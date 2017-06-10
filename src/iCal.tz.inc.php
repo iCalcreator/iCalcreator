@@ -60,7 +60,7 @@ function getTzOffsetForDate($timezonesarray, $tzid, $timestamp) {
             $timestamp[util::$LCYEAR]
             ) ;
     }
-    $tzoffset = array();
+    $tzoffset = [];
     // something to return if all goes wrong (such as if $tzid doesn't find us an array of dates)
     $tzoffset[$OFFSETHIS] = '+0000';
     $tzoffset[$OFFSETSEC] = 0;
@@ -100,17 +100,17 @@ function getTzOffsetForDate($timezonesarray, $tzid, $timestamp) {
 /**
  * Returns an array containing all the timezone data in the vcalendar object
  *
- * @param object $vcalendar  iCalcreator calendar instance
+ * @param vcalendar $vcalendar  iCalcreator calendar instance
  * @return array             time zone transition timestamp,
  *                             array before(offsetHis, offsetSec),
  *                             array after(offsetHis, offsetSec, tzname)
  *                           based on the timezone data in the vcalendar object
  */
 function getTimezonesAsDateArrays($vcalendar) {
-    $timezonedata = array();
+    $timezonedata = [];
     while( $vtz = $vcalendar->getComponent( util::$LCVTIMEZONE )) {
         $tzid       = $vtz->getProperty('tzid');
-        $alltzdates = array();
+        $alltzdates = [];
         while ( $vtzc = $vtz->getComponent( util::$LCSTANDARD )) {
             $newtzdates = expandTimezoneDates($vtzc);
             $alltzdates = array_merge($alltzdates, $newtzdates);
@@ -141,13 +141,13 @@ function expandTimezoneDates($vtzc) {
   static $TZNAME    = 'tzname';
   static $YEARLY    = 'YEARLY';
   static $FMTDATE   = '%04d%02d%02dT%02d%02d%02d';
-  static $DAYNAMES  = array( 'SU' => 'Sunday',
-                             'MO' => 'Monday',
-                             'TU' => 'Tuesday',
-                             'WE' => 'Wednesday',
-                             'TH' => 'Thursday',
-                             'FR' => 'Friday',
-                             'SA' => 'Saturday' );
+  static $DAYNAMES  = ['SU' => 'Sunday',
+                       'MO' => 'Monday',
+                       'TU' => 'Tuesday',
+                       'WE' => 'Wednesday',
+                       'TH' => 'Thursday',
+                       'FR' => 'Friday',
+                       'SA' => 'Saturday'];
   static $MON        = 'mon';
   static $MDAY       = 'mday';
   static $HOURS      = 'hours';
@@ -158,15 +158,15 @@ function expandTimezoneDates($vtzc) {
   static $SP1WEEK    = ' week';
   static $SP1YEAR    = ' year';
   static $PLUS10YEAR = '+10 year';
-    $tzdates = array();
+    $tzdates = [];
     // prepare time zone "description" to attach to each change
-    $tzbefore = array();
+    $tzbefore = [];
     $tzbefore[$OFFSETHIS] = $vtzc->getProperty(util::$TZOFFSETFROM) ;
     $tzbefore[$OFFSETSEC] = util::tz2offset($tzbefore[$OFFSETHIS]);
     if(( util::$MINUS != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )) &&
        ( util::$PLUS  != substr( (string) $tzbefore[$OFFSETSEC], 0, 1 )))
       $tzbefore[$OFFSETSEC] = util::$PLUS . $tzbefore[$OFFSETSEC];
-    $tzafter = array();
+    $tzafter = [];
     $tzafter[$OFFSETHIS]  = $vtzc->getProperty(util::$TZOFFSETTO) ;
     $tzafter[$OFFSETSEC]  = util::tz2offset($tzafter[$OFFSETHIS]);
     if(( util::$MINUS != substr( (string) $tzafter[$OFFSETSEC], 0, 1 )) &&
@@ -202,11 +202,11 @@ function expandTimezoneDates($vtzc) {
     $diff  = -1 * $tzbefore[$OFFSETSEC];
     $dtstarttimestamp += $diff;
                 // add this (start) change to the array of changes
-    $tzdates[] = array(
+    $tzdates[] = [
         util::$LCTIMESTAMP => $dtstarttimestamp,
         $TZBEFORE  => $tzbefore,
         $TZAFTER   => $tzafter
-        );
+    ];
     $datearray = getdate($dtstarttimestamp);
     // save original array to use time parts, because strtotime (used below) apparently loses the time
     $changetime = $datearray ;
@@ -286,11 +286,11 @@ function expandTimezoneDates($vtzc) {
                     $datearray[util::$LCYEAR]
                         );
                 // add this change to the array of changes
-                $tzdates[] = array(
+                $tzdates[] = [
                     util::$LCTIMESTAMP => $offsetchangetimestamp,
                     $TZBEFORE  => $tzbefore,
                     $TZAFTER   => $tzafter
-                    );
+                ];
                 // update counters (timestamp and count)
                 $offsetchangetimestamp = strtotime(util::$PLUS . (( isset( $rrule[util::$INTERVAL] ) && ( $rrule[util::$INTERVAL] != 0 )) ? $rrule[util::$INTERVAL] : 1 ) . $SP1YEAR,$offsetchangetimestamp);
                 $count += 1 ;
@@ -312,11 +312,11 @@ function expandTimezoneDates($vtzc) {
                         $rdate[util::$LCYEAR]
                         ) ;
                 // add this change to the array of changes
-                $tzdates[] = array(
+                $tzdates[] = [
                     util::$LCTIMESTAMP => $offsetchangetimestamp,
                     $TZBEFORE          => $tzbefore,
                     $TZAFTER           => $tzafter
-                    );
+                ];
             }
         }
     }

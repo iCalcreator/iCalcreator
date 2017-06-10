@@ -77,8 +77,8 @@ trait DTENDtrait {
   public function setDtend( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->dtend = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                              util::$LCparams => util::setParams( $params ));
+        $this->dtend = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                        util::$LCparams => util::setParams( $params )];
         return true;
       }
       else

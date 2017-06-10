@@ -54,10 +54,10 @@ trait ORGANIZERtrait {
       return ( $this->getConfig( util::$ALLOWEMPTY )) ? util::createElement( util::$ORGANIZER ) : null;
     return util::createElement( util::$ORGANIZER,
                                 util::createParams( $this->organizer[util::$LCparams],
-                                                    array( util::$CN,
+                                                    [util::$CN,
                                                            util::$DIR,
                                                            util::$SENT_BY,
-                                                           util::$LANGUAGE ),
+                                                           util::$LANGUAGE],
                                                     $this->getConfig( util::$LANGUAGE )),
                                 $this->organizer[util::$LCvalue] );
   }
@@ -79,8 +79,8 @@ trait ORGANIZERtrait {
         return false;
     }
     $value = utilAttendee::calAddressCheck( $value, false );
-    $this->organizer = array( util::$LCvalue  => $value,
-                              util::$LCparams => util::setParams( $params ));
+    $this->organizer = [util::$LCvalue  => $value,
+                        util::$LCparams => util::setParams( $params )];
     if( isset( $this->organizer[util::$LCparams][util::$SENT_BY] ))
       $this->organizer[util::$LCparams][util::$SENT_BY] =
         utilAttendee::calAddressCheck( $this->organizer[util::$LCparams][util::$SENT_BY], false );

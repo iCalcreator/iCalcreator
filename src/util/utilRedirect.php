@@ -39,18 +39,18 @@ class utilRedirect {
  * @access private
  * @static
  */
-  private static $headers = array( 'Content-Encoding: gzip',
+  private static $headers = ['Content-Encoding: gzip',
                                    'Vary: *',
                                    'Content-Length: %s',
                                    'Content-Type: text/calendar; charset=utf-8',
                                    'Content-Disposition: attachment; filename="%s"',
                                    'Content-Disposition: inline; filename="%s"',
                                    'Cache-Control: max-age=10',
-                                 );
+  ];
 /**
  * Return created, updated and/or parsed calendar, sending a HTTP redirect header.
  *
- * @param object $calendar
+ * @param vcalendar $calendar
  * @param bool   $utf8Encode
  * @param bool   $gzip
  * @param bool   $cdType       true : Content-Disposition: attachment... (default), false : ...inline...
@@ -95,7 +95,7 @@ class utilRedirect {
 /**
  * If recent version of calendar file exists (default one hour), an HTTP redirect header is sent
  *
- * @param object $calendar
+ * @param vcalendar $calendar
  * @param int    $timeout  default 3600 sec
  * @param bool   $cdType   true : Content-Disposition: attachment... (default), false : ...inline...
  * @return bool true on success, false on error

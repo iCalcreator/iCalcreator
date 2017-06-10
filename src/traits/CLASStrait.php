@@ -72,8 +72,8 @@ trait CLASStrait {
       else
         return false;
     }
-    $this->class = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                          util::$LCparams => util::setParams( $params ));
+    $this->class = [util::$LCvalue  => util::trimTrailNL( $value ),
+                    util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

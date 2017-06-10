@@ -26,7 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
 /**
  * iCalcreator VFREEBUSY component class
  *
@@ -56,7 +55,7 @@ class vfreebusy extends calendarComponent {
  * @uses calendarComponent::setConfig()
  * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $F = 'f';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));

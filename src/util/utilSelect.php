@@ -58,7 +58,7 @@ class utilSelect {
  * @param bool   $split  optional, true (default) - one component copy every DAY it occurs during the
  *                                                  period (implies flat=false)
  *                                 false          - one occurance of component only in output array
- * @return array or false
+ * @return array|false
  * @uses util::isDateTimeClass()
  * @uses vcalendar::countComponents()
  * @uses utilSelect::selectComponents2()
@@ -107,8 +107,8 @@ class utilSelect {
     static $PRA         = '%a';
     static $YMD2        = 'Y-m-d';
     static $DAYOFDAYS   = 'day %d of %d';
-    static $SORTER      = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                                 'cmpfcn' );
+    static $SORTER      = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                                 'cmpfcn'];
             /* check  if empty calendar */
     if( 1 > $calendar->countComponents())
       return false;
@@ -137,7 +137,7 @@ class utilSelect {
       $cType     = util::$VCOMPS;
     else {
       if( ! is_array( $cType ))
-        $cType   = array( $cType );
+        $cType   = [$cType];
       $cType     = array_map( $STRTOLOWER, $cType );
       foreach( $cType as $cix => $theType ) {
         if( ! in_array( $theType, util::$VCOMPS ))
@@ -154,10 +154,10 @@ class utilSelect {
       $split = false;
 // echo " args={$startY}-{$startM}-{$startD} - {$endY}-{$endM}-{$endD}, flat={$flat}, any={$any}, split={$split}<br>\n"; $tcnt = 0;// test ###
             /* iterate components */
-    $result      = array();
+    $result      = [];
     $calendar->sort( util::$UID );
     $compUIDcmp  = null;
-    $exdatelist  = $recurrIdList = array();
+    $exdatelist  = $recurrIdList = [];
     $INTERVAL_P1D = new DateInterval( $P1D );
 // echo ' comp ix : ' . implode( ',', ( array_keys( $calendar->components ))) . "<br>\n"; // test ###
     $cix = -1;
@@ -186,7 +186,7 @@ class utilSelect {
 // echo 'START comp(' . $cix . ') ' . $component->objName . ', UID:' . $compUID . "<br>\n"; // test ###
       if( $compUIDcmp != $compUID ) {
         $compUIDcmp = $compUID;
-        $exdatelist = $recurrIdList = array();
+        $exdatelist = $recurrIdList = [];
       }
 // echo "#$cix".PHP_EOL.var_export( $component, true ) . "\n"; // test ###
       $compStart = iCaldateTime::factory( $prop[util::$LCvalue],
@@ -266,10 +266,10 @@ class utilSelect {
         $rangeSet = ( isset( $prop[util::$LCparams][$RANGE] ) &&
                      ( $THISANDFUTURE == $prop[util::$LCparams][$RANGE] ))
                   ? true : false;
-        $recurrIdList[$recurrid->key] = array( clone $compStart,
+        $recurrIdList[$recurrid->key] = [clone $compStart,
                                                clone $compEnd,
                                                $compDuration,
-                                               $rangeSet ); // change recur this day to new YmdHis/duration/range
+                                               $rangeSet]; // change recur this day to new YmdHis/duration/range
 // echo "adding comp no:$cix with date=".$compStart->format('Y-m-d H:i:s e')." to recurrIdList id={$recurrid->key}, newDate={$compStart->key}<br>\n"; // test ###
         unset( $prop );
         continue;                         // ignore any other props in the component
@@ -398,7 +398,7 @@ class utilSelect {
                if 'any' components, check components with reccurrence rules, removing all excluding dates
                *********************************************************** */
       if( true === $any ) {
-        $recurlist = array();
+        $recurlist = [];
             /* make a list of optional repeating dates for component occurence, rrule, rdate */
         self::getAllRRULEdates( $component, $recurlist,
                                 $dtstartTz, $compStart, $workStart, $workEnd,
@@ -608,10 +608,10 @@ class utilSelect {
                                              $workEnd,
                                              $compStartHis ) {
     while( false !== ( $prop = $component->getProperty( util::$EXRULE  ))) {
-      $exdatelist2 = array();
+      $exdatelist2 = [];
       if( isset( $prop[util::$UNTIL][util::$LCHOUR] )) { // convert UNTIL date to DTSTART timezone
         $until = iCaldateTime::factory( $prop[util::$UNTIL],
-                                        array( util::$TZID => util::$UTC ),
+                                        [util::$TZID => util::$UTC],
                                         null,
                                         $dtstartTz );
         $until = $until->format();
@@ -679,10 +679,10 @@ class utilSelect {
                                             $exdatelist,
                                             $compDuration ) {
     while( false !== ( $prop = $component->getProperty( util::$RRULE ))) {
-      $recurlist2 = array();
+      $recurlist2 = [];
       if( isset( $prop[util::$UNTIL][util::$LCHOUR] )) { // convert RRULE['UNTIL'] to the same timezone as DTSTART !!
         $until = iCaldateTime::factory( $prop[util::$UNTIL],
-                                        array( util::$TZID => util::$UTC ),
+                                        [util::$TZID => util::$UTC],
                                         null,
                                         $dtstartTz );
         $until = $until->format();
@@ -757,7 +757,7 @@ class utilSelect {
         elseif( util::$DATE == $rdateFmt ) {          // single recurrence, DATE
           $rdate  = iCaldateTime::factory( $theRdate,
                                            array_merge( $params,
-                                                        array( util::$TZID => $dtstartTz )),
+                                                        [util::$TZID => $dtstartTz]),
                                            null,
                                            $dtstartTz );
           if( self::inScope( $rdate, $workStart, $rdate, $fcnEnd, $format ) &&
@@ -779,7 +779,7 @@ class utilSelect {
 /**
  * Return selected components from calendar based on specific property value(-s)
  *
- * @param object $calendar
+ * @param vcalendar $calendar
  * @param array  $selectOptions (string) key => (mixed) value, (key=propertyName)
  * @return array
  * @uses vcalendar::$components
@@ -791,7 +791,7 @@ class utilSelect {
  */
   private static function selectComponents2( vcalendar $calendar,
                                                  array $selectOptions ) {
-    $output = array();
+    $output = [];
     $selectOptions = array_change_key_case( $selectOptions, CASE_UPPER );
     while( $component3 = $calendar->getComponent()) {
       if( empty( $component3 ))
@@ -803,13 +803,13 @@ class utilSelect {
         if( ! in_array( $propName, util::$OTHERPROPS ))
           continue;
         if( ! is_array( $pValue ))
-          $pValue = array( $pValue );
+          $pValue = [$pValue];
         if(( util::$UID == $propName ) && in_array( $uid, $pValue )) {
           $output[$uid][] = $component3;
           continue;
         }
         elseif( in_array( $propName, util::$MPROPS1 )) {
-          $propValues = array();
+          $propValues = [];
           $component3->getProperties( $propName, $propValues );
           $propValues = array_keys( $propValues );
           foreach( $pValue as $theValue ) {
@@ -842,7 +842,7 @@ class utilSelect {
     } // end while( $component3 = $calendar->getComponent()) {
     if( ! empty( $output )) {
       ksort( $output ); // uid order
-      $output2 = array();
+      $output2 = [];
       foreach( $output as $uid => $uList ) {
         foreach( $uList as $cx => $uValue )
           $output2[] = $uValue;

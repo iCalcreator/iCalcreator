@@ -74,8 +74,8 @@ trait PERCENT_COMPLETEtrait {
       else
         return false;
     }
-    $this->percentcomplete = array( util::$LCvalue  => $value,
-                                    util::$LCparams => util::setParams( $params ));
+    $this->percentcomplete = [util::$LCvalue  => $value,
+                              util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

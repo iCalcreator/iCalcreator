@@ -45,7 +45,7 @@ trait FREEBUSYtrait {
  */
    protected static $LCFBTYPE         = 'fbtype';
    protected static $UCFBTYPE         = 'FBTYPE';
-   protected static $FREEBUSYKEYS     = array( 'FREE', 'BUSY', 'BUSY-UNAVAILABLE', 'BUSY-TENTATIVE' );
+   protected static $FREEBUSYKEYS     = ['FREE', 'BUSY', 'BUSY-UNAVAILABLE', 'BUSY-TENTATIVE'];
    protected static $FREE             = 'FREE';
    protected static $BUSY             = 'BUSY';
    protected static $BUSY_UNAVAILABLE = 'BUSY-UNAVAILABLE';
@@ -65,7 +65,7 @@ trait FREEBUSYtrait {
  */
   public function createFreebusy() {
     static $FMT    = ';FBTYPE=%s';
-    static $SORTER = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate1' );
+    static $SORTER = ['kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate1'];
     if( empty( $this->freebusy ))
       return null;
     $output = null;
@@ -137,7 +137,7 @@ trait FREEBUSYtrait {
  * @uses util::strDate2ArrayDate()
  */
   public function setFreebusy( $fbType, $fbValues, $params=null, $index=null ) {
-    static $PREFIXARR = array( 'P', '+', '-' );
+    static $PREFIXARR = ['P', '+', '-'];
     static $P = 'P';
     if( empty( $fbValues )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
@@ -155,13 +155,13 @@ trait FREEBUSYtrait {
     if( ! in_array( $fbType, self::$FREEBUSYKEYS ) &&
         ! util::isXprefixed( $fbType ))
       $fbType = self::$BUSY;
-    $input = array( self::$LCFBTYPE => $fbType );
+    $input = [self::$LCFBTYPE => $fbType];
     foreach( $fbValues as $fbPeriod ) {   // periods => period
       if( empty( $fbPeriod ))
         continue;
-      $freebusyPeriod = array();
+      $freebusyPeriod = [];
       foreach( $fbPeriod as $fbMember ) { // pairs => singlepart
-        $freebusyPairMember = array();
+        $freebusyPairMember = [];
         if( is_array( $fbMember )) {
           if( util::isArrayDate( $fbMember )) { // date-time value
             $freebusyPairMember       = util::chkDateArr( $fbMember, 7 );

@@ -96,7 +96,7 @@ trait TRIGGERtrait {
  */
   public function setTrigger( $year=null, $month=null, $day=null, $week=null, $hour=null, $min=null, $sec=null,
                               $relatedStart=null, $before=null, $params=null ) {
-    static $PREFIXARR    = array( 'P', '+', '-' );
+    static $PREFIXARR    = ['P', '+', '-'];
     static $P            = 'P';
     static $RELATEDSTART = 'relatedStart';
     static $BEFORE       = 'before';
@@ -106,8 +106,8 @@ trait TRIGGERtrait {
       ( empty( $month ) || is_array( $month )) &&
         empty( $day ) && empty( $week ) && empty( $hour ) && empty( $min ) && empty( $sec )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->trigger = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                util::$LCparams => util::setParams( $month ) );
+        $this->trigger = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                          util::$LCparams => util::setParams( $month )];
         return true;
       }
       else
@@ -173,14 +173,14 @@ trait TRIGGERtrait {
       $hour = ( $hour ) ? $hour : 0;
       $min  = ( $min  ) ? $min  : 0;
       $sec  = ( $sec  ) ? $sec  : 0;
-      $this->trigger = array( util::$LCparams => $params );
-      $this->trigger[util::$LCvalue] = array( util::$LCYEAR  => $year,
-                                              util::$LCMONTH => $month,
-                                              util::$LCDAY   => $day,
-                                              util::$LCHOUR  => $hour,
-                                              util::$LCMIN   => $min,
-                                              util::$LCSEC   => $sec,
-                                              util::$LCtz    => util::$Z );
+      $this->trigger = [util::$LCparams => $params];
+      $this->trigger[util::$LCvalue] = [util::$LCYEAR  => $year,
+                                        util::$LCMONTH => $month,
+                                        util::$LCDAY   => $day,
+                                        util::$LCHOUR  => $hour,
+                                        util::$LCMIN   => $min,
+                                        util::$LCSEC   => $sec,
+                                        util::$LCtz    => util::$Z];
       return true;
     }
     elseif(( empty( $year ) && empty( $month )) &&    // duration
@@ -191,8 +191,8 @@ trait TRIGGERtrait {
          ( ! empty( $sec )  || ( 0 == $sec  )))) {
       unset( $params[$RELATED] );     // set at output creation (END only)
       unset( $params[util::$VALUE] ); // util::$DURATION default
-      $this->trigger = array( util::$LCparams => $params );
-      $this->trigger[util::$LCvalue]  = array();
+      $this->trigger = [util::$LCparams => $params];
+      $this->trigger[util::$LCvalue]  = [];
       if( ! empty( $week ))
         $this->trigger[util::$LCvalue][util::$LCWEEK] = $week;
       if( ! empty( $day  ))

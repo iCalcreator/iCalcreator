@@ -68,8 +68,8 @@ trait UIDtrait {
   public function setUid( $value, $params=null ) {
     if( empty( $value ) && ( util::$ZERO != $value ))
       return false; // no allowEmpty check here !!!!
-    $this->uid = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                        util::$LCparams => util::setParams( $params ));
+    $this->uid = [util::$LCvalue  => util::trimTrailNL( $value ),
+                  util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

@@ -81,7 +81,7 @@ class iCalvCard {
     $email  = str_replace( $UCMAILTOCOLON, null, $email );
     $name   = $person = substr( $email, 0, $pos );
     if( ctype_upper( $name ) || ctype_lower( $name ))
-      $name = array( $name );
+      $name = [$name];
     else {
       if( false !== ( $pos = strpos( $name, util::$DOT ))) {
         $name = explode( util::$DOT, $name );
@@ -90,7 +90,7 @@ class iCalvCard {
       }
       else { // split camelCase
         $chars = $name;
-        $name  = array( $chars[0] );
+        $name  = [$chars[0]];
         $k     = 0;
         $len   = strlen( $chars );
         $x     = 1;
@@ -141,7 +141,7 @@ class iCalvCard {
         $dbl = $cnt;
         $fName = sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
       }
-      if( false === file_put_contents( $fname, $vCard ))
+      if( false === file_put_contents( $fName, $vCard ))
         return false;
       return true;
     }
@@ -164,10 +164,10 @@ class iCalvCard {
  * @static
  */
   public static function iCal2vCards( $calendar, $version=null, $directory=null, $ext=null ) {
-    static $vCardP = array( 'ATTENDEE', 'CONTACT', 'ORGANIZER' );
+    static $vCardP = ['ATTENDEE', 'CONTACT', 'ORGANIZER'];
     static $AT     = '@';
     static $UCMAILTOCOLON = 'MAILTO:';
-    $hits   = array();
+    $hits   = [];
     foreach( $vCardP as $prop ) {
       $hits2 = $calendar->getProperty( $prop );
       foreach( $hits2 as $propValue => $occCnt ) {

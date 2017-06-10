@@ -53,11 +53,14 @@ trait VERSIONtrait {
     return sprintf( self::$FMTICAL, util::$VERSION,
                                     $this->version );
   }
-/**
- * Set (another?) calendar version
- *
- * @param string $value
- */
+
+    /**
+     * Set (another?) calendar version
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
   public function setVersion( $value ) {
     if( empty( $value ))
       return false;

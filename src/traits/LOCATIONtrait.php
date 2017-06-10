@@ -75,8 +75,8 @@ trait LOCATIONtrait {
       else
         return false;
     }
-    $this->location = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                             util::$LCparams => util::setParams( $params ));
+    $this->location = [util::$LCvalue  => util::trimTrailNL( $value ),
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

@@ -76,8 +76,8 @@ trait COMPLETEDtrait {
   public function setCompleted( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->completed = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                  util::$LCparams => util::setParams( $params ));
+        $this->completed = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                            util::$LCparams => util::setParams( $params )];
         return true;
       }
       else

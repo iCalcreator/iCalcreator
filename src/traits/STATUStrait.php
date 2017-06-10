@@ -72,8 +72,8 @@ trait STATUStrait {
       else
         return false;
     }
-    $this->status = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                           util::$LCparams => util::setParams( $params ));
+    $this->status = [util::$LCvalue  => util::trimTrailNL( $value ),
+                     util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

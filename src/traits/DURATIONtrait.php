@@ -84,7 +84,7 @@ trait DURATIONtrait {
  * @uses util::duration2arr()
  */
   public function setDuration( $week, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
-    static $PLUSMINUSARR = array( '+', '-' );
+    static $PLUSMINUSARR = ['+', '-'];
     if( empty( $week ) && empty( $day ) && empty( $hour ) && empty( $min ) && empty( $sec )) {
       if( $this->getConfig( util::$ALLOWEMPTY ))
         $week = $day = null;
@@ -92,22 +92,22 @@ trait DURATIONtrait {
         return false;
     }
     if( is_array( $week ) && ( 1 <= count( $week )))
-      $this->duration = array( util::$LCvalue  => util::duration2arr( $week ),
-                               util::$LCparams => util::setParams( $day ));
+      $this->duration = [util::$LCvalue  => util::duration2arr( $week ),
+                         util::$LCparams => util::setParams( $day )];
     elseif( is_string( $week ) && ( 3 <= strlen( trim( $week )))) {
       $week = util::trimTrailNL( trim( $week ));
       if( in_array( $week[0], $PLUSMINUSARR ))
         $week = substr( $week, 1 );
-      $this->duration = array( util::$LCvalue  => util::durationStr2arr( $week ),
-                               util::$LCparams => util::setParams( $day ));
+      $this->duration = [util::$LCvalue  => util::durationStr2arr( $week ),
+                         util::$LCparams => util::setParams( $day )];
     }
     else
-      $this->duration = array( util::$LCvalue  => util::duration2arr( array( util::$LCWEEK => $week,
-                                                                             util::$LCDAY  => $day,
-                                                                             util::$LCHOUR => $hour,
-                                                                             util::$LCMIN  => $min,
-                                                                             util::$LCSEC  => $sec )),
-                               util::$LCparams => util::setParams( $params ));
+      $this->duration = [util::$LCvalue  => util::duration2arr( [util::$LCWEEK => $week,
+                                                                 util::$LCDAY  => $day,
+                                                                 util::$LCHOUR => $hour,
+                                                                 util::$LCMIN  => $min,
+                                                                 util::$LCSEC  => $sec]),
+                         util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

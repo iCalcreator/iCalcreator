@@ -53,13 +53,13 @@ class utilRecur {
  * @static
  */
   private static function recurBydaySort( $byDayA, $byDayB ) {
-    static $days = array( 'SU' => 0,
-                          'MO' => 1,
-                          'TU' => 2,
-                          'WE' => 3,
-                          'TH' => 4,
-                          'FR' => 5,
-                          'SA' => 6 );
+    static $days = ['SU' => 0,
+                    'MO' => 1,
+                    'TU' => 2,
+                    'WE' => 3,
+                    'TH' => 4,
+                    'FR' => 5,
+                    'SA' => 6];
     return ( $days[substr( $byDayA, -2 )] < $days[substr( $byDayB, -2 )] ) ? -1 : 1;
   }
 /**
@@ -82,7 +82,7 @@ class utilRecur {
     static $RECURBYDAYSORTER = null;
     static $SP0          = '';
     if( is_null( $RECURBYDAYSORTER ))
-      $RECURBYDAYSORTER = array( get_class(), 'recurBydaySort' );
+      $RECURBYDAYSORTER = [get_class(), 'recurBydaySort'];
     if( empty( $recurData ))
       return null;
     $output = null;
@@ -114,7 +114,7 @@ class utilRecur {
             $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
             break;
           case util::$BYDAY :
-            $byday          = array( $SP0 );
+            $byday          = [$SP0];
             $bx             = 0;
             foreach( $ruleValue as $bix => $bydayPart ) {
               if( ! empty( $byday[$bx] ) &&   // new day
@@ -166,7 +166,7 @@ class utilRecur {
     static $BYSECOND = 'BYSECOND';
     static $BYMINUTE = 'BYMINUTE';
     static $BYHOUR   = 'BYHOUR';
-    $input       = array();
+    $input       = [];
     if( empty( $rexrule ))
       return $input;
     $rexrule     = array_change_key_case( $rexrule, CASE_UPPER );
@@ -209,7 +209,7 @@ class utilRecur {
       }
     } // end foreach( $rexrule as $rexruleLabel => $rexruleValue )
             /* set recurrence rule specification in rfc2445 order */
-    $input2 = array();
+    $input2 = [];
     if( isset( $input[util::$FREQ] ))
       $input2[util::$FREQ]     = $input[util::$FREQ];
     if( isset( $input[util::$UNTIL] ))
@@ -282,8 +282,8 @@ class utilRecur {
                                        $fcnStart,
                                        $fcnEnd=false ) {
     static $YMDHIS2         = 'Y-m-d H:i:s';
-    static $YEAR2DAYARR     = array( 'YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY' );
-    static $daynames        = array( 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA' );
+    static $YEAR2DAYARR     = ['YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY'];
+    static $daynames        = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
     static $YEARCNT_UP      = 'yearcnt_up';
     static $YEARCNT_DOWN    = 'yearcnt_down';
     static $MONTHDAYNO_UP   = 'monthdayno_up';
@@ -369,7 +369,7 @@ class utilRecur {
 // echo 'fcnEnd:'.$fcnEndYMD.$untilHis."<br>\n";//test
     if( $wdateYMD > $fcnEndYMD ) {
 // echo 'recur out of date, '.implode('-',$wdate).', end='.implode('-',$fcnEnd)."<br>\n";//test
-      return array(); // nothing to do.. .
+      return []; // nothing to do.. .
     }
     if( ! isset( $recur[util::$FREQ] )) // "MUST be specified.. ."
       $recur[util::$FREQ] = self::$DAILY; // ??
@@ -378,7 +378,7 @@ class utilRecur {
       $recur[util::$INTERVAL] = 1;
     $recurCount   = ( ! isset( $recur[util::$BYSETPOS] )) ? 1 : 0; // DTSTART counts as the first occurrence
             /* find out how to step up dates and set index for interval count */
-    $step = array();
+    $step = [];
     if( self::$YEARLY == $recur[util::$FREQ] )
       $step[util::$LCYEAR]  = 1;
     elseif( self::$MONTHLY == $recur[util::$FREQ] )
@@ -388,42 +388,42 @@ class utilRecur {
     else
       $step[util::$LCDAY]   = 1;
     if( isset( $step[util::$LCYEAR] ) && isset( $recur[util::$BYMONTH] ))
-      $step = array( util::$LCMONTH => 1 );
+      $step = [util::$LCMONTH => 1];
     if( empty( $step ) && isset( $recur[util::$BYWEEKNO] )) // ??
-      $step = array( util::$LCDAY => 7 );
+      $step = [util::$LCDAY => 7];
     if( isset( $recur[util::$BYYEARDAY] ) ||
         isset( $recur[util::$BYMONTHDAY] ) ||
         isset( $recur[util::$BYDAY] ))
-      $step = array( util::$LCDAY => 1 );
-    $intervalarr = array();
+      $step = [util::$LCDAY => 1];
+    $intervalarr = [];
     if( 1 < $recur[util::$INTERVAL] ) {
       $intervalix = self::recurIntervalIx( $recur[util::$FREQ],
                                            $wdate,
                                            $wkst );
-      $intervalarr = array( $intervalix => 0 );
+      $intervalarr = [$intervalix => 0];
     }
     if( isset( $recur[util::$BYSETPOS] )) { // save start date + weekno
-      $bysetposymd1 = $bysetposymd2 = $bysetposw1 = $bysetposw2 = array();
+      $bysetposymd1 = $bysetposymd2 = $bysetposw1 = $bysetposw2 = [];
 // echo "bysetposXold_start=$bysetposYold $bysetposMold $bysetposDold<br>\n"; // test ###
       if( is_array( $recur[util::$BYSETPOS] )) {
         foreach( $recur[util::$BYSETPOS] as $bix => $bval )
           $recur[util::$BYSETPOS][$bix] = (int) $bval;
       }
       else
-        $recur[util::$BYSETPOS] = array( (int) $recur[util::$BYSETPOS] );
+        $recur[util::$BYSETPOS] = [(int) $recur[util::$BYSETPOS]];
       if( self::$YEARLY == $recur[util::$FREQ] ) {
         $wdate[util::$LCMONTH] = $wdate[util::$LCDAY] = 1; // start from beginning of year
         $wdateYMD = sprintf( util::$YMD, $wdate[util::$LCYEAR],
                                          $wdate[util::$LCMONTH],
                                          $wdate[util::$LCDAY] );
-        self::stepdate( $fcnEnd, $fcnEndYMD, array( util::$LCYEAR => 1 )); // make sure to count last year
+        self::stepdate( $fcnEnd, $fcnEndYMD, [util::$LCYEAR => 1]); // make sure to count last year
       }
       elseif( self::$MONTHLY == $recur[util::$FREQ] ) {
         $wdate[util::$LCDAY]   = 1; // start from beginning of month
         $wdateYMD = sprintf( util::$YMD, $wdate[util::$LCYEAR],
                                          $wdate[util::$LCMONTH],
                                          $wdate[util::$LCDAY] );
-        self::stepdate( $fcnEnd, $fcnEndYMD, array( util::$LCMONTH => 1 )); // make sure to count last month
+        self::stepdate( $fcnEnd, $fcnEndYMD, [util::$LCMONTH => 1]); // make sure to count last month
       }
       else
         self::stepdate( $fcnEnd, $fcnEndYMD, $step); // make sure to count whole last period
@@ -449,19 +449,19 @@ class utilRecur {
         break;
       if( $year_old != $wdate[util::$LCYEAR] ) {
         $year_old   = $wdate[util::$LCYEAR];
-        $daycnts    = array();
+        $daycnts    = [];
         $yeardays   = $weekno = 0;
-        $yeardaycnt = array();
+        $yeardaycnt = [];
         foreach( $daynames as $dn )
           $yeardaycnt[$dn] = 0;
         for( $m = 1; $m <= 12; $m++ ) { // count up and update up-counters
-          $daycnts[$m] = array();
-          $weekdaycnt = array();
+          $daycnts[$m] = [];
+          $weekdaycnt = [];
           foreach( $daynames as $dn )
             $weekdaycnt[$dn] = 0;
           $mcnt     = date( 't', mktime( 0, 0, 0, $m, 1, $wdate[util::$LCYEAR] ));
           for( $d   = 1; $d <= $mcnt; $d++ ) {
-            $daycnts[$m][$d] = array();
+            $daycnts[$m][$d] = [];
             if( isset( $recur[util::$BYYEARDAY] )) {
               $yeardays++;
               $daycnts[$m][$d][$YEARCNT_UP] = $yeardays;
@@ -486,7 +486,7 @@ class utilRecur {
           } // end for( $d   = 1; $d <= $mcnt; $d++ )
         } // end for( $m = 1; $m <= 12; $m++ )
         $daycnt = 0;
-        $yeardaycnt = array();
+        $yeardaycnt = [];
         if( isset( $recur[util::$BYWEEKNO] ) ||
             ( $recur[util::$FREQ] == self::$WEEKLY )) {
           $weekno = null;
@@ -500,7 +500,7 @@ class utilRecur {
           }
         }
         for( $m = 12; $m > 0; $m-- ) { // count down and update down-counters
-          $weekdaycnt = array();
+          $weekdaycnt = [];
           foreach( $daynames as $dn )
             $yeardaycnt[$dn] = $weekdaycnt[$dn] = 0;
           $monthcnt = 0;
@@ -537,7 +537,7 @@ class utilRecur {
         $currentKey = array_keys( $intervalarr );
         $currentKey = end( $currentKey ); // get last index
         if( $currentKey != $intervalix )
-          $intervalarr = array( $intervalix => ( $intervalarr[$currentKey] + 1 ));
+          $intervalarr = [$intervalix => ( $intervalarr[$currentKey] + 1 )];
         if(( $recur[util::$INTERVAL] != $intervalarr[$intervalix] ) &&
            ( 0 != $intervalarr[$intervalix] )) {
             /* step up date */
@@ -743,7 +743,7 @@ class utilRecur {
           }
 // echo "<br>\n"; // test ###
           $bysetposarr1 = $bysetposarr2;
-          $bysetposarr2 = array();
+          $bysetposarr2 = [];
         } // end if( $bysetpos )
       } // end if( $updateOK && isset( $recur['BYSETPOS'] ))
     } // end while( true )
@@ -825,21 +825,14 @@ class utilRecur {
   private static function stepdate( & $date, & $dateYMD, $step=null ) {
     static $t = 't';
     if( is_null( $step ))
-      $step   = array( util::$LCDAY => 1 );
+      $step   = [util::$LCDAY => 1];
     if( ! isset( $date[util::$LCHOUR] ))
       $date[util::$LCHOUR] = 0;
     if( ! isset( $date[util::$LCMIN] ))
       $date[util::$LCMIN]  = 0;
     if( ! isset( $date[util::$LCSEC] ))
       $date[util::$LCSEC]  = 0;
-    if( isset( $step[util::$LCDAY] ))
-      $mcnt        = date( $t,
-                           mktime( (int) $date[util::$LCHOUR],
-                                   (int) $date[util::$LCMIN],
-                                   (int) $date[util::$LCSEC],
-                                   (int) $date[util::$LCMONTH],
-                                   (int) $date[util::$LCDAY],
-                                   (int) $date[util::$LCYEAR] ));
+
     foreach( $step as $stepix => $stepvalue )
       $date[$stepix]            += $stepvalue;
     if( isset( $step[util::$LCMONTH] )) {
@@ -849,6 +842,13 @@ class utilRecur {
       }
     }
     elseif( isset( $step[util::$LCDAY] )) {
+        $mcnt        = date( $t,
+            mktime( (int) $date[util::$LCHOUR],
+                (int) $date[util::$LCMIN],
+                (int) $date[util::$LCSEC],
+                (int) $date[util::$LCMONTH],
+                (int) $date[util::$LCDAY],
+                (int) $date[util::$LCYEAR] ));
       if( $mcnt < $date[util::$LCDAY] ) {
         $date[util::$LCDAY]     -= $mcnt;
         $date[util::$LCMONTH]   += 1;

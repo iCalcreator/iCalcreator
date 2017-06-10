@@ -1,0 +1,40 @@
+# Mac OS X Finder and whatnot
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Generated files
+VersionX-revision.h
+
+# build products
+build/
+
+# Other source repository archive directories (protects when importing)
+.hg
+.svn
+CVS
+
+# PhpStorm
+.idea
+
+*.swp
+
+# Xcode
+build/*
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+profile
+*.moved-aside
+InfoPlist.h
+*.xcuserstate
+*.xccheckout
+xcuserdata/
+
+
+*.sass-cache*
