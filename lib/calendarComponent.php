@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.2.11 - 2015-03-31
  */
+namespace Kigkonsult\iCalcreator;
+
 class calendarComponent  extends iCalBase {
 /** @var array component property UID value */
   protected $uid;

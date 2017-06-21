@@ -32,6 +32,8 @@
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.7 - 2015-03-10
  */
+namespace Kigkonsult\iCalcreator;
+
 class iCaldateTime extends dateTime {
 /** @var string default date[-time] format */
   public $dateFormat = 'Y-m-d H:i:s e';
@@ -100,7 +102,7 @@ class iCaldateTime extends dateTime {
     if( isset( $date['hour'] ))
       $strdate     .= 'T'.sprintf( iCalUtilityFunctions::$fmt['His'], (int) $date['hour'], (int) $date['min'], (int) $date['sec'] );
     try {
-      $timezone     = new DateTimeZone( $tz );
+      $timezone     = new \DateTimeZone( $tz );
       $d            = new iCaldateTime( $strdate, $timezone );
     }
     catch( Exception $e ) {
@@ -111,7 +113,7 @@ class iCaldateTime extends dateTime {
         $dtstartTz  = 'UTC';
       if( $dtstartTz != $d->getTimezoneName()) { // set the same timezone as dtstart
         try {
-          $timezone = new DateTimeZone( $dtstartTz );
+          $timezone = new \DateTimeZone( $dtstartTz );
           $d->setTimezone( $timezone );
         }
         catch( Exception $e ) {}
