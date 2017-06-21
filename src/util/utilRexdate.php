@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -39,14 +39,11 @@ class utilRexdate {
  * @param array $theDate    date to check
  * @param int   $parno      no of date parts (i.e. year, month.. .)
  * @param array $params     property parameters
- * @uses util::isParamsValueSet(
- * @uses util::isOffset()
- * @uses util::strDate2ArrayDate()
  * @access private
  * @static
  */
   private static function chkDateCfg( $theDate, & $parno, & $params ) {
-    $paramsValueIsDATE = util::isParamsValueSet( array( util::$LCparams => $params ),
+    $paramsValueIsDATE = util::isParamsValueSet( [util::$LCparams => $params],
                                                  util::$DATE );
     switch( true ) {
       case ( isset( $params[util::$TZID] )) :
@@ -57,8 +54,8 @@ class utilRexdate {
         $parno = 3;
         break;
       default:
-        if( util::isParamsValueSet( array( util::$LCparams => $params ),
-                                           util::$PERIOD )) {
+        if( util::isParamsValueSet( [util::$LCparams => $params],
+                                    util::$PERIOD )) {
           $params[util::$VALUE] = util::$PERIOD;
           $parno = 7;
         }
@@ -83,7 +80,7 @@ class utilRexdate {
               $parno = 6;
             break;
           default : // i.e. string
-            $date = trim( $theDate );
+            $date = trim((string) $theDate );
             if( util::$Z == substr( $date, -1 ))
               $parno = 7; // UTC DATE-TIME
             elseif((( 8 == strlen( $date ) && ctype_digit( $date )) ||
@@ -104,6 +101,7 @@ class utilRexdate {
           $parno = 6;
         break;
     } // end switch( true )
+    return true;
   }
 /**
  * Return formatted output for calendar component property data value type recur
@@ -111,19 +109,15 @@ class utilRexdate {
  * @param array  $exdateData
  * @param bool   $allowEmpty
  * @return string
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::date2strdate()
- * @uses self::recurBydaySort()
  * @static
  */
   public static function formatExdate( $exdateData, $allowEmpty ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortExdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortExdate2' );
+    static $SORTER1 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                       'sortExdate1'];
+    static $SORTER2 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                       'sortExdate2'];
     $output  = null;
-    $exdates = array();
+    $exdates = [];
     foreach(( array_keys( $exdateData )) as $ex ) {
       $theExdate = $exdateData[$ex];
       if( empty( $theExdate[util::$LCvalue] )) {
@@ -168,26 +162,17 @@ class utilRexdate {
     return $output;
   }
 /**
- * Prepare calendar component property exdate
+ * Return prepared calendar component property exdate input
  *
  * @param array   $exdates
  * @param array   $params
- * @return bool
- * @uses util::setParams()
- * @uses calendarComponent::chkDateCfg()
- * @uses util::existRem()
- * @uses util::strDate2arr()
- * @uses util::isArrayTimestampDate()
- * @uses util::isOffset()
- * @uses util::timestamp2date()
- * @uses util::chkDateArr()
- * @uses util::strDate2ArrayDate()
+ * @return array
  * @static
  */
   public static function prepInputExdate( $exdates, $params=null ) {
-    static $GMTUTCZARR = array( 'GMT', 'UTC', 'Z' );
-    $input  = array( util::$LCparams => util::setParams( $params,
-                                                         util::$DEFAULTVALUEDATETIME ));
+    static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
+    $input  = [util::$LCparams => util::setParams( $params,
+                                                   util::$DEFAULTVALUEDATETIME )];
     $toZ = ( isset( $input[util::$LCparams][util::$TZID] ) &&
              in_array( strtoupper( $input[util::$LCparams][util::$TZID] ),
                        $GMTUTCZARR ))
@@ -268,22 +253,16 @@ class utilRexdate {
  * @param bool   $allowEmpty
  * @param string $objName
  * @return string
- * @uses util::createElement()
- * @uses vcalendarSortHandler::sortRdate1()
- * @uses vcalendarSortHandler::sortRdate2()
- * @uses util::isParamsValueSet()
- * @uses util::createParams()
- * @uses util::date2strdate()
  * @static
  */
   public static function formatRdate( $rdateData, $allowEmpty, $objName ) {
-    static $SORTER1 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortRdate1' );
-    static $SORTER2 = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                             'sortRdate2' );
+    static $SORTER1 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                       'sortRdate1'];
+    static $SORTER2 = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                       'sortRdate2'];
     $utcTime = ( in_array( $objName, util::$TZCOMPS )) ? true : false;
     $output  = null;
-    $rdates  = array();
+    $rdates  = [];
     foreach(( array_keys( $rdateData )) as $rpix ) {
       $theRdate = $rdateData[$rpix];
       if( empty( $theRdate[util::$LCvalue] )) {
@@ -362,32 +341,19 @@ class utilRexdate {
     return $output;
   }
 /**
- * Prepare calendar component property rdate
+ * Return prepared calendar component property rdate input
  *
  * @param array  $rdates
  * @param array  $params
  * @param string $objName
- * @return bool
- * @uses util::setParams()
- * @uses util::isParamsValueSet()
- * @uses calendarComponent::chkDateCfg()
- * @uses util::existRem()
- * @uses util::strDate2arr()
- * @uses util::isArrayTimestampDate()
- * @uses util::isOffset()
- * @uses util::timestamp2date()
- * @uses util::isArrayDate()
- * @uses util::chkDateArr()
- * @uses util::strDate2ArrayDate()
- * @uses util::duration2arr()
- * @uses util::durationStr2arr()
+ * @return array
  * @static
  */
   public static function prepInputRdate( $rdates, $params, $objName ) {
-    static $PREFIXARR  = array( 'P', '+', '-' );
-    static $GMTUTCZARR = array( 'GMT', 'UTC', 'Z' );
-    $input = array( util::$LCparams => util::setParams( $params,
-                                                        util::$DEFAULTVALUEDATETIME ));
+    static $PREFIXARR  = ['P', '+', '-'];
+    static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
+    $input = [util::$LCparams => util::setParams( $params,
+                                                  util::$DEFAULTVALUEDATETIME )];
     if( in_array( $objName, util::$TZCOMPS )) {
       unset( $input[util::$LCparams][util::$TZID] );
       $input[util::$LCparams][util::$VALUE] = util::$DATE_TIME;

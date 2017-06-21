@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -43,8 +43,6 @@ trait EXDATEtrait {
  * Return formatted output for calendar component property exdate
  *
  * @return string
- * @uses utilRexdate::formatExdate()
- * @uses calendarComponent::getConfig()
  */
   public function createExdate() {
     if( empty( $this->exdate ))
@@ -59,9 +57,6 @@ trait EXDATEtrait {
  * @param array   $params
  * @param integer $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
- * @uses utilRexdate::prepInputExdate()
  */
   public function setExdate( $exdates, $params=null, $index=null ) {
     if( empty( $exdates )) {

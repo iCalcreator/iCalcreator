@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait URLtrait {
  * Return formatted output for calendar component property url
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
  */
   public function createUrl() {
     if( empty( $this->url ))
@@ -61,8 +58,6 @@ trait URLtrait {
  * @param string  $value
  * @param array   $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
  */
   public function setUrl( $value, $params=null ) {
     static $URN = 'urn';
@@ -75,8 +70,8 @@ trait URLtrait {
       $value = util::$EMPTYPROPERTY;
     else
       return false;
-    $this->url = array( util::$LCvalue  => $value,
-                        util::$LCparams => util::setParams( $params ));
+    $this->url = [util::$LCvalue  => $value,
+                  util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

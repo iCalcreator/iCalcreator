@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -45,27 +45,23 @@ trait FREEBUSYtrait {
  */
    protected static $LCFBTYPE         = 'fbtype';
    protected static $UCFBTYPE         = 'FBTYPE';
-   protected static $FREEBUSYKEYS     = array( 'FREE', 'BUSY', 'BUSY-UNAVAILABLE', 'BUSY-TENTATIVE' );
+   protected static $FREEBUSYKEYS     = ['FREE', 'BUSY', 'BUSY-UNAVAILABLE', 'BUSY-TENTATIVE'];
    protected static $FREE             = 'FREE';
    protected static $BUSY             = 'BUSY';
+/*
    protected static $BUSY_UNAVAILABLE = 'BUSY-UNAVAILABLE';
    protected static $BUSY_TENTATIVE   = 'BUSY-TENTATIVE';
+*/
 /**
  * Return formatted output for calendar component property freebusy
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.16.27 - 2013-07-05
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses vcalendarSortHandler::sortRdate1
- * @uses util::date2strdate()
- * @uses util::duration2str()
  */
   public function createFreebusy() {
     static $FMT    = ';FBTYPE=%s';
-    static $SORTER = array( 'kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate1' );
+    static $SORTER = ['kigkonsult\iCalcreator\vcalendarSortHandler', 'sortRdate1'];
     if( empty( $this->freebusy ))
       return null;
     $output = null;
@@ -95,9 +91,9 @@ trait FREEBUSYtrait {
         $content .= $formatted;
         $content .= util::$L;
         $cnt2 = count( $freebusyPeriod[1]);
-        if( array_key_exists( util::$LCYEAR, $freebusyPeriod[1] ))      // date-time
+        if( array_key_exists( util::$LCYEAR, $freebusyPeriod[1] )) // date-time
           $cnt2 = 7;
-        elseif( array_key_exists( 'week', $freebusyPeriod[1] ))  // duration
+        elseif( array_key_exists( util::$LCWEEK, $freebusyPeriod[1] )) // duration
           $cnt2 = 5;
         if(( 7 == $cnt2 )   &&    // period=  -> date-time
             isset( $freebusyPeriod[1][util::$LCYEAR] )  &&
@@ -105,7 +101,7 @@ trait FREEBUSYtrait {
             isset( $freebusyPeriod[1][util::$LCDAY] )) {
           $content .= util::date2strdate( $freebusyPeriod[1] );
         }
-        else {                                  // period=  -> dur-time
+        else {                                                     // period=  -> dur-time
           $content .= util::duration2str( $freebusyPeriod[1] );
         }
         if( $fno < $cnt )
@@ -126,19 +122,9 @@ trait FREEBUSYtrait {
  * @param array   $params
  * @param integer $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::isArrayDate()
- * @uses util::setMval()
- * @uses util::chkDateArr()
- * @uses util::isArrayTimestampDate()
- * @uses util::timestamp2date()
- * @uses util::duration2arr()
- * @uses util::durationStr2arr()
- * @uses util::strDate2ArrayDate()
  */
   public function setFreebusy( $fbType, $fbValues, $params=null, $index=null ) {
-    static $PREFIXARR = array( 'P', '+', '-' );
-    static $P = 'P';
+    static $PREFIXARR = ['P', '+', '-'];
     if( empty( $fbValues )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
         util::setMval( $this->freebusy,
@@ -155,15 +141,15 @@ trait FREEBUSYtrait {
     if( ! in_array( $fbType, self::$FREEBUSYKEYS ) &&
         ! util::isXprefixed( $fbType ))
       $fbType = self::$BUSY;
-    $input = array( self::$LCFBTYPE => $fbType );
-    foreach( $fbValues as $fbPeriod ) {   // periods => period
+    $input = [self::$LCFBTYPE => $fbType];
+    foreach( $fbValues as $fbPeriod ) {               // periods => period
       if( empty( $fbPeriod ))
         continue;
-      $freebusyPeriod = array();
-      foreach( $fbPeriod as $fbMember ) { // pairs => singlepart
-        $freebusyPairMember = array();
+      $freebusyPeriod = [];
+      foreach( $fbPeriod as $fbMember ) {             // pairs => singlepart
+        $freebusyPairMember = [];
         if( is_array( $fbMember )) {
-          if( util::isArrayDate( $fbMember )) { // date-time value
+          if( util::isArrayDate( $fbMember )) {       // date-time value
             $freebusyPairMember       = util::chkDateArr( $fbMember, 7 );
             $freebusyPairMember[util::$LCtz] = util::$Z;
           }
@@ -171,17 +157,15 @@ trait FREEBUSYtrait {
             $freebusyPairMember       = util::timestamp2date( $fbMember[util::$LCTIMESTAMP], 7 );
             $freebusyPairMember[util::$LCtz] = util::$Z;
           }
-          else {                                         // array format duration
+          else {                                      // array format duration
             $freebusyPairMember = util::duration2arr( $fbMember );
           }
         }
-        elseif(( 3 <= strlen( trim( $fbMember ))) &&    // string format duration
+        elseif(( 3 <= strlen( trim( $fbMember ))) &&  // string format duration
                         ( in_array( $fbMember{0}, $PREFIXARR ))) {
-          if( $P != $fbMember{0} )
-            $fbmember = substr( $fbMember, 1 );
           $freebusyPairMember = util::durationStr2arr( $fbMember );
         }
-        elseif( 8 <= strlen( trim( $fbMember ))) { // text date ex. 2006-08-03 10:12:18
+        elseif( 8 <= strlen( trim( $fbMember ))) {    // text date ex. 2006-08-03 10:12:18
           $freebusyPairMember       = util::strDate2ArrayDate( $fbMember, 7 );
           unset( $freebusyPairMember[util::$UNPARSEDTEXT] );
           $freebusyPairMember[util::$LCtz] = util::$Z;

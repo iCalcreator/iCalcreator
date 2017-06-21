@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -35,10 +35,10 @@ use kigkonsult\iCalcreator\util\utilGeo;
  */
 class iCalXML {
   private static $vcalendar      = 'vcalendar';
-  private static $calProps       = array( 'version',
-                                          'prodid',
-                                          'calscale',
-                                          'method' );
+  private static $calProps       = ['version',
+                                    'prodid',
+                                    'calscale',
+                                    'method'];
   private static $properties     = 'properties';
   private static $PARAMETERS     = 'parameters';
   private static $components     = 'components';
@@ -91,16 +91,11 @@ class iCalXML {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.18.1 - 2013-08-18
- * @param object $calendar   iCalcreator vcalendar instance reference
+ * @param vcalendar $calendar   iCalcreator vcalendar instance reference
  * @return string
- * @uses vcalendar::getProperty()
- * @uses iCalXML::addXMLchild()
- * @uses vcalendar::getConfig()
- * @uses vcalendar::getComponent()
- * @uses calendarComponent::getProperty()
  * @static
  */
- public static function iCal2XML( $calendar ) {
+ public static function iCal2XML( vcalendar $calendar ) {
   static $YMDTHISZ = 'Ymd\THis\Z';
   static $XMLstart = '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- created %s using kigkonsult.se %s iCal2XMl (rfc6321) --></icalendar>';
             /** fix an SimpleXMLElement instance and create root element */
@@ -581,27 +576,18 @@ class iCalXML {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.8 - 2017-04-17
- * @param object $parent   reference to a SimpleXMLelement node
+ * @param SimpleXMLElement $parent   a SimpleXMLelement node
  * @param string $name     new element node name
  * @param string $type     content type, subelement(-s) name
  * @param string $content  new subelement content
  * @param array  $params   new element 'attributes'
- * @uses util::isXprefixed()
- * @uses util::duration2str()
- * @uses utilGeo::geo2str2()
- * @uses utilGeo::$geoLatFmt
- * @uses utilGeo::$geoLongFmt
  * @access private
  * @static
  */
- private static function addXMLchild( & $parent,
-                                        $name,
-                                        $type,
-                                        $content,
-                                        $params=array()) {
+ private static function addXMLchild( \SimpleXMLElement & $parent, $name, $type, $content, $params=[] ) {
   static $FMTYMD    = '%04d-%02d-%02d';
   static $FMTYMDHIS = '%04d-%02d-%02dT%02d:%02d:%02d';
-  static $PLUSMINUSARR = array( '+', '-' );
+  static $PLUSMINUSARR = ['+', '-'];
   static $BOOLEAN   = 'boolean';
   static $UNTIL     = 'until';
   static $START     = 'start';
@@ -670,7 +656,7 @@ class iCalXML {
       break;
     case self::$date:
       if( array_key_exists( util::$LCYEAR, $content ))
-        $content = array( $content );
+        $content = [$content];
       foreach( $content as $date ) {
         $str = sprintf( $FMTYMD, (int) $date[util::$LCYEAR],
                                  (int) $date[util::$LCMONTH],
@@ -680,7 +666,7 @@ class iCalXML {
       break;
     case self::$date_time:
       if( array_key_exists( util::$LCYEAR, $content ))
-        $content = array( $content );
+        $content = [$content];
       foreach( $content as $dt ) {
         if( ! isset( $dt[util::$LCHOUR] )) $dt[util::$LCHOUR] = 0;
         if( ! isset( $dt[util::$LCMIN] ))  $dt[util::$LCMIN]  = 0;
@@ -824,7 +810,7 @@ class iCalXML {
       break;
     case self::$text:
       if( ! is_array( $content ))
-        $content = array( $content );
+        $content = [$content];
       foreach( $content as $part )
         $v = $child->addChild( $type, htmlspecialchars( $part ));
       break;
@@ -861,10 +847,9 @@ class iCalXML {
  * @param  string $xmlfile
  * @param  array  $iCalcfg iCalcreator config array (opt)
  * @return mixediCalcreator instance or false on error
- * @uses iCalXML::xml2iCal()
  * @static
  */
- public static function XMLfile2iCal( $xmlfile, $iCalcfg=array()) {
+ public static function XMLfile2iCal( $xmlfile, $iCalcfg=[] ) {
   if( false === ( $xmlstr = file_get_contents( $xmlfile )))
     return false;
   return self::xml2iCal( $xmlstr, $iCalcfg );
@@ -877,10 +862,9 @@ class iCalXML {
  * @param  string $xmlstr
  * @param  array  $iCalcfg iCalcreator config array (opt)
  * @return mixed  iCalcreator instance or false on error
- * @uses iCalXML::xml2iCal()
  * @static
  */
- public static function XMLstr2iCal( $xmlstr, $iCalcfg=array()) {
+ public static function XMLstr2iCal( $xmlstr, $iCalcfg=[] ) {
   return self::XML2iCal( $xmlstr, $iCalcfg);
  }
 /**
@@ -891,12 +875,10 @@ class iCalXML {
  * @param  string $xmlstr
  * @param  array  $iCalcfg iCalcreator config array (opt)
  * @return mixed  iCalcreator instance or false on error
- * @uses vcalendar::vcalendar()
- * @uses iCalXML::XMLgetComps()
  * @static
  */
- public static function XML2iCal( $xmlstr, $iCalcfg=array()) {
-  static $CRLF = array( "\r\n", "\n\r", "\n", "\r" );
+ public static function XML2iCal( $xmlstr, $iCalcfg=[] ) {
+  static $CRLF = ["\r\n", "\n\r", "\n", "\r"];
   $xmlstr  = str_replace( $CRLF, null, $xmlstr );
   $xml     = self::XMLgetTagContent1( $xmlstr, self::$vcalendar, $endIx );
   $iCal    = new vcalendar( $iCalcfg );
@@ -911,12 +893,6 @@ class iCalXML {
  * @param object $iCal   iCalcreator vcalendar or component object instance
  * @param string $xml
  * @return object
- * @uses util::$allComps
- * @uses iCalXML::XMLgetTagContent1()
- * @uses iCalXML::XMLgetProps()
- * @uses iCalXML::XMLgetTagContent2()
- * @uses vcalendar::newComponent()
- * @uses iCalXML::XMLgetComps()
  * @access private
  * @static
  */
@@ -952,13 +928,8 @@ class iCalXML {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.3 - 2017-03-19
- * @param  array  $iCal iCalcreator calendar/component instance
+ * @param  object $iCal iCalcreator calendar/component instance
  * @param  string $xml
- * @uses iCalXML::XMLgetTagContent2()
- * @uses vcalendar::setProperty()
- * @uses calendarComponent::setproperty()
- * @uses iCalXML::XMLgetTagContent1()
- * @uses vcalendar::setProperty()
  * @access private
  * @static
  */
@@ -975,7 +946,7 @@ class iCalXML {
       $xml        = substr( $xml, $endIx);
       continue;
     }
-    $params       = array();
+    $params       = [];
     if( $PARAMENDTAG == substr( $xml2, 0, 13 ))
       $xml2       = substr( $xml2, 13 );
     elseif( $PARAMTAG == substr( $xml2, 0, 12 )) {
@@ -988,7 +959,7 @@ class iCalXML {
           while( ! empty( $xml4 )) {
             $paramValue = self::XMLgetTagContent1( $xml4, self::$cal_address, $endIx4 );
             if( ! isset( $params[$paramKey] ))
-              $params[$paramKey]   = array( $paramValue );
+              $params[$paramKey]   = [$paramValue];
             else
               $params[$paramKey][] = $paramValue;
             $xml4     = substr( $xml4, $endIx4 );
@@ -1011,7 +982,7 @@ class iCalXML {
     switch( $propName ) {
       case util::$CATEGORIES:
       case util::$RESOURCES:
-        $tValue      = array();
+        $tValue      = [];
         while( ! empty( $xml2 )) {
           $tValue[]  = html_entity_decode( self::XMLgetTagContent2( $xml2,
                                                                     $valueType,
@@ -1025,7 +996,7 @@ class iCalXML {
         if( self::$period != $valueType ) {
           if( self::$date == $valueType )
             $params[util::$VALUE] = util::$DATE;
-          $t         = array();
+          $t         = [];
           while( ! empty( $xml2 ) &&
                 ( $DATETAGST == substr( $xml2, 0, 5 ))) {
             $t[]     = self::XMLgetTagContent2( $xml2,
@@ -1039,13 +1010,13 @@ class iCalXML {
       case util::$FREEBUSY:
         if( util::$RDATE == $propName )
           $params[util::$VALUE] = util::$PERIOD;
-        $value       = array();
+        $value       = [];
         while( ! empty( $xml2 ) &&
               ( $PERIODTAG == substr( $xml2, 0, 8 ))) {
           $xml3      = self::XMLgetTagContent1( $xml2,
                                                 self::$period,
                                                 $endIx4 ); // period
-          $t         = array();
+          $t         = [];
           while( ! empty( $xml3 )) {
             $t[]     = self::XMLgetTagContent2( $xml3,
                                                 $pType,
@@ -1061,7 +1032,7 @@ class iCalXML {
         $value       = str_replace( util::$COLON, null, $value );
         break;
       case util::$GEO:
-        $tValue      = array( utilGeo::$LATITUDE => $value );
+        $tValue      = [utilGeo::$LATITUDE => $value];
         $tValue[utilGeo::$LONGITUDE] = self::XMLgetTagContent1( substr( $xml2, $endIx3 ),
                                                                 utilGeo::$LONGITUDE,
                                                                 $endIx3 );
@@ -1069,7 +1040,7 @@ class iCalXML {
         break;
       case util::$EXRULE:
       case util::$RRULE:
-        $tValue      = array( $valueType => $value );
+        $tValue      = [$valueType => $value];
         $xml2        = substr( $xml2, $endIx3 );
         $valueType   = false;
         while( ! empty( $xml2 )) {
@@ -1086,11 +1057,11 @@ class iCalXML {
               break;
             case util::$BYDAY:
               if( 2 == strlen( $t ))
-                $tValue[$valueType][] = array( util::$DAY => $t );
+                $tValue[$valueType][] = [util::$DAY => $t];
               else {
                 $day = substr( $t, -2 );
                 $key = substr( $t, 0, ( strlen( $t ) - 2 ));
-                $tValue[$valueType][] = array( $key, util::$DAY => $day );
+                $tValue[$valueType][] = [$key, util::$DAY => $day];
               }
               break;
             default:
@@ -1101,7 +1072,7 @@ class iCalXML {
         $value       = $tValue;
         break;
       case util::$REQUEST_STATUS:
-        $tValue      = array();
+        $tValue      = [];
         while( ! empty( $xml2 )) {
           $t         = html_entity_decode( self::XMLgetTagContent2( $xml2,
                                                                     $valueType,
@@ -1112,8 +1083,8 @@ class iCalXML {
         if( ! empty( $tValue ))
           $value     = $tValue;
         else
-          $value     = array( self::$code => null,
-                              strtolower( util::$DESCRIPTION ) => null );
+          $value     = [self::$code                      => null,
+                        strtolower( util::$DESCRIPTION ) => null];
         break;
       default:
         switch( $valueType ) {

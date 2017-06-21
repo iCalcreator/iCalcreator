@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait COMMENTtrait {
  * Return formatted output for calendar component property comment
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::strrep()
  */
   public function createComment() {
     if( empty( $this->comment ))
@@ -73,8 +69,6 @@ trait COMMENTtrait {
  * @param array   $params
  * @param integer $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
  */
   public function setComment( $value, $params=null, $index=null ) {
     if( empty( $value )) {

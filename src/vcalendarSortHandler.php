@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -37,12 +37,12 @@ class vcalendarSortHandler {
  * vcalendar sort callback function
  *
  * @since 2.23.9 - 2017-04-20
- * @param array $a
- * @param array $b
+ * @param calendarComponent $a
+ * @param calendarComponent $b
  * @return int
  * @static
  */
-  public static function cmpfcn( $a, $b ) {
+  public static function cmpfcn( calendarComponent $a, calendarComponent $b ) {
     if(        empty( $a ))                     return -1;
     if(        empty( $b ))                     return  1;
     if( util::$LCVTIMEZONE == $a->objName ) {
@@ -65,18 +65,12 @@ class vcalendarSortHandler {
  * Set sort arguments/parameters in component
  *
  * @since 2.23.19 - 2017-04-22
- * @param object $c       valendar component
- * @param string $sortArg
- * @uses calendarComponent::getProperty()
- * @uses calendarComponent::getProperties()
- * @uses util::isArrayDate()
- * @uses vcalendarSortHandler::arrDate2str()
- * @uses util::date2strdate()
- * @uses util::strDate2ArrayDate()
+ * @param calendarComponent $c       valendar component
+ * @param string            $sortArg
  * @static
  */
-  public static function setSortArgs( $c, $sortArg=null ) {
-    static $INITARR = array( '0', '0', '0', '0' );
+  public static function setSortArgs( calendarComponent $c, $sortArg=null ) {
+    static $INITARR = ['0', '0', '0', '0'];
     $c->srtk = $INITARR;
     if( util::$LCVTIMEZONE == $c->objName ) {
       if( false === ( $c->srtk[0] = $c->getProperty( util::$TZID )))
@@ -85,7 +79,7 @@ class vcalendarSortHandler {
     }
     elseif( ! is_null( $sortArg )) {
       if( in_array( $sortArg, util::$MPROPS1 )) { // all string
-        $propValues = array();
+        $propValues = [];
         $c->getProperties( $sortArg, $propValues );
         if( ! empty( $propValues )) {
           $c->srtk[0] = key( array_slice( $propValues, 0, 1, TRUE ));
@@ -149,23 +143,23 @@ class vcalendarSortHandler {
 /**
  * Return formatted string from (array) date/datetime
  *
- * @param array $adate
+ * @param array $aDate
  * @return string
  * @access private
  * @static
  */
-  private static function arrDate2str( $adate ) {
+  private static function arrDate2str( array $aDate ) {
     $str    = sprintf( util::$YMD,
-                       $adate[util::$LCYEAR],
-                       $adate[util::$LCMONTH],
-                       $adate[util::$LCDAY] );
-    if( isset( $adate[util::$LCHOUR] ))
+                       $aDate[util::$LCYEAR],
+                       $aDate[util::$LCMONTH],
+                       $aDate[util::$LCDAY] );
+    if( isset( $aDate[util::$LCHOUR] ))
       $str .= sprintf( util::$HIS,
-                       $adate[util::$LCHOUR],
-                       $adate[util::$LCMIN],
-                       $adate[util::$LCSEC] );
-    if( isset( $adate[util::$LCtz] ) && ! empty( $adate[util::$LCtz] ))
-      $str .= $adate[util::$LCtz];
+                       $aDate[util::$LCHOUR],
+                       $aDate[util::$LCMIN],
+                       $aDate[util::$LCSEC] );
+    if( isset( $aDate[util::$LCtz] ) && ! empty( $aDate[util::$LCtz] ))
+      $str .= $aDate[util::$LCtz];
     return $str;
   }
 /**
@@ -176,7 +170,7 @@ class vcalendarSortHandler {
  * @return int
  * @static
  */
-  public static function sortExdate1( $a, $b ) {
+  public static function sortExdate1( array $a, array $b ) {
     $as  = sprintf( util::$YMD, (int) $a[util::$LCYEAR],
                                 (int) $a[util::$LCMONTH],
                                 (int) $a[util::$LCDAY] );
@@ -201,7 +195,7 @@ class vcalendarSortHandler {
  * @return int
  * @static
  */
-  public static function sortExdate2( $a, $b ) {
+  public static function sortExdate2( array $a, array $b ) {
     $val = reset( $a[util::$LCvalue] );
     $as  = sprintf( util::$YMD, (int) $val[util::$LCYEAR],
                                 (int) $val[util::$LCMONTH],
@@ -226,10 +220,9 @@ class vcalendarSortHandler {
  * @param array $a
  * @param array $b
  * @return int
- * @uses vcalendarSortHandler::formatdatePart()
  * @static
  */
-  public static function sortRdate1( $a, $b ) {
+  public static function sortRdate1( array $a, array $b ) {
     $as    = null;
     if( isset( $a[util::$LCYEAR] ))
       $as  = self::formatdatePart( $a );
@@ -256,10 +249,9 @@ class vcalendarSortHandler {
  * @param array $a
  * @param array $b
  * @return int
- * @uses vcalendarSortHandler::formatdatePart()
  * @static
  */
-  public static function sortRdate2( $a, $b ) {
+  public static function sortRdate2( array $a, array $b ) {
     $as    = null;
     if( isset( $a[util::$LCvalue][0][util::$LCYEAR] ))
       $as  = self::formatdatePart( $a[util::$LCvalue][0] );

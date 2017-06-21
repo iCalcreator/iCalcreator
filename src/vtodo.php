@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -71,11 +71,8 @@ class vtodo extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-02-01
  * @param array $config
- * @uses calendarComponent::__contruct()
- * @uses calendarComponent::setConfig()
- * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $T = 't';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -94,12 +91,12 @@ class vtodo extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
+           $this->config,
            $this->propix,
            $this->compix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->attach,
            $this->attendee,
            $this->categories,
@@ -139,38 +136,6 @@ class vtodo extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.5.1 - 2008-11-07
  * @return string
- * @uses calendarComponent::createUid()
- * @uses calendarComponent::createDtstamp()
- * @uses vtodo::createAttach()
- * @uses vtodo::createAttendee()
- * @uses vtodo::createCategories()
- * @uses vtodo::createClass()
- * @uses vtodo::createComment()
- * @uses vtodo::createCompleted()
- * @uses vtodo::createContact()
- * @uses vtodo::createDescription()
- * @uses vtodo::createDtstart()
- * @uses vtodo::createDtend()
- * @uses vtodo::createDuration()
- * @uses vtodo::createExdate()
- * @uses vtodo::createExrule()
- * @uses vtodo::createGeo()
- * @uses vtodo::createLastModified()
- * @uses vtodo::createLocation()
- * @uses vtodo::createOrganizer()
- * @uses vtodo::createPriority()
- * @uses vtodo::createRdate()
- * @uses vtodo::createRelatedTo()
- * @uses vtodo::createRequestStatus()
- * @uses vtodo::createRecurrenceid()
- * @uses vtodo::createResources()
- * @uses vtodo::createRrule()
- * @uses vtodo::createSequence()
- * @uses vtodo::createStatus()
- * @uses vtodo::createSummary()
- * @uses vtodo::createUrl()
- * @uses calendarComponent::createXprop()
- * @uses calendarComponent::createSubComponent()
  */
   public function createComponent() {
     $objectname =  strtoupper( $this->objName );

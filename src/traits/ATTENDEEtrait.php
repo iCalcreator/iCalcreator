@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -43,7 +43,6 @@ trait ATTENDEEtrait {
  * Return formatted output for calendar component property attendee
  *
  * @return string
- * @uses calendarComponent::getConfig()
  */
   public function createAttendee() {
     if( empty( $this->attendee ))
@@ -57,10 +56,6 @@ trait ATTENDEEtrait {
  * @param array   $params
  * @param integer $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses utilAttendee::calAddressCheck()
- * @uses utilAttendee::prepAttendeeParams()
- * @uses util::setMval()
  */
   public function setAttendee( $value, $params=null, $index=null ) {
     if( empty( $value )) {

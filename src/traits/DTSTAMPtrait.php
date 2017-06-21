@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,11 +42,6 @@ trait DTSTAMPtrait {
  * Return formatted output for calendar component property dtstamp
  *
  * @return string
- * @uses util::hasNodate()
- * @uses util::makeDtstamp()
- * @uses util::createParams()
- * @uses util::date2strdate()
- * @uses util::createElement()
  */
   public function createDtstamp() {
     if( util::hasNodate( $this->dtstamp ))
@@ -66,8 +61,6 @@ trait DTSTAMPtrait {
  * @param int   $sec
  * @param array $params
  * @return bool
- * @uses util::makeDtstamp()
- * @uses util::setDate2()
  */
   public function setDtstamp( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
     $this->dtstamp = ( empty( $year )) ? util::makeDtstamp()

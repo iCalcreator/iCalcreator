@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -25,8 +25,6 @@
  * This file is a part of iCalcreator.
  */
 namespace kigkonsult\iCalcreator;
-use DateTime;
-use DateTimeZone;
 use kigkonsult\iCalcreator\util\util;
 /**
  * iCalcreator::selectComponent dateTime support class
@@ -34,7 +32,7 @@ use kigkonsult\iCalcreator\util\util;
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.20 - 2017-02-07
  */
-class iCaldateTime extends DateTime {
+class iCaldateTime extends \DateTime {
 /**
  * @var string default date[-time] format
  */
@@ -46,7 +44,7 @@ class iCaldateTime extends DateTime {
 /**
  * @var array date[-time] origin
  */
-  public $SCbools    = array();
+  public $SCbools    = [];
 /**
  * Return time (His) array
  *
@@ -92,7 +90,6 @@ class iCaldateTime extends DateTime {
  * @param array  $tz
  * @param string $dtstartTz
  * @return object
- * @uses iCaldateTime::getTimezoneName()
  * @static
  */
   public static function factory( array $date, $params=null, $tz=null, $dtstartTz=null ) {
@@ -113,10 +110,10 @@ class iCaldateTime extends DateTime {
                                                       (int) $date[util::$LCMIN],
                                                       (int) $date[util::$LCSEC] );
     try {
-      $timezone     = new DateTimeZone( $tz );
+      $timezone     = new \DateTimeZone( $tz );
       $iCaldateTime = new iCaldateTime( $strdate, $timezone );
     }
-    catch( Exception $e ) {
+    catch( \Exception $e ) {
       $iCaldateTime = new iCaldateTime( $strdate );
     }
     if( ! empty( $dtstartTz )) {
@@ -124,13 +121,13 @@ class iCaldateTime extends DateTime {
         $dtstartTz  = util::$UTC;
       if( $dtstartTz != $iCaldateTime->getTimezoneName()) { // set the same timezone as dtstart
         try {
-          $timezone = new DateTimeZone( $dtstartTz );
+          $timezone = new \DateTimeZone( $dtstartTz );
           $iCaldateTime->setTimezone( $timezone );
         }
-        catch( Exception $e ) {} // ??
+        catch( \Exception $e ) {} // ??
       }
     }
-    if( util::isParamsValueSet( array( util::$LCparams => $params ), util::$DATE )) {
+    if( util::isParamsValueSet( [util::$LCparams => $params], util::$DATE )) {
       $iCaldateTime->dateFormat = $Y_M_D;
       $iCaldateTime->key        = $iCaldateTime->format( $YMD );
     }

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -43,13 +43,10 @@ class iCalvCard {
  * @param string  $version    vCard version (default 2.1)
  * @param string  $directory  where to save vCards (default false)
  * @param string  $ext        vCard file extension (default 'vcf')
- * @return mixed, bool true (if directory set and save ok), string (if not), false on error
+ * @return mixed  bool true (if directory set and save ok), string (if not), false on error
  * @static
  */
-  public static function iCal2vCard( $email,
-                                     $version=null,
-                                     $directory=null,
-                                     $ext=null ) {
+  public static function iCal2vCard( $email, $version=null, $directory=null, $ext=null ) {
     static $UCMAILTOCOLON = 'MAILTO:';
     static $CRLF     = "\r\n";
     static $FMTFN    = "FN:%s\r\n";
@@ -81,7 +78,7 @@ class iCalvCard {
     $email  = str_replace( $UCMAILTOCOLON, null, $email );
     $name   = $person = substr( $email, 0, $pos );
     if( ctype_upper( $name ) || ctype_lower( $name ))
-      $name = array( $name );
+      $name = [$name];
     else {
       if( false !== ( $pos = strpos( $name, util::$DOT ))) {
         $name = explode( util::$DOT, $name );
@@ -90,7 +87,7 @@ class iCalvCard {
       }
       else { // split camelCase
         $chars = $name;
-        $name  = array( $chars[0] );
+        $name  = [$chars[0]];
         $k     = 0;
         $len   = strlen( $chars );
         $x     = 1;
@@ -141,7 +138,7 @@ class iCalvCard {
         $dbl = $cnt;
         $fName = sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
       }
-      if( false === file_put_contents( $fname, $vCard ))
+      if( false === file_put_contents( $fName, $vCard ))
         return false;
       return true;
     }
@@ -154,20 +151,18 @@ class iCalvCard {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.20 - 2017-02-20
- * @param object  $calendar   iCalcreator vcalendar instance
- * @param string  $version    vCard version (default 2.1)
- * @param string  $directory  where to save vCards (default false)
- * @param string  $ext        vCard file extension (default 'vcf')
- * @return mixed, bool true (if directory set and save ok), string (if not), false on error
- * @uses vcalendar::getProperty()
- * @uses iCalvCard::iCal2vCard()
+ * @param vcalendar $calendar   iCalcreator vcalendar instance
+ * @param string    $version    vCard version (default 2.1)
+ * @param string    $directory  where to save vCards (default false)
+ * @param string    $ext        vCard file extension (default 'vcf')
+ * @return mixed    bool true (if directory set and save ok), string (if not), false on error
  * @static
  */
-  public static function iCal2vCards( $calendar, $version=null, $directory=null, $ext=null ) {
-    static $vCardP = array( 'ATTENDEE', 'CONTACT', 'ORGANIZER' );
+  public static function iCal2vCards( vcalendar $calendar, $version=null, $directory=null, $ext=null ) {
+    static $vCardP = ['ATTENDEE', 'CONTACT', 'ORGANIZER'];
     static $AT     = '@';
     static $UCMAILTOCOLON = 'MAILTO:';
-    $hits   = array();
+    $hits   = [];
     foreach( $vCardP as $prop ) {
       $hits2 = $calendar->getProperty( $prop );
       foreach( $hits2 as $propValue => $occCnt ) {

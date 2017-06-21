@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -37,17 +37,16 @@ class calendarComponent extends iCalBase {
 /**
  * @var string component type
  */
-  public $objName;
+  public $objName   = null;
 /**
  * @var int component number
  */
-  public $cno = 0;
+  public $cno       = 0;
 /**
  * Constructor for calendar component object
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.20.23 - 2017-02-21
- * @uses util::makeDtstamp()
  */
   public function __construct() {
     static $BS = '\\';
@@ -80,8 +79,6 @@ class calendarComponent extends iCalBase {
  * @param mixed  $propName  bool false => X-property
  * @param int    $propix    specific property in case of multiply occurences
  * @return bool
- * @uses calendarComponent::notExistProp()
- * @uses util::deletePropertyM()
  */
   public function deleteProperty( $propName=null, $propix=null ) {
     if( $this->notExistProp( $propName ))
@@ -286,7 +283,6 @@ class calendarComponent extends iCalBase {
  * @since 2.5.1 - 2008-10-15
  * @param string $propName
  * @return bool
- * @uses calendarComponent::{$propName}
  */
   public function notExistProp( $propName ) {
     static $LASTMODIFIED    = 'lastmodified';
@@ -326,7 +322,7 @@ class calendarComponent extends iCalBase {
     return false;
   }
 /**
- * Get component property value/params
+ * Return component property value/params
  *
  * Return array with keys VALUE/PARAMS rf arg $inclParam is true
  * If property has multiply values, consequtive function calls are needed
@@ -337,16 +333,9 @@ class calendarComponent extends iCalBase {
  * @param bool    $inclParam
  * @param bool    $specform
  * @return mixed
- * @uses calendarComponent::getProperty()
- * @uses utilGeo::geo2str2()
- * @uses calendarComponent::notExistProp()
- * @uses util::recountMvalPropix()
- * @uses util::makeDtstamp()
- * @uses util::duration2date()
- * @uses util::makeUid()
  */
-  public function getProperty( $propName=false,
-                               $propix=false,
+  public function getProperty( $propName=null,
+                               $propix=null,
                                $inclParam=false,
                                $specform=false ) {
     if( 0 == strcasecmp( util::$GEOLOCATION, $propName )) {
@@ -481,8 +470,8 @@ class calendarComponent extends iCalBase {
                     isset( $this->dtstart[util::$LCparams][util::$TZID] ))
                     ? array_merge((array) $this->duration[util::$LCparams], $this->dtstart[util::$LCparams] )
                     : $this->duration[util::$LCparams];
-        return ( $inclParam ) ? array( util::$LCvalue => $value,
-                                       util::$LCparams =>  $params )
+        return ( $inclParam ) ? [util::$LCvalue  => $value,
+                                 util::$LCparams => $params]
                               : $value;
         break;
       case util::$EXDATE:
@@ -646,10 +635,10 @@ class calendarComponent extends iCalBase {
         if( $propName != util::$X_PROP ) {
           if( ! isset( $this->xprop[$propName] ))
             return false;
-          return ( $inclParam ) ? array( $propName,
-                                         $this->xprop[$propName] )
-                                : array( $propName,
-                                         $this->xprop[$propName][util::$LCvalue] );
+          return ( $inclParam ) ? [$propName,
+                                   $this->xprop[$propName]]
+                                : [$propName,
+                                   $this->xprop[$propName][util::$LCvalue]];
         }
         else {
           if( empty( $this->xprop ))
@@ -657,10 +646,10 @@ class calendarComponent extends iCalBase {
           $xpropno = 0;
           foreach( $this->xprop as $xpropkey => $xpropvalue ) {
             if( $propix == $xpropno )
-              return ( $inclParam ) ? array( $xpropkey,
-                                             $this->xprop[$xpropkey] )
-                                    : array( $xpropkey,
-                                             $this->xprop[$xpropkey][util::$LCvalue] );
+              return ( $inclParam ) ? [$xpropkey,
+                                       $this->xprop[$xpropkey]]
+                                    : [$xpropkey,
+                                       $this->xprop[$xpropkey][util::$LCvalue]];
             else
               $xpropno++;
           }
@@ -678,12 +667,11 @@ class calendarComponent extends iCalBase {
  * @since 2.21.11 - 2015-03-21
  * @param string  $propName
  * @param array   $output    incremented result array
- * return array
- * @uses calendarComponent::getProperty()
+ * @return array
  */
   public function getProperties( $propName, & $output ) {
     if( empty( $output ))
-      $output = array();
+      $output = [];
     if( ! in_array( strtoupper( $propName ), util::$MPROPS1 ))
       return $output;
     while( false !== ( $content = $this->getProperty( $propName ))) {
@@ -745,53 +733,6 @@ class calendarComponent extends iCalBase {
  *                    first argument is ALWAYS component name,
  *                    second ALWAYS component value!
  * @return bool
- * @uses calendarComponent::getProperty()
- * @uses calendarComponent::notExistProp()
- * @uses calendarComponent::getConfig()
- * @uses calendarComponent::setAction()
- * @uses calendarComponent::setAttendee()
- * @uses calendarComponent::setCategories()
- * @uses calendarComponent::setClass()
- * @uses calendarComponent::setComment()
- * @uses calendarComponent::setCompleted()
- * @uses calendarComponent::setContact()
- * @uses calendarComponent::setCreated()
- * @uses calendarComponent::setDescription()
- * @uses calendarComponent::setDtend()
- * @uses calendarComponent::setDtstamp()
- * @uses calendarComponent::setDtstart()
- * @uses calendarComponent::setDue()
- * @uses calendarComponent::setDuration()
- * @uses calendarComponent::setExdate()
- * @uses calendarComponent::setExrule()
- * @uses calendarComponent::setFreebusy()
- * @uses calendarComponent::setGeo()
- * @uses calendarComponent::setLastmodified()
- * @uses calendarComponent::setLocation()
- * @uses calendarComponent::setOrganizer()
- * @uses calendarComponent::setPercentcomplete()
- * @uses calendarComponent::setPriority()
- * @uses calendarComponent::setRdate()
- * @uses calendarComponent::setRecurrenceid()
- * @uses calendarComponent::setRelatedto()
- * @uses calendarComponent::setRepeat()
- * @uses calendarComponent::setRequeststatus()
- * @uses calendarComponent::setResources()
- * @uses calendarComponent::setRrule()
- * @uses calendarComponent::setSequence()
- * @uses calendarComponent::setStatus()
- * @uses calendarComponent::setSummary()
- * @uses calendarComponent::setTransp()
- * @uses calendarComponent::setTrigger()
- * @uses calendarComponent::setTzid()
- * @uses calendarComponent::setTzname()
- * @uses calendarComponent::setTzoffsetfrom()
- * @uses calendarComponent::setTzoffsetto()
- * @uses calendarComponent::setTzurl()
- * @uses calendarComponent::setUid()
- * @uses calendarComponent::$objName
- * @uses calendarComponent::setUrl()
- * @uses calendarComponent::setXprop()
  */
   public function setProperty() {
     $numargs    = func_num_args();
@@ -1027,14 +968,6 @@ class calendarComponent extends iCalBase {
  * @since 2.23.5 - 2017-04-14
  * @param mixed $unparsedtext   strict rfc2445 formatted, single property string or array of strings
  * @return bool false if error occurs during parsing
- * @uses calendarComponent::getConfig()
- * @uses util::convEolChar()
- * @uses util::isXprefixed()
- * @uses util::trimTrailNL()
- * @uses util::splitContent()
- * @uses calendarComponent::setProperty()
- * @uses util::strunrep()
- * @uses calendarComponent::parse()
  */
   public function parse( $unparsedtext=null ) {
     static $NLCHARS       = '\n';
@@ -1046,10 +979,10 @@ class calendarComponent extends iCalBase {
     static $BEGINVALARM   = 'BEGIN:VALARM';
     static $BEGINSTANDARD = 'BEGIN:STANDARD';
     static $BEGINDAYLIGHT = 'BEGIN:DAYLIGHT';
-    static $TEXTPROPS     = array( 'CATEGORIES',
-                                   'COMMENT',
-                                   'DESCRIPTION',
-                                   'SUMMARY' );
+    static $TEXTPROPS     = ['CATEGORIES',
+                             'COMMENT',
+                             'DESCRIPTION',
+                             'SUMMARY'];
     static $X_            = 'X-';
     static $DBBS          = "\\";
     static $SS            = '/';
@@ -1067,7 +1000,7 @@ class calendarComponent extends iCalBase {
       }
     }
     elseif( ! isset( $this->unparsed ))
-      $rows = array();
+      $rows = [];
     else
       $rows = $this->unparsed;
             /* skip leading (empty/invalid) lines */
@@ -1080,7 +1013,7 @@ class calendarComponent extends iCalBase {
       if(( $NLCHARS == $tst ) || empty( $tst ))
         unset( $rows[$lix] );
     }
-    $this->unparsed = array();
+    $this->unparsed = [];
     $comp           = $this;
     $config         = $this->getConfig();
     $compSync = $subSync = 0;
@@ -1251,7 +1184,7 @@ class calendarComponent extends iCalBase {
         case util::$EXRULE :
         case util::$RRULE :
           $values = explode( util::$SEMIC, $row );
-          $recur = array();
+          $recur = [];
           foreach( $values as $value2 ) {
             if( empty( $value2 ))
               continue; // ;-char in end position ???
@@ -1262,7 +1195,7 @@ class calendarComponent extends iCalBase {
                 $value4 = explode( util::$COMMA, $value3[1] );
                 if( 1 < count( $value4 )) {
                   foreach( $value4 as $v5ix => $value5 ) {
-                    $value6 = array();
+                    $value6 = [];
                     $dayno = $dayname = null;
                     $value5 = trim( (string) $value5 );
                     if(( ctype_alpha( substr( $value5, -1 ))) &&
@@ -1279,7 +1212,7 @@ class calendarComponent extends iCalBase {
                   }
                 }
                 else {
-                  $value4 = array();
+                  $value4 = [];
                   $dayno  = $dayname = null;
                   $value5 = trim( (string) $value3[1] );
                   if(( ctype_alpha( substr( $value5, -1 ))) &&
@@ -1346,7 +1279,6 @@ class calendarComponent extends iCalBase {
  * @param mixed $arg1  ordno/component type/ component uid
  * @param mixed $arg2  ordno if arg1 = component type
  * @return object
- * @uses calendarComponent::getProperty()
  */
   public function getComponent ( $arg1=null, $arg2=null ) {
     static $INDEX = 'INDEX';
@@ -1393,7 +1325,7 @@ class calendarComponent extends iCalBase {
       }
     }
             /* not found.. . */
-    unset( $this->compix );
+    $this->compix = [];
     return false;
   }
 /**
@@ -1402,10 +1334,10 @@ class calendarComponent extends iCalBase {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 1.x.x - 2007-04-24
  * @param object $component calendar component
- * @uses calendarComponent::setComponent( $component )
  */
   public function addSubComponent ( $component ) {
     $this->setComponent( $component );
+    return true;
   }
 /**
  * Return formatted output for subcomponents
@@ -1413,16 +1345,12 @@ class calendarComponent extends iCalBase {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.21.11 - 2015-03-10
  * @return string
- * @uses calendarComponent::getProperty()
- * @uses calendarComponent::setConfig()
- * @uses calendarComponent::getConfig()
- * @uses calendarComponent::createComponent()
  */
   public function createSubComponent() {
     static $DATEKEY = '%04d%02d%02d%02d%02d%02d000';
     $output = null;
     if( util::$LCVTIMEZONE == $this->objName ) { // sort : standard, daylight, in dtstart order
-      $stdarr = $dlarr = array();
+      $stdarr = $dlarr = [];
       foreach( $this->components as $cix => $component ) {
         if( empty( $component ))
           continue;
@@ -1444,7 +1372,7 @@ class calendarComponent extends iCalBase {
           $dlarr[$key] = $component;
         }
       } // end foreach(...
-      $this->components = array();
+      $this->components = [];
       ksort( $stdarr, SORT_NUMERIC );
       foreach( $stdarr as $std )
         $this->components[] = $std;

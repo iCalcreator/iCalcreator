@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -25,8 +25,6 @@
  * This file is a part of iCalcreator.
  */
 namespace kigkonsult\iCalcreator;
-use DateTime;
-use DateTimeZone;
 use kigkonsult\iCalcreator\util\util;
 /**
  * iCalcreator timezone management class
@@ -64,24 +62,15 @@ class timezoneHandler {
  * Additional changes jpirkey
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.23 - 2017-02-17
- * @param object $calendar  iCalcreator calendar instance
- * @param string $timezone  valid timezone avveptable by PHP5 DateTimeZone
- * @param array  $xProp     *[x-propName => x-propValue], optional
- * @param int    $from      unix timestamp
- * @param int    $to        unix timestamp
+ * @param vcalendar $calendar  iCalcreator calendar instance
+ * @param string    $timezone  valid timezone avveptable by PHP5 DateTimeZone
+ * @param array     $xProp     *[x-propName => x-propValue]
+ * @param int       $from      unix timestamp
+ * @param int       $to        unix timestamp
  * @return bool
- * @uses vcalendar::getProperty()
- * @uses vcalendar::newComponent()
- * @uses calendarComponent::setproperty()
- * @uses util::isXprefixed()
- * @uses timezoneHandler::offsetSec2His()
  * @static
  */
-  public static function createTimezone( $calendar,
-                                         $timezone,
-                                         $xProp=array(),
-                                         $from=null,
-                                         $to=null ) {
+  public static function createTimezone( vcalendar $calendar, $timezone, $xProp=[], $from=null, $to=null ) {
     static $YMD          = 'Ymd';
     static $T000000      = 'T000000';
     static $MINUS7MONTH  = '-7 month';
@@ -102,35 +91,35 @@ class timezoneHandler {
     if( ! empty( $to )   && ! is_int( $to ))
       return false;
     try {
-      $dtz               = new DateTimeZone( $timezone );
+      $dtz               = new \DateTimeZone( $timezone );
       $transitions       = $dtz->getTransitions();
-      $utcTz             = new DateTimeZone( util::$UTC );
+      $utcTz             = new \DateTimeZone( util::$UTC );
     }
-    catch( Exception $e ) {
+    catch( \Exception $e ) {
       return false;
     }
     if( empty( $from ) || empty( $to )) {
       $dates             = array_keys( $calendar->getProperty( util::$DTSTART ));
       if( empty( $dates ))
-        $dates           = array( date( $YMD ));
+        $dates           = [date( $YMD )];
     }
     if( ! empty( $from )) {
       try {
         $timestamp       = sprintf( self::$FMTTIMESTAMP, $from );
-        $dateFrom        = new DateTime( $timestamp );      // set lowest date (UTC)
+        $dateFrom        = new \DateTime( $timestamp );      // set lowest date (UTC)
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
     }
     else {
       try {
         $from            = reset( $dates );                 // set lowest date to the lowest dtstart date
-        $dateFrom        = new DateTime( $from . $T000000, $dtz );
+        $dateFrom        = new \DateTime( $from . $T000000, $dtz );
         $dateFrom->modify( $MINUS7MONTH );                  // set $dateFrom to seven month before the lowest date
         $dateFrom->setTimezone( $utcTz );                   // convert local date to UTC
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
     }
@@ -138,34 +127,34 @@ class timezoneHandler {
     if( ! empty( $to )) {
       try {
         $timestamp       = sprintf( self::$FMTTIMESTAMP, $to );
-        $dateTo          = new DateTime( $timestamp );     // set end date (UTC)
+        $dateTo          = new \DateTime( $timestamp );     // set end date (UTC)
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
     }
     else {
       try {
         $to              = end( $dates );                   // set highest date to the highest dtstart date
-        $dateTo          = new DateTime( $to . $T235959, $dtz );
+        $dateTo          = new \DateTime( $to . $T235959, $dtz );
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
       $dateTo->modify( $PLUS18MONTH );                      // set $dateTo to 18 month after the highest date
       $dateTo->setTimezone( $utcTz );                       // convert local date to UTC
     }
     $dateToYmd           = $dateTo->format( $YMD2 );
-    $transTemp           = array();
+    $transTemp           = [];
     $prevOffsetfrom      = 0;
     $stdIx  = $dlghtIx   = null;
     $prevTrans           = false;
     foreach( $transitions as $tix => $trans ) {             // all transitions in date-time order!!
       try {
         $timestamp       = sprintf( self::$FMTTIMESTAMP, $trans[$TS] );
-        $date            = new DateTime( $timestamp );      // set transition date (UTC)
+        $date            = new \DateTime( $timestamp );      // set transition date (UTC)
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
       $transDateYmd      = $date->format( $YMD2 );
@@ -181,12 +170,12 @@ class timezoneHandler {
         $trans[util::$TZOFFSETFROM] = $prevOffsetfrom;      // i.e. set previous offsetto as offsetFrom
         $date->modify( $trans[util::$TZOFFSETFROM] . $SECONDS );    // convert utc date to local date
         $d               = explode( util::$MINUS, $date->format( $YMDHIS3 ));
-        $trans[self::$TIME] = array( util::$LCYEAR  => (int) $d[0], // set date to array
-                                     util::$LCMONTH => (int) $d[1], //  to ease up dtstart and (opt) rdate setting
-                                     util::$LCDAY   => (int) $d[2],
-                                     util::$LCHOUR  => (int) $d[3],
-                                     util::$LCMIN   => (int) $d[4],
-                                     util::$LCSEC   => (int) $d[5] );
+        $trans[self::$TIME] = [util::$LCYEAR  => (int) $d[0], // set date to array
+                               util::$LCMONTH => (int) $d[1], //  to ease up dtstart and (opt) rdate setting
+                               util::$LCDAY   => (int) $d[2],
+                               util::$LCHOUR  => (int) $d[3],
+                               util::$LCMIN   => (int) $d[4],
+                               util::$LCSEC   => (int) $d[5]];
       }
       $prevOffsetfrom    = $trans[self::$OFFSET];
       if( true !== $trans[$ISDST] ) {                       // standard timezone
@@ -222,33 +211,33 @@ class timezoneHandler {
       if( $prevTrans ) {            // then we use the last transition (before startdate) for the tz info
         try {
           $timestamp     = sprintf( self::$FMTTIMESTAMP, $prevTrans[$TS] );
-          $date          = new DateTime( $timestamp );     // set transition date (UTC)
+          $date          = new \DateTime( $timestamp );     // set transition date (UTC)
         }
-        catch( Exception $e ) {
+        catch( \Exception $e ) {
           return false;
         }
         $date->modify( $prevTrans[util::$TZOFFSETFROM] . $SECONDS );// convert utc date to local date
         $d               = explode( util::$MINUS, $date->format( $YMDHIS3 )); // set arr-date to ease up dtstart setting
-        $prevTrans[self::$TIME] = array( util::$LCYEAR  => (int) $d[0],
-                                         util::$LCMONTH => (int) $d[1],
-                                         util::$LCDAY   => (int) $d[2],
-                                         util::$LCHOUR  => (int) $d[3],
-                                         util::$LCMIN   => (int) $d[4],
-                                         util::$LCSEC   => (int) $d[5] );
+        $prevTrans[self::$TIME] = [util::$LCYEAR  => (int) $d[0],
+                                   util::$LCMONTH => (int) $d[1],
+                                   util::$LCDAY   => (int) $d[2],
+                                   util::$LCHOUR  => (int) $d[3],
+                                   util::$LCMIN   => (int) $d[4],
+                                   util::$LCSEC   => (int) $d[5]];
         $transTemp[0] = $prevTrans;
       } // end if( $prevTrans )
       else {                        // or we use the timezone identifier to BUILD the standard tz info (?)
         try {
-          $newTz         = new DateTimeZone( $timezone );
-          $date          = new DateTime( $NOW, $newTz );
+          $newTz         = new \DateTimeZone( $timezone );
+          $date          = new \DateTime( $NOW, $newTz );
         }
-        catch( Exception $e ) {
+        catch( \Exception $e ) {
           return false;
         }
-        $transTemp[0]    = array( $TIME       => $date->format( $YMDTHISO ),
-                                  $OFFSET     => $date->format( util::$Z ),
-                                  util::$TZOFFSETFROM => $date->format( util::$Z ),
-                                  $ISDST      => false );
+        $transTemp[0]    = [$TIME               => $date->format( $YMDTHISO ),
+                            $OFFSET             => $date->format( util::$Z ),
+                            util::$TZOFFSETFROM => $date->format( util::$Z ),
+                            $ISDST              => false];
       }
     }
     foreach( $transTemp as $tix => $trans ) { // create standard/daylight subcomponents
@@ -299,19 +288,18 @@ class timezoneHandler {
     return $output;
   }
 /**
- * Very simple conversion of a MS timezone to a PHP5 valid (Date-)timezone
+ * Very basic conversion of a MS timezone to a PHP5 valid (Date-)timezone
  * matching (MS) UCT offset and time zone descriptors
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.23.8 - 2017-04-17
  * @param string $timezone     to convert
  * @return bool
- * @uses util::tz2offset()
  * @static
  */
   public static function ms2phpTZ( & $timezone ) {
-    static $REPL1  = array( 'GMT', 'gmt', 'utc' );
-    static $REPL2  = array( '(', ')', '&', ',', '  ' );
+    static $REPL1  = ['GMT', 'gmt', 'utc'];
+    static $REPL2  = ['(', ')', '&', ',', '  '];
     static $PUTC   = '(UTC';
     static $ENDP   = ')';
     static $TIMEZONE_ID = 'timezone_id';
@@ -334,12 +322,12 @@ class timezoneHandler {
                                        substr( $search, ( $pos + 1 ))));
     $searchWords  = explode( util::$SP1, $searchText );
     try {
-      $timezoneAbbreviations = DateTimeZone::listAbbreviations();
+      $timezoneAbbreviations = \DateTimeZone::listAbbreviations();
     }
-    catch( Exception $e ) {
+    catch( \Exception $e ) {
       return false;
     }
-    $hits = array();
+    $hits = [];
     foreach( $timezoneAbbreviations as $name => $transitions ) {
       foreach( $transitions as $cnt => $transition ) {
         if( empty( $transition[self::$OFFSET] ) ||
@@ -391,15 +379,9 @@ class timezoneHandler {
  * @param string $tzTo    PHP valid 'to' timezone, default util::$UTC
  * @param string $format  date output format, default 'Ymd\THis'
  * @return bool true on success, false on error
- * @uses util::isArrayDate()
- * @uses util::date2strdate()
- * @uses util::chkDateArr()
  * @static
  */
-  public static function transformDateTime( & $date,
-                                              $tzFrom,
-                                              $tzTo=null,
-                                              $format=null ) {
+  public static function transformDateTime( & $date, $tzFrom, $tzTo=null, $format=null ) {
     static $YMDTHIS = 'Ymd\THis';
     if( is_null( $tzTo ))
       $tzTo    = util::$UTC;
@@ -410,11 +392,11 @@ class timezoneHandler {
     if( is_array( $date ) && isset( $date[util::$LCTIMESTAMP] )) {
       try {
         $timestamp = sprintf( self::$FMTTIMESTAMP, $date[util::$LCTIMESTAMP] );
-        $d     = new DateTime( $timestamp ); // set UTC date
-        $newTz = new DateTimeZone( $tzFrom );
+        $d     = new \DateTime( $timestamp ); // set UTC date
+        $newTz = new \DateTimeZone( $tzFrom );
         $d->setTimezone( $newTz );           // convert to 'from' date
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
     }
@@ -427,18 +409,18 @@ class timezoneHandler {
       if( util::$Z == substr( $date, -1 ))
         $date  = substr( $date, 0, ( strlen( $date ) - 2 ));
       try {
-        $newTz = new DateTimeZone( $tzFrom );
-        $d     = new DateTime( $date, $newTz );
+        $newTz = new \DateTimeZone( $tzFrom );
+        $d     = new \DateTime( $date, $newTz );
       }
-      catch( Exception $e ) {
+      catch( \Exception $e ) {
         return false;
       }
     }
     try {
-      $newTz   = new DateTimeZone( $tzTo );
+      $newTz   = new \DateTimeZone( $tzTo );
       $d->setTimezone( $newTz );
     }
-    catch( Exception $e ) {
+    catch( \Exception $e ) {
       return false;
     }
     $date = $d->format( $format );

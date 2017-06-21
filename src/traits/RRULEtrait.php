@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -43,7 +43,6 @@ trait RRULEtrait {
  * Return formatted output for calendar component property rrule
  *
  * @return string
- * @uses utilRecur::formatRecur()
  */
   public function createRrule() {
     return utilRecur::formatRecur( util::$RRULE,
@@ -56,9 +55,6 @@ trait RRULEtrait {
  * @param array    $rruleset
  * @param array    $params
  * @param integer  $index
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
- * @uses utilRecur::setRexrule()
  */
   public function setRrule( $rruleset, $params=null, $index=null ) {
     if( empty( $rruleset )) {

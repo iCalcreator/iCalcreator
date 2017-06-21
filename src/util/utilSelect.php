@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -26,9 +26,9 @@
  */
 namespace kigkonsult\iCalcreator\util;
 use kigkonsult\iCalcreator\vcalendar;
+use kigkonsult\iCalcreator\calendarComponent;
 use kigkonsult\iCalcreator\vcalendarSortHandler;
 use kigkonsult\iCalcreator\iCaldateTime;
-use DateInterval;
 /**
  * iCalcreator geo support class
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
@@ -41,43 +41,24 @@ class utilSelect {
  * DTSTART MUST be set for every component.
  * No check of date.
  * @param object $calendar
- * @param mixed  $startY optional,      (int) start Year,  default current Year
- *                                 ALT. (obj) start date (datetime)
- *                                 ALT. array selecOptions ( *[ <propName> => <uniqueValue> ] )
- * @param mixed  $startM optional,      (int) start Month, default current Month
- *                                 ALT. (obj) end date (datetime)
- * @param int    $startD optional, start Day,   default current Day
- * @param int    $endY   optional, end   Year,  default $startY
- * @param int    $endM   optional, end   Month, default $startM
- * @param int    $endD   optional, end   Day,   default $startD
- * @param mixed  $cType  optional, calendar component type(-s), default false=all else string/array type(-s)
- * @param bool   $flat   optional, false (default) => output : array[Year][Month][Day][]
- *                                 true            => output : array[] (ignores split)
- * @param bool   $any    optional, true (default) - select component(-s) that occurs within period
- *                                 false          - only component(-s) that starts within period
- * @param bool   $split  optional, true (default) - one component copy every DAY it occurs during the
- *                                                  period (implies flat=false)
- *                                 false          - one occurance of component only in output array
- * @return array or false
- * @uses util::isDateTimeClass()
- * @uses vcalendar::countComponents()
- * @uses utilSelect::selectComponents2()
- * @uses calendarComponent::$objName
- * @uses calendarComponent::getProperty()
- * @uses iCaldateTime::factory()
- * @uses iCaldateTime::getTimezoneName()
- * @uses iCaldateTime::getTime()
- * @uses iCaldateTime::$SCbools
- * @uses iCaldateTime::format()
- * @uses utilSelect::inScope()
- * @uses utilSelect::getAllEXRULEdates()
- * @uses utilSelect::getAllEXDATEdates()
- * @uses utilSelect::getAllRRULEdates()
- * @uses utilSelect::getAllRDATEdates()
- * @uses calendarComponent::setProperty()
- * @uses calendarComponent::deleteProperty()
- * @uses util::setSortArgs()
- * @uses util::cmpfcn()
+ * @param mixed  $startY      (int) start Year,  default current Year
+ *                       ALT. (obj) start date (datetime)
+ *                       ALT. array selecOptions ( *[ <propName> => <uniqueValue> ] )
+ * @param mixed  $startM      (int) start Month, default current Month
+ *                       ALT. (obj) end date (datetime)
+ * @param int    $startD start Day,   default current Day
+ * @param int    $endY   end   Year,  default $startY
+ * @param int    $endM   end   Month, default $startM
+ * @param int    $endD   end   Day,   default $startD
+ * @param mixed  $cType  calendar component type(-s), default false=all else string/array type(-s)
+ * @param bool   $flat   false (default) => output : array[Year][Month][Day][]
+ *                       true            => output : array[] (ignores split)
+ * @param bool   $any    true (default) - select component(-s) that occurs within period
+ *                       false          - only component(-s) that starts within period
+ * @param bool   $split  true (default) - one component copy every DAY it occurs during the
+ *                                        period (implies flat=false)
+ *                       false          - one occurance of component only in output array
+ * @return mixed array on success, bool false on error
  * @static
  */
   public static function selectComponents( vcalendar $calendar,
@@ -107,8 +88,8 @@ class utilSelect {
     static $PRA         = '%a';
     static $YMD2        = 'Y-m-d';
     static $DAYOFDAYS   = 'day %d of %d';
-    static $SORTER      = array( 'kigkonsult\iCalcreator\vcalendarSortHandler',
-                                 'cmpfcn' );
+    static $SORTER      = ['kigkonsult\iCalcreator\vcalendarSortHandler',
+                           'cmpfcn'];
             /* check  if empty calendar */
     if( 1 > $calendar->countComponents())
       return false;
@@ -137,7 +118,7 @@ class utilSelect {
       $cType     = util::$VCOMPS;
     else {
       if( ! is_array( $cType ))
-        $cType   = array( $cType );
+        $cType   = [$cType];
       $cType     = array_map( $STRTOLOWER, $cType );
       foreach( $cType as $cix => $theType ) {
         if( ! in_array( $theType, util::$VCOMPS ))
@@ -154,11 +135,11 @@ class utilSelect {
       $split = false;
 // echo " args={$startY}-{$startM}-{$startD} - {$endY}-{$endM}-{$endD}, flat={$flat}, any={$any}, split={$split}<br>\n"; $tcnt = 0;// test ###
             /* iterate components */
-    $result      = array();
+    $result      = [];
     $calendar->sort( util::$UID );
     $compUIDcmp  = null;
-    $exdatelist  = $recurrIdList = array();
-    $INTERVAL_P1D = new DateInterval( $P1D );
+    $exdatelist  = $recurrIdList = [];
+    $INTERVAL_P1D = new \DateInterval( $P1D );
 // echo ' comp ix : ' . implode( ',', ( array_keys( $calendar->components ))) . "<br>\n"; // test ###
     $cix = -1;
     while( $component = $calendar->getComponent()) {
@@ -186,7 +167,7 @@ class utilSelect {
 // echo 'START comp(' . $cix . ') ' . $component->objName . ', UID:' . $compUID . "<br>\n"; // test ###
       if( $compUIDcmp != $compUID ) {
         $compUIDcmp = $compUID;
-        $exdatelist = $recurrIdList = array();
+        $exdatelist = $recurrIdList = [];
       }
 // echo "#$cix".PHP_EOL.var_export( $component, true ) . "\n"; // test ###
       $compStart = iCaldateTime::factory( $prop[util::$LCvalue],
@@ -266,10 +247,10 @@ class utilSelect {
         $rangeSet = ( isset( $prop[util::$LCparams][$RANGE] ) &&
                      ( $THISANDFUTURE == $prop[util::$LCparams][$RANGE] ))
                   ? true : false;
-        $recurrIdList[$recurrid->key] = array( clone $compStart,
-                                               clone $compEnd,
-                                               $compDuration,
-                                               $rangeSet ); // change recur this day to new YmdHis/duration/range
+        $recurrIdList[$recurrid->key] = [clone $compStart,
+                                         clone $compEnd,
+                                         $compDuration,
+                                         $rangeSet]; // change recur this day to new YmdHis/duration/range
 // echo "adding comp no:$cix with date=".$compStart->format('Y-m-d H:i:s e')." to recurrIdList id={$recurrid->key}, newDate={$compStart->key}<br>\n"; // test ###
         unset( $prop );
         continue;                         // ignore any other props in the component
@@ -398,7 +379,7 @@ class utilSelect {
                if 'any' components, check components with reccurrence rules, removing all excluding dates
                *********************************************************** */
       if( true === $any ) {
-        $recurlist = array();
+        $recurlist = [];
             /* make a list of optional repeating dates for component occurence, rrule, rdate */
         self::getAllRRULEdates( $component, $recurlist,
                                 $dtstartTz, $compStart, $workStart, $workEnd,
@@ -566,52 +547,46 @@ class utilSelect {
 /**
  * Return bool true if dates are in scope
  *
- * @param object $start       datetime
- * @param object $scopeStart  datetime
- * @param object $end         datetime
- * @param object $scopeEnd    datetime
- * @param string $format
+ * @param iCaldateTime $start
+ * @param iCaldateTime $scopeStart
+ * @param iCaldateTime $end
+ * @param iCaldateTime $scopeEnd
+ * @param string       $format
  * @return bool
  * @access private
  * @static
  */
-  private static function inScope( $start,
-                                   $scopeStart,
-                                   $end,
-                                   $scopeEnd,
+  private static function inScope( iCaldateTime $start,
+                                   iCaldateTime $scopeStart,
+                                   iCaldateTime $end,
+                                   iCaldateTime $scopeEnd,
                                    $format ) {
     return (( $start->format( $format ) >= $scopeStart->format( $format )) &&
             ( $end->format(   $format ) <= $scopeEnd->format(   $format )));
   }
-
 /**
  * Get all EXRULE dates (multiple values allowed)
  *
- * @param object $component
- * @param array  $exdatelist
- * @param string $dtstartTz,
- * @param object $compStart,
- * @param object $workStart,
- * @param object $workEnd,
- * @param string $compStartHis,
- * @uses calendarComponent::getProperty()
- * @uses iCaldateTime::factory()
- * @uses iCaldateTime::format()
- * @uses util::strDate2arr()
- * @uses utilRecur::recur2date()
+ * @param calendarComponent $component
+ * @param array             $exdatelist
+ * @param string            $dtstartTz
+ * @param iCaldateTime      $compStart
+ * @param iCaldateTime      $workStart
+ * @param iCaldateTime      $workEnd
+ * @param string            $compStartHis
  */
-  private static function getAllEXRULEdates( $component,
-                                           & $exdatelist,
+  private static function getAllEXRULEdates( calendarComponent $component,
+                                             array & $exdatelist,
                                              $dtstartTz,
-                                             $compStart,
-                                             $workStart,
-                                             $workEnd,
+                                             iCaldateTime $compStart,
+                                             iCaldateTime $workStart,
+                                             iCaldateTime $workEnd,
                                              $compStartHis ) {
     while( false !== ( $prop = $component->getProperty( util::$EXRULE  ))) {
-      $exdatelist2 = array();
+      $exdatelist2 = [];
       if( isset( $prop[util::$UNTIL][util::$LCHOUR] )) { // convert UNTIL date to DTSTART timezone
         $until = iCaldateTime::factory( $prop[util::$UNTIL],
-                                        array( util::$TZID => util::$UTC ),
+                                        [util::$TZID => util::$UTC],
                                         null,
                                         $dtstartTz );
         $until = $until->format();
@@ -627,16 +602,17 @@ class utilSelect {
         $exdatelist[$k.$compStartHis] = $v;
       unset( $until, $exdatelist2 );
     }
+    return true;
   }
 /**
  * Get all EXDATE dates (multiple values allowed)
  *
- * @param object $component
- * @param array  $exdatelist
- * @param string $dtstartTz,
+ * @param calendarComponent $component
+ * @param array             $exdatelist
+ * @param string            $dtstartTz
  */
-  private static function getAllEXDATEdates( $component,
-                                           & $exdatelist,
+  private static function getAllEXDATEdates( calendarComponent $component,
+                                             array & $exdatelist,
                                              $dtstartTz ) {
     while( false !== ( $prop = $component->getProperty( util::$EXDATE,
                                                         false,
@@ -649,40 +625,35 @@ class utilSelect {
         $exdatelist[$exdate->key] = true;
       } // end - foreach( $exdate as $exdate )
     }
+    return true;
   }
-
 /**
- * Get all RRULE dates (multiple values allowed)
+ * Update $recurlist all RRULE dates (multiple values allowed)
  *
- * @param object $component
- * @param array  $recurlist
- * @param string $dtstartTz,
- * @param object $compStart,
- * @param object $workStart,
- * @param object $workEnd,
- * @param string $compStartHis,
+ * @param calendarComponent $component
+ * @param array             $recurlist
+ * @param string            $dtstartTz
+ * @param iCaldateTime      $compStart
+ * @param iCaldateTime      $workStart
+ * @param iCaldateTime      $workEnd
+ * @param string $compStartHis
  * @param array  $exdatelist
  * @param object $compDuration
- * @uses calendarComponent::getProperty()
- * @uses iCaldateTime::factory()
- * @uses iCaldateTime::format()
- * @uses util::strDate2arr()
- * @uses utilRecur::recur2date()
  */
-  private static function getAllRRULEdates( $component,
-                                          & $recurlist,
+  private static function getAllRRULEdates( calendarComponent $component,
+                                            array & $recurlist,
                                             $dtstartTz,
-                                            $compStart,
-                                            $workStart,
-                                            $workEnd,
+                                            iCaldateTime $compStart,
+                                            iCaldateTime$workStart,
+                                            iCaldateTime $workEnd,
                                             $compStartHis,
-                                            $exdatelist,
+                                            array $exdatelist,
                                             $compDuration ) {
     while( false !== ( $prop = $component->getProperty( util::$RRULE ))) {
-      $recurlist2 = array();
+      $recurlist2 = [];
       if( isset( $prop[util::$UNTIL][util::$LCHOUR] )) { // convert RRULE['UNTIL'] to the same timezone as DTSTART !!
         $until = iCaldateTime::factory( $prop[util::$UNTIL],
-                                        array( util::$TZID => util::$UTC ),
+                                        [util::$TZID => util::$UTC],
                                         null,
                                         $dtstartTz );
         $until = $until->format();
@@ -701,32 +672,28 @@ class utilSelect {
       }
       unset( $prop, $until, $recurlist2 );
     }
+    return true;
   }
 /**
- * Get all RDATE dates (multiple values allowed)
+ * Update $recurlist with RDATE dates (multiple values allowed)
  *
- * @param object $component
- * @param array  $recurlist
- * @param string $dtstartTz,
- * @param object $workStart,
- * @param object $fcnEnd,
- * @param string string $format
- * @param array  $exdatelist
- * @param string $compStartHis,
- * @param object $compDuration
- * @uses calendarComponent::getProperty()
- * @uses iCaldateTime::factory()
- * @uses utilSelect::inScope()
- * @uses iCaldateTime::diff()
- * @uses util::duration2str()
+ * @param calendarComponent $component
+ * @param array             $recurlist
+ * @param string            $dtstartTz
+ * @param iCaldateTime      $workStart
+ * @param iCaldateTime      $fcnEnd
+ * @param string            $format
+ * @param array             $exdatelist
+ * @param string            $compStartHis
+ * @param object            $compDuration
  */
-  private static function getAllRDATEdates( $component,
-                                          & $recurlist,
+  private static function getAllRDATEdates( calendarComponent $component,
+                                            array & $recurlist,
                                             $dtstartTz,
-                                            $workStart,
-                                            $fcnEnd,
+                                            iCaldateTime $workStart,
+                                            iCaldateTime $fcnEnd,
                                             $format,
-                                            $exdatelist,
+                                            array $exdatelist,
                                             $compStartHis,
                                             $compDuration ) {
     while( false !== ( $prop = $component->getProperty( util::$RDATE,
@@ -752,12 +719,12 @@ class utilSelect {
                                                                            $theRdate[1],
                                                                            $dtstartTz ));
           else                                        // period duration
-            $recurlist[$rdate->key] = new DateInterval( util::duration2str( $theRdate[1] ));
+            $recurlist[$rdate->key] = new \DateInterval( util::duration2str( $theRdate[1] ));
         } // end if( util::$PERIOD == $rdateFmt )
         elseif( util::$DATE == $rdateFmt ) {          // single recurrence, DATE
           $rdate  = iCaldateTime::factory( $theRdate,
                                            array_merge( $params,
-                                                        array( util::$TZID => $dtstartTz )),
+                                                        [util::$TZID => $dtstartTz] ),
                                            null,
                                            $dtstartTz );
           if( self::inScope( $rdate, $workStart, $rdate, $fcnEnd, $format ) &&
@@ -775,23 +742,20 @@ class utilSelect {
         } // end DATETIME
       } // end foreach( $prop as $rix => $theRdate )
     }  // end while( false !== ( $prop = $component->getProperty( util::$RDATE, false, true )))
+    return true;
   }
 /**
- * Return selected components from calendar based on specific property value(-s)
+ * Return array with selected components values from calendar based on specific property value(-s)
  *
- * @param object $calendar
+ * @param vcalendar $calendar
  * @param array  $selectOptions (string) key => (mixed) value, (key=propertyName)
  * @return array
- * @uses vcalendar::$components
- * @uses calendarComponent::$objName
- * @uses calendarComponent::getProperty()
- * @uses calendarComponent::getProperties()
  * @access private
  * @static
  */
   private static function selectComponents2( vcalendar $calendar,
-                                                 array $selectOptions ) {
-    $output = array();
+                                             array $selectOptions ) {
+    $output = [];
     $selectOptions = array_change_key_case( $selectOptions, CASE_UPPER );
     while( $component3 = $calendar->getComponent()) {
       if( empty( $component3 ))
@@ -803,13 +767,13 @@ class utilSelect {
         if( ! in_array( $propName, util::$OTHERPROPS ))
           continue;
         if( ! is_array( $pValue ))
-          $pValue = array( $pValue );
+          $pValue = [$pValue];
         if(( util::$UID == $propName ) && in_array( $uid, $pValue )) {
           $output[$uid][] = $component3;
           continue;
         }
         elseif( in_array( $propName, util::$MPROPS1 )) {
-          $propValues = array();
+          $propValues = [];
           $component3->getProperties( $propName, $propValues );
           $propValues = array_keys( $propValues );
           foreach( $pValue as $theValue ) {
@@ -842,7 +806,7 @@ class utilSelect {
     } // end while( $component3 = $calendar->getComponent()) {
     if( ! empty( $output )) {
       ksort( $output ); // uid order
-      $output2 = array();
+      $output2 = [];
       foreach( $output as $uid => $uList ) {
         foreach( $uList as $cx => $uValue )
           $output2[] = $uValue;

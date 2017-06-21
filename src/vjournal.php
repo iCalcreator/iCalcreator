@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -26,9 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
-use kigkonsult\iCalcreator\util\utilRecur;
-use kigkonsult\iCalcreator\util\utilRexdate;
 /**
  * iCalcreator VJOURNAL component class
  *
@@ -66,11 +63,8 @@ class vjournal extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-02-01
  * @param array $config
- * @uses calendarComponent::__contruct()
- * @uses calendarComponent::setConfig()
- * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $J = 'j';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -86,11 +80,12 @@ class vjournal extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
+           $this->config,
+           $this->compix,
            $this->propix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->attach,
            $this->attendee,
            $this->categories,
@@ -122,30 +117,6 @@ class vjournal extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.5.1 - 2008-10-12
  * @return string
- * @uses calendarComponent::createUid()
- * @uses calendarComponent::createDtstamp()
- * @uses vjournal::createAttach()
- * @uses vjournal::createAttendee()
- * @uses vjournal::createCategories()
- * @uses vjournal::createClass()
- * @uses vjournal::createComment()
- * @uses vjournal::createContact()
- * @uses vjournal::createDescription()
- * @uses vjournal::createDtstart()
- * @uses vjournal::createExdate()
- * @uses vjournal::createExrule()
- * @uses vjournal::createLastModified()
- * @uses vjournal::createOrganizer()
- * @uses vjournal::createRdate()
- * @uses vjournal::createRelatedTo()
- * @uses vjournal::createRequestStatus()
- * @uses vjournal::createRecurrenceid()
- * @uses vjournal::createRrule()
- * @uses vjournal::createSequence()
- * @uses vjournal::createStatus()
- * @uses vjournal::createSummary()
- * @uses vjournal::createUrl()
- * @uses calendarComponent::createXprop()
  */
   public function createComponent() {
     $objectname =  strtoupper( $this->objName );

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -26,8 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilRecur;
-use kigkonsult\iCalcreator\util\utilRexdate;
 /**
  * iCalcreator VTIMEZONE component class
  *
@@ -57,11 +55,8 @@ class vtimezone extends calendarComponent {
  * @since 2.22.23 - 2017-02-01
  * @param mixed $timezonetype  default false ( STANDARD / DAYLIGHT )
  * @param array $config
- * @uses calendarComponent::__contruct()
- * @uses vtimezone::setConfig()
- * @uses util::initConfig(
  */
-  public function __construct( $timezonetype=null, $config = array()) {
+  public function __construct( $timezonetype=null, $config = []) {
     static $TZ = 'tz';
     if( is_array( $timezonetype )) {
       $config       = $timezonetype;
@@ -87,12 +82,12 @@ class vtimezone extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
+           $this->config,
            $this->propix,
            $this->compix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->comment,
            $this->dtstart,
            $this->lastmodified,
@@ -111,19 +106,6 @@ class vtimezone extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.5.1 - 2008-10-25
  * @return string
- * @uses vtimezone::createTzid()
- * @uses vtimezone::createLastModified()
- * @uses vtimezone::createTzurl()
- * @uses vtimezone::createDtstart()
- * @uses vtimezone::createTzoffsetfrom()
- * @uses vtimezone::createTzoffsetto()
- * @uses vtimezone::createComment()
- * @uses vtimezone::createRdate()
- * @uses vtimezone::createRrule()
- * @uses vtimezone::createTzname()
- * @uses vtimezone::createXprop()
- * @uses calendarComponent::createXprop()
- * @uses calendarComponent::createSubComponent()
  */
   public function createComponent() {
     $objectname = strtoupper(( isset( $this->timezonetype )) ? $this->timezonetype : $this->objName );
@@ -143,7 +125,7 @@ class vtimezone extends calendarComponent {
     return $component . sprintf( util::$FMTEND, $objectname );
   }
 /**
- * Get vtimezone component property value/params
+ * Return vtimezone component property value/params
  *
  * If arg $inclParam, return array with keys VALUE/PARAMS
  * @param string  $propName
@@ -151,14 +133,9 @@ class vtimezone extends calendarComponent {
  * @param bool    $inclParam
  * @param bool    $specform
  * @return mixed
- * @uses vtimezone::$tzid
- * @uses vtimezone::$tzoffsetfrom
- * @uses vtimezone::$tzoffsetto
- * @uses vtimezone::$tzurl
- * @uses calendarComponent::getProperty()
  */
-  public function getProperty( $propName=false,
-                               $propix=false,
+  public function getProperty( $propName=null,
+                               $propix=null,
                                $inclParam=false,
                                $specform=false ) {
     switch( strtoupper( $propName )) {

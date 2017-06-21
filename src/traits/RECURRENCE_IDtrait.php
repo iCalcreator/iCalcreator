@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait RECURRENCE_IDtrait {
  * Return formatted output for calendar component property recurrence-id
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::date2strdate()
- * @uses util::createParams()
  */
   public function createRecurrenceid() {
     if( empty( $this->recurrenceid ))
@@ -69,16 +65,14 @@ trait RECURRENCE_IDtrait {
  * @param string  $tz
  * @param array   $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setDate()
  */
   public function setRecurrenceid( $year, $month=null, $day=null,
                                    $hour=null, $min=null, $sec=null,
                                    $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->recurrenceid = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                     util::$LCparams => null );
+        $this->recurrenceid = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                               util::$LCparams => null];
         return true;
       }
       else

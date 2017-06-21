@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait LOCATIONtrait {
  * Return formatted output for calendar component property location
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::strrep()
  */
   public function createLocation() {
     if( empty( $this->location ))
@@ -53,10 +49,10 @@ trait LOCATIONtrait {
     if( empty( $this->location[util::$LCvalue] ))
       return ( $this->getConfig( util::$ALLOWEMPTY )) ? util::createElement( util::$LOCATION ) : null;
     return util::createElement( util::$LOCATION,
-                                 util::createParams( $this->location[util::$LCparams],
-                                                     util::$ALTRPLANGARR,
-                                                     $this->getConfig( util::$LANGUAGE )),
-                                 util::strrep( $this->location[util::$LCvalue] ));
+                                util::createParams( $this->location[util::$LCparams],
+                                                    util::$ALTRPLANGARR,
+                                                    $this->getConfig( util::$LANGUAGE )),
+                                util::strrep( $this->location[util::$LCvalue] ));
   }
 /**
  * Set calendar component property location
@@ -64,9 +60,6 @@ trait LOCATIONtrait {
  * @param string  $value
  * @param array   $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::trimTrailNL()
- * @uses util::setParams()
  */
   public function setLocation( $value, $params=null ) {
     if( empty( $value )) {
@@ -75,8 +68,8 @@ trait LOCATIONtrait {
       else
         return false;
     }
-    $this->location = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                             util::$LCparams => util::setParams( $params ));
+    $this->location = [util::$LCvalue  => util::trimTrailNL( $value ),
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

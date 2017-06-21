@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait REQUEST_STATUStrait {
  * Return formatted output for calendar component property request-status
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::strrep()
  */
   public function createRequestStatus() {
     static $STATCODE = 'statcode';
@@ -67,7 +63,7 @@ trait REQUEST_STATUStrait {
         $content  .= util::$SEMIC . util::strrep( $rStat[util::$LCvalue][$EXTDATA] );
       $output     .= util::createElement( util::$REQUEST_STATUS,
                                           util::createParams( $rStat[util::$LCparams],
-                                                              array( util::$LANGUAGE ),
+                                                              [util::$LANGUAGE],
                                                               $lang ),
                                           $content );
     }
@@ -82,9 +78,6 @@ trait REQUEST_STATUStrait {
  * @param array    $params
  * @param integer  $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::trimTrailNL( )
- * @uses util::setMval()
  */
   public function setRequestStatus( $statcode, $text, $extdata=null, $params=null, $index=null ) {
     static $STATCODE = 'statcode';
@@ -96,8 +89,8 @@ trait REQUEST_STATUStrait {
       else
         return false;
     }
-    $input = array( $STATCODE => $statcode,
-                    $TEXT     => util::trimTrailNL( $text ));
+    $input = [$STATCODE => $statcode,
+              $TEXT     => util::trimTrailNL( $text )];
     if( $extdata )
       $input[$EXTDATA] = util::trimTrailNL( $extdata );
     util::setMval( $this->requeststatus,

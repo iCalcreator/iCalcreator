@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.23.16 manual</title>
+<title>iCalcreator 2.23.18 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2017 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.23.16">
+<meta name="description" content="using iCalcreator v2.23.18">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -137,9 +137,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.23.16</p>
+<p class="header">iCalcreator v2.23.18</p>
 <p>
-iCalcreator v2.23.16<br>
+iCalcreator v2.23.18<br>
 Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
@@ -187,7 +187,7 @@ The iCal standards are <a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.23.16 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
+For iCalcreator 2.23.18 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -272,7 +272,7 @@ This style is used for <em>PHP</em> coding examples.
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
 Use the kigkonsult.se support <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se/support" target="_blank">page</a>
-exploring iCalcreator 2.23.16 use and iCal issues. Previous iCalcreator releases are supported upon (paid) request only.
+exploring iCalcreator 2.23.18 use and iCal issues. Previous iCalcreator releases are supported upon (paid) request only.
 </p>
 <p>
 Use the contact <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">page</a>
@@ -311,7 +311,7 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.23.16/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.23.18/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
@@ -2535,7 +2535,7 @@ foreach( $events_arr as $year =&gt; $year_arr ) {
   foreach( $year_arr as $month =&gt; $month_arr ) {
     foreach( $month_arr as $day =&gt; $day_arr ) {
       foreach( $day_arr as $event ) {
-        $currddate   = $event-&gt;getProperty( &quot;x-current-dtstart&quot; );
+        $currddate   = $event-&gt;getProperty( kigkonsult\iCalcreator\util\util::$X_CURRENT_DTSTART );
         <span class="comment">// if member of a recurrence set, returns
        // array(&quot; x-current-dtstart&quot;,
        // &lt;(string) date(&quot;Y-m-d&nbsp;[H:i:s][timezone/UTC&nbsp;offset]&quot;)&gt;)</span>
@@ -2663,7 +2663,7 @@ $vcalendar = new kigkonsult\iCalcreator\vcalendar();
 $vcalendar-&gt;setConfig( $config );
 $vcalendar-&gt;parse();
 $vevent    = vcalendar-&gt;getComponent( 1 ); // <span class="comment">fetch first EVENT</span>
-$vevent-&gt;setProperty( &quot;dtstart&quot;,
+$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DTSTART,
                       2006, 12, 24, 19, 30, 00 );
                                            // <span class="comment">update <a class="ref" href="#DTSTART">DTSTART</a> property</span>
 $vcalendar-&gt;setComponent( $vevent, 1 );    // <span class="comment">replace first component</span>
@@ -2734,7 +2734,7 @@ $vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
 
 $str       = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.23.16//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.23.18//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2938,7 +2938,7 @@ $vcalendar-&gt;useCachedCalendar();
 
 <a name="iCalcreatorVersion"></a><h4>3.1.4.7 iCalcreatorVersion</h4>
 <p>
-This static class method returns the iCalcreator class version number (2.23.16+).
+This static class method returns the iCalcreator class version number (2.23.18+).
 </p>
 <p>
 There is also a <em>PHP</em> constant &quot;ICALCREATOR_VERSION&quot; (all versions).
@@ -3386,7 +3386,8 @@ When setting URL, the previously set <a href="#Directory">Directory</a> is remov
 A remote file is identified by the file suffix &quot;.ics&quot;, otherwise the URL is classified as a resource.
 When setting URL to a remote iCal <u>file</u>, only directory need to be (re-)set,
 filename remains unchanged (i.e. 1. set URL, 2. parse, 3. set directory, 4. saveCalendar).
-The URL remote file <u>file</u> part can be retrieved by the vcalendar method getConfig( &quot;filename&quot; ).
+The URL remote file <u>file</u> part can be retrieved by the vcalendar method<br>
+getConfig( &quot;filename&quot; ).
 When using a resource, filename is unset (note <a href="#Filename">filename</a>, above).
 </p>
 <p class="label">Example</p>
@@ -6262,7 +6263,7 @@ $str = $component-&gt;createRrule();
 <p class="label">Example 1</p>
 <p>Delete (single/first) RRULE property.</p>
 <p class="example">
-$vevent-&gt;deleteProperty( kigkonsult\iCalcreator\util\util::$RRULES );
+$vevent-&gt;deleteProperty( kigkonsult\iCalcreator\util\util::$RRULE );
 
 </p>
 <p class="label">Example 2</p>
@@ -7925,14 +7926,14 @@ Return (bool) true if argument directory is not null, otherwise vCard string.
 
 <a name="Copyright"></a><h4>5.1 Copyright</h4>
 <p>
-iCalcreator v2.23.16<br>
+iCalcreator v2.23.18<br>
 Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se support" target="_blank">kigkonsult.se support</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
 <p>
-Due to the iCalcreator 2.23.16 release is a unstable development release,
+Due to the iCalcreator 2.23.18 release is a unstable development release,
 the licence is somewhat restricted.
 </p>
 

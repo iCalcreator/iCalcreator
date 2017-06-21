@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait PERCENT_COMPLETEtrait {
  * Return formatted output for calendar component property percent-complete
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
  */
   public function createPercentComplete() {
     if( ! isset( $this->percentcomplete ) ||
@@ -64,8 +61,6 @@ trait PERCENT_COMPLETEtrait {
  * @param int    $value
  * @param array  $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
  */
   public function setPercentComplete( $value, $params=null ) {
     if( empty( $value ) && ! is_numeric( $value )) {
@@ -74,8 +69,8 @@ trait PERCENT_COMPLETEtrait {
       else
         return false;
     }
-    $this->percentcomplete = array( util::$LCvalue  => $value,
-                                    util::$LCparams => util::setParams( $params ));
+    $this->percentcomplete = [util::$LCvalue  => $value,
+                              util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

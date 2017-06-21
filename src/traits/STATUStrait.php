@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait STATUStrait {
  * Return formatted output for calendar component property status
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
  */
   public function createStatus() {
     if( empty( $this->status ))
@@ -60,10 +57,6 @@ trait STATUStrait {
  *
  * @param string  $value
  * @param array   $params
- * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::trimTrailNL()
- * @uses calendarComponent::setParams()
  */
   public function setStatus( $value, $params=null ) {
     if( empty( $value )) {
@@ -72,8 +65,8 @@ trait STATUStrait {
       else
         return false;
     }
-    $this->status = array( util::$LCvalue  => util::trimTrailNL( $value ),
-                           util::$LCparams => util::setParams( $params ));
+    $this->status = [util::$LCvalue  => util::trimTrailNL( $value ),
+                     util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

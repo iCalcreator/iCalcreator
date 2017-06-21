@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait TZNAMEtrait {
  * Return formatted output for calendar component property tzname
  *
  * @return string
- * @uses util::createParams()
- * @uses util::createElement()
- * @uses util::strrep(
- * @uses calendarComponent::getConfig()
  */
   public function createTzname() {
     if( empty( $this->tzname ))
@@ -56,7 +52,7 @@ trait TZNAMEtrait {
       if( ! empty( $theName[util::$LCvalue] ))
         $output .= util::createElement( util::$TZNAME,
                                         util::createParams( $theName[util::$LCparams],
-                                                            array( util::$LANGUAGE ),
+                                                            [util::$LANGUAGE],
                                                             $lang ),
                                         util::strrep( $theName[util::$LCvalue] ));
       elseif( $this->getConfig( util::$ALLOWEMPTY ))
@@ -71,9 +67,6 @@ trait TZNAMEtrait {
  * @param array    $params
  * @param integer  $index
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setMval()
- * @uses util::trimTrailNL()
  */
   public function setTzname( $value, $params=null, $index=null ) {
     if( empty( $value )) {

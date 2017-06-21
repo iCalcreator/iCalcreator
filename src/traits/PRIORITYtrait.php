@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait PRIORITYtrait {
  * Return formatted output for calendar component property priority
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
  */
   public function createPriority() {
     if( ! isset( $this->priority ) ||
@@ -63,8 +60,6 @@ trait PRIORITYtrait {
  * @param int    $value
  * @param array  $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
  */
   public function setPriority( $value, $params=null ) {
     if( empty( $value ) && ! is_numeric( $value ))    {
@@ -73,8 +68,8 @@ trait PRIORITYtrait {
       else
         return false;
     }
-    $this->priority = array( util::$LCvalue  => $value,
-                             util::$LCparams => util::setParams( $params ));
+    $this->priority = [util::$LCvalue  => $value,
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

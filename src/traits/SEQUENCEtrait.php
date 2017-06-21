@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait SEQUENCEtrait {
  * Return formatted output for calendar component property sequence
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
  */
   public function createSequence() {
     if( ! isset( $this->sequence ) ||
@@ -63,8 +60,6 @@ trait SEQUENCEtrait {
  *
  * @param int    $value
  * @param array  $params
- * @return bool
- * @uses util::setParams();
  */
   public function setSequence( $value=null, $params=null ) {
     if(( empty( $value ) && ! is_numeric( $value )) && ( util::$ZERO != $value ))
@@ -72,8 +67,8 @@ trait SEQUENCEtrait {
                  ( -1 < $this->sequence[util::$LCvalue] ))
              ? $this->sequence[util::$LCvalue] + 1
              : util::$ZERO;
-    $this->sequence = array( util::$LCvalue  => $value,
-                             util::$LCparams => util::setParams( $params ));
+    $this->sequence = [util::$LCvalue  => $value,
+                       util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

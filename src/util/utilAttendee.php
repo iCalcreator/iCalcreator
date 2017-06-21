@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -71,8 +71,6 @@ class utilAttendee {
  * @param array $attendeeData
  * @param bool  $allowEmpty
  * @return string
- * @uses util::createElement()
- * @uses utilAttendee::getQuotedListItems()
  * @static
  */
   public static function formatAttendee( array $attendeeData, $allowEmpty ) {
@@ -153,7 +151,7 @@ class utilAttendee {
           $attributes .= sprintf( $FMTKEYVALUE,
                                   util::$LANGUAGE,
                                   $pValue[util::$LANGUAGE] );
-        $xparams = array();
+        $xparams = [];
         foreach( $pValue as $pLabel2 => $pValue2 ) {
           if( ctype_digit( (string) $pLabel2 ))
             $xparams[]  = $pValue2;
@@ -201,19 +199,16 @@ class utilAttendee {
  * @param array  $params
  * @param string $objName
  * @param string $lang
- * @return string
- * @uses util::isXprefixed()
- * @uses util::calAddressCheck()
- * @uses util::existRem()
+ * @return array
  * @static
  */
   public static function prepAttendeeParams( $params, $objName, $lang ) {
     static $NONXPROPCOMPS = null;
     if( is_null( $NONXPROPCOMPS ))
-      $NONXPROPCOMPS = array( util::$LCVFREEBUSY, util::$LCVALARM );
-    $params2 = array();
+      $NONXPROPCOMPS = [util::$LCVFREEBUSY, util::$LCVALARM];
+    $params2 = [];
     if( is_array( $params )) {
-      $optArr = array();
+      $optArr = [];
       $params = array_change_key_case( $params, CASE_UPPER );
       foreach( $params as $pLabel => $optParamValue ) {
         if( ! util::isXprefixed( $pLabel ) &&
@@ -224,7 +219,7 @@ class utilAttendee {
           case util::$DELEGATED_TO:
           case util::$DELEGATED_FROM:
             if( ! is_array( $optParamValue ))
-              $optParamValue  = array( $optParamValue );
+              $optParamValue  = [$optParamValue];
             foreach(( array_keys( $optParamValue )) as $px )
               $optArr[$pLabel][] = self::calAddressCheck( $optParamValue[$px] );
             break;

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,11 +42,6 @@ trait COMPLETEDtrait {
  * Return formatted output for calendar component property completed
  *
  * @return string
- * @uses util::hasNodate()
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::date2strdate();
  */
   public function createCompleted( ) {
     if( empty( $this->completed ))
@@ -68,16 +63,12 @@ trait COMPLETEDtrait {
  * @param int   $sec
  * @param array $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
- * @uses calendarComponent::$completed
- * @uses util::setDate2()
  */
   public function setCompleted( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->completed = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                  util::$LCparams => util::setParams( $params ));
+        $this->completed = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                            util::$LCparams => util::setParams( $params )];
         return true;
       }
       else

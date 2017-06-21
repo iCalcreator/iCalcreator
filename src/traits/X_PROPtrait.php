@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -41,12 +41,6 @@ trait X_PROPtrait {
 /**
  * Return formatted output for calendar/component property x-prop
  *
- * @uses iCalBase::$xprop
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::strrep()
- * @uses util::trimTrailNL()
  * @return string
  */
   public function createXprop() {
@@ -70,7 +64,7 @@ trait X_PROPtrait {
         $xpropPart[util::$LCvalue] = util::strrep( $xpropPart[util::$LCvalue] );
       $output     .= util::createElement( $label,
                                           util::createParams( $xpropPart[util::$LCparams],
-                                                              array( util::$LANGUAGE ),
+                                                              [util::$LANGUAGE],
                                                               $lang ),
                                           util::trimTrailNL( $xpropPart[util::$LCvalue] ));
     }
@@ -83,10 +77,6 @@ trait X_PROPtrait {
  * @param string $value
  * @param array $params optional
  * @return bool
- * @uses util::isXprefixed()
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
- * @uses iCalBase::$xprop
  */
   public function setXprop( $label, $value, $params=false ) {
     if( empty( $label ) || ! util::isXprefixed( $label ))
@@ -97,10 +87,10 @@ trait X_PROPtrait {
       else
         return false;
     }
-    $xprop         = array( util::$LCvalue => $value );
+    $xprop         = [util::$LCvalue => $value];
     $xprop[util::$LCparams] = util::setParams( $params );
     if( ! is_array( $this->xprop ))
-      $this->xprop = array();
+      $this->xprop = [];
     $this->xprop[strtoupper( $label )] = $xprop;
     return true;
   }
@@ -115,7 +105,7 @@ trait X_PROPtrait {
  * @static
  */
   protected static function deleteXproperty( $propName=null, & $xProp, & $propix, & $propdelix ) {
-    $reduced = array();
+    $reduced = [];
     if( $propName != util::$X_PROP ) {
       if( ! isset( $xProp[$propName] )) {
         unset( $propdelix[$propName] );

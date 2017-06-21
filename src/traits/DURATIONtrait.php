@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,10 +42,6 @@ trait DURATIONtrait {
  * Return formatted output for calendar component property duration
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::duration2str()
  */
   public function createDuration() {
     if( empty( $this->duration ))
@@ -76,15 +72,9 @@ trait DURATIONtrait {
  * @param int   $sec
  * @param array $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::duration2arr()
- * @uses util::durationStr2arr()
- * @uses util::setParams()
- * @uses util::trimTrailNL()
- * @uses util::duration2arr()
  */
   public function setDuration( $week, $day=null, $hour=null, $min=null, $sec=null, $params=null ) {
-    static $PLUSMINUSARR = array( '+', '-' );
+    static $PLUSMINUSARR = ['+', '-'];
     if( empty( $week ) && empty( $day ) && empty( $hour ) && empty( $min ) && empty( $sec )) {
       if( $this->getConfig( util::$ALLOWEMPTY ))
         $week = $day = null;
@@ -92,22 +82,22 @@ trait DURATIONtrait {
         return false;
     }
     if( is_array( $week ) && ( 1 <= count( $week )))
-      $this->duration = array( util::$LCvalue  => util::duration2arr( $week ),
-                               util::$LCparams => util::setParams( $day ));
+      $this->duration = [util::$LCvalue  => util::duration2arr( $week ),
+                         util::$LCparams => util::setParams( $day )];
     elseif( is_string( $week ) && ( 3 <= strlen( trim( $week )))) {
       $week = util::trimTrailNL( trim( $week ));
       if( in_array( $week[0], $PLUSMINUSARR ))
         $week = substr( $week, 1 );
-      $this->duration = array( util::$LCvalue  => util::durationStr2arr( $week ),
-                               util::$LCparams => util::setParams( $day ));
+      $this->duration = [util::$LCvalue  => util::durationStr2arr( $week ),
+                         util::$LCparams => util::setParams( $day )];
     }
     else
-      $this->duration = array( util::$LCvalue  => util::duration2arr( array( util::$LCWEEK => $week,
-                                                                             util::$LCDAY  => $day,
-                                                                             util::$LCHOUR => $hour,
-                                                                             util::$LCMIN  => $min,
-                                                                             util::$LCSEC  => $sec )),
-                               util::$LCparams => util::setParams( $params ));
+      $this->duration = [util::$LCvalue  => util::duration2arr( [util::$LCWEEK => $week,
+                                                                 util::$LCDAY  => $day,
+                                                                 util::$LCHOUR => $hour,
+                                                                 util::$LCMIN  => $min,
+                                                                 util::$LCSEC  => $sec] ),
+                         util::$LCparams => util::setParams( $params )];
     return true;
   }
 }

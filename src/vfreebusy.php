@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -26,7 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
 /**
  * iCalcreator VFREEBUSY component class
  *
@@ -52,11 +51,8 @@ class vfreebusy extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-02-01
  * @param array $config
- * @uses calendarComponent::__contruct()
- * @uses calendarComponent::setConfig()
- * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $F = 'f';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -72,12 +68,12 @@ class vfreebusy extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
+           $this->config,
            $this->propix,
            $this->compix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->attendee,
            $this->comment,
            $this->contact,
@@ -97,20 +93,6 @@ class vfreebusy extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.3.1 - 2007-11-19
  * @return string
- * @uses calendarComponent::createUid()
- * @uses calendarComponent::createDtstamp()
- * @uses vfreebusy::createAttendee()
- * @uses vfreebusy::createComment()
- * @uses vfreebusy::createContact()
- * @uses vfreebusy::createDtstart()
- * @uses vfreebusy::createDtend()
- * @uses vfreebusy::createDuration()
- * @uses vfreebusy::createFreebusy()
- * @uses vfreebusy::createOrganizer()
- * @uses vfreebusy::createRequestStatus()
- * @uses vfreebusy::createUrl()
- * @uses vfreebusy::createUrl()
- * @uses calendarComponent::createXprop()
  */
   public function createComponent() {
     $objectname =  strtoupper( $this->objName );

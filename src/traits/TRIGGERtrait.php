@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,11 +42,6 @@ trait TRIGGERtrait {
  * Return formatted output for calendar component property trigger
  *
  * @return string
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::date2strdate()
- * @uses util::duration2str()
- * @uses util::createParams()
  */
   public function createTrigger() {
     static $RELATEDSTART = 'relatedStart';
@@ -87,16 +82,10 @@ trait TRIGGERtrait {
  * @param bool   $before
  * @param array  $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
- * @uses util::isArrayTimestampDate()
- * @uses util::timestamp2date()
- * @uses util::strDate2ArrayDate()
- * @uses util::duration2arr()
  */
   public function setTrigger( $year=null, $month=null, $day=null, $week=null, $hour=null, $min=null, $sec=null,
                               $relatedStart=null, $before=null, $params=null ) {
-    static $PREFIXARR    = array( 'P', '+', '-' );
+    static $PREFIXARR    = ['P', '+', '-'];
     static $P            = 'P';
     static $RELATEDSTART = 'relatedStart';
     static $BEFORE       = 'before';
@@ -106,8 +95,8 @@ trait TRIGGERtrait {
       ( empty( $month ) || is_array( $month )) &&
         empty( $day ) && empty( $week ) && empty( $hour ) && empty( $min ) && empty( $sec )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->trigger = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                                util::$LCparams => util::setParams( $month ) );
+        $this->trigger = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                          util::$LCparams => util::setParams( $month )];
         return true;
       }
       else
@@ -173,14 +162,14 @@ trait TRIGGERtrait {
       $hour = ( $hour ) ? $hour : 0;
       $min  = ( $min  ) ? $min  : 0;
       $sec  = ( $sec  ) ? $sec  : 0;
-      $this->trigger = array( util::$LCparams => $params );
-      $this->trigger[util::$LCvalue] = array( util::$LCYEAR  => $year,
-                                              util::$LCMONTH => $month,
-                                              util::$LCDAY   => $day,
-                                              util::$LCHOUR  => $hour,
-                                              util::$LCMIN   => $min,
-                                              util::$LCSEC   => $sec,
-                                              util::$LCtz    => util::$Z );
+      $this->trigger = [util::$LCparams => $params];
+      $this->trigger[util::$LCvalue] = [util::$LCYEAR  => $year,
+                                        util::$LCMONTH => $month,
+                                        util::$LCDAY   => $day,
+                                        util::$LCHOUR  => $hour,
+                                        util::$LCMIN   => $min,
+                                        util::$LCSEC   => $sec,
+                                        util::$LCtz    => util::$Z];
       return true;
     }
     elseif(( empty( $year ) && empty( $month )) &&    // duration
@@ -191,8 +180,8 @@ trait TRIGGERtrait {
          ( ! empty( $sec )  || ( 0 == $sec  )))) {
       unset( $params[$RELATED] );     // set at output creation (END only)
       unset( $params[util::$VALUE] ); // util::$DURATION default
-      $this->trigger = array( util::$LCparams => $params );
-      $this->trigger[util::$LCvalue]  = array();
+      $this->trigger = [util::$LCparams => $params];
+      $this->trigger[util::$LCvalue]  = [];
       if( ! empty( $week ))
         $this->trigger[util::$LCvalue][util::$LCWEEK] = $week;
       if( ! empty( $day  ))

@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -39,24 +39,20 @@ class utilRedirect {
  * @access private
  * @static
  */
-  private static $headers = array( 'Content-Encoding: gzip',
-                                   'Vary: *',
-                                   'Content-Length: %s',
-                                   'Content-Type: text/calendar; charset=utf-8',
-                                   'Content-Disposition: attachment; filename="%s"',
-                                   'Content-Disposition: inline; filename="%s"',
-                                   'Cache-Control: max-age=10',
-                                 );
+  private static $headers = ['Content-Encoding: gzip',
+                             'Vary: *',
+                             'Content-Length: %s',
+                             'Content-Type: text/calendar; charset=utf-8',
+                             'Content-Disposition: attachment; filename="%s"',
+                             'Content-Disposition: inline; filename="%s"',
+                             'Cache-Control: max-age=10'];
 /**
  * Return created, updated and/or parsed calendar, sending a HTTP redirect header.
  *
- * @param object $calendar
- * @param bool   $utf8Encode
- * @param bool   $gzip
- * @param bool   $cdType       true : Content-Disposition: attachment... (default), false : ...inline...
- * @uses vcalendar::getConfig()
- * @uses vcalendar::createCalendar()
- * @uses utilRedirect::$headers
+ * @param vcalendar $calendar
+ * @param bool      $utf8Encode
+ * @param bool      $gzip
+ * @param bool      $cdType       true : Content-Disposition: attachment... (default), false : ...inline...
  * @return bool true on success, false on error
  * @static
  */
@@ -95,12 +91,10 @@ class utilRedirect {
 /**
  * If recent version of calendar file exists (default one hour), an HTTP redirect header is sent
  *
- * @param object $calendar
- * @param int    $timeout  default 3600 sec
- * @param bool   $cdType   true : Content-Disposition: attachment... (default), false : ...inline...
+ * @param vcalendar $calendar
+ * @param int       $timeout  default 3600 sec
+ * @param bool      $cdType   true : Content-Disposition: attachment... (default), false : ...inline...
  * @return bool true on success, false on error
- * @uses vcalendar::getConfig()
- * @uses vcalendar::$headers
  * @static
  */
   public static function useCachedCalendar( vcalendar $calendar,

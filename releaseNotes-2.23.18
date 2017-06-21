@@ -1,12 +1,12 @@
 
-iCalcreator 2.23.16 releaseNotes
+iCalcreator 2.23.18 releaseNotes
 
 This is an (unstable) evaluation release,
 please mail your opinion and observations!
 
 Focus now is on usability (and functionality),
-the 2.23.7 is a beta-2 release
-and will become a (stable) 2.24 release.
+the 2.23.18 is a beta-2 release
+and is the (last) 2.24 release candidate.
 
 MAJOR rewrite (but same API)
 - require PHP >= 5.4
@@ -49,3 +49,6 @@ iCalBase::deleteComponent()
   UID/component name spilt
 autoloader
   renamed to autoloader
+code refresh:
+  fixed typos and fcn arg. and return types
+utilRecur class

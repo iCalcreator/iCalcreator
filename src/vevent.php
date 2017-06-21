@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -70,11 +70,8 @@ class vevent extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-02-01
  * @param  array $config
- * @uses calendarComponent::__contruct()
- * @uses calendarComponent::setConfig()
- * @uses util::initConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $E = 'e';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -93,12 +90,12 @@ class vevent extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
-           $this->propix,
+           $this->config,
            $this->compix,
+           $this->propix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->attach,
            $this->attendee,
            $this->categories,
@@ -137,39 +134,6 @@ class vevent extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.10.16 - 2011-10-28
  * @return string
- * @uses calendarComponent::createUid()
- * @uses calendarComponent::createDtstamp()
- * @uses vevent::createAttach()
- * @uses vevent::createAttendee()
- * @uses vevent::createCategories()
- * @uses vevent::createComment()
- * @uses vevent::createContact()
- * @uses vevent::createClass()
- * @uses vevent::createCreated()
- * @uses vevent::createDescription()
- * @uses vevent::createDtstart()
- * @uses vevent::createDtend()
- * @uses vevent::createDuration()
- * @uses vevent::createExdate()
- * @uses vevent::createExrule()
- * @uses vevent::createGeo()
- * @uses vevent::createLastModified()
- * @uses vevent::createLocation()
- * @uses vevent::createOrganizer()
- * @uses vevent::createPriority()
- * @uses vevent::createRdate()
- * @uses vevent::createRrule()
- * @uses vevent::createRelatedTo()
- * @uses vevent::createRequestStatus()
- * @uses vevent::createRecurrenceid()
- * @uses vevent::createResources()
- * @uses vevent::createSequence()
- * @uses vevent::createStatus()
- * @uses vevent::createSummary()
- * @uses vevent::createTransp()
- * @uses vevent::createUrl()
- * @uses calendarComponent::createXprop()
- * @uses calendarComponent::createSubComponent()
  */
   public function createComponent() {
     $objectname =  strtoupper( $this->objName );

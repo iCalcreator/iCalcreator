@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -26,7 +26,6 @@
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;
-use kigkonsult\iCalcreator\util\utilAttendee;
 /**
  * iCalcreator VALARM component class
  *
@@ -48,10 +47,8 @@ class valarm extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-02-01
  * @param array $config
- * @uses calendarComponent::__construct()
- * @uses calendarComponent::setConfig()
  */
-  public function __construct( $config = array()) {
+  public function __construct( $config = []) {
     static $A = 'a';
     parent::__construct();
     $this->setConfig( util::initConfig( $config ));
@@ -67,11 +64,11 @@ class valarm extends calendarComponent {
     unset( $this->xprop,
            $this->components,
            $this->unparsed,
-           $this->config );
-    unset( $this->objName,
-           $this->cno,
+           $this->config,
            $this->propix,
            $this->propdelix );
+    unset( $this->objName,
+           $this->cno );
     unset( $this->action,
            $this->attach,
            $this->attendee,
@@ -87,15 +84,6 @@ class valarm extends calendarComponent {
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.5.1 - 2008-10-22
  * @return string
- * @uses valarm::createAction()
- * @uses valarm::createAttach()
- * @uses valarm::createAttendee()
- * @uses valarm::createDescription()
- * @uses valarm::createDuration()
- * @uses valarm::createRepeat()
- * @uses valarm::createSummary()
- * @uses valarm::createTrigger()
- * @uses calendarComponent::createXprop()
  */
   public function createComponent() {
     $objectname =  strtoupper( $this->objName );
@@ -120,7 +108,6 @@ class valarm extends calendarComponent {
  * @param bool    $inclParam
  * @param bool    $specform
  * @return mixed
- * @uses calendarComponent::getProperty()
  */
   public function getProperty( $propName=false,
                                $propix=false,

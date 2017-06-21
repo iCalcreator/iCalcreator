@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,9 +42,6 @@ trait PRODIDtrait {
  * Return formatted output for calendar property prodid
  *
  * @return string
- * @uses vcalendar::makeProdid()
- * @uses vcalendar::getConfig()
- * @uses util::createElement()
  */
   public function createProdid() {
     if( ! isset( $this->prodid ))
@@ -66,7 +63,6 @@ trait PRODIDtrait {
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.22.20 - 2017-01-29
- * @uses vcalendar::getConfig()
  */
   public function makeProdid() {
     static $FMT = '-//%s//NONSGML kigkonsult.se %s//%s';

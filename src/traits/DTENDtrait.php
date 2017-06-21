@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.16
+ * version   2.23.18
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -42,11 +42,6 @@ trait DTENDtrait {
  * Return formatted output for calendar component property dtend
  *
  * @return string
- * @uses util::hasNodate()
- * @uses calendarComponent::getConfig()
- * @uses util::createElement()
- * @uses util::createParams()
- * @uses util::date2strdate()
  */
   public function createDtend() {
     if( empty( $this->dtend ))
@@ -70,15 +65,12 @@ trait DTENDtrait {
  * @param string $tz
  * @param array  $params
  * @return bool
- * @uses calendarComponent::getConfig()
- * @uses util::setParams()
- * @uses util::setDate()
  */
   public function setDtend( $year, $month=null, $day=null, $hour=null, $min=null, $sec=null, $tz=null, $params=null ) {
     if( empty( $year )) {
       if( $this->getConfig( util::$ALLOWEMPTY )) {
-        $this->dtend = array( util::$LCvalue  => util::$EMPTYPROPERTY,
-                              util::$LCparams => util::setParams( $params ));
+        $this->dtend = [util::$LCvalue  => util::$EMPTYPROPERTY,
+                        util::$LCparams => util::setParams( $params )];
         return true;
       }
       else
