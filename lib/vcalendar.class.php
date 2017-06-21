@@ -1767,9 +1767,10 @@ class vcalendar extends iCalBase {
           return FALSE;                 /* err 3 */
       }
             /* READ FILE */
-      if( ! empty( $context ) && filter_var( $file, FILTER_VALIDATE_URL ) &&
-             ( FALSE === ( $rows = file_get_contents( $file, FALSE, $context ))))
-        return FALSE;                 /* err 6 */
+      if( ! empty( $context ) && filter_var( $file, FILTER_VALIDATE_URL )){
+          if(FALSE === ($rows = file_get_contents( $file, FALSE, $context )))
+            return FALSE; /* err 6 */
+      }
       elseif(  FALSE === ( $rows = file_get_contents( $file )))
         return FALSE;                 /* err 5 */
     } // end if(( FALSE === $unparsedtext ) || empty( $unparsedtext ))
