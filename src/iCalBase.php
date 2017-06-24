@@ -323,6 +323,28 @@ abstract class iCalBase {
     }
     return $this->components[$ix];
   }
+
+    /**
+     * @return vevent
+     */
+    public function newEvent() {
+        return $this->newComponent(util::$LCVEVENT);
+    }
+
+    /**
+     * @return valarm
+     */
+    public function newAlarm() {
+        return $this->newComponent(util::$LCVALARM);
+    }
+
+    /**
+     * @return vtodo
+     */
+    public function newTodo() {
+        return $this->newComponent(util::$LCVTODO);
+    }
+
 /**
  * Delete calendar subcomponent from component container
  *
