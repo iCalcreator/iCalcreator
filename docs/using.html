@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-<title>iCalcreator 2.23.18 manual</title>
+<title>iCalcreator 2.23.20 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2017 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.23.18">
+<meta name="description" content="using iCalcreator v2.23.20">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -137,9 +137,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.23.18</p>
+<p class="header">iCalcreator v2.23.20</p>
 <p>
-iCalcreator v2.23.18<br>
+iCalcreator v2.23.20<br>
 Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
@@ -187,7 +187,7 @@ The iCal standards are <a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.23.18 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
+For iCalcreator 2.23.20 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -272,7 +272,7 @@ This style is used for <em>PHP</em> coding examples.
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
 Use the kigkonsult.se support <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se/support" target="_blank">page</a>
-exploring iCalcreator 2.23.18 use and iCal issues. Previous iCalcreator releases are supported upon (paid) request only.
+exploring iCalcreator 2.23.20 use and iCal issues. Previous iCalcreator releases are supported upon (paid) request only.
 </p>
 <p>
 Use the contact <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">page</a>
@@ -311,7 +311,7 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.23.18/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.23.20/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
@@ -413,8 +413,7 @@ $vcalendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
 <a href="#vfreebusy_constr">3.1.1.5 vfreebusy</a><br>
 <a href="#valarm_constr">3.1.1.6 valarm</a><br>
 <a href="#vtimezone_constr">3.1.1.7 vtimezone</a><br>
-<a href="#standard_constr">3.1.1.8 standard</a><br>
-<a href="#daylight_constr">3.1.1.9 daylight</a><br>
+<a href="#standard_daylight_constr">3.1.1.8 standard / daylight</a><br>
 <br>
 <a href="#iCalcreator_object_property_methods">3.1.2 iCalcreator object property methods</a><br>
 <a href="#deleteProperty">3.1.2.1 deleteProperty</a><br>
@@ -1264,7 +1263,7 @@ If not set, the <a href="#DTSTAMP">DTSTAMP</a> and <a href="#UID">UID</a> proper
 are automatically created by iCalcreator<br>
 for <a href="#VEVENT">vevent</a>,<a href="#VTODO">vtodo</a>, <a href="#VJOURNAL">vjournal</a> and <a href="#VFREEBUSY">vfreebusy</a> components<br>
 when using iCalcreator object methods <a href="#saveCalendar">saveCalendar</a> or <a href="#returnCalendar">returnCalendar</a><br>
-or when fetching <a href="#DTSTAMP">DTSTAMP</a>/<a href="#UID">UID</a> property value with the component function <a href="#getProperty_PROP">getProperty</a>.
+or when fetching <a href="#DTSTAMP">DTSTAMP</a>/<a href="#UID">UID</a> property value with the component method <a href="#getProperty_PROP">getProperty</a>.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_Component_list">[up]</a>
@@ -1345,8 +1344,21 @@ $vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
 
 $vevent    = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCVEVENT );
 $vevent-&gt;setProperty( .. .
-
 </p>
+<p>
+You can also use a convenient vcalendar::newComponent() method wrapper, like:
+</p>
+<p class="format">vcalendar::newVevent()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vevent    = $vcalendar-&gt;newVevent();
+$vevent-&gt;setProperty( .. .
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VEVENT">VEVENT</a> object.</p>
 <p class="format">vevent::vevent( [ config ] )</p>
@@ -1390,6 +1402,21 @@ $vtodo     = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCV
 $vtodo-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use a convenient vcalendar::newComponent() method wrapper, like:
+</p>
+<p class="format">vcalendar::newVtodo()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vtodo     = $vcalendar-&gt;newVtodo();
+$vtodo-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VTODO">VTODO</a> object.</p>
 <p class="format">vtodo::vtodo( [ config ] )</p>
@@ -1432,6 +1459,21 @@ $vjournal  = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCV
 $vjournal-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use a convenient vcalendar::newComponent() method wrapper, like:
+</p>
+<p class="format">vcalendar::newVjournal()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vjournal  = $vcalendar-&gt;newVjournal();
+$vjournal-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VJOURNAL">VJOURNAL</a> object.</p>
 <p class="format">vjournal::vjournal( [ config ] )</p>
@@ -1474,6 +1516,21 @@ $vfreebusy = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCV
 $vfreebusy-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use a convenient vcalendar::newComponent() method wrapper, like:
+</p>
+<p class="format">vcalendar::newVfreebusy()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vfreebusy = $vcalendar-&gt;newVfreebusy();
+$vfreebusy-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VFREEBUSY">VFREEBUSY</a> object.</p>
 <p class="format">vfreebusy::vfreebusy( [ config ] )</p>
@@ -1501,6 +1558,8 @@ $vcalendar-&gt;setComponent( $vfreebusy );
 <p>
 Create a new <a href="#VALARM">VALARM</a> object using an iCalcreator object component factory-method,
 returning a reference to the new (sub-)component.
+The <a href="#VALARM">VALARM</a> calendar component MUST only appear (one or more, mutually independent)
+within either a <a href="#VEVENT">VEVENT</a> or <a href="#VTODO">VTODO</a> calendar component.
 </p>
 <p>
 To ease up usage, kigkonsult\iCalcreator\util\util::$LCVALARM as used in code snippets is available.
@@ -1519,6 +1578,24 @@ $valarm    = $vevent-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCVALA
 $valarm-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use a convenient calendarComponent::newComponent() method wrapper, like:
+</p>
+<p class="format">calendarComponent::newValarm()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vevent    = $vcalendar-&gt;newVevent();
+$vevent-&gt;setProperty( .. .
+
+$valarm    = $vevent-&gt;newValarm();
+$valarm-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VALARM">VALARM</a> object.</p>
 <p class="format">valarm::valarm( [ config ] )</p>
@@ -1570,6 +1647,21 @@ $vtimezone = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCV
 $vtimezone-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use a convenient vcalendar::newComponent() method wrapper, like:
+</p>
+<p class="format">vcalendar::newVtimezone()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vtimezone = $vcalendar-&gt;newVtimezone();
+$vtimezone-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VTIMEZONE">VTIMEZONE</a> object.</p>
 <p class="format">vtimezone::vtimezone( [ config ] )</p>
@@ -1592,15 +1684,16 @@ $vcalendar-&gt;setComponent( $vtimezone );
 <h5>Creation of timezone components</h5>
 <p>
 It is possible to create timezone components, using a method in timezoneHandler class, <a href="#createTimezone">createTimezone</a>
-and utilizing the <em>PHP</em> DateTimeZone class (<em>PHP</em> 5 >= 5.2.0).
+and utilizing the <em>PHP</em> DateTimeZone class.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
 
-<a name="standard_constr"></a><h4>3.1.1.8 standard</h4>
+<a name="standard_daylight_constr"></a><h4>3.1.1.8 standard / daylight</h4>
 <p class="label">Format 1</p>
 <p>
-Create a new <a href="#VTIMEZONE">VTIMEZONE</a> <b>standard</b> object using an iCalcreator object component factory-method,
+Create a new <a href="#VTIMEZONE">VTIMEZONE</a> <b>standard</b> / <b>daylight</b> objects
+using an iCalcreator object component factory-method,
 returning a reference to the new (sub-)component.
 </p>
 <p>
@@ -1626,6 +1719,28 @@ $daylight  = $vtimezone-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCD
 $daylight-&gt;setProperty( .. .
 
 </p>
+<p>
+You can also use convenient vcalendar::newComponent() method wrappers, like:
+</p>
+<p class="format">vtimezone::newStandard()</p>
+<p class="format">vtimezone::newDaylight()</p>
+<p class="label">Example</p>
+<p class="example">
+$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
+                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
+$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
+
+$vtimezone = $vcalendar-&gt;newVtimezone();
+$vtimezone-&gt;setProperty( .. .
+
+$standard  = $vtimezone-&gt;newStandard();
+$standard-&gt;setProperty( .. .
+
+$daylight  = $vtimezone-&gt;newDaylight();
+$daylight-&gt;setProperty( .. .
+
+</p>
+
 <p class="label">Format 2</p>
 <p>Create a new <a href="#VTIMEZONE">VTIMEZONE</a> STANDARD object.</p>
 <p class="format">vtimezone::vtimezone( &quot;standard&quot; [, config ] )</p>
@@ -1662,68 +1777,11 @@ $vcalendar-&gt;setComponent( $vtimezone );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
 
 
-<a name="daylight_constr"></a><h4>3.1.1.9 daylight</h4>
-<p class="label">Format 1</p>
-<p>
-Create a new <a name="VTIMEZONE">VTIMEZONE</a> <b>daylight</b> object using a component factory-method,
-returning a reference to the new (sub-)component.
-</p>
-<p>
-To ease up usage,
-kigkonsult\iCalcreator\util\util::$LCSTANDARD and
-kigkonsult\iCalcreator\util\util::$LCDAYLIGHT
-as used in code snippets are available.
-</p>
-<p class="format">vtimezone::newComponent( &quot;daylight&quot; )</p>
-<p class="label">Example</p>
-<p class="example">
-$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
-                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
-$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
-
-$vtimezone = $vcalendar-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCVTIMEZONE );
-
-$standard  = $vtimezone-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCSTANDARD );
-
-$daylight  = $vtimezone-&gt;newComponent( kigkonsult\iCalcreator\util\util::$LCDAYLIGHT );
-
-</p>
-<p class="label">Format 2</p>
-<p>Create a new <a href="#VTIMEZONE">VTIMEZONE</a> DAYLIGHT object.</p>
-<p class="format">vtimezone::vtimezone( daylight [, config ] )</p>
-<p class="comment">
-config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
-</p>
-<p class="label">Example</p>
-<p class="example">
-$config    = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID => &quot;kigkonsult.se&quot;,
-                    kigkonsult\iCalcreator\util\util::$TZID =&gt; &quot;Europe/Stockholm&quot; );
-$vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
-
-$vtimezone = new kigkonsult\iCalcreator\vtimezone( $vcalendar-&gt;getConfig());
-
-$standard  = new kigkonsult\iCalcreator\vtimezone(
-                 kigkonsult\iCalcreator\util\util::$LCSTANDARD,
-                 $vtimezone-&gt;getConfig());
-
-$vtimezone-&gt;setComponent( $standard );
-$daylight  = new kigkonsult\iCalcreator\vtimezone(
-                 kigkonsult\iCalcreator\util\util::$LCDAYLIGHT,
-                 $vtimezone-&gt;getConfig() );
-
-$vtimezone-&gt;setComponent( $daylight );
-$vcalendar-&gt;setComponent( $vtimezone );
-
-</p>
-<br>
-<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Function_list">[up]</a>
-
-
 <a name="iCalcreator_object_property_methods"></a><h3>3.1.2 iCalcreator object property methods</h3>
 
 <a name="deleteProperty"></a><h4>3.1.2.1 deleteProperty</h4>
 <p>Generic iCalcreator object deleteProperty method, simplifying removal of <strong>calendar</strong> properties.</p>
-<p>Bool false is returned if no property exists or when end-of-properties at consecutive function calls.</p>
+<p>Bool false is returned if no property exists or when end-of-properties at consecutive method calls.</p>
 <p class="label">Format</p>
 <p class="format">vcalendar::deleteProperty( [ PropName [, order=1 ] )</p>
 <p class="comment">propName = (string) case independent, [RFC5545] component property names,
@@ -1748,7 +1806,7 @@ if( ! $vcalendar-&gt;deleteProperty( kigkonsult\iCalcreator\util\util::$METHOD )
 <a name="getProperty"></a><h4>3.1.2.2 getProperty</h4>
 <p class="label">Format 1</p>
 <p>Generic iCalcreator getProperty method, simplifying fetch of <strong>calendar</strong> properties.</p>
-<p>Bool false is returned if no property exists or when end-of-properties at consecutive function calls.</p>
+<p>Bool false is returned if no property exists or when end-of-properties at consecutive method calls.</p>
 <p class="format">vcalendar::getProperty( [ PropName [, order=1 [, complete=false ]]] )</p>
 <p class="comment">propName = (string) case independent, [RFC5545] component property names,
            unknown/missing propName will be regarded as <a href="#X-PROPERTY">X-property</a>.
@@ -2184,7 +2242,7 @@ $vcalendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
 Remove component from the iCalcreator object instance.
 </p>
 <p>
-Bool false is returned if no component exists or when end-of-components at consecutive function calls.
+Bool false is returned if no component exists or at end-of-components invoking the method consecutive.
 </p>
 <p class="label">format 1</p>
 Remove component with order number (1st=1, 2nd=2).
@@ -2233,7 +2291,7 @@ while( $vtodo-&gt;deleteComponent( kigkonsult\iCalcreator\util\util::$LCVALARM))
 <a name="getComponent"></a><h4>3.1.3.2 getComponent</h4>
 <p>Get (next) component from the iCalcreator object instance.</p>
 <p>
-Bool false is returned if no component exists or when end-of-components at consecutive function calls.
+Bool false is returned if no component exists or at end-of-components invoking the method consecutive.
 </p>
 <p class="label">format 1</p>
 <p>Get next component, until end-of-components.</p>
@@ -2245,7 +2303,7 @@ $config      = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;k
 $vcalendar    = new kigkonsult\iCalcreator\vcalendar();
 $vcalendar-&gt;setConfig( $config );
 $vcalendar-&gt;parse();
-while( $comp = $vcalendar-&gt;getComponent()) {
+while( $comp = $vcalendar-&gt;getComponent()) {§
 .. .
 }
 
@@ -2734,7 +2792,7 @@ $vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
 
 $str       = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.23.18//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.23.20//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2938,7 +2996,7 @@ $vcalendar-&gt;useCachedCalendar();
 
 <a name="iCalcreatorVersion"></a><h4>3.1.4.7 iCalcreatorVersion</h4>
 <p>
-This static class method returns the iCalcreator class version number (2.23.18+).
+This static class method returns the iCalcreator class version number (2.23.20+).
 </p>
 <p>
 There is also a <em>PHP</em> constant &quot;ICALCREATOR_VERSION&quot; (all versions).
@@ -3096,7 +3154,7 @@ $config = $vcalendar-&gt;getConfig();
 $vevent = new kigkonsult\iCalcreator\vevent( $config );
 
 </p>
-<p>Only component relevant configuration are set. If using the <a href="#newComponent">newComponent</a> function, configuration is set automatically.</p>
+<p>Only component relevant configuration are set. If using the <a href="#newComponent">newComponent</a> method, configuration is set automatically.</p>
 <br>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
@@ -4347,7 +4405,7 @@ $created = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$CREATED )
 <p>
 Insert property value. Input date is always a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME or,
 if &quot;offset&quot; parameter is used, converted to a <a href="#DATE_WITH_UTC_TIME">UTC</a> DATE-TIME.
-Notice, use function <a href="#transformDateTime">transformDateTime</a> to change a local datetime to UTC datetime.
+Notice, youn can use the <a href="#transformDateTime">timezoneHandler::transformDateTime()</a> method to change a local datetime to UTC datetime.
 </p>
 <p>The current UTC date-time is set if invoked without parameters.</p>
 <p class="label">Format</p>
@@ -7590,7 +7648,6 @@ The timezoneHandler class has three utility methods: <a href="#createTimezone">c
 The (static) method, applied on a iCalcrator object instance and using a <em>PHP</em> valid (string) timezone,
 return <a href="#VTIMEZONE">vtimezone</a>, <a href="#STANDARD">standard</a> and <a href="#DAYLIGHT">daylight</a> components,
 based on <em>PHP</em> DateTimeZone class and the <em>PHP</em> time zone transition dates.
-(<em>PHP</em> 5 >= 5.2.0)
 </p>
 <p>
 Recommendation is to call the method <b>after</b> editing components (and without (period) from/to arguments, below),
@@ -7663,7 +7720,6 @@ END:VTIMEZONE
 <p>
 The (static) ms2phpTZ method manages (a very simple) conversion of a MS timezone to a <em>PHP</em>5 valid (Date-)timezone,<br>
 matching (MS) UTC offset and time zone descriptors, based on <em>PHP</em> DateTimeZone class.
-(<em>PHP</em> 5 >= 5.2.0)
 </p>
 <p>If true is returned, the MS timezone argument (below) is converted to a <em>PHP</em>5 time zone, otherwise unaltered.</p>
 <p class="label">Format</p>
@@ -7683,7 +7739,7 @@ if( false !== kigkonsult\iCalcreator\timezoneHandler::ms2phpTZ( $search ))
 
 <a name="transformDateTime"></a><h4>4.1.3 transformDateTime</h4>
 <p>
-The (static) transformDateTime method transforms a datetime from a time zone to another. (Requires <em>PHP</em> >= 5.2.0 and <em>PHP</em> DateTimeZone acceptable time zones).
+The (static) transformDateTime method transforms a datetime from a time zone to another. (Requires <em>PHP</em> DateTimeZone acceptable time zones).
 </p>
 <p>
 Bool false is returned if not using a &quot;strtotime&quot; acceptable datetime string or unacceptable <em>PHP</em> time zones.
@@ -7926,14 +7982,14 @@ Return (bool) true if argument directory is not null, otherwise vCard string.
 
 <a name="Copyright"></a><h4>5.1 Copyright</h4>
 <p>
-iCalcreator v2.23.18<br>
+iCalcreator v2.23.20<br>
 Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se support" target="_blank">kigkonsult.se support</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
 </p>
 <p>
-Due to the iCalcreator 2.23.18 release is a unstable development release,
+Due to the iCalcreator 2.23.20 release is a unstable development release,
 the licence is somewhat restricted.
 </p>
 

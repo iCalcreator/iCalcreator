@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.18
+ * version   2.23.20
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -61,7 +61,7 @@ class timezoneHandler {
  *   based on contribution by Yitzchok Lavi <icalcreator@onebigsystem.com>
  * Additional changes jpirkey
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.23 - 2017-02-17
+ * @since 2.23.20 - 2017-06-26
  * @param vcalendar $calendar  iCalcreator calendar instance
  * @param string    $timezone  valid timezone avveptable by PHP5 DateTimeZone
  * @param array     $xProp     *[x-propName => x-propValue]
@@ -71,6 +71,7 @@ class timezoneHandler {
  * @static
  */
   public static function createTimezone( vcalendar $calendar, $timezone, $xProp=[], $from=null, $to=null ) {
+    static $Y            = 'Y  ';
     static $YMD          = 'Ymd';
     static $T000000      = 'T000000';
     static $MINUS7MONTH  = '-7 month';
@@ -91,8 +92,7 @@ class timezoneHandler {
     if( ! empty( $to )   && ! is_int( $to ))
       return false;
     try {
-      $dtz               = new \DateTimeZone( $timezone );
-      $transitions       = $dtz->getTransitions();
+      $newTz             = new \DateTimeZone( $timezone );
       $utcTz             = new \DateTimeZone( util::$UTC );
     }
     catch( \Exception $e ) {
@@ -115,7 +115,7 @@ class timezoneHandler {
     else {
       try {
         $from            = reset( $dates );                 // set lowest date to the lowest dtstart date
-        $dateFrom        = new \DateTime( $from . $T000000, $dtz );
+        $dateFrom        = new \DateTime( $from . $T000000, $newTz );
         $dateFrom->modify( $MINUS7MONTH );                  // set $dateFrom to seven month before the lowest date
         $dateFrom->setTimezone( $utcTz );                   // convert local date to UTC
       }
@@ -136,7 +136,7 @@ class timezoneHandler {
     else {
       try {
         $to              = end( $dates );                   // set highest date to the highest dtstart date
-        $dateTo          = new \DateTime( $to . $T235959, $dtz );
+        $dateTo          = new \DateTime( $to . $T235959, $newTz );
       }
       catch( \Exception $e ) {
         return false;
@@ -149,18 +149,23 @@ class timezoneHandler {
     $prevOffsetfrom      = 0;
     $stdIx  = $dlghtIx   = null;
     $prevTrans           = false;
+    $transitions         = $newTz->getTransitions();
     foreach( $transitions as $tix => $trans ) {             // all transitions in date-time order!!
+      if( 0 > (int) date( $Y, $trans[$TS] )) {              // skip negative year... but save offset
+        $prevOffsetfrom  = $trans[self::$OFFSET];           // previous trans offset will be 'next' trans offsetFrom
+        continue;
+      }
       try {
         $timestamp       = sprintf( self::$FMTTIMESTAMP, $trans[$TS] );
-        $date            = new \DateTime( $timestamp );      // set transition date (UTC)
+        $date            = new \DateTime( $timestamp );     // set transition date (UTC)
       }
       catch( \Exception $e ) {
         return false;
       }
       $transDateYmd      = $date->format( $YMD2 );
-      if ( $transDateYmd < $dateFromYmd ) {
+      if( $transDateYmd < $dateFromYmd ) {
         $prevOffsetfrom  = $trans[self::$OFFSET];           // previous trans offset will be 'next' trans offsetFrom
-        $prevTrans       = $trans;                          // save it in case we don't find any that match
+        $prevTrans       = $trans;                          // we save it in case we don't find any that match
         $prevTrans[util::$TZOFFSETFROM] = ( 0 < $tix ) ? $transitions[$tix-1][self::$OFFSET] : 0;
         continue;
       }
@@ -200,15 +205,15 @@ class timezoneHandler {
       } // end daylight timezone
       $transTemp[$tix]   = $trans;
     } // end foreach( $transitions as $tix => $trans )
-    $tz                  = $calendar->newComponent( util::$LCVTIMEZONE );
-    $tz->setproperty( util::$TZID, $timezone );
+    $timezoneComp        = $calendar->newVtimezone();
+    $timezoneComp->setproperty( util::$TZID, $timezone );
     if( ! empty( $xProp )) {
       foreach( $xProp as $xPropName => $xPropValue )
         if( util::isXprefixed( $xPropName ))
-          $tz->setproperty( $xPropName, $xPropValue );
+          $timezoneComp->setproperty( $xPropName, $xPropValue );
     }
-    if( empty( $transTemp )) {      // if no match found
-      if( $prevTrans ) {            // then we use the last transition (before startdate) for the tz info
+    if( empty( $transTemp )) {      // if no match is found
+      if( $prevTrans ) {            // we use the last transition (before startdate) for the tz info
         try {
           $timestamp     = sprintf( self::$FMTTIMESTAMP, $prevTrans[$TS] );
           $date          = new \DateTime( $timestamp );     // set transition date (UTC)
@@ -228,30 +233,30 @@ class timezoneHandler {
       } // end if( $prevTrans )
       else {                        // or we use the timezone identifier to BUILD the standard tz info (?)
         try {
-          $newTz         = new \DateTimeZone( $timezone );
           $date          = new \DateTime( $NOW, $newTz );
         }
         catch( \Exception $e ) {
           return false;
         }
-        $transTemp[0]    = [$TIME               => $date->format( $YMDTHISO ),
-                            $OFFSET             => $date->format( util::$Z ),
+        $transTemp[0]    = [self::$TIME         => $date->format( $YMDTHISO ),
+                            self::$OFFSET       => $date->format( util::$Z ),
                             util::$TZOFFSETFROM => $date->format( util::$Z ),
                             $ISDST              => false];
       }
-    }
+    } // end if( empty( $transTemp ))
     foreach( $transTemp as $tix => $trans ) { // create standard/daylight subcomponents
-      $type              = ( true !== $trans[$ISDST] ) ? util::$LCSTANDARD : util::$LCDAYLIGHT;
-      $scomp             = $tz->newComponent( $type );
-      $scomp->setProperty( util::$DTSTART,  $trans[self::$TIME] );
-//      $scomp->setProperty( 'x-utc-timestamp', $tix.' : '.$trans[$TS] );   // test ###
+      $subComp           = ( true !== $trans[$ISDST] )
+                         ? $timezoneComp->newStandard()
+                         : $timezoneComp->newDaylight();
+      $subComp->setProperty( util::$DTSTART,  $trans[self::$TIME] );
+//      $subComp->setProperty( 'x-utc-timestamp', $tix.' : '.$trans[$TS] );   // test ###
       if( ! empty( $trans[$ABBR] ))
-        $scomp->setProperty( util::$TZNAME, $trans[$ABBR] );
+        $subComp->setProperty( util::$TZNAME, $trans[$ABBR] );
       if( isset( $trans[util::$TZOFFSETFROM] ))
-        $scomp->setProperty( util::$TZOFFSETFROM, self::offsetSec2His( $trans[util::$TZOFFSETFROM] ));
-      $scomp->setProperty( util::$TZOFFSETTO,     self::offsetSec2His( $trans[self::$OFFSET] ));
+        $subComp->setProperty( util::$TZOFFSETFROM, self::offsetSec2His( $trans[util::$TZOFFSETFROM] ));
+      $subComp->setProperty( util::$TZOFFSETTO,     self::offsetSec2His( $trans[self::$OFFSET] ));
       if( isset( $trans[util::$RDATE] ))
-        $scomp->setProperty( util::$RDATE,  $trans[util::$RDATE] );
+        $subComp->setProperty( util::$RDATE,  $trans[util::$RDATE] );
     }
     return true;
   }

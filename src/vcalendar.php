@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.18
+ * version   2.23.20
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -652,6 +652,56 @@ class vcalendar extends iCalBase {
             /* not found.. . */
     $this->compix = [];
     return false;
+  }
+/**
+ * Return vevent object instance, vcalendar::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newVevent() {
+    return $this->newComponent( util::$LCVEVENT );
+  }
+/**
+ * Return vtodo object instance, vcalendar::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newVtodo() {
+    return $this->newComponent( util::$LCVTODO );
+  }
+/**
+ * Return vjournal object instance, vcalendar::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newVjournal() {
+    return $this->newComponent( util::$LCVJOURNAL );
+  }
+/**
+ * Return vfreebusy object instance, vcalendar::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newVfreebusy() {
+    return $this->newComponent( util::$LCVFREEBUSY );
+  }
+/**
+ * Return vtimezone object instance, vcalendar::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newVtimezone() {
+    return $this->newComponent( util::$LCVTIMEZONE );
   }
 /**
  * Replace calendar component in vcalendar

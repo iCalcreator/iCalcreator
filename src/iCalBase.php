@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.18
+ * version   2.23.20
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -30,7 +30,7 @@ use kigkonsult\iCalcreator\util\util;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' ))
-  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.18' );
+  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.23.20' );
 /**
  * iCalcreator base class
  *

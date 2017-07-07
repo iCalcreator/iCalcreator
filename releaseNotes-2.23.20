@@ -52,3 +52,5 @@ autoloader
 code refresh:
   fixed typos and fcn arg. and return types
 utilRecur class
+timezoneHandler::createTimezone(), timezone mgnt
+vcalendar::newComponent() wrappers, ex. vcalendar::newVevent() etc

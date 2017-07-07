@@ -5,7 +5,7 @@
  * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * link      http://kigkonsult.se/iCalcreator/index.php
  * package   iCalcreator
- * version   2.23.18
+ * version   2.23.20
  * license   By obtaining and/or copying the Software, iCalcreator,
  *           you (the licensee) agree that you have read, understood,
  *           and will comply with the following terms and conditions.
@@ -167,5 +167,25 @@ class vtimezone extends calendarComponent {
         break;
     }
     return false;
+  }
+/**
+ * Return timezone standard object instance, vtimezone::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newStandard() {
+    return $this->newComponent( util::$LCSTANDARD );
+  }
+/**
+ * Return timezone daylight object instance, vtimezone::newComponent() wrapper
+ *
+ * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @since 2.23.20 - 2017-06-26
+ * @return object
+ */
+  public function newDaylight() {
+    return $this->newComponent( util::$LCDAYLIGHT );
   }
 }
