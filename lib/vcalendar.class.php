@@ -1901,9 +1901,7 @@ class vcalendar extends iCalBase {
             ||
             (
               version_compare(phpversion(), '7.0', '=>') &&
-              (
-                substr( $line, $lix, 1 ) != ""
-              )
+              substr( $line, $lix, 1 ) != ""
             )
           )
           {
