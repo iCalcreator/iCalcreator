@@ -1893,7 +1893,20 @@ class vcalendar extends iCalBase {
         if( FALSE !== strpos( $line, ',' )) {
           $content  = array( 0 => '' );
           $cix = $lix = 0;
-          while( FALSE !== substr( $line, $lix, 1 )) {
+          while(
+            (
+              version_compare(phpversion(), '7.0', '<') &&
+              FALSE !== substr( $line, $lix, 1 )
+            ) 
+            ||
+            (
+              version_compare(phpversion(), '7.0', '=>') &&
+              (
+                substr( $line, $lix, 1 ) != ""
+              )
+            )
+          )
+          {
             if(( 0 < $lix ) && ( ',' == $line[$lix] ) && ( "\\" != $line[( $lix - 1 )])) {
               $cix++;
               $content[$cix] = '';
