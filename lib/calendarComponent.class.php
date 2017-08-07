@@ -54,6 +54,7 @@ class calendarComponent  extends iCalBase {
  * @uses calendarComponent::$format
  * @uses calendarComponent::$dtzid
  * @uses calendarComponent::$allowEmpty
+ * @uses calendarComponent::$apple
  * @uses calendarComponent::$xcaldecl
  * @uses calendarComponent::_createFormat()
  * @uses calendarComponent::_makeDtstamp()
@@ -70,6 +71,7 @@ class calendarComponent  extends iCalBase {
     $this->format          = null;
     $this->dtzid           = null;
     $this->allowEmpty      = TRUE;
+    $this->apple           = FALSE;
     $this->xcaldecl        = array();
 
     $this->_createFormat();
@@ -1373,6 +1375,19 @@ class calendarComponent  extends iCalBase {
                                   iCalUtilityFunctions::_geo2str2( $this->geo['value']['latitude'],  iCalUtilityFunctions::$geoLatFmt ).
                               ';'.iCalUtilityFunctions::_geo2str2( $this->geo['value']['longitude'], iCalUtilityFunctions::$geoLongFmt ));
   }
+
+  function createAppleGeo() {
+    if( empty( $this->geo )) return FALSE;
+    if( empty( $this->geo['value'] )) return FALSE;
+
+    if( empty( $this->location )) return FALSE;
+    if( empty( $this->location['value'] )) return FALSE;
+	$locationValue = explode(', ', $this->location['value']);
+	$title = $locationValue[0];
+	array_shift($locationValue);
+    return 'X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=' . implode('\\\\n',$locationValue) . ';X-APPLE-RADIUS=100;X-TITLE=' . $title . ':geo:' . $this->geo['value']['latitude'] . ',' .  $this->geo['value']['longitude'] . $this->nl;
+  }
+
 /**
  * set calendar component property geo
  *
@@ -1459,6 +1474,7 @@ class calendarComponent  extends iCalBase {
  * @return string
  */
   function createLocation() {
+	if($this->getConfig('apple')) return FALSE;
     if( empty( $this->location )) return FALSE;
     if( empty( $this->location['value'] ))
       return ( $this->getConfig( 'allowEmpty' )) ? $this->_createElement( 'LOCATION' ) : FALSE;
@@ -2935,6 +2951,7 @@ class calendarComponent  extends iCalBase {
  * @param mixed $config
  * @uses calendarComponent::getConfig()
  * @uses calendarComponent::$allowEmpty
+ * @uses calendarComponent::$apple
  * @uses calendarComponent::$compix
  * @uses calendarComponent::$components
  * @uses calendarComponent::$objName
@@ -2998,6 +3015,7 @@ class calendarComponent  extends iCalBase {
     if( !$config ) {
       $return = array();
       $return['ALLOWEMPTY']  = $this->getConfig( 'ALLOWEMPTY' );
+      $return['APPLE']       = $this->getConfig( 'APPLE' );
       $return['FORMAT']      = $this->getConfig( 'FORMAT' );
       if( FALSE !== ( $lang  = $this->getConfig( 'LANGUAGE' )))
         $return['LANGUAGE']  = $lang;
@@ -3009,6 +3027,9 @@ class calendarComponent  extends iCalBase {
     switch( strtoupper( $config )) {
       case 'ALLOWEMPTY':
         return $this->allowEmpty;
+        break;
+      case 'APPLE':
+        return $this->apple;
         break;
       case 'COMPSINFO':
         unset( $this->compix );
@@ -3143,6 +3164,11 @@ class calendarComponent  extends iCalBase {
       case 'ALLOWEMPTY':
         $this->allowEmpty = $value;
         $subcfg = array( 'ALLOWEMPTY' => $value );
+        $res    = TRUE;
+        break;
+       case 'APPLE':
+        $this->apple = $value;
+        $subcfg = array( 'APPLE' => $value );
         $res    = TRUE;
         break;
       case 'FORMAT':

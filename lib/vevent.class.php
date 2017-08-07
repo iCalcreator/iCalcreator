@@ -170,6 +170,7 @@ class vevent extends calendarComponent {
     if( defined( 'ICAL_LANG' ) && !isset( $config['language'] ))
                                           $config['language']   = ICAL_LANG;
     if( !isset( $config['allowEmpty'] ))  $config['allowEmpty'] = TRUE;
+    if( !isset( $config['apple'] ))       $config['apple']      = FALSE;
     if( !isset( $config['nl'] ))          $config['nl']         = "\r\n";
     if( !isset( $config['format'] ))      $config['format']     = 'iCal';
     if( !isset( $config['delimiter'] ))   $config['delimiter']  = DIRECTORY_SEPARATOR;
@@ -242,6 +243,7 @@ class vevent extends calendarComponent {
     $component    .= $this->createExdate();
     $component    .= $this->createExrule();
     $component    .= $this->createGeo();
+    $component    .= $this->createAppleGeo();
     $component    .= $this->createLastModified();
     $component    .= $this->createLocation();
     $component    .= $this->createOrganizer();

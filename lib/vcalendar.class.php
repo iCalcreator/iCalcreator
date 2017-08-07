@@ -108,6 +108,7 @@ class vcalendar extends iCalBase {
     if( defined( 'ICAL_LANG' ) && !isset( $config['language'] ))
                                           $config['language']   = ICAL_LANG;
     if( !isset( $config['allowEmpty'] ))  $config['allowEmpty'] = TRUE;
+    if( !isset( $config['apple'] ))       $config['apple']      = FALSE;
     if( !isset( $config['nl'] ))          $config['nl']         = "\r\n";
     if( !isset( $config['format'] ))      $config['format']     = 'iCal';
     if( !isset( $config['delimiter'] ))   $config['delimiter']  = DIRECTORY_SEPARATOR;
@@ -433,7 +434,7 @@ class vcalendar extends iCalBase {
       case 'R-UID':
       case 'UID':
       case 'URL':
-        $output  = array();
+      	$output  = array();
         foreach ( $this->components as $cix => $component) {
           if( !in_array( $component->objName, iCalUtilityFunctions::$vComps ))
             continue;
@@ -561,6 +562,7 @@ class vcalendar extends iCalBase {
  * @param mixed $config
  * @uses vcalendar::getConfig()
  * @uses vcalendar::$allowEmpty
+ * @uses vcalendar::$apple
  * @uses vcalendar::$components
  * @uses calendarComponent::_getProperties()
  * @uses calendarComponent::$objName
@@ -581,6 +583,7 @@ class vcalendar extends iCalBase {
     if( !$config ) {
       $return = array();
       $return['ALLOWEMPTY']  = $this->getConfig( 'ALLOWEMPTY' );
+      $return['APPLE']       = $this->getConfig( 'APPLE' );
       $return['DELIMITER']   = $this->getConfig( 'DELIMITER' );
       $return['DIRECTORY']   = $this->getConfig( 'DIRECTORY' );
       $return['FILENAME']    = $this->getConfig( 'FILENAME' );
@@ -599,6 +602,9 @@ class vcalendar extends iCalBase {
     switch( strtoupper( $config )) {
       case 'ALLOWEMPTY':
         return $this->allowEmpty;
+        break;
+      case 'APPLE':
+        return $this->apple;
         break;
       case 'COMPSINFO':
         unset( $this->compix );
@@ -682,6 +688,7 @@ class vcalendar extends iCalBase {
  * @param string $value
  * @uses vcalendar::setConfig()
  * @uses vcalendar::$allowEmpty
+ * @uses vcalendar::$apple
  * @uses vcalendar::$components
  * @uses vcalendar::$url
  * @uses vcalendar::$delimiter
@@ -724,6 +731,11 @@ class vcalendar extends iCalBase {
       case 'ALLOWEMPTY':
         $this->allowEmpty = $value;
         $subcfg  = array( 'ALLOWEMPTY' => $value );
+        $res = TRUE;
+        break;
+      case 'APPLE':
+        $this->apple = $value;
+        $subcfg  = array( 'APPLE' => $value );
         $res = TRUE;
         break;
       case 'DELIMITER':
