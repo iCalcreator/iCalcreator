@@ -2,27 +2,31 @@
 /**
  * iCalcreator, a PHP rfc2445/rfc5545 solution.
  *
- * copyright 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * link      http://kigkonsult.se/iCalcreator/index.php
- * package   iCalcreator
- * version   2.23.20
- * license   By obtaining and/or copying the Software, iCalcreator,
- *           you (the licensee) agree that you have read, understood,
- *           and will comply with the following terms and conditions.
- *           a. The above copyright, link, package and version notices,
- *              this licence notice and
- *              the [rfc5545] PRODID as implemented and invoked in the software
- *              shall be included in all copies or substantial portions of the Software.
- *           b. The Software, iCalcreator, is for
- *              individual evaluation use and evaluation result use only;
- *              non assignable, non-transferable, non-distributable,
- *              non-commercial and non-public rights, use and result use.
- *           c. Creative Commons
- *              Attribution-NonCommercial-NoDerivatives 4.0 International License
- *              (http://creativecommons.org/licenses/by-nc-nd/4.0/)
- *           In case of conflict, a and b supercede c.
- *
  * This file is a part of iCalcreator.
+ *
+ * Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * Link      http://kigkonsult.se/iCalcreator/index.php
+ * Package   iCalcreator
+ * Version   2.24
+ * License   Subject matter of licence is the software iCalcreator.
+ *           The above copyright, link, package and version notices,
+ *           this licence notice and the [rfc5545] PRODID as implemented and
+ *           invoked in iCalcreator shall be included in all copies or
+ *           substantial portions of the iCalcreator.
+ *           iCalcreator can be used either under the terms of
+ *           a proprietary license, available at <https://kigkonsult.se/>
+ *           or the GNU Affero General Public License, version 3:
+ *           iCalcreator is free software: you can redistribute it and/or
+ *           modify it under the terms of the GNU Affero General Public License
+ *           as published by the Free Software Foundation, either version 3 of
+ *           the License, or (at your option) any later version.
+ *           iCalcreator is distributed in the hope that it will be useful,
+ *           but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *           GNU Affero General Public License for more details.
+ *           You should have received a copy of the GNU Affero General Public
+ *           License along with this program.
+ *           If not, see <http://www.gnu.org/licenses/>.
  */
 namespace kigkonsult\iCalcreator;
 use kigkonsult\iCalcreator\util\util;

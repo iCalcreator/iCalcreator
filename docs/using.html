@@ -1,12 +1,41 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!--
+iCalcreator, a PHP rfc2445/rfc5545 solution.
+
+This file is a part of iCalcreator.
+
+Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+Link      http://kigkonsult.se/iCalcreator/index.php
+Package   iCalcreator
+Version   2.24
+License   Subject matter of licence is the software iCalcreator.
+          The above copyright, link, package and version notices,
+          this licence notice and the [rfc5545] PRODID as implemented and
+          invoked in iCalcreator shall be included in all copies or
+          substantial portions of the iCalcreator.
+          iCalcreator can be used either under the terms of
+          a proprietary license, available at <https://kigkonsult.se/>
+          or the GNU Affero General Public License, version 3:
+          iCalcreator is free software: you can redistribute it and/or
+          modify it under the terms of the GNU Affero General Public License
+          as published by the Free Software Foundation, either version 3 of
+          the License, or (at your option) any later version.
+          iCalcreator is distributed in the hope that it will be useful,
+          but WITHOUT ANY WARRANTY; without even the implied warranty of
+          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+          GNU Affero General Public License for more details.
+          You should have received a copy of the GNU Affero General Public
+          License along with this program.
+          If not, see <http://www.gnu.org/licenses/>.
+-->
 <html>
 <head>
-<title>iCalcreator 2.23.20 manual</title>
+<title>iCalcreator 2.24 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2017 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.23.20">
+<meta name="description" content="using iCalcreator v2.24">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -137,9 +166,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.23.20</p>
+<p class="header">iCalcreator v2.24</p>
 <p>
-iCalcreator v2.23.20<br>
+iCalcreator v2.24<br>
 Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
@@ -187,7 +216,7 @@ The iCal standards are <a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.23.20 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
+For iCalcreator 2.24 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -271,12 +300,14 @@ This style is used for <em>PHP</em> coding examples.
 
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
-Use the kigkonsult.se support <a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se/support" target="_blank">page</a>
-exploring iCalcreator 2.23.20 use and iCal issues. Previous iCalcreator releases are supported upon (paid) request only.
+Previous iCalcreator releases are supported upon (paid) request only.
 </p>
 <p>
-Use the contact <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">page</a>
-for queries, improvement/development issues or professional support and development.
+Use
+<a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">kigkonsult.se/contact</a>
+or
+<a href="https://github.com/iCalcreator/iCalcreator/issues" title="github" target="_blank"> github.com/iCalcreator</a>
+for improvement/development issues or professional support and development.
 Please note that paid support or consulting service has the highest priority.
 </p>
 <p>
@@ -311,7 +342,7 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.23.20/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.24/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
@@ -588,8 +619,6 @@ $vcalendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
 <a href="#iCal2vCards">4.5.2 iCal2vCards</a><br>
 <br>
 <a href="#Copyright_and_Licence">5 COPYRIGHT AND LICENSE</a><br>
-<a href="#Copyright">5.1 Copyright</a><br>
-<a href="#Licence">4.2 License</a><br>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
@@ -2792,7 +2821,7 @@ $vcalendar = new kigkonsult\iCalcreator\vcalendar( $config );
 
 $str       = array(
 &quot;BEGIN:VCALENDAR&quot;,
-&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.23.20//&quot;,
+&quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.24//&quot;,
 &quot;VERSION:2.0&quot;,
 &quot;BEGIN:VEVENT&quot;,
 &quot;DTSTART:20101224T190000Z&quot;,
@@ -2996,7 +3025,7 @@ $vcalendar-&gt;useCachedCalendar();
 
 <a name="iCalcreatorVersion"></a><h4>3.1.4.7 iCalcreatorVersion</h4>
 <p>
-This static class method returns the iCalcreator class version number (2.23.20+).
+This static class method returns the iCalcreator class version number (2.24+).
 </p>
 <p>
 There is also a <em>PHP</em> constant &quot;ICALCREATOR_VERSION&quot; (all versions).
@@ -7980,52 +8009,33 @@ Return (bool) true if argument directory is not null, otherwise vCard string.
 
 <a name="Copyright_and_Licence"></a><h1>5 COPYRIGHT AND LICENSE</h1>
 
-<a name="Copyright"></a><h4>5.1 Copyright</h4>
-<p>
-iCalcreator v2.23.20<br>
-Copyright &copy; 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
-<a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
-<a href="http://kigkonsult.se/support/index.php" title="kigkonsult.se support" target="_blank">kigkonsult.se support</a><br>
-<a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
-</p>
-<p>
-Due to the iCalcreator 2.23.20 release is a unstable development release,
-the licence is somewhat restricted.
-</p>
+<table>
+<tr><td>Copyright<td>(c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+<tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
+<tr><td>Package  <td>iCalcreator
+<tr><td>Version  <td>2.24
+<tr><td class="top">License  <td>
+Subject matter of licence is the software iCalcreator.<br>
+The above copyright, link, package and version notices,
+this licence notice and the [rfc5545] PRODID as implemented and
+invoked in iCalcreator shall be included in all copies or
+substantial portions of the iCalcreator.<br>
+iCalcreator can be used either under the terms of
+a proprietary license, available at <a href="https://kigkonsult.se/">&lt;https://kigkonsult.se/&gt;</a><br>
+or the GNU Affero General Public License, version 3:<br>
+iCalcreator is free software: you can redistribute it and/or
+modify it under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.<br>
+iCalcreator is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.<br>
+You should have received a copy of the GNU Affero General Public
+License along with this program.
+If not, see <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt;</a>.
+</table>
 
-<a name="Licence"></a><h4>4.2 License</h4>
-<p>
-By obtaining and/or copying the Software, iCalcreator,
-you (the licensee) agree that you have read, understood,
-and will comply with the following terms and conditions.
-</p>
-<dl>
-<dt>
-a.
-<dd>
-The copyright, link, package and version notices,
-the licence notice and
-the [rfc5545] PRODID as implemented and invoked in the software
-shall be included in all copies or substantial portions of the Software.
-<dt>
-b.
-<dd>
-The Software, iCalcreator, is for
-individual evaluation use and evaluation result use only;
-non assignable, non-transferable, non-distributable,
-non-commercial and non-public rights, use and result use.
-</dd>
-<dt>
-c.
-<dd>
-Creative Commons<br>
-Attribution-NonCommercial-NoDerivatives 4.0 International License<br>
-(http://creativecommons.org/licenses/by-nc-nd/4.0/)<br><br>
-</dd>
-<dt>In case of conflict, a and b supercedes c.
-<dd>
-</dd>
-</dl>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Copyright_and_Licence">[up]</a>
 </body>

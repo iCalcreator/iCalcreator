@@ -1,14 +1,12 @@
 
-iCalcreator 2.23.18 releaseNotes
+iCalcreator 2.24 releaseNotes
 
-This is an (unstable) evaluation release,
-please mail your opinion and observations!
+This is a major release!
 
-Focus now is on usability (and functionality),
-the 2.23.18 is a beta-2 release
-and is the (last) 2.24 release candidate.
+The release includes (but not limited to)
 
 MAJOR rewrite (but same API)
+
 - require PHP >= 5.4
 - namespace 'kigkonsult\iCalcreator'
 - all calendar properties implemented as traits
@@ -28,7 +26,8 @@ MAJOR rewrite (but same API)
 - updated autoloader and altered folder structure
 - improved performance
 
-Bug fixed and updates
+Bug fixed and updates:
+
 util::size75()
   no line break in CRLF
   preserve opt. trailing CRLF
@@ -47,8 +46,6 @@ vcalendar::getComponent()
 calendarComponent::getComponent()
 iCalBase::deleteComponent()
   UID/component name spilt
-autoloader
-  renamed to autoloader
 code refresh:
   fixed typos and fcn arg. and return types
 utilRecur class

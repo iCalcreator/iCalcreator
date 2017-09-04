@@ -1,6 +1,6 @@
 # iCalcreator
 
-is a PHP class package managing
+is the PHP class package managing
 
 > iCal (rfc2445/rfc5445) information
 
@@ -14,6 +14,5 @@ iCalcreator supports systems like
  * other applications...
 
 Builds
-- stable 2.22 *(master)*
-- latest 2.22.5 *(tag)*
-- unstable 2.23.20 *(tag)* *- evaluation only, release candidate*
+- stable 2.24 *(master)*
+- old 2.22.5 *(tag)* - unsupported
