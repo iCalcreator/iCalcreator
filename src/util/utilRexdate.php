@@ -175,8 +175,10 @@ class utilRexdate {
  */
   public static function prepInputExdate( $exdates, $params=null ) {
     static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
-    $input  = [util::$LCparams => util::setParams( $params,
-                                                   util::$DEFAULTVALUEDATETIME )];
+    $input = [
+      util::$LCparams => util::setParams( $params, util::$DEFAULTVALUEDATETIME ),
+      util::$LCvalue => []
+    ];
     $toZ = ( isset( $input[util::$LCparams][util::$TZID] ) &&
              in_array( strtoupper( $input[util::$LCparams][util::$TZID] ),
                        $GMTUTCZARR ))

@@ -544,7 +544,7 @@ class utilSelect {
       else
         ksort( $result );
     } // end elseif( !$flat )
-    if( 0 >= count( $result ))
+    if( !is_null($result) && 0 >= count( $result ))
       return false;
     return $result;
   }
