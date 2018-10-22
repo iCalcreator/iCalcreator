@@ -488,7 +488,7 @@ class util {
                                      $preSet=null ) {
     if( $preSet )
       return $preSet;
-    if( ( 0 == count( $array )) || ! is_array( $array ))
+    if( ! is_array( $array ) || ( 0 == count( $array )) )
       return $elseVal;
     foreach( $array as $key => $value ) {
       if( 0 == strcasecmp( $expkey, $key )) {
