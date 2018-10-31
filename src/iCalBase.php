@@ -4,10 +4,10 @@
  *
  * This file is a part of iCalcreator.
  *
- * Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.24
+ * Version   2.24.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -34,13 +34,13 @@ use kigkonsult\iCalcreator\util\util;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' ))
-  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.24' );
+  define( 'ICALCREATOR_VERSION', 'iCalcreator 2.24.2' );
 /**
  * iCalcreator base class
  *
  * Properties and methods shared by vcalendar and calendarComponents
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.20 - 2017-01-30
+ * @since 2.24.1 - 2018-10-22
  */
 abstract class iCalBase {
   use traits\X_PROPtrait;

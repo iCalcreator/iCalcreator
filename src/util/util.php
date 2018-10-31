@@ -33,7 +33,7 @@ namespace kigkonsult\iCalcreator\util;
  * iCalcreator utility/support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.21.11 - 2015-04-03
+ * @since 2.24.1 - 2018-10-22
  */
 class util {
 /**
@@ -470,7 +470,7 @@ class util {
  * Remove expected key/value from array and returns hitval (if found) else returns elseval
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.4.16 - 2008-11-08
+ * @since 2.24.1 - 2018-10-22
  * @param array  $array    iCal property parameters
  * @param string $expkey   expected key
  * @param string $expval   expected value
@@ -488,7 +488,7 @@ class util {
                                      $preSet=null ) {
     if( $preSet )
       return $preSet;
-    if( ( 0 == count( $array )) || ! is_array( $array ))
+    if( ! is_array( $array ) || ( 0 == count( $array )))
       return $elseVal;
     foreach( $array as $key => $value ) {
       if( 0 == strcasecmp( $expkey, $key )) {

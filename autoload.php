@@ -4,10 +4,10 @@
  *
  * This file is a part of iCalcreator.
  *
- * Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.24
+ * Version   2.24.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -34,12 +34,12 @@
  * iCalcreator package autoloader
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.23.16 - 2017-05-27
+ * @since 2.24.2 - 2018-10-31
  */
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.24' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.24.2' );
 /**
  * load iCalcreator src and support classes and traits
  */

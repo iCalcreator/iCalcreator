@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.24
+ * Version   2.24.1
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -33,7 +33,7 @@ namespace kigkonsult\iCalcreator\util;
  * iCalcreator EXDATE/RDATE support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.22.23 - 2017-04-04
+ * @since 2.24.1 - 2018-10-22
  */
 class utilRexdate {
 /**
@@ -172,11 +172,14 @@ class utilRexdate {
  * @param array   $params
  * @return array
  * @static
+ * @since 2.24.1 - 2018-10-22
  */
   public static function prepInputExdate( $exdates, $params=null ) {
     static $GMTUTCZARR = ['GMT', 'UTC', 'Z'];
-    $input  = [util::$LCparams => util::setParams( $params,
-                                                   util::$DEFAULTVALUEDATETIME )];
+    $input  = [
+      util::$LCparams => util::setParams( $params, util::$DEFAULTVALUEDATETIME ),
+      util::$LCvalue  => []
+    ];
     $toZ = ( isset( $input[util::$LCparams][util::$TZID] ) &&
              in_array( strtoupper( $input[util::$LCparams][util::$TZID] ),
                        $GMTUTCZARR ))
