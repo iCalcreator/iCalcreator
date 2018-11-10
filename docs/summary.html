@@ -7,14 +7,14 @@ This file is a part of iCalcreator.
 Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 Link      http://kigkonsult.se/iCalcreator/index.php
 Package   iCalcreator
-Version   2.24.2
+Version   2.26
 License   Subject matter of licence is the software iCalcreator.
           The above copyright, link, package and version notices,
           this licence notice and the [rfc5545] PRODID as implemented and
           invoked in iCalcreator shall be included in all copies or
           substantial portions of the iCalcreator.
           iCalcreator can be used either under the terms of
-          a proprietary license, available at <https://kigkonsult.se/>
+          a proprietary license, available from iCal_at_kigkonsult_dot_se
           or the GNU Affero General Public License, version 3:
           iCalcreator is free software: you can redistribute it and/or
           modify it under the terms of the GNU Affero General Public License
@@ -30,12 +30,12 @@ License   Subject matter of licence is the software iCalcreator.
 -->
 <html>
 <head>
-<title>iCalcreator 2.24.2 summary</title>
+<title>iCalcreator 2.26 summary</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-<meta name="copyright"   content="2017-2017 Kjell-Inge Gustafsson, kigkonsult">
+<meta name="copyright"   content="2007-2018 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="iCalcreator 2.24.2 summary" />
+<meta name="description" content="iCalcreator 2.26 summary" />
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -46,9 +46,6 @@ License   Subject matter of licence is the software iCalcreator.
 body {
   MARGIN-LEFT     : 10px;
   WIDTH           : 750px;
-}
-a {
-  BACKGROUND-COLOR: inherit;
 }
 a.ref {
   BACKGROUND-COLOR: inherit;
@@ -169,15 +166,15 @@ sup {
 </head>
 <body>
 
-<h1>iCalcreator v2.24.2</h1>
+<h1>iCalcreator v2.26</h1>
 <p>
-iCalcreator v2.24.2<br>
-Copyright (c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.26<br>
+Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
-<a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se contact" target="_blank">kigkonsult.se contact</a>
+Contact : iCal_at_kigkonsult_dot_se
 </p>
 
-<h4>Preface</h2>
+<h4>Preface</h4>
 <p>
 This document describes a <b>short summary</b> usage of iCalcreator, a <em>PHP</em> software implementation of standards rfc5545/rfc5546 (rfc2445/rfc2446) to manage iCal formatted files.
 </p>
@@ -205,14 +202,14 @@ The use of the software implies acceptance of these terms and the <a href="#Copy
 This document makes previous versions obsolete.
 </p>
 
-<h4>The software</h2>
+<h4>The software</h4>
 <p>
 iCalcreator is a <em>PHP</em> class package managing iCal files, supporting (non-)calendar
 systems and applications to process and communicate calendar information like
 events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
-For iCalcreator 2.24.2 version (and later), <em>PHP</em> version &gt;= 5.4 is required.
+For iCalcreator 2.26 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
@@ -247,12 +244,12 @@ iCalcreator also supports xCal (iCal xml),
 The XML Format for <strong>iCalendar</strong>.
 </p>
 
-<h4>SUPPORT</h4>
+<h4>Support</h4>
 <p>
 For previous iCalcreator releases support upon (paid) request only.
 </p>
 <p>
-Use the contact <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">page</a>
+Use the issues <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank">page</a>
 for queries, improvement/development issues or professional support and development.
 Please note that paid support or consulting service has the highest priority.
 </p>
@@ -261,7 +258,7 @@ kigkonsult offer professional services for software support, design and new/re-d
 of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle management, including long term utility, reliability and maintainability.
 </p>
 
-<h4>DONATE</h4>
+<h4>Donate</h4>
 <p>
 You can show your appreciation for our free software,
 and can support future development by making a donation to the kigkonsult GPL/LGPL projects.
@@ -273,24 +270,22 @@ Thanks in advance!
 
 <h4>Contact</h4>
 <p>
-Use the <a href="http://kigkonsult.se/contact/index.php" title="kigkonsult.se/contact" target="_blank">contact page</a>
- for queries, improvement/development issues or professional support and development.
- Please note that paid support or consulting service has the highest priority.
+    Use the <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>
+    for queries, improvement/development issues or professional support and development.
+    Please note that paid support or consulting service has the highest priority.
 </p>
 
 <h4>Downloads and usage examples</h4>
 <p>
-At <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult iCalcreator" target="_blank">kigkonsult.se</a> you can download the
-<a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank">complete manual</a>
-and review and explore iCalcreator usage at the
-<a href="http://kigkonsult.se/test/index.php" title="kigkonsult.se iCalcreator implement and test examples" target="_blank">coding and test</a> pages.
+At <a href="https://github.com/iCalcreator/iCalcreator" title="kigkonsult iCalcreator" target="_blank">kigkonsult.se</a> you can download a more
+complete manual and review and explore iCalcreator usage.
 </p>
 
-<h4>INSTALL</h4>
+<h4>Install</h4>
 <dl>
 <dt>Composer (https://getcomposer.org/)
 <dd>&nbsp;
-<dd>composer require kigkonsult/iCalcreator
+<dd>composer require kigkonsult/icalcreator
 <dd>&nbsp;
 <dt>or
 <dd> include the (download) iCalcreator folder to your include-path<br>
@@ -302,14 +297,18 @@ and review and explore iCalcreator usage at the
 <dd>You may also need to set the default timezone.
 </dl>
 
+<p>
+iCalcreator 2.26 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+</p>
+
 
 <h4>Notes</h4>
 <p>
-When creating a new calendar(/component) object instance, review config settings.
+When creating a new Vcalendar(/component) instance, review config settings.
 </p>
 <p>
 You will find a complete iCalcreator function list (ex. getProperty, deleteProperty) in
-<a href="http://kigkonsult.se/downloads/index.php#iCalcreator" title="iCalcreator complete manual" target="_blank">iCalcreator manual</a>.
+<a href="https://github.com/iCalcreator/iCalcreator/docs" title="iCalcreator complete manual" target="_blank">iCalcreator manual</a>.
 </p>
 <p>
 Note, to ease up usage, you will find convenient holders for component names,
@@ -319,93 +318,86 @@ properties, config keys etc in top of the &quot;util&quot; class file (src/util/
 <h2>CREATE</h2>
 
 <p class="example">
-
         // <span class="comment">define time zone</span>
 $tz = &quot;Europe/Stockholm&quot;;
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$config = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;,
+$config = [
+    Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;,
         // <span class="comment">opt. set &quot;calendar&quot; timezone</span>
-                 kigkonsult\iCalcreator\util\util::$TZID      =&gt; $tz );
-        // <span class="comment">create a new calendar object instance</span>
-$calendar= new kigkonsult\iCalcreator\vcalendar( $config );
+    Kigkonsult\Icalcreator\Util\Util::$TZID      =&gt; $tz
+];
+        // <span class="comment">create a new Vcalendar instance</span>
+$calendar= new Kigkonsult\Icalcreator\Vcalendar( $config );
 
         // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( kigkonsult\iCalcreator\util\util::$METHOD,
-                        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( &quot;x-wr-calname&quot;,
-                        &quot;Calendar Sample&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-CALDESC&quot;,
-                        &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
-                        $tz );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$METHOD, &quot;PUBLISH&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALNAME, &quot;Calendar Sample&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALDESC, &quot;Calendar Description&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_TIMEZONE, $tz );
         // <span class="comment">create an calendar event component</span>
 $vevent = $calendar-&gt;newVevent();
         // <span class="comment">set event start</span>
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DTSTART,
-                      array( &quot;year&quot;  =&gt; 2017,
-                             &quot;month&quot; =&gt;    4,
-                             &quot;day&quot;   =&gt;    1,
-                             &quot;hour&quot;  =&gt;   19,
-                             &quot;min&quot;   =&gt;    0,
-                             &quot;sec&quot;   =&gt;    0 ));
+$vevent-&gt;setProperty(
+    Kigkonsult\Icalcreator\Util\Util::$DTSTART,
+    [
+        &quot;year&quot;  =&gt; 2017,
+        &quot;month&quot; =&gt;    4,
+        &quot;day&quot;   =&gt;    1,
+        &quot;hour&quot;  =&gt;   19,
+        &quot;min&quot;   =&gt;    0,
+        &quot;sec&quot;   =&gt;    0
+    ]
+);
         // <span class="comment">set event end</span>
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DTEND,
-                      array( &quot;year&quot;  =&gt; 2017,
-                             &quot;month&quot; =&gt;    4,
-                             &quot;day&quot;   =&gt;    1,
-                             &quot;hour&quot;  =&gt;   22,
-                             &quot;min&quot;   =&gt;   30,
-                             &quot;sec&quot;   =&gt;    0 ));
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$LOCATION,
-                      &quot;Central Placa&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$SUMMARY,
-                      &quot;PHP summit&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION,
-                      &quot;This is a description&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$COMMENT,
-                      &quot;This is a comment&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$ATTENDEE,
-                      &quot;attendee1@icaldomain.net&quot; );
+$vevent-&gt;setProperty(
+    Kigkonsult\Icalcreator\Util\Util::$DTEND,
+    [
+        &quot;year&quot;  =&gt; 2017,
+        &quot;month&quot; =&gt;    4,
+        &quot;day&quot;   =&gt;    1,
+        &quot;hour&quot;  =&gt;   22,
+        &quot;min&quot;   =&gt;   30,
+        &quot;sec&quot;   =&gt;    0
+    ]
+);
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$LOCATION, &quot;Central Placa&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$SUMMARY, &quot;PHP summit&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION, &quot;This is a description&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$COMMENT, &quot;This is a comment&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$ATTENDEE, &quot;attendee1@icaldomain.net&quot; );
 
         // <span class="comment">create an event alarm</span>
 $valarm = $vevent-&gt;newValarm();
-$valarm-&gt;setProperty( kigkonsult\iCalcreator\util\util::$ACTION,
-                      &quot;DISPLAY&quot; );
+$valarm-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$ACTION, &quot;DISPLAY&quot; );
         // <span class="comment">reuse the event description</span>
-$valarm-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION,
-                      $vevent-&gt;getProperty(
-                        kigkonsult\iCalcreator\util\util::$DESCRIPTION
-                      )
-                    );
+$valarm-&gt;setProperty(
+    Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION,
+    $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION )
+);
         // <span class="comment">a local date</span>
 $d = sprintf( '%04d%02d%02d %02d%02d%02d', 2017, 3, 31, 15, 0, 0 );
         // <span class="comment">create alarm trigger (in UTC datetime)</span>
-kigkonsult\iCalcreator\timezoneHandler::transformDateTime( $d,
-                                                           $tz,
-                                                           &quot;UTC&quot;,
-                                                           &quot;Ymd\THis\Z&quot; );
-$valarm-&gt;setProperty( kigkonsult\iCalcreator\util\util::$TRIGGER,
-                      $d );
+Kigkonsult\Icalcreator\TimezoneHandler::transformDateTime( $d, $tz, &quot;UTC&quot;, &quot;Ymd\THis\Z&quot; );
+$valarm-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$TRIGGER, $d );
 
         // <span class="comment">create another calendar event component</span>
 $vevent = $calendar-&gt;newVevent();
         // <span class="comment">alt. date format, here for an all-day event</span>
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DTSTART,
-                      &quot;20170401&quot;,
-                      array(&quot;VALUE&quot; =&gt; &quot;DATE&quot;));
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$ORGANIZER,
-                      &quot;boss@icaldomain.com&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$SUMMARY,
-                      &quot;ALL-DAY event&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION,
-                      &quot;This is a description for an all-day event&quot; );
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$RESOURCES,
-                      &quot;Full attension&quot; );
+$vevent-&gt;setProperty(
+    Kigkonsult\Icalcreator\Util\Util::$DTSTART,
+    &quot;20170401&quot;,
+    [ &quot;VALUE&quot; =&gt; &quot;DATE&quot; ]
+);
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$ORGANIZER, &quot;cio@icaldomain.com&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$SUMMARY, &quot;ALL-DAY event&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION, &quot;This is a description for an all-day event&quot; );
+$vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$RESOURCES, &quot;Full attension&quot; );
         // <span class="comment">weekly, four occasions</span>
-$vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$RRULE,
-                      array( &quot;FREQ&quot;  =&gt; &quot;WEEKLY&quot;,
-                             &quot;count&quot; =&gt; 4));
+$vevent-&gt;setProperty(
+    Kigkonsult\Icalcreator\Util\Util::$RRULE,
+    [ &quot;FREQ&quot;  =&gt; &quot;WEEKLY&quot;, &quot;count&quot; =&gt; 4 ]
+);
         // <span class="comment">supporting parse of strict rfc5545 formatted text</span>
 $vevent-&gt;parse( &quot;LOCATION:1CP Conference Room 4350&quot; );
 
@@ -415,32 +407,32 @@ $vevent-&gt;parse( &quot;LOCATION:1CP Conference Room 4350&quot; );
         // <span class="comment">create timezone component(-s)</span>
         // <span class="comment">based on all start dates in events (i.e. all dtstarts)</span>
         // <span class="comment">X-LIC-LOCATION required of some calendar software</span>
-$xprops = array( &quot;X-LIC-LOCATION&quot; => $tz );
-kigkonsult\iCalcreator\timezoneHandler::createTimezone( $v,
-                                                        $tz,
-                                                        $xprops );
+$xprops = [ Kigkonsult\Icalcreator\Util\Util::$X_LIC_LOCATION => $tz ];
+Kigkonsult\Icalcreator\TimezoneHandler::createTimezone( $v, $tz, $xprops );
 
 </p>
 
 <h2>PARSE</h2>
 <h4>iCal, rfc5545 / rfc2445 </h4>
-<p>How to create iCalcreator object instance</p>
+<p>How to create Vcalendar instance</p>
 <p class="example">
 
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$config = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; );
+$config = [ Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 
-        // <span class="comment">create a new calendar object instance</span>
-$calendar= new kigkonsult\iCalcreator\vcalendar( $config );
+        // <span class="comment">create a new Vcalendar instance</span>
+$calendar= new Kigkonsult\Icalcreator\Vcalendar( $config );
 
 </p>
 <p>and then parse a local iCal file</p>
 <p class="example">
 
         // <span class="comment">set directory and file name</span>
-$config = array( kigkonsult\iCalcreator\util\util::$DIRECTORY =&gt; &quot;calendars&quot;,
-                 kigkonsult\iCalcreator\util\util::$FILENAME  =&gt; &quot;file.ics&quot; );
+$config = [
+    Kigkonsult\Icalcreator\Util\Util::$DIRECTORY =&gt; &quot;calendars&quot;,
+    Kigkonsult\Icalcreator\Util\Util::$FILENAME  =&gt; &quot;file.ics&quot;
+];
 $calendar-&gt;setConfig( $config );
 $calendar-&gt;parse();
         // <span class="comment">continue process (edit, parse, select) $calendar</span>
@@ -451,7 +443,7 @@ $calendar-&gt;parse();
 <p class="example">
 
         // <span class="comment">support parse of remote files</span>
-$calendar-&gt;setConfig( kigkonsult\iCalcreator\util\util::$URL,
+$calendar-&gt;setConfig( Kigkonsult\Icalcreator\Util\Util::$URL,
                       &quot;http://www.aDomain.net/file.ics&quot; );
 $calendar-&gt;parse();
 
@@ -470,21 +462,21 @@ $calendar-&gt;sort();
 
 <h4>xCal, rfc6321 (XML)</h4>
 <p>
-How to convert (file) XML resource  to an iCalcreator object instance.
+How to convert (file) XML resource  to an Vcalendar instance.
 </p>
 <p class="example">
 
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$config = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; );
+$config = [ Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 
         // <span class="comment">use a local xCal file</span>
 $filename = &quot;xmlfile.xml&quot;;
         // <span class="comment">  or a remote xCal resource</span>
 /* $filename = 'http://kigkonsult.se/xcal.php?a=1&amp;b=2&amp;c=3'; */
-if( ! ( $calendar = kigkonsult\iCalcreator\iCalXML::XMLfile2iCal( $filename, $config )))
-  exit( &quot;Error when parsing $filename&quot; );
-
+if( ! ( $calendar = Kigkonsult\Icalcreator\IcalXML::XMLfile2iCal( $filename, $config ))) {
+    exit( &quot;Error when parsing $filename&quot; );
+}
         // <span class="comment">continue process (edit, parse, select) $calendar</span>
 
 </p>
@@ -493,57 +485,55 @@ if( ! ( $calendar = kigkonsult\iCalcreator\iCalXML::XMLfile2iCal( $filename, $co
 <h2>EDIT</h2>
 <p class="example">
 
-        // <span class="comment">create a new calendar object instance</span>
-$config   = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; );
-$calendar = new kigkonsult\iCalcreator\vcalendar( $config );
+        // <span class="comment">create a new Vcalendar instance</span>
+$config   = [ Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$calendar = new Kigkonsult\Icalcreator\Vcalendar( $config );
 
         // <span class="comment">parse a calendar file</span>
-$config   = array( kigkonsult\iCalcreator\util\util::$DIRECTORY =&gt; &quot;calendars&quot;,
-                   kigkonsult\iCalcreator\util\util::$FILENAME  =&gt; &quot;file.ics&quot; );
+$config   = [
+    Kigkonsult\Icalcreator\Util\Util::$DIRECTORY =&gt; &quot;calendars&quot;,
+    Kigkonsult\Icalcreator\Util\Util::$FILENAME  =&gt; &quot;file.ics&quot;
+];
 $calendar-&gt;setConfig( $config );
 $calendar-&gt;parse();
         // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( kigkonsult\iCalcreator\util\util::$METHOD,
-                        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( &quot;x-wr-calname&quot;,
-                        &quot;Calendar Sample&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-CALDESC&quot;,
-                        &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
-                        &quot;Europe/Stockholm&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$METHOD, &quot;PUBLISH&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALNAME, &quot;Calendar Sample&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALDESC, &quot;Calendar Description&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
 
         // <span class="comment">read events, one by one</span>
-while( $vevent = $calendar-&gt;getComponent( kigkonsult\iCalcreator\util\util::$LCVEVENT )) {
+while( $vevent = $calendar-&gt;getComponent( Kigkonsult\Icalcreator\Util\Util::$LCVEVENT )) {
 
         // <span class="comment">uid (unique id/key for component), required, one occurrence </span>
-  $uid = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$UID );
+    $uid = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$UID );
 
         // <span class="comment">dtstart required, one occurrence</span>
-  $dtstart = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$DTSTART );
+    $dtstart = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$DTSTART );
 
         // <span class="comment">opt. description</span>
-if( $description = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION,
-                                         1 )) {
+    if( $description = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION, 1 )) {
 
         // <span class="comment">edit the description</span>
 
         // <span class="comment">update/replace the description</span>
-    $vevent-&gt;setProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION, $description, FALSE, 1 );
-  }
+        $vevent-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION, $description, FALSE, 1 );
+    }
 
         // <span class="comment">optional comments</span>
-  while( $comment = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$COMMENT )) {
-    .. .
-  }
+    while( $comment = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$COMMENT )) {
+        .. .
+    }
 
         // <span class="comment">remove all ATTENDEE properties .. .</span>
-  while( $vevent-&gt;deleteProperty( kigkonsult\iCalcreator\util\util::$ATTENDEE ))
-    continue;
+    while( $vevent-&gt;deleteProperty( Kigkonsult\Icalcreator\Util\Util::$ATTENDEE )) {
+       continue;
+    }
 
         // <span class="comment">update/replace event in calendar</span>
         // <span class="comment"> with UID as key</span>
-  $calendar-&gt;setComponent ( $vevent, $uid );
-}
+    $calendar-&gt;setComponent ( $vevent, $uid );
+} // end while
 
 </p>
 <br>
@@ -555,24 +545,19 @@ if( $description = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$D
 </p>
 <p class="example">
 
-        // <span class="comment">create a new calendar object instance</span>
-$config   = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; );
-$calendar = new kigkonsult\iCalcreator\vcalendar( $config );
+        // <span class="comment">create a new Vcalendar instance</span>
+$config   = [ Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$calendar = new Kigkonsult\Icalcreator\Vcalendar( $config );
 
         // <span class="comment">iCalcreator also support remote files</span>
-$calendar-&gt;setConfig( kigkonsult\iCalcreator\util\util::$URL,
-                      &quot;http://www.aDomain.net/file.ics&quot; );
+$calendar-&gt;setConfig( Kigkonsult\Icalcreator\Util\Util::$URL, &quot;http://www.aDomain.net/file.ics&quot; );
 $calendar-&gt;parse();
 
         // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( kigkonsult\iCalcreator\util\util::$METHOD,
-                        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( &quot;x-wr-calname&quot;,
-                        &quot;Calendar Sample&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-CALDESC&quot;,
-                        &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
-                        &quot;Europe/Stockholm&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$METHOD, &quot;PUBLISH&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALNAME, &quot;Calendar Sample&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALDESC, &quot;Calendar Description&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
 
 </p>
 <h4>Ex. calendar date based select</h4>
@@ -582,29 +567,27 @@ $calendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
         // <span class="comment">(including components with recurrence pattern)</span>
 $eventArray = $calendar-&gt;selectComponents();
 foreach( $eventArray as $year =&gt; $yearArray) {
- foreach( $yearArray as $month =&gt; $monthArray ) {
-  foreach( $monthArray as $day =&gt; $dailyEventsArray ) {
-   foreach( $dailyEventsArray as $vevent ) {
+    foreach( $yearArray as $month =&gt; $monthArray ) {
+        foreach( $monthArray as $day =&gt; $dailyEventsArray ) {
+            foreach( $dailyEventsArray as $vevent ) {
 
         // <span class="comment">if event is a member of a recurrence set</span>
-        // <span class="comment">returns array( </span>
-        // <span class="comment">    &quot;x-current-dtstart&quot;</span>
-        // <span class="comment">  , (string) date(</span>
-        // <span class="comment">    &quot;Y-m-d [H:i:s][timezone/UTC offset]&quot;))</span>
-    $currddate = $event-&gt;getProperty(
-                   kigkonsult\iCalcreator\util\util::$X_CURRENT_DTSTART
-                 );
+        // <span class="comment">returns [ </span>
+        // <span class="comment">    &quot;x-current-dtstart&quot;,</span>
+        // <span class="comment">   (string) date( &quot;Y-m-d [H:i:s][timezone/UTC offset]&quot;)</span>
+        // <span class="comment">]</span>
+                $currddate = $event-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$X_CURRENT_DTSTART );
 
         // <span class="comment">orig. dtstart</span>
-    $dtstart     = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$DTSTART );
-    $summary     = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$SUMMARY );
-    $description = $vevent-&gt;getProperty( kigkonsult\iCalcreator\util\util::$DESCRIPTION );
-    .. .
-    .. .
-   }
-  }
- }
-}
+                $dtstart     = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$DTSTART );
+                $summary     = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$SUMMARY );
+                $description = $vevent-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$DESCRIPTION );
+                .. .
+                .. .
+            } // end foreach
+        } // end foreach
+    } // end foreach
+} // end foreach
 
 </p>
 <h4>Ex. calendar select specific property values</h4>
@@ -617,10 +600,10 @@ foreach( $eventArray as $year =&gt; $yearArray) {
         // <span class="comment">PRIORITY, RESOURCES, STATUS,</span>
         // <span class="comment">SUMMARY, UID, URL,</span>
         // <span class="comment">GEOLOCATION<sup>*</sup></span>
-$valueOccur = $calendar-&gt;getProperty( kigkonsult\iCalcreator\util\util::$RESOURCES );
+$valueOccur = $calendar-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$RESOURCES );
 foreach( $valueOccur as $uniqueValue =&gt; $occurCnt ) {
 
-  echo &quot;The RESOURCES value &lt;b&gt;$uniqueValue&lt;/b&gt; occurs &lt;b&gt;$occurCnt&lt;/b&gt; times&lt;br /&gt;&quot;;
+    echo &quot;The RESOURCES value &lt;b&gt;$uniqueValue&lt;/b&gt; occurs &lt;b&gt;$occurCnt&lt;/b&gt; times&lt;br /&gt;&quot;;
 
 }
 
@@ -639,10 +622,10 @@ by combining the "LOCATION" and "GEO" property values (only if "GEO" is set).
         // <span class="comment">LOCATION, ORGANIZER,</span>
         // <span class="comment">PRIORITY, RESOURCES, STATUS,</span>
         // <span class="comment">SUMMARY, URL, UID</span>
-$selectSpec = array( kigkonsult\iCalcreator\util\util::$CATEGORIES =&gt; &quot;course1&quot; );
+$selectSpec = [ Kigkonsult\Icalcreator\Util\Util::$CATEGORIES =&gt; &quot;course1&quot; ];
 $specComps  = $calendar-&gt;selectComponents( $selectSpec );
 foreach( $specComps as $comp ) {
-.. .
+    .. .
 }
 
 </p>
@@ -653,19 +636,15 @@ foreach( $specComps as $comp ) {
 <p>(setup)</p>
 <p class="example">
 
-        // <span class="comment">create a new calendar object instance</span>
-$config = array( kigkonsult\iCalcreator\util\util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; );
-$calendar= new kigkonsult\iCalcreator\vcalendar( $config );
+        // <span class="comment">create a new Vcalendar instance</span>
+$config = [ Kigkonsult\Icalcreator\Util\Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$calendar= new Kigkonsult\Icalcreator\Vcalendar( $config );
 
         // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( kigkonsult\iCalcreator\util\util::$METHOD,
-                        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( &quot;x-wr-calname&quot;,
-                        &quot;Calendar Sample&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-CALDESC&quot;,
-                        &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( &quot;X-WR-TIMEZONE&quot;,
-                        &quot;Europe/Stockholm&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$METHOD, &quot;PUBLISH&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALNAME, &quot;Calendar Sample&quot; );
+$calendar-&gt;setProperty( Kigkonsult\Icalcreator\Util\Util::$X_WR_CALDESC, &quot;Calendar Description&quot; );
+$calendar-&gt;setProperty(  Kigkonsult\Icalcreator\Util\Util::$X_LIC_LOCATION , &quot;Europe/Stockholm&quot; );
 
         // <span class="comment">continue process (edit, parse, select) $calendar</span>
 
@@ -688,8 +667,10 @@ Save calendar to file.
 <p class="example">
 
         // <span class="comment">set output directory and file name</span>
-$config = array( kigkonsult\iCalcreator\util\util::$DIRECTORY =&gt; &quot;depot&quot;,
-                 kigkonsult\iCalcreator\util\util::$FILENAME  =&gt; &quot;calendar.ics&quot; );
+$config = [
+    Kigkonsult\Icalcreator\Util\Util::$DIRECTORY =&gt; &quot;depot&quot;,
+    Kigkonsult\Icalcreator\Util\Util::$FILENAME  =&gt; &quot;calendar.ics&quot;
+];
 $calendar-&gt;setConfig( $config );
 $calendar-&gt;saveCalendar();
 
@@ -701,7 +682,7 @@ Create well-formed XML, rfc6321 (as string).
 </p>
 <p class="example">
 
-$xmlstr = kigkonsult\iCalcreator\iCalXML::iCal2XML( $calendar);
+$xmlstr = Kigkonsult\Icalcreator\IcalXML::iCal2XML( $calendar);
 
 </p>
 
@@ -710,7 +691,7 @@ $xmlstr = kigkonsult\iCalcreator\iCalXML::iCal2XML( $calendar);
 Create a json string.
 </p>
 <p class="example">
-$xmlstr = kigkonsult\iCalcreator\iCalXML::iCal2XML( $calendar);
+$xmlstr = Kigkonsult\Icalcreator\IcalXML::iCal2XML( $calendar);
 $json   = json_encode( simplexml_load_string( $xmlstr ));
 
 </p>
@@ -724,32 +705,32 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
 <h2>COPYRIGHT AND LICENSE</h2>
 
 <table>
-<tr><td>Copyright<td>(c) 2007-2017 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
-<tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
-<tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.24.2
-<tr><td class="top">License  <td>
-Subject matter of licence is the software iCalcreator.<br>
-The above copyright, link, package and version notices,
-this licence notice and the [rfc5545] PRODID as implemented and
-invoked in iCalcreator shall be included in all copies or
-substantial portions of the iCalcreator.<br>
-iCalcreator can be used either under the terms of
-a proprietary license, available at <a href="https://kigkonsult.se/">&lt;https://kigkonsult.se/&gt;</a><br>
-or the GNU Affero General Public License, version 3:<br>
-iCalcreator is free software: you can redistribute it and/or
-modify it under the terms of the GNU Affero General Public License
-as published by the Free Software Foundation, either version 3 of
-the License, or (at your option) any later version.<br>
-iCalcreator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.<br>
-You should have received a copy of the GNU Affero General Public
-License along with this program.
-If not, see <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt;</a>.
+    <tr><td>Copyright<td>(c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+    <tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
+    <tr><td>Package  <td>iCalcreator
+    <tr><td>Version  <td>2.26
+    <tr><td class="top">License  <td>
+        Subject matter of licence is the software iCalcreator.<br>
+        The above copyright, link, package and version notices,
+        this licence notice and the [rfc5545] PRODID as implemented and
+        invoked in iCalcreator shall be included in all copies or
+        substantial portions of the iCalcreator.<br>
+        iCalcreator can be used either under the terms of
+        a proprietary license, available from iCal_at_kigkonsult_dot_se<br>
+        or the GNU Affero General Public License, version 3:<br>
+        iCalcreator is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Affero General Public License
+        as published by the Free Software Foundation, either version 3 of
+        the License, or (at your option) any later version.<br>
+        iCalcreator is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU Affero General Public License for more details.<br>
+        You should have received a copy of the GNU Affero General Public
+        License along with this program.
+        If not, see <a href="http://www.gnu.org/licenses/">&quot;http://www.gnu.org/licenses/&quot;</a>.
 </table>
-<br>
+
 <br>
 </body>
 </html>

@@ -17,4 +17,7 @@ iCalcreator supports systems like
 Builds :
 
 - stable 2.24.2 *(master)*
-- old 2.22.5 *(tag)* - unsupported
+
+- next 2.26 - review releaseNotes-2.26 !
+
+- old 2.22.5 - unsupported

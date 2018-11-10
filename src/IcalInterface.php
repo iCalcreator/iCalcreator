@@ -28,44 +28,27 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator;
+
 /**
- * autoload.php
+ * interface IcalInterface
  *
- * iCalcreator package autoloader
- *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
+ * @see https://en.wikipedia.org/wiki/Basic_access_authentication
+ * @see https://tools.ietf.org/html/rfc7617
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
-    }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+interface IcalInterface
+{
+    /**
+     * Class constants
+     */
+    const VTIMEZONE = 'Vtimezone';
+    const STANDARD  = 'Standard';
+    const DAYLIGHT  = 'Daylight';
+    const VEVENT    = 'Vevent';
+    const VTODO     = 'Vtodo';
+    const VJOURNAL  = 'Vjournal';
+    const VFREEBUSY = 'Vfreebusy';
+    const VALARM    = 'Valarm';
+}

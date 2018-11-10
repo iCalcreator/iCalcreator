@@ -1,0 +1,20 @@
+
+iCalcreator 2.26 releaseNotes
+
+PHP 5.6+ required
+Psr 1+4 support
+new Namespace Kigkonsult\IcalCreator
+minor internal rework
+static variables replaced by constants :
+  Kigkonsult\Icalcreator\Vcalendar::VEVENT,
+  Kigkonsult\Icalcreator\Vcalendar::VTODO,,
+  Kigkonsult\Icalcreator\Vcalendar::VJOURNAL,
+  Kigkonsult\Icalcreator\Vcalendar::VFREEBUSY
+  Kigkonsult\Icalcreator\Vcalendar::VTIMEZONE
+  Kigkonsult\Icalcreator\Vcalendar::STANDARD
+  Kigkonsult\Icalcreator\Vcalendar::DAYLIGHT
+  Kigkonsult\Icalcreator\Util\UtilSelect::X_CURRENT_DTSTART,
+  Kigkonsult\Icalcreator\Util\UtilSelect::X_CURRENT_DTEND,
+  Kigkonsult\Icalcreator\Util\UtilSelect::X_CURRENT_DUE,
+  Kigkonsult\Icalcreator\Util\UtilSelect::X_RECURRENCE,
+  Kigkonsult\Icalcreator\Util\UtilSelect::X_OCCURENCE

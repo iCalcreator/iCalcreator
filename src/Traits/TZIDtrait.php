@@ -28,44 +28,65 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * TZID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-05
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait TZIDtrait
+{
+    /**
+     * @var array component property TZID value
+     * @access protected
+     */
+    protected $tzid = null;
+
+    /**
+     * Return formatted output for calendar component property tzid
+     *
+     * @return string
+     */
+    public function createTzid() {
+        if( empty( $this->tzid )) {
+            return null;
+        }
+        if( empty( $this->tzid[Util::$LCvalue] )) {
+            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$TZID ) : null;
+        }
+        return Util::createElement(
+            Util::$TZID,
+            Util::createParams( $this->tzid[Util::$LCparams] ),
+            Util::strrep( $this->tzid[Util::$LCvalue] )
+        );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property tzid
+     *
+     * @since 2.23.12 - 2017-04-22
+     * @param string $value
+     * @param array  $params
+     * @return bool
+     */
+    public function setTzid( $value, $params = null ) {
+        if( empty( $value )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $value = Util::$EMPTYPROPERTY;
+            }
+            else {
+                return false;
+            }
+        }
+        $this->tzid = [
+            Util::$LCvalue  => trim( Util::trimTrailNL( $value )),
+            Util::$LCparams => Util::setParams( $params ),
+        ];
+        return true;
+    }
+}

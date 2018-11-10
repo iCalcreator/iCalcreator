@@ -28,44 +28,47 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * METHOD property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-02
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait METHODtrait
+{
+    /**
+     * @var string calendar property METHOD
+     * @access protected
+     */
+    protected $method = null;
+
+    /**
+     * Return formatted output for calendar property method
+     *
+     * @return string
+     */
+    public function createMethod() {
+        return ( empty( $this->method ))
+            ? null
+            : sprintf( self::$FMTICAL, Util::$METHOD, $this->method );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar property method
+     *
+     * @param string $value
+     * @return bool
+     */
+    public function setMethod( $value ) {
+        if( empty( $value )) {
+            return false;
+        }
+        $this->method = $value;
+        return true;
+    }
+}

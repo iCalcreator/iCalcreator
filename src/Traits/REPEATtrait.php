@@ -28,44 +28,66 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * REPEAT property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-05
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait REPEATtrait
+{
+    /**
+     * @var array component property REPEAT value
+     * @access protected
+     */
+    protected $repeat = null;
+
+    /**
+     * Return formatted output for calendar component property repeat
+     *
+     * @return string
+     */
+    public function createRepeat() {
+        if( ! isset( $this->repeat ) ||
+            ( empty( $this->repeat ) && ! is_numeric( $this->repeat ))) {
+            return null;
+        }
+        if( ! isset( $this->repeat[Util::$LCvalue] ) ||
+            ( empty( $this->repeat[Util::$LCvalue] ) && ! \is_numeric( $this->repeat[Util::$LCvalue] ))) {
+            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$REPEAT ) : null;
+        }
+        return Util::createElement(
+            Util::$REPEAT,
+            Util::createParams( $this->repeat[Util::$LCparams] ),
+            $this->repeat[Util::$LCvalue]
+        );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property repeat
+     *
+     * @param string $value
+     * @param array  $params
+     * @return bool
+     */
+    public function setRepeat( $value, $params = null ) {
+        if( empty( $value ) && ! is_numeric( $value )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $value = Util::$EMPTYPROPERTY;
+            }
+            else {
+                return false;
+            }
+        }
+        $this->repeat = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => Util::setParams( $params ),
+        ];
+        return true;
+    }
+}

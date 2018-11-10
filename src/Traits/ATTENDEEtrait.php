@@ -28,44 +28,62 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilAttendee;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * ATTENDEE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-17
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait ATTENDEEtrait
+{
+    /**
+     * @var array component property ATTENDEE value
+     * @access protected
+     */
+    protected $attendee = null;
+
+    /**
+     * Return formatted output for calendar component property attendee
+     *
+     * @return string
+     */
+    public function createAttendee() {
+        if( empty( $this->attendee )) {
+            return null;
+        }
+        return UtilAttendee::formatAttendee( $this->attendee, $this->getConfig( Util::$ALLOWEMPTY ));
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property attach
+     *
+     * @param string  $value
+     * @param array   $params
+     * @param integer $index
+     * @return bool
+     */
+    public function setAttendee( $value, $params = null, $index = null ) {
+        if( empty( $value )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $value = Util::$EMPTYPROPERTY;
+            }
+            else {
+                return false;
+            }
+        }
+        Util::setMval(
+            $this->attendee,
+            UtilAttendee::calAddressCheck( $value, false ),
+            UtilAttendee::prepAttendeeParams( $params, $this->compType, $this->getConfig( Util::$LANGUAGE )),
+            false,
+            $index
+        );
+        return true;
+    }
+}

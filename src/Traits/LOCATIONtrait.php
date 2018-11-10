@@ -28,44 +28,64 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * LOCATION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-17
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait LOCATIONtrait
+{
+    /**
+     * @var array component property LOCATION value
+     * @access protected
+     */
+    protected $location = null;
+
+    /**
+     * Return formatted output for calendar component property location
+     *
+     * @return string
+     */
+    public function createLocation() {
+        if( empty( $this->location )) {
+            return null;
+        }
+        if( empty( $this->location[Util::$LCvalue] )) {
+            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$LOCATION ) : null;
+        }
+        return Util::createElement(
+            Util::$LOCATION,
+            Util::createParams( $this->location[Util::$LCparams], Util::$ALTRPLANGARR, $this->getConfig( Util::$LANGUAGE )),
+            Util::strrep( $this->location[Util::$LCvalue] )
+        );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property location
+     *
+     * @param string $value
+     * @param array  $params
+     * @return bool
+     */
+    public function setLocation( $value, $params = null ) {
+        if( empty( $value )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $value = Util::$EMPTYPROPERTY;
+            }
+            else {
+                return false;
+            }
+        }
+        $this->location = [
+            Util::$LCvalue  => Util::trimTrailNL( $value ),
+            Util::$LCparams => Util::setParams( $params ),
+        ];
+        return true;
+    }
+}

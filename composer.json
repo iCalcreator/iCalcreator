@@ -17,11 +17,11 @@
                   "standard",
                   "daylight",
                   "file" ],
-    "time" : "2018-10-31",
-    "license": "(AGPLv3 or proprietary)",
+    "time" : "2018-11-10",
+    "license": ["AGPL-3.0-or-later", "proprietary"],
     "homepage": "http://kigkonsult.se",
     "support": {
-       "issues": "http://kigkonsult.se/contact/index.php"
+       "issues": "https://github.com/iCalcreator/iCalcreator/issues"
     },
     "authors": [
         {
@@ -31,9 +31,10 @@
     ],
     "autoload": {
         "files": ["autoload.php"],
-        "psr-4": { "kigkonsult\\iCalcreator\\": ["src/", "src/util/", "src/traits/"] }
+        "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/util/", "src/traits/"] }
     },
     "require": {
-        "php": ">=5.4"
+        "php": ">=5.6"
+        "ext-simplexml": "*"
     }
 }

@@ -28,44 +28,58 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilRexdate;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * RDATE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-26
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait RDATEtrait
+{
+    /**
+     * @var array component property RDATE value
+     * @access protected
+     */
+    protected $rdate = null;
+
+    /**
+     * Return formatted output for calendar component property rdate
+     *
+     * @return string
+     */
+    public function createRdate() {
+        if( empty( $this->rdate )) {
+            return null;
+        }
+        return UtilRexdate::formatRdate( $this->rdate, $this->getConfig( Util::$ALLOWEMPTY ), $this->compType );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property rdate
+     *
+     * @param array   $rdates
+     * @param array   $params
+     * @param integer $index
+     * @return bool
+     */
+    public function setRdate( $rdates, $params = null, $index = null ) {
+        if( empty( $rdates )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                Util::setMval( $this->rdate, Util::$EMPTYPROPERTY, $params, false, $index );
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        $input = UtilRexdate::prepInputRdate( $rdates, $params, $this->compType );
+        Util::setMval( $this->rdate, $input[Util::$LCvalue], $input[Util::$LCparams], false, $index );
+        return true;
+    }
+}

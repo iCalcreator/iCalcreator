@@ -28,44 +28,64 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * ATTACH property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-02
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait ATTACHtrait
+{
+    /**
+     * @var array component property ATTACH value
+     * @access protected
+     */
+    protected $attach = null;
+
+    /**
+     * Return formatted output for calendar component property attach
+     *
+     * @return string
+     */
+    public function createAttach() {
+        if( empty( $this->attach )) {
+            return null;
+        }
+        $output = null;
+        foreach( $this->attach as $aix => $attachPart ) {
+            if( ! empty( $attachPart[Util::$LCvalue] )) {
+                $output .= Util::createElement( Util::$ATTACH, Util::createParams( $attachPart[Util::$LCparams] ), $attachPart[Util::$LCvalue] );
+            }
+            elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $output .= Util::createElement( Util::$ATTACH );
+            }
+        }
+        return $output;
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property attach
+     *
+     * @param string  $value
+     * @param array   $params
+     * @param integer $index
+     * @return bool
+     */
+    public function setAttach( $value, $params = null, $index = null ) {
+        if( empty( $value )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                $value = Util::$EMPTYPROPERTY;
+            }
+            else {
+                return false;
+            }
+        }
+        Util::setMval( $this->attach, $value, $params, false, $index );
+        return true;
+    }
+}

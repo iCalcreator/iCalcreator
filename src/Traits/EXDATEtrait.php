@@ -28,44 +28,58 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilRexdate;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * EXDATE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-05
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait EXDATEtrait
+{
+    /**
+     * @var array component property EXDATE value
+     * @access protected
+     */
+    protected $exdate = null;
+
+    /**
+     * Return formatted output for calendar component property exdate
+     *
+     * @return string
+     */
+    public function createExdate() {
+        if( empty( $this->exdate )) {
+            return null;
+        }
+        return UtilRexdate::formatExdate( $this->exdate, $this->getConfig( Util::$ALLOWEMPTY ));
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property exdate
+     *
+     * @param array   $exdates
+     * @param array   $params
+     * @param integer $index
+     * @return bool
+     */
+    public function setExdate( $exdates, $params = null, $index = null ) {
+        if( empty( $exdates )) {
+            if( $this->getConfig( Util::$ALLOWEMPTY )) {
+                Util::setMval( $this->exdate, Util::$EMPTYPROPERTY, $params, false, $index );
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        $input = UtilRexdate::prepInputExdate( $exdates, $params );
+        Util::setMval( $this->exdate, $input[Util::$LCvalue], $input[Util::$LCparams],false, $index );
+        return true;
+    }
+}

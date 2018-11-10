@@ -28,44 +28,65 @@
  *           License along with this program.
  *           If not, see <http://www.gnu.org/licenses/>.
  */
+
+namespace Kigkonsult\Icalcreator\Traits;
+
+use Kigkonsult\Icalcreator\Util\Util;
+
 /**
- * autoload.php
- *
- * iCalcreator package autoloader
+ * DTSTAMP property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.26 - 2018-11-10
+ * @since  2.22.23 - 2017-02-02
  */
-/**
- *         Do NOT alter or remove the constant!!
- */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
-/**
- * load iCalcreator src and support classes and Traits
- */
-spl_autoload_register(
-  function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
+trait DTSTAMPtrait
+{
+    /**
+     * @var array component property DTSTAMP value
+     * @access protected
+     */
+    protected $dtstamp = null;
+
+    /**
+     * Return formatted output for calendar component property dtstamp
+     *
+     * @return string
+     */
+    public function createDtstamp() {
+        if( Util::hasNodate( $this->dtstamp )) {
+            $this->dtstamp = Util::makeDtstamp();
+        }
+        return Util::createElement(
+            Util::$DTSTAMP,
+            Util::createParams( $this->dtstamp[Util::$LCparams] ),
+            Util::date2strdate( $this->dtstamp[Util::$LCvalue], 7 )
+        );
     }
-    return false;
-  }
-);
-/**
- * iCalcreator timezones add-on functionality functions, IF required?
- */
-// include __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'iCal.tz.inc.php';
+
+    /**
+     * Set calendar component property dtstamp
+     *
+     * @param mixed $year
+     * @param mixed $month
+     * @param int   $day
+     * @param int   $hour
+     * @param int   $min
+     * @param int   $sec
+     * @param array $params
+     * @return bool
+     */
+    public function setDtstamp(
+        $year,
+        $month  = null,
+        $day    = null,
+        $hour   = null,
+        $min    = null,
+        $sec    = null,
+        $params = null
+    ) {
+        $this->dtstamp = ( empty( $year ))
+            ? Util::makeDtstamp()
+            : Util::setDate2( $year, $month, $day, $hour, $min, $sec, $params );
+        return true;
+    }
+}
