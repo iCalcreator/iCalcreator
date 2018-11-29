@@ -835,10 +835,10 @@ class vcalendar extends iCalBase {
           return false;               /* err 3 */
       }
       if( ! empty( $context ) && filter_var( $file, FILTER_VALIDATE_URL )) {
-        If( false === ( $rows = file_get_contents( $file, false, $context )))
+        If( false === ( $rows = $this->curlGetContents( $file, $context )))
           return false;               /* err 6 */
       }
-      elseif(  false === ( $rows = file_get_contents( $file )))
+      elseif(  false === ( $rows = $this->curlGetContents( $file )))
         return false;                 /* err 5 */
     } // end if( empty( $unparsedtext ))
     elseif( is_array( $unparsedtext )) {
@@ -1057,4 +1057,19 @@ class vcalendar extends iCalBase {
                                             $timeout,
                                             $cdType );
   }
+  
+  public function curlGetContents($url, $headers=null)
+  {
+    $ch = curl_init();
+    if(!empty($headers)) {
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    }
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
+  }
+  
 }
