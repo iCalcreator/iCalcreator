@@ -68,7 +68,7 @@ trait RRULEtrait
     public function setRrule( $rruleset, $params = null, $index = null ) {
         if( empty( $rruleset )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $rruleset = Util::$EMPTYPROPERTY;
+                $rruleset = Util::$SP0;
             }
             else {
                 return false;

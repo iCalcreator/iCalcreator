@@ -71,7 +71,7 @@ trait EXDATEtrait
     public function setExdate( $exdates, $params = null, $index = null ) {
         if( empty( $exdates )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                Util::setMval( $this->exdate, Util::$EMPTYPROPERTY, $params, false, $index );
+                Util::setMval( $this->exdate, Util::$SP0, $params, false, $index );
                 return true;
             }
             else {

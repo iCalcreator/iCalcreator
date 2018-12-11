@@ -34,6 +34,9 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\UtilGeo;
 
+use function floatval;
+use function is_array;
+
 /**
  * GEO property functions
  *
@@ -62,7 +65,8 @@ trait GEOtrait
         }
         return Util::createElement(
             Util::$GEO,
-            Util::createParams(  $this->geo[Util::$LCparams] ),
+            Util::createParams(
+                $this->geo[Util::$LCparams] ),
             UtilGeo::geo2str2( $this->geo[Util::$LCvalue][UtilGeo::$LATITUDE], UtilGeo::$geoLatFmt ) .
                 Util::$SEMIC .
                 UtilGeo::geo2str2( $this->geo[Util::$LCvalue][UtilGeo::$LONGITUDE], UtilGeo::$geoLongFmt ));
@@ -78,7 +82,7 @@ trait GEOtrait
      */
     public function setGeo( $latitude, $longitude, $params = null ) {
         if( isset( $latitude ) && isset( $longitude )) {
-            if( ! \is_array( $this->geo )) {
+            if( ! is_array( $this->geo )) {
                 $this->geo = [];
             }
             $this->geo[Util::$LCvalue][UtilGeo::$LATITUDE]  = floatval( $latitude );
@@ -87,7 +91,7 @@ trait GEOtrait
         }
         elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
             $this->geo = [
-                Util::$LCvalue  => Util::$EMPTYPROPERTY,
+                Util::$LCvalue  => Util::$SP0,
                 Util::$LCparams => Util::setParams( $params ),
             ];
         }

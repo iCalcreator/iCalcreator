@@ -33,6 +33,9 @@ namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function sprintf;
+use function strtoupper;
+
 /**
  * iCalcreator VJOURNAL component class
  *
@@ -134,8 +137,8 @@ class Vjournal extends CalendarComponent
      * @return string
      */
     public function createComponent() {
-        $compType    = \strtoupper( $this->compType );
-        $component   = \sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper( $this->compType );
+        $component   = sprintf( Util::$FMTBEGIN, $compType );
         $component  .= $this->createUid();
         $component  .= $this->createDtstamp();
         $component  .= $this->createAttach();
@@ -161,6 +164,6 @@ class Vjournal extends CalendarComponent
         $component  .= $this->createSummary();
         $component  .= $this->createUrl();
         $component  .= $this->createXprop();
-        return $component . \sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( Util::$FMTEND, $compType );
     }
 }

@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function gmdate;
+
 /**
  * CREATED property functions
  *
@@ -86,7 +88,7 @@ trait CREATEDtrait
     ) {
         static $YMDTHIS = 'Ymd\THis';
         if( empty( $year )) {
-            $year = \gmdate( $YMDTHIS );
+            $year = gmdate( $YMDTHIS );
         }
         $this->created = Util::setDate2( $year, $month, $day, $hour, $min, $sec, $params );
         return true;

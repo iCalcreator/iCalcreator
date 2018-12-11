@@ -43,6 +43,18 @@ namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function array_merge;
+use function count;
+use function explode;
+use function getdate;
+use function is_array;
+use function mktime;
+use function sort;
+use function sprintf;
+use function strtotime;
+use function substr;
+use function time;
+
 /**
  * Returns array with the offset information
  *
@@ -60,7 +72,7 @@ function getTzOffsetForDate( $timezonesarray, $tzid, $timestamp ) {
     static $TZBEFORE = 'tzbefore';
     static $TZAFTER = 'tzafter';
     static $TZNAME = 'tzname';
-    if( \is_array( $timestamp )) {
+    if( is_array( $timestamp )) {
         $timestamp = \gmmktime(
             $timestamp[Util::$LCHOUR],
             $timestamp[Util::$LCMIN],
@@ -79,7 +91,7 @@ function getTzOffsetForDate( $timezonesarray, $tzid, $timestamp ) {
         return $tzoffset;
     }
     $tzdatearray = $timezonesarray[$tzid];
-    if( \is_array( $tzdatearray )) {
+    if( is_array( $tzdatearray )) {
         sort( $tzdatearray ); // just in case
         if( $timestamp < $tzdatearray[0][Util::$LCTIMESTAMP] ) {
             // our date is before the first change
@@ -128,11 +140,11 @@ function getTimezonesAsDateArrays( $Vcalendar ) {
         $alltzdates = [];
         while( $vtzc = $vtz->getComponent( Vcalendar::STANDARD )) {
             $newtzdates = expandTimezoneDates( $vtzc );
-            $alltzdates = \array_merge( $alltzdates, $newtzdates );
+            $alltzdates = array_merge( $alltzdates, $newtzdates );
         }
         while( $vtzc = $vtz->getComponent( Vcalendar::DAYLIGHT )) {
             $newtzdates = expandTimezoneDates( $vtzc );
-            $alltzdates = \array_merge( $alltzdates, $newtzdates );
+            $alltzdates = array_merge( $alltzdates, $newtzdates );
         }
         sort( $alltzdates );
         $timezonedata[$tzid] = $alltzdates;
@@ -181,15 +193,15 @@ function expandTimezoneDates( $vtzc ) {
     $tzbefore             = [];
     $tzbefore[$OFFSETHIS] = $vtzc->getProperty( Util::$TZOFFSETFROM );
     $tzbefore[$OFFSETSEC] = Util::tz2offset( $tzbefore[$OFFSETHIS] );
-    if(( Util::$MINUS != \substr((string) $tzbefore[$OFFSETSEC], 0, 1 )) &&
-        ( Util::$PLUS != \substr((string) $tzbefore[$OFFSETSEC], 0, 1 ))) {
+    if(( Util::$MINUS != substr((string) $tzbefore[$OFFSETSEC], 0, 1 )) &&
+        ( Util::$PLUS != substr((string) $tzbefore[$OFFSETSEC], 0, 1 ))) {
         $tzbefore[$OFFSETSEC] = Util::$PLUS . $tzbefore[$OFFSETSEC];
     }
     $tzafter             = [];
     $tzafter[$OFFSETHIS] = $vtzc->getProperty( Util::$TZOFFSETTO );
     $tzafter[$OFFSETSEC] = Util::tz2offset( $tzafter[$OFFSETHIS] );
-    if(( Util::$MINUS != \substr((string) $tzafter[$OFFSETSEC], 0, 1 )) &&
-        ( Util::$PLUS != \substr((string) $tzafter[$OFFSETSEC], 0, 1 ))) {
+    if(( Util::$MINUS != substr((string) $tzafter[$OFFSETSEC], 0, 1 )) &&
+        ( Util::$PLUS != substr((string) $tzafter[$OFFSETSEC], 0, 1 ))) {
         $tzafter[$OFFSETSEC] = Util::$PLUS . $tzafter[$OFFSETSEC];
     }
     if( false === ( $tzafter[$TZNAME] = $vtzc->getProperty( Util::$TZNAME ))) {
@@ -197,12 +209,12 @@ function expandTimezoneDates( $vtzc ) {
     }
     // find out where to start from
     $dtstart          = $vtzc->getProperty( Util::$DTSTART );
-    $dtstarttimestamp = \mktime( $dtstart[Util::$LCHOUR],
-                                 $dtstart[Util::$LCMIN],
-                                 $dtstart[Util::$LCSEC],
-                                 $dtstart[Util::$LCMONTH],
-                                 $dtstart[Util::$LCDAY],
-                                 $dtstart[Util::$LCYEAR]
+    $dtstarttimestamp = mktime( $dtstart[Util::$LCHOUR],
+                                $dtstart[Util::$LCMIN],
+                                $dtstart[Util::$LCSEC],
+                                $dtstart[Util::$LCMONTH],
+                                $dtstart[Util::$LCDAY],
+                                $dtstart[Util::$LCYEAR]
     );
     if( ! isset( $dtstart[Util::$UNPARSEDTEXT] )) // ??
     {
@@ -220,8 +232,8 @@ function expandTimezoneDates( $vtzc ) {
         // so that the time will change at the right time of day
         // at worst we'll get midnight again
         $origdtstartsplit = explode( 'T', $dtstart[Util::$UNPARSEDTEXT] );
-        $dtstarttimestamp = \strtotime( '19020101', 0 );
-        $dtstarttimestamp = \strtotime( $origdtstartsplit[1], $dtstarttimestamp );
+        $dtstarttimestamp = strtotime( '19020101', 0 );
+        $dtstarttimestamp = strtotime( $origdtstartsplit[1], $dtstarttimestamp );
     }
     // the date (in dtstart and opt RDATE/RRULE) is ALWAYS LOCAL (not utc!!), adjust from 'utc' to 'local' timestamp
     $diff             = -1 * $tzbefore[$OFFSETSEC];
@@ -232,20 +244,20 @@ function expandTimezoneDates( $vtzc ) {
         $TZBEFORE          => $tzbefore,
         $TZAFTER           => $tzafter,
     ];
-    $datearray = \getdate( $dtstarttimestamp );
+    $datearray = getdate( $dtstarttimestamp );
     // save original array to use time parts, because strtotime (used below) apparently loses the time
     $changetime = $datearray;
     // generate dates according to an RRULE line
     $rrule = $vtzc->getProperty( Util::$RRULE );
-    if( \is_array( $rrule )) {
+    if( is_array( $rrule )) {
         if( $rrule[Util::$FREQ] == $YEARLY ) {
             // calculate transition dates starting from DTSTART
             $offsetchangetimestamp = $dtstarttimestamp;
             // calculate transition dates until 10 years in the future
-            $stoptimestamp = \strtotime( $PLUS10YEAR, \time());
+            $stoptimestamp = strtotime( $PLUS10YEAR, time());
             // if UNTIL is set, calculate until then (however far ahead)
-            if( isset( $rrule[Util::$UNTIL] ) && ( $rrule[Util::$UNTIL] != '' )) {
-                $stoptimestamp = \mktime(
+            if( isset( $rrule[Util::$UNTIL] ) && ( $rrule[Util::$UNTIL] != Util::$SP0 )) {
+                $stoptimestamp = mktime(
                     $rrule[Util::$UNTIL][Util::$LCHOUR],
                     $rrule[Util::$UNTIL][Util::$LCMIN],
                     $rrule[Util::$UNTIL][Util::$LCSEC],
@@ -260,23 +272,23 @@ function expandTimezoneDates( $vtzc ) {
             while( $offsetchangetimestamp < $stoptimestamp &&
                 ( $stopcount == 0 || $count < $stopcount )) {
                 // break up the timestamp into its parts
-                $datearray = \getdate( $offsetchangetimestamp );
+                $datearray = getdate( $offsetchangetimestamp );
                 if( isset( $rrule[Util::$BYMONTH] ) && ( $rrule[Util::$BYMONTH] != 0 )) {
                     // set the month
                     $datearray[$MON] = $rrule[Util::$BYMONTH];
                 }
                 if( isset( $rrule[Util::$BYMONTHDAY] )) {         // start quickfix...
                     // set first found/specific day of month
-                    $datearray[$MDAY] = ( \is_array( $rrule[Util::$BYMONTHDAY] ))
+                    $datearray[$MDAY] = ( is_array( $rrule[Util::$BYMONTHDAY] ))
                         ? reset( $rrule[Util::$BYMONTHDAY] )
                         : $rrule[Util::$BYMONTHDAY]; // end quickfix
                 }
-                elseif( isset( $rrule[Util::$BYDAY] ) && \is_array( $rrule[Util::$BYDAY] )) {  // update: 'isset...'
+                elseif( isset( $rrule[Util::$BYDAY] ) && is_array( $rrule[Util::$BYDAY] )) {  // update: 'isset...'
                     // find the Xth WKDAY in the month
                     // the starting point for this process is the first of the month set above
                     $datearray[$MDAY] = 1;
                     // turn $datearray as it is now back into a timestamp
-                    $offsetchangetimestamp = \mktime(
+                    $offsetchangetimestamp = mktime(
                         $datearray[$HOURS],
                         $datearray[$MINUTES],
                         $datearray[$SECONDS],
@@ -288,27 +300,27 @@ function expandTimezoneDates( $vtzc ) {
                         // to find Xth WKDAY in month, we find last WKDAY in month before
                         // we do that by finding first WKDAY in this month and going back one week
                         // then we add X weeks (below)
-                        $offsetchangetimestamp = \strtotime( $DAYNAMES[$rrule[Util::$BYDAY][Util::$DAY]],
+                        $offsetchangetimestamp = strtotime( $DAYNAMES[$rrule[Util::$BYDAY][Util::$DAY]],
                                                             $offsetchangetimestamp
                         );
-                        $offsetchangetimestamp = \strtotime( $MINUS1WEEK, $offsetchangetimestamp );
+                        $offsetchangetimestamp = strtotime( $MINUS1WEEK, $offsetchangetimestamp );
                     }
                     else {
                         // to find Xth WKDAY before the end of the month, we find the first WKDAY in the following month
                         // we do that by going forward one month and going to WKDAY there
                         // then we subtract X weeks (below)
-                        $offsetchangetimestamp = \strtotime( $PLUS1MONTH, $offsetchangetimestamp );
-                        $offsetchangetimestamp = \strtotime( $DAYNAMES[$rrule[Util::$BYDAY][Util::$DAY]],
+                        $offsetchangetimestamp = strtotime( $PLUS1MONTH, $offsetchangetimestamp );
+                        $offsetchangetimestamp = strtotime( $DAYNAMES[$rrule[Util::$BYDAY][Util::$DAY]],
                                                             $offsetchangetimestamp
                         );
                     }
                     // now move forward or back the appropriate number of weeks, into the month we want
-                    $offsetchangetimestamp = \strtotime( $rrule[Util::$BYDAY][0] . $SP1WEEK, $offsetchangetimestamp );
-                    $datearray             = \getdate( $offsetchangetimestamp );
+                    $offsetchangetimestamp = strtotime( $rrule[Util::$BYDAY][0] . $SP1WEEK, $offsetchangetimestamp );
+                    $datearray             = getdate( $offsetchangetimestamp );
                 }
                 // convert the date parts back into a timestamp, setting the time parts according to the
                 // original time data which we stored
-                $offsetchangetimestamp = \mktime(
+                $offsetchangetimestamp = mktime(
                     $changetime[$HOURS],
                     $changetime[$MINUTES],
                     $changetime[$SECONDS] + $diff,
@@ -323,7 +335,7 @@ function expandTimezoneDates( $vtzc ) {
                     $TZAFTER           => $tzafter,
                 ];
                 // update \counters (timestamp and \count)
-                $offsetchangetimestamp = \strtotime( Util::$PLUS
+                $offsetchangetimestamp = strtotime( Util::$PLUS
                                                     . (( isset( $rrule[Util::$INTERVAL] ) && ( $rrule[Util::$INTERVAL] != 0 ))
                                                         ? $rrule[Util::$INTERVAL] : 1 )
                                                     . $SP1YEAR, $offsetchangetimestamp
@@ -334,8 +346,7 @@ function expandTimezoneDates( $vtzc ) {
     }
     // generate dates according to RDATE lines
     while( $rdates = $vtzc->getProperty( Util::$RDATE )) {
-        if( \is_array( $rdates )) {
-
+        if( is_array( $rdates )) {
             foreach( $rdates as $rdate ) {
                 // convert the explicit change date to a timestamp
                 $offsetchangetimestamp = \mktime(

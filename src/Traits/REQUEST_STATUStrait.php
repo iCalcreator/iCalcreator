@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function number_format;
+
 /**
  * REQUEST-STATUS property functions
  *
@@ -73,7 +75,12 @@ trait REQUEST_STATUStrait
                 }
                 continue;
             }
-            $content = \number_format((float) $rStat[Util::$LCvalue][self::$STATCODE], 2, Util::$DOT, null );
+            $content = number_format(
+                (float) $rStat[Util::$LCvalue][self::$STATCODE],
+                2,
+                Util::$DOT,
+                null
+            );
             $content .= Util::$SEMIC . Util::strrep( $rStat[Util::$LCvalue][self::$TEXT] );
             if( isset( $rStat[Util::$LCvalue][self::$EXTDATA] )) {
                 $content .= Util::$SEMIC . Util::strrep( $rStat[Util::$LCvalue][self::$EXTDATA] );
@@ -100,7 +107,7 @@ trait REQUEST_STATUStrait
     public function setRequestStatus( $statcode, $text, $extdata = null, $params = null, $index = null ) {
         if( empty( $statcode ) || empty( $text )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $statcode = $text = Util::$EMPTYPROPERTY;
+                $statcode = $text = Util::$SP0;
             }
             else {
                 return false;

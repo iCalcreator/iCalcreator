@@ -61,7 +61,11 @@ trait SUMMARYtrait
         }
         return Util::createElement(
             Util::$SUMMARY,
-            Util::createParams( $this->summary[Util::$LCparams], Util::$ALTRPLANGARR, $this->getConfig( Util::$LANGUAGE )),
+            Util::createParams(
+                $this->summary[Util::$LCparams],
+                Util::$ALTRPLANGARR,
+                $this->getConfig( Util::$LANGUAGE )
+            ),
             Util::strrep( $this->summary[Util::$LCvalue] )
         );
     }
@@ -76,7 +80,7 @@ trait SUMMARYtrait
     public function setSummary( $value, $params = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

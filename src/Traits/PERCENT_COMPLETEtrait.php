@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function is_numeric;
+
 /**
  * PERCENT-COMPLETE property functions
  *
@@ -59,7 +61,7 @@ trait PERCENT_COMPLETEtrait
         }
         if( ! isset( $this->percentcomplete[Util::$LCvalue] ) ||
             ( empty( $this->percentcomplete[Util::$LCvalue] ) &&
-                ! \is_numeric( $this->percentcomplete[Util::$LCvalue] ))) {
+                ! is_numeric( $this->percentcomplete[Util::$LCvalue] ))) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$PERCENT_COMPLETE ) : null;
         }
         return Util::createElement(
@@ -79,7 +81,7 @@ trait PERCENT_COMPLETEtrait
     public function setPercentComplete( $value, $params = null ) {
         if( empty( $value ) && ! is_numeric( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

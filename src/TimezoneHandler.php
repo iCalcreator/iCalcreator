@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -35,6 +35,24 @@ use Kigkonsult\Icalcreator\Util\Util;
 use DateTimeZone;
 use DateTime;
 use Exception;
+
+use function array_keys;
+use function date;
+use function end;
+use function explode;
+use function floor;
+use function is_array;
+use function is_int;
+use function is_null;
+use function ksort;
+use function reset;
+use function sprintf;
+use function str_replace;
+use function strcasecmp;
+use function strpos;
+use function strtolower;
+use function substr;
+use function trim;
 
 /**
  * iCalcreator timezone management class
@@ -108,10 +126,10 @@ class TimezoneHandler
         if( empty( $timezone )) {
             return false;
         }
-        if( ! empty( $from ) && ! \is_int( $from )) {
+        if( ! empty( $from ) && ! is_int( $from )) {
             return false;
         }
-        if( ! empty( $to ) && ! \is_int( $to )) {
+        if( ! empty( $to ) && ! is_int( $to )) {
             return false;
         }
         try {
@@ -129,8 +147,8 @@ class TimezoneHandler
         }
         if( ! empty( $from )) {
             try {
-                $timestamp = \sprintf( self::$FMTTIMESTAMP, $from );
-                $dateFrom  = new DateTime( $timestamp );      // set lowest date (UTC)
+                $timestamp = sprintf( self::$FMTTIMESTAMP, $from );
+                $dateFrom  = new DateTime( $timestamp );    // set lowest date (UTC)
             }
             catch( Exception $e ) {
                 return false;
@@ -138,10 +156,10 @@ class TimezoneHandler
         }
         else {
             try {
-                $from     = \reset( $dates );         // set lowest date to the lowest dtstart date
+                $from     = reset( $dates );         // set lowest date to the lowest dtstart date
                 $dateFrom = new DateTime( $from . $T000000, $newTz );
-                $dateFrom->modify( $MINUS7MONTH );            // set $dateFrom to seven month before the lowest date
-                $dateFrom->setTimezone( $utcTz );             // convert local date to UTC
+                $dateFrom->modify( $MINUS7MONTH );          // set $dateFrom to seven month before the lowest date
+                $dateFrom->setTimezone( $utcTz );           // convert local date to UTC
             }
             catch( Exception $e ) {
                 return false;
@@ -150,8 +168,8 @@ class TimezoneHandler
         $dateFromYmd = $dateFrom->format( $YMD2 );
         if( ! empty( $to )) {
             try {
-                $timestamp = \sprintf( self::$FMTTIMESTAMP, $to );
-                $dateTo    = new DateTime( $timestamp );      // set end date (UTC)
+                $timestamp = sprintf( self::$FMTTIMESTAMP, $to );
+                $dateTo    = new DateTime( $timestamp );    // set end date (UTC)
             }
             catch( Exception $e ) {
                 return false;
@@ -159,10 +177,10 @@ class TimezoneHandler
         }
         else {
             try {
-                $to     = \end( $dates );             // set highest date to the highest dtstart date
-                $dateTo = new \DateTime( $to . $T235959, $newTz );
+                $to     = end( $dates );             // set highest date to the highest dtstart date
+                $dateTo = new DateTime( $to . $T235959, $newTz );
             }
-            catch( \Exception $e ) {
+            catch( Exception $e ) {
                 return false;
             }
             $dateTo->modify( $PLUS18MONTH );                  // set $dateTo to 18 month after the highest date
@@ -175,12 +193,12 @@ class TimezoneHandler
         $prevTrans      = false;
         $transitions    = $newTz->getTransitions();
         foreach( $transitions as $tix => $trans ) {           // all transitions in date-time order!!
-            if( 0 > (int) \date( $Y, $trans[$TS] )) {         // skip negative year... but save offset
+            if( 0 > (int) date( $Y, $trans[$TS] )) {         // skip negative year... but save offset
                 $prevOffsetfrom = $trans[self::$OFFSET];      // previous trans offset will be 'next' trans offsetFrom
                 continue;
             }
             try {
-                $timestamp = \sprintf( self::$FMTTIMESTAMP, $trans[$TS] );
+                $timestamp = sprintf( self::$FMTTIMESTAMP, $trans[$TS] );
                 $date      = new DateTime( $timestamp );      // set transition date (UTC)
             }
             catch( Exception $e ) {
@@ -244,7 +262,7 @@ class TimezoneHandler
         if( empty( $transTemp )) {        // if no match is found
             if( $prevTrans ) {            // we use the last transition (before startdate) for the tz info
                 try {
-                    $timestamp = \sprintf( self::$FMTTIMESTAMP, $prevTrans[$TS] );
+                    $timestamp = sprintf( self::$FMTTIMESTAMP, $prevTrans[$TS] );
                     $date      = new DateTime( $timestamp ); // set transition date (UTC)
                 }
                 catch( Exception $e ) {
@@ -308,25 +326,25 @@ class TimezoneHandler
      */
     public static function offsetSec2His( $seconds ) {
         static $FMT = '%02d';
-        switch( \substr( $seconds, 0, 1 )) {
+        switch( substr( $seconds, 0, 1 )) {
             case Util::$MINUS :
                 $output  = Util::$MINUS;
-                $seconds = \substr( $seconds, 1 );
+                $seconds = substr( $seconds, 1 );
                 break;
             case Util::$PLUS :
                 $output  = Util::$PLUS;
-                $seconds = \substr( $seconds, 1 );
+                $seconds = substr( $seconds, 1 );
                 break;
             default :
                 $output = Util::$PLUS;
                 break;
         }
-        $output  .= \sprintf( $FMT, ((int) \floor( $seconds / 3600 ))); // hour
+        $output  .= sprintf( $FMT, ((int) floor( $seconds / 3600 ))); // hour
         $seconds = $seconds % 3600;
-        $output  .= \sprintf( $FMT, ((int) \floor( $seconds / 60 )));   // min
+        $output  .= sprintf( $FMT, ((int) floor( $seconds / 60 )));   // min
         $seconds = $seconds % 60;
         if( 0 < $seconds ) {
-            $output .= \sprintf( $FMT, $seconds ); // sec
+            $output .= sprintf( $FMT, $seconds ); // sec
         }
         return $output;
     }
@@ -350,21 +368,21 @@ class TimezoneHandler
         if( empty( $timezone )) {
             return false;
         }
-        $search = \str_replace( Util::$QQ, null, $timezone );
-        $search = \str_replace( $REPL1, Util::$UTC, $search );
-        if( $PUTC != \substr( $search, 0, 4 )) {
+        $search = str_replace( Util::$QQ, null, $timezone );
+        $search = str_replace( $REPL1, Util::$UTC, $search );
+        if( $PUTC != substr( $search, 0, 4 )) {
             return false;
         }
-        if( false === ( $pos = \strpos( $search, $ENDP ))) {
+        if( false === ( $pos = strpos( $search, $ENDP ))) {
             return false;
         }
-        $searchOffset = \substr( $search, 4, ( $pos - 4 ));
-        $searchOffset = Util::tz2offset( \str_replace( Util::$COLON, null, $searchOffset ));
+        $searchOffset = substr( $search, 4, ( $pos - 4 ));
+        $searchOffset = Util::tz2offset( str_replace( Util::$COLON, null, $searchOffset ));
         while( Util::$SP1 == $search[( $pos + 1 )] ) {
             $pos += 1;
         }
-        $searchText  = \trim( \str_replace( $REPL2, Util::$SP1, \substr( $search, ( $pos + 1 ))));
-        $searchWords = \explode( Util::$SP1, $searchText );
+        $searchText  = trim( str_replace( $REPL2, Util::$SP1, substr( $search, ( $pos + 1 ))));
+        $searchWords = explode( Util::$SP1, $searchText );
         try {
             $timezoneAbbreviations = DateTimeZone::listAbbreviations();
         }
@@ -379,7 +397,7 @@ class TimezoneHandler
                     ( $transition[self::$OFFSET] != $searchOffset )) {
                     continue;
                 }
-                $cWords = \explode( Util::$L, $transition[$TIMEZONE_ID] );
+                $cWords = explode( Util::$L, $transition[$TIMEZONE_ID] );
                 $cPrio  = $hitCnt = $rank = 0;
                 foreach( $cWords as $cWord ) {
                     if( empty( $cWord )) {
@@ -388,11 +406,11 @@ class TimezoneHandler
                     $cPrio += 1;
                     $sPrio  = 0;
                     foreach( $searchWords as $sWord ) {
-                        if( empty( $sWord ) || ( self::$TIME == \strtolower( $sWord ))) {
+                        if( empty( $sWord ) || ( self::$TIME == strtolower( $sWord ))) {
                             continue;
                         }
                         $sPrio += 1;
-                        if( 0 == \strcasecmp( $cWord, $sWord )) {
+                        if( 0 == strcasecmp( $cWord, $sWord )) {
                             $hitCnt += 1;
                             $rank   += ( $cPrio + $sPrio );
                         }
@@ -412,7 +430,7 @@ class TimezoneHandler
         ksort( $hits );
         foreach( $hits as $rank => $tzs ) {
             if( ! empty( $tzs )) {
-                $timezone = \reset( $tzs );
+                $timezone = reset( $tzs );
                 return true;
             }
         }
@@ -442,9 +460,9 @@ class TimezoneHandler
         if( is_null( $format )) {
             $format = $YMDTHIS;
         }
-        if( \is_array( $date ) && isset( $date[Util::$LCTIMESTAMP] )) {
+        if( is_array( $date ) && isset( $date[Util::$LCTIMESTAMP] )) {
             try {
-                $timestamp = \sprintf( self::$FMTTIMESTAMP, $date[Util::$LCTIMESTAMP] );
+                $timestamp = sprintf( self::$FMTTIMESTAMP, $date[Util::$LCTIMESTAMP] );
                 $d         = new DateTime( $timestamp ); // set UTC date
                 $newTz     = new DateTimeZone( $tzFrom );
                 $d->setTimezone( $newTz );               // convert to 'from' date
@@ -460,12 +478,11 @@ class TimezoneHandler
                 }
                 $date = Util::date2strdate( Util::chkDateArr( $date ));
             }
-            if( Util::$Z == \substr( $date, -1 )) {
-                $date = \substr( $date, 0, ( \strlen( $date ) - 2 ));
+            if( Util::$Z == substr( $date, -1 )) {
+                $date = substr( $date, 0, ( \strlen( $date ) - 2 ));
             }
             try {
-                $newTz = new DateTimeZone( $tzFrom );
-                $d     = new DateTime( $date, $newTz );
+                $d    = new DateTime( $date, new DateTimeZone( $tzFrom ));
             }
             catch( Exception $e ) {
                 return false;

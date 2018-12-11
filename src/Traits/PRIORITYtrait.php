@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function is_numeric;
+
 /**
  * PRIORITY property functions
  *
@@ -58,7 +60,7 @@ trait PRIORITYtrait
             return null;
         }
         if( ! isset( $this->priority[Util::$LCvalue] ) ||
-            ( empty( $this->priority[Util::$LCvalue] ) && ! \is_numeric( $this->priority[Util::$LCvalue] ))) {
+            ( empty( $this->priority[Util::$LCvalue] ) && ! is_numeric( $this->priority[Util::$LCvalue] ))) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$PRIORITY ) : null;
         }
         return Util::createElement(
@@ -78,7 +80,7 @@ trait PRIORITYtrait
     public function setPriority( $value, $params = null ) {
         if( empty( $value ) && ! is_numeric( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.7
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -29,16 +29,23 @@
  *           If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Kigkonsult\Icalcreator;
+namespace Kigkonsult\Icalcreator\Util;
 
-use Kigkonsult\Icalcreator\Util\UtilSelect;
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\CalendarComponent;
+use DateInterval;
+
+use function array_slice;
+use function is_null;
+use function key;
+use function reset;
+use function strcmp;
 
 /**
  * iCalcreator VcalendarSortHandler class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.26.7 - 2018-12-02
  */
 class VcalendarSortHandler
 {
@@ -82,7 +89,7 @@ class VcalendarSortHandler
             elseif( empty( $b->srtk[$k] )) {
                 return 1;
             }
-            $sortStat = \strcmp( $a->srtk[$k], $b->srtk[$k] );
+            $sortStat = strcmp( $a->srtk[$k], $b->srtk[$k] );
             if( 0 == $sortStat ) {
                 continue;
             }
@@ -94,7 +101,7 @@ class VcalendarSortHandler
     /**
      * Set sort arguments/parameters in component
      *
-     * @since 2.26 - 2018-11-10
+     * @since 2.26.3 - 2018-11-15
      * @param CalendarComponent $c valendar component
      * @param string            $sortArg
      * @static
@@ -111,17 +118,14 @@ class VcalendarSortHandler
             }
             return;
         }
-        elseif( ! \is_null( $sortArg )) {
+        elseif( ! is_null( $sortArg )) {
             if( Util::isPropInList( $sortArg, Util::$MPROPS1 )) { // all string
                 $propValues = [];
                 $c->getProperties( $sortArg, $propValues );
                 if( ! empty( $propValues )) {
-                    $c->srtk[0] = key( \array_slice( $propValues, 0, 1, true ));
-                    if( Util::$RELATED_TO == $sortArg ) {
-                        $c->srtk[0] .= $c->getProperty( Util::$UID );
-                    }
+                    $c->srtk[0] = key( array_slice( $propValues, 0, 1, true ));
                 }
-                elseif( Util::$RELATED_TO == $sortArg ) {
+                if( Util::$RELATED_TO == $sortArg ) {
                     $c->srtk[0] = $c->getProperty( Util::$UID );
                 }
             } // end if( Util::isPropInList( $sortArg, Util::$MPROPS1 ))
@@ -131,7 +135,7 @@ class VcalendarSortHandler
                     if( false !== ( $d = $c->getProperty( Util::$RECURRENCE_ID ))) {
                         $c->srtk[1] = self::arrDate2str( $d );
                         if( false === ( $c->srtk[2] = $c->getProperty( Util::$SEQUENCE ))) {
-                            $c->srtk[2] = PHP_INT_MAX;
+                            $c->srtk[2] = 0; // missing sequence equals sequence:0 in comb. with recurr.-id
                         }
                     }
                     else {
@@ -224,10 +228,10 @@ class VcalendarSortHandler
      * @static
      */
     public static function sortExdate2( array $a, array $b ) {
-        $val = \reset( $a[Util::$LCvalue] );
+        $val = reset( $a[Util::$LCvalue] );
         $as  = Util::getYMDString( $val );
         $as .= ( isset( $val[Util::$LCHOUR] )) ? Util::getHisString( $val ) : null;
-        $val = \reset( $b[Util::$LCvalue] );
+        $val = reset( $b[Util::$LCvalue] );
         $bs  = Util::getYMDString( $val );
         $bs .= ( isset( $val[Util::$LCHOUR] )) ? Util::getHisString( $val ) : null;
         return strcmp( $as, $bs );
@@ -236,84 +240,113 @@ class VcalendarSortHandler
     /**
      * Sort callback function for freebusy and rdate, sort single property (inside values)
      *
-     * @param array $a
-     * @param array $b
+     * @param array|DateInterval $a
+     * @param array|DateInterval $b
      * @return int
      * @static
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-12-03
      */
-    public static function sortRdate1( array $a, array $b ) {
+    public static function sortRdate1( $a, $b ) {
         $as = null;
-        if( isset( $a[Util::$LCYEAR] )) {
+        if( $a instanceof DateInterval ) {
+            $as = UtilDuration::dateInterval2String( $a, true );
+        }
+        elseif( isset( $a[Util::$LCYEAR] )) {
             $as = self::formatdatePart( $a );
         }
         elseif( isset( $a[0][Util::$LCYEAR] )) {
             $as  = self::formatdatePart( $a[0] );
-            $as .= self::formatdatePart( $a[1] );
+            if( isset( $a[1] )) {
+                $as .= self::formatdatePart( $a[1] );
+            }
         }
         else {
             return 1;
         }
         $bs = null;
-        if( isset( $b[Util::$LCYEAR] )) {
+        if( $b instanceof DateInterval ) {
+            $bs = UtilDuration::dateInterval2String( $b, true );
+        }
+        elseif( isset( $b[Util::$LCYEAR] )) {
             $bs = self::formatdatePart( $b );
         }
         elseif( isset( $b[0][Util::$LCYEAR] )) {
             $bs  = self::formatdatePart( $b[0] );
-            $bs .= self::formatdatePart( $b[1] );
+            if( isset( $b[1] )) {
+                $bs .= self::formatdatePart( $b[1] );
+            }
         }
         else {
             return -1;
         }
-        return \strcmp( $as, $bs );
+        return strcmp( $as, $bs );
     }
 
     /**
      * Sort callback function for rdate, sort multiple RDATEs in order (after 1st datetime/date/period)
      *
-     * @param array $a
-     * @param array $b
+     * @param array|DateInterval $a
+     * @param array|DateInterval $b
      * @return int
      * @static
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-12-03
      */
-    public static function sortRdate2( array $a, array $b ) {
+    public static function sortRdate2( $a, $b ) {
         $as = null;
-        if( isset( $a[Util::$LCvalue][0][Util::$LCYEAR] )) {
-            $as = self::formatdatePart( $a[Util::$LCvalue][0] );
+        if( $a instanceof DateInterval ) {
+            $as  = UtilDuration::dateInterval2String( $a, true );
+        }
+        elseif( isset( $a[Util::$LCvalue][0][Util::$LCYEAR] )) {
+            $as  = self::formatdatePart( $a[Util::$LCvalue][0] );
         }
         elseif( isset( $a[Util::$LCvalue][0][0][Util::$LCYEAR] )) {
             $as  = self::formatdatePart( $a[Util::$LCvalue][0][0] );
-            $as .= self::formatdatePart( $a[Util::$LCvalue][0][1] );
+            if( isset( $a[Util::$LCvalue][0][1] )) {
+                $as .= self::formatdatePart( $a[Util::$LCvalue][0][1] );
+            }
         }
         else {
             return 1;
         }
         $bs = null;
-        if( isset( $b[Util::$LCvalue][0][Util::$LCYEAR] )) {
-            $bs = self::formatdatePart( $b[Util::$LCvalue][0] );
+        if( $b instanceof DateInterval ) {
+            $bs  = UtilDuration::dateInterval2String( $b, true );
+        }
+        elseif( isset( $b[Util::$LCvalue][0][Util::$LCYEAR] )) {
+            $bs  = self::formatdatePart( $b[Util::$LCvalue][0] );
         }
         elseif( isset( $a[Util::$LCvalue][0][0][Util::$LCYEAR] )) {
             $bs  = self::formatdatePart( $b[Util::$LCvalue][0][0] );
-            $bs .= self::formatdatePart( $b[Util::$LCvalue][0][1] );
+            if( isset( $b[Util::$LCvalue][0][1] )) {
+                $bs .= self::formatdatePart( $b[Util::$LCvalue][0][1] );
+            }
         }
         else {
             return -1;
         }
-        return \strcmp( $as, $bs );
+        return strcmp( $as, $bs );
     }
 
     /**
      * Format date
      *
-     * @param array $part
+     * @param array|DateInterval $part
      * @return string
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-11-29
      */
-    private static function formatdatePart( array $part ) {
-        if( isset( $part[Util::$LCYEAR] )) {
+    private static function formatdatePart( $part ) {
+        if( $part instanceof DateInterval ) {
+            $str = UtilDuration::dateInterval2String( $part, true );
+        }
+        elseif( isset( $part[Util::$LCYEAR] )) {
             $str  = Util::getYMDString( $part );
             $str .= ( isset( $part[Util::$LCHOUR] )) ? Util::getHisString( $part ) : null;
         }
         else {
-            $str = Util::duration2str( $part );
+            $str = UtilDuration::duration2str( $part );
         }
         return $str;
     }

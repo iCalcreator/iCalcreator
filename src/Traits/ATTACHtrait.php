@@ -59,7 +59,11 @@ trait ATTACHtrait
         $output = null;
         foreach( $this->attach as $aix => $attachPart ) {
             if( ! empty( $attachPart[Util::$LCvalue] )) {
-                $output .= Util::createElement( Util::$ATTACH, Util::createParams( $attachPart[Util::$LCparams] ), $attachPart[Util::$LCvalue] );
+                $output .= Util::createElement(
+                    Util::$ATTACH,
+                    Util::createParams( $attachPart[Util::$LCparams] ),
+                    $attachPart[Util::$LCvalue]
+                );
             }
             elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $output .= Util::createElement( Util::$ATTACH );
@@ -79,7 +83,7 @@ trait ATTACHtrait
     public function setAttach( $value, $params = null, $index = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

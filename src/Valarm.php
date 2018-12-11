@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.7
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -32,6 +32,10 @@
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilDuration;
+
+use function sprintf;
+use function strtoupper;
 
 /**
  * iCalcreator VALARM component class
@@ -101,8 +105,8 @@ class Valarm extends CalendarComponent
      * @return string
      */
     public function createComponent() {
-        $compType    = \strtoupper( $this->compType );
-        $component   = \sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper( $this->compType );
+        $component   = sprintf( Util::$FMTBEGIN, $compType );
         $component  .= $this->createAction();
         $component  .= $this->createAttach();
         $component  .= $this->createAttendee();
@@ -112,7 +116,7 @@ class Valarm extends CalendarComponent
         $component  .= $this->createSummary();
         $component  .= $this->createTrigger();
         $component  .= $this->createXprop();
-        return $component . \sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( Util::$FMTEND, $compType );
     }
 
     /**
@@ -125,6 +129,8 @@ class Valarm extends CalendarComponent
      * @param bool   $inclParam
      * @param bool   $specform
      * @return mixed
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-12-02
      */
     public function getProperty(
         $propName  = null,
@@ -132,7 +138,7 @@ class Valarm extends CalendarComponent
         $inclParam = null,
         $specform  = null
     ) {
-        switch( \strtoupper( $propName )) {
+        switch( strtoupper( $propName )) {
             case Util::$ACTION:
                 if( isset( $this->action[Util::$LCvalue] )) {
                     return ( $inclParam ) ? $this->action : $this->action[Util::$LCvalue];
@@ -144,9 +150,26 @@ class Valarm extends CalendarComponent
                 }
                 break;
             case Util::$TRIGGER:
-                if( isset( $this->trigger[Util::$LCvalue] )) {
-                    return ( $inclParam ) ? $this->trigger : $this->trigger[Util::$LCvalue];
+                if( ! isset( $this->trigger[Util::$LCvalue] )) {
+                    break;
                 }
+                if( isset( $this->trigger[Util::$LCvalue]['invert'] )) { // fix pre 7.0.5 bug
+                    $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $this->trigger[Util::$LCvalue] );
+                    $value = UtilDuration::dateInterval2arr( $dateInterval );
+                    $value[UtilDuration::$BEFORE]       =
+                        ( 0 < $this->trigger[Util::$LCvalue]['invert'] ) ? true : false;
+                    $value[UtilDuration::$RELATEDSTART] =
+                        ( isset( $this->trigger[Util::$LCparams ][UtilDuration::$RELATED] ) &&
+                        ( UtilDuration::$END == $this->trigger[Util::$LCparams ][UtilDuration::$RELATED] ))
+                            ? false
+                            : true;
+                }
+                else {
+                    $value = $this->trigger[Util::$LCvalue];
+                }
+                return ( $inclParam )
+                    ? [ Util::$LCvalue => $value, Util::$LCparams => $this->trigger[Util::$LCparams ] ]
+                    : $value;
                 break;
             default:
                 return parent::getProperty( $propName, $propix, $inclParam, $specform );

@@ -33,6 +33,25 @@ namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function array_reverse;
+use function array_shift;
+use function ctype_lower;
+use function ctype_upper;
+use function explode;
+use function file_put_contents;
+use function implode;
+use function ksort;
+use function is_dir;
+use function is_file;
+use function is_writable;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function strpos;
+use function substr;
+use function ucfirst;
+
 /**
  * iCalcreator vCard support class
  *
@@ -75,38 +94,38 @@ class IcalvCard
         if( empty( $version )) {
             $version = $V2_1;
         }
-        if( false === ( $pos = \strpos( $email, $AT ))) {
+        if( false === ( $pos = strpos( $email, $AT ))) {
             return false;
         }
         if( $directory ) {
-            if( DIRECTORY_SEPARATOR != \substr( $directory, ( 0 - \strlen( DIRECTORY_SEPARATOR )))) {
+            if( DIRECTORY_SEPARATOR != substr( $directory, ( 0 - strlen( DIRECTORY_SEPARATOR )))) {
                 $directory .= DIRECTORY_SEPARATOR;
             }
-            if( ! \is_dir( $directory ) || ! \is_writable( $directory )) {
+            if( ! is_dir( $directory ) || ! is_writable( $directory )) {
                 return false;
             }
         }
         /* prepare vCard */
-        $email = \str_replace( $UCMAILTOCOLON, null, $email );
-        $name  = $person = \substr( $email, 0, $pos );
-        if( \ctype_upper( $name ) || \ctype_lower( $name )) {
+        $email = str_replace( $UCMAILTOCOLON, null, $email );
+        $name  = $person = substr( $email, 0, $pos );
+        if( ctype_upper( $name ) || ctype_lower( $name )) {
             $name = [ $name ];
         }
         else {
-            if( false !== ( $pos = \strpos( $name, Util::$DOT ))) {
-                $name = \explode( Util::$DOT, $name );
+            if( false !== ( $pos = strpos( $name, Util::$DOT ))) {
+                $name = explode( Util::$DOT, $name );
                 foreach( $name as $k => $part ) {
-                    $name[$k] = \ucfirst( $part );
+                    $name[$k] = ucfirst( $part );
                 }
             }
             else { // split camelCase
                 $chars = $name;
                 $name  = [ $chars[0] ];
                 $k     = 0;
-                $len   = \strlen( $chars );
+                $len   = strlen( $chars );
                 $x     = 1;
                 while( $x < $len ) {
-                    if( \ctype_upper( $chars[$x] )) {
+                    if( ctype_upper( $chars[$x] )) {
                         $k        += 1;
                         $name[$k] = null;
                     }
@@ -115,11 +134,11 @@ class IcalvCard
                 }
             }
         }
-        $FN    = \sprintf( $FMTFN, \implode( utiL::$SP1, $name ));
+        $FN    = sprintf( $FMTFN, implode( utiL::$SP1, $name ));
         $name  = array_reverse( $name );
-        $N     = \sprintf( $FMTN, \array_shift( $name ));
+        $N     = sprintf( $FMTN, array_shift( $name ));
         $scCnt = 0;
-        while( null != ( $part = \array_shift( $name ))) {
+        while( null != ( $part = array_shift( $name ))) {
             if(( $V4_0 != $version ) || ( 4 > $scCnt )) {
                 $scCnt += 1;
             }
@@ -130,15 +149,15 @@ class IcalvCard
             $scCnt += 1;
         }
         $N     .= Util::$CRLF;
-        $EMAIL = \sprintf( $FMTEMAIL, $email );
+        $EMAIL  = sprintf( $FMTEMAIL, $email );
         /* create vCard */
-        $vCard = $BEGINVCARD;
-        $vCard .= \sprintf( $FMTVERSION, $version );
-        $vCard .= \sprintf( $FMTPRODID, ICALCREATOR_VERSION );
+        $vCard  = $BEGINVCARD;
+        $vCard .= sprintf( $FMTVERSION, $version );
+        $vCard .= sprintf( $FMTPRODID, ICALCREATOR_VERSION );
         $vCard .= $N;
         $vCard .= $FN;
         $vCard .= $EMAIL;
-        $vCard .= \sprintf( $FMTREV, gmdate( $YMDTHISZ ));
+        $vCard .= sprintf( $FMTREV, gmdate( $YMDTHISZ ));
         $vCard .= $ENDVCARD;
         /* save each vCard as (unique) single file */
         if(  empty( $directory )) {
@@ -147,16 +166,16 @@ class IcalvCard
         if( empty( $ext )) {
             $ext = $EXTVCF;
         }
-        $fprfx = $directory . \preg_replace( $EXPR, null, $email );
+        $fprfx = $directory . preg_replace( $EXPR, null, $email );
         $cnt   = 1;
         $dbl   = null;
-        $fName = \sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
-        while( \is_file( $fName )) {
+        $fName = sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
+        while( is_file( $fName )) {
             $cnt   += 1;
             $dbl   = $cnt;
-            $fName = \sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
+            $fName = sprintf( $FMTFNAME, $fprfx, $dbl, $ext );
         }
-        if( false === \file_put_contents( $fName, $vCard )) {
+        if( false === file_put_contents( $fName, $vCard )) {
             return false;
         }
         return true;
@@ -182,10 +201,10 @@ class IcalvCard
         foreach( $vCardP as $prop ) {
             $hits2 = $calendar->getProperty( $prop );
             foreach( $hits2 as $propValue => $occCnt ) {
-                if( false === ( $pos = \strpos( $propValue, $AT ))) {
+                if( false === ( $pos = strpos( $propValue, $AT ))) {
                     continue;
                 }
-                $propValue = \str_replace( $UCMAILTOCOLON, null, $propValue );
+                $propValue = str_replace( $UCMAILTOCOLON, null, $propValue );
                 if( isset( $hits[$propValue] )) {
                     $hits[$propValue] += $occCnt;
                 }
@@ -197,7 +216,7 @@ class IcalvCard
         if( empty( $hits )) {
             return false;
         }
-        \ksort( $hits );
+        ksort( $hits );
         $output = null;
         foreach( $hits as $email => $skip ) {
             $res = self::iCal2vCard( $email, $version, $directory, $ext );

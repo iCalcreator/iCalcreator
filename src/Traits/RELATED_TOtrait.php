@@ -85,7 +85,7 @@ trait RELATED_TOtrait
         static $PARENT  = 'PARENT';
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

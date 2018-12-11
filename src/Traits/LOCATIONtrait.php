@@ -61,7 +61,11 @@ trait LOCATIONtrait
         }
         return Util::createElement(
             Util::$LOCATION,
-            Util::createParams( $this->location[Util::$LCparams], Util::$ALTRPLANGARR, $this->getConfig( Util::$LANGUAGE )),
+            Util::createParams(
+                $this->location[Util::$LCparams],
+                Util::$ALTRPLANGARR,
+                $this->getConfig( Util::$LANGUAGE )
+            ),
             Util::strrep( $this->location[Util::$LCvalue] )
         );
     }
@@ -76,7 +80,7 @@ trait LOCATIONtrait
     public function setLocation( $value, $params = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

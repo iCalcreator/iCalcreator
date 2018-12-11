@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.7
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -33,11 +33,31 @@ namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function define;
+use function defined;
+use function array_change_key_case;
+use function array_filter;
+use function array_keys;
+use function array_slice;
+use function array_unshift;
+use function count;
+use function ctype_digit;
+use function get_object_vars;
+use function gethostbyname;
+use function is_array;
+use function is_null;
+use function is_object;
+use function key;
+use function strtolower;
+use function strtoupper;
+use function trim;
+use function ucfirst;
+
 /**
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26.7' );
 }
 
 /**
@@ -46,11 +66,18 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.26.1 - 2018-11-17
  */
 abstract class IcalBase implements IcalInterface
 {
     use Traits\X_PROPtrait;
+
+    /**
+     * @var string
+     * @access protected
+     * @static
+     */
+    protected static $INDEX = 'INDEX';
 
     /**
      * @var array container for sub-components
@@ -91,15 +118,15 @@ abstract class IcalBase implements IcalInterface
      * @since  2.26 - 2018-11-10
      */
     public function __clone() {
-        $object_vars = \get_object_vars( $this );
+        $object_vars = get_object_vars( $this );
         foreach( $object_vars as $attr_name => $attr_value ) {
-            if( \is_object( $this->$attr_name )) {
+            if( is_object( $this->$attr_name )) {
                 $this->$attr_name = clone $this->$attr_name;
             }
-            else if( \is_array( $this->$attr_name )) {
+            else if( is_array( $this->$attr_name )) {
                 // Note: This copies only one dimension arrays
-                foreach( $this->$attr_name as &$attr_array_value ) {
-                    if( \is_object( $attr_array_value )) {
+                foreach( $this->$attr_name as & $attr_array_value ) {
+                    if( is_object( $attr_array_value )) {
                         $attr_array_value = clone $attr_array_value;
                     }
                     unset( $attr_array_value);
@@ -135,7 +162,7 @@ abstract class IcalBase implements IcalInterface
             $return[Util::$UNIQUE_ID] = $this->getConfig( Util::$UNIQUE_ID );
             return $return;
         }
-        switch( \strtoupper( $config )) {
+        switch( strtoupper( $config )) {
             case Util::$ALLOWEMPTY:
                 if( isset( $this->config[Util::$ALLOWEMPTY] )) {
                     return $this->config[Util::$ALLOWEMPTY];
@@ -180,7 +207,7 @@ abstract class IcalBase implements IcalInterface
                     $output[Util::$SUMMARY] = 1;
                 }
                 if( ! empty( $this->description )) {
-                    $output[Util::$DESCRIPTION] = \count( $this->description );
+                    $output[Util::$DESCRIPTION] = count( $this->description );
                 }
                 if( ! empty( $this->dtstart )) {
                     $output[Util::$DTSTART] = 1;
@@ -195,46 +222,46 @@ abstract class IcalBase implements IcalInterface
                     $output[Util::$DURATION] = 1;
                 }
                 if( ! empty( $this->rrule )) {
-                    $output[Util::$RRULE] = \count( $this->rrule );
+                    $output[Util::$RRULE] = count( $this->rrule );
                 }
                 if( ! empty( $this->rdate )) {
-                    $output[Util::$RDATE] = \count( $this->rdate );
+                    $output[Util::$RDATE] = count( $this->rdate );
                 }
                 if( ! empty( $this->exdate )) {
-                    $output[Util::$EXDATE] = \count( $this->exdate );
+                    $output[Util::$EXDATE] = count( $this->exdate );
                 }
                 if( ! empty( $this->exrule )) {
-                    $output[Util::$EXRULE] = \count( $this->exrule );
+                    $output[Util::$EXRULE] = count( $this->exrule );
                 }
                 if( ! empty( $this->action )) {
                     $output[Util::$ACTION] = 1;
                 }
                 if( ! empty( $this->attach )) {
-                    $output[Util::$ATTACH] = \count( $this->attach );
+                    $output[Util::$ATTACH] = count( $this->attach );
                 }
                 if( ! empty( $this->attendee )) {
-                    $output[Util::$ATTENDEE] = \count( $this->attendee );
+                    $output[Util::$ATTENDEE] = count( $this->attendee );
                 }
                 if( ! empty( $this->categories )) {
-                    $output[Util::$CATEGORIES] = \count( $this->categories );
+                    $output[Util::$CATEGORIES] = count( $this->categories );
                 }
                 if( ! empty( $this->class )) {
                     $output[Util::$CLASS] = 1;
                 }
                 if( ! empty( $this->comment )) {
-                    $output[Util::$COMMENT] = \count( $this->comment );
+                    $output[Util::$COMMENT] = count( $this->comment );
                 }
                 if( ! empty( $this->completed )) {
                     $output[Util::$COMPLETED] = 1;
                 }
                 if( ! empty( $this->contact )) {
-                    $output[Util::$CONTACT] = \count( $this->contact );
+                    $output[Util::$CONTACT] = count( $this->contact );
                 }
                 if( ! empty( $this->created )) {
                     $output[Util::$CREATED] = 1;
                 }
                 if( ! empty( $this->freebusy )) {
-                    $output[Util::$FREEBUSY] = \count( $this->freebusy );
+                    $output[Util::$FREEBUSY] = count( $this->freebusy );
                 }
                 if( ! empty( $this->geo )) {
                     $output[Util::$GEO] = 1;
@@ -258,16 +285,16 @@ abstract class IcalBase implements IcalInterface
                     $output[Util::$RECURRENCE_ID] = 1;
                 }
                 if( ! empty( $this->relatedto )) {
-                    $output[Util::$RELATED_TO] = \count( $this->relatedto );
+                    $output[Util::$RELATED_TO] = count( $this->relatedto );
                 }
                 if( ! empty( $this->repeat )) {
                     $output[Util::$REPEAT] = 1;
                 }
                 if( ! empty( $this->requeststatus )) {
-                    $output[Util::$REQUEST_STATUS] = \count( $this->requeststatus );
+                    $output[Util::$REQUEST_STATUS] = count( $this->requeststatus );
                 }
                 if( ! empty( $this->resources )) {
-                    $output[Util::$RESOURCES] = \count( $this->resources );
+                    $output[Util::$RESOURCES] = count( $this->resources );
                 }
                 if( ! empty( $this->sequence )) {
                     $output[Util::$SEQUENCE] = 1;
@@ -285,7 +312,7 @@ abstract class IcalBase implements IcalInterface
                     $output[Util::$TZID] = 1;
                 }
                 if( ! empty( $this->tzname )) {
-                    $output[Util::$TZNAME] = \count( $this->tzname );
+                    $output[Util::$TZNAME] = count( $this->tzname );
                 }
                 if( ! empty( $this->tzoffsetfrom )) {
                     $output[Util::$TZOFFSETFROM] = 1;
@@ -300,12 +327,12 @@ abstract class IcalBase implements IcalInterface
                     $output[Util::$URL] = 1;
                 }
                 if( ! empty( $this->xprop )) {
-                    $output[Util::$X_PROP] = \count( $this->xprop );
+                    $output[Util::$X_PROP] = count( $this->xprop );
                 }
                 return $output;
                 break;
             case Util::$SETPROPERTYNAMES:
-                return \array_keys( $this->getConfig( Util::$PROPINFO ));
+                return array_keys( $this->getConfig( Util::$PROPINFO ));
                 break;
             case Util::$TZID:
                 if( isset( $this->config[Util::$TZID] )) {
@@ -315,7 +342,7 @@ abstract class IcalBase implements IcalInterface
             case Util::$UNIQUE_ID:
                 if( empty( $this->config[Util::$UNIQUE_ID] )) {
                     $this->config[Util::$UNIQUE_ID] = ( isset( $_SERVER[Util::$SERVER_NAME] ))
-                        ? \gethostbyname( $_SERVER[Util::$SERVER_NAME] )
+                        ? gethostbyname( $_SERVER[Util::$SERVER_NAME] )
                         : Util::$LOCALHOST;
                 }
                 return $this->config[Util::$UNIQUE_ID];
@@ -338,8 +365,8 @@ abstract class IcalBase implements IcalInterface
         if( is_null( $softUpdate )) {
             $softUpdate = false;
         }
-        if( \is_array( $config )) {
-            $config = \array_change_key_case( $config, CASE_UPPER );
+        if( is_array( $config )) {
+            $config = array_change_key_case( $config, CASE_UPPER );
             foreach( $config as $cKey => $cValue ) {
                 if( false === $this->setConfig( $cKey, $cValue, $softUpdate )) {
                     return false;
@@ -348,7 +375,7 @@ abstract class IcalBase implements IcalInterface
             return true;
         }
         $res = false;
-        switch( \strtoupper( $config )) {
+        switch( strtoupper( $config )) {
             case Util::$ALLOWEMPTY:
                 $this->config[Util::$ALLOWEMPTY] = $value;
                 $subcfg = [ Util::$ALLOWEMPTY => $value ];
@@ -363,12 +390,12 @@ abstract class IcalBase implements IcalInterface
                 $res    = true;
                 break;
             case Util::$TZID:
-                $this->config[Util::$TZID] = \trim( $value );
+                $this->config[Util::$TZID] = trim( $value );
                 $subcfg = [ Util::$TZID => trim( $value ) ];
                 $res    = true;
                 break;
             case Util::$UNIQUE_ID:
-                $value  = \trim( $value );
+                $value  = trim( $value );
                 $this->config[Util::$UNIQUE_ID] = $value;
                 $subcfg = [ Util::$UNIQUE_ID => $value ];
                 $res    = true;
@@ -400,7 +427,7 @@ abstract class IcalBase implements IcalInterface
      * @return int
      */
     public function countComponents() {
-        return ( empty( $this->components )) ? 0 : \count( $this->components );
+        return ( empty( $this->components )) ? 0 : count( $this->components );
     }
 
     /**
@@ -415,8 +442,8 @@ abstract class IcalBase implements IcalInterface
         $config = $this->getConfig();
         $ix     = ( empty( $this->components ))
             ? 0
-            : \key( \array_slice( $this->components, -1, 1, true )) + 1;
-        switch( \ucfirst( \strtolower( $compType ))) {
+            : key( array_slice( $this->components, -1, 1, true )) + 1;
+        switch( ucfirst( \strtolower( $compType ))) {
             case self::VALARM :
                 $this->components[$ix] = new Valarm( $config );
                 break;
@@ -453,29 +480,28 @@ abstract class IcalBase implements IcalInterface
      * Delete calendar subcomponent from component container
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
+     * @since  2.26.1 - 2018-11-17
      * @param mixed $arg1 ordno / component type / component uid
      * @param mixed $arg2 ordno if arg1 = component type
      * @return bool  true on success
      */
     public function deleteComponent( $arg1, $arg2 = false ) {
-        static $INDEX = 'INDEX';
         if( ! isset( $this->components )) {
             return false;
         }
         $argType = $index = null;
-        if( \ctype_digit((string) $arg1 )) {
-            $argType = $INDEX;
+        if( ctype_digit((string) $arg1 )) {
+            $argType = self::$INDEX;
             $index   = (int) $arg1 - 1;
         }
         elseif( Util::isCompInList( $arg1, Util::$ALLCOMPS )) {
-            $argType = \ucfirst( \strtolower( $arg1 ));
-            $index   = ( ! empty( $arg2 ) && \ctype_digit((string) $arg2 )) ? (( int ) $arg2 - 1 ) : 0;
+            $argType = ucfirst( strtolower( $arg1 ));
+            $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 )) ? (( int ) $arg2 - 1 ) : 0;
         }
         $cix2dC = 0;
         $remove = false;
         foreach( $this->components as $cix => $component ) {
-            if(( $INDEX == $argType ) && ( $index == $cix )) {
+            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
                 unset( $this->components[$cix] );
                 $remove = true;
                 break;
@@ -496,7 +522,7 @@ abstract class IcalBase implements IcalInterface
             }
         } // end foreach( $this->components as $cix => $component )
         if( $remove ) {
-            $this->components = \array_filter( $this->components );
+            $this->components = array_filter( $this->components );
             return true;
         }
         return false;
@@ -506,14 +532,13 @@ abstract class IcalBase implements IcalInterface
      * Add calendar component as subcomponent to container for subcomponents
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
+     * @since  2.26.1 - 2018-11-17
      * @param object $component CalendarComponent
      * @param mixed  $arg1      ordno/component type/ component uid
      * @param mixed  $arg2      ordno if arg1 = component type
      * @return bool
      */
     public function setComponent( $component, $arg1 = false, $arg2 = false ) {
-        static $INDEX = 'INDEX';
         if( ! isset( $this->components )) {
             return false;
         }
@@ -528,13 +553,13 @@ abstract class IcalBase implements IcalInterface
             return true;
         }
         $argType = $index = null;
-        if( \ctype_digit((string) $arg1 )) { // index insert/replace
-            $argType = $INDEX;
+        if( ctype_digit((string) $arg1 )) { // index insert/replace
+            $argType = self::$INDEX;
             $index   = (int) $arg1 - 1;
         }
         elseif( Util::isCompInList( $arg1, Util::$MCOMPS )) {
-            $argType = \ucfirst( \strtolower( $arg1 ));
-            $index   = ( \ctype_digit((string) $arg2 )) ? ((int) $arg2 ) - 1 : 0;
+            $argType = ucfirst( \strtolower( $arg1 ));
+            $index   = ( ctype_digit((string) $arg2 )) ? ((int) $arg2 ) - 1 : 0;
         }
         // else if arg1 is set, arg1 must be an UID
         $cix2sC = 0;
@@ -542,7 +567,7 @@ abstract class IcalBase implements IcalInterface
             if( empty( $component2 )) {
                 continue;
             }
-            if(( $INDEX == $argType ) && ( $index == $cix )) { // index insert/replace
+            if(( self::$INDEX == $argType ) && ( $index == $cix )) { // index insert/replace
                 $this->components[$cix] = clone $component;
                 return true;
             }
@@ -559,7 +584,7 @@ abstract class IcalBase implements IcalInterface
             }
         }
         /* arg1=index and not found.. . insert at index .. .*/
-        if( $INDEX == $argType ) {
+        if( self::$INDEX == $argType ) {
             $this->components[$index] = clone $component;
             \ksort( $this->components, SORT_NUMERIC );
         }

@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -29,12 +29,19 @@
  *           If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Kigkonsult\Icalcreator;
+namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
 use DateTimeZone;
 use Exception;
 use Kigkonsult\Icalcreator\Util\Util;
+
+use function date_default_timezone_get;
+use function explode;
+use function get_object_vars;
+use function is_array;
+use function is_object;
+use function substr;
 
 /**
  * iCalcreator::selectComponent dateTime support class
@@ -65,16 +72,16 @@ class IcaldateTime extends DateTime
      */
     public function __clone()
     {
-        $object_vars = \get_object_vars( $this );
+        $object_vars = get_object_vars( $this );
 
         foreach( $object_vars as $attr_name => $attr_value ) {
-            if( \is_object ($this->$attr_name )) {
+            if( is_object($this->$attr_name )) {
                 $this->$attr_name = clone $this->$attr_name;
             }
-            else if( \is_array( $this->$attr_name )) {
+            else if( is_array( $this->$attr_name )) {
                 // Note: This copies only one dimension arrays
                 foreach( $this->$attr_name as &$attr_array_value ) {
-                    if( \is_object( $attr_array_value )) {
+                    if( is_object( $attr_array_value )) {
                         $attr_array_value = clone $attr_array_value;
                     }
                     unset( $attr_array_value);
@@ -92,7 +99,31 @@ class IcaldateTime extends DateTime
      */
     public function getTime() {
         static $H_I_S = 'H:i:s';
-        return \explode( Util::$COLON, $this->format( $H_I_S ));
+        $res = [];
+        foreach( explode( Util::$COLON, $this->format( $H_I_S )) as $t ) {
+            $res[] = (int) $t;
+        }
+        return $res;
+    }
+
+    /**
+     * set date and time from YmdHis string
+     *
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.2 - 2018-11-14
+     * @param string $YmdHisString
+     */
+    public function setDateTimeFromString( $YmdHisString ) {
+        $this->setDate(
+            (int) substr( $YmdHisString, 0, 4 ),
+            (int) substr( $YmdHisString, 4, 2 ),
+            (int) substr( $YmdHisString, 6, 2 )
+        );
+        $this->setTime(
+            (int) substr( $YmdHisString, 8, 2 ),
+            (int) substr( $YmdHisString, 10, 2 ),
+            (int) substr( $YmdHisString, 12, 2 )
+        );
     }
 
     /**
@@ -145,7 +176,7 @@ class IcaldateTime extends DateTime
             $tz = ( Util::$Z == $tz[Util::$LCtz] ) ? Util::$UTC : $tz[Util::$LCtz];
         }
         else {
-            $tz = \date_default_timezone_get();
+            $tz = date_default_timezone_get();
         }
         $strdate = Util::getYMDString( $date );
         if( isset( $date[Util::$LCHOUR] )) {
@@ -181,5 +212,16 @@ class IcaldateTime extends DateTime
             $iCaldateTime->key = $iCaldateTime->format( $YMDHIS );
         }
         return $iCaldateTime;
+    }
+
+    /**
+     * Return clone
+     *
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.2 - 2018-11-14
+     * @return static
+     */
+    public function getClone() {
+        return clone $this;
     }
 }

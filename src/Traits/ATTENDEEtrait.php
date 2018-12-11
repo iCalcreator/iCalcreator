@@ -71,7 +71,7 @@ trait ATTENDEEtrait
     public function setAttendee( $value, $params = null, $index = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

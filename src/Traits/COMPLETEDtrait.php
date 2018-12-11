@@ -90,7 +90,7 @@ trait COMPLETEDtrait
         if( empty( $year )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $this->completed = [
-                    Util::$LCvalue => Util::$EMPTYPROPERTY,
+                    Util::$LCvalue => Util::$SP0,
                     Util::$LCparams => Util::setParams( $params ),
                 ];
                 return true;

@@ -33,6 +33,12 @@ namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function is_array;
+use function sprintf;
+use function strtolower;
+use function strtoupper;
+use function ucfirst;
+
 /**
  * iCalcreator VTIMEZONE component class
  *
@@ -67,11 +73,11 @@ class Vtimezone extends CalendarComponent
      */
     public function __construct( $timezonetype = null, $config = [] ) {
         static $TZ = 'tz';
-        if( \is_array( $timezonetype )) {
+        if( is_array( $timezonetype )) {
             $config       = $timezonetype;
             $timezonetype = null;
         }
-        $this->timezonetype = ( empty( $timezonetype )) ? self::VTIMEZONE : \ucfirst( \strtolower( $timezonetype ));
+        $this->timezonetype = ( empty( $timezonetype )) ? self::VTIMEZONE : ucfirst( strtolower( $timezonetype ));
         parent::__construct();
         $this->setConfig( Util::initConfig( $config ));
         $prf       = ( empty( $timezonetype )) ? $TZ : \substr( $timezonetype, 0, 1 );
@@ -124,8 +130,8 @@ class Vtimezone extends CalendarComponent
      * @return string
      */
     public function createComponent() {
-        $compType    = \strtoupper(( isset( $this->timezonetype )) ? $this->timezonetype : $this->compType );
-        $component   = \sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper(( isset( $this->timezonetype )) ? $this->timezonetype : $this->compType );
+        $component   = sprintf( Util::$FMTBEGIN, $compType );
         $component  .= $this->createTzid();
         $component  .= $this->createLastModified();
         $component  .= $this->createTzurl();
@@ -138,7 +144,7 @@ class Vtimezone extends CalendarComponent
         $component  .= $this->createTzname();
         $component  .= $this->createXprop();
         $component  .= $this->createSubComponent();
-        return $component . \sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( Util::$FMTEND, $compType );
     }
 
     /**
@@ -153,12 +159,12 @@ class Vtimezone extends CalendarComponent
      * @return mixed
      */
     public function getProperty(
-        $propName = null,
-        $propix = null,
+        $propName  = null,
+        $propix    = null,
         $inclParam = false,
-        $specform = false
+        $specform  = false
     ) {
-        switch( \strtoupper( $propName )) {
+        switch( strtoupper( $propName )) {
             case Util::$TZID:
                 if( isset( $this->tzid[Util::$LCvalue] )) {
                     return ( $inclParam ) ? $this->tzid : $this->tzid[Util::$LCvalue];

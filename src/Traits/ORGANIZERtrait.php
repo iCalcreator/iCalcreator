@@ -86,7 +86,7 @@ trait ORGANIZERtrait
     public function setOrganizer( $value, $params = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

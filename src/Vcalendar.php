@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26,7
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -35,6 +35,45 @@ use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\UtilGeo;
 use Kigkonsult\Icalcreator\Util\UtilSelect;
 use Kigkonsult\Icalcreator\Util\UtilRedirect;
+use Kigkonsult\Icalcreator\Util\VcalendarSortHandler;
+
+use function array_change_key_case;
+use function array_keys;
+use function basename;
+use function clearstatcache;
+use function ctype_digit;
+use function date;
+use function end;
+use function explode;
+use function file_exists;
+use function file_get_contents;
+use function filter_var;
+use function func_get_args;
+use function func_num_args;
+use function gethostbyname;
+use function implode;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_file;
+use function is_null;
+use function is_readable;
+use function is_string;
+use function is_writable;
+use function ksort;
+use function microtime;
+use function realpath;
+use function rtrim;
+use function str_replace;
+use function strcasecmp;
+use function strlen;
+use function stripos;
+use function strpos;
+use function strtolower;
+use function strtoupper;
+use function substr;
+use function trim;
+use function usort;
 
 /**
  * Vcalendar class
@@ -105,7 +144,7 @@ class Vcalendar extends IcalBase
      * @return string
      */
     public static function iCalcreatorVersion() {
-        return \trim( \substr( ICALCREATOR_VERSION, \strpos( ICALCREATOR_VERSION, Util::$SP1 )));
+        return trim( substr( ICALCREATOR_VERSION, strpos( ICALCREATOR_VERSION, Util::$SP1 )));
     }
 
     /**
@@ -119,7 +158,7 @@ class Vcalendar extends IcalBase
     public function getConfig( $config = null ) {
         static $YMDHIS = 'YmdHis';
         static $DOTICS = '.ics';
-        if( \is_null( $config )) {
+        if( is_null( $config )) {
             $return                    = [];
             $return[Util::$ALLOWEMPTY] = $this->getConfig( Util::$ALLOWEMPTY );
             $return[Util::$DELIMITER]  = $this->getConfig( Util::$DELIMITER );
@@ -166,7 +205,7 @@ class Vcalendar extends IcalBase
             case Util::$FILENAME :
                 if( ! isset( $this->config[Util::$FILENAME] )) {
                     $this->config[Util::$FILENAME] =
-                        \date( $YMDHIS, intval( microtime( true ))) . $DOTICS;
+                        date( $YMDHIS, intval( microtime( true ))) . $DOTICS;
                 }
                 return $this->config[Util::$FILENAME];
                 break;
@@ -174,7 +213,7 @@ class Vcalendar extends IcalBase
                 $size = 0;
                 if( empty( $this->config[Util::$URL] )) {
                     $dirfile = $this->getConfig( Util::$DIRFILE );
-                    if( ! \is_file( $dirfile ) || ( false === ( $size = filesize( $dirfile )))) {
+                    if( ! is_file( $dirfile ) || ( false === ( $size = filesize( $dirfile )))) {
                         $size = 0;
                     }
                     clearstatcache();
@@ -214,7 +253,7 @@ class Vcalendar extends IcalBase
         static $UCPROTOHTTPS = 'HTTPS://';
         static $DOTICS       = '.ics';
         if( is_array( $config )) {
-            $config = \array_change_key_case( $config, CASE_UPPER );
+            $config = array_change_key_case( $config, CASE_UPPER );
             if( isset( $config[Util::$DELIMITER] )) {
                 if( false === $this->setConfig( Util::$DELIMITER, $config[Util::$DELIMITER] )) {
                     return false;
@@ -235,13 +274,13 @@ class Vcalendar extends IcalBase
             return true;
         }
         $res = false;
-        switch( \strtoupper( $config )) {
+        switch( strtoupper( $config )) {
             case Util::$DELIMITER :
                 $this->config[Util::$DELIMITER] = $value;
                 return true;
                 break;
             case Util::$DIRECTORY :
-                if( false === ( $value = \realpath( \rtrim( \trim( $value ), $this->config[Util::$DELIMITER] )))) {
+                if( false === ( $value = realpath( rtrim( trim( $value ), $this->config[Util::$DELIMITER] )))) {
                     return false;
                 }
                 else { /* local directory */
@@ -251,13 +290,13 @@ class Vcalendar extends IcalBase
                 }
                 break;
             case Util::$FILENAME :
-                $value   = \trim( $value );
+                $value   = trim( $value );
                 $dirfile = $this->config[Util::$DIRECTORY] .
                     $this->config[Util::$DELIMITER] . $value;
-                if( \file_exists( $dirfile )) {
+                if( file_exists( $dirfile )) {
                     /* local file exists */
-                    if( \is_readable( $dirfile ) || \is_writable( $dirfile )) {
-                        \clearstatcache();
+                    if( is_readable( $dirfile ) || is_writable( $dirfile )) {
+                        clearstatcache();
                         $this->config[Util::$FILENAME] = $value;
                         return true;
                     }
@@ -265,8 +304,8 @@ class Vcalendar extends IcalBase
                         return false;
                     }
                 }
-                elseif( \is_readable( $this->config[Util::$DIRECTORY] ) ||
-                        \is_writable( $this->config[Util::$DIRECTORY] )) {
+                elseif( is_readable( $this->config[Util::$DIRECTORY] ) ||
+                        is_writable( $this->config[Util::$DIRECTORY] )) {
                     /* read- or writable directory */
                     \clearstatcache();
                     $this->config[Util::$FILENAME] = $value;
@@ -277,14 +316,14 @@ class Vcalendar extends IcalBase
                 }
                 break;
             case Util::$LANGUAGE : // set language for calendar component as defined in [RFC 1766]
-                $value  = \trim( $value );
+                $value  = trim( $value );
                 $this->config[Util::$LANGUAGE] = $value;
                 $this->makeProdid();
                 $subcfg = [ Util::$LANGUAGE => $value ];
                 $res    = true;
                 break;
             case Util::$UNIQUE_ID :
-                $value  = \trim( $value );
+                $value  = trim( $value );
                 $this->config[Util::$UNIQUE_ID] = $value;
                 $this->makeProdid();
                 $subcfg = [ Util::$UNIQUE_ID => $value ];
@@ -292,15 +331,15 @@ class Vcalendar extends IcalBase
                 break;
             case Util::$URL :
                 /* remote file - URL */
-                $value = \str_replace( $PROTOCOLS, $PROTOHTTP, \trim( $value ));
-                $value = \str_replace( $UCPROTOHTTPS, $LCPROTOHTTPS, \trim( $value ));
-                if(( $PROTOHTTP != \substr( $value, 0, 7 )) &&
-                    ( $LCPROTOHTTPS != \substr( $value, 0, 8 ))) {
+                $value = str_replace( $PROTOCOLS, $PROTOHTTP, trim( $value ));
+                $value = str_replace( $UCPROTOHTTPS, $LCPROTOHTTPS, trim( $value ));
+                if(( $PROTOHTTP != substr( $value, 0, 7 )) &&
+                    ( $LCPROTOHTTPS != substr( $value, 0, 8 ))) {
                     return false;
                 }
                 $this->config[Util::$DIRECTORY] = Util::$DOT;
                 $this->config[Util::$URL]       = $value;
-                if( $DOTICS != strtolower( \substr( $value, -4 ))) {
+                if( $DOTICS != strtolower( substr( $value, -4 ))) {
                     unset( $this->config[Util::$FILENAME] );
                 }
                 else {
@@ -340,7 +379,7 @@ class Vcalendar extends IcalBase
         $propName = null,
         $propix   = null
     ) {
-        $propName = ( $propName ) ? \strtoupper( $propName ) : Util::$X_PROP;
+        $propName = ( $propName ) ? strtoupper( $propName ) : Util::$X_PROP;
         if( ! $propix ) {
             $propix = ( isset( $this->propdelix[$propName] ) &&
                 ( Util::$X_PROP != $propName ))
@@ -379,7 +418,7 @@ class Vcalendar extends IcalBase
     ) {
         static $RECURRENCE_ID_UID = 'RECURRENCE-ID-UID';
         static $R_UID             = 'R-UID';
-        $propName = ( $propName ) ? \strtoupper( $propName ) : Util::$X_PROP;
+        $propName = ( $propName ) ? strtoupper( $propName ) : Util::$X_PROP;
         if( Util::$X_PROP == $propName ) {
             if( empty( $propix )) {
                 $propix = ( isset( $this->propix[$propName] ))
@@ -436,7 +475,7 @@ class Vcalendar extends IcalBase
                     if(( false === $content ) || empty( $content )) {
                         continue;
                     }
-                    elseif( \is_array( $content )) {
+                    elseif( is_array( $content )) {
                         if( isset( $content[Util::$LCYEAR] )) {
                             $key = Util::getYMDString( $content );
                             if( ! isset( $output[$key] )) {
@@ -525,12 +564,12 @@ class Vcalendar extends IcalBase
      * @return mixed array|string|bool
      */
     public function setProperty( $args ) {
-        $numargs = \func_num_args();
+        $numargs = func_num_args();
         if( 1 > $numargs ) {
             return false;
         }
-        $arglist = \func_get_args();
-        switch( \strtoupper( $arglist[0] )) {
+        $arglist = func_get_args();
+        switch( strtoupper( $arglist[0] )) {
             case Util::$CALSCALE:
                 return $this->setCalscale( $arglist[1] );
             case Util::$METHOD:
@@ -573,21 +612,20 @@ class Vcalendar extends IcalBase
      * @return mixed CalendarComponent|bool (false on error)
      */
     public function getComponent( $arg1 = null, $arg2 = null ) {
-        static $INDEX = 'INDEX';
         $index = $argType = null;
         switch( true ) {
-            case ( \is_null( $arg1 )) : // first or next in component chain
-                $argType = $INDEX;
-                if( isset( $this->compix[$INDEX] )) {
-                    $this->compix[$INDEX] = $this->compix[$INDEX] + 1;
+            case ( is_null( $arg1 )) : // first or next in component chain
+                $argType = self::$INDEX;
+                if( isset( $this->compix[self::$INDEX] )) {
+                    $this->compix[self::$INDEX] = $this->compix[self::$INDEX] + 1;
                 }
                 else {
-                    $this->compix[$INDEX] = 1;
+                    $this->compix[self::$INDEX] = 1;
                 }
-                $index = $this->compix[$INDEX];
+                $index = $this->compix[self::$INDEX];
                 break;
-            case ( \is_array( $arg1 )) : // [ *[propertyName => propertyValue] ]
-                $arg2 = \implode( Util::$MINUS, array_keys( $arg1 ));
+            case ( is_array( $arg1 )) : // [ *[propertyName => propertyValue] ]
+                $arg2 = implode( Util::$MINUS, array_keys( $arg1 ));
                 if( isset( $this->compix[$arg2] )) {
                     $this->compix[$arg2] = $this->compix[$arg2] + 1;
                 }
@@ -596,16 +634,16 @@ class Vcalendar extends IcalBase
                 }
                 $index = $this->compix[$arg2];
                 break;
-            case ( \ctype_digit((string) $arg1 )) : // specific component in chain
-                $argType      = $INDEX;
+            case ( ctype_digit((string) $arg1 )) : // specific component in chain
+                $argType      = self::$INDEX;
                 $index        = (int) $arg1;
                 $this->compix = [];
                 break;
             case ( Util::isCompInList( $arg1, Util::$MCOMPS ) &&
-                ( 0 != \strcasecmp( $arg1, self::VALARM ))) : // object class name
-                unset( $this->compix[$INDEX] );
-                $argType = \strtolower( $arg1 );
-                if( \is_null( $arg2 )) {
+                ( 0 != strcasecmp( $arg1, self::VALARM ))) : // object class name
+                unset( $this->compix[self::$INDEX] );
+                $argType = strtolower( $arg1 );
+                if( is_null( $arg2 )) {
                     if( isset( $this->compix[$argType] )) {
                         $this->compix[$argType] = $this->compix[$argType] + 1;
                     }
@@ -614,12 +652,12 @@ class Vcalendar extends IcalBase
                     }
                     $index = $this->compix[$argType];
                 }
-                elseif( isset( $arg2 ) && \ctype_digit((string) $arg2 )) {
+                elseif( isset( $arg2 ) && ctype_digit((string) $arg2 )) {
                     $index = (int) $arg2;
                 }
                 break;
-            case ( \is_string( $arg1 )) : // assume UID as 1st argument
-                if( \is_null( $arg2 )) {
+            case ( is_string( $arg1 )) : // assume UID as 1st argument
+                if( is_null( $arg2 )) {
                     if( isset( $this->compix[$arg1] )) {
                         $this->compix[$arg1] = $this->compix[$arg1] + 1;
                     }
@@ -628,7 +666,7 @@ class Vcalendar extends IcalBase
                     }
                     $index = $this->compix[$arg1];
                 }
-                elseif( isset( $arg2 ) && \ctype_digit((string) $arg2 )) {
+                elseif( isset( $arg2 ) && ctype_digit((string) $arg2 )) {
                     $index = (int) $arg2;
                 }
                 break;
@@ -636,8 +674,8 @@ class Vcalendar extends IcalBase
         if( isset( $index )) {
             $index -= 1;
         }
-        $ckeys = \array_keys( $this->components );
-        if( ! empty( $index ) && ( $index > \end( $ckeys ))) {
+        $ckeys = array_keys( $this->components );
+        if( ! empty( $index ) && ( $index > end( $ckeys ))) {
             return false;
         }
         $cix1gC = 0;
@@ -645,16 +683,16 @@ class Vcalendar extends IcalBase
             if( empty( $this->components[$cix] )) {
                 continue;
             }
-            if(( $INDEX == $argType ) && ( $index == $cix )) {
+            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
                 return clone $this->components[$cix];
             }
-            elseif( 0 == \strcasecmp( $argType, $this->components[$cix]->compType )) {
+            elseif( 0 == strcasecmp( $argType, $this->components[$cix]->compType )) {
                 if( $index == $cix1gC ) {
                     return clone $this->components[$cix];
                 }
                 $cix1gC++;
             }
-            elseif( \is_array( $arg1 )) { // [ *[propertyName => propertyValue] ]
+            elseif( is_array( $arg1 )) { // [ *[propertyName => propertyValue] ]
                 $hit  = [];
                 foreach( $arg1 as $propName => $propValue ) {
                     if( ! Util::isPropInList( $propName, Util::$DATEPROPS ) &&
@@ -677,25 +715,25 @@ class Vcalendar extends IcalBase
                     }
                     if( Util::isPropInList( $propName, Util::$DATEPROPS )) {
                         $valueDate = Util::getYMDString( $value );
-                        if( 8 < \strlen( $propValue )) {
+                        if( 8 < strlen( $propValue )) {
                             if( isset( $value[Util::$LCHOUR] )) {
-                                if( Util::$T == \substr( $propValue, 8, 1 )) {
-                                    $propValue = \str_replace( Util::$T, null, $propValue );
+                                if( Util::$T == substr( $propValue, 8, 1 )) {
+                                    $propValue = str_replace( Util::$T, null, $propValue );
                                 }
                                 $valueDate .= Util::getHisString( $value );
                             }
                             else {
-                                $propValue = \substr( $propValue, 0, 8 );
+                                $propValue = substr( $propValue, 0, 8 );
                             }
                         }
                         $hit[] = ( $propValue == $valueDate ) ? true : false;
                         continue;
                     }
-                    elseif( ! \is_array( $value )) {
+                    elseif( ! is_array( $value )) {
                         $value = [ $value ];
                     }
                     foreach( $value as $part ) {
-                        $part = ( false !== \strpos( $part, Util::$COMMA )) ? explode( Util::$COMMA, $part ) : [ $part ];
+                        $part = ( false !== strpos( $part, Util::$COMMA )) ? explode( Util::$COMMA, $part ) : [ $part ];
                         foreach( $part as $subPart ) {
                             if( $propValue == $subPart ) {
                                 $hit[] = true;
@@ -705,7 +743,7 @@ class Vcalendar extends IcalBase
                     } // end foreach( $value as $part )
                     $hit[] = false; // no hit in property
                 } // end  foreach( $arg1 as $propName => $propValue )
-                if( \in_array( true, $hit )) {
+                if( in_array( true, $hit )) {
                     if( $index == $cix1gC ) {
                         return clone $this->components[$cix];
                     }
@@ -867,12 +905,12 @@ class Vcalendar extends IcalBase
      * @param string $sortArg
      */
     public function sort( $sortArg = null ) {
-        static $SORTER = [ 'Kigkonsult\Icalcreator\VcalendarSortHandler', 'cmpfcn' ];
+        static $SORTER = [ 'Kigkonsult\Icalcreator\Util\VcalendarSortHandler', 'cmpfcn' ];
         if( 2 > $this->countComponents()) {
             return;
         }
-        if( ! \is_null( $sortArg )) {
-            $sortArg = \strtoupper( $sortArg );
+        if( ! is_null( $sortArg )) {
+            $sortArg = strtoupper( $sortArg );
             if( ! Util::isPropInList( $sortArg, Util::$OTHERPROPS ) &&
                 ( Util::$DTSTAMP != $sortArg )) {
                 $sortArg = null;
@@ -881,7 +919,7 @@ class Vcalendar extends IcalBase
         foreach( $this->components as $cix => $component ) {
             VcalendarSortHandler::setSortArgs( $this->components[$cix], $sortArg );
         }
-        \usort( $this->components, $SORTER );
+        usort( $this->components, $SORTER );
     }
 
     /**
@@ -935,17 +973,17 @@ class Vcalendar extends IcalBase
                     return false;
                 }               /* err 3 */
             }
-            if( ! empty( $context ) && \filter_var( $file, FILTER_VALIDATE_URL )) {
-                If( false === ( $rows = \file_get_contents( $file, false, $context ))) {
+            if( ! empty( $context ) && filter_var( $file, FILTER_VALIDATE_URL )) {
+                If( false === ( $rows = file_get_contents( $file, false, $context ))) {
                     return false;
                 }               /* err 6 */
             }
-            elseif( false === ( $rows = \file_get_contents( $file ))) {
+            elseif( false === ( $rows = file_get_contents( $file ))) {
                 return false;
             }                 /* err 5 */
         } // end if( empty( $unparsedtext ))
-        elseif( \is_array( $unparsedtext )) {
-            $rows     = \implode( $NLCHARS . Util::$CRLF, $unparsedtext );
+        elseif( is_array( $unparsedtext )) {
+            $rows     = implode( $NLCHARS . Util::$CRLF, $unparsedtext );
             $arrParse = true;
         }
         else { // string
@@ -971,8 +1009,8 @@ class Vcalendar extends IcalBase
             return false;
         }
         /* skip trailing empty lines and ensure an end row */
-        $lix = \array_keys( $rows );
-        $lix = \end( $lix );
+        $lix = array_keys( $rows );
+        $lix = end( $lix );
         while( 3 < $lix ) {
             $tst = \trim( $rows[$lix] );
             if(( $NLCHARS == $tst ) || empty( $tst )) {
@@ -980,7 +1018,7 @@ class Vcalendar extends IcalBase
                 $lix--;
                 continue;
             }
-            if( false === \stripos( $rows[$lix], $END_VCALENDAR )) {
+            if( false === stripos( $rows[$lix], $END_VCALENDAR )) {
                 $rows[] = $END_VCALENDAR;
             }
             else {
@@ -995,10 +1033,10 @@ class Vcalendar extends IcalBase
         $config     = $this->getConfig();
         foreach( $rows as $lix => $row ) {
             switch( true ) {
-                case ( 0 == \strcasecmp( $BEGIN_VCALENDAR, substr( $row, 0, 15 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VCALENDAR, substr( $row, 0, 15 ))) :
                     $calSync++;
                     break;
-                case ( 0 == \strcasecmp( $END_VCALENDAR, substr( $row, 0, 13 ))) :
+                case ( 0 == strcasecmp( $END_VCALENDAR, substr( $row, 0, 13 ))) :
                     if( 0 < $compSync ) {
                         $this->components[] = $comp;
                     }
@@ -1008,12 +1046,12 @@ class Vcalendar extends IcalBase
                         return false;
                     }                 /* err 20 */
                     break 2;
-                case ( \in_array( \strtoupper( \substr( $row, 0, 6 )), $ENDSHORTS )) :
+                case ( in_array( strtoupper( substr( $row, 0, 6 )), $ENDSHORTS )) :
                     $this->components[] = $comp;
                     $compSync  -= 1;
                     $compClosed = true;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN_VEVENT, \substr( $row, 0, 12 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VEVENT, substr( $row, 0, 12 ))) :
                     if( ! $compClosed ) {
                         $this->components[] = $comp;
                         $compSync -= 1;
@@ -1022,7 +1060,7 @@ class Vcalendar extends IcalBase
                     $compSync  += 1;
                     $compClosed = false;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN_VFREEBUSY, \substr( $row, 0, 15 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VFREEBUSY, substr( $row, 0, 15 ))) :
                     if( ! $compClosed ) {
                         $this->components[] = $comp;
                         $compSync -= 1;
@@ -1031,7 +1069,7 @@ class Vcalendar extends IcalBase
                     $compSync += 1;
                     $compClosed = false;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN_VJOURNAL, \substr( $row, 0, 14 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VJOURNAL, substr( $row, 0, 14 ))) :
                     if( ! $compClosed ) {
                         $this->components[] = $comp;
                         $compSync -= 1;
@@ -1040,7 +1078,7 @@ class Vcalendar extends IcalBase
                     $compSync += 1;
                     $compClosed = false;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN_VTODO, \substr( $row, 0, 11 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VTODO, substr( $row, 0, 11 ))) :
                     if( ! $compClosed ) {
                         $this->components[] = $comp;
                         $compSync -= 1;
@@ -1049,7 +1087,7 @@ class Vcalendar extends IcalBase
                     $compSync  += 1;
                     $compClosed = false;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN_VTIMEZONE, \substr( $row, 0, 15 ))) :
+                case ( 0 == strcasecmp( $BEGIN_VTIMEZONE, substr( $row, 0, 15 ))) :
                     if( ! $compClosed ) {
                         $this->components[] = $comp;
                         $compSync -= 1;
@@ -1136,7 +1174,7 @@ class Vcalendar extends IcalBase
         if( false === ( $dirfile = $this->getConfig( Util::$URL ))) {
             $dirfile = $this->getConfig( Util::$DIRFILE );
         }
-        return ( false === \file_put_contents( $dirfile, $output, LOCK_EX )) ? false : true;
+        return ( false === file_put_contents( $dirfile, $output, LOCK_EX )) ? false : true;
     }
 
     /**

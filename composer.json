@@ -31,7 +31,7 @@
     ],
     "autoload": {
         "files": ["autoload.php"],
-        "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/util/", "src/traits/"] }
+        "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/Util/", "src/Traits/"] }
     },
     "require": {
         "php": ">=5.6"

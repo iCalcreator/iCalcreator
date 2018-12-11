@@ -33,6 +33,25 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;
 
+use function clearstatcache;
+use function file_put_contents;
+use function fclose;
+use function filesize;
+use function filemtime;
+use function fopen;
+use function fpassthru;
+use function gzencode;
+use function header;
+use function is_file;
+use function is_readable;
+use function sprintf;
+use function strlen;
+use function sys_get_temp_dir;
+use function tempnam;
+use function time;
+use function unlink;
+use function utf8_encode;
+
 /**
  * iCalcreator redirect support class
  *
@@ -78,30 +97,30 @@ class UtilRedirect
         $filename = $calendar->getConfig( Util::$FILENAME );
         $output   = $calendar->createCalendar();
         if( $utf8Encode ) {
-            $output = \utf8_encode( $output );
+            $output = utf8_encode( $output );
         }
         $fsize = null;
         if( $gzip ) {
-            $output = \gzencode( $output, 9 );
-            $fsize  = \strlen( $output );
+            $output = gzencode( $output, 9 );
+            $fsize  = strlen( $output );
             header( self::$headers[0] );
             header( self::$headers[1] );
         }
         else {
-            if( false !== ( $temp = \tempnam( sys_get_temp_dir(), $ICR ))) {
-                if( false !== \file_put_contents( $temp, $output )) {
-                    $fsize = @\filesize( $temp );
+            if( false !== ( $temp = tempnam( sys_get_temp_dir(), $ICR ))) {
+                if( false !== file_put_contents( $temp, $output )) {
+                    $fsize = @filesize( $temp );
                 }
-                \unlink( $temp );
+                unlink( $temp );
             }
         }
         if( ! empty( $fsize )) {
-            \header( sprintf( self::$headers[2], $fsize ));
+            header( sprintf( self::$headers[2], $fsize ));
         }
-        \header( self::$headers[3] );
+        header( self::$headers[3] );
         $cdType = ( $cdType ) ? 4 : 5;
-        \header( sprintf( self::$headers[$cdType], $filename ));
-        \header( self::$headers[6] );
+        header( sprintf( self::$headers[$cdType], $filename ));
+        header( self::$headers[6] );
         echo $output;
         return true;
     }
@@ -124,27 +143,27 @@ class UtilRedirect
         if( false === ( $dirfile = $calendar->getConfig( Util::$URL ))) {
             $dirfile = $calendar->getConfig( Util::$DIRFILE );
         }
-        if( ! \is_file( $dirfile ) || ! \is_readable( $dirfile )) {
+        if( ! is_file( $dirfile ) || ! is_readable( $dirfile )) {
             return false;
         }
-        if( \time() - \filemtime( $dirfile ) > $timeout ) {
+        if( time() - filemtime( $dirfile ) > $timeout ) {
             return false;
         }
-        \clearstatcache();
-        $fsize    = @\filesize( $dirfile );
+        clearstatcache();
+        $fsize    = @filesize( $dirfile );
         $filename = $calendar->getConfig( Util::$FILENAME );
-        \header( self::$headers[3] );
+        header( self::$headers[3] );
         if( ! empty( $fsize )) {
-            \header( sprintf( self::$headers[2], $fsize ));
+            header( sprintf( self::$headers[2], $fsize ));
         }
         $cdType = ( $cdType ) ? 4 : 5;
-        \header( sprintf( self::$headers[$cdType], $filename ));
-        \header( self::$headers[6] );
-        if( false === ( $fp = @\fopen( $dirfile, $R ))) {
+        header( sprintf( self::$headers[$cdType], $filename ));
+        header( self::$headers[6] );
+        if( false === ( $fp = @fopen( $dirfile, $R ))) {
             return false;
         }
-        \fpassthru( $fp );
-        \fclose( $fp );
+        fpassthru( $fp );
+        fclose( $fp );
         return true;
     }
 }

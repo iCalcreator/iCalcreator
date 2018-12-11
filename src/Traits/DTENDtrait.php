@@ -93,7 +93,7 @@ trait DTENDtrait
         if( empty( $year )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $this->dtend = [
-                    Util::$LCvalue  => Util::$EMPTYPROPERTY,
+                    Util::$LCvalue  => Util::$SP0,
                     Util::$LCparams => Util::setParams( $params ),
                 ];
                 return true;

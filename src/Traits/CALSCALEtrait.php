@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function sprintf;
+
 /**
  * CALSCALE property functions
  *

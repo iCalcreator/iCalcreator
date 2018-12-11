@@ -33,6 +33,9 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function filter_var;
+use function substr;
+
 /**
  * URL property functions
  *
@@ -76,13 +79,13 @@ trait URLtrait
     public function setUrl( $value, $params = null ) {
         static $URN = 'urn';
         if( ! empty( $value )) {
-            if( ! \filter_var( $value, FILTER_VALIDATE_URL ) &&
-                ( 0 != strcasecmp( $URN, \substr( $value, 0, 3 )))) {
+            if( ! filter_var( $value, FILTER_VALIDATE_URL ) &&
+                ( 0 != strcasecmp( $URN, substr( $value, 0, 3 )))) {
                 return false;
             }
         }
         elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-            $value = Util::$EMPTYPROPERTY;
+            $value = Util::$SP0;
         }
         else {
             return false;

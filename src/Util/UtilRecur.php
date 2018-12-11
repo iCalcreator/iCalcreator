@@ -32,6 +32,29 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeZone;
+
+use function array_change_key_case;
+use function array_keys;
+use function checkdate;
+use function count;
+use function ctype_digit;
+use function date;
+use function end;
+use function get_class;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_null;
+use function is_string;
+use function mktime;
+use function sprintf;
+use function strcasecmp;
+use function strlen;
+use function strtoupper;
+use function substr;
+use function trim;
+use function usort;
 
 /**
  * iCalcreator recur support class
@@ -84,7 +107,7 @@ class UtilRecur
             'FR' => 5,
             'SA' => 6,
         ];
-        return ( $days[\substr( $byDayA, -2 )] < $days[\substr( $byDayB, -2 )] ) ? -1 : 1;
+        return ( $days[substr( $byDayA, -2 )] < $days[substr( $byDayB, -2 )] ) ? -1 : 1;
     }
 
     /**
@@ -97,13 +120,12 @@ class UtilRecur
      * @static
      */
     public static function formatRecur( $recurlabel, $recurData, $allowEmpty ) {
-        static $FMTFREQEQ = 'FREQ=%s';
-        static $FMTDEFAULTEQ = ';%s=%s';
-        static $FMTOTHEREQ = ';%s=';
+        static $FMTFREQEQ        = 'FREQ=%s';
+        static $FMTDEFAULTEQ     = ';%s=%s';
+        static $FMTOTHEREQ       = ';%s=';
         static $RECURBYDAYSORTER = null;
-        static $SP0 = '';
         if( is_null( $RECURBYDAYSORTER )) {
-            $RECURBYDAYSORTER = [ \get_class(), 'recurBydaySort' ];
+            $RECURBYDAYSORTER    = [ get_class(), 'recurBydaySort' ];
         }
         if( empty( $recurData )) {
             return null;
@@ -121,31 +143,31 @@ class UtilRecur
                 : null;
             $content1   = $content2 = null;
             foreach( $theRule[Util::$LCvalue] as $ruleLabel => $ruleValue ) {
-                $ruleLabel = \strtoupper( $ruleLabel );
+                $ruleLabel = strtoupper( $ruleLabel );
                 switch( $ruleLabel ) {
                     case Util::$FREQ :
-                        $content1 .= \sprintf( $FMTFREQEQ, $ruleValue );
+                        $content1 .= sprintf( $FMTFREQEQ, $ruleValue );
                         break;
                     case Util::$UNTIL :
                         $parno    = ( isset( $ruleValue[Util::$LCHOUR] )) ? 7 : 3;
-                        $content2 .= \sprintf( $FMTDEFAULTEQ, Util::$UNTIL,
-                                               Util::date2strdate( $ruleValue, $parno )
+                        $content2 .= sprintf( $FMTDEFAULTEQ, Util::$UNTIL,
+                                              Util::date2strdate( $ruleValue, $parno )
                         );
                         break;
                     case Util::$COUNT :
                     case Util::$INTERVAL :
                     case Util::$WKST :
-                        $content2 .= \sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
+                        $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
                         break;
                     case Util::$BYDAY :
-                        $byday = [ $SP0 ];
+                        $byday = [ Util::$SP0 ];
                         $bx    = 0;
                         foreach( $ruleValue as $bix => $bydayPart ) {
                             if( ! empty( $byday[$bx] ) &&   // new day
-                                ! \ctype_digit( substr( $byday[$bx], -1 )) ) {
-                                $byday[++$bx] = $SP0;
+                                ! ctype_digit( substr( $byday[$bx], -1 )) ) {
+                                $byday[++$bx] = Util::$SP0;
                             }
-                            if( ! \is_array( $bydayPart ))   // day without order number
+                            if( ! is_array( $bydayPart ))   // day without order number
                             {
                                 $byday[$bx] .= (string) $bydayPart;
                             }
@@ -155,18 +177,18 @@ class UtilRecur
                                 }
                             }
                         } // end foreach( $ruleValue as $bix => $bydayPart )
-                        if( 1 < \count( $byday )) {
-                            \usort( $byday, $RECURBYDAYSORTER );
+                        if( 1 < count( $byday )) {
+                            usort( $byday, $RECURBYDAYSORTER );
                         }
-                        $content2 .= \sprintf( $FMTDEFAULTEQ, Util::$BYDAY, \implode( Util::$COMMA, $byday ));
+                        $content2 .= sprintf( $FMTDEFAULTEQ, Util::$BYDAY, implode( Util::$COMMA, $byday ));
                         break;
                     default : // BYSECOND/BYMINUTE/BYHOUR/BYMONTHDAY/BYYEARDAY/BYWEEKNO/BYMONTH/BYSETPOS...
-                        if( \is_array( $ruleValue )) {
-                            $content2 .= \sprintf( $FMTOTHEREQ, $ruleLabel );
-                            $content2 .= \implode( Util::$COMMA, $ruleValue );
+                        if( is_array( $ruleValue )) {
+                            $content2 .= sprintf( $FMTOTHEREQ, $ruleLabel );
+                            $content2 .= implode( Util::$COMMA, $ruleValue );
                         }
                         else {
-                            $content2 .= \sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
+                            $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
                         }
                         break;
                 } // end switch( $ruleLabel )
@@ -182,29 +204,35 @@ class UtilRecur
      * @param array $rexrule
      * @return array
      * @static
+     * @since 2.26.7 - 2018-11-23
      */
     public static function setRexrule( $rexrule ) {
         static $BYSECOND = 'BYSECOND';
         static $BYMINUTE = 'BYMINUTE';
-        static $BYHOUR = 'BYHOUR';
+        static $BYHOUR   = 'BYHOUR';
         $input = [];
         if( empty( $rexrule )) {
             return $input;
         }
-        $rexrule = \array_change_key_case( $rexrule, CASE_UPPER );
+        $rexrule = array_change_key_case( $rexrule, CASE_UPPER );
         foreach( $rexrule as $rexruleLabel => $rexruleValue ) {
             if( Util::$UNTIL != $rexruleLabel ) {
                 $input[$rexruleLabel] = $rexruleValue;
             }
             else {
-                Util::strDate2arr( $rexruleValue );
-                if( Util::isArrayTimestampDate( $rexruleValue )) // timestamp, always date-time UTC
-                {
+                if( $rexruleValue instanceof DateTime ) {
+                    $rexruleValue->setTimezone((new DateTimeZone( Util::$UTC ))); // ensure UTC
+                    $rexruleValue = Util::dateTime2Str( $rexruleValue );
+                }
+                else {
+                    Util::strDate2arr( $rexruleValue );
+                }
+                if( Util::isArrayTimestampDate( $rexruleValue )) { // timestamp, always date-time UTC
                     $input[$rexruleLabel] = Util::timestamp2date( $rexruleValue, 7, Util::$UTC );
                 }
                 elseif( Util::isArrayDate( $rexruleValue )) { // date or UTC date-time
                     $parno = ( isset( $rexruleValue[Util::$LCHOUR] ) ||
-                        isset( $rexruleValue[4] )) ? 7 : 3;
+                               isset( $rexruleValue[4] )) ? 7 : 3;
                     $d     = Util::chkDateArr( $rexruleValue, $parno );
                     if(( 3 < $parno ) &&
                         isset( $d[Util::$LCtz] ) &&
@@ -217,11 +245,11 @@ class UtilRecur
                         $input[$rexruleLabel] = $d;
                     }
                 }
-                elseif( 8 <= \strlen( \trim( $rexruleValue )) ) { // ex. textual date-time 2006-08-03 10:12:18 => UTC
+                elseif( 8 <= strlen( trim( $rexruleValue )) ) { // ex. textual date-time 2006-08-03 10:12:18 => UTC
                     $input[$rexruleLabel] = Util::strDate2ArrayDate( $rexruleValue );
                     unset( $input[$rexruleLabel][Util::$UNPARSEDTEXT] );
                 }
-                if(( 3 < \count( $input[$rexruleLabel] )) &&
+                if(( 3 < count( $input[$rexruleLabel] )) &&
                     ! isset( $input[$rexruleLabel][Util::$LCtz] )) {
                     $input[$rexruleLabel][Util::$LCtz] = Util::$Z;
                 }
@@ -251,22 +279,21 @@ class UtilRecur
             $input2[$BYHOUR] = $input[$BYHOUR];
         }
         if( isset( $input[Util::$BYDAY] )) {
-            if( ! \is_array( $input[Util::$BYDAY] )) // ensure upper case.. .
-            {
+            if( ! is_array( $input[Util::$BYDAY] )) { // ensure upper case.. .
                 $input2[Util::$BYDAY] = \strtoupper( $input[Util::$BYDAY] );
             }
             else {
                 foreach( $input[Util::$BYDAY] as $BYDAYx => $BYDAYv ) {
-                    if( 0 == \strcasecmp( Util::$DAY, $BYDAYx )) {
-                        $input2[Util::$BYDAY][Util::$DAY] = \strtoupper( $BYDAYv );
+                    if( 0 == strcasecmp( Util::$DAY, $BYDAYx )) {
+                        $input2[Util::$BYDAY][Util::$DAY] = strtoupper( $BYDAYv );
                     }
-                    elseif( ! \is_array( $BYDAYv )) {
+                    elseif( ! is_array( $BYDAYv )) {
                         $input2[Util::$BYDAY][$BYDAYx] = $BYDAYv;
                     }
                     else {
                         foreach( $BYDAYv as $BYDAYx2 => $BYDAYv2 ) {
-                            if( 0 == \strcasecmp( Util::$DAY, $BYDAYx2 )) {
-                                $input2[Util::$BYDAY][$BYDAYx][Util::$DAY] = \strtoupper( $BYDAYv2 );
+                            if( 0 == strcasecmp( Util::$DAY, $BYDAYx2 )) {
+                                $input2[Util::$BYDAY][$BYDAYx][Util::$DAY] = strtoupper( $BYDAYv2 );
                             }
                             else {
                                 $input2[Util::$BYDAY][$BYDAYx][$BYDAYx2] = $BYDAYv2;
@@ -336,13 +363,12 @@ class UtilRecur
             $fcnEnd[Util::$LCYEAR] += 1;
         }
         $fcnEndYMD = Util::getYMDString( $fcnEnd );
-        if( ! isset( $recur[Util::$COUNT] ) &&
-            ! isset( $recur[Util::$UNTIL] )) {
+        if( ! isset( $recur[Util::$COUNT] ) && ! isset( $recur[Util::$UNTIL] )) {
             $recur[Util::$UNTIL] = $fcnEnd;
         } // create break
         if( isset( $recur[Util::$UNTIL] )) {
             foreach( $recur[Util::$UNTIL] as $k => $v ) {
-                if( \ctype_digit( $v )) {
+                if( ctype_digit( $v )) {
                     $recur[Util::$UNTIL][$k] = (int) $v;
                 }
             }
@@ -355,7 +381,7 @@ class UtilRecur
                 $untilHis = Util::getHisString( $recur[Util::$UNTIL] );
             }
             else {
-                $untilHis = \sprintf( $HIS, 23, 59, 59 );
+                $untilHis = sprintf( $HIS, 23, 59, 59 );
             }
         } // end if( isset( $recur[Util::$UNTIL] ))
         if( $wDateYMD > $fcnEndYMD ) {
@@ -401,7 +427,7 @@ class UtilRecur
         }
         if( isset( $recur[Util::$BYSETPOS] )) { // save start date + weekno
             $bysetPosymd1 = $bysetPosymd2 = $bysetPosw1 = $bysetPosw2 = [];
-            if( \is_array( $recur[Util::$BYSETPOS] )) {
+            if( is_array( $recur[Util::$BYSETPOS] )) {
                 foreach( $recur[Util::$BYSETPOS] as $bix => $bval ) {
                     $recur[Util::$BYSETPOS][$bix] = (int) $bval;
                 }
@@ -451,8 +477,8 @@ class UtilRecur
                 /* create interval index */
                 $intervalIx = self::recurIntervalIx( $recur[Util::$FREQ], $wDate, $wkst );
                 /* check interval */
-                $currentKey = \array_keys( $intervalArr );
-                $currentKey = \end( $currentKey ); // get last index
+                $currentKey = array_keys( $intervalArr );
+                $currentKey = end( $currentKey ); // get last index
                 if( $currentKey != $intervalIx ) {
                     $intervalArr = [ $intervalIx => ( $intervalArr[$currentKey] + 1 ) ];
                 }
@@ -540,7 +566,7 @@ class UtilRecur
                                        ( $recur[Util::$FREQ] == self::$MONTHLY )) ||
                                   isset( $recur[Util::$BYMONTH] )) {
                                 $daynoSw = self::recurBYcntcheck(
-                                    $bydayvalue['0'],
+                                    $bydayvalue[Util::$ZERO],
                                     $dayCnts[$m][$d][self::$MONTHDAYNO_UP],
                                     $dayCnts[$m][$d][self::$MONTHDAYNO_DOWN]
                                 );
@@ -548,7 +574,7 @@ class UtilRecur
                             elseif( isset( $recur[Util::$FREQ] ) &&
                                          ( $recur[Util::$FREQ] == self::$YEARLY )) {
                                 $daynoSw = self::recurBYcntcheck(
-                                    $bydayvalue['0'],
+                                    $bydayvalue[Util::$ZERO],
                                     $dayCnts[$m][$d][self::$YEARDAYNO_UP],
                                     $dayCnts[$m][$d][self::$YEARDAYNO_DOWN]
                                 );
@@ -654,7 +680,7 @@ class UtilRecur
 
                     foreach( $recur[Util::$BYSETPOS] as $ix ) {
                         if( 0 > $ix ) { // both positive and negative BYSETPOS allowed
-                            $ix = ( \count( $bysetPosArr1 ) + $ix + 1 );
+                            $ix = ( count( $bysetPosArr1 ) + $ix + 1 );
                         }
                         $ix--;
                         if( isset( $bysetPosArr1[$ix] )) {
@@ -687,7 +713,7 @@ class UtilRecur
      * @static
      */
     private static function recurBYcntcheck( $BYvalue, $upValue, $downValue ) {
-        if( \is_array( $BYvalue ) && ( \in_array( $upValue, $BYvalue ) || \in_array( $downValue, $BYvalue )) ) {
+        if( is_array( $BYvalue ) && ( in_array( $upValue, $BYvalue ) || in_array( $downValue, $BYvalue )) ) {
             return true;
         }
         elseif(( $BYvalue == $upValue ) || ( $BYvalue == $downValue )) {
@@ -741,7 +767,7 @@ class UtilRecur
      * @static
      */
     private static function stepDate( & $date, & $dateYMD, $step = null ) {
-        if( \is_null( $step )) {
+        if( is_null( $step )) {
             $step = [ Util::$LCDAY => 1 ];
         }
         if( ! isset( $date[Util::$LCHOUR] )) {
@@ -884,7 +910,7 @@ class UtilRecur
     private static function reFormatDate( & $aDate ) {
         static $YMDHIS2 = 'Y-m-d H:i:s';
         switch( true ) {
-            case ( \is_string( $aDate )) :
+            case ( is_string( $aDate )) :
                 Util::strDate2arr( $aDate );
                 break;
             case ( $aDate instanceof DateTime ) :
@@ -895,7 +921,7 @@ class UtilRecur
                 break;
         }
         foreach( $aDate as $k => $v ) {
-            if( \ctype_digit( $v )) {
+            if( ctype_digit( $v )) {
                 $aDate[$k] = (int) $v;
             }
         }
@@ -916,7 +942,7 @@ class UtilRecur
      */
     private static function getWeeNumber( $hour, $min, $sec, $month, $day, $year ) {
         static $W = 'W';
-        return (int) date( $W, \mktime( $hour, $min, $sec, $month, $day, $year ));
+        return (int) date( $W, mktime( $hour, $min, $sec, $month, $day, $year ));
     }
 
     /**
@@ -934,7 +960,7 @@ class UtilRecur
      */
     private static function getDaysInMonth( $hour, $min, $sec, $month, $day, $year ) {
         static $T = 't';
-        return (int) \date( $T, \mktime( $hour, $min, $sec, $month, $day, $year ));
+        return (int) date( $T, mktime( $hour, $min, $sec, $month, $day, $year ));
     }
 
     /**
@@ -952,7 +978,7 @@ class UtilRecur
      */
     private static function getDayInWeek( $hour, $min, $sec, $month, $day, $year ) {
         static $W = 'w';
-        $dayNo = (int) \date( $W, \mktime( $hour, $min, $sec, $month, $day, $year ));
+        $dayNo = (int) date( $W, mktime( $hour, $min, $sec, $month, $day, $year ));
         return self::$DAYNAMES[$dayNo];
     }
 

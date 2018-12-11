@@ -33,6 +33,9 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function implode;
+use function is_array;
+
 /**
  * RESOURCES property functions
  *
@@ -65,11 +68,11 @@ trait RESOURCEStrait
                 }
                 continue;
             }
-            if( \is_array( $resource[Util::$LCvalue] )) {
+            if( is_array( $resource[Util::$LCvalue] )) {
                 foreach( $resource[Util::$LCvalue] as $rix => $rValue ) {
                     $resource[Util::$LCvalue][$rix] = Util::strrep( $rValue );
                 }
-                $content = \implode( Util::$COMMA, $resource[Util::$LCvalue] );
+                $content = implode( Util::$COMMA, $resource[Util::$LCvalue] );
             }
             else {
                 $content = Util::strrep( $resource[Util::$LCvalue] );
@@ -94,13 +97,13 @@ trait RESOURCEStrait
     public function setResources( $value, $params = null, $index = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;
             }
         }
-        if( \is_array( $value )) {
+        if( is_array( $value )) {
             foreach( $value as & $valuePart ) {
                 $valuePart = Util::trimTrailNL( $valuePart );
             }

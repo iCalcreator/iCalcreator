@@ -66,9 +66,10 @@ trait CLASStrait
         if( empty( $this->{self::$KLASS}[Util::$LCvalue] )) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$CLASS ) : null;
         }
-        return Util::createElement( Util::$CLASS,
-                                    Util::createParams( $this->{self::$KLASS}[Util::$LCparams] ),
-                                    $this->{self::$KLASS}[Util::$LCvalue]
+        return Util::createElement(
+            Util::$CLASS,
+            Util::createParams( $this->{self::$KLASS}[Util::$LCparams] ),
+            $this->{self::$KLASS}[Util::$LCvalue]
         );
     }
 
@@ -82,7 +83,7 @@ trait CLASStrait
     public function setClass( $value, $params = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

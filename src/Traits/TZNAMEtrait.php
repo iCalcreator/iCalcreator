@@ -84,17 +84,18 @@ trait TZNAMEtrait
     public function setTzname( $value, $params = null, $index = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;
             }
         }
-        Util::setMval( $this->tzname,
-                       Util::trimTrailNL( $value ),
-                       $params,
-                       false,
-                       $index
+        Util::setMval(
+            $this->tzname,
+            Util::trimTrailNL( $value ),
+            $params,
+            false,
+            $index
         );
         return true;
     }

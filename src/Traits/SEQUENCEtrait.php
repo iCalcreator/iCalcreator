@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function is_numeric;
+
 /**
  * SEQUENCE property functions
  *
@@ -58,7 +60,7 @@ trait SEQUENCEtrait
             return null;
         }
         if(( ! isset( $this->sequence[Util::$LCvalue] ) ||
-                ( empty( $this->sequence[Util::$LCvalue] ) && ! \is_numeric( $this->sequence[Util::$LCvalue] ))) &&
+                ( empty( $this->sequence[Util::$LCvalue] ) && ! is_numeric( $this->sequence[Util::$LCvalue] ))) &&
                 ( Util::$ZERO != $this->sequence[Util::$LCvalue] )) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$SEQUENCE ) : null;
         }
@@ -77,7 +79,7 @@ trait SEQUENCEtrait
      * @return bool
      */
     public function setSequence( $value = null, $params = null ) {
-        if(( empty( $value ) && ! \is_numeric( $value )) && ( Util::$ZERO != $value )) {
+        if(( empty( $value ) && ! is_numeric( $value )) && ( Util::$ZERO != $value )) {
             $value = ( isset( $this->sequence[Util::$LCvalue] ) &&
                 ( -1 < $this->sequence[Util::$LCvalue] ))
                 ? $this->sequence[Util::$LCvalue] + 1

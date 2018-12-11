@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.8
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -32,12 +32,22 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilDuration;
+use DateInterval;
+use Exception;
+
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+use function strlen;
+use function substr;
 
 /**
  * DURATION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since  2.26.8 - 2018-12-12
  */
 trait DURATIONtrait
 {
@@ -51,16 +61,22 @@ trait DURATIONtrait
      * Return formatted output for calendar component property duration
      *
      * @return string
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-11-28
      */
     public function createDuration() {
-        if( empty( $this->duration )) {
+        if( ! isset( $this->duration[Util::$LCvalue] )) {
             return null;
         }
-        if( ! isset( $this->duration[Util::$LCvalue][Util::$LCWEEK] ) &&
-            ! isset( $this->duration[Util::$LCvalue][Util::$LCDAY] )  &&
-            ! isset( $this->duration[Util::$LCvalue][Util::$LCHOUR] ) &&
-            ! isset( $this->duration[Util::$LCvalue][Util::$LCMIN] )  &&
-            ! isset( $this->duration[Util::$LCvalue][Util::$LCSEC] )) {
+        if( isset( $this->duration[Util::$LCvalue]['invert'] )) { // fix pre 7.0.5 bug
+            $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $this->duration[Util::$LCvalue] );
+            return Util::createElement(
+                Util::$DURATION,
+                Util::createParams( $this->duration[Util::$LCparams] ),
+                UtilDuration::dateInterval2String( $dateInterval )
+            );
+        }
+        else {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 return Util::createElement( Util::$DURATION );
             }
@@ -68,18 +84,11 @@ trait DURATIONtrait
                 return null;
             }
         }
-        return Util::createElement(
-            Util::$DURATION,
-            Util::createParams( $this->duration[Util::$LCparams] ),
-            Util::duration2str( $this->duration[Util::$LCvalue] )
-        );
     }
 
     /**
      * Set calendar component property duration
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.23.8 - 2017-04-17
      * @param mixed $week
      * @param mixed $day
      * @param int   $hour
@@ -87,6 +96,8 @@ trait DURATIONtrait
      * @param int   $sec
      * @param array $params
      * @return bool
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-12-02
      */
     public function setDuration(
         $week,
@@ -96,7 +107,6 @@ trait DURATIONtrait
         $sec    = null,
         $params = null
     ) {
-        static $PLUSMINUSARR = [ '+', '-' ];
         if( empty( $week ) && empty( $day ) && empty( $hour ) && empty( $min ) && empty( $sec )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $week = $day = null;
@@ -105,33 +115,68 @@ trait DURATIONtrait
                 return false;
             }
         }
-        if( \is_array( $week ) && ( 1 <= \count( $week ))) {
+        if( $week instanceof DateInterval ) {
             $this->duration = [
-                Util::$LCvalue  => Util::duration2arr( $week ),
+                Util::$LCvalue  => (array) $week,  // fix pre 7.0.5 bug
                 Util::$LCparams => Util::setParams( $day ),
             ];
         }
-        elseif( \is_string( $week ) && ( 3 <= \strlen( trim( $week )))) {
-            $week = Util::trimTrailNL( trim( $week ));
-            if( \in_array( $week[0], $PLUSMINUSARR )) {
-                $week = \substr( $week, 1 );
+        elseif( is_array( $week ) && ( 1 <= count( $week ))) {
+            try {
+                $dateInterval = new DateInterval(
+                    UtilDuration::duration2str(
+                        UtilDuration::duration2arr( $week )
+                    )
+                );
+                $week = UtilDuration::conformDateInterval( $dateInterval );
+            }
+            catch( Exception $e ) {
+                return false;
             }
             $this->duration = [
-                Util::$LCvalue  => Util::durationStr2arr( $week ), // array
+                Util::$LCvalue  => (array) $week,  // fix pre 7.0.5 bug
+                Util::$LCparams => Util::setParams( $day ),
+            ];
+        }
+        elseif( is_string( $week ) && ( 3 <= strlen( trim( $week )))) {
+            $week = Util::trimTrailNL( trim( $week ));
+            if( in_array( $week[0], Util::$PLUSMINUSARR )) { // can only be positive
+                $week = substr( $week, 1 );
+            }
+            try {
+                $dateInterval = new DateInterval( $week );
+                $week = UtilDuration::conformDateInterval( $dateInterval );
+            }
+            catch( Exception $e ) {
+                return false;
+            }
+            $this->duration = [
+                Util::$LCvalue  => (array) $week,  // fix pre 7.0.5 bug
                 Util::$LCparams => Util::setParams( $day ),
             ];
         }
         else {
+            try {
+                $dateInterval = new DateInterval(
+                    UtilDuration::duration2str(
+                        UtilDuration::duration2arr(
+                            [
+                                Util::$LCWEEK => (int) $week,
+                                Util::$LCDAY  => (int) $day,
+                                Util::$LCHOUR => (int) $hour,
+                                Util::$LCMIN  => (int) $min,
+                                Util::$LCSEC  => (int) $sec,
+                            ]
+                        )
+                    )
+                );
+                $week = UtilDuration::conformDateInterval( $dateInterval );
+            }
+            catch( Exception $e ) {
+                return false;
+            }
             $this->duration = [
-                Util::$LCvalue  => Util::duration2arr(
-                    [
-                        Util::$LCWEEK => $week,
-                        Util::$LCDAY  => $day,
-                        Util::$LCHOUR => $hour,
-                        Util::$LCMIN  => $min,
-                        Util::$LCSEC  => $sec,
-                    ]
-                ),
+                Util::$LCvalue  => (array) $week,  // fix pre 7.0.5 bug
                 Util::$LCparams => Util::setParams( $params ),
             ];
         }

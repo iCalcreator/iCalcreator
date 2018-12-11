@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * ACTION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since  2.26.2 - 2018-11-27
  */
 trait ACTIONtrait
 {
@@ -59,7 +59,11 @@ trait ACTIONtrait
         if( empty( $this->action[Util::$LCvalue] )) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$ACTION ) : null;
         }
-        return Util::createElement( Util::$ACTION, Util::createParams( $this->action[Util::$LCparams] ), $this->action[Util::$LCvalue] );
+        return Util::createElement(
+            Util::$ACTION,
+            Util::createParams( $this->action[Util::$LCparams] ),
+            $this->action[Util::$LCvalue]
+        );
     }
 
     /**
@@ -72,7 +76,7 @@ trait ACTIONtrait
     public function setAction( $value, $params = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

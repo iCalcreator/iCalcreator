@@ -32,7 +32,36 @@
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilDuration;
 use Kigkonsult\Icalcreator\Util\UtilGeo;
+
+use function array_keys;
+use function array_merge;
+use function array_unshift;
+use function count;
+use function ctype_alpha;
+use function ctype_digit;
+use function end;
+use function explode;
+use function func_get_args;
+use function func_num_args;
+use function get_called_class;
+use function in_array;
+use function is_array;
+use function is_null;
+use function ksort;
+use function property_exists;
+use function reset;
+use function sprintf;
+use function strcasecmp;
+use function stripos;
+use function strlen;
+use function strpos;
+use function strrpos;
+use function strtolower;
+use function strtoupper;
+use function substr;
+use function trim;
 
 /**
  *  Parent class for calendar components
@@ -69,8 +98,8 @@ class CalendarComponent extends IcalBase
             $this->compType = $this->timezonetype;
         }
         else {
-            $className      = \get_called_class();
-            $this->compType = \substr( $className, \strrpos( $className, $BS ) + 1 );
+            $className      = get_called_class();
+            $this->compType = substr( $className, strrpos( $className, $BS ) + 1 );
         }
         if( Util::isCompInList( $this->compType, Util::$VCOMPS )) {
             $this->dtstamp = Util::makeDtstamp();
@@ -104,9 +133,9 @@ class CalendarComponent extends IcalBase
         if( $this->notExistProp( $propName )) {
             return false;
         }
-        $propName = \strtoupper( $propName );
+        $propName = strtoupper( $propName );
         if( Util::isPropInList( $propName, Util::$MPROPS2 )) {
-            if( \is_null( $propix )) {
+            if( is_null( $propix )) {
                 $propix = ( isset( $this->propdelix[$propName] ) && ( Util::$X_PROP != $propName ))
                     ? $this->propdelix[$propName] + 2 : 1;
             }
@@ -298,35 +327,35 @@ class CalendarComponent extends IcalBase
         if( empty( $propName )) {
             return false;
         } // when deleting x-prop, an empty propName may be used=allowed
-        switch( \strtoupper( $propName )) {
+        switch( strtoupper( $propName )) {
             case Util::$LAST_MODIFIED :
-                if( ! \property_exists( $this, $LASTMODIFIED )) {
+                if( ! property_exists( $this, $LASTMODIFIED )) {
                     return true;
                 }
                 break;
             case Util::$PERCENT_COMPLETE :
-                if( ! \property_exists( $this, $PERCENTCOMPLETE )) {
+                if( ! property_exists( $this, $PERCENTCOMPLETE )) {
                     return true;
                 }
                 break;
             case Util::$RECURRENCE_ID :
-                if( ! \property_exists( $this, $RECURRENCEID )) {
+                if( ! property_exists( $this, $RECURRENCEID )) {
                     return true;
                 }
                 break;
             case Util::$RELATED_TO :
-                if( ! \property_exists( $this, $RELATEDTO )) {
+                if( ! property_exists( $this, $RELATEDTO )) {
                     return true;
                 }
                 break;
             case Util::$REQUEST_STATUS :
-                if( ! \property_exists( $this, $REQUESTSTATUS )) {
+                if( ! property_exists( $this, $REQUESTSTATUS )) {
                     return true;
                 }
                 break;
             default :
                 if( ! Util::isXprefixed( $propName ) &&
-                    ! \property_exists( $this, strtolower( $propName ))) {
+                    ! property_exists( $this, strtolower( $propName ))) {
                     return true;
                 }
                 break;
@@ -340,13 +369,13 @@ class CalendarComponent extends IcalBase
      * Return array with keys VALUE/PARAMS rf arg $inclParam is true
      * If property has multiply values, consequtive function calls are needed
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
      * @param string $propName
      * @param int    $propix specific property in case of multiply occurences
      * @param bool   $inclParam
      * @param bool   $specform
      * @return mixed
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.7 - 2018-11-28
      */
     public function getProperty(
         $propName  = null,
@@ -354,7 +383,7 @@ class CalendarComponent extends IcalBase
         $inclParam = false,
         $specform  = false
     ) {
-        if( 0 == \strcasecmp( Util::$GEOLOCATION, $propName )) {
+        if( 0 == strcasecmp( Util::$GEOLOCATION, $propName )) {
             if( false === ( $geo = $this->getProperty( Util::$GEO ))) {
                 return false;
             }
@@ -368,7 +397,7 @@ class CalendarComponent extends IcalBase
         if( $this->notExistProp( $propName )) {
             return false;
         }
-        $propName = ( $propName ) ? \strtoupper( $propName ) : Util::$X_PROP;
+        $propName = ( $propName ) ? strtoupper( $propName ) : Util::$X_PROP;
         if( Util::isPropInList( $propName, Util::$MPROPS2 )) {
             if( empty( $propix )) {
                 $propix = ( isset( $this->propix[$propName] )) ? $this->propix[$propName] + 2 : 1;
@@ -473,15 +502,20 @@ class CalendarComponent extends IcalBase
                 if( ! isset( $this->duration[Util::$LCvalue] )) {
                     return false;
                 }
-                $value  = ( $specform &&
-                    isset( $this->dtstart[Util::$LCvalue] ) &&
-                    isset( $this->duration[Util::$LCvalue] ))
-                    ? Util::duration2date( $this->dtstart[Util::$LCvalue], $this->duration[Util::$LCvalue] )
-                    : $this->duration[Util::$LCvalue];
-                $params = ( $specform &&
-                    $inclParam &&
+                $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $this->duration[Util::$LCvalue] );
+                if( $specform && isset( $this->dtstart[Util::$LCvalue] )) {
+                    $dtStart = $this->dtstart[Util::$LCvalue];
+                    if( isset( $this->dtstart[Util::$LCparams][Util::$TZID] )) {
+                        $dtStart[Util::$LCtz] = $this->dtstart[Util::$LCparams][Util::$TZID];
+                    }
+                    $value = UtilDuration::dateInterval2date( $dtStart, $dateInterval );
+                }
+                else {
+                    $value = UtilDuration::dateInterval2arr( $dateInterval );
+                }
+                $params = ( $specform && $inclParam &&
                     isset( $this->dtstart[Util::$LCparams][Util::$TZID] ))
-                    ? \array_merge((array) $this->duration[Util::$LCparams], $this->dtstart[Util::$LCparams] )
+                    ? array_merge((array) $this->duration[Util::$LCparams], $this->dtstart[Util::$LCparams] )
                     : $this->duration[Util::$LCparams];
                 return ( $inclParam ) ? [ Util::$LCvalue  => $value, Util::$LCparams => $params, ] : $value;
                 break;
@@ -510,7 +544,14 @@ class CalendarComponent extends IcalBase
                     unset( $this->propix[$propName] );
                     return false;
                 }
-                return ( $inclParam ) ? $this->freebusy[$propix] : $this->freebusy[$propix][Util::$LCvalue];
+                $output = $this->freebusy[$propix];
+                foreach( $output[Util::$LCvalue] as $perIx => $freebusyPeriod ) {
+                    if( isset( $freebusyPeriod[1]['invert'] )) { // fix pre 7.0.5 bug
+                        $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
+                        $output[Util::$LCvalue][$perIx][1] = UtilDuration::dateInterval2arr( $dateInterval );
+                    }
+                }
+                return ( $inclParam ) ? $output : $output[Util::$LCvalue];
                 break;
             case Util::$GEO:
                 if( isset( $this->geo[Util::$LCvalue] )) {
@@ -545,11 +586,21 @@ class CalendarComponent extends IcalBase
             case Util::$RDATE:
                 Util::recountMvalPropix( $this->rdate, $propix );
                 $this->propix[$propName] = $propix;
-                if( ! isset( $this->rdate[$propix] )) {
+                if( ! isset( $this->rdate[$propix] ) ||
+                    empty( $this->rdate[$propix] ) ||
+                    empty( $this->rdate[$propix][Util::$LCvalue] )
+                ) {
                     unset( $this->propix[$propName] );
                     return false;
                 }
-                return ( $inclParam ) ? $this->rdate[$propix] : $this->rdate[$propix][Util::$LCvalue];
+                $output = $this->rdate[$propix];
+                foreach( $output[Util::$LCvalue] as $rIx => $rdatePart ) {
+                    if( isset( $rdatePart[1]['invert'] )) { // fix pre 7.0.5 bug
+                        $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $rdatePart[1] );
+                        $output[Util::$LCvalue][$rIx][1] = UtilDuration::dateInterval2arr( $dateInterval );
+                    }
+                }
+                return ( $inclParam ) ? $output : $output[Util::$LCvalue];
                 break;
             case Util::$RECURRENCE_ID:
                 if( isset( $this->recurrenceid[Util::$LCvalue] )) {
@@ -687,12 +738,12 @@ class CalendarComponent extends IcalBase
             if( empty( $content )) {
                 continue;
             }
-            if( \is_array( $content )) {
+            if( is_array( $content )) {
                 foreach( $content as $part ) {
-                    if( false !== \strpos( $part, Util::$COMMA )) {
-                        $part = \explode( Util::$COMMA, $part );
+                    if( false !== strpos( $part, Util::$COMMA )) {
+                        $part = explode( Util::$COMMA, $part );
                         foreach( $part as $contentPart ) {
-                            $contentPart = \trim( $contentPart );
+                            $contentPart = trim( $contentPart );
                             if( ! empty( $contentPart )) {
                                 if( ! isset( $output[$contentPart] )) {
                                     $output[$contentPart] = 1;
@@ -704,7 +755,7 @@ class CalendarComponent extends IcalBase
                         }
                     }
                     else {
-                        $part = \trim( $part );
+                        $part = trim( $part );
                         if( ! isset( $output[$part] )) {
                             $output[$part] = 1;
                         }
@@ -714,10 +765,10 @@ class CalendarComponent extends IcalBase
                     }
                 }
             } // end if( is_array( $content ))
-            elseif( false !== \strpos( $content, Util::$COMMA )) {
-                $content = \explode( Util::$COMMA, $content );
+            elseif( false !== strpos( $content, Util::$COMMA )) {
+                $content = explode( Util::$COMMA, $content );
                 foreach( $content as $contentPart ) {
-                    $contentPart = \trim( $contentPart );
+                    $contentPart = trim( $contentPart );
                     if( ! empty( $contentPart )) {
                         if( ! isset( $output[$contentPart] )) {
                             $output[$contentPart] = 1;
@@ -729,7 +780,7 @@ class CalendarComponent extends IcalBase
                 }
             } // end elseif( false !== strpos( $content, Util::$COMMA ))
             else {
-                $content = \trim( $content );
+                $content = trim( $content );
                 if( ! empty( $content )) {
                     if( ! isset( $output[$content] )) {
                         $output[$content] = 1;
@@ -740,7 +791,7 @@ class CalendarComponent extends IcalBase
                 }
             }
         }
-        \ksort( $output );
+        ksort( $output );
     }
 
     /**
@@ -754,114 +805,113 @@ class CalendarComponent extends IcalBase
      * @return mixed array|bool
      */
     public function setProperty( $args ) {
-        $numargs = \func_num_args();
+        $numargs = func_num_args();
         if( 1 > $numargs ) {
             return false;
         }
-        $arglist = \func_get_args();
-        if( $this->notExistProp( $arglist[0] )) {
+        $args    = func_get_args();
+        if( $this->notExistProp( $args[0] )) {
             return false;
         }
         if( ! $this->getConfig( Util::$ALLOWEMPTY ) &&
-            ( ! isset( $arglist[1] ) || empty( $arglist[1] ))) {
+            ( ! isset( $args[1] ) || empty( $args[1] ))) {
             return false;
         }
-        $arglist[0] = \strtoupper( $arglist[0] );
+        $args[0] = strtoupper( $args[0] );
         for( $argix = $numargs; $argix < 12; $argix++ ) {
-            if( ! isset( $arglist[$argix] )) {
-                $arglist[$argix] = null;
+            if( ! isset( $args[$argix] )) {
+                $args[$argix] = null;
             }
         }
-        switch( $arglist[0] ) {
+        switch( $args[0] ) {
             case Util::$ACTION:
-                return $this->setAction( $arglist[1], $arglist[2] );
+                return $this->setAction( $args[1], $args[2] );
             case Util::$ATTACH:
-                return $this->setAttach( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setAttach( $args[1], $args[2], $args[3] );
             case Util::$ATTENDEE:
-                return $this->setAttendee( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setAttendee( $args[1], $args[2], $args[3] );
             case Util::$CATEGORIES:
-                return $this->setCategories( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setCategories( $args[1], $args[2], $args[3] );
             case Util::$CLASS:
-                return $this->setClass( $arglist[1], $arglist[2] );
+                return $this->setClass( $args[1], $args[2] );
             case Util::$COMMENT:
-                return $this->setComment( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setComment( $args[1], $args[2], $args[3] );
             case Util::$COMPLETED:
-                return $this->setCompleted( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7] );
+                return $this->setCompleted( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7] );
             case Util::$CONTACT:
-                return $this->setContact( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setContact( $args[1], $args[2], $args[3] );
             case Util::$CREATED:
-                return $this->setCreated( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7] );
+                return $this->setCreated( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7] );
             case Util::$DESCRIPTION:
-                return $this->setDescription( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setDescription( $args[1], $args[2], $args[3] );
             case Util::$DTEND:
-                return $this->setDtend( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7], $arglist[8] );
+                return $this->setDtend( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8] );
             case Util::$DTSTAMP:
-                return $this->setDtstamp( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7] );
+                return $this->setDtstamp( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7] );
             case Util::$DTSTART:
-                return $this->setDtstart( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7], $arglist[8] );
+                return $this->setDtstart( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8] );
             case Util::$DUE:
-                return $this->setDue( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7], $arglist[8]
-                );
+                return $this->setDue( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8] );
             case Util::$DURATION:
-                return $this->setDuration( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5],  $arglist[6] );
+                return $this->setDuration( $args[1], $args[2], $args[3], $args[4], $args[5],  $args[6] );
             case Util::$EXDATE:
-                return $this->setExdate( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setExdate( $args[1], $args[2], $args[3] );
             case Util::$EXRULE:
-                return $this->setExrule( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setExrule( $args[1], $args[2], $args[3] );
             case Util::$FREEBUSY:
-                return $this->setFreebusy( $arglist[1], $arglist[2], $arglist[3], $arglist[4] );
+                return $this->setFreebusy( $args[1], $args[2], $args[3], $args[4] );
             case Util::$GEO:
-                return $this->setGeo( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setGeo( $args[1], $args[2], $args[3] );
             case Util::$LAST_MODIFIED:
-                return $this->setLastModified( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7] );
+                return $this->setLastModified( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7] );
             case Util::$LOCATION:
-                return $this->setLocation( $arglist[1], $arglist[2] );
+                return $this->setLocation( $args[1], $args[2] );
             case Util::$ORGANIZER:
-                return $this->setOrganizer( $arglist[1], $arglist[2] );
+                return $this->setOrganizer( $args[1], $args[2] );
             case Util::$PERCENT_COMPLETE:
-                return $this->setPercentComplete( $arglist[1], $arglist[2] );
+                return $this->setPercentComplete( $args[1], $args[2] );
             case Util::$PRIORITY:
-                return $this->setPriority( $arglist[1], $arglist[2] );
+                return $this->setPriority( $args[1], $args[2] );
             case Util::$RDATE:
-                return $this->setRdate( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setRdate( $args[1], $args[2], $args[3] );
             case Util::$RECURRENCE_ID:
-                return $this->setRecurrenceid( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7], $arglist[8] );
+                return $this->setRecurrenceid( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8] );
             case Util::$RELATED_TO:
-                return $this->setRelatedTo( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setRelatedTo( $args[1], $args[2], $args[3] );
             case Util::$REPEAT:
-                return $this->setRepeat( $arglist[1], $arglist[2] );
+                return $this->setRepeat( $args[1], $args[2] );
             case Util::$REQUEST_STATUS:
-                return $this->setRequestStatus( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5] );
+                return $this->setRequestStatus( $args[1], $args[2], $args[3], $args[4], $args[5] );
             case Util::$RESOURCES:
-                return $this->setResources( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setResources( $args[1], $args[2], $args[3] );
             case Util::$RRULE:
-                return $this->setRrule( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setRrule( $args[1], $args[2], $args[3] );
             case Util::$SEQUENCE:
-                return $this->setSequence( $arglist[1], $arglist[2] );
+                return $this->setSequence( $args[1], $args[2] );
             case Util::$STATUS:
-                return $this->setStatus( $arglist[1], $arglist[2] );
+                return $this->setStatus( $args[1], $args[2] );
             case Util::$SUMMARY:
-                return $this->setSummary( $arglist[1], $arglist[2] );
+                return $this->setSummary( $args[1], $args[2] );
             case Util::$TRANSP:
-                return $this->setTransp( $arglist[1], $arglist[2] );
+                return $this->setTransp( $args[1], $args[2] );
             case Util::$TRIGGER:
-                return $this->setTrigger( $arglist[1], $arglist[2], $arglist[3], $arglist[4], $arglist[5], $arglist[6], $arglist[7], $arglist[8], $arglist[9], $arglist[10], $arglist[11] );
+                return $this->setTrigger( $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8], $args[9], $args[10], $args[11] );
             case Util::$TZID:
-                return $this->setTzid( $arglist[1], $arglist[2] );
+                return $this->setTzid( $args[1], $args[2] );
             case Util::$TZNAME:
-                return $this->setTzname( $arglist[1], $arglist[2], $arglist[3] );
+                return $this->setTzname( $args[1], $args[2], $args[3] );
             case Util::$TZOFFSETFROM:
-                return $this->setTzoffsetfrom( $arglist[1], $arglist[2] );
+                return $this->setTzoffsetfrom( $args[1], $args[2] );
             case Util::$TZOFFSETTO:
-                return $this->setTzoffsetto( $arglist[1], $arglist[2] );
+                return $this->setTzoffsetto( $args[1], $args[2] );
             case Util::$TZURL:
-                return $this->setTzurl( $arglist[1], $arglist[2] );
+                return $this->setTzurl( $args[1], $args[2] );
             case Util::$UID:
-                return $this->setUid( $arglist[1], $arglist[2] );
+                return $this->setUid( $args[1], $args[2] );
             case Util::$URL:
-                return $this->setUrl( $arglist[1], $arglist[2] );
+                return $this->setUrl( $args[1], $args[2] );
             default:
-                return $this->setXprop( $arglist[0], $arglist[1], $arglist[2] );
+                return $this->setXprop( $args[0], $args[1], $args[2] );
         }
     }
 
@@ -884,12 +934,11 @@ class CalendarComponent extends IcalBase
         static $BEGINSTANDARD = 'BEGIN:STANDARD';
         static $BEGINDAYLIGHT = 'BEGIN:DAYLIGHT';
         static $TEXTPROPS     = [ 'CATEGORIES', 'COMMENT', 'DESCRIPTION', 'SUMMARY', ];
-        static $X_            = 'X-';
         static $SS            = '/';
         static $EQ            = '=';
         if( ! empty( $unparsedtext )) {
             $arrParse = false;
-            if( \is_array( $unparsedtext )) {
+            if( is_array( $unparsedtext )) {
                 $unparsedtext = \implode( $NLCHARS . Util::$CRLF, $unparsedtext );
                 $arrParse     = true;
             }
@@ -908,11 +957,11 @@ class CalendarComponent extends IcalBase
         }
         /* skip leading (empty/invalid) lines */
         foreach( $rows as $lix => $row ) {
-            if( false !== ( $pos = \stripos( $row, $BEGIN ))) {
-                $rows[$lix] = \substr( $row, $pos );
+            if( false !== ( $pos = stripos( $row, $BEGIN ))) {
+                $rows[$lix] = substr( $row, $pos );
                 break;
             }
-            $tst = \trim( $row );
+            $tst = trim( $row );
             if(( $NLCHARS == $tst ) || empty( $tst )) {
                 unset( $rows[$lix] );
             }
@@ -923,28 +972,28 @@ class CalendarComponent extends IcalBase
         $compSync       = $subSync = 0;
         foreach( $rows as $lix => $row ) {
             switch( true ) {
-                case ( 0 == \strcasecmp( $ENDALARM, \substr( $row, 0, 10 ))) :
+                case ( 0 == strcasecmp( $ENDALARM, substr( $row, 0, 10 ))) :
                     if( 1 != $subSync ) {
                         return false;
                     }
                     $this->components[] = $comp;
                     $subSync -= 1;
                     break;
-                case ( 0 == \strcasecmp( $ENDDAYLIGHT, \substr( $row, 0, 12 ))) :
+                case ( 0 == strcasecmp( $ENDDAYLIGHT, substr( $row, 0, 12 ))) :
                     if( 1 != $subSync ) {
                         return false;
                     }
                     $this->components[] = $comp;
                     $subSync -= 1;
                     break;
-                case ( 0 == \strcasecmp( $ENDSTANDARD, \substr( $row, 0, 12 ))) :
+                case ( 0 == strcasecmp( $ENDSTANDARD, substr( $row, 0, 12 ))) :
                     if( 1 != $subSync ) {
                         return false;
                     }
-                    \array_unshift( $this->components, $comp );
+                    array_unshift( $this->components, $comp );
                     $subSync -= 1;
                     break;
-                case ( 0 == \strcasecmp( $END, \substr( $row, 0, 4 ))) :
+                case ( 0 == strcasecmp( $END, substr( $row, 0, 4 ))) :
                     if( 1 != $compSync ) { // end:<component>
                         return false;
                     }
@@ -953,19 +1002,19 @@ class CalendarComponent extends IcalBase
                     }
                     $compSync -= 1;
                     break 2;  /* skip trailing empty lines */
-                case ( 0 == \strcasecmp( $BEGINVALARM, \substr( $row, 0, 12 ))) :
+                case ( 0 == strcasecmp( $BEGINVALARM, substr( $row, 0, 12 ))) :
                     $comp = new Valarm( $config );
                     $subSync += 1;
                     break;
-                case ( 0 == \strcasecmp( $BEGINSTANDARD, \substr( $row, 0, 14 ))) :
+                case ( 0 == strcasecmp( $BEGINSTANDARD, substr( $row, 0, 14 ))) :
                     $comp = new Vtimezone( self::STANDARD, $config );
                     $subSync += 1;
                     break;
-                case ( 0 == \strcasecmp( $BEGINDAYLIGHT, \substr( $row, 0, 14 ))) :
+                case ( 0 == strcasecmp( $BEGINDAYLIGHT, substr( $row, 0, 14 ))) :
                     $comp = new Vtimezone( self::DAYLIGHT, $config );
                     $subSync += 1;
                     break;
-                case ( 0 == \strcasecmp( $BEGIN, \substr( $row, 0, 6 ))) :
+                case ( 0 == strcasecmp( $BEGIN, substr( $row, 0, 6 ))) :
                     $compSync += 1;         // begin:<component>
                     break;
                 default :
@@ -986,15 +1035,15 @@ class CalendarComponent extends IcalBase
             list( $propName, $row ) = Util::getPropName( $row );
             if( Util::isXprefixed( $propName )) {
                 $propName2 = $propName;
-                $propName  = $X_;
+                $propName  = Util::$X_;
             }
-            if( ! Util::isPropInList( \strtoupper( $propName ), Util::$PROPNAMES )) {
+            if( ! Util::isPropInList( strtoupper( $propName ), Util::$PROPNAMES )) {
                 continue;
             } // skip non standard property names
             /* separate attributes from value */
             Util::splitContent( $row, $propAttr );
-            if(( $NLCHARS == \strtolower( substr( $row, -2 ))) &&
-                ! Util::isPropInList( \strtoupper( $propName ), $TEXTPROPS ) &&
+            if(( $NLCHARS == strtolower( substr( $row, -2 ))) &&
+                ! Util::isPropInList( strtoupper( $propName ), $TEXTPROPS ) &&
                 ( ! Util::isXprefixed( $propName ))) {
                 $row = Util::trimTrailNL( $row );
             }
@@ -1002,10 +1051,10 @@ class CalendarComponent extends IcalBase
             switch( strtoupper( $propName )) {
                 case Util::$ATTENDEE :
                     foreach( $propAttr as $pix => $attr ) {
-                        if( ! \in_array( strtoupper( $pix ), Util::$ATTENDEEPARKEYS )) {
+                        if( ! in_array( strtoupper( $pix ), Util::$ATTENDEEPARKEYS )) {
                             continue;
                         }  // 'MEMBER', 'DELEGATED-TO', 'DELEGATED-FROM'
-                        $attr2 = \explode( Util::$COMMA, $attr );
+                        $attr2 = explode( Util::$COMMA, $attr );
                         if( 1 < count( $attr2 )) {
                             $propAttr[$pix] = $attr2;
                         }
@@ -1015,7 +1064,7 @@ class CalendarComponent extends IcalBase
                 case Util::$CATEGORIES :
                     // fall through
                 case Util::$RESOURCES :
-                    if( false !== \strpos( $row, Util::$COMMA )) {
+                    if( false !== strpos( $row, Util::$COMMA )) {
                         $content = Util::commaSplit( $row );
                         if( 1 < count( $content )) {
                             foreach( $content as & $contentPart ) {
@@ -1043,7 +1092,7 @@ class CalendarComponent extends IcalBase
                     $this->setProperty( $propName, Util::strunrep( $row ), $propAttr );
                     break;
                 case Util::$REQUEST_STATUS :
-                    $values    = \explode( Util::$SEMIC, $row, 3 );
+                    $values    = explode( Util::$SEMIC, $row, 3 );
                     $values[1] = ( isset( $values[1] )) ? Util::strunrep( $values[1] ) : null;
                     $values[2] = ( isset( $values[2] )) ? Util::strunrep( $values[2] ) : null;
                     $this->setProperty( $propName
@@ -1054,25 +1103,25 @@ class CalendarComponent extends IcalBase
                     );
                     break;
                 case Util::$FREEBUSY :
-                    $class = \get_called_class();
+                    $class = get_called_class();
                     if( ! isset( $class::$UCFBTYPE )) {
                         break;
                     } // freebusy-prop in a non-freebusy component??
                     $fbtype = ( isset( $propAttr[$class::$UCFBTYPE] ))
                         ? $propAttr[$class::$UCFBTYPE] : null; // force default
                     unset( $propAttr[$class::$UCFBTYPE] );
-                    $values = \explode( Util::$COMMA, $row );
+                    $values = explode( Util::$COMMA, $row );
                     foreach( $values as $vix => $value ) {
-                        $value2 = \explode( $SS, $value ); // '/'
-                        if( 1 < \count( $value2 )) {
+                        $value2 = explode( $SS, $value ); // '/'
+                        if( 1 < count( $value2 )) {
                             $values[$vix] = $value2;
                         }
                     }
                     $this->setProperty( $propName, $fbtype, $values, $propAttr );
                     break;
                 case Util::$GEO :
-                    $value = \explode( Util::$SEMIC, $row, 2 );
-                    if( 2 > \count( $value )) {
+                    $value = explode( Util::$SEMIC, $row, 2 );
+                    if( 2 > count( $value )) {
                         $value[1] = null;
                     }
                     $this->setProperty( $propName, $value[0], $value[1], $propAttr );
@@ -1086,9 +1135,9 @@ class CalendarComponent extends IcalBase
                         $this->setProperty( $propName, $row, $propAttr );
                         break;
                     }
-                    $values = \explode( Util::$COMMA, $row );
+                    $values = explode( Util::$COMMA, $row );
                     foreach( $values as $vix => $value ) {
-                        $value2 = \explode( $SS, $value );
+                        $value2 = explode( $SS, $value );
                         if( 1 < count( $value2 )) {
                             $values[$vix] = $value2;
                         }
@@ -1098,28 +1147,27 @@ class CalendarComponent extends IcalBase
                 case Util::$EXRULE :
                     // fall through
                 case Util::$RRULE :
-                    $values = \explode( Util::$SEMIC, $row );
+                    $values = explode( Util::$SEMIC, $row );
                     $recur  = [];
                     foreach( $values as $value2 ) {
                         if( empty( $value2 )) {
                             continue;
                         } // ;-char in end position ???
-                        $value3    = \explode( $EQ, $value2, 2 );
-                        $rulelabel = \strtoupper( $value3[0] );
+                        $value3    = explode( $EQ, $value2, 2 );
+                        $rulelabel = strtoupper( $value3[0] );
                         switch( $rulelabel ) {
                             case Util::$BYDAY:
-                                {
-                                    $value4 = \explode( Util::$COMMA, $value3[1] );
-                                    if( 1 < \count( $value4 )) {
+                                    $value4 = explode( Util::$COMMA, $value3[1] );
+                                    if( 1 < count( $value4 )) {
                                         foreach( $value4 as $v5ix => $value5 ) {
                                             $value6 = [];
                                             $dayno  = $dayname = null;
-                                            $value5 = \trim((string) $value5 );
-                                            if(( \ctype_alpha( \substr( $value5, -1 ))) &&
-                                               ( \ctype_alpha( \substr( $value5, -2, 1 )))) {
-                                                $dayname = \substr( $value5, -2, 2 );
-                                                if( 2 < \strlen( $value5 )) {
-                                                    $dayno = \substr( $value5, 0, ( \strlen( $value5 ) - 2 ));
+                                            $value5 = trim((string) $value5 );
+                                            if(( ctype_alpha( substr( $value5, -1 ))) &&
+                                               ( ctype_alpha( substr( $value5, -2, 1 )))) {
+                                                $dayname = substr( $value5, -2, 2 );
+                                                if( 2 < strlen( $value5 )) {
+                                                    $dayno = substr( $value5, 0, ( strlen( $value5 ) - 2 ));
                                                 }
                                             }
                                             if( $dayno ) {
@@ -1134,12 +1182,12 @@ class CalendarComponent extends IcalBase
                                     else {
                                         $value4 = [];
                                         $dayno  = $dayname = null;
-                                        $value5 = \trim((string) $value3[1] );
-                                        if(( \ctype_alpha( \substr( $value5, -1 ))) &&
-                                           ( \ctype_alpha( \substr( $value5, -2, 1 )))) {
-                                            $dayname = \substr( $value5, -2, 2 );
-                                            if( 2 < \strlen( $value5 )) {
-                                                $dayno = \substr( $value5, 0, ( strlen( $value5 ) - 2 ));
+                                        $value5 = trim((string) $value3[1] );
+                                        if(( ctype_alpha( substr( $value5, -1 ))) &&
+                                           ( ctype_alpha( substr( $value5, -2, 1 )))) {
+                                            $dayname = substr( $value5, -2, 2 );
+                                            if( 2 < strlen( $value5 )) {
+                                                $dayno = substr( $value5, 0, ( strlen( $value5 ) - 2 ));
                                             }
                                         }
                                         if( $dayno ) {
@@ -1151,21 +1199,18 @@ class CalendarComponent extends IcalBase
                                     }
                                     $recur[$rulelabel] = $value4;
                                     break;
-                                }
                             default:
-                                {
-                                    $value4 = \explode( Util::$COMMA, $value3[1] );
+                                    $value4 = explode( Util::$COMMA, $value3[1] );
                                     if( 1 < count( $value4 )) {
                                         $value3[1] = $value4;
                                     }
                                     $recur[$rulelabel] = $value3[1];
                                     break;
-                                }
                         } // end - switch $rulelabel
                     } // end - foreach( $values.. .
                     $this->setProperty( $propName, $recur, $propAttr );
                     break;
-                case $X_ :
+                case Util::$X_ :
                     $propName = ( isset( $propName2 )) ? $propName2 : $propName;
                     unset( $propName2 );
                 // fall through
@@ -1205,32 +1250,34 @@ class CalendarComponent extends IcalBase
      * Return calendar component subcomponent from component container
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
+     * @since  2.26.1 - 2018-11-17
      * @param mixed $arg1 ordno/component type/ component uid
      * @param mixed $arg2 ordno if arg1 = component type
      * @return mixed CalendarComponent|bool
      */
     public function getComponent( $arg1 = null, $arg2 = null ) {
-        static $INDEX = 'INDEX';
         if( empty( $this->components )) {
             return false;
         }
         $index = $argType = null;
         switch( true ) {
-            case ( \is_null( $arg1 )) :
-                $argType = $INDEX;
-                $index   = $this->compix[$INDEX] = ( isset( $this->compix[$INDEX] )) ? $this->compix[$INDEX] + 1 : 1;
+            case ( is_null( $arg1 )) :
+                $argType = self::$INDEX;
+                $this->compix[self::$INDEX] = ( isset( $this->compix[self::$INDEX] ))
+                    ? $this->compix[self::$INDEX] + 1 : 1;
+                $index   = $this->compix[self::$INDEX];
                 break;
-            case ( \ctype_digit((string) $arg1 )) :
-                $argType = $INDEX;
+            case ( ctype_digit((string) $arg1 )) :
+                $argType = self::$INDEX;
                 $index   = (int) $arg1;
                 $this->compix = [];
                 break;
             case ( Util::isCompInList( $arg1, Util::$SUBCOMPS )) : // class name
-                unset( $this->compix[$INDEX] );
-                $argType = \strtolower( $arg1 );
-                if( \is_null( $arg2 )) {
-                    $index = $this->compix[$argType] = ( isset( $this->compix[$argType] )) ? $this->compix[$argType] + 1 : 1;
+                unset( $this->compix[self::$INDEX] );
+                $argType = strtolower( $arg1 );
+                if( is_null( $arg2 )) {
+                    $index = $this->compix[$argType] = ( isset( $this->compix[$argType] ))
+                        ? $this->compix[$argType] + 1 : 1;
                 }
                 else {
                     $index = (int) $arg2;
@@ -1238,8 +1285,8 @@ class CalendarComponent extends IcalBase
                 break;
         }
         $index -= 1;
-        $ckeys = \array_keys( $this->components );
-        if( ! empty( $index ) && ( $index > \end( $ckeys ))) {
+        $ckeys = array_keys( $this->components );
+        if( ! empty( $index ) && ( $index > end( $ckeys ))) {
             return false;
         }
         $cix2gC = 0;
@@ -1247,12 +1294,12 @@ class CalendarComponent extends IcalBase
             if( empty( $this->components[$cix] )) {
                 continue;
             }
-            if(( $INDEX == $argType ) && ( $index == $cix )) {
+            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
                 return clone $this->components[$cix];
             }
-            elseif(( \strcasecmp( $this->components[$cix]->compType, $argType ) == 0 ) ||
+            elseif(( strcasecmp( $this->components[$cix]->compType, $argType ) == 0 ) ||
                 ( isset( $this->components[$cix]->timezonetype ) &&
-                    ( \strcasecmp( $this->components[$cix]->timezonetype, $argType ) == 0 ))) {
+                    ( strcasecmp( $this->components[$cix]->timezonetype, $argType ) == 0 ))) {
                 if( $index == $cix2gC ) {
                     return clone $this->components[$cix];
                 }
@@ -1294,7 +1341,7 @@ class CalendarComponent extends IcalBase
                     continue;
                 }
                 $dt  = $component->getProperty( Util::$DTSTART );
-                $key = (int) \sprintf(
+                $key = (int) sprintf(
                     $DATEKEY,
                     (int) $dt[Util::$LCYEAR],
                     (int) $dt[Util::$LCMONTH],
@@ -1317,12 +1364,12 @@ class CalendarComponent extends IcalBase
                 }
             } // end foreach(...
             $this->components = [];
-            \ksort( $stdarr, SORT_NUMERIC );
+            ksort( $stdarr, SORT_NUMERIC );
             foreach( $stdarr as $std ) {
                 $this->components[] = $std;
             }
             unset( $stdarr );
-            \ksort( $dlarr, SORT_NUMERIC );
+            ksort( $dlarr, SORT_NUMERIC );
             foreach( $dlarr as $dl ) {
                 $this->components[] = $dl;
             }

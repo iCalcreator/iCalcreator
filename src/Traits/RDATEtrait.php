@@ -71,7 +71,7 @@ trait RDATEtrait
     public function setRdate( $rdates, $params = null, $index = null ) {
         if( empty( $rdates )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                Util::setMval( $this->rdate, Util::$EMPTYPROPERTY, $params, false, $index );
+                Util::setMval( $this->rdate, Util::$SP0, $params, false, $index );
                 return true;
             }
             else {

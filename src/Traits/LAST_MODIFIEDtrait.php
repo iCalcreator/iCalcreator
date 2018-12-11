@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function gmdate;
+
 /**
  * LAST-MODIFIED property functions
  *
@@ -86,7 +88,7 @@ trait LAST_MODIFIEDtrait
     ) {
         static $TMDTHIS = 'Ymd\THis';
         if( empty( $year )) {
-            $year = \gmdate( $TMDTHIS );
+            $year = gmdate( $TMDTHIS );
         }
         $this->lastmodified = Util::setDate2( $year, $month, $day, $hour, $min, $sec, $params );
         return true;

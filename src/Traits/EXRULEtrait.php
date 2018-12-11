@@ -68,7 +68,7 @@ trait EXRULEtrait
     public function setExrule( $exruleset, $params = null, $index = null ) {
         if( empty( $exruleset )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $exruleset = Util::$EMPTYPROPERTY;
+                $exruleset = Util::$SP0;
             }
             else {
                 return false;

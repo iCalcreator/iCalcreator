@@ -62,7 +62,9 @@ trait RECURRENCE_IDtrait
         return Util::createElement(
             Util::$RECURRENCE_ID,
             Util::createParams( $this->recurrenceid[Util::$LCparams] ),
-            Util::date2strdate( $this->recurrenceid[Util::$LCvalue],Util::isParamsValueSet( $this->recurrenceid, Util::$DATE ) ? 3 : null )
+            Util::date2strdate(
+                $this->recurrenceid[Util::$LCvalue],
+                Util::isParamsValueSet( $this->recurrenceid, Util::$DATE ) ? 3 : null )
         );
     }
 
@@ -92,7 +94,7 @@ trait RECURRENCE_IDtrait
         if( empty( $year )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $this->recurrenceid = [
-                    Util::$LCvalue  => Util::$EMPTYPROPERTY,
+                    Util::$LCvalue  => Util::$SP0,
                     Util::$LCparams => null,
                 ];
                 return true;
@@ -101,11 +103,9 @@ trait RECURRENCE_IDtrait
                 return false;
             }
         }
-        $this->recurrenceid = Util::setDate( $year, $month, $day, $hour, $min, $sec, $tz,
-                                             $params,
-                                             null,
-                                             null,
-                                             $this->getConfig( Util::$TZID )
+        $this->recurrenceid = Util::setDate(
+            $year, $month, $day, $hour, $min, $sec, $tz,
+            $params,null, null, $this->getConfig( Util::$TZID )
         );
         return true;
     }

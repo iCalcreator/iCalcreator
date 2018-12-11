@@ -33,6 +33,8 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function is_numeric;
+
 /**
  * REPEAT property functions
  *
@@ -58,7 +60,7 @@ trait REPEATtrait
             return null;
         }
         if( ! isset( $this->repeat[Util::$LCvalue] ) ||
-            ( empty( $this->repeat[Util::$LCvalue] ) && ! \is_numeric( $this->repeat[Util::$LCvalue] ))) {
+            ( empty( $this->repeat[Util::$LCvalue] ) && ! is_numeric( $this->repeat[Util::$LCvalue] ))) {
             return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$REPEAT ) : null;
         }
         return Util::createElement(
@@ -78,7 +80,7 @@ trait REPEATtrait
     public function setRepeat( $value, $params = null ) {
         if( empty( $value ) && ! is_numeric( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

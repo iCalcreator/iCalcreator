@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -32,6 +32,9 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
+
+use function sprintf;
+use function strtoupper;
 
 /**
  * PRODID property functions
@@ -71,17 +74,17 @@ trait PRODIDtrait
      *  value, as defined in [ISO 9070]."
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.22.20 - 2017-01-29
+     * @since  2.26.2 - 2018-11-29
      */
     public function makeProdid() {
         static $FMT = '-//%s//NONSGML kigkonsult.se %s//%s';
         if( false !== ( $lang = $this->getConfig( Util::$LANGUAGE ))) {
-            $lang = \strtoupper( $lang );
+            $lang = strtoupper( $lang );
         }
         else {
-            $lang = null;
+            $lang = Util::$SP0;
         }
-        $this->prodid = \sprintf(
+        $this->prodid = sprintf(
             $FMT,
             $this->getConfig( Util::$UNIQUE_ID ),
             ICALCREATOR_VERSION,

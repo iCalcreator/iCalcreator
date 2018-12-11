@@ -33,6 +33,9 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function implode;
+use function is_array;
+
 /**
  * CATEGORIES property functions
  *
@@ -65,7 +68,7 @@ trait CATEGORIEStrait
                 }
                 continue;
             }
-            if( \is_array( $category[Util::$LCvalue] )) {
+            if( is_array( $category[Util::$LCvalue] )) {
                 foreach( $category[Util::$LCvalue] as $cix => $cValue ) {
                     $category[Util::$LCvalue][$cix] = Util::strrep( $cValue );
                 }
@@ -74,13 +77,14 @@ trait CATEGORIEStrait
             else {
                 $content = Util::strrep( $category[Util::$LCvalue] );
             }
-            $output .= Util::createElement( Util::$CATEGORIES,
-                                            Util::createParams(
-                                                $category[Util::$LCparams],
-                                                [ Util::$LANGUAGE ],
-                                                $lang
-                                            ),
-                                            $content
+            $output .= Util::createElement(
+                Util::$CATEGORIES,
+                Util::createParams(
+                    $category[Util::$LCparams],
+                    [ Util::$LANGUAGE ],
+                    $lang
+                ),
+                $content
             );
         }
         return $output;
@@ -97,7 +101,7 @@ trait CATEGORIEStrait
     public function setCategories( $value, $params = null, $index = null ) {
         if( empty( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;

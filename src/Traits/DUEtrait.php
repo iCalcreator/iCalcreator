@@ -93,7 +93,7 @@ trait DUEtrait
         if( empty( $year )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $this->due = [
-                    Util::$LCvalue  => Util::$EMPTYPROPERTY,
+                    Util::$LCvalue  => Util::$SP0,
                     Util::$LCparams => Util::setParams( $params ),
                 ];
                 return true;
@@ -105,8 +105,9 @@ trait DUEtrait
         if( false === ( $tzid = $this->getConfig( Util::$TZID ))) {
             $tzid = null;
         }
-        $this->due = Util::setDate( $year, $month, $day, $hour, $min, $sec, $tz,
-                                    $params, null, null, $tzid
+        $this->due = Util::setDate(
+            $year, $month, $day, $hour, $min, $sec, $tz,
+            $params, null, null, $tzid
         );
         return true;
     }

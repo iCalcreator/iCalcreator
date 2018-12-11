@@ -33,6 +33,12 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function count;
+use function implode;
+use function is_array;
+use function is_numeric;
+use function strtoupper;
+
 /**
  * X-property functions
  *
@@ -60,17 +66,17 @@ trait X_PROPtrait
         $lang   = $this->getConfig( Util::$LANGUAGE );
         foreach( $this->xprop as $label => $xpropPart ) {
             if( ! isset( $xpropPart[Util::$LCvalue] ) ||
-                ( empty( $xpropPart[Util::$LCvalue] ) && ! \is_numeric( $xpropPart[Util::$LCvalue] ))) {
+                ( empty( $xpropPart[Util::$LCvalue] ) && ! is_numeric( $xpropPart[Util::$LCvalue] ))) {
                 if( $this->getConfig( Util::$ALLOWEMPTY )) {
                     $output .= Util::createElement( $label );
                 }
                 continue;
             }
-            if( \is_array( $xpropPart[Util::$LCvalue] )) {
+            if( is_array( $xpropPart[Util::$LCvalue] )) {
                 foreach( $xpropPart[Util::$LCvalue] as $pix => $theXpart ) {
                     $xpropPart[Util::$LCvalue][$pix] = Util::strrep( $theXpart );
                 }
-                $xpropPart[Util::$LCvalue] = \implode( Util::$COMMA, $xpropPart[Util::$LCvalue] );
+                $xpropPart[Util::$LCvalue] = implode( Util::$COMMA, $xpropPart[Util::$LCvalue] );
             }
             else {
                 $xpropPart[Util::$LCvalue] = Util::strrep( $xpropPart[Util::$LCvalue] );
@@ -96,9 +102,9 @@ trait X_PROPtrait
         if( empty( $label ) || ! Util::isXprefixed( $label )) {
             return false;
         }
-        if( empty( $value ) && ! \is_numeric( $value )) {
+        if( empty( $value ) && ! is_numeric( $value )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$EMPTYPROPERTY;
+                $value = Util::$SP0;
             }
             else {
                 return false;
@@ -106,10 +112,10 @@ trait X_PROPtrait
         }
         $xprop = [ Util::$LCvalue => $value ];
         $xprop[Util::$LCparams] = Util::setParams( $params );
-        if( ! \is_array( $this->xprop )) {
+        if( ! is_array( $this->xprop )) {
             $this->xprop = [];
         }
-        $this->xprop[\strtoupper( $label )] = $xprop;
+        $this->xprop[strtoupper( $label )] = $xprop;
         return true;
     }
 
@@ -138,7 +144,7 @@ trait X_PROPtrait
             }
         }
         else {
-            if( \count( $xProp ) <= $propix ) {
+            if( count( $xProp ) <= $propix ) {
                 unset( $propdelix[$propName] );
                 return false;
             }

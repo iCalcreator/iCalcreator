@@ -32,6 +32,8 @@
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use function sprintf;
+use function strtoupper;
 
 /**
  * iCalcreator VEVENT component class
@@ -154,7 +156,7 @@ class Vevent extends CalendarComponent
      */
     public function createComponent() {
         $compType    = strtoupper( $this->compType );
-        $component   = \sprintf( Util::$FMTBEGIN, $compType );
+        $component   = sprintf( Util::$FMTBEGIN, $compType );
         $component  .= $this->createUid();
         $component  .= $this->createDtstamp();
         $component  .= $this->createAttach();
@@ -188,7 +190,7 @@ class Vevent extends CalendarComponent
         $component  .= $this->createUrl();
         $component  .= $this->createXprop();
         $component  .= $this->createSubComponent();
-        return $component . \sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( Util::$FMTEND, $compType );
     }
 
     /**

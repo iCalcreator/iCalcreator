@@ -96,7 +96,7 @@ trait DTSTARTtrait
         if( empty( $year )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
                 $this->dtstart = [
-                    Util::$LCvalue  => Util::$EMPTYPROPERTY,
+                    Util::$LCvalue  => Util::$SP0,
                     Util::$LCparams => Util::setParams( $params ),
                 ];
                 return true;
@@ -108,8 +108,9 @@ trait DTSTARTtrait
         if( false === ( $tzid = $this->getConfig( Util::$TZID ))) {
             $tzid = null;
         }
-        $this->dtstart = Util::setDate( $year, $month, $day, $hour, $min, $sec, $tz,
-                                        $params, Util::$DTSTART, $this->compType, $tzid
+        $this->dtstart = Util::setDate(
+            $year, $month, $day, $hour, $min, $sec, $tz,
+            $params, Util::$DTSTART, $this->compType, $tzid
         );
         return true;
     }

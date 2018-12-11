@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      http://kigkonsult.se/iCalcreator/index.php
  * Package   iCalcreator
- * Version   2.26
+ * Version   2.26.8
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the [rfc5545] PRODID as implemented and
@@ -32,12 +32,25 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\UtilDuration;
+use DateTime;
+use DateTimeZone;
+use DateInterval;
+use Exception;
+
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+use function sprintf;
+use function strlen;
+use function usort;
 
 /**
  * FREEBUSY property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since  2.26.8 - 2018-12-12
  */
 trait FREEBUSYtrait
 {
@@ -64,12 +77,12 @@ trait FREEBUSYtrait
      * Return formatted output for calendar component property freebusy
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.16.27 - 2013-07-05
+     * @since  2.26.7 - 2018-12-02
      * @return string
      */
     public function createFreebusy() {
         static $FMT = ';FBTYPE=%s';
-        static $SORTER = [ 'Kigkonsult\Icalcreator\VcalendarSortHandler', 'sortRdate1' ];
+        static $SORTER = [ 'Kigkonsult\Icalcreator\Util\VcalendarSortHandler', 'sortRdate1' ];
         if( empty( $this->freebusy )) {
             return null;
         }
@@ -85,44 +98,35 @@ trait FREEBUSYtrait
             }
             $attributes = $content = null;
             if( isset( $freebusyPart[Util::$LCvalue][self::$LCFBTYPE] )) {
-                $attributes .= \sprintf( $FMT, $freebusyPart[Util::$LCvalue][self::$LCFBTYPE] );
+                $attributes .= sprintf( $FMT, $freebusyPart[Util::$LCvalue][self::$LCFBTYPE] );
                 unset( $freebusyPart[Util::$LCvalue][self::$LCFBTYPE] );
                 $freebusyPart[Util::$LCvalue] = array_values( $freebusyPart[Util::$LCvalue] );
             }
             else {
-                $attributes .= \sprintf( $FMT, self::$BUSY );
+                $attributes .= sprintf( $FMT, self::$BUSY );
             }
             $attributes .= Util::createParams( $freebusyPart[Util::$LCparams] );
             $fno        = 1;
-            $cnt        = \count( $freebusyPart[Util::$LCvalue] );
+            $cnt        = count( $freebusyPart[Util::$LCvalue] );
             if( 1 < $cnt ) {
-                \usort( $freebusyPart[Util::$LCvalue], $SORTER );
+                usort( $freebusyPart[Util::$LCvalue], $SORTER );
             }
             foreach( $freebusyPart[Util::$LCvalue] as $periodix => $freebusyPeriod ) {
-                $formatted = Util::date2strdate( $freebusyPeriod[0] );
-                $content   .= $formatted;
+                $content   .= Util::date2strdate( $freebusyPeriod[0] );
                 $content   .= Util::$L;
-                $cnt2      = \count( $freebusyPeriod[1] );
-                if( \array_key_exists( Util::$LCYEAR, $freebusyPeriod[1] )) { // date-time
-                    $cnt2 = 7;
+                if( isset( $freebusyPeriod[1]['invert'] )) { // fix pre 7.0.5 bug
+                    $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
+                        // period=  -> duration
+                    $content .= UtilDuration::dateInterval2String( $dateInterval );
                 }
-                elseif( \array_key_exists( Util::$LCWEEK, $freebusyPeriod[1] )) { // duration
-                    $cnt2 = 5;
-                }
-                if(( 7 == $cnt2 ) &&    // period=  -> date-time
-                    isset( $freebusyPeriod[1][Util::$LCYEAR] ) &&
-                    isset( $freebusyPeriod[1][Util::$LCMONTH] ) &&
-                    isset( $freebusyPeriod[1][Util::$LCDAY] )) {
+                else {  // period=  -> date-time
                     $content .= Util::date2strdate( $freebusyPeriod[1] );
-                }
-                else {                                                     // period=  -> dur-time
-                    $content .= Util::duration2str( $freebusyPeriod[1] );
                 }
                 if( $fno < $cnt ) {
                     $content .= Util::$COMMA;
                 }
                 $fno++;
-            } // end foreach( $freebusyPart[Util::$LCvalue] as $periodix => $freebusyPeriod )
+            } // end foreach
             $output .= Util::createElement( Util::$FREEBUSY, $attributes, $content );
         } // end foreach( $this->freebusy as $fx => $freebusyPart )
         return $output;
@@ -136,16 +140,18 @@ trait FREEBUSYtrait
      * @param array   $params
      * @param integer $index
      * @return bool
+     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+     * @since  2.26.27 - 2018-12-02
      */
     public function setFreebusy( $fbType, $fbValues, $params = null, $index = null ) {
-        static $PREFIXARR = [ 'P', '+', '-' ];
         if( empty( $fbValues )) {
             if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                Util::setMval( $this->freebusy,
-                               Util::$EMPTYPROPERTY,
-                               $params,
-                               false,
-                               $index
+                Util::setMval(
+                    $this->freebusy,
+                    Util::$SP0,
+                    $params,
+                    false,
+                    $index
                 );
                 return true;
             }
@@ -154,50 +160,77 @@ trait FREEBUSYtrait
             }
         }
         $fbType = strtoupper( $fbType );
-        if( ! \in_array( $fbType, self::$FREEBUSYKEYS ) &&
-            ! Util::isXprefixed( $fbType )) {
+        if( ! in_array( $fbType, self::$FREEBUSYKEYS ) && ! Util::isXprefixed( $fbType )) {
             $fbType = self::$BUSY;
         }
         $input = [ self::$LCFBTYPE => $fbType ];
-        foreach( $fbValues as $fbPeriod ) {               // periods => period
+        foreach( $fbValues as $fbPeriod ) {                   // periods => period
             if( empty( $fbPeriod )) {
                 continue;
             }
             $freebusyPeriod = [];
-            foreach( $fbPeriod as $fbMember ) {             // pairs => singlepart
+            foreach( $fbPeriod as $fbMember ) { // pairs => singlepart
                 $freebusyPairMember = [];
-                if( \is_array( $fbMember )) {
-                    if( Util::isArrayDate( $fbMember )) {       // date-time value
-                        $freebusyPairMember              = Util::chkDateArr( $fbMember, 7 );
+                switch( true ) {
+                    case ( $fbMember instanceof DateTime ) :     // datetime
+                        $fbMember->setTimezone((new DateTimeZone( Util::$UTC )));
+                        $date = Util::dateTime2Str( $fbMember );
+                        Util::strDate2arr( $date );
+                        $freebusyPairMember = $date;
                         $freebusyPairMember[Util::$LCtz] = Util::$Z;
-                    }
-                    elseif( Util::isArrayTimestampDate( $fbMember )) { // timestamp value
-                        $freebusyPairMember              = Util::timestamp2date( $fbMember[Util::$LCTIMESTAMP], 7 );
+                        break;
+                    case ( $fbMember instanceof DateInterval ) : // interval
+                        $freebusyPairMember = (array) $fbMember; // fix pre 7.0.5 bug
+                        break;
+                    case ( is_array( $fbMember )) :
+                        if( Util::isArrayDate( $fbMember )) {    // date-time value
+                            $freebusyPairMember              = Util::chkDateArr( $fbMember, 7 );
+                            $freebusyPairMember[Util::$LCtz] = Util::$Z;
+                        }
+                        elseif( Util::isArrayTimestampDate( $fbMember )) { // timestamp value
+                            $freebusyPairMember = Util::timestamp2date( $fbMember[Util::$LCTIMESTAMP], 7 );
+                            $freebusyPairMember[Util::$LCtz] = Util::$Z;
+                        }
+                        else {                                    // array format duration
+                            try {  // fix pre 7.0.5 bug
+                                $freebusyPairMember = (array) UtilDuration::conformDateInterval(
+                                    new DateInterval(
+                                        UtilDuration::duration2str(
+                                            UtilDuration::duration2arr( $fbMember )
+                                        )
+                                    )
+                                );
+                            }
+                            catch( Exception $e ) {
+                                return false;
+                            }
+                        }
+                        break;
+                    case ( ! is_string( $fbMember )) :
+                        continue;
+                        break;
+                    case (( 3 <= strlen( trim( $fbMember ))) && ( in_array( $fbMember{0}, UtilDuration::$PREFIXARR ))) :
+                        // string format duration
+                        if( in_array( $fbMember{0}, Util::$PLUSMINUSARR )) { // can only be positive
+                            $fbMember = substr( $fbMember, 1 );
+                        }
+                        try {  // fix pre 7.0.5 bug
+                            $freebusyPairMember = (array) UtilDuration::conformDateInterval( new DateInterval( $fbMember ));
+                        }
+                        catch( Exception $e ) {
+                            return false;
+                        }
+                        break;
+                    case ( 8 <= strlen( trim( $fbMember ))) :   // text date ex. 2006-08-03 10:12:18
+                        $freebusyPairMember = Util::strDate2ArrayDate( $fbMember, 7 );
+                        unset( $freebusyPairMember[Util::$UNPARSEDTEXT] );
                         $freebusyPairMember[Util::$LCtz] = Util::$Z;
-                    }
-                    else {                                      // array format duration
-                        $freebusyPairMember = Util::duration2arr( $fbMember );
-                    }
-                }
-                elseif(( 3 <= \strlen( trim( $fbMember ))) &&  // string format duration
-                    ( in_array( $fbMember{0}, $PREFIXARR ))) {
-                    $freebusyPairMember = Util::durationStr2arr( $fbMember );
-                }
-                elseif( 8 <= \strlen( trim( $fbMember ))) {    // text date ex. 2006-08-03 10:12:18
-                    $freebusyPairMember = Util::strDate2ArrayDate( $fbMember, 7 );
-                    unset( $freebusyPairMember[Util::$UNPARSEDTEXT] );
-                    $freebusyPairMember[Util::$LCtz] = Util::$Z;
-                }
+                } // end switch
                 $freebusyPeriod[] = $freebusyPairMember;
             }
             $input[] = $freebusyPeriod;
         }
-        Util::setMval( $this->freebusy,
-                       $input,
-                       $params,
-                       false,
-                       $index
-        );
+        Util::setMval( $this->freebusy, $input, $params, false, $index );
         return true;
     }
 }

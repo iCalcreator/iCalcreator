@@ -31,6 +31,10 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
+use function abs;
+use function sprintf;
+use function rtrim;
+
 /**
  * iCalcreator geo support class
  *
@@ -65,6 +69,6 @@ class UtilGeo
         else {
             $sign = ( 0.0 > $ll ) ? Util::$MINUS : null;
         }
-        return \rtrim( \rtrim( $sign . \sprintf( $format, abs( $ll )), Util::$ZERO ), Util::$DOT );
+        return rtrim( rtrim( $sign . sprintf( $format, abs( $ll )), Util::$ZERO ), Util::$DOT );
     }
 }

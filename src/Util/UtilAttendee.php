@@ -33,6 +33,18 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;
 
+use function array_change_key_case;
+use function array_keys;
+use function ctype_digit;
+use function filter_var;
+use function in_array;
+use function is_array;
+use function sprintf;
+use function strcasecmp;
+use function strpos;
+use function substr;
+use function trim;
+
 /**
  * iCalcreator attendee support class
  *
@@ -56,19 +68,19 @@ class UtilAttendee
      */
     public static function calAddressCheck( $value, $trimQuotes = true ) {
         static $MAILTOCOLON = 'MAILTO:';
-        $value = \trim( $value );
+        $value = trim( $value );
         if( $trimQuotes ) {
-            $value = \trim( $value, Util::$QQ );
+            $value = trim( $value, Util::$QQ );
         }
         switch( true ) {
             case( empty( $value )) :
                 break;
-            case( 0 == \strcasecmp( $MAILTOCOLON, \substr( $value, 0, 7 ))) :
-                $value = $MAILTOCOLON . \substr( $value, 7 ); // accept mailto:
+            case( 0 == strcasecmp( $MAILTOCOLON, substr( $value, 0, 7 ))) :
+                $value = $MAILTOCOLON . substr( $value, 7 ); // accept mailto:
                 break;
-            case( false !== ( $pos = \strpos( \substr( $value, 0, 9 ), Util::$COLON ))) :
+            case( false !== ( $pos = strpos( substr( $value, 0, 9 ), Util::$COLON ))) :
                 break;                                       // accept (as is) from list above
-            case( \filter_var( $value, FILTER_VALIDATE_EMAIL )) :
+            case( filter_var( $value, FILTER_VALIDATE_EMAIL )) :
                 $value = $MAILTOCOLON . $value;              // accept mail address
                 break;
             default :                                        // accept as is...
@@ -105,61 +117,61 @@ class UtilAttendee
                     continue;
                 }
                 if(( Util::$LCparams != $pLabel ) ||
-                    ( ! \is_array( $pValue ))) {
+                    ( ! is_array( $pValue ))) {
                     continue;
                 }
                 foreach( $pValue as $pLabel2 => $pValue2 ) { // fix (opt) quotes
-                    if( \is_array( $pValue2 ) ||
-                        \in_array( $pLabel2, Util::$ATTENDEEPARKEYS )) {
+                    if( is_array( $pValue2 ) ||
+                        in_array( $pLabel2, Util::$ATTENDEEPARKEYS )) {
                         continue;
                     } // DELEGATED-FROM, DELEGATED-TO, MEMBER
-                    if(( false !== \strpos( $pValue2, Util::$COLON )) ||
-                       ( false !== \strpos( $pValue2, Util::$SEMIC )) ||
-                       ( false !== \strpos( $pValue2, Util::$COMMA ))) {
-                        $pValue[$pLabel2] = \sprintf( $FMTQVALUE, $pValue2 );
+                    if(( false !== strpos( $pValue2, Util::$COLON )) ||
+                       ( false !== strpos( $pValue2, Util::$SEMIC )) ||
+                       ( false !== strpos( $pValue2, Util::$COMMA ))) {
+                        $pValue[$pLabel2] = sprintf( $FMTQVALUE, $pValue2 );
                     }
                 }
                 /* set attenddee parameters in rfc2445 order */
                 if( isset( $pValue[Util::$CUTYPE] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$CUTYPE, $pValue[Util::$CUTYPE] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$CUTYPE, $pValue[Util::$CUTYPE] );
                 }
                 if( isset( $pValue[Util::$MEMBER] )) {
-                    $attributes .= \sprintf( $FMTKEYEQ, Util::$MEMBER ) .
+                    $attributes .= sprintf( $FMTKEYEQ, Util::$MEMBER ) .
                                    self::getQuotedListItems( $pValue[Util::$MEMBER] );
                 }
                 if( isset( $pValue[Util::$ROLE] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$ROLE, $pValue[Util::$ROLE] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$ROLE, $pValue[Util::$ROLE] );
                 }
                 if( isset( $pValue[Util::$PARTSTAT] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$PARTSTAT, $pValue[Util::$PARTSTAT] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$PARTSTAT, $pValue[Util::$PARTSTAT] );
                 }
                 if( isset( $pValue[Util::$RSVP] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$RSVP, $pValue[Util::$RSVP] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$RSVP, $pValue[Util::$RSVP] );
                 }
                 if( isset( $pValue[Util::$DELEGATED_TO] )) {
-                    $attributes .= \sprintf( $FMTKEYEQ, Util::$DELEGATED_TO ) .
+                    $attributes .= sprintf( $FMTKEYEQ, Util::$DELEGATED_TO ) .
                                    self::getQuotedListItems( $pValue[Util::$DELEGATED_TO] );
                 }
                 if( isset( $pValue[Util::$DELEGATED_FROM] )) {
-                    $attributes .= \sprintf( $FMTKEYEQ, Util::$DELEGATED_FROM ) .
+                    $attributes .= sprintf( $FMTKEYEQ, Util::$DELEGATED_FROM ) .
                                    self::getQuotedListItems( $pValue[Util::$DELEGATED_FROM] );
                 }
                 if( isset( $pValue[Util::$SENT_BY] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$SENT_BY, $pValue[Util::$SENT_BY] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$SENT_BY, $pValue[Util::$SENT_BY] );
                 }
                 if( isset( $pValue[Util::$CN] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$CN, $pValue[Util::$CN] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$CN, $pValue[Util::$CN] );
                 }
                 if( isset( $pValue[Util::$DIR] )) {
                     $delim       = ( false === \strpos( $pValue[Util::$DIR], Util::$QQ )) ? Util::$QQ : null;
-                    $attributes .= \sprintf( $FMTDIREQ, Util::$DIR, $delim, $pValue[Util::$DIR], $delim );
+                    $attributes .= sprintf( $FMTDIREQ, Util::$DIR, $delim, $pValue[Util::$DIR], $delim );
                 }
                 if( isset( $pValue[Util::$LANGUAGE] )) {
-                    $attributes .= \sprintf( $FMTKEYVALUE, Util::$LANGUAGE, $pValue[Util::$LANGUAGE] );
+                    $attributes .= sprintf( $FMTKEYVALUE, Util::$LANGUAGE, $pValue[Util::$LANGUAGE] );
                 }
                 $xparams = [];
                 foreach( $pValue as $pLabel2 => $pValue2 ) {
-                    if( \ctype_digit((string) $pLabel2 )) {
+                    if( ctype_digit((string) $pLabel2 )) {
                         $xparams[] = $pValue2;
                     }
                     elseif( ! in_array( $pLabel2, Util::$ATTENDEEPARALLKEYS )) {
@@ -171,11 +183,11 @@ class UtilAttendee
                 }
                 ksort( $xparams, SORT_STRING );
                 foreach( $xparams as $pLabel2 => $pValue2 ) {
-                    if( \ctype_digit((string) $pLabel2 )) {
+                    if( ctype_digit((string) $pLabel2 )) {
                         $attributes .= Util::$SEMIC . $pValue2;
                     } // ??
                     else {
-                        $attributes .= \sprintf( $FMTKEYVALUE, $pLabel2, $pValue2 );
+                        $attributes .= sprintf( $FMTKEYVALUE, $pLabel2, $pValue2 );
                     }
                 }
             } // end foreach( $attendeePart )) as $pLabel => $pValue )
@@ -197,9 +209,7 @@ class UtilAttendee
         static $FMTCOMMAQVALUE = ',"%s"';
         $strList = null;
         foreach( $list as $x => $v ) {
-            $strList .= ( 0 < $x )
-                ? \sprintf( $FMTCOMMAQVALUE, $v )
-                : \sprintf( $FMTQVALUE, $v );
+            $strList .= ( 0 < $x ) ? sprintf( $FMTCOMMAQVALUE, $v ) : sprintf( $FMTQVALUE, $v );
         }
         return $strList;
     }
@@ -221,7 +231,7 @@ class UtilAttendee
         $params2 = [];
         if( is_array( $params )) {
             $optArr = [];
-            $params = \array_change_key_case( $params, CASE_UPPER );
+            $params = array_change_key_case( $params, CASE_UPPER );
             foreach( $params as $pLabel => $optParamValue ) {
                 if( ! Util::isXprefixed( $pLabel ) &&
                     Util::isCompInList( $compType, $NONXPROPCOMPS )) {
@@ -243,7 +253,7 @@ class UtilAttendee
                             $optParamValue = self::calAddressCheck( $optParamValue );
                         }
                         else {
-                            $optParamValue = \trim( $optParamValue, Util::$QQ );
+                            $optParamValue = trim( $optParamValue, Util::$QQ );
                         }
                         $params2[$pLabel] = $optParamValue;
                         break;
