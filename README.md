@@ -18,6 +18,6 @@ Builds :
 
 - stable 2.24.2 *(master)*
 
-- next 2.26 - review releaseNotes-2.26 !
+- next 2.26.8 - review releaseNotes: PHP 5.6+, PSR1+4, DateTime/DateInterval input support
 
 - old 2.22.5 - unsupported
