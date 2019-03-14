@@ -17,8 +17,8 @@
                   "standard",
                   "daylight",
                   "file" ],
-    "time" : "2018-11-10",
-    "license": ["AGPL-3.0-or-later", "proprietary"],
+    "time" : "2019-03-15",
+    "license": ["LGPL-3.0-or-later"],
     "homepage": "http://kigkonsult.se",
     "support": {
        "issues": "https://github.com/iCalcreator/iCalcreator/issues"

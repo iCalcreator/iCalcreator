@@ -1,41 +1,40 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <!--
-iCalcreator, a PHP rfc2445/rfc5545 solution.
+ iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
 
-This file is a part of iCalcreator.
+ This file is a part of iCalcreator.
 
-Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
-Link      http://kigkonsult.se/iCalcreator/index.php
-Package   iCalcreator
-Version   2.26.7
-License   Subject matter of licence is the software iCalcreator.
-          The above copyright, link, package and version notices,
-          this licence notice and the [rfc5545] PRODID as implemented and
-          invoked in iCalcreator shall be included in all copies or
-          substantial portions of the iCalcreator.
-          iCalcreator can be used either under the terms of
-          a proprietary license, available from iCal_at_kigkonsult_dot_se
-          or the GNU Affero General Public License, version 3:
-          iCalcreator is free software: you can redistribute it and/or
-          modify it under the terms of the GNU Affero General Public License
-          as published by the Free Software Foundation, either version 3 of
-          the License, or (at your option) any later version.
-          iCalcreator is distributed in the hope that it will be useful,
-          but WITHOUT ANY WARRANTY; without even the implied warranty of
-          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-          GNU Affero General Public License for more details.
-          You should have received a copy of the GNU Affero General Public
-          License along with this program.
-          If not, see <http://www.gnu.org/licenses/>.
+ copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ Link      https://kigkonsult.se
+ Package   iCalcreator
+ Version   2.26.8
+ License   Subject matter of licence is the software iCalcreator.
+           The above copyright, link, package and version notices,
+           this licence notice and the invariant [rfc5545] PRODID result use
+           as implemented and invoked in iCalcreator shall be included in
+           all copies or substantial portions of the iCalcreator.
+
+           iCalcreator is free software: you can redistribute it and/or modify
+           it under the terms of the GNU Lesser General Public License as published
+           by the Free Software Foundation, either version 3 of the License,
+           or (at your option) any later version.
+
+           iCalcreator is distributed in the hope that it will be useful,
+           but WITHOUT ANY WARRANTY; without even the implied warranty of
+           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+           GNU Lesser General Public License for more details.
+
+           You should have received a copy of the GNU Lesser General Public License
+           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
 -->
 <html>
 <head>
-<title>iCalcreator 2.26.7 manual</title>
+<title>iCalcreator 2.26.8 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-<meta name="copyright"   content="2007-2018 Kjell-Inge Gustafsson, kigkonsult">
-<meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.26.7">
+<meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
+<meta name="keywords"    content="ical, calendar, calendar, xcal, xml, icalendar, rfc2445, rfc5545, vcalendar, php, create">
+<meta name="description" content="using iCalcreator v2.26.8">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -166,18 +165,20 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.26.7</p>
+<p class="header">iCalcreator v2.26.8</p>
 <p>
-iCalcreator v2.26.7<br>
-Copyright &copy; 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.26.8<br>
+Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
 Contact : iCal_at_kigkonsult_dot_se
 </p>
 
 <h2>Preface</h2>
 <p>
-This document describes usage of iCalcreator, a <em>PHP</em> software implementation of standards
-<a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a> to manage iCal formatted files.
+    This document describes usage of iCalcreator, the <em>PHP</em> software implementation of standards
+    <a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>/
+    <a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+    (rfc2445/rfc2446) to manage iCal formatted files.
 </p>
 <p>
 This document is provided by kigkonsult for informational purposes
@@ -216,7 +217,7 @@ The iCal standards are <a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.26.7 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
+For iCalcreator 2.26.8 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -232,20 +233,20 @@ A short iCal description is found at <a href="http://en.wikipedia.org/wiki/ICale
 The <strong>iCalendar</strong> format, <strong>iCal</strong>, are described in
 </p>
 <dl>
-<dt><a href="http://kigkonsult.se/downloads/dl.php?f=rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>
+<dt><a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>
 <dd>&quot;Internet Calendaring and Scheduling Core Object Specification (<strong>iCalendar</strong>)&quot;
-<dt><a href="http://kigkonsult.se/downloads/dl.php?f=rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+<dt><a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
 <dd>&quot;iCalendar Transport-Independent Interoperability Protocol (iTIP)&quot;<br>Scheduling Events, BusyTime, To-dos and Journal Entries
 <p class="quotes">. ..allows for the capture and exchange of information normally stored
 within a calendaring and scheduling application.</p>
 and
 <p class="quotes">. ..is an exchange format between applications or systems.</p>
 </dl>
-<p><a href="http://kigkonsult.se/downloads/dl.php?f=rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a> and
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+<p><a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a> and
+<a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
 obsoletes, respectively,
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="Download RFC2445 in text format" target="_blank">rfc2445</a> and
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc2446" title="Download RFC2446 in text format" target="_blank">rfc2446</a>.
+<a href="https://tools.ietf.org/html/rfc2445" title="Download RFC2445 in text format" target="_blank">rfc2445</a> and
+<a href="https://tools.ietf.org/html/rfc2446" title="Download RFC2446 in text format" target="_blank">rfc2446</a>.
 </p>
 <p>
 Any references to rfc2445, below, corresponds to rfc5545.
@@ -254,7 +255,7 @@ Any references to rfc2445, below, corresponds to rfc5545.
 <h4>xCal</h4>
 <p>
 iCalcreator also supports xCal (iCal xml),
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc6321" title="Download RFC6321 in text format" target="_blank">rfc6321</a>,
+<a href="https://tools.ietf.org/html/rfc6321" title="Download RFC6321 in text format" target="_blank">rfc6321</a>,
 The XML Format for <strong>iCalendar</strong>.
 </p>
 <p>
@@ -300,16 +301,14 @@ This style is used for <em>PHP</em> coding examples.
 
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
-For previous iCalcreator releases support upon (paid) request only.
+    For support report, use <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>.
 </p>
 <p>
-Use the <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>
-for queries, improvement/development issues or professional support and development.
-Please note that paid support or consulting service has the highest priority.
+    For non emergency issues, support upon (paid) request only.
 </p>
 <p>
-kigkonsult offer professional services for software support, design and new/re-development, customizations and adaptations
-of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle management, including long term utility, reliability and maintainability.
+    kigkonsult offer professional services for software support, design and new/re-development and unit tests
+    of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle management, including long term utility, reliability and maintainability.
 </p>
 
 <br>
@@ -339,12 +338,12 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.26.7/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.26.8/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 <p>
-iCalcreator 2.26.7 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.26.8 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 <p>
 You may need to set the default timezone.
@@ -363,7 +362,7 @@ There are free iCal icons (use as buttons on a web page?) to download
 <p>
     A brief release plan, changable...<br>
     Bugs are fixed as soon as possible upon priority or severity.
-<dd>
+<dl>
 <dt>v2.28</dt>
 <dd>Exception error management</dd>
 <dd>&nbsp;</dd>
@@ -384,7 +383,6 @@ There are free iCal icons (use as buttons on a web page?) to download
     by new external iCal file/url acquire/dispose handler(s)
 </dd>
 </dl>
-</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
 
@@ -680,7 +678,7 @@ properties and config keys etc in top of the &quot;util&quot; class file (src/ut
 used in code snippets.
 </p>
 <p>
-Quote from <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a>
+Quote from <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a>
 - Internet Calendaring and Scheduling Core Object Specification (<strong>iCalendar</strong>)!
 </p>
 <a name="VCALENDAR"></a><h2>2.1  VCALENDAR</h2>
@@ -2944,7 +2942,7 @@ $vcalendar   = new Kigkonsult\Icalcreator\Vcalendar(
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.26.7//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.26.8//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -3120,7 +3118,7 @@ Sort created/parsed <strong>calendar</strong> components on the following (prior
 A date value, like &quot;DTSTART;VALUE=DATE:20120717&quot;, are sorted before a datetime value.<br>
 <a href="#VTIMEZONE">VTIMEZONE</a> component(-s) is always placed first (ordered by <a href="#TZID">TZID</a>). The
 <a href="#VTIMEZONE">STANDARD</a>&nbsp;/&nbsp;<a href="#VTIMEZONE">DAYLIGHT</a>&nbsp; sub-components are sorted (on asc. key <a href="#DTSTART">DTSTART</a>) when calling
-<a href="#createCalendar">createCalendar</a> (or <a href="#returnCalender">returnCalender</a>).
+<a href="#createCalendar">createCalendar</a> (or <a href="#returnCalendar">returnCalendar</a>).
 <br>
 <a href="#VALARM">ALARM</a> sub-components, if exists, are not sorted.
 
@@ -3392,7 +3390,7 @@ $vevent-&gt;setConfig(
 
 <a name="allowEmpty"></a><h4>3.1.5.5 Allow empty components</h4>
 <p>
-Allow or reject empty <strong>calendar</strong> properties. Used in <a href="#createCalendar">createCalendar</a>, <a href="#returnCalender">returnCalender</a> or
+Allow or reject empty <strong>calendar</strong> properties. Used in <a href="#createCalendar">createCalendar</a>, <a href="#returnCalendar">returnCalendar</a> or
 create&lt;Property&gt; methods, creating [RFC5545] formats.
 </p>
 <p>
@@ -3695,7 +3693,7 @@ $vcalendar-&gt;saveCalendar();
 <p>
 All iCalcreator component object property methods for get/set data.<br>
 For property format in detail, see
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
+<a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
 </p>
 <a name="DATE_WITH_UTC_TIME"></a>
 <span class="label">Notice:</span> for properties and VALUE=DATE-TIME in <b>UTC</b> timezone.
@@ -3779,7 +3777,7 @@ while( $vevent = $vcalendar-&gt;getComponent( Kigkonsult\Icalcreator\Vcalendar::
 </p>
 <p>
 To get Vcalendar instance property values, use <a href="#getProperty">getProperty</a>.
-<p/>
+</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
@@ -4227,7 +4225,7 @@ xparams        = (string) key =&gt; (string) value // <span class="comment">key 
 propOrderNo    = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>          = as defined in [RFC5546]</p>
 <p>
-See rules in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
+See rules in detail in <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
 </p>
 <p class="label">Example</p>
 <p class="example">
@@ -5330,7 +5328,7 @@ to change a (local) date value to UTC time zone.
 <p>Parameters, will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;exrule&quot;, recur [, xparams [, propOrderNo ]] )</p>
-See rules in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
+See rules in detail in <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
 <p class="comment">recur<sup>1</sup>      = (array) ( "FREQ" =&gt; freq
      // <span class="comment">either UNTIL or COUNT may appear in a &quot;recur&quot;,
         but UNTIL and COUNT MUST NOT occur in the same &quot;recur&quot;</span>
@@ -5604,7 +5602,7 @@ propOrderNo       = (int) order number                              // <span cla
     other string formats, acceptable by <em>PHP</em> strtotime function, may (would) work
     <span class="comment">(notice <a href="#date_restriction">date restriction</a>)</span></p>
 <p class="label">Example</p>
-See rules in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
+See rules in detail in <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
 <p class="example">
 $fdate1 = new DateTime( '2001-01-01 01:01:01 UTC' );
 $fdate2 = new DateTime( '2002-02-02 02:02:02 UTC' );
@@ -6184,7 +6182,7 @@ propOrderNo   = (int) order number             // <span class="comment">1=1st, 2
     other string formats, acceptable by <em>PHP</em> strtotime function, may (would) work
     <span class="comment">(notice <a href="#date_restriction">date restriction</a>)</span></p>
 <p class="label">Example</p>
-See rules in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).<br>
+See rules in detail in <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).<br>
 <p class="example">
 $rdate1 = new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; );
 $rdate2 = new DateTime( &quot;2002-02-02 02:02:02 UTC&quot; );
@@ -6685,7 +6683,7 @@ $rrules = $vtodo-&gt;getProperty( Kigkonsult\Icalcreator\Util\Util::$RRULE );
 <p class="label">Format</p>
 <p class="format">calendarComponent::setProperty( &quot;rrule&quot;, recur [, xparams [, propOrderNo ]] )</p>
 <p>
-For rules example see <a href="#EXRULE">Exrule</a> format and in detail in <a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
+For rules example see <a href="#EXRULE">Exrule</a> format and in detail in <a href="https://tools.ietf.org/html/rfc2445" title="RFC2445" target="_blank">RFC2445</a> - Internet Calendaring and Scheduling Core Object Specification (iCalendar).
 </p>
 <p class="comment">recur<sup>1</sup>      = see <a href="#EXRULE">Exrule</a>
 xparams<sup>2</sup>    = (array) ( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
@@ -8367,30 +8365,29 @@ Return (bool) true if argument directory is not null, otherwise vCard string.
 <a name="Copyright_and_Licence"></a><h1>5 COPYRIGHT AND LICENSE</h1>
 
 <table>
-<tr><td>Copyright<td>(c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+<tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.26.7
+<tr><td>Version  <td>2.26.8
 <tr><td class="top">License  <td>
-Subject matter of licence is the software iCalcreator.<br>
-The above copyright, link, package and version notices,
-this licence notice and the [rfc5545] PRODID as implemented and
-invoked in iCalcreator shall be included in all copies or
-substantial portions of the iCalcreator.<br>
-iCalcreator can be used either under the terms of
-a proprietary license, available from iCal_at_kigkonsult_dot_se<br>
-or the GNU Affero General Public License, version 3:<br>
-iCalcreator is free software: you can redistribute it and/or
-modify it under the terms of the GNU Affero General Public License
-as published by the Free Software Foundation, either version 3 of
-the License, or (at your option) any later version.<br>
-iCalcreator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.<br>
-You should have received a copy of the GNU Affero General Public
-License along with this program.
-If not, see <a href="http://www.gnu.org/licenses/">&quot;http://www.gnu.org/licenses/&quot;</a>.
+    Subject matter of licence is the software iCalcreator.
+    The above copyright, link, package and version notices,
+    this licence notice and the invariant [rfc5545] PRODID result use
+    as implemented and invoked in iCalcreator shall be included in
+    all copies or substantial portions of the iCalcreator.
+
+    iCalcreator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3 of the License,
+    or (at your option) any later version.
+
+    iCalcreator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with iCalcreator. If not, see
 </table>
 
 <br>

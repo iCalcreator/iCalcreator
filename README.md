@@ -2,10 +2,12 @@
 
 is the PHP class package managing
 
-> iCal (rfc2445/rfc5445) information
+> iCal (rfc2445/rfc5445) calendar information
 
 operating on calendar and
 calendar events, reports, todos and journaling data.
+
+~~~~~~~~
 
 iCalcreator supports systems like
 
@@ -14,10 +16,14 @@ iCalcreator supports systems like
 * project management systems
 * other applications...
 
-Builds :
+~~~~~~~~
 
-- stable 2.24.2 *(master)*
+Latest stable build 2.26.8 *(master)*.
 
-- next 2.26.8 - review releaseNotes: PHP 5.6+, PSR1+4, DateTime/DateInterval input support
+Please review the release info in the releaseNotes.
 
-- old 2.22.5 - unsupported
+Unsupported: 
+- 2.26
+- 2.24.2
+- 2.24
+- 2.22.5

@@ -1,41 +1,40 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <!--
-iCalcreator, a PHP rfc2445/rfc5545 solution.
+ iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
 
-This file is a part of iCalcreator.
+ This file is a part of iCalcreator.
 
-Copyright (c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
-Link      http://kigkonsult.se/iCalcreator/index.php
-Package   iCalcreator
-Version   2.26.7
-License   Subject matter of licence is the software iCalcreator.
-          The above copyright, link, package and version notices,
-          this licence notice and the [rfc5545] PRODID as implemented and
-          invoked in iCalcreator shall be included in all copies or
-          substantial portions of the iCalcreator.
-          iCalcreator can be used either under the terms of
-          a proprietary license, available from iCal_at_kigkonsult_dot_se
-          or the GNU Affero General Public License, version 3:
-          iCalcreator is free software: you can redistribute it and/or
-          modify it under the terms of the GNU Affero General Public License
-          as published by the Free Software Foundation, either version 3 of
-          the License, or (at your option) any later version.
-          iCalcreator is distributed in the hope that it will be useful,
-          but WITHOUT ANY WARRANTY; without even the implied warranty of
-          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-          GNU Affero General Public License for more details.
-          You should have received a copy of the GNU Affero General Public
-          License along with this program.
-          If not, see <http://www.gnu.org/licenses/>.
+ copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ Link      https://kigkonsult.se
+ Package   iCalcreator
+ Version   2.26.8
+ License   Subject matter of licence is the software iCalcreator.
+           The above copyright, link, package and version notices,
+           this licence notice and the invariant [rfc5545] PRODID result use
+           as implemented and invoked in iCalcreator shall be included in
+           all copies or substantial portions of the iCalcreator.
+
+           iCalcreator is free software: you can redistribute it and/or modify
+           it under the terms of the GNU Lesser General Public License as published
+           by the Free Software Foundation, either version 3 of the License,
+           or (at your option) any later version.
+
+           iCalcreator is distributed in the hope that it will be useful,
+           but WITHOUT ANY WARRANTY; without even the implied warranty of
+           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+           GNU Lesser General Public License for more details.
+
+           You should have received a copy of the GNU Lesser General Public License
+           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
 -->
 <html>
 <head>
-    <title>iCalcreator 2.26.7 manual</title>
+    <title>iCalcreator 2.26.8 manual</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-    <meta name="copyright"   content="2007-2018 Kjell-Inge Gustafsson, kigkonsult">
+    <meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.26.7">
+    <meta name="description" content="using iCalcreator v2.26.8">
     <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -46,11 +45,6 @@ License   Subject matter of licence is the software iCalcreator.
 body {
   MARGIN-LEFT     : 10px;
   WIDTH           : 750px;
-}
-a.ref {
-  BACKGROUND-COLOR: inherit;
-  FONT-SIZE       : 8pt;
-  LETTER-SPACING  : 0.1em;
 }
 h1 {
   BACKGROUND-COLOR: silver;
@@ -77,20 +71,6 @@ h5 {
 table {
   border-collapse : collapse;
   width           : 100%;
-}
-.bb {
-  BORDER-BOTTOM   : gray dotted thin;
-}
-.blb {
-  BORDER-LEFT     : gray dotted thin;
-  BORDER-BOTTOM   : gray dotted thin;
-  TEXT-ALIGN      : center;
-}
-.bl {
-  BORDER-LEFT     : gray dotted thin;
-}
-.center {
-  TEXT-ALIGN      : center;
 }
 p.comment {
   FONT-FAMILY     : monospace;
@@ -137,11 +117,6 @@ p.format, span.format {
   BORDER          : thin solid black;
   FONT-SIZE       : xx-large;
 }
-p.label {
-  FONT-FAMILY     : Arial;
-  FONT-WEIGHT     : bold;
-  LETTER-SPACING  : 0.1em;
-}
 p.quotes {
   BACKGROUND-COLOR: #F5F5F5;
   FONT-FAMILY     : Arial;
@@ -154,11 +129,6 @@ sup {
   FONT-WEIGHT     : bold;
   VERTICAL-ALIGN  : super;
 }
-.ref {
-  BACKGROUND-COLOR: transparent;
-  FONT-SIZE       : 8pt;
-  LETTER-SPACING  : 0.1em;
-}
 .top {
   VERTICAL-ALIGN  : top;
 }
@@ -166,18 +136,20 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.26.7</p>
+<p class="header">iCalcreator v2.26.8</p>
 <p>
-    iCalcreator v2.26.7<br>
-    Copyright &copy; 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+    iCalcreator v2.26.8<br>
+    Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
     Contact : iCal_at_kigkonsult_dot_se
 </p>
 
 <h2>Preface</h2>
 <p>
-    This document describes usage of iCalcreator, a <em>PHP</em> software implementation of standards
-    <a href="#Standards">rfc5545/rfc5546 (rfc2445/rfc2446)</a> to manage iCal formatted files.
+    This document describes usage of iCalcreator, the <em>PHP</em> software implementation of standards
+    <a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>/
+    <a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+    (rfc2445/rfc2446) to manage iCal formatted files.
 </p>
 <p>
     This document is provided by kigkonsult for informational purposes
@@ -210,7 +182,7 @@ systems and applications to process and communicate calendar information like
 events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
-For iCalcreator 2.26.7 version (and later), <em>PHP</em> version 5.6+ is required.
+For iCalcreator 2.26.8 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
@@ -299,13 +271,13 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.26.7/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.26.8/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 
 <p>
-iCalcreator 2.26.7 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.26.8 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -756,30 +728,30 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
 <h2>COPYRIGHT AND LICENSE</h2>
 
 <table>
-    <tr><td>Copyright<td>(c) 2007-2018 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+    <tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.26.7
+    <tr><td>Version  <td>2.26.8
     <tr><td class="top">License  <td>
-        Subject matter of licence is the software iCalcreator.<br>
-        The above copyright, link, package and version notices,
-        this licence notice and the [rfc5545] PRODID as implemented and
-        invoked in iCalcreator shall be included in all copies or
-        substantial portions of the iCalcreator.<br>
-        iCalcreator can be used either under the terms of
-        a proprietary license, available from iCal_at_kigkonsult_dot_se<br>
-        or the GNU Affero General Public License, version 3:<br>
-        iCalcreator is free software: you can redistribute it and/or
-        modify it under the terms of the GNU Affero General Public License
-        as published by the Free Software Foundation, either version 3 of
-        the License, or (at your option) any later version.<br>
-        iCalcreator is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU Affero General Public License for more details.<br>
-        You should have received a copy of the GNU Affero General Public
-        License along with this program.
-        If not, see <a href="http://www.gnu.org/licenses/">&quot;http://www.gnu.org/licenses/&quot;</a>.
+    Subject matter of licence is the software iCalcreator.
+    The above copyright, link, package and version notices,
+    this licence notice and the invariant [rfc5545] PRODID result use
+    as implemented and invoked in iCalcreator shall be included in
+    all copies or substantial portions of the iCalcreator.
+
+    iCalcreator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3 of the License,
+    or (at your option) any later version.
+
+    iCalcreator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with iCalcreator. If not, see
+    &lt;https://www.gnu.org/licenses/&gt;.
 </table>
 
 <br>
