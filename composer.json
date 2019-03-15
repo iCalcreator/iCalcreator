@@ -34,7 +34,7 @@
         "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/Util/", "src/Traits/"] }
     },
     "require": {
-        "php": ">=5.6"
+        "php": ">=5.6",
         "ext-simplexml": "*"
     }
 }
