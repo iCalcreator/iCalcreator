@@ -18,11 +18,16 @@ iCalcreator supports systems like
 
 ~~~~~~~~
 
-Latest stable build 2.26.8 *(master)*.
+__Builds__
 
-Please review the release info in the releaseNotes.
+Please review the releaseNotes for a brief overview, 
+docs/summary and docs/using for details.
 
-Unsupported: 
+Stable 2.26.8 *(master)*.
+
+Release 2.28 candidate (tag 2.27.16)
+
+Unsupported (tags): 
 - 2.26
 - 2.24.2
 - 2.24
