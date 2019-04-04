@@ -2,7 +2,7 @@
 
 is the PHP class package managing
 
-> iCal (rfc2445/rfc5445) calendar information
+> iCal (rfc2445/rfc5545) calendar information
 
 operating on calendar and
 calendar events, reports, todos and journaling data.
@@ -24,7 +24,7 @@ docs/summary and docs/using for details.
 
 Stable 2.26.8 *(master)*.
 
-Release 2.28 candidate (2.27.16)
+Release 2.28 candidate (2.27.17)
 
 Unsupported (tags): 
 - 2.26
@@ -33,7 +33,7 @@ Unsupported (tags):
 - 2.22.5
 
 
-Brief 2.27.16 demo :
+Brief 2.27.17 demo :
 
 ``` php
 <?php

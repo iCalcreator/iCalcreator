@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.27.16
+ * Version   2.27.17
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -60,8 +60,9 @@ include_once 'DtBase.php';
  */
 class MiscTest extends DtBase
 {
-    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-    private static $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
+    private static $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static $EOLCHARS = [ "\r\n ", "\r\n\t", PHP_EOL . " ", PHP_EOL . "\t" ];
 
     /**
      * testMisc1 provider
@@ -74,7 +75,7 @@ class MiscTest extends DtBase
         $value  = Vcalendar::OPAQUE;
         $params = self::$STCPAR;
         $dataArr[] = [
-            111,
+            1011,
             [
                 Vcalendar::TRANSP => [ Vcalendar::VEVENT ]
             ],
@@ -95,7 +96,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            121,
+            1021,
             [
                 Vcalendar::DESCRIPTION => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -117,7 +118,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            131,
+            1031,
             [
                 Vcalendar::LOCATION => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -139,7 +140,28 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            141,
+            1041,
+            [
+                Vcalendar::SUMMARY => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            [
+                Util::$LCvalue  => $value,
+                Util::$LCparams => $params
+            ],
+            strtoupper( Vcalendar::SUMMARY ) .
+            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            ':' . $value
+        ];
+
+        $value = '⚽ Major League Soccer on ESPN+';
+        $params = [
+                Vcalendar::ALTREP   => 'This is an alternative representation',
+                Vcalendar::LANGUAGE => 'EN'
+            ] + self::$STCPAR;
+        $dataArr[] = [ // testing utf8 char
+            1042,
             [
                 Vcalendar::SUMMARY => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -158,7 +180,7 @@ class MiscTest extends DtBase
         $value  = 'http://example.com/pub/calendars/jsmith/mytime.ics';
         $params = []  + self::$STCPAR;
         $dataArr[] = [
-            151,
+            1051,
             [
                 Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
             ],
@@ -186,37 +208,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            161,
-            [
-                Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
-            ],
-            $value,
-            $params,
-            $getValue,
-            strtoupper( Vcalendar::ORGANIZER ) .
-            ParameterFactory::createParams(
-                $params,
-                [
-                    Vcalendar::CN,
-                    Vcalendar::DIR,
-                    Vcalendar::SENT_BY,
-                    Vcalendar::LANGUAGE
-                ]
-            ) .
-            ':' . $value
-        ];
-
-        $value  = 'MAILTO:2_GE3DOMJUGY4TAMJWGE3DOMJUG365HNXGBG3PQRYTRZYWB2DYBABH62MAPQKXV7U3S27S2OHYDULBO@imip.me.com';
-        $params = [
-                Vcalendar::CN             => 'grebulon com',
-                'EMAIL'                   => 'xxx@gmail.com'
-            ] + self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
-        $dataArr[] = [
-            162,
+            1061,
             [
                 Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -244,7 +236,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            171,
+            1071,
             [
                 Vcalendar::KLASS => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -264,7 +256,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            181,
+            1081,
             [
                 Vcalendar::STATUS => [ Vcalendar::VEVENT ]
             ],
@@ -284,7 +276,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            182,
+            1082,
             [
                 Vcalendar::STATUS => [ Vcalendar::VTODO ]
             ],
@@ -304,7 +296,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            183,
+            1083,
             [
                 Vcalendar::STATUS => [ Vcalendar::VJOURNAL ]
             ],
@@ -324,7 +316,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            191,
+            1091,
             [
                 Vcalendar::GEO => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -388,8 +380,8 @@ class MiscTest extends DtBase
                     sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
                 );
 
-                $createString = str_replace( Util::$CRLF . ' ' , null, $comp->{$createMethod}() );
-                $createString = str_replace( '\,', ',', $createString );
+                $createString   = str_replace( self::$EOLCHARS , null, $comp->{$createMethod}() );
+                $createString   = str_replace( '\,', ',', $createString );
                 $this->assertEquals(
                     $expectedString,
                     trim( $createString ),
@@ -428,7 +420,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            211,
+            2011,
             [
                 Vcalendar::CATEGORIES  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -450,7 +442,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            221,
+            2021,
             [
                 Vcalendar::COMMENT  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
             ],
@@ -472,7 +464,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            231,
+            2031,
             [
                 Vcalendar::CONTACT  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
             ],
@@ -494,7 +486,7 @@ class MiscTest extends DtBase
             Vcalendar::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
-            241,
+            2041,
             [
                 Vcalendar::DESCRIPTION => [ Vcalendar::VJOURNAL ]
             ],
@@ -516,7 +508,7 @@ class MiscTest extends DtBase
                 Vcalendar::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [
-            251,
+            2051,
             [
                 Vcalendar::RESOURCES => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -538,7 +530,7 @@ class MiscTest extends DtBase
                 Vcalendar::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [
-            252,
+            2052,
             [
                 Vcalendar::RESOURCES => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -580,7 +572,7 @@ class MiscTest extends DtBase
         $expectedString = str_replace( Util::$CRLF . ' ' , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
-            261,
+            2061,
             [
                 Vcalendar::ATTENDEE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ] // , Vcalendar::VFREEBUSY
             ],
@@ -597,10 +589,10 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue ], true ));
-        $expectedString = str_replace( Util::$CRLF . ' ' , null, $expectedString);
+        $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
-            262,
+            2062,
             [
                 Vcalendar::ATTENDEE => [ Vcalendar::VFREEBUSY ] // , Vcalendar::VFREEBUSY
             ],
@@ -618,7 +610,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            271,
+            2071,
             [
                 Vcalendar::RELATED_TO => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -638,7 +630,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            281,
+            2081,
             [
                 Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -658,7 +650,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            282,
+            2082,
             [
                 Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -682,7 +674,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            291,
+            2091,
             [
                 Vcalendar::REQUEST_STATUS => [
                     Vcalendar::VEVENT,
@@ -760,7 +752,7 @@ class MiscTest extends DtBase
                     sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
                 );
 
-                $createString = str_replace( Util::$CRLF . ' ' , null, $comp->{$createMethod}());
+                $createString = str_replace( self::$EOLCHARS , null, $comp->{$createMethod}());
                 $createString = str_replace( '\,', ',', $createString );
                 $this->assertEquals(
                     $expectedString,
@@ -835,7 +827,7 @@ class MiscTest extends DtBase
                     Vcalendar::VTODO,
                     Vcalendar::VJOURNAL,
                     Vcalendar::VFREEBUSY,
-//                    Vcalendar::VTIMEZONE
+//                    Vcalendar::VTIMEZONE // as for now, can't sort Vtimezone...
                 ]
             ],
             $value,
@@ -871,25 +863,6 @@ class MiscTest extends DtBase
         $expectedGet,
         $expectedString
     ) {
-        /*
-        $propName  = 'X-ABC-MMSUBJ';
-        $propComps = [
-            $propName => [
-                Vcalendar::VEVENT,
-                Vcalendar::VTODO,
-                Vcalendar::VJOURNAL,
-                Vcalendar::VFREEBUSY,
-                Vcalendar::VTIMEZONE
-            ]
-        ];
-        $value     = 'This is an X-property value';
-        $params    = [] + self::$STCPAR;
-        $expectedGet = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
-        $expectedString = ParameterFactory::createParams( $params ) . ':' . $value;
-*/
         // set two Vcalendar X-properties
         $c = new Vcalendar();
         for( $x = 1; $x < 2; $x++ ) {
@@ -1080,4 +1053,82 @@ class MiscTest extends DtBase
             );
         }
     }
+    /**
+     * Testing parse eol-htab
+     *
+     * @test
+     * @dataProvider parse5Provider
+     * @param int    $case
+     * @paran string $value
+     */
+    public function testparse5( $case, $value ) {
+        $c = new Vcalendar();
+        $c->parse( $value );
+
+        $this->parseCalendarTest( $case, $c );
+
+    }
+
+    /**
+     * testparse5 provider
+     */
+    public function parse5Provider() {
+
+        $dataArr = [];
+
+        $dataArr[] = [
+            501,
+            "BEGIN:VCALENDAR\r\n" .
+            "VERSION:2.0\r\n" .
+            "PRODID:-//ShopReply Inc//CalReply 1.0//EN\r\n" .
+            "METHOD:REFRESH\r\n" .
+            "X-WR-CALNAME:ESPN Daily Calendar\r\n" .
+            "X-WR-RELCALID:657d63b8-df1d-e611-8b88-06bb54d48d13\r\n" .
+            "X-PUBLISH-TTL:P1D\r\n" .
+            "BEGIN:VTIMEZONE\r\n" .
+            "TZID:America/New_York\r\n" .
+            "BEGIN:STANDARD\r\n" .
+            "DTSTART:20070101T020000\r\n" .
+            "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;\r\n" .
+            "TZOFFSETFROM:-0400\r\n" .
+            "TZOFFSETTO:-0500\r\n" .
+            "END:STANDARD\r\n" .
+            "BEGIN:DAYLIGHT\r\n" .
+            "DTSTART:20070101T020000\r\n" .
+            "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU;\r\n" .
+            "TZOFFSETFROM:-0500\r\n" .
+            "TZOFFSETTO:-0400\r\n" .
+            "END:DAYLIGHT\r\n" .
+            "END:VTIMEZONE\r\n" .
+            "BEGIN:VEVENT\r\n" .
+            "UID:e2317772-f3a2-42cf-a5ac-e639fb6b2af0\r\n" .
+            "CLASS:PUBLIC\r\n" .
+            "TRANSP:TRANSPARENT\r\n" .
+            "SUMMARY:⚽ English FA Cup on ESPN+\r\n" .
+            "DTSTART;TZID=\"America/New_York\":20190316T081500\r\n" .
+            "DTEND;TZID=\"America/New_York\":20190316T091500\r\n" .
+            'DESCRIPTION:Watch live: http://bit.ly/FACuponEPlus\n\nNot an ESPN+ subscrib' . "\r\n\t" .
+            'er? Start your free trial here: http://bit.ly/ESPNPlusSignup\n\nShare - http:' . "\r\n\t" .
+            '//calrep.ly/2pLaM0n\n\nYou may unsubscribe by following - https://espn.calrep' . "\r\n\t" .
+            'lyapp.com/unsubscribe/9bba908612a34be1881bc5098e8adbda\n\nPowered by CalReply' . "\r\n\t" .
+            " - http://calrep.ly/poweredby\r\n" .
+            'LOCATION:England\'s biggest soccer competition continues.\n\n• Watford vs. C' . "\r\n\t" .
+            'rystal Palace (8:15 a.m. ET)\n• Swansea City vs. Manchester City (1:20 p.m.)\\' . "\r\n\t" .
+            'n• Wolverhampton vs. Manchester United (3:55 p.m.)\n\nWatch live: http://bit.' . "\r\n\t" .
+            "ly/FACuponEPlus\r\n" .
+            "DTSTAMP:20190315T211012Z\r\n" .
+            "LAST-MODIFIED:20190315T211012Z\r\n" .
+            "SEQUENCE:1\r\n" .
+            "BEGIN:VALARM\r\n" .
+            "ACTION:DISPLAY\r\n" .
+            "DESCRIPTION:Reminder\r\n" .
+            "TRIGGER:-PT15M\r\n" .
+            "END:VALARM\r\n" .
+            "END:VEVENT\r\n" .
+            "END:VCALENDAR\r\n"
+        ];
+
+        return $dataArr;
+    }
+
 }

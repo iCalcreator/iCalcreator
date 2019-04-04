@@ -1,5 +1,5 @@
 
-iCalcreator 2.27.16 releaseNotes
+iCalcreator 2.27.17 releaseNotes
 
  2.27.1  Deprecated Vcalendar/<component>::deleteProperty/getProperty()/setProperty methods,
          replaced by property delete-/get-/set-methods
@@ -38,3 +38,4 @@ iCalcreator 2.27.16 releaseNotes
 
  2.27.16 Major improved performance for Vcalendar::selectComponents() (i.e RecurFactory) on more simple recurs patterns
 
+ 2.17.17 Parse eol-htab bug, StringFactory

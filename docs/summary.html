@@ -5,7 +5,7 @@
  copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.27.16
+ Version   2.27.17
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -29,12 +29,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.27.16 manual</title>
+    <title>iCalcreator 2.27.17 manual</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
     <meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.27.16">
+    <meta name="description" content="using iCalcreator v2.27.17">
     <style type="text/css">
         * {
             FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -144,9 +144,9 @@
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.27.16</p>
+<p class="header">iCalcreator v2.27.17</p>
 <p>
-    iCalcreator v2.27.16<br>
+    iCalcreator v2.27.17<br>
     Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
     <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -192,7 +192,7 @@
     events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
-For iCalcreator 2.27.16 version (and later), <em>PHP</em> version 5.6+ is required.
+For iCalcreator 2.27.17 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
@@ -204,9 +204,9 @@ For iCalcreator 2.27.16 version (and later), <em>PHP</em> version 5.6+ is requir
     The <strong>iCalendar</strong> format, <strong>iCal</strong>, are described in
 </p>
 <dl>
-<dt><a href="http://kigkonsult.se/downloads/dl.php?f=rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>
+<dt><a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>
 <dd>&quot;Internet Calendaring and Scheduling Core Object Specification (<strong>iCalendar</strong>)&quot;
-<dt><a href="http://kigkonsult.se/downloads/dl.php?f=rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+<dt><a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
 <dd>&quot;iCalendar Transport-Independent Interoperability Protocol (iTIP)&quot;<br>Scheduling Events, BusyTime, To-dos and Journal Entries
 <p class="quotes">. ..allows for the capture and exchange of information normally stored
 within a calendaring and scheduling application.</p>
@@ -214,11 +214,11 @@ and
 <p class="quotes">. ..is an exchange format between applications or systems.</p>
 </dl>
 <p>
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a> and
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
+<a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a> and
+<a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
 obsoletes, respectively,
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc2445" title="Download RFC2445 in text format" target="_blank">rfc2445</a> and
-<a href="http://kigkonsult.se/downloads/dl.php?f=rfc2446" title="Download RFC2446 in text format" target="_blank">rfc2446</a>.
+<a href="https://tools.ietf.org/html/rfc2445" title="Download RFC2445 in text format" target="_blank">rfc2445</a> and
+<a href="https://tools.ietf.org/html/rfc2446" title="Download RFC2446 in text format" target="_blank">rfc2446</a>.
 </p>
 <p>
 Any references to rfc2445, below, corresponds to rfc5545.
@@ -227,7 +227,7 @@ Any references to rfc2445, below, corresponds to rfc5545.
 <h4>xCal</h4>
 <p>
     iCalcreator also supports xCal (iCal xml),
-    <a href="http://kigkonsult.se/downloads/dl.php?f=rfc6321" title="Download RFC6321 in text format" target="_blank">rfc6321</a>,
+    <a href="https://tools.ietf.org/html/rfc6321" title="Download RFC6321 in text format" target="_blank">rfc6321</a>,
     The XML Format for <strong>iCalendar</strong>.
 </p>
 <p>
@@ -280,13 +280,13 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.27.16/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.27.17/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 
 <p>
-iCalcreator 2.27.16 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.27.17 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -712,7 +712,7 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
     <tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.27.16
+    <tr><td>Version  <td>2.27.17
     <tr><td class="top">License  <td>
         Subject matter of licence is the software iCalcreator.<br>
         The above copyright, link, package and version notices,<br>

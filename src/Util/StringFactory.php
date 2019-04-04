@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.27.16
+ * Version   2.27.17
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -35,6 +35,7 @@ use function count;
 use function ctype_digit;
 use function explode;
 use function floor;
+use function in_array;
 use function openssl_random_pseudo_bytes;
 use function ord;
 use function rtrim;
@@ -54,7 +55,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.11 - 2019-01-04
+ * @since  2.27.17 - 2019-03-30
  */
 class StringFactory
 {
@@ -65,17 +66,20 @@ class StringFactory
      * @param array $rows
      * @return array
      * @static
-     * @since  2.22.23 - 2017-02-17
+     * @since  2.27.17 - 2019-03-30
      */
     public static function concatRows( $rows ) {
+        static $CHARs = [ ' ', "\t" ];
         $output = [];
         $cnt    = count( $rows );
         for( $i = 0; $i < $cnt; $i++ ) {
             $line = rtrim( $rows[$i], Util::$CRLF );
-            while( isset( $rows[$i + 1] ) &&
-                ! empty( $rows[$i + 1] ) &&
-                ( Util::$SP1 == $rows[$i + 1]{0} )) {
-                $line .= rtrim( substr( $rows[++$i], 1 ), Util::$CRLF );
+            $i1 = $i + 1;
+            while(( $i < $cnt ) && isset( $rows[$i1] ) && ! empty( $rows[$i1] ) &&
+                in_array( $rows[$i1]{0}, $CHARs )) {
+                $i += 1;
+                $line .= rtrim( substr( $rows[$i], 1 ), Util::$CRLF );
+                $i1 = $i + 1;
             }
             $output[] = $line;
         }
@@ -92,7 +96,7 @@ class StringFactory
      * @param string $text
      * @return array
      * @static
-     * @since  2.22.23 - 2017-03-01
+     * @since  2.27.17 - 2019-03-30
      */
     public static function convEolChar( & $text ) {
         static $BASEDELIM  = null;
@@ -100,7 +104,7 @@ class StringFactory
         static $EMPTYROW   = null;
         static $FMT        = '%1$s%2$75s%1$s';
         static $CRLFs      = [ "\r\n", "\n\r", "\n", "\r" ];
-        static $CRLFexts   = [ "\r\n ", "\n\r\t" ];
+        static $CRLFexts   = [ "\r\n ", "\r\n\t" ];
         /* fix dummy line separator etc */
         if( empty( $BASEDELIM )) {
             $BASEDELIM  = StringFactory::getRandChars( 16 );
