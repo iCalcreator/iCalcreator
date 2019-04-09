@@ -75,7 +75,7 @@ use function ucfirst;
  * iCalcreator utility/support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26.7 - 2018-11-25
+ * @since  2.26.9 - 2019-04-09
  */
 class Util implements IcalInterface
 {
@@ -1984,13 +1984,13 @@ class Util implements IcalInterface
      * Return bool true if datetime har offset timezone
      *
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.7 - 2018-11-24
+     * @since  2.26.9 - 2019-04-09
      * @param DateTime $datetime
      * @return bool
      * @static
      */
     public static function dateTimeHasOffset( $datetime ) {
-        $tzName = ($datetime->getTimezone())->getName();
+        $tzName = $datetime->getTimezone()->getName();
         return (( false != strpos( $tzName, Util::$COLON )) || Util::isOffset( $tzName ));
     }
 

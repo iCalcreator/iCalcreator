@@ -23,9 +23,9 @@ __Builds__
 Please review the releaseNotes for a brief overview, 
 docs/summary and docs/using for details.
 
-Stable 2.26.8 *(master)*.
+Stable 2.26.9 *(master)*.
 
-Release 2.28 candidate (tag 2.27.16)
+Release 2.28 candidate (tag 2.27.17)
 
 Unsupported (tags): 
 - 2.26

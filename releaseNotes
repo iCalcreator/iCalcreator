@@ -38,3 +38,4 @@ v2.26.8 Accept DateInterval as input arg. in set-functions:
         as well as date/duration arrays returned from property get-methods,
         replaced by DateTime/DateInterval
 
+v2.26.9 Util::dateTimeHasOffset typo error
