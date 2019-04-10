@@ -656,10 +656,10 @@ class DateTimeFactory
      * @param DateTime $datetime
      * @return bool
      * @static
-     * @since  2.26.7 - 2018-11-24
+     * @since  2.27.19 - 2019-04-09
      */
     public static function dateTimeHasOffset( DateTime $datetime ) {
-        return DateTimeZoneFactory::hasOffset( ($datetime->getTimezone())->getName());
+        return DateTimeZoneFactory::hasOffset( $datetime->getTimezone()->getName());
     }
 
     /**

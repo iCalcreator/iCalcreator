@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.27.17
+ * Version   2.27.18
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -41,7 +41,7 @@ use Exception;
  * Testing exceptions in DateIntervalFactory
  *
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-03-12
+ * @since  2.27.18 - 2019-04-09
  */
 class SelectComponentsTest extends TestCase
 {
@@ -386,14 +386,45 @@ class SelectComponentsTest extends TestCase
      */
     public function SelectComponentsTestProvider() {
 
+        $veventCalendar = self::veventCalendarSubProvider();
+        $todoCalendar   = self::vtodoCalendarSubProvider();
+
         $dataArr = [];
 
         $dataArr[] = [
-            self::veventCalendarSubProvider(),
+            11,
+            clone $veventCalendar,
+            null
         ];
 
         $dataArr[] = [
-            self::vtodoCalendarSubProvider(),
+            12,
+            clone $veventCalendar,
+            strtolower( Vcalendar::VEVENT )
+        ];
+
+        $dataArr[] = [
+            13,
+            clone $veventCalendar,
+            [ strtolower( Vcalendar::VEVENT ), strtolower( Vcalendar::VTODO ) ]
+        ];
+
+        $dataArr[] = [
+            21,
+            clone $todoCalendar,
+            null
+        ];
+
+        $dataArr[] = [
+            22,
+            clone $todoCalendar,
+            strtolower( Vcalendar::VTODO )
+        ];
+
+        $dataArr[] = [
+            23,
+            clone $todoCalendar,
+            [ strtolower( Vcalendar::VEVENT ), strtolower( Vcalendar::VTODO ) ]
         ];
 
         return $dataArr;
@@ -404,18 +435,24 @@ class SelectComponentsTest extends TestCase
      *
      * @test
      * @dataProvider SelectComponentsTestProvider
-     * @param Vcalendar $vcalendar
+     * @param int          $case
+     * @param Vcalendar    $vcalendar
+     * @param string|array $compType
      * @throws Exception
      */
-    public function SelectComponentsTest( Vcalendar $vcalendar ) {
+    public function SelectComponentsTest( $case, Vcalendar $vcalendar, $compType = null ) {
+        static $FMTerr = 'error in case#%d';
+        $errStr = sprintf( $FMTerr, $case );
 
         $selectComponents = $vcalendar->selectComponents(
             new DateTime( '20190421T000000', new DateTimezone( 'Europe/Stockholm' )),
             new DateTime( '20190630T000000', new DateTimezone( 'Europe/Stockholm' ))
+            ,null, null, null, null,
+            $compType
         );
 
 // 2019-04-21
-        $this->assertTrue( isset( $selectComponents[2019][4][21][0] ));
+        $this->assertTrue( isset( $selectComponents[2019][4][21][0] ), $errStr . 10 );
         /*
         $this->assertEquals(
             '2019-04-21 09:00:00 Europe/Stockholm',
@@ -424,86 +461,100 @@ class SelectComponentsTest extends TestCase
         */
         $this->assertEquals(
             '2019-04-21 09:00:00 Europe/Stockholm',
-            $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1]
+            $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
+            $errStr . 11
         );
         if( false == ( $value = $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DUE );
         }
         $this->assertEquals(
             '2019-04-21 10:00:00 Europe/Stockholm',
-            $value[1]
+            $value[1],
+            $errStr . 12
         );
 
 // 2019-04-28
         $this->assertTrue( isset( $selectComponents[2019][4][28][0] ));
         $this->assertEquals(
             2,
-            $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_RECURRENCE )[1]
+            $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
+            $errStr . 13
         );
         $this->assertEquals(
             '2019-04-28 09:00:00 Europe/Stockholm',
-            $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1]
+            $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
+            $errStr . 14
         );
         if( false == ( $value = $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DUE );
         }
         $this->assertEquals(
             '2019-04-28 10:00:00 Europe/Stockholm',
-            $value[1]
+            $value[1],
+            $errStr . 15
         );
 
 // 2019-05-04
         $this->assertTrue( isset( $selectComponents[2019][5][4][0] ));
         $this->assertEquals(
             3,
-            $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_RECURRENCE )[1]
+            $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
+            $errStr . 16
         );
         $this->assertEquals(
             '2019-05-04 10:00:00 Europe/Stockholm',
-            $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1]
+            $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
+            $errStr . 17
         );
         if( false == ( $value = $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DUE );
         }
         $this->assertEquals(
             '2019-05-04 12:00:00 Europe/Stockholm',
-            $value[1]
+            $value[1],
+            $errStr . 18
         );
 
 // 2019-05-19
         $this->assertTrue( isset( $selectComponents[2019][5][19][0] ));
         $this->assertEquals(
             4,
-            $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_RECURRENCE )[1]
+            $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
+            $errStr . 19
         );
         $this->assertEquals(
             '2019-05-19 09:00:00 Europe/Stockholm',
-            $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1]
+            $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
+            $errStr . 20
         );
         if( false == ( $value = $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DUE );
         }
         $this->assertEquals(
             '2019-05-19 10:00:00 Europe/Stockholm',
-            $value[1]
+            $value[1],
+            $errStr . 21
         );
 
 // 2019-06-09
         $this->assertTrue( isset( $selectComponents[2019][6][9][0] ));
         $this->assertEquals(
             5,
-            $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_RECURRENCE )[1]
+            $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
+            $errStr . 22
         );
         $this->assertEquals(
             '2019-06-09 09:00:00 Europe/Stockholm',
-            $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1]
+            $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
+            $errStr . 23
         );
         if( false == ( $value = $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DUE );
         }
         $this->assertEquals(
             '2019-06-09 11:00:00 Europe/Stockholm',
-            $value[1]
+            $value[1],
+            $errStr . 24
         );
 
     }

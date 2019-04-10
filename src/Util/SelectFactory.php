@@ -39,7 +39,6 @@ use RuntimeException;
 
 use function array_change_key_case;
 use function array_keys;
-use function array_map;
 use function array_unique;
 use function count;
 use function in_array;
@@ -48,14 +47,16 @@ use function is_null;
 use function ksort;
 use function sprintf;
 use function stripos;
+use function strtolower;
 use function substr;
+use function ucfirst;
 use function usort;
 
 /**
  * iCalcreator geo support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.6 - 2018-12-29
+ * @since 2.27.18 - 2019-04-08
  */
 class SelectFactory
 {
@@ -111,7 +112,7 @@ class SelectFactory
      * @throws RuntimeException
      * @throws Exception
      * @static
-     * @since 2.27.14 - 2019-03-12
+     * @since 2.27.18 - 2019-04-08
      */
     public static function selectComponents(
         Vcalendar $calendar,
@@ -140,14 +141,15 @@ class SelectFactory
         if( is_array( $startY )) {
             return SelectFactory::selectComponents2( $calendar, $startY );
         }
-        /* check default dates */
+        /* assert boundary dates */
         SelectFactory::assertDateArguments( $startY, $startM, $startD, $endY, $endM, $endD );
-        /* check component types */
+        /* assert component types */
         $cType = SelectFactory::assertComponentTypes( $cType );
-        /* check bool args */
+        /* assert bool args */
         SelectFactory:: assertBoolArguments( $flat, $any, $split );
         /* iterate components */
         $result     = [];
+        $calendar   = clone $calendar;
         $calendar->sort( Vcalendar::UID );
         $compUIDold = null;
         $exdateList = $recurIdList = [];
@@ -843,6 +845,31 @@ class SelectFactory
     }
 
     /**
+     * Return reviewed component types
+     *
+     * @param array|string $cType
+     * @return array
+     * @access private
+     * @static
+     * @since 2.27.18 - 2019-04-07
+     */
+    private static function assertComponentTypes( $cType = null ) {
+        if( empty( $cType )) {
+            return Vcalendar::$VCOMPS;
+        }
+        if( ! is_array( $cType )) {
+            $cType = [ $cType ];
+        }
+        foreach( $cType as $cix => & $theType ) {
+            $theType     = ucfirst( strtolower( $theType ));
+            if( ! Util::isCompInList( $theType, Vcalendar::$VCOMPS )) {
+                $theType = Vcalendar::VEVENT;
+            }
+        }
+        return array_unique( $cType );
+    }
+
+    /**
      * Assert bool arguments
      *
      * @param bool      $flat
@@ -869,32 +896,6 @@ class SelectFactory
             // invalid combination
             $split = false;
         }
-    }
-
-    /**
-     * Return checked compoment types
-     *
-     * @param array|string $cType
-     * @return array
-     * @access private
-     * @static
-     * @since 2.27.14 - 2019-03-13
-     */
-    private static function assertComponentTypes( $cType ) {
-        static $STRTOLOWER = 'strtolower';
-        static $UCFIRST    = 'ucfirst';
-        if( empty( $cType )) {
-            return Vcalendar::$VCOMPS;
-        }
-        if( ! is_array( $cType )) {
-            $cType = [ $cType ];
-        }
-        foreach( $cType as $cix => $theType ) {
-            if( ! Util::isCompInList( $theType, Vcalendar::$VCOMPS )) {
-                $cType[$cix] = Vcalendar::VEVENT;
-            }
-        }
-        return array_unique( $cType );
     }
 
     /**
