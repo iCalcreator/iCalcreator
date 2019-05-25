@@ -45,3 +45,6 @@ iCalcreator 2.27.16 releaseNotes
  2.27.18 bugs - SelectFactory::selectComponents args calendar, cType reviewing
 
  2.27.19 bug - typo in DateTimeFactory::dateTimeHasOffset
+------------
+
+ 2.27.20 bug - Break/Continue mixup in RecurFactory::recurWeeklySimple2: split up tests, minor code clean up

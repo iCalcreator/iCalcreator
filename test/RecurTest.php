@@ -45,7 +45,7 @@ use Exception;
  */
 class RecurTest extends TestCase
 {
-    private static $ERRFMT = "%s error in case #%s, start %s, end %s, recur:%s";
+    protected static $ERRFMT = "%s error in case #%s, start %s, end %s, recur:%s";
 
     protected static $totExpectTime = 0.0;
     protected static $totResultTime = 0.0;
@@ -101,7 +101,7 @@ class RecurTest extends TestCase
                 $execTime
             ];
             $interval += 1;
-        }
+        } // end for
 
         // rfc example 23 - with interval for-loop
         $count    = 10;

@@ -36,8 +36,6 @@ use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
 
-include_once 'DtBase.php';
-
 /**
  * class MiscTest, testing VALUE TEXT etc
  * ATTENDEE

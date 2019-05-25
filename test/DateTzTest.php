@@ -36,8 +36,6 @@ use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
-include_once 'DtBase.php';
-
 /**
  * class DateTzTest, testing VALUE DATETIME for Standard/Daylight (allways local time), also empty value, DTSTART
  *

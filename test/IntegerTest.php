@@ -34,8 +34,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Exception;
 
-include_once 'DtBase.php';
-
 /**
  * class IntegerTest, testing Integers in
  *    PERCENT-COMPLETE    VTODO

@@ -110,7 +110,6 @@ class RexdateFactory
             $content   = $attributes = null;
             foreach(( array_keys( $theExdate[Util::$LCvalue] )) as $eix ) {
                 $exdatePart = $theExdate[Util::$LCvalue][$eix];
-                $parNo      = count( $exdatePart );
                 $formatted  = DateTimeFactory::dateArrayToStr( $exdatePart, $isValueDate );
                 if( isset( $theExdate[Util::$LCparams][Vcalendar::TZID] )) {
                     $formatted = str_replace( Vcalendar::Z, null, $formatted );
@@ -534,8 +533,6 @@ class RexdateFactory
                 $output[Util::$LCparams][Vcalendar::TZID] = $paramTZid;
             }
         }
-        else
-            unset( $wDate[Util::$LCtz] );
         $output[Util::$LCparams] = array_filter( $output[Util::$LCparams] );
         return $output;
     }

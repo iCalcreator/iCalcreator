@@ -906,7 +906,6 @@ class RecurFactory
             switch( true ) {
                 case( $Ymd <= $fcnStartYmd ) :
                     $wDate = $wDate->modify( $modify1 );
-                    continue;
                     break;
                 case( $endYmd < $Ymd ) :
                     break 2;
@@ -917,7 +916,7 @@ class RecurFactory
                         }
                     }
                     $wDate = $wDate->modify( $modify1 );
-                    continue;
+                    break;
                 default :
                     // now is the first day of next week
                     if( 1 < $recur[Vcalendar::INTERVAL] ) {
@@ -1317,7 +1316,7 @@ class RecurFactory
             }
         } // end if( isset( $recur[Vcalendar::UNTIL] ))
         if( $wDateYMD > $fcnEndYMD ) {
-            return []; // nothing to do.. .
+            return; // nothing to do.. .
         }
         $recurFreqIsYearly  = ( Vcalendar::YEARLY  == $recur[Vcalendar::FREQ] );
         $recurFreqIsMonthly = ( Vcalendar::MONTHLY == $recur[Vcalendar::FREQ] );

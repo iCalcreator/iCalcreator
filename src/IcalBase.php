@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.27.18
+ * Version   2.27.20
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -27,7 +27,6 @@
  *
  * This file is a part of iCalcreator.
  */
-
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
@@ -61,7 +60,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.27.18' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.27.20' );
 }
 
 /**
@@ -70,7 +69,7 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.9 - 2018-12-29
+ * @since  2.27.20 - 2019-05-20
  */
 abstract class IcalBase implements IcalInterface
 {

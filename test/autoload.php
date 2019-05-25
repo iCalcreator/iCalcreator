@@ -30,7 +30,7 @@
 /**
  * autoload.php
  *
- * iCalcreator package autoloader
+ * iCalcreator package test autoloader
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.27.20 - 2019-05-20
@@ -38,30 +38,45 @@
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.27.20' );
+if( ! defined( 'ICALCREATOR_VERSION' )) {
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.27.20' );
+}
 /**
  * load iCalcreator src and support classes and Traits
  */
 spl_autoload_register(
   function( $class ) {
-    static $SRC      = 'src';
-    static $BS       = '\\';
-    static $PHP      = '.php';
-    static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
-    static $BASEDIR  = null;
-    if( is_null( $BASEDIR ))
-      $BASEDIR       = __DIR__ . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
-    if( 0 != strncmp( $PREFIX, $class, 23 ))
-      return false;
-    $class   = substr( $class, 23 );
-    if( false !== strpos( $class, $BS ))
-      $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
-    $file    = $BASEDIR . $class . $PHP;
-    if( file_exists( $file )) {
-      require $file;
-      return true;
-    }
-    return false;
+      static $PREFIX   = 'Kigkonsult\\Icalcreator\\';
+      static $BS       = '\\';
+      static $PATHSRC  = null;
+      static $PATHTEST = null;
+      static $DD       = '..';
+      static $SRC      = 'src';
+      static $TEST     = 'test';
+      static $FMT      = '%1$s%2$s.php';
+      if( empty( $PATHSRC ) ) {
+          $PATHSRC  =
+              realpath( __DIR__ . DIRECTORY_SEPARATOR . $DD . DIRECTORY_SEPARATOR . $SRC ) . DIRECTORY_SEPARATOR;
+          $PATHTEST =
+              realpath( __DIR__ . DIRECTORY_SEPARATOR . $DD . DIRECTORY_SEPARATOR . $TEST ) . DIRECTORY_SEPARATOR;
+      }
+      if( 0 != strncmp( $PREFIX, $class, 23 ) ) {
+          return false;
+      }
+      $class = substr( $class, 23 );
+      if( false !== strpos( $class, $BS ) ) {
+          $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
+      }
+      $file = sprintf( $FMT, $PATHSRC, $class );
+      if( file_exists( $file ) ) {
+          include $file;
+      }
+      else {
+          $file = sprintf( $FMT, $PATHTEST, $class );
+          if( file_exists( $file ) ) {
+              include $file;
+          }
+      }
   }
 );
 /**

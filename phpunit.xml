@@ -5,7 +5,7 @@
  copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.27.17
+ Version   2.27.20
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -35,7 +35,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          syntaxCheck="false"
-         bootstrap="autoload.php"
+         bootstrap="test/autoload.php"
         >
     <testsuites>
         <testsuite name="Vcalendar Tests">
@@ -69,7 +69,10 @@
             <file>./test/VtimezoneTest.php</file>
         </testsuite>
         <testsuite name="Recur Tests">
-            <file>./test/RecurTest.php</file>
+            <file>./test/RecurYearTest.php</file>
+            <file>./test/RecurMonthTest.php</file>
+            <file>./test/RecurWeekTest.php</file>
+            <file>./test/RecurDayTest.php</file>
             <file>./test/SelectComponentsTest.php</file>
         </testsuite>
         <testsuite name="vCard Tests">

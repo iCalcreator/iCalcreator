@@ -34,8 +34,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 
-include_once 'DtBase.php';
-
 /**
  * class ValarmTest, testing Integers in
  *    PERCENT-COMPLETE    VTODO

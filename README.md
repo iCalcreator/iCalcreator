@@ -24,7 +24,7 @@ docs/summary and docs/using for details.
 
 Stable 2.26.8 *(master)*.
 
-Release 2.28 candidate (2.27.17)
+Release 2.28 candidate (2.27.20)
 
 Unsupported (tags): 
 - 2.26

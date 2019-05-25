@@ -31,14 +31,10 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;
-use InvalidArgumentException;
 
 use function array_key_exists;
 use function in_array;
 use function is_array;
-use function method_exists;
-use function sort;
-use function strpos;
 use function strtolower;
 use function strtoupper;
 use function ucfirst;

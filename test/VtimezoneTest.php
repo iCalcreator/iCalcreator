@@ -35,8 +35,6 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use InvalidArgumentException;
 use Exception;
 
-include_once 'DtBase.php';
-
 /**
  * class VtimezoneTest, testing Vtimezone::populate
  *
