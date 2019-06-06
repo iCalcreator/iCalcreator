@@ -48,3 +48,5 @@ iCalcreator 2.27.16 releaseNotes
 ------------
 
  2.27.20 bug - Break/Continue mixup in RecurFactory::recurWeeklySimple2: split up tests, minor code clean up
+
+ 2.27.21 bug - Break/Continue mixup in Vcalendar.php

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.27.17
+ * Version   2.27.21
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -77,7 +77,7 @@ use function usort;
  * Vcalendar class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.6 - 2018-12-28
+ * @since  2.27.21 - 2019-06-06
  */
 final class Vcalendar extends IcalBase
 {
@@ -957,7 +957,7 @@ final class Vcalendar extends IcalBase
      *
      * @throws UnexpectedValueException
      * @access private
-     * @since  2.27.14 - 2019-02-26
+     * @since  2.27.21 - 2019-06-06
      */
     private function parseCalendarData() {
         static $BEGIN     = 'BEGIN:';
@@ -986,15 +986,15 @@ final class Vcalendar extends IcalBase
             list( $propName, $row ) = StringFactory::getPropName( $row );
             switch( true ) {
                 case ( StringFactory::isXprefixed( $propName )) :
+                    // accept X-properties
                     break;
                 case ( Util::isPropInList( $propName, [ self::PRODID, self::VERSION ] )) :
-                    continue 2;// ignore version/prodid properties
-                    break;
-                case ( ! Util::isPropInList( $propName, $CALPROPS )) :
+                    // ignore version/prodid properties
                     continue 2;
                     break;
-                default :// skip non standard property names
-                    continue;
+                case ( ! Util::isPropInList( $propName, $CALPROPS )) :
+                    // skip non standard property names
+                    continue 2;
                     break;
             } // end switch
             /* separate attributes from value */
