@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -38,7 +38,7 @@ use function sprintf;
  * METHOD property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since  2.27.3 - 2018-12-22
  */
 trait METHODtrait
 {
@@ -56,20 +56,46 @@ trait METHODtrait
     public function createMethod() {
         return ( empty( $this->method ))
             ? null
-            : sprintf( self::$FMTICAL, Util::$METHOD, $this->method );
+            : sprintf( self::$FMTICAL, self::METHOD, $this->method );
+    }
+
+    /**
+     * Delete calendar component property method
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteMethod() {
+        $this->method = null;
+        return true;
+    }
+
+    /**
+     * Return method
+     *
+     * @return string
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function getMethod() {
+        if( empty( $this->method )) {
+            return false;
+        }
+        return $this->method;
     }
 
     /**
      * Set calendar property method
      *
      * @param string $value
-     * @return bool
+     * @return static
+     * @since  2.27.3 - 2018-12-22
      */
     public function setMethod( $value ) {
         if( empty( $value )) {
-            return false;
+            $this->assertEmptyValue( $value, self::METHOD );
+            $value = Util::$SP0;
         }
         $this->method = $value;
-        return true;
+        return $this;
     }
 }

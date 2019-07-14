@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * LOCATION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since 2.27.3 2018-12-22
  */
 trait LOCATIONtrait
 {
@@ -56,17 +59,42 @@ trait LOCATIONtrait
             return null;
         }
         if( empty( $this->location[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$LOCATION ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::LOCATION ) : null;
         }
-        return Util::createElement(
-            Util::$LOCATION,
-            Util::createParams(
+        return StringFactory::createElement(
+            self::LOCATION,
+            ParameterFactory::createParams(
                 $this->location[Util::$LCparams],
-                Util::$ALTRPLANGARR,
-                $this->getConfig( Util::$LANGUAGE )
+                self::$ALTRPLANGARR,
+                $this->getConfig( self::LANGUAGE )
             ),
-            Util::strrep( $this->location[Util::$LCvalue] )
+            StringFactory::strrep( $this->location[Util::$LCvalue] )
         );
+    }
+
+    /**
+     * Delete calendar component property location
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteLocation() {
+        $this->location = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property location
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getLocation( $inclParam = false ) {
+        if( empty( $this->location )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->location : $this->location[Util::$LCvalue];
     }
 
     /**
@@ -74,21 +102,20 @@ trait LOCATIONtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setLocation( $value, $params = null ) {
+    public function setLocation( $value = null, $params = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::LOCATION );
+            $value = Util::$SP0;
+            $params    = [];
         }
         $this->location = [
-            Util::$LCvalue  => Util::trimTrailNL( $value ),
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

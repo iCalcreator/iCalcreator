@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * CONTACT property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @throws InvalidArgumentException
+ * @since 2.27.3 2018-12-22
  */
 trait CONTACTtrait
 {
@@ -56,20 +60,51 @@ trait CONTACTtrait
             return null;
         }
         $output = null;
-        $lang   = $this->getConfig( Util::$LANGUAGE );
+        $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->contact as $cx => $contact ) {
             if( ! empty( $contact[Util::$LCvalue] )) {
-                $output .= Util::createElement(
-                    Util::$CONTACT,
-                    Util::createParams( $contact[Util::$LCparams], Util::$ALTRPLANGARR, $lang ),
-                    Util::strrep( $contact[Util::$LCvalue] )
+                $output .= StringFactory::createElement(
+                    self::CONTACT,
+                    ParameterFactory::createParams( $contact[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                    StringFactory::strrep( $contact[Util::$LCvalue] )
                 );
             }
-            elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $output .= Util::createElement( Util::$CONTACT );
+            elseif( $this->getConfig( self::ALLOWEMPTY )) {
+                $output .= StringFactory::createElement( self::CONTACT );
             }
         }
         return $output;
+    }
+
+    /**
+     * Delete calendar component property contact
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteContact( $propDelIx = null ) {
+        if( empty( $this->contact )) {
+            unset( $this->propDelIx[self::CONTACT] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->contact, self::CONTACT, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property contact
+     *
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getContact( $propIx = null, $inclParam = false ) {
+        if( empty( $this->contact )) {
+            unset( $this->propIx[self::CONTACT] );
+            return false;
+        }
+        return $this->getPropertyM( $this->contact, self::CONTACT, $propIx, $inclParam );
     }
 
     /**
@@ -78,18 +113,17 @@ trait CONTACTtrait
      * @param string  $value
      * @param array   $params
      * @param integer $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-28
      */
-    public function setContact( $value, $params = null, $index = null ) {
+    public function setContact( $value = null, $params = null, $index = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::CONTACT );
+            $value  = Util::$SP0;
+            $params = [];
         }
-        Util::setMval( $this->contact, Util::trimTrailNL( $value ), $params,false, $index );
-        return true;
+        $this->setMval( $this->contact, StringFactory::trimTrailNL( $value ), $params, null, $index );
+        return $this;
     }
 }

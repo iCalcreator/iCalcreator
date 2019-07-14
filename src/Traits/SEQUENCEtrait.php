@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,9 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 use function is_numeric;
 
@@ -38,7 +40,7 @@ use function is_numeric;
  * SEQUENCE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-24
+ * @since  2.27.3 - 2018-12-22
  */
 trait SEQUENCEtrait
 {
@@ -54,20 +56,44 @@ trait SEQUENCEtrait
      * @return string
      */
     public function createSequence() {
-        if( ! isset( $this->sequence ) ||
-            ( empty( $this->sequence ) && ! is_numeric( $this->sequence ))) {
+        if( empty( $this->sequence )) {
             return null;
         }
         if(( ! isset( $this->sequence[Util::$LCvalue] ) ||
                 ( empty( $this->sequence[Util::$LCvalue] ) && ! is_numeric( $this->sequence[Util::$LCvalue] ))) &&
                 ( Util::$ZERO != $this->sequence[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$SEQUENCE ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::SEQUENCE ) : null;
         }
-        return Util::createElement(
-            Util::$SEQUENCE,
-            Util::createParams( $this->sequence[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::SEQUENCE,
+            ParameterFactory::createParams( $this->sequence[Util::$LCparams] ),
             $this->sequence[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property sequence
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteSequence() {
+        $this->sequence = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property sequence
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getSequence( $inclParam = false ) {
+        if( empty( $this->sequence )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->sequence : $this->sequence[Util::$LCvalue];
     }
 
     /**
@@ -75,7 +101,8 @@ trait SEQUENCEtrait
      *
      * @param int   $value
      * @param array $params
-     * @return bool
+     * @return static
+     * @since  2.27.2 - 2019-01-04
      */
     public function setSequence( $value = null, $params = null ) {
         if(( empty( $value ) && ! is_numeric( $value )) && ( Util::$ZERO != $value )) {
@@ -84,10 +111,13 @@ trait SEQUENCEtrait
                 ? $this->sequence[Util::$LCvalue] + 1
                 : Util::$ZERO;
         }
+        else {
+            self::assertIsInteger( $value, self::SEQUENCE );
+        }
         $this->sequence = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

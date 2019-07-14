@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\HttpFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * TZURL property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.3 2018-12-22
  */
 trait TZURLtrait
 {
@@ -56,13 +60,38 @@ trait TZURLtrait
             return null;
         }
         if( empty( $this->tzurl[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$TZURL ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::TZURL ) : null;
         }
-        return Util::createElement(
-            Util::$TZURL,
-            Util::createParams( $this->tzurl[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::TZURL,
+            ParameterFactory::createParams( $this->tzurl[Util::$LCparams] ),
             $this->tzurl[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property tzurl
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteTzurl() {
+        $this->tzurl = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property tzurl
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-13
+     */
+    public function getTzurl( $inclParam = false ) {
+        if( empty( $this->tzurl )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->tzurl : $this->tzurl[Util::$LCvalue];
     }
 
     /**
@@ -70,21 +99,26 @@ trait TZURLtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
+     * @todo "TZURL" values SHOULD NOT be specified as a file URI type.
+     * This URI form can be useful within an organization, but is problematic
+     * in the Internet.
      */
-    public function setTzurl( $value, $params = null ) {
+    public function setTzurl( $value = null, $params = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::TZURL );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        else {
+            HttpFactory::assertUrl( $value );
         }
         $this->tzurl = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
+use function microtime;
 /**
  * UID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.23.20 - 2017-02-17
+ * @since  2.27.11 - 2019-01-02
  */
 trait UIDtrait
 {
@@ -50,35 +54,107 @@ trait UIDtrait
      * Return formatted output for calendar component property uid
      *
      * If uid is missing, uid is created
-     *
      * @return string
+     * @since  2.27.11 - 2019-01-02
      */
     public function createUid() {
-        if( empty( $this->uid )) {
-            $this->uid = Util::makeUid( $this->getConfig( Util::$UNIQUE_ID ));
+        if( self::isUidEmpty( $this->uid )) {
+            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
         }
-        return Util::createElement(
-            Util::$UID,
-            Util::createParams( $this->uid[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::UID,
+            ParameterFactory::createParams( $this->uid[Util::$LCparams] ),
             $this->uid[Util::$LCvalue]
         );
     }
 
     /**
+     * Delete calendar component property uid
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteUid() {
+        $this->uid = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property uid
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.11 - 2019-01-02
+     */
+    public function getUid( $inclParam = false ) {
+        if( self::isUidEmpty( $this->uid )) {
+            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
+        }
+        return ( $inclParam ) ? $this->uid : $this->uid[Util::$LCvalue];
+    }
+
+    /**
+     * Return bool true if uid is empty
+     *
+     * @param array  $array
+     * @return bool
+     * @access private
+     * @static
+     * @since 2.27.11 2019-01-02
+     */
+    private static function isUidEmpty( array $array = null ) {
+        if( empty( $array )) {
+            return true;
+        }
+        if( empty( $array[Util::$LCvalue] ) &&
+            ( Util::$ZERO != $array[Util::$LCvalue] )) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return an unique id for a calendar component object instance
+     *
+     * @param string $unique_id
+     * @return array
+     * @access private
+     * @static
+     * @since  2.22.23 - 2017-02-17
+     */
+    private static function makeUid( $unique_id ) {
+        static $FMT     = '%s-%s@%s';
+        static $TMDTHIS = 'Ymd\THisT';
+        return [
+            Util::$LCvalue  => sprintf(
+                $FMT,
+                date( $TMDTHIS ),
+                substr( microtime(), 2, 4 ) . StringFactory::getRandChars( 6 ),
+                $unique_id
+            ),
+            Util::$LCparams => null,
+        ];
+    }
+
+    /**
      * Set calendar component property uid
      *
+     * If empty input, male one
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2019-01-02
      */
-    public function setUid( $value, $params = null ) {
+    public function setUid( $value = null, $params = null ) {
         if( empty( $value ) && ( Util::$ZERO != $value )) {
-            return false;
+            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
+            return $this;
         } // no allowEmpty check here !!!!
         $this->uid = [
-            Util::$LCvalue  => Util::trimTrailNL( $value ),
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

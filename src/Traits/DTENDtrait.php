@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,19 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function is_array;
 
 /**
  * DTEND property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.14 2019-01-28
  */
 trait DTENDtrait
 {
@@ -49,27 +55,62 @@ trait DTENDtrait
     /**
      * Return formatted output for calendar component property dtend
      *
+     * "The value type of the "DTEND" or "DUE" properties MUST match the value type of "DTSTART" property."
      * @return string
+     * @since  2.27.12 - 2019-01-09
      */
     public function createDtend() {
         if( empty( $this->dtend )) {
             return null;
         }
-        if( Util::hasNodate( $this->dtend )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$DTEND ) : null;
+        if( DateTimeFactory::hasNoDate( $this->dtend )) {
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::DTEND ) : null;
         }
-        $parno = Util::isParamsValueSet( $this->dtend, Util::$DATE ) ? 3 : null;
-        return Util::createElement(
-            Util::$DTEND,
-            Util::createParams( $this->dtend[Util::$LCparams] ),
-            Util::date2strdate( $this->dtend[Util::$LCvalue], $parno )
+        if( ! empty( $this->dtstart )) {
+            $parNo = ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE ) ? 3 : null;
+        }
+        else {
+            $parNo = ParameterFactory::isParamsValueSet( $this->dtend, self::DATE ) ? 3 : null;
+        }
+        return StringFactory::createElement(
+            self::DTEND,
+            ParameterFactory::createParams( $this->dtend[Util::$LCparams] ),
+            DateTimeFactory::dateArrayToStr(
+                $this->dtend[Util::$LCvalue],
+                ParameterFactory::isParamsValueSet( $this->dtend, self::DATE )
+            )
         );
+    }
+
+    /**
+     * Delete calendar component property dtend
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteDtend( ) {
+        $this->dtend = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property dtend
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getDtend( $inclParam = false ) {
+        if( empty( $this->dtend )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->dtend : $this->dtend[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property dtend
      *
-     * @param mixed  $year
+     * @param mixed  $value
      * @param mixed  $month
      * @param int    $day
      * @param int    $hour
@@ -77,36 +118,51 @@ trait DTENDtrait
      * @param int    $sec
      * @param string $tz
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.14 2019-02-10
      */
     public function setDtend(
-        $year,
-        $month = null,
-        $day = null,
-        $hour = null,
-        $min = null,
-        $sec = null,
-        $tz = null,
+        $value  = null,
+        $month  = null,
+        $day    = null,
+        $hour   = null,
+        $min    = null,
+        $sec    = null,
+        $tz     = null,
         $params = null
     ) {
-        if( empty( $year )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $this->dtend = [
-                    Util::$LCvalue  => Util::$SP0,
-                    Util::$LCparams => Util::setParams( $params ),
-                ];
-                return true;
+        if( empty( $value )) {
+            $this->assertEmptyValue( $value, self::DTEND );
+            $this->dtend = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
+            return $this;
+        }
+        if( DateTimeFactory::isArgsDate( $value, $month, $day )) {
+            $value = DateTimeFactory::argsToStr( $value, $month, $day, $hour, $min, $sec, $tz );
+            if( is_array( $params )) {
+                $month = $params;
             }
             else {
-                return false;
+                $month = ( is_array( $hour )) ? $hour : [];
             }
         }
-        if( false === ( $tzid = $this->getConfig( Util::$TZID ))) {
-            $tzid = null;
+        elseif( ! is_array( $month )) {
+            $month = [];
         }
-        $this->dtend = Util::setDate( $year, $month, $day, $hour, $min, $sec, $tz,
-                                      $params, null, null, $tzid
+        $dtstart = $this->getDtstart( true );
+        if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
+            $month[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+        }
+        $this->dtend = DateTimeFactory::setDate(
+            $value,
+            ParameterFactory::setParams( $month, DateTimeFactory::$DEFAULTVALUEDATETIME )
         );
-        return true;
+        if( ! empty( $dtstart ) && ( Util::issetAndNotEmpty( $dtstart, Util::$LCvalue ))) {
+            DateTimeFactory::assertYmdArgsAsDatesAreInSequence( $dtstart, $this->dtend, self::DTEND );
+        }
+        return $this;
     }
 }

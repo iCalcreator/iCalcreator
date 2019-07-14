@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * RELATED-TO property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since 2.27.3 2018-12-22
  */
 trait RELATED_TOtrait
 {
@@ -58,17 +61,48 @@ trait RELATED_TOtrait
         $output = null;
         foreach( $this->relatedto as $rx => $relation ) {
             if( ! empty( $relation[Util::$LCvalue] )) {
-                $output .= Util::createElement(
-                    Util::$RELATED_TO,
-                    Util::createParams( $relation[Util::$LCparams] ),
-                    Util::strrep( $relation[Util::$LCvalue] )
+                $output .= StringFactory::createElement(
+                    self::RELATED_TO,
+                    ParameterFactory::createParams( $relation[Util::$LCparams] ),
+                    StringFactory::strrep( $relation[Util::$LCvalue] )
                 );
             }
-            elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $output .= Util::createElement( Util::$RELATED_TO );
+            elseif( $this->getConfig( self::ALLOWEMPTY )) {
+                $output .= StringFactory::createElement( self::RELATED_TO );
             }
         }
         return $output;
+    }
+
+    /**
+     * Delete calendar component property related-to
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteRelatedto( $propDelIx = null ) {
+        if( empty( $this->relatedto )) {
+            unset( $this->propDelIx[self::RELATED_TO] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->relatedto, self::RELATED_TO, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property related-to
+     *
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getRelatedto( $propIx = null, $inclParam = false ) {
+        if( empty( $this->relatedto )) {
+            unset( $this->propIx[self::RELATED_TO] );
+            return false;
+        }
+        return $this->getPropertyM( $this->relatedto, self::RELATED_TO, $propIx, $inclParam );
     }
 
     /**
@@ -77,23 +111,23 @@ trait RELATED_TOtrait
      * @param string $value
      * @param array  $params
      * @param int    $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setRelatedTo( $value, $params = [], $index = null ) {
+    public function setRelatedTo( $value = null, $params = [], $index = null ) {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::RELATED_TO );
+            $value  = Util::$SP0;
+            $params = [];
+
         }
         if( ! empty( $params )) {
-            Util::existRem( $params, $RELTYPE, $PARENT, true ); // remove default
+            ParameterFactory::existRem( $params, $RELTYPE, $PARENT, true ); // remove default
         }
-        Util::setMval( $this->relatedto, Util::trimTrailNL( $value ), $params, false, $index );
-        return true;
+        $this->setMval( $this->relatedto, StringFactory::trimTrailNL( $value ), $params, null, $index );
+        return $this;
     }
 }

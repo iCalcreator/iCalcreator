@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,8 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\Util;
+use Exception;
+
 use function sprintf;
 use function strtoupper;
 
@@ -38,9 +39,9 @@ use function strtoupper;
  * iCalcreator VEVENT component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.4 - 2018-12-17
  */
-class Vevent extends CalendarComponent
+final class Vevent extends VetComponent
 {
     use Traits\ATTACHtrait,
         Traits\ATTENDEEtrait,
@@ -51,7 +52,6 @@ class Vevent extends CalendarComponent
         Traits\CREATEDtrait,
         Traits\DESCRIPTIONtrait,
         Traits\DTENDtrait,
-        Traits\DTSTAMPtrait,
         Traits\DTSTARTtrait,
         Traits\DURATIONtrait,
         Traits\EXDATEtrait,
@@ -75,24 +75,16 @@ class Vevent extends CalendarComponent
         Traits\URLtrait;
 
     /**
-     * Constructor for calendar component VEVENT object
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.22.20 - 2017-02-01
-     * @param  array $config
+     * @var string
+     * @access protected
+     * @static
      */
-    public function __construct( $config = [] ) {
-        static $E = 'e';
-        parent::__construct();
-        $this->setConfig( Util::initConfig( $config ));
-        $this->cno = $E . parent::getObjectNo();
-    }
+    protected static $compSgn = 'e';
 
     /**
      * Destructor
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
+     * @since  2.27.3 - 2018-12-28
      */
     public function __destruct() {
         if( ! empty( $this->components )) {
@@ -100,19 +92,22 @@ class Vevent extends CalendarComponent
                 $this->components[$cix]->__destruct();
             }
         }
-        unset( $this->xprop,
+        unset(
+            $this->compType,
+            $this->xprop,
             $this->components,
             $this->unparsed,
             $this->config,
             $this->compix,
-            $this->propix,
-            $this->propdelix
+            $this->propIx,
+            $this->propDelIx
         );
-        unset( $this->compType,
+        unset(
             $this->cno,
             $this->srtk
         );
-        unset( $this->attach,
+        unset(
+            $this->attach,
             $this->attendee,
             $this->categories,
             $this->class,
@@ -149,13 +144,13 @@ class Vevent extends CalendarComponent
     /**
      * Return formatted output for calendar component VEVENT object instance
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
      * @return string
+     * @throws Exception  (on Duration/Rdate err)
+     * @since  2.27.2 - 2018-12-21
      */
     public function createComponent() {
-        $compType    = strtoupper( $this->compType );
-        $component   = sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper( $this->getCompType());
+        $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createUid();
         $component  .= $this->createDtstamp();
         $component  .= $this->createAttach();
@@ -189,17 +184,7 @@ class Vevent extends CalendarComponent
         $component  .= $this->createUrl();
         $component  .= $this->createXprop();
         $component  .= $this->createSubComponent();
-        return $component . sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( self::$FMTEND, $compType );
     }
 
-    /**
-     * Return Valarm object instance, CalendarComponent::newComponent() wrapper
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
-     * @return object
-     */
-    public function newValarm() {
-        return $this->newComponent( self::VALARM );
-    }
 }

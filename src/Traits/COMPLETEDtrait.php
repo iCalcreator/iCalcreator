@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,21 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function array_change_key_case;
+use function is_array;
 
 /**
  * COMPLETED property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-19
+ * @since 2.27.14 2019-01-28
  */
 trait COMPLETEDtrait
 {
@@ -50,55 +58,98 @@ trait COMPLETEDtrait
      * Return formatted output for calendar component property completed
      *
      * @return string
+     * @since  2.27.14 - 2019-01-26
      */
     public function createCompleted() {
         if( empty( $this->completed )) {
             return null;
         }
-        if( Util::hasNodate( $this->completed )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$COMPLETED ) : null;
+        if( DateTimeFactory::hasNoDate( $this->completed )) {
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::COMPLETED ) : null;
         }
-        return Util::createElement(
-            Util::$COMPLETED,
-            Util::createParams( $this->completed[Util::$LCparams] ),
-            Util::date2strdate( $this->completed[Util::$LCvalue], 7 )
+        return StringFactory::createElement(
+            self::COMPLETED,
+            ParameterFactory::createParams( $this->completed[Util::$LCparams] ),
+            DateTimeFactory::dateArrayToStr( $this->completed[Util::$LCvalue] )
         );
+    }
+
+    /**
+     * Delete calendar component property completed
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteCompleted( ) {
+        $this->completed = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property completed
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getCompleted( $inclParam = false ) {
+        if( empty( $this->completed )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->completed : $this->completed[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property completed
      *
-     * @param mixed $year
-     * @param mixed $month
-     * @param int   $day
-     * @param int   $hour
-     * @param int   $min
-     * @param int   $sec
-     * @param array $params
-     * @return bool
+     * @param mixed  $value
+     * @param mixed  $month
+     * @param int    $day
+     * @param int    $hour
+     * @param int    $min
+     * @param int    $sec
+     * @param string $tz
+     * @param array  $params
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.14 2019-01-29
      */
     public function setCompleted(
-        $year,
+        $value  = null,
         $month  = null,
         $day    = null,
         $hour   = null,
         $min    = null,
         $sec    = null,
+        $tz     = null,
         $params = null
     ) {
-        if( empty( $year )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $this->completed = [
-                    Util::$LCvalue => Util::$SP0,
-                    Util::$LCparams => Util::setParams( $params ),
-                ];
-                return true;
+        if( empty( $value )) {
+            $this->assertEmptyValue( $value, self::COMPLETED );
+            $this->completed = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
+            return $this;
+        }
+        if( DateTimeFactory::isArgsDate( $value, $month, $day )) {
+            $value = DateTimeFactory::argsToStr( $value, $month, $day, $hour, $min, $sec, $tz );
+            if( is_array( $params )) {
+                $month = $params;
             }
             else {
-                return false;
+                $month = ( is_array( $hour )) ? $hour : [];
             }
         }
-        $this->completed = Util::setDate2( $year, $month, $day, $hour, $min, $sec, $params );
-        return true;
+        elseif( ! is_array( $month )) {
+            $month = [];
+        }
+        $month[Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+        $this->completed = DateTimeFactory::setDate(
+            $value,
+            array_change_key_case( $month, CASE_UPPER ),
+            true // $forceUTC
+        );
+        return $this;
     }
 }

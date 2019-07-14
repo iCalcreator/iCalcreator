@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,20 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Vcalendar;
+use InvalidArgumentException;
+
+use sprintf;
 
 /**
  * TZOFFSETTO property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait TZOFFSETTOtrait
 {
@@ -56,13 +63,38 @@ trait TZOFFSETTOtrait
             return null;
         }
         if( empty( $this->tzoffsetto[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$TZOFFSETTO ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::TZOFFSETTO ) : null;
         }
-        return Util::createElement(
-            Util::$TZOFFSETTO,
-            Util::createParams( $this->tzoffsetto[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::TZOFFSETTO,
+            ParameterFactory::createParams( $this->tzoffsetto[Util::$LCparams] ),
             $this->tzoffsetto[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property tzoffsetto
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteTzoffsetto() {
+        $this->tzoffsetto = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property tzoffsetto
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-13
+     */
+    public function getTzoffsetto( $inclParam = false ) {
+        if( empty( $this->tzoffsetto )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->tzoffsetto : $this->tzoffsetto[Util::$LCvalue];
     }
 
     /**
@@ -70,21 +102,24 @@ trait TZOFFSETTOtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2019-03-14
      */
-    public function setTzoffsetto( $value, $params = null ) {
+    public function setTzoffsetto( $value = null, $params = null ) {
+        static $ERR = 'Invalid %s offset value %s';
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::TZOFFSETTO );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        elseif( ! DateTimeZoneFactory::hasOffset( $value )) {
+            throw new InvalidArgumentException( sprintf( $ERR, Vcalendar::TZOFFSETTO, $value ));
         }
         $this->tzoffsetto = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

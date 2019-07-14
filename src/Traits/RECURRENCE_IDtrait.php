@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,19 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function is_array;
 
 /**
  * RECURRENCE-ID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.14 2019-01-28
  */
 trait RECURRENCE_IDtrait
 {
@@ -56,21 +62,47 @@ trait RECURRENCE_IDtrait
             return null;
         }
         if( empty( $this->recurrenceid[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$RECURRENCE_ID ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::RECURRENCE_ID ) : null;
         }
-        return Util::createElement(
-            Util::$RECURRENCE_ID,
-            Util::createParams( $this->recurrenceid[Util::$LCparams] ),
-            Util::date2strdate(
+        return StringFactory::createElement(
+            self::RECURRENCE_ID,
+            ParameterFactory::createParams( $this->recurrenceid[Util::$LCparams] ),
+            DateTimeFactory::dateArrayToStr(
                 $this->recurrenceid[Util::$LCvalue],
-                Util::isParamsValueSet( $this->recurrenceid, Util::$DATE ) ? 3 : null )
+                ParameterFactory::isParamsValueSet( $this->recurrenceid, self::DATE )
+            )
         );
+    }
+
+    /**
+     * Delete calendar component property recurrence-id
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteRecurrenceid() {
+        $this->recurrenceid = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property recurrence-id
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getRecurrenceid( $inclParam = false ) {
+        if( empty( $this->recurrenceid )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->recurrenceid : $this->recurrenceid[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property recurrence-id
      *
-     * @param mixed  $year
+     * @param mixed  $value
      * @param mixed  $month
      * @param int    $day
      * @param int    $hour
@@ -78,10 +110,12 @@ trait RECURRENCE_IDtrait
      * @param int    $sec
      * @param string $tz
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.14 2019-02-10
      */
     public function setRecurrenceid(
-        $year,
+        $value  = null,
         $month  = null,
         $day    = null,
         $hour   = null,
@@ -90,22 +124,30 @@ trait RECURRENCE_IDtrait
         $tz     = null,
         $params = null
     ) {
-        if( empty( $year )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $this->recurrenceid = [
-                    Util::$LCvalue  => Util::$SP0,
-                    Util::$LCparams => null,
-                ];
-                return true;
+        if( empty( $value )) {
+            $this->assertEmptyValue( $value, self::RECURRENCE_ID );
+            $this->recurrenceid = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
+            return $this;
+        }
+        if( DateTimeFactory::isArgsDate( $value, $month, $day )) {
+            $value = DateTimeFactory::argsToStr( $value, $month, $day, $hour, $min, $sec, $tz );
+            if( is_array( $params )) {
+                $month = $params;
             }
             else {
-                return false;
+                $month = ( is_array( $hour )) ? $hour : [];
             }
         }
-        $this->recurrenceid = Util::setDate(
-            $year, $month, $day, $hour, $min, $sec, $tz,
-            $params,null, null, $this->getConfig( Util::$TZID )
+        elseif( ! is_array( $month )) {
+            $month = [];
+        }
+        $this->recurrenceid = DateTimeFactory::setDate(
+            $value,
+            ParameterFactory::setParams( $month, DateTimeFactory::$DEFAULTVALUEDATETIME )
         );
-        return true;
+        return $this;
     }
 }

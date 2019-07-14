@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,14 +30,19 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\UtilAttendee;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
+use InvalidArgumentException;
+
+use function trim;
 
 /**
  * ORGANIZER property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-04-03
+ * @since  2.27.8 - 2019-03-17
  */
 trait ORGANIZERtrait
 {
@@ -57,22 +62,48 @@ trait ORGANIZERtrait
             return null;
         }
         if( empty( $this->organizer[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$ORGANIZER ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY ))
+                ? StringFactory::createElement( self::ORGANIZER ) : null;
         }
-        return Util::createElement(
-            Util::$ORGANIZER,
-            Util::createParams(
+        return StringFactory::createElement(
+            self::ORGANIZER,
+            ParameterFactory::createParams(
                 $this->organizer[Util::$LCparams],
                 [
-                    Util::$CN,
-                    Util::$DIR,
-                    Util::$SENT_BY,
-                    Util::$LANGUAGE,
+                    self::CN,
+                    self::DIR,
+                    self::SENT_BY,
+                    self::LANGUAGE,
                 ],
-                $this->getConfig( Util::$LANGUAGE )
+                $this->getConfig( self::LANGUAGE )
             ),
             $this->organizer[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property organizer
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteOrganizer() {
+        $this->organizer = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property organizer
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getOrganizer( $inclParam = false ) {
+        if( empty( $this->organizer )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->organizer : $this->organizer[Util::$LCvalue];
     }
 
     /**
@@ -80,29 +111,32 @@ trait ORGANIZERtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since  2.27.8 - 2019-03-17
      */
-    public function setOrganizer( $value, $params = null ) {
+    public function setOrganizer( $value = null, $params = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::ORGANIZER );
+            $value  = Util::$SP0;
+            $params = [];
+
         }
-        $value           = UtilAttendee::calAddressCheck( $value, false );
+        $value = CalAddressFactory::conformCalAddress( $value );
+        if( ! empty( $value )) {
+            CalAddressFactory::assertCalAddress( $value );
+        }
         $this->organizer = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        if( isset( $this->organizer[Util::$LCparams][Util::$SENT_BY] )) {
-            $this->organizer[Util::$LCparams][Util::$SENT_BY] =
-                UtilAttendee::calAddressCheck(
-                    $this->organizer[Util::$LCparams][Util::$SENT_BY],
-                    false
-                );
+        if( isset( $this->organizer[Util::$LCparams][self::SENT_BY] )) {
+            $sentBy = CalAddressFactory::conformCalAddress(
+                trim( $this->organizer[Util::$LCparams][self::SENT_BY], Util::$QQ )
+            );
+            CalAddressFactory::assertCalAddress( $sentBy );
+            $this->organizer[Util::$LCparams][self::SENT_BY] = $sentBy;
         }
-        return true;
+        return $this;
     }
 }

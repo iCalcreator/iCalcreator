@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,16 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-
-use function filter_var;
-use function substr;
+use Kigkonsult\Icalcreator\Util\HttpFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * URL property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.3 2018-12-22
  */
 trait URLtrait
 {
@@ -59,13 +60,38 @@ trait URLtrait
             return null;
         }
         if( empty( $this->url[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$URL ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::URL ) : null;
         }
-        return Util::createElement(
-            Util::$URL,
-            Util::createParams( $this->url[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::URL,
+            ParameterFactory::createParams( $this->url[Util::$LCparams] ),
             $this->url[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property url
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteUrl() {
+        $this->url = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property url
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getUrl( $inclParam = false ) {
+        if( empty( $this->url )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->url : $this->url[Util::$LCvalue];
     }
 
     /**
@@ -73,26 +99,23 @@ trait URLtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setUrl( $value, $params = null ) {
-        static $URN = 'urn';
-        if( ! empty( $value )) {
-            if( ! filter_var( $value, FILTER_VALIDATE_URL ) &&
-                ( 0 != strcasecmp( $URN, substr( $value, 0, 3 )))) {
-                return false;
-            }
-        }
-        elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-            $value = Util::$SP0;
+    public function setUrl( $value = null, $params = null ) {
+        if( empty( $value )) {
+            $this->assertEmptyValue( $value, self::URL );
+            $value  = Util::$SP0;
+            $params = [];
         }
         else {
-            return false;
+            HttpFactory::assertUrl( $value );
         }
         $this->url = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

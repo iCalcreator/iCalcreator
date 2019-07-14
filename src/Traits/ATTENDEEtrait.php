@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,13 +31,15 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\UtilAttendee;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
+use Kigkonsult\Icalcreator\Util\HttpFactory;
+use InvalidArgumentException;
 
 /**
  * ATTENDEE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since  2.27.8 - 2019-03-17
  */
 trait ATTENDEEtrait
 {
@@ -56,33 +58,74 @@ trait ATTENDEEtrait
         if( empty( $this->attendee )) {
             return null;
         }
-        return UtilAttendee::formatAttendee( $this->attendee, $this->getConfig( Util::$ALLOWEMPTY ));
+        return CalAddressFactory::outputFormatAttendee(
+            $this->attendee,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
-     * Set calendar component property attach
+     * Delete calendar component property attendee
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteAttendee( $propDelIx = null ) {
+        if( empty( $this->attendee )) {
+            unset( $this->propDelIx[self::ATTENDEE] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->attendee, self::ATTENDEE, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property attendee
+     *
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getAttendee( $propIx = null, $inclParam = false ) {
+        if( empty( $this->attendee )) {
+            unset( $this->propIx[self::ATTENDEE] );
+            return false;
+        }
+        return $this->getPropertyM( $this->attendee, self::ATTENDEE, $propIx, $inclParam );
+    }
+
+    /**
+     * Set calendar component property attendee
      *
      * @param string  $value
      * @param array   $params
      * @param integer $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since  2.27.8 - 2019-03-17
      */
-    public function setAttendee( $value, $params = null, $index = null ) {
+    public function setAttendee( $value = null, $params = null, $index = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::ATTENDEE );
+            $value  = Util::$SP0;
+            $params = [];
         }
-        Util::setMval(
+        $value = CalAddressFactory::conformCalAddress( $value );
+        if( ! empty( $value )) {
+            CalAddressFactory::assertCalAddress( $value );
+        }
+        $this->setMval(
             $this->attendee,
-            UtilAttendee::calAddressCheck( $value, false ),
-            UtilAttendee::prepAttendeeParams( $params, $this->compType, $this->getConfig( Util::$LANGUAGE )),
-            false,
+            $value,
+            CalAddressFactory::inputPrepAttendeeParams(
+                $params,
+                $this->getCompType(),
+                $this->getConfig( self::LANGUAGE )
+            ),
+            null,
             $index
         );
-        return true;
+        return $this;
     }
 }

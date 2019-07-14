@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,19 +30,23 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 use function count;
 use function implode;
 use function is_array;
 use function is_numeric;
+use function sprintf;
 use function strtoupper;
 
 /**
  * X-property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait X_PROPtrait
 {
@@ -62,105 +66,167 @@ trait X_PROPtrait
             return null;
         }
         $output = null;
-        $lang   = $this->getConfig( Util::$LANGUAGE );
-        foreach( $this->xprop as $label => $xpropPart ) {
+        $lang   = $this->getConfig( self::LANGUAGE );
+        foreach( $this->xprop as $xpropName => $xpropPart ) {
             if( ! isset( $xpropPart[Util::$LCvalue] ) ||
                 ( empty( $xpropPart[Util::$LCvalue] ) && ! is_numeric( $xpropPart[Util::$LCvalue] ))) {
-                if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                    $output .= Util::createElement( $label );
+                if( $this->getConfig( self::ALLOWEMPTY )) {
+                    $output .= StringFactory::createElement( $xpropName );
                 }
                 continue;
             }
             if( is_array( $xpropPart[Util::$LCvalue] )) {
                 foreach( $xpropPart[Util::$LCvalue] as $pix => $theXpart ) {
-                    $xpropPart[Util::$LCvalue][$pix] = Util::strrep( $theXpart );
+                    $xpropPart[Util::$LCvalue][$pix] = StringFactory::strrep( $theXpart );
                 }
                 $xpropPart[Util::$LCvalue] = implode( Util::$COMMA, $xpropPart[Util::$LCvalue] );
             }
             else {
-                $xpropPart[Util::$LCvalue] = Util::strrep( $xpropPart[Util::$LCvalue] );
+                $xpropPart[Util::$LCvalue] = StringFactory::strrep( $xpropPart[Util::$LCvalue] );
             }
-            $output .= Util::createElement(
-                $label,
-                Util::createParams( $xpropPart[Util::$LCparams], [ Util::$LANGUAGE ], $lang ),
-                Util::trimTrailNL( $xpropPart[Util::$LCvalue] )
+            $output .= StringFactory::createElement(
+                $xpropName,
+                ParameterFactory::createParams( $xpropPart[Util::$LCparams], [ self::LANGUAGE ], $lang ),
+                StringFactory::trimTrailNL( $xpropPart[Util::$LCvalue] )
             );
         }
         return $output;
     }
 
     /**
-     * Set calendar property x-prop
-     *
-     * @param string $label
-     * @param string $value
-     * @param array  $params   optional
-     * @return bool
-     */
-    public function setXprop( $label, $value, $params = null ) {
-        if( empty( $label ) || ! Util::isXprefixed( $label )) {
-            return false;
-        }
-        if( empty( $value ) && ! is_numeric( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
-        }
-        $xprop = [ Util::$LCvalue => $value ];
-        $xprop[Util::$LCparams] = Util::setParams( $params );
-        if( ! is_array( $this->xprop )) {
-            $this->xprop = [];
-        }
-        $this->xprop[strtoupper( $label )] = $xprop;
-        return true;
-    }
-
-    /**
      * Delete component property X-prop value
      *
      * @param string $propName
-     * @param array  $xProp  component X-property
-     * @param int    $propix removal counter
-     * @param array  $propdelix
-     * @access protected
+     * @param int    $propDelIx removal counter
      * @return bool
-     * @static
+     * @since  2.27.1 - 2018-12-15
      */
-    protected static function deleteXproperty( $propName, & $xProp, & $propix, & $propdelix ) {
+    public function deleteXprop( $propName, $propDelIx=null ) {
+        $propName = ( $propName ) ? strtoupper( $propName ) : self::X_PROP;
+        if( empty( $this->xprop )) {
+            foreach( $this->propDelIx as $propName => $v ) {
+                if( StringFactory::isXprefixed( $propName )) {
+                    unset( $this->propDelIx[$propName] );
+                }
+            }
+            return false;
+        }
+        if( is_null( $propDelIx )) {
+            $propDelIx = ( isset( $this->propDelIx[$propName] ) && ( self::X_PROP != $propName ))
+                ? $this->propDelIx[$propName] + 2 : 1;
+        }
+        $this->propDelIx[$propName] = --$propDelIx;
         $reduced = [];
-        if( $propName != Util::$X_PROP ) {
-            if( ! isset( $xProp[$propName] )) {
-                unset( $propdelix[$propName] );
+        if( $propName != self::X_PROP ) {
+            if( ! isset( $this->xprop[$propName] )) {
+                unset( $this->propDelIx[$propName] );
                 return false;
             }
-            foreach( $xProp as $k => $xValue ) {
+            foreach( $this->xprop as $k => $xValue ) {
                 if(( $k != $propName ) && ! empty( $xValue )) {
                     $reduced[$k] = $xValue;
                 }
             }
         }
         else {
-            if( count( $xProp ) <= $propix ) {
-                unset( $propdelix[$propName] );
+            if( count( $this->xprop ) <= $propDelIx ) {
+                unset( $this->propDelIx[$propName] );
                 return false;
             }
-            $xpropno = 0;
-            foreach( $xProp as $xPropKey => $xPropValue ) {
-                if( $propix != $xpropno ) {
-                    $reduced[$xPropKey] = $xPropValue;
+            $xpropNo = 0;
+            foreach( $this->xprop as $xpropKey => $xpropValue ) {
+                if( $propDelIx != $xpropNo ) {
+                    $reduced[$xpropKey] = $xpropValue;
                 }
-                $xpropno++;
+                $xpropNo++;
             }
         }
-        $xProp = $reduced;
-        if( empty( $xProp )) {
-            $xProp = null;
-            unset( $propdelix[$propName] );
+        $this->xprop = $reduced;
+        if( empty( $this->xprop )) {
+            $this->xprop = null;
+            unset( $this->propDelIx[$propName] );
             return false;
         }
         return true;
     }
+
+    /**
+     * Get calendar component property x-prop
+     *
+     * @param string $propName
+     * @param int    $propIx    specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.11 - 2019-01-02
+     */
+    public function getXprop( $propName = null, $propIx = null, $inclParam = false ) {
+        if( empty( $this->xprop )) {
+            foreach( $this->propIx as $propName => $v ) {
+                if( StringFactory::isXprefixed( $propName )) {
+                    unset( $this->propIx[$propName] );
+                }
+            }
+            return false;
+        }
+        $propName = ( $propName ) ? strtoupper( $propName ) : self::X_PROP;
+        if( $propName != self::X_PROP ) {
+            if( ! isset( $this->xprop[$propName] )) {
+                return false;
+            }
+            return ( $inclParam )
+                ? [ $propName, $this->xprop[$propName], ]
+                : [ $propName, $this->xprop[$propName][Util::$LCvalue], ];
+        }
+        if( empty( $propIx )) {
+            $propIx = ( isset( $this->propIx[$propName] )) ? $this->propIx[$propName] + 2 : 1;
+        }
+        $this->propIx[$propName] = --$propIx;
+        $class = get_class();
+        $class::recountMvalPropix( $this->xprop, $propIx );
+        $this->propIx[$propName] = $propIx;
+        $xpropNo = 0;
+        foreach( $this->xprop as $xpropKey => $xpropValue ) {
+            if( $propIx == $xpropNo ) {
+                return ( $inclParam )
+                    ? [ $xpropKey, $this->xprop[$xpropKey], ]
+                    : [ $xpropKey, $this->xprop[$xpropKey][Util::$LCvalue], ];
+            }
+            else {
+                $xpropNo++;
+            }
+        }
+        return false; // not found ??
+    }
+
+    /**
+     * Set calendar property x-prop
+     *
+     * @param string $xpropName
+     * @param string $value
+     * @param array  $params   optional
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
+     */
+    public function setXprop( $xpropName, $value=null, $params = null ) {
+        static $MSG = 'Invalid X-property name : \'%s\'';
+        if( empty( $xpropName ) || ! StringFactory::isXprefixed( $xpropName )) {
+            throw new InvalidArgumentException( sprintf( $MSG, $xpropName ));
+        }
+        if( empty( $value )) {
+            $this->assertEmptyValue( $value, $xpropName );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        $xprop = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => ParameterFactory::setParams( $params )
+        ];
+        if( ! is_array( $this->xprop )) {
+            $this->xprop = [];
+        }
+        $this->xprop[strtoupper( $xpropName )] = $xprop;
+        return $this;
+    }
+
 }

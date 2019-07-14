@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,10 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 use function is_numeric;
 
@@ -38,7 +41,7 @@ use function is_numeric;
  * PERCENT-COMPLETE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.3 2018-12-22
  */
 trait PERCENT_COMPLETEtrait
 {
@@ -53,21 +56,45 @@ trait PERCENT_COMPLETEtrait
      *
      * @return string
      */
-    public function createPercentComplete() {
-        if( ! isset( $this->percentcomplete ) ||
-            ( empty( $this->percentcomplete ) && ! is_numeric( $this->percentcomplete ))) {
+    public function createPercentcomplete() {
+        if( empty( $this->percentcomplete )) {
             return null;
         }
         if( ! isset( $this->percentcomplete[Util::$LCvalue] ) ||
             ( empty( $this->percentcomplete[Util::$LCvalue] ) &&
                 ! is_numeric( $this->percentcomplete[Util::$LCvalue] ))) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$PERCENT_COMPLETE ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::PERCENT_COMPLETE ) : null;
         }
-        return Util::createElement(
-            Util::$PERCENT_COMPLETE,
-            Util::createParams( $this->percentcomplete[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::PERCENT_COMPLETE,
+            ParameterFactory::createParams( $this->percentcomplete[Util::$LCparams] ),
             $this->percentcomplete[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property percentcomplete
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deletePercentcomplete() {
+        $this->percentcomplete = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property percent-complete
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getPercentcomplete( $inclParam = false ) {
+        if( empty( $this->percentcomplete )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->percentcomplete : $this->percentcomplete[Util::$LCvalue];
     }
 
     /**
@@ -75,21 +102,23 @@ trait PERCENT_COMPLETEtrait
      *
      * @param int   $value
      * @param array $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setPercentComplete( $value, $params = null ) {
+    public function setPercentcomplete( $value = null, $params = null ) {
         if( empty( $value ) && ! is_numeric( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::PERCENT_COMPLETE );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        else {
+            self::assertIsInteger( $value, self::PERCENT_COMPLETE, 0, 100 );
         }
         $this->percentcomplete = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

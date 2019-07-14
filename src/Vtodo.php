@@ -1,11 +1,11 @@
 <?php
 /**
- * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,7 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\Util;
+use Exception;
 
 use function sprintf;
 use function strtoupper;
@@ -39,9 +39,9 @@ use function strtoupper;
  * iCalcreator VTODO component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.4 - 2018-12-19
  */
-class Vtodo extends CalendarComponent
+final class Vtodo extends VetComponent
 {
     use Traits\ATTACHtrait,
         Traits\ATTENDEEtrait,
@@ -77,23 +77,15 @@ class Vtodo extends CalendarComponent
         Traits\URLtrait;
 
     /**
-     * Constructor for calendar component VTODO object
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
-     * @param array $config
+     * @var string
+     * @access protected
+     * @static
      */
-    public function __construct( $config = [] ) {
-        static $T = 't';
-        parent::__construct();
-        $this->setConfig( Util::initConfig( $config ));
-        $this->cno = $T . parent::getObjectNo();
-    }
+    protected static $compSgn = 't';
 
     /**
      * Destructor
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.26 - 2018-11-10
      */
     public function __destruct() {
@@ -102,19 +94,22 @@ class Vtodo extends CalendarComponent
                 $this->components[$cix]->__destruct();
             }
         }
-        unset( $this->xprop,
+        unset(
+            $this->compType,
+            $this->xprop,
             $this->components,
             $this->unparsed,
             $this->config,
-            $this->propix,
+            $this->propIx,
             $this->compix,
-            $this->propdelix
+            $this->propDelIx
         );
-        unset( $this->compType,
+        unset(
             $this->cno,
             $this->srtk
         );
-        unset( $this->attach,
+        unset(
+            $this->attach,
             $this->attendee,
             $this->categories,
             $this->class,
@@ -152,13 +147,13 @@ class Vtodo extends CalendarComponent
     /**
      * Return formatted output for calendar component VTODO object instance
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
      * @return string
+     * @throws Exception  (on Duration/Rdate err)
+     * @since  2.27.2 - 2018-12-21
      */
     public function createComponent() {
-        $compType    = strtoupper( $this->compType );
-        $component   = sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper( $this->getCompType());
+        $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createUid();
         $component  .= $this->createDtstamp();
         $component  .= $this->createAttach();
@@ -179,7 +174,7 @@ class Vtodo extends CalendarComponent
         $component  .= $this->createLastModified();
         $component  .= $this->createLocation();
         $component  .= $this->createOrganizer();
-        $component  .= $this->createPercentComplete();
+        $component  .= $this->createPercentcomplete();
         $component  .= $this->createPriority();
         $component  .= $this->createRdate();
         $component  .= $this->createRelatedTo();
@@ -193,17 +188,7 @@ class Vtodo extends CalendarComponent
         $component  .= $this->createUrl();
         $component  .= $this->createXprop();
         $component  .= $this->createSubComponent();
-        return $component . sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( self::$FMTEND, $compType );
     }
 
-    /**
-     * Return Valarm object instance, CalendarComponent::newComponent() wrapper
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
-     * @return object
-     */
-    public function newValarm() {
-        return $this->newComponent( self::VALARM );
-    }
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,18 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function strtoupper;
 
 /**
  * TRANSP property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-17
+ * @since 2.27.3 2018-12-22
  */
 trait TRANSPtrait
 {
@@ -56,13 +61,39 @@ trait TRANSPtrait
             return null;
         }
         if( empty( $this->transp[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$TRANSP ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY ))
+                ? StringFactory::createElement( self::TRANSP ) : null;
         }
-        return Util::createElement(
-            Util::$TRANSP,
-            Util::createParams( $this->transp[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::TRANSP,
+            ParameterFactory::createParams( $this->transp[Util::$LCparams] ),
             $this->transp[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property transp
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteTransp() {
+        $this->transp = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property transp
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-13
+     */
+    public function getTransp( $inclParam = false ) {
+        if( empty( $this->transp )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->transp : $this->transp[Util::$LCvalue];
     }
 
     /**
@@ -70,21 +101,27 @@ trait TRANSPtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setTransp( $value, $params = null ) {
+    public function setTransp( $value = null, $params = null ) {
+        static $ALLOWED = [
+            self::OPAQUE,
+            self::TRANSPARENT
+        ];
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::TRANSP );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        else {
+            self::assertInEnumeration( $value, $ALLOWED, self::TRANSP );
         }
         $this->transp = [
-            Util::$LCvalue  => Util::trimTrailNL( $value ),
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

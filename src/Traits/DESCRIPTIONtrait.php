@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,18 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function is_bool;
 
 /**
  * DESCRIPTION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait DESCRIPTIONtrait
 {
@@ -56,20 +61,57 @@ trait DESCRIPTIONtrait
             return null;
         }
         $output = null;
-        $lang   = $this->getConfig( Util::$LANGUAGE );
+        $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->description as $dx => $description ) {
             if( ! empty( $description[Util::$LCvalue] )) {
-                $output .= Util::createElement(
-                    Util::$DESCRIPTION,
-                    Util::createParams( $description[Util::$LCparams], Util::$ALTRPLANGARR, $lang ),
-                    Util::strrep( $description[Util::$LCvalue] )
+                $output .= StringFactory::createElement(
+                    self::DESCRIPTION,
+                    ParameterFactory::createParams( $description[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                    StringFactory::strrep( $description[Util::$LCvalue] )
                 );
             }
-            elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $output .= Util::createElement( Util::$DESCRIPTION );
+            elseif( $this->getConfig( self::ALLOWEMPTY )) {
+                $output .= StringFactory::createElement( self::DESCRIPTION );
             }
         }
         return $output;
+    }
+
+    /**
+     * Delete calendar component property description
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteDescription( $propDelIx = null ) {
+        if( empty( $this->description )) {
+            unset( $this->propDelIx[self::DESCRIPTION] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->description, self::DESCRIPTION, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property description
+     *
+     * @param bool|int  $propIx specific property in case of multiply occurrence
+     * @param bool      $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-17
+     */
+    public function getDescription( $propIx = null, $inclParam = null ) {
+        if( empty( $this->description )) {
+            unset( $this->propIx[self::DESCRIPTION] );
+            return false;
+        }
+        if( self::VJOURNAL != $this->getCompType()) {
+            if( ! is_bool( $inclParam )) {
+                $inclParam = ( true == $propIx ) ? true : false; // note ==
+            }
+            $propIx = null;
+        }
+        return $this->getPropertyM( $this->description, self::DESCRIPTION, $propIx, $inclParam );
     }
 
     /**
@@ -78,21 +120,20 @@ trait DESCRIPTIONtrait
      * @param string  $value
      * @param array   $params
      * @param integer $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setDescription( $value, $params = null, $index = null ) {
+    public function setDescription( $value = null, $params = null, $index = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::DESCRIPTION );
+            $value  = Util::$SP0;
+            $params = [];
         }
-        if( self::VJOURNAL != $this->compType ) {
+        if( self::VJOURNAL != $this->getCompType()) {
             $index = 1;
         }
-        Util::setMval( $this->description, $value, $params,false, $index );
-        return true;
+        $this->setMval( $this->description, $value, $params,null, $index );
+        return $this;
     }
 }

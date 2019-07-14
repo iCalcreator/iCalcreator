@@ -1,13 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!DOCTYPE html>
 <!--
  iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
-
- This file is a part of iCalcreator.
 
  copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.26.8
+ Version   2.28
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -26,130 +24,141 @@
 
            You should have received a copy of the GNU Lesser General Public License
            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+
+ This file is a part of iCalcreator.
 -->
-<html>
+<html lang="en">
 <head>
-    <title>iCalcreator 2.26.8 manual</title>
+    <title>iCalcreator 2.28 manual</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
     <meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.26.8">
+    <meta name="description" content="using iCalcreator v2.28">
     <style type="text/css">
-* {
-  FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
-  BACKGROUND-COLOR: white;
-  COLOR           : black;
-  FONT-SIZE       : small;
-}
-body {
-  MARGIN-LEFT     : 10px;
-  WIDTH           : 750px;
-}
-h1 {
-  BACKGROUND-COLOR: silver;
-  BORDER          : thin solid black;
-  FONT-SIZE       : x-large;
-  FONT-WEIGHT     : bold;
-  DISPLAY         : block;
-}
-h2 {
-  FONT-SIZE       : large;
-}
-h3 {
-  FONT-SIZE       : medium;
-}
-h4 {
-  FONT-SIZE       : small;
-  FONT-WEIGHT     : bold;
-}
-h5 {
-  FONT-SIZE       : small;
-  FONT-WEIGHT     : normal;
-  TEXT-DECORATION : underline;
-}
-table {
-  border-collapse : collapse;
-  width           : 100%;
-}
-p.comment {
-  FONT-FAMILY     : monospace;
-  FONT-SIZE       : 9pt;
-  FONT-WEIGHT     : 500;
-  WHITE-SPACE     : pre-wrap;      /* css-3 */
-  WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
-  WHITE-SPACE     : -pre-wrap;     /* Opera 4-6 */
-  WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
-  WORD-WRAP       : break-word;    /* Internet Explorer 5.5+ */
-}
-span.comment {
-  BACKGROUND-COLOR: inherit;
-  FONT-FAMILY     : Areal;
-  FONT-SIZE       : 8pt;
-  LETTER-SPACING  : 0.2em;
-}
-p.example {
-  BACKGROUND-COLOR: #DCDCDC;
-  font-family     : monospace;
-  FONT-SIZE       : 9pt;
-  LETTER-SPACING  : 0.1em;
-  LINE-HEIGHT     : 1.5em;
-  WHITE-SPACE     : pre-wrap;      /* css-3 */
-  WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
-  WHITE-SPACE     : -pre-wrap;     /* Opera 4-6 */
-  WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
-  WORD-WRAP       : break-word;    /* Internet Explorer 5.5+ */
-}
-p.format, span.format {
-  BORDER          : gray dotted thin;
-  FONT-FAMILY     : Helvetica;
-  FONT-SIZE       : 9pt;
-  LETTER-SPACING  : 0.2em;
-  LINE-HEIGHT     : 2em;
-  WHITE-SPACE     : pre-wrap;      /* css-3 */
-  WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
-  WHITE-SPACE     : -pre-wrap;     /* Opera 4-6 */
-  WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
-  WORD-WRAP       : break-word;    /* Internet Explorer 5.5+ */
-}
-.header {
-  BACKGROUND-COLOR: silver;
-  BORDER          : thin solid black;
-  FONT-SIZE       : xx-large;
-}
-p.quotes {
-  BACKGROUND-COLOR: #F5F5F5;
-  FONT-FAMILY     : Arial;
-  FONT-STYLE      : italic;
-  LETTER-SPACING  : 0.1em;
-}
-sup {
-  BACKGROUND-COLOR: transparent;
-  FONT-SIZE       : x-small;
-  FONT-WEIGHT     : bold;
-  VERTICAL-ALIGN  : super;
-}
-.top {
-  VERTICAL-ALIGN  : top;
-}
-</style>
+        * {
+            FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
+            BACKGROUND-COLOR: white;
+            COLOR           : black;
+            FONT-SIZE       : small;
+        }
+        body {
+            MARGIN-LEFT     : 10px;
+            WIDTH           : 750px;
+        }
+        h1 {
+            BACKGROUND-COLOR: silver;
+            BORDER          : thin solid black;
+            FONT-SIZE       : x-large;
+            FONT-WEIGHT     : bold;
+            DISPLAY         : block;
+        }
+        h2 {
+            FONT-SIZE       : large;
+        }
+        h3 {
+            FONT-SIZE       : medium;
+        }
+        h4 {
+            FONT-SIZE       : small;
+            FONT-WEIGHT     : bold;
+        }
+        h5 {
+            FONT-SIZE       : small;
+            FONT-WEIGHT     : normal;
+            TEXT-DECORATION : underline;
+        }
+        table {
+            border-collapse : collapse;
+            width           : 100%;
+        }
+        .bb {
+            BORDER-BOTTOM   : gray dotted thin;
+        }
+        .bl {
+            BORDER-LEFT     : gray dotted thin;
+        }
+        .center {
+            TEXT-ALIGN      : center;
+        }
+        p.comment {
+            FONT-FAMILY     : monospace;
+            FONT-SIZE       : 9pt;
+            FONT-WEIGHT     : 500;
+            WHITE-SPACE     : pre-wrap;      /* css-3 */
+            WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
+            WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
+        }
+        span.comment {
+            BACKGROUND-COLOR: transparent;
+            FONT-FAMILY     : Areal, sans-serif;
+            FONT-SIZE       : 8pt;
+            LETTER-SPACING  : 0.2em;
+        }
+        p.example {
+            BACKGROUND-COLOR: #DCDCDC;
+            font-family     : monospace;
+            FONT-SIZE       : 9pt;
+            LETTER-SPACING  : 0.1em;
+            LINE-HEIGHT     : 1.5em;
+            WHITE-SPACE     : pre-wrap;      /* css-3 */
+            WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
+            WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
+        }
+        p.format, span.format {
+            BORDER          : gray dotted thin;
+            FONT-FAMILY     : Helvetica, sans-serif;
+            FONT-SIZE       : 9pt;
+            LETTER-SPACING  : 0.2em;
+            LINE-HEIGHT     : 2em;
+            WHITE-SPACE     : pre-wrap;      /* css-3 */
+            WHITE-SPACE     : -moz-pre-wrap; /* Mozilla, since 1999 */
+            WHITE-SPACE     : -o-pre-wrap;   /* Opera 7 */
+        }
+        .header {
+            BACKGROUND-COLOR: silver;
+            BORDER          : thin solid black;
+            FONT-SIZE       : xx-large;
+        }
+        p.label {
+            FONT-FAMILY     : Arial, sans-serif;
+            FONT-WEIGHT     : bold;
+            LETTER-SPACING  : 0.1em;
+        }
+        p.quotes {
+            BACKGROUND-COLOR: #F5F5F5;
+            FONT-FAMILY     : Arial, sans-serif;
+            FONT-STYLE      : italic;
+            LETTER-SPACING  : 0.1em;
+        }
+        sup {
+            BACKGROUND-COLOR: transparent;
+            FONT-SIZE       : x-small;
+            FONT-WEIGHT     : bold;
+            VERTICAL-ALIGN  : super;
+        }
+        .top {
+            VERTICAL-ALIGN  : top;
+        }
+    </style>
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.26.8</p>
+<p class="header">iCalcreator v2.28</p>
 <p>
-    iCalcreator v2.26.8<br>
+    iCalcreator v2.28<br>
     Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
-    <a href="http://kigkonsult.se/iCalcreator/index.php" title="kigkonsult.se/iCalcreator" target="_blank">kigkonsult.se iCalcreator</a><br>
-    Contact : iCal_at_kigkonsult_dot_se
+    <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
+    <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
+    Contact iCal_at_kigkonsult_dot_se
 </p>
 
 <h2>Preface</h2>
 <p>
-    This document describes usage of iCalcreator, the <em>PHP</em> software implementation of standards
+    This document describes summary usage of iCalcreator, the <em>PHP</em> software implementation of standards
     <a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a>/
     <a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
-    (rfc2445/rfc2446) to manage iCal formatted files.
+    (rfc2445/rfc2446) to manage calendar information.
 </p>
 <p>
     This document is provided by kigkonsult for informational purposes
@@ -177,18 +186,18 @@ sup {
 
 <h4>The software</h4>
 <p>
-iCalcreator is a <em>PHP</em> class package managing iCal files, supporting (non-)calendar
-systems and applications to process and communicate calendar information like
-events, agendas, tasks, reports, totos and journaling information.
+    iCalcreator is the <em>PHP</em> class package managing iCal calendar information,
+    supporting (non-)calendar
+    systems and applications to process and communicate calendar information like
+    events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
-For iCalcreator 2.26.8 version (and later), <em>PHP</em> version 5.6+ is required.
+For iCalcreator 2.28 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
 <p>
-    A short iCal description is found at
-    <a href="http://en.wikipedia.org/wiki/ICalendar#Core_object" title="iCalendar From Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
+    A short iCal description is found at <a href="http://en.wikipedia.org/wiki/ICalendar#Core_object" title="iCalendar From Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
     If You are not familiar with iCal, read this first!
 </p>
 <p>
@@ -271,13 +280,13 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.26.8/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.28/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 
 <p>
-iCalcreator 2.26.8 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.28 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -290,225 +299,276 @@ You will find a complete iCalcreator function list (ex. getProperty, deletePrope
 <a href="https://github.com/iCalcreator/iCalcreator/docs" title="iCalcreator complete manual" target="_blank">iCalcreator manual</a>.
 </p>
 <p>
-Note, to ease up usage, you will find convenient holders for component names,
-properties, config keys etc in top of the &quot;util&quot; class file (src/util/util.php).
+Note, to ease up usage, you will find convenient constants for component names,
+properties, config keys etc in (src/)IcalInterface.
 </p>
 
 <h2>CREATE</h2>
 
 <p class="example">&lt;?php
 
-namespace Kigkonsult\Icalcreator;
-
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Vcalendar;
+use DateTime;
+use DateTimezone;
 
         // <span class="comment">define time zone</span>
 $tz = &quot;Europe/Stockholm&quot;;
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$config = [
-    Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;,
-        // <span class="comment">opt. set &quot;calendar&quot; timezone</span>
-    Util::$TZID      =&gt; $tz
-];
+$config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
         // <span class="comment">create a new Vcalendar instance</span>
-$calendar= new Vcalendar( $config );
+$calendar = Vcalendar::factory( $config )
 
         // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( Util::$METHOD,        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_CALNAME,  &quot;Calendar Sample&quot;);
-$calendar-&gt;setProperty( Util::$X_WR_CALDESC,  &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_TIMEZONE, $tz );
+    -&gt;setMethod( Vcalendar::PUBLISH )
+    -&gt;setXprop(  Vcalendar::X_WR_CALNAME,  &quot;Calendar Sample&quot; );
+    -&gt;setXprop(  Vcalendar::X_WR_CALDESC,  &quot;Calendar Description&quot; );
+    ->setXprop(  Vcalendar::X_WR_RELCALID,"3E26604A-50F4-4449-8B3E-E4F4932D05B5" )
+    -&gt;setXprop(  Vcalendar::X_WR_TIMEZONE, $tz );
 
         // <span class="comment">create an calendar event component</span>
-$vevent = $calendar-&gt;newVevent();
+$vevent1 = $calendar-&gt;newVevent()
         // <span class="comment">set event start</span>
-$vevent-&gt;setProperty(
-    Util::$DTSTART,
-    new DateTime( '2017-04-01 19:00:00')
-);
+    -&gt;setDtstart( new DateTime( '2017-04-01 19:00:00', new DateTimezone( $tz )))
         // <span class="comment">set event end</span>
-$vevent-&gt;setProperty(
-    Util::$DTEND,
-    new DateTime( '2017-04-01 22:30:00')
-);
-$vevent-&gt;setProperty( Util::$LOCATION,    &quot;Central Placa&quot; );
-$vevent-&gt;setProperty( Util::$SUMMARY,     &quot;PHP summit&quot; );
-$vevent-&gt;setProperty( Util::$DESCRIPTION, &quot;This is a description&quot; );
-$vevent-&gt;setProperty( Util::$COMMENT,     &quot;This is a comment&quot; );
-$vevent-&gt;setProperty( Util::$ATTENDEE,    &quot;attendee1@icaldomain.net&quot; );
+    -&gt;setDtend(  new DateTime( '2017-04-01 22:30:00', new DateTimezone( $tz )))
 
-        // <span class="comment">create an event alarm</span>
-$valarm = $vevent-&gt;newValarm();
-$valarm-&gt;setProperty( Util::$ACTION, &quot;DISPLAY&quot; );
-        // <span class="comment">reuse the event description</span>
-$valarm-&gt;setProperty( Util::$DESCRIPTION, $vevent-&gt;getProperty( Util::$DESCRIPTION ));
-        // <span class="comment">create alarm trigger (in UTC datetime)</span>
-$valarm-&gt;setProperty(
-    Util::$TRIGGER,
-    new DateTime( '2017-04-01 08:00:00 UTC')
-);
+    // <span class="comment">describe the event</span>
+    ->setSummary( 'Scheduled meeting with six occurrences' )
+    ->setDescription(
+        'Agenda for the the meeting...',
+        [ Vcalendar::ALTREP =>
+                'CID:&lt;FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com&gt;' ]
+    )
+    ->setComment( 'It\'s going to be fun..' )
 
-        // <span class="comment">create another calendar event component</span>
-$vevent = $calendar-&gt;newVevent();
-        // <span class="comment">alt. date format, here for an all-day event</span>
-$vevent-&gt;setProperty(
-    Util::$DTSTART,
-    &quot;20170401&quot;,
-    [ &quot;VALUE&quot; =&gt; &quot;DATE&quot; ]
-);
-$vevent-&gt;setProperty( Util::$ORGANIZER,   &quot;cio@icaldomain.com&quot; );
-$vevent-&gt;setProperty( Util::$SUMMARY,     &quot;ALL-DAY event&quot; );
-$vevent-&gt;setProperty( Util::$DESCRIPTION, &quot;This is a description for an all-day event&quot; );
-$vevent-&gt;setProperty( Util::$RESOURCES,   &quot;Full attension&quot; );
-        // <span class="comment">weekly, four occasions</span>
-$vevent-&gt;setProperty(
-    Util::$RRULE,
-    [
-        &quot;FREQ&quot;  =&gt; &quot;WEEKLY&quot;,
-        &quot;count&quot; =&gt; 4
-    ]
-);
-        // <span class="comment">supporting parse of strict rfc5545 formatted text</span>
-$vevent-&gt;parse( &quot;LOCATION:1CP Conference Room 4350&quot; );
+    // <span class="comment">place the event</span>
+    ->setLocation( 'Kafé Ekorren Stockholm' )
+    ->setGeo( '59.32206', '18.12485' )
 
-        // <span class="comment">all calendar components are described in <a href="https://tools.ietf.org/html/rfc5545" title="RFC5545" target="_blank">rfc5545</a></span>
-        // <span class="comment">a complete iCalcreator function list (ex. setProperty) in the iCalcreator using manual</span>
+    // <span class="comment">with recurrence rule</span>
+    ->setRrule(
+        [
+            Vcalendar::FREQ  => Vcalendar::WEEKLY,
+            Vcalendar::COUNT => 5,
+        ]
+    )
 
-        // <span class="comment">create timezone component(-s)</span>
-        // <span class="comment">based on all start dates in events (i.e. all dtstarts)</span>
-        // <span class="comment">X-LIC-LOCATION required of some calendar software</span>
-$xprops = [ Util::$X_LIC_LOCATION => $tz ];
-Kigkonsult\Icalcreator\TimezoneHandler::createTimezone( $v, $tz, $xprops );
+    // <span class="comment">and set another using a recurrence date</span>
+    ->setRdate(
+        [
+            new DateTime( '20190609T090000', new DateTimezone( $tz )),
+            new DateTime( '20190609T110000', new DateTimezone( $tz )),
+        ],
+        [ Vcalendar::VALUE => Vcalendar::PERIOD ]
+    )
+
+    // <span class="comment">revoke a recurrence date</span>
+    ->setExdate( new DateTime( '2019-05-12 09:00:00', new DateTimezone( $tz )))
+
+    // <span class="comment">organizer, chair  and some participants</span>
+    ->setOrganizer(
+        'secretary@coffeebean.com',
+        [ Vcalendar::CN => 'Secretary CoffeeBean' ]
+    )
+    ->setAttendee(
+        'president@coffeebean.com',
+        [
+            Vcalendar::ROLE     => Vcalendar::CHAIR,
+            Vcalendar::PARTSTAT => Vcalendar::ACCEPTED,
+            Vcalendar::RSVP     => Vcalendar::FALSE,
+            Vcalendar::CN       => 'President CoffeeBean',
+        ]
+    )
+    ->setAttendee(
+        'participant1@coffeebean.com',
+        [
+            Vcalendar::ROLE     => Vcalendar::REQ_PARTICIPANT,
+            Vcalendar::PARTSTAT => Vcalendar::NEEDS_ACTION,
+            Vcalendar::RSVP     => Vcalendar::TRUE,
+            Vcalendar::CN       => 'Participant1 CoffeeBean',
+        ]
+    )
+    ->setAttendee(
+        'participant2@coffeebean.com',
+        [
+            Vcalendar::ROLE     => Vcalendar::REQ_PARTICIPANT,
+            Vcalendar::PARTSTAT => Vcalendar::NEEDS_ACTION,
+            Vcalendar::RSVP     => Vcalendar::TRUE,
+            Vcalendar::CN       => 'Participant2 CoffeeBean',
+        ]
+    );
+
+    // <span class="comment">add an alarm for the event</span>
+$alarm = $event1->newValarm()
+    ->setAction( Vcalendar::DISPLAY )
+
+    // <span class="comment">copy description from event</span>
+    ->setDescription( $event1->getDescription())
+
+    // <span class="comment">fire off the alarm one day before</span>
+    ->setTrigger( '-P1D' );
+
+    // <span class="comment">alter day and time for one event in recurrence set</span>
+$event2 = $vcalendar->newVevent()
+    ->setTransp( Vcalendar::OPAQUE )
+    ->setClass( Vcalendar::P_BLIC )
+
+    // <span class="comment">reference to one event in recurrence set</span>
+    ->setUid( $event1->getUid())
+    ->setSequence( 2 )
+    // <span class="comment">pointer to event in the recurrence set</span>
+    ->setRecurrenceid( '20190505T090000 Europe/Stockholm' )
+
+    // <span class="comment">opt. some description</span>
+    ->setDescription(
+        'Altered day and time for event 2019-05-05',
+        [ Vcalendar::ALTREP =>
+            'CID:&lt;FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com&gt;' ]
+    )
+    // <span class="comment">reason comment</span>
+    ->setComment( 'working hard for two hours...' )
+
+    // <span class="comment">the altered day and time with duration</span>
+    ->setDtstart( new DateTime( '20190504T100000', new DateTimezone( $tz )))
+    ->setDuration( 'PT2H' )
+
+    // <span class="comment">add alarm (copy from event1)</span>
+    ->setComponent( $event1->getComponent( Vcalendar::VALARM ));
+
+
+$calendarString = $vcalendar
+
+    // <span class="comment">apply appropriate Vtimezone with Standard/DayLight components</span>
+    ->vtimezonePopulate()
+
+    // <span class="comment">and create the (string) calendar</span>
+    ->createCalendar();
 
 </p>
 
 <h2>PARSE</h2>
 <h4>iCal, rfc5545 / rfc2445 </h4>
 <p>How to parse an iCal (external/file) resource</p>
-<p class="example">
+<p class="example">&lt;?php
+
+use Kigkonsult\Icalcreator\Vcalendar;
 
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$vcalendar   = new Vcalendar(
-    [ Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ]
-);
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
+        // <span class="comment">get iCal contents from file</span>
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 
+        // <span class="comment">parse iCal contents</span>
 $vcalendar-&gt;parse( $iCalContent );
 
 <h4>xCal, rfc6321 (XML)</h4>
 <p>
-How to convert (file) XML resource  to an Vcalendar instance.
+How to convert an XML resource  to an Vcalendar class instance.
 </p>
-<p class="example">
+<p class="example">&lt;?php
+
+use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
 
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">required if any component UID is missing</span>
-$config = [ Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 
         // <span class="comment">use a local xCal file</span>
 $filename = &quot;xmlfile.xml&quot;;
         // <span class="comment">  or a remote xCal resource</span>
 /* $filename = 'http://kigkonsult.se/xcal.php?a=1&amp;b=2&amp;c=3'; */
-if( ! ( $calendar = Kigkonsult\Icalcreator\IcalXML::XMLfile2iCal( $filename, $config ))) {
-    exit( &quot;Error when parsing $filename&quot; );
+
+        // <span class="comment">get XML contents from file</span>
+$iCalContent = file_get_contents( $filename );
+
+    // <span class="comment">parse the XML contents to Vcalendar class instance</span>
+try {
+    $calendar = IcalXMLFactory::XML2iCal( $iCalContent, $config );
+}
+catch( Exception $e ) {
+    exit( &quot;XML parse error&quot; );
 }
         // <span class="comment">continue process (edit, parse, select) $calendar</span>
-
+...
+...
 </p>
 
 
 <h2>EDIT</h2>
-<p class="example">
+<p>
+(setup)
+</p>
+<p class="example">&lt;?php
+
+use Kigkonsult\Icalcreator\Vcalendar;
 
         // <span class="comment">create a new Vcalendar instance</span>
-$config   = [ Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$config   = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 $calendar = new Vcalendar( $config );
 
-        // <span class="comment">parse a calendar file</span>
-$config   = [
-    Util::$DIRECTORY =&gt; &quot;calendars&quot;,
-    Util::$FILENAME  =&gt; &quot;file.ics&quot;
-];
-$calendar-&gt;setConfig( $config );
-$calendar-&gt;parse();
+        // <span class="comment">get iCal contents from file</span>
+$iCalContent = file_get_contents( &quot;calendar.ics&quot; );
+
+        // <span class="comment">parse iCal contents</span>
+$calendar-&gt;parse( $iCalContent )
+
         // <span class="comment">required of some calendar software</span>
+    -&gt;setMethod( Vcalendar::PUBLISH )
+    -&gt;setXprop(  Vcalendar::X_WR_CALNAME, &quot;Calendar Sample&quot; )
+    -&gt;setXprop(  Vcalendar::X_WR_CALDESC, &quot;Calendar Description&quot; )
+    -&gt;setXprop(  Vcalendar::X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
 
-$calendar-&gt;setProperty( Util::$METHOD,        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_CALNAME,  &quot;Calendar Sample&quot;);
-$calendar-&gt;setProperty( Util::$X_WR_CALDESC,  &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
-
+</p>
+<p>
+Get and set values
+</p>
+<p class="example">
         // <span class="comment">read events, one by one</span>
-while( $vevent = $calendar-&gt;getComponent(
-    Vcalendar::VEVENT )) {
+while( $vevent = $calendar-&gt;getComponent( Vcalendar::VEVENT )) {
 
         // <span class="comment">get uid (unique id/key for component), required, one occurrence </span>
-    $uid = $vevent-&gt;getProperty( Util::$UID );
+    $uid = $vevent-&gt;getUid();
 
         // <span class="comment">get dtstart required, one occurrence</span>
-    $dtstart = $vevent-&gt;getProperty( Util::$DTSTART );
+    $dtstart = $vevent-&gt;getDtstart();
 
-        // <span class="comment">opt. description</span>
-    if( $description = $vevent-&gt;getProperty( Util::$DESCRIPTION, 1 )) {
+        // <span class="comment">opt. (first) description</span>
+    if( false != ( $description = $vevent-&gt;getDescription())) {
 
         // <span class="comment">edit the description</span>
+    ...
 
         // <span class="comment">update/replace the description</span>
-        $vevent-&gt;setProperty(
-            Util::$DESCRIPTION,
-            $description,
-            false,
-            1
-        );
+        $vevent-&gt;setDescription( $description );
     }
 
-        // <span class="comment">get optional comments</span>
-    while( $comment = $vevent-&gt;getProperty( Util::$COMMENT )) {
+        // <span class="comment">get optional comments, may occur multiple times</span>
+    while( $comment = $vevent-&gt;getComment() {
         .. .
     }
 
         // <span class="comment">remove all ATTENDEE properties .. .</span>
-    while( $vevent-&gt;deleteProperty( Util::$ATTENDEE )) {
+    while( $vevent-&gt;deleteAttendee()) {
        continue;
     }
 
-        // <span class="comment">update/replace event in calendar</span>
-        // <span class="comment"> with UID as key</span>
-    $calendar-&gt;setComponent ( $vevent, $uid );
+        // <span class="comment">update/replace event in calendar with UID as key</span>
+    $calendar-&gt;setComponent( $vevent, $uid );
 } // end while
 
 </p>
-<br>
-<br>
+
 
 <h2>SELECT</h2>
 <p>
-(setup)
-</p>
-<p class="example">
-
-        // <span class="comment">create a new Vcalendar instance</span>
-$calendar   = new Vcalendar(
-    [ Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ]
-);
-
-$iCalContent = file_get_contents( &quot;http://www.aDomain.net/file.ics&quot; );
-
-$calendar-&gt;parse( $iCalContent );
-
-        // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( Util::$METHOD,        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_CALNAME,  &quot;Calendar Sample&quot;);
-$calendar-&gt;setProperty( Util::$X_WR_CALDESC,  &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_TIMEZONE, &quot;Europe/Stockholm&quot;);
-
+(setup as above)
 </p>
 <h4>Ex. calendar date based select</h4>
 <p class="example">
-
         // <span class="comment">select components occurring today</span>
         // <span class="comment">(including components with recurrence pattern)</span>
 $eventArray = $calendar-&gt;selectComponents();
@@ -520,14 +580,16 @@ foreach( $eventArray as $year =&gt; $yearArray) {
         // <span class="comment">if event is a member of a recurrence set</span>
         // <span class="comment">returns [ </span>
         // <span class="comment">    &quot;x-current-dtstart&quot;,</span>
-        // <span class="comment">   (string) date( &quot;Y-m-d [H:i:s][timezone/UTC offset]&quot;)</span>
+        // <span class="comment">   (string) date( &quot;Y-m-d [H:i:s][timezone]&quot; )</span>
         // <span class="comment">]</span>
-                $currddate = $event-&gt;getProperty( Util::$X_CURRENT_DTSTART );
+                $currDate    = $event-&gt;getXprop( Vcalendar::X_CURRENT_DTSTART );
 
         // <span class="comment">orig. dtstart</span>
-                $dtstart     = $vevent-&gt;getProperty( Util::$DTSTART );
-                $summary     = $vevent-&gt;getProperty( Util::$SUMMARY );
-                $description = $vevent-&gt;getProperty( Util::$DESCRIPTION );
+                $dtstart     = $vevent-&gt;getDtstart();
+
+        // <span class="comment">event description</span>
+                $summary     = $vevent-&gt;getSummary();
+                $description = $vevent-&gt;getDescription();
                 .. .
                 .. .
             } // end foreach
@@ -537,6 +599,9 @@ foreach( $eventArray as $year =&gt; $yearArray) {
 
 </p>
 <h4>Ex. calendar select specific property values</h4>
+<p>
+(setup as above)
+</p>
 <p class="example">
 
         // <span class="comment">fetch specific property from calendar perspective</span>
@@ -546,99 +611,87 @@ foreach( $eventArray as $year =&gt; $yearArray) {
         // <span class="comment">PRIORITY, RESOURCES, STATUS,</span>
         // <span class="comment">SUMMARY, UID, URL,</span>
         // <span class="comment">GEOLOCATION<sup>*</sup></span>
-$valueOccur = $calendar-&gt;getProperty( Util::$RESOURCES );
-foreach( $valueOccur as $uniqueValue =&gt; $occurCnt ) {
-
-    echo &quot;The RESOURCES value &lt;b&gt;$uniqueValue&lt;/b&gt; occurs &lt;b&gt;$occurCnt&lt;/b&gt; times&lt;br /&gt;&quot;;
-
+$valueOccur = $calendar-&gt;getProperty( Vcalendar::RESOURCES );
+foreach( $valueOccur as $uniquePropertyValue =&gt; $occurCnt ) {
+    echo 'The RESOURCES value ' . $uniquePropertyValue .
+         ' occurs ' . $occurCnt . ' times';
 }
 
 </p>
 <p>
-<sup>*</sup>) Using the non-standard directive "GEOLOCATION", iCalcreator returns output supporting
-ISO6709 "Standard representation of geographic point location by coordinates",
+<sup>*</sup>) Using the non-standard directive "GEOLOCATION", iCalcreator returns output
 by combining the "LOCATION" and "GEO" property values (only if "GEO" is set).
 </p>
 <h4>Ex. select calendar components based on specific property value</h4>
+<p>
+(setup as above)
+</p>
 <p class="example">
-
         // <span class="comment">selects components</span>
         // <span class="comment">based on specific property value(-s)</span>
         // <span class="comment">ATTENDEE, CATEGORIES, CONTACT,</span>
         // <span class="comment">LOCATION, ORGANIZER,</span>
         // <span class="comment">PRIORITY, RESOURCES, STATUS,</span>
         // <span class="comment">SUMMARY, URL, UID</span>
-$selectSpec = [ Util::$CATEGORIES =&gt; &quot;course1&quot; ];
+$selectSpec = [ Vcalendar::CATEGORIES =&gt; &quot;course1&quot; ];
 $specComps  = $calendar-&gt;selectComponents( $selectSpec );
-foreach( $specComps as $comp ) {
+foreach( $specComps as $component ) {
     .. .
 }
 
 </p>
-<br>
-<br>
 
 <h2>OUTPUT</h2>
-<p>(setup)</p>
-<p class="example">
 
-        // <span class="comment">create a new Vcalendar instance</span>
-$calendar   = new Vcalendar(
-    [ Util::$UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ]
-);
-
-        // <span class="comment">required of some calendar software</span>
-$calendar-&gt;setProperty( Util::$METHOD,        &quot;PUBLISH&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_CALNAME,  &quot;Calendar Sample&quot;);
-$calendar-&gt;setProperty( Util::$X_WR_CALDESC,  &quot;Calendar Description&quot; );
-$calendar-&gt;setProperty( Util::$X_WR_TIMEZONE, &quot;Europe/Stockholm&quot;);
-
-        // <span class="comment">continue process (edit, parse, select) $calendar</span>
-
-</p>
 <h5>opt 1</h5>
 <p>
-Redirect calendar file to browser.
+    Get calendar as string
 </p>
-<p class="example">
 
+<p class="example">...
+$calendarStr = $calendar-&gt;createCalendar();
+
+</p>
+
+
+<h5>opt 2</h5>
+<p>
+    Redirect calendar file to browser.
+</p>
+<p class="example">...
 $calendar-&gt;returnCalendar();
 exit;
 
 </p>
 
-<h5>opt 2</h5>
+<h5>opt 3</h5>
 <p>
-Save calendar to file.
+    Save calendar to file.
 </p>
-<p class="example">
+<p class="example">...
+        // <span class="comment">Get calendar as string</span>
+$calendarStr = $calendar-&gt;createCalendar();
 
-        // <span class="comment">set output directory and file name</span>
-$config = [
-    Util::$DIRECTORY =&gt; &quot;depot&quot;,
-    Util::$FILENAME  =&gt; &quot;calendar.ics&quot;
-];
-$calendar-&gt;setConfig( $config );
-$calendar-&gt;saveCalendar();
+        // <span class="comment">Save string as file</span>
+$iCalContent = file_put_contents( &quot;calendar.ics&quot;, $calendarStr );
 
 </p>
 
-<h5>opt 3, xCal</h5>
+<h5>opt 4, xCal</h5>
 <p>
-Create well-formed XML, rfc6321 (as string).
+    Create well-formed XML, rfc6321 (as string) from a Vcalendar class instance.
 </p>
-<p class="example">
-
-$xmlstr = Kigkonsult\Icalcreator\IcalXML::iCal2XML( $calendar);
+<p class="example">...
+$xmlstr = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $calendar);
 
 </p>
 
-<h5>opt 4, json</h5>
+<h5>opt 5, json</h5>
 <p>
-Create a json string.
+    Create a json string from a Vcalendar class instance.
 </p>
-<p class="example">
-$xmlstr = Kigkonsult\Icalcreator\IcalXML::iCal2XML( $calendar);
+<p class="example">...
+$xmlstr = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $calendar);
 $json   = json_encode( simplexml_load_string( $xmlstr ));
 
 </p>
@@ -653,28 +706,28 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
 
 <table>
     <tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
-    <tr><td>Link     <td>http://kigkonsult.se/iCalcreator/index.php
+    <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.26.8
+    <tr><td>Version  <td>2.28
     <tr><td class="top">License  <td>
-    Subject matter of licence is the software iCalcreator.<br>
-    The above copyright, link, package and version notices,<br>
-    this licence notice and the invariant [rfc5545] PRODID result use<br>
-    as implemented and invoked in iCalcreator shall be included in<br>
-    all copies or substantial portions of the iCalcreator.<br>
-    <br>
-    iCalcreator is free software: you can redistribute it and/or modify<br>
-    it under the terms of the GNU Lesser General Public License as published<br>
-    by the Free Software Foundation, either version 3 of the License,<br>
-    or (at your option) any later version.<br>
-    <br>
-    iCalcreator is distributed in the hope that it will be useful,<br>
-    but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the<br>
-    GNU Lesser General Public License for more details.<br>
-    <br>
-    You should have received a copy of the GNU Lesser General Public License<br>
-    along with iCalcreator. If not, see &lt;https://www.gnu.org/licenses/&gt;.
+        Subject matter of licence is the software iCalcreator.<br>
+        The above copyright, link, package and version notices,<br>
+        this licence notice and the invariant [rfc5545] PRODID result use<br>
+        as implemented and invoked in iCalcreator shall be included in<br>
+        all copies or substantial portions of the iCalcreator.<br>
+        <br>
+        iCalcreator is free software: you can redistribute it and/or modify<br>
+        it under the terms of the GNU Lesser General Public License as published<br>
+        by the Free Software Foundation, either version 3 of the License,<br>
+        or (at your option) any later version.<br>
+        <br>
+        iCalcreator is distributed in the hope that it will be useful,<br>
+        but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the<br>
+        GNU Lesser General Public License for more details.<br>
+        <br>
+        You should have received a copy of the GNU Lesser General Public License<br>
+        along with iCalcreator. If not, see &lt;https://www.gnu.org/licenses/&gt;.
 </table>
 
 <br>

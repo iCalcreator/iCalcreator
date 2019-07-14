@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,19 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
+
+use function strtoupper;
 
 /**
  * STATUS property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait STATUStrait
 {
@@ -56,13 +62,38 @@ trait STATUStrait
             return null;
         }
         if( empty( $this->status[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$STATUS ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::STATUS ) : null;
         }
-        return Util::createElement(
-            Util::$STATUS,
-            Util::createParams( $this->status[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::STATUS,
+            ParameterFactory::createParams( $this->status[Util::$LCparams] ),
             $this->status[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property status
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteStatus() {
+        $this->status = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property status
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getStatus( $inclParam = false ) {
+        if( empty( $this->status )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->status : $this->status[Util::$LCvalue];
     }
 
     /**
@@ -70,21 +101,48 @@ trait STATUStrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.2 2019-03-14
      */
-    public function setStatus( $value, $params = null ) {
-        if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+    public function setStatus( $value = null, $params = null ) {
+        static $ALLOWED_VEVENT = [
+            self::CONFIRMED,
+            self::CANCELLED,
+            self::TENTATIVE
+        ];
+        static $ALLOWED_VTODO = [
+            self::COMPLETED,
+            self::CANCELLED,
+            self::IN_PROCESS,
+            self::NEEDS_ACTION,
+        ];
+        static $ALLOWED_VJOURNAL = [
+            self::CANCELLED,
+            self::DRAFT,
+            self::F_NAL,
+        ];
+
+        switch( true ) {
+            case ( empty( $value )) :
+                $this->assertEmptyValue( $value, self::STATUS );
+                $value  = Util::$SP0;
+                $params = [];
+                break;
+            case ( Vcalendar::VEVENT == $this->getCompType()) :
+                self::assertInEnumeration( $value, $ALLOWED_VEVENT, self::STATUS );
+                break;
+            case ( Vcalendar::VTODO == $this->getCompType()) :
+                self::assertInEnumeration( $value, $ALLOWED_VTODO, self::STATUS );
+                break;
+            case ( Vcalendar::VJOURNAL == $this->getCompType()) :
+                self::assertInEnumeration( $value, $ALLOWED_VJOURNAL, self::STATUS );
+                break;
         }
         $this->status = [
-            Util::$LCvalue  => Util::trimTrailNL( $value ),
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

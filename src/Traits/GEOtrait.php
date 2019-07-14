@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,8 +30,10 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\UtilGeo;
+use Kigkonsult\Icalcreator\Util\GeoFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 use function floatval;
 use function is_array;
@@ -40,7 +42,7 @@ use function is_array;
  * GEO property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait GEOtrait
 {
@@ -60,15 +62,60 @@ trait GEOtrait
             return null;
         }
         if( empty( $this->geo[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$GEO ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::GEO ) : null;
         }
-        return Util::createElement(
-            Util::$GEO,
-            Util::createParams(
-                $this->geo[Util::$LCparams] ),
-            UtilGeo::geo2str2( $this->geo[Util::$LCvalue][UtilGeo::$LATITUDE], UtilGeo::$geoLatFmt ) .
-                Util::$SEMIC .
-                UtilGeo::geo2str2( $this->geo[Util::$LCvalue][UtilGeo::$LONGITUDE], UtilGeo::$geoLongFmt ));
+        return StringFactory::createElement(
+            self::GEO,
+            ParameterFactory::createParams(
+                $this->geo[Util::$LCparams]
+            ),
+            GeoFactory::geo2str2( $this->geo[Util::$LCvalue][self::LATITUDE], GeoFactory::$geoLatFmt ) .
+            Util::$SEMIC .
+            GeoFactory::geo2str2( $this->geo[Util::$LCvalue][self::LONGITUDE], GeoFactory::$geoLongFmt )
+        );
+    }
+
+    /**
+     * Delete calendar component property geo
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteGeo() {
+        $this->geo = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property geo
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getGeo( $inclParam = false ) {
+        if( empty( $this->geo )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->geo : $this->geo[Util::$LCvalue];
+    }
+
+    /**
+     * Get ISO6709 "Standard representation of geographic point location by coordinates"
+     *
+     * Combining the LOCATION and GEO property values (only if GEO is set)
+     * @return bool|string
+     * @since 2.27.14 2019-02-27
+     */
+    public function getGeoLocation() {
+        if( false === ( $geo = $this->getGeo())) {
+            return false;
+        }
+        $loc     = $this->getLocation();
+        $content = ( empty( $loc )) ? null : $loc . Util::$L;
+        return $content .
+            GeoFactory::geo2str2( $geo[self::LATITUDE], GeoFactory::$geoLatFmt ) .
+            GeoFactory::geo2str2( $geo[self::LONGITUDE], GeoFactory::$geoLongFmt);
     }
 
     /**
@@ -77,26 +124,25 @@ trait GEOtrait
      * @param mixed $latitude
      * @param mixed $longitude
      * @param array $params
-     * @return bool
+     * @return static
+     * @since 2.27.3 2018-12-22
      */
-    public function setGeo( $latitude, $longitude, $params = null ) {
+    public function setGeo( $latitude = null, $longitude = null, $params = null ) {
         if( isset( $latitude ) && isset( $longitude )) {
             if( ! is_array( $this->geo )) {
                 $this->geo = [];
             }
-            $this->geo[Util::$LCvalue][UtilGeo::$LATITUDE]  = floatval( $latitude );
-            $this->geo[Util::$LCvalue][UtilGeo::$LONGITUDE] = floatval( $longitude );
-            $this->geo[Util::$LCparams]                     = Util::setParams( $params );
-        }
-        elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-            $this->geo = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => Util::setParams( $params ),
-            ];
+            $this->geo[Util::$LCvalue][self::LATITUDE]  = floatval( $latitude );
+            $this->geo[Util::$LCvalue][self::LONGITUDE] = floatval( $longitude );
+            $this->geo[Util::$LCparams]                 = ParameterFactory::setParams( $params );
         }
         else {
-            return false;
+            $this->assertEmptyValue( $latitude, self::GEO );
+            $this->geo = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
         }
-        return true;
+        return $this;
     }
 }

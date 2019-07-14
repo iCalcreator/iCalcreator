@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,14 +31,16 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use InvalidArgumentException;
 
+use Kigkonsult\Icalcreator\Vcalendar;
 use function sprintf;
 
 /**
  * CALSCALE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since  2.27.3 - 2019-03-13
  */
 trait CALSCALEtrait
 {
@@ -54,22 +56,49 @@ trait CALSCALEtrait
      * @return string
      */
     public function createCalscale() {
-        return ( empty( $this->calscale ))
-            ? null
-            : sprintf( self::$FMTICAL, Util::$CALSCALE, $this->calscale );
+        if( empty( $this->calscale )) {
+            $this->calscale = Vcalendar::GREGORIAN;
+        }
+        return sprintf( self::$FMTICAL, self::CALSCALE, $this->calscale );
+    }
+
+    /**
+     * Delete calendar component property calscale
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteCalscale() {
+        $this->calscale = null;
+        return true;
+    }
+
+    /**
+     * Return calscale
+     *
+     * @return string
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function getCalscale() {
+        if( empty( $this->calscale )) {
+            $this->calscale = Vcalendar::GREGORIAN;
+        }
+        return $this->calscale;
     }
 
     /**
      * Set calendar property calscale
      *
      * @param string $value
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException;
+     * @since  2.27.3 - 2018-12-22
      */
     public function setCalscale( $value ) {
         if( empty( $value )) {
-            return false;
+            $value = Vcalendar::GREGORIAN;
         }
         $this->calscale = $value;
-        return true;
+        return $this;
     }
 }

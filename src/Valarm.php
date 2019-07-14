@@ -1,11 +1,11 @@
 <?php
 /**
- * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,8 +30,7 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\UtilDuration;
+use Exception;
 
 use function sprintf;
 use function strtoupper;
@@ -40,9 +39,9 @@ use function strtoupper;
  * iCalcreator VALARM component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.4 - 2018-12-19
  */
-class Valarm extends CalendarComponent
+final class Valarm extends CalendarComponent
 {
     use Traits\ACTIONtrait,
         Traits\ATTACHtrait,
@@ -54,38 +53,33 @@ class Valarm extends CalendarComponent
         Traits\TRIGGERtrait;
 
     /**
-     * Constructor for calendar component VALARM object
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.22.20 - 2017-02-01
-     * @param array $config
+     * @var string
+     * @access protected
+     * @static
      */
-    public function __construct( $config = [] ) {
-        static $A = 'a';
-        parent::__construct();
-        $this->setConfig( Util::initConfig( $config ));
-        $this->cno = $A . parent::getObjectNo();
-    }
+    protected static $compSgn = 'a';
 
     /**
      * Destructor
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
+     * @since  2.27.3 - 2018-12-28
      */
     public function __destruct() {
-        unset( $this->xprop,
+        unset(
+            $this->compType,
+            $this->xprop,
             $this->components,
             $this->unparsed,
             $this->config,
-            $this->propix,
-            $this->propdelix
+            $this->propIx,
+            $this->propDelIx
         );
-        unset( $this->compType,
+        unset(
             $this->cno,
             $this->srtk
         );
-        unset( $this->action,
+        unset(
+            $this->action,
             $this->attach,
             $this->attendee,
             $this->description,
@@ -99,13 +93,13 @@ class Valarm extends CalendarComponent
     /**
      * Return formatted output for calendar component VALARM object instance
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
      * @return string
+     * @throws Exception  (on Duration/Trigger err)
+     * @since  2.26 - 2018-11-10
      */
     public function createComponent() {
-        $compType    = strtoupper( $this->compType );
-        $component   = sprintf( Util::$FMTBEGIN, $compType );
+        $compType    = strtoupper( $this->getCompType());
+        $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createAction();
         $component  .= $this->createAttach();
         $component  .= $this->createAttendee();
@@ -115,65 +109,7 @@ class Valarm extends CalendarComponent
         $component  .= $this->createSummary();
         $component  .= $this->createTrigger();
         $component  .= $this->createXprop();
-        return $component . sprintf( Util::$FMTEND, $compType );
+        return $component . sprintf( self::$FMTEND, $compType );
     }
 
-    /**
-     * Return Valarm component property value/params,
-     *
-     * If arg $inclParam, return array with keys VALUE/PARAMS.
-     *
-     * @param string $propName
-     * @param int    $propix specific property in case of multiply occurences
-     * @param bool   $inclParam
-     * @param bool   $specform
-     * @return mixed
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.7 - 2018-12-02
-     */
-    public function getProperty(
-        $propName  = null,
-        $propix    = null,
-        $inclParam = null,
-        $specform  = null
-    ) {
-        switch( strtoupper( $propName )) {
-            case Util::$ACTION:
-                if( isset( $this->action[Util::$LCvalue] )) {
-                    return ( $inclParam ) ? $this->action : $this->action[Util::$LCvalue];
-                }
-                break;
-            case Util::$REPEAT:
-                if( isset( $this->repeat[Util::$LCvalue] )) {
-                    return ( $inclParam ) ? $this->repeat : $this->repeat[Util::$LCvalue];
-                }
-                break;
-            case Util::$TRIGGER:
-                if( ! isset( $this->trigger[Util::$LCvalue] )) {
-                    break;
-                }
-                if( isset( $this->trigger[Util::$LCvalue]['invert'] )) { // fix pre 7.0.5 bug
-                    $dateInterval = UtilDuration::DateIntervalArr2DateInterval( $this->trigger[Util::$LCvalue] );
-                    $value = UtilDuration::dateInterval2arr( $dateInterval );
-                    $value[UtilDuration::$BEFORE]       =
-                        ( 0 < $this->trigger[Util::$LCvalue]['invert'] ) ? true : false;
-                    $value[UtilDuration::$RELATEDSTART] =
-                        ( isset( $this->trigger[Util::$LCparams ][UtilDuration::$RELATED] ) &&
-                        ( UtilDuration::$END == $this->trigger[Util::$LCparams ][UtilDuration::$RELATED] ))
-                            ? false
-                            : true;
-                }
-                else {
-                    $value = $this->trigger[Util::$LCvalue];
-                }
-                return ( $inclParam )
-                    ? [ Util::$LCvalue => $value, Util::$LCparams => $this->trigger[Util::$LCparams ] ]
-                    : $value;
-                break;
-            default:
-                return parent::getProperty( $propName, $propix, $inclParam, $specform );
-                break;
-        }
-        return false;
-    }
 }

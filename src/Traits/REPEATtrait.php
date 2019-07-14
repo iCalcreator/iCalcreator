@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,10 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 use function is_numeric;
 
@@ -38,7 +41,7 @@ use function is_numeric;
  * REPEAT property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.3 2018-12-22
  */
 trait REPEATtrait
 {
@@ -54,19 +57,43 @@ trait REPEATtrait
      * @return string
      */
     public function createRepeat() {
-        if( ! isset( $this->repeat ) ||
-            ( empty( $this->repeat ) && ! is_numeric( $this->repeat ))) {
+        if( empty( $this->repeat )) {
             return null;
         }
         if( ! isset( $this->repeat[Util::$LCvalue] ) ||
             ( empty( $this->repeat[Util::$LCvalue] ) && ! is_numeric( $this->repeat[Util::$LCvalue] ))) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$REPEAT ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::REPEAT ) : null;
         }
-        return Util::createElement(
-            Util::$REPEAT,
-            Util::createParams( $this->repeat[Util::$LCparams] ),
+        return StringFactory::createElement(
+            self::REPEAT,
+            ParameterFactory::createParams( $this->repeat[Util::$LCparams] ),
             $this->repeat[Util::$LCvalue]
         );
+    }
+
+    /**
+     * Delete calendar component property repeat
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteRepeat() {
+        $this->repeat = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property repeat
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-13
+     */
+    public function getRepeat( $inclParam = false ) {
+        if( empty( $this->repeat )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->repeat : $this->repeat[Util::$LCvalue];
     }
 
     /**
@@ -74,21 +101,23 @@ trait REPEATtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setRepeat( $value, $params = null ) {
-        if( empty( $value ) && ! is_numeric( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+    public function setRepeat( $value = null, $params = null ) {
+        if( empty( $value ) && ( Util::$ZERO != $value )) {
+            $this->assertEmptyValue( $value, self::REPEAT );
+            $value  = Util::$SP0;
+            $params = [];
+        }
+        else {
+            self::assertIsInteger( $value, self::REPEAT );
         }
         $this->repeat = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

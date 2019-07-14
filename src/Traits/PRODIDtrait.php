@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,6 +30,7 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 use function sprintf;
@@ -55,10 +56,23 @@ trait PRODIDtrait
      * @return string
      */
     public function createProdid() {
-        if( ! isset( $this->prodid )) {
+        if( empty( $this->prodid )) {
             $this->makeProdid();
         }
-        return Util::createElement( Util::$PRODID, null, $this->prodid );
+        return StringFactory::createElement( self::PRODID, null, $this->prodid );
+    }
+
+    /**
+     * Return prodid
+     *
+     * @return string
+     * @since  2.27.1 - 2018-12-16
+     */
+    public function getProdid() {
+        if( empty( $this->prodid )) {
+            $this->makeProdid();
+        }
+        return $this->prodid;
     }
 
     /**
@@ -72,12 +86,11 @@ trait PRODIDtrait
      *  is a globally unique identifier; using some technique such as an FPI
      *  value, as defined in [ISO 9070]."
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.26.2 - 2018-11-29
      */
     public function makeProdid() {
         static $FMT = '-//%s//NONSGML kigkonsult.se %s//%s';
-        if( false !== ( $lang = $this->getConfig( Util::$LANGUAGE ))) {
+        if( false !== ( $lang = $this->getConfig( self::LANGUAGE ))) {
             $lang = strtoupper( $lang );
         }
         else {
@@ -85,7 +98,7 @@ trait PRODIDtrait
         }
         $this->prodid = sprintf(
             $FMT,
-            $this->getConfig( Util::$UNIQUE_ID ),
+            $this->getConfig( self::UNIQUE_ID ),
             ICALCREATOR_VERSION,
             $lang
         );

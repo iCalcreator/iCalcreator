@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * TZID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-05
+ * @since 2.27.3 2018-12-22
  */
 trait TZIDtrait
 {
@@ -56,13 +59,38 @@ trait TZIDtrait
             return null;
         }
         if( empty( $this->tzid[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$TZID ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::TZID ) : null;
         }
-        return Util::createElement(
-            Util::$TZID,
-            Util::createParams( $this->tzid[Util::$LCparams] ),
-            Util::strrep( $this->tzid[Util::$LCvalue] )
+        return StringFactory::createElement(
+            self::TZID,
+            ParameterFactory::createParams( $this->tzid[Util::$LCparams] ),
+            StringFactory::strrep( $this->tzid[Util::$LCvalue] )
         );
+    }
+
+    /**
+     * Delete calendar component property tzid
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteTzid() {
+        $this->tzid = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property tzid
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-13
+     */
+    public function getTzid( $inclParam = false ) {
+        if( empty( $this->tzid )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->tzid : $this->tzid[Util::$LCvalue];
     }
 
     /**
@@ -71,21 +99,20 @@ trait TZIDtrait
      * @since 2.23.12 - 2017-04-22
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setTzid( $value, $params = null ) {
+    public function setTzid( $value = null, $params = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::TZID );
+            $value  = Util::$SP0;
+            $params = [];
         }
         $this->tzid = [
-            Util::$LCvalue  => trim( Util::trimTrailNL( $value )),
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCvalue  => trim( StringFactory::trimTrailNL( $value )),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

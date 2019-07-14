@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * SUMMARY property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait SUMMARYtrait
 {
@@ -56,17 +59,42 @@ trait SUMMARYtrait
             return null;
         }
         if( empty( $this->summary[Util::$LCvalue] )) {
-            return ( $this->getConfig( Util::$ALLOWEMPTY )) ? Util::createElement( Util::$SUMMARY ) : null;
+            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::SUMMARY ) : null;
         }
-        return Util::createElement(
-            Util::$SUMMARY,
-            Util::createParams(
+        return StringFactory::createElement(
+            self::SUMMARY,
+            ParameterFactory::createParams(
                 $this->summary[Util::$LCparams],
-                Util::$ALTRPLANGARR,
-                $this->getConfig( Util::$LANGUAGE )
+                self::$ALTRPLANGARR,
+                $this->getConfig( self::LANGUAGE )
             ),
-            Util::strrep( $this->summary[Util::$LCvalue] )
+            StringFactory::strrep( $this->summary[Util::$LCvalue] )
         );
+    }
+
+    /**
+     * Delete calendar component property summary
+     *
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteSummary() {
+        $this->summary = null;
+        return true;
+    }
+
+    /**
+     * Get calendar component property summary
+     *
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getSummary( $inclParam = false ) {
+        if( empty( $this->summary )) {
+            return false;
+        }
+        return ( $inclParam ) ? $this->summary : $this->summary[Util::$LCvalue];
     }
 
     /**
@@ -74,21 +102,20 @@ trait SUMMARYtrait
      *
      * @param string $value
      * @param array  $params
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setSummary( $value, $params = null ) {
+    public function setSummary( $value = null, $params = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::SUMMARY );
+            $value  = Util::$SP0;
+            $params = [];
         }
         $this->summary = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => Util::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        return true;
+        return $this;
     }
 }

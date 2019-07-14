@@ -1,11 +1,11 @@
 <?php
 /**
- * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,11 +31,13 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;
+use InvalidArgumentException;
 
 use function clearstatcache;
 use function file_put_contents;
 use function fclose;
 use function filesize;
+use function filter_var;
 use function filemtime;
 use function fopen;
 use function fpassthru;
@@ -44,7 +46,10 @@ use function header;
 use function is_file;
 use function is_readable;
 use function sprintf;
+use function strcasecmp;
 use function strlen;
+use function strpos;
+use function substr;
 use function sys_get_temp_dir;
 use function tempnam;
 use function time;
@@ -52,12 +57,12 @@ use function unlink;
 use function utf8_encode;
 
 /**
- * iCalcreator redirect support class
+ * iCalcreator http support class, also rfc2368 support (iCal cal-address)
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.8 - 2019-03-17
  */
-class UtilRedirect
+class HttpFactory
 {
     /**
      * HTTP headers
@@ -93,7 +98,7 @@ class UtilRedirect
         $cdType     = true
     ) {
         static $ICR = 'iCr';
-        $filename = $calendar->getConfig( Util::$FILENAME );
+        $filename = $calendar->getConfig( Vcalendar::FILENAME );
         $output   = $calendar->createCalendar();
         if( $utf8Encode ) {
             $output = utf8_encode( $output );
@@ -139,8 +144,8 @@ class UtilRedirect
         $cdType  = true
     ) {
         static $R = 'r';
-        if( false === ( $dirfile = $calendar->getConfig( Util::$URL ))) {
-            $dirfile = $calendar->getConfig( Util::$DIRFILE );
+        if( false === ( $dirfile = $calendar->getConfig( Vcalendar::URL ))) {
+            $dirfile = $calendar->getConfig( Vcalendar::DIRFILE );
         }
         if( ! is_file( $dirfile ) || ! is_readable( $dirfile )) {
             return false;
@@ -150,7 +155,7 @@ class UtilRedirect
         }
         clearstatcache();
         $fsize    = @filesize( $dirfile );
-        $filename = $calendar->getConfig( Util::$FILENAME );
+        $filename = $calendar->getConfig( Vcalendar::FILENAME );
         header( self::$headers[3] );
         if( ! empty( $fsize )) {
             header( sprintf( self::$headers[2], $fsize ));
@@ -165,4 +170,40 @@ class UtilRedirect
         fclose( $fp );
         return true;
     }
+
+    /**
+     * Assert URL
+     *
+     * @param string $url
+     * @throws InvalidArgumentException
+     * @static
+     * @since  2.27.3 - 2018-12-28
+     */
+    public static function assertUrl( $url ) {
+        static $UC   = '_';
+        static $URN  = 'urn';
+        static $HTTP = 'http://';
+        static $MSG  = 'Validity error #%d for URL value \'%s\'';
+        $url2 = ( false !== strpos( $url, $UC )) ? str_replace( $UC, Util::$MINUS, $url ) : $url;
+        $no   = 0;
+        do {
+            if( false !== filter_var( $url2, FILTER_VALIDATE_URL )) {
+                break;
+            }
+            if( empty( parse_url( $url2, PHP_URL_SCHEME)) &&
+                ( false !== filter_var( $HTTP . $url2, FILTER_VALIDATE_URL ))) {
+                break;
+            }
+            $no = 1;
+            if( 0 != strcasecmp( $URN, substr( $url, 0, 3 ))) {
+                $no = 2;
+            }
+            break;
+        } while( true );
+        if( ! empty( $no )) {
+            throw new InvalidArgumentException( sprintf( $MSG, $no, $url ));
+        }
+    }
+
+
 }

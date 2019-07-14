@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.9
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -26,11 +26,13 @@
  *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  *
  * This file is a part of iCalcreator.
-*/
-
+ */
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\HttpFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 use function define;
 use function defined;
@@ -38,15 +40,17 @@ use function array_change_key_case;
 use function array_filter;
 use function array_keys;
 use function array_slice;
-use function array_unshift;
 use function count;
 use function ctype_digit;
 use function get_object_vars;
-use function gethostbyname;
 use function is_array;
 use function is_null;
 use function is_object;
 use function key;
+use function ksort;
+use function microtime;
+use function property_exists;
+use function sprintf;
 use function strtolower;
 use function strtoupper;
 use function trim;
@@ -56,7 +60,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.26.9' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.28' );
 }
 
 /**
@@ -65,7 +69,7 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26.1 - 2018-11-17
+ * @since  2.27.20 - 2019-05-20
  */
 abstract class IcalBase implements IcalInterface
 {
@@ -76,44 +80,146 @@ abstract class IcalBase implements IcalInterface
      * @access protected
      * @static
      */
-    protected static $INDEX = 'INDEX';
+    protected static $INDEX  = 'INDEX';
+    protected static $YMDHIS = 'YmdHis';
+    protected static $DOTICS = '.ics';
+    protected static $BS     = '\\';
+
+    /**
+     * @var array  iCal V*-component collection
+     * @static
+     * @usedby IcalBase+Vcalendar+SelectFactory
+     */
+    public static $VCOMPS   = [
+        Vcalendar::VEVENT,
+        Vcalendar::VTODO,
+        Vcalendar::VJOURNAL,
+        Vcalendar::VFREEBUSY
+    ];
+
+    /**
+     * @var array  iCal timezone component collection
+     * @static
+     * @usedby DTSTARTtrait+RexdateFactory
+     */
+    public static $TZCOMPS  = [
+        Vcalendar::VTIMEZONE,
+        Vcalendar::STANDARD,
+        Vcalendar::DAYLIGHT
+    ];
+
+    /**
+     * @var array  iCal component collection
+     * @access protected
+     * @static
+     */
+    protected static $MCOMPS = [
+        Vcalendar::VEVENT,
+        Vcalendar::VTODO,
+        Vcalendar::VJOURNAL,
+        Vcalendar::VFREEBUSY,
+        Vcalendar::VALARM,
+        Vcalendar::VTIMEZONE
+    ];
+
+    /**
+     * @var array  iCal sub-component collection
+     * @access protected
+     * @static
+     * @usedby CalendarComponent+IcalBase+DTSTAMPtrait
+     */
+    protected static $SUBCOMPS = [
+        Vcalendar::VALARM,
+        Vcalendar::VTIMEZONE,
+        Vcalendar::STANDARD,
+        Vcalendar::DAYLIGHT
+    ];
+
+    /**
+     * @var array  iCal component multiple property sub-collection
+     * @static
+     * @usedby CalendarComponent + Vcalendar + SelectFactory + SortFactory
+     */
+    public static $MPROPS1    = [
+        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT,
+        Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
+    ];
+
+    /**
+     * @var array  iCal component multiple property collection
+     * @access protected
+     * @static
+     * @usedby CalendarComponent(deprecated) + IcalBase
+     */
+    protected static $MPROPS2    = [
+        Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
+        Vcalendar::COMMENT, Vcalendar::CONTACT, Vcalendar::DESCRIPTION,
+        Vcalendar::EXDATE, Vcalendar::EXRULE, Vcalendar::FREEBUSY, Vcalendar::RDATE,
+        Vcalendar::RELATED_TO, Vcalendar::RESOURCES, Vcalendar::RRULE,
+        Vcalendar::REQUEST_STATUS, Vcalendar::TZNAME, Vcalendar::X_PROP,
+    ];
+
+    /**
+     * @var array  iCal component misc. property collection
+     * @static
+     * @usedby Vcalendar + SelectFactory
+     */
+    public static $OTHERPROPS = [
+        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT, Vcalendar::LOCATION,
+        Vcalendar::ORGANIZER, Vcalendar::PRIORITY, Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
+        Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::UID, Vcalendar::URL,
+    ];
 
     /**
      * @var array container for sub-components
      * @access protected
      */
     protected $components = [];
+
     /**
      * @var array $unparsed calendar/components in 'raw' text...
      * @access protected
      */
     protected $unparsed = null;
+
     /**
-     * @var array $config configuration
+     * @var array $config configuration with defaults
      * @access protected
      */
-    protected $config = [];
+    protected $config = [
+        self::ALLOWEMPTY => true,
+        self::DELIMITER  => DIRECTORY_SEPARATOR,
+        self::DIRECTORY  => '.'
+    ];
+
+    /**
+     * @var string component type
+     * @access protected
+     */
+    protected $compType = null;
+
     /**
      * @var array component index
      * @access protected
      */
     protected $compix = [];
+
     /**
      * @var array get multi property index
      * @access protected
      */
-    protected $propix = [];
+    protected $propIx = [];
+
     /**
      * @var array delete multi property index
      * @access protected
      */
-    protected $propdelix = [];
+    protected $propDelIx = [];
 
     /**
      * __clone method
      *
      * @link https://php.net/manual/en/language.oop5.cloning.php#116329
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.26 - 2018-11-10
      */
     public function __clone() {
@@ -128,46 +234,149 @@ abstract class IcalBase implements IcalInterface
                     if( is_object( $attr_array_value )) {
                         $attr_array_value = clone $attr_array_value;
                     }
-                    unset( $attr_array_value);
+                    unset( $attr_array_value );
                 }
             }
         }
         $this->compix    = [];
-        $this->propix    = [];
-        $this->propdelix = [];
+        $this->propIx    = [];
+        $this->propDelIx = [];
     }
 
     /**
-     * Return config value or info about subcomponents, false on not found
+     * Reset internal counters
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
-     * @param mixed $config
-     * @return mixed
+     * @return static
+     * @since  2.27.14 - 2019-03-11
      */
-    public function getConfig( $config = false ) {
+    public function reset() {
+        $this->compix = [];
+        return $this;
+    }
+
+    /**
+     * Return component type
+     *
+     * @return string
+     * @static
+     * @since  2.27.2 - 2018-12-21
+     */
+    public function getCompType() {
+        return $this->compType;
+    }
+
+    /**
+     * Remove Vcalendar/component config key value
+     *
+     * @param string $key
+     * @return static
+     * @since  2.27.14 - 2019-02-04
+     */
+    public function deleteConfig( $key ) {
+        $key = strtoupper( $key );
+        if( isset( $this->config[$key] )) {
+            unset( $this->config[$key] );
+        }
+        return $this;
+    }
+
+    /**
+     * Return Vcalendar/component config value, false on not found
+     *
+     * @param mixed $config
+     * @return mixed   bool false on not found or empty
+     * @since  2.27.14 - 2019-02-20
+     */
+    public function getConfig( $config = null ) {
         static $LCORDNO = 'ordno';
         static $LCTYPE  = 'type';
         static $LCUID   = 'uid';
         static $LCPROPS = 'props';
         static $LCSUB   = 'sub';
-        if( empty( $config )) {
-            $return                    = [];
-            $return[Util::$ALLOWEMPTY] = $this->getConfig( Util::$ALLOWEMPTY );
-            if( false !== ( $lang = $this->getConfig( Util::$LANGUAGE ))) {
-                $return[Util::$LANGUAGE] = $lang;
+        if( is_null( $config )) {
+            $output                      = [];
+            $output[self::ALLOWEMPTY]    = $this->getConfig( self::ALLOWEMPTY );
+            if( false !== ( $cfg = $this->getConfig( self::LANGUAGE ))) {
+                $output[self::LANGUAGE]  = $cfg;
             }
-            $return[Util::$TZID]      = $this->getConfig( Util::$TZID );
-            $return[Util::$UNIQUE_ID] = $this->getConfig( Util::$UNIQUE_ID );
-            return $return;
+            $output[self::UNIQUE_ID]     = $this->getConfig( self::UNIQUE_ID );
+            if( ! property_exists( $this, self::getInternalPropName( self::PRODID ))) {
+                $output[self::DELIMITER] = $this->getConfig( self::DELIMITER );
+                $output[self::DIRECTORY] = $this->getConfig( self::DIRECTORY );
+                $output[self::FILENAME]  = $this->getConfig( self::FILENAME );
+                $output[self::DIRFILE]   = $this->getConfig( self::DIRFILE );
+                $output[self::FILESIZE]  = $this->getConfig( self::FILESIZE );
+                if( false !== ( $cfg = $this->getConfig( self::URL ))) {
+                    $output[self::URL]   = $cfg;
+                }
+            }
+            return $output;
         }
         switch( strtoupper( $config )) {
-            case Util::$ALLOWEMPTY:
-                if( isset( $this->config[Util::$ALLOWEMPTY] )) {
-                    return $this->config[Util::$ALLOWEMPTY];
+            case self::ALLOWEMPTY:
+                if( ! isset( $this->config[self::ALLOWEMPTY] )) { // default
+                    $this->config[self::ALLOWEMPTY] = true;
+                }
+                return $this->config[self::ALLOWEMPTY];
+                break;
+            case self::UNIQUE_ID:
+                if( isset( $this->config[self::UNIQUE_ID] )) {
+                    return $this->config[self::UNIQUE_ID];
                 }
                 break;
-            case Util::$COMPSINFO:
+            case self::LANGUAGE: // get language for calendar component as defined in [RFC 1766]
+                if( isset( $this->config[self::LANGUAGE] )) {
+                    return $this->config[self::LANGUAGE];
+                }
+                break;
+            case self::DELIMITER :
+                if( ! isset( $this->config[self::DELIMITER] )) {  // default
+                    $this->config[self::DELIMITER] = DIRECTORY_SEPARATOR;
+                }
+                return $this->config[self::DELIMITER];
+                break;
+            case self::DIRECTORY :
+                if( ! isset( $this->config[self::DIRECTORY] )) {  // default
+                    $this->config[self::DIRECTORY] = Util::$DOT;
+                }
+                return $this->config[self::DIRECTORY];
+                break;
+            case self::FILENAME :
+                if( ! isset( $this->config[self::FILENAME] )) {
+                    $this->config[self::FILENAME] = self::getFakedFilename();
+                }
+                return $this->config[self::FILENAME];
+                break;
+            case self::FILESIZE :
+                $size = 0;
+                if( empty( $this->config[self::URL] )) {
+                    $dirFile = $this->getConfig( self::DIRFILE );
+                    if( ! is_file( $dirFile ) || ( false === ( $size = filesize( $dirFile )))) {
+                        $size = 0;
+                    }
+                    clearstatcache();
+                }
+                return $size;
+                break;
+            case self::DIRFILE :
+                return
+                    $this->getConfig( self::DIRECTORY ) .
+                    $this->getConfig( self::DELIMITER ) .
+                    $this->getConfig( self::FILENAME );
+                break;
+            case self::FILEINFO :
+                return [
+                    $this->getConfig( self::DIRECTORY ),
+                    $this->getConfig( self::FILENAME ),
+                    $this->getConfig( self::FILESIZE ),
+                ];
+                break;
+            case self::URL :
+                if( ! empty( $this->config[self::URL] )) {
+                    return $this->config[self::URL];
+                }
+                break;
+            case self::COMPSINFO:
                 $this->compix = [];
                 $info = [];
                 if( ! empty( $this->components )) {
@@ -176,313 +385,498 @@ abstract class IcalBase implements IcalInterface
                             continue;
                         }
                         $info[$cix][$LCORDNO] = $cix + 1;
-                        $info[$cix][$LCTYPE]  = $component->compType;
-                        $info[$cix][$LCUID]   = $component->getProperty( Util::$UID );
-                        $info[$cix][$LCPROPS] = $component->getConfig( Util::$PROPINFO );
-                        $info[$cix][$LCSUB]   = $component->getConfig( Util::$COMPSINFO );
+                        $info[$cix][$LCTYPE]  = $component->getCompType();
+                        if( ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS )) {
+                            $info[$cix][$LCUID] = $component->getUid();
+                        }
+                        $info[$cix][$LCPROPS] = $component->getConfig( self::PROPINFO );
+                        $info[$cix][$LCSUB]   = $component->getConfig( self::COMPSINFO );
                     }
                 }
                 return $info;
                 break;
-            case Util::$LANGUAGE: // get language for calendar component as defined in [RFC 1766]
-                if( isset( $this->config[Util::$LANGUAGE] )) {
-                    return $this->config[Util::$LANGUAGE];
-                }
+            case self::PROPINFO:
+                return $this->getpropInfo();
                 break;
-            case Util::$PROPINFO:
-                $output = [];
-                if( ! Util::isCompInList( $this->compType, Util::$SUBCOMPS )) {
-                    if( empty( $this->uid )) {
-                        $this->uid = Util::makeUid( $this->getConfig( Util::$UNIQUE_ID ));
-                    }
-
-                    $output[Util::$UID] = 1;
-                    if( empty( $this->dtstamp )) {
-                        $this->dtstamp = Util::makeDtstamp();
-                    }
-                    $output[Util::$DTSTAMP] = 1;
-                }
-                if( ! empty( $this->summary )) {
-                    $output[Util::$SUMMARY] = 1;
-                }
-                if( ! empty( $this->description )) {
-                    $output[Util::$DESCRIPTION] = count( $this->description );
-                }
-                if( ! empty( $this->dtstart )) {
-                    $output[Util::$DTSTART] = 1;
-                }
-                if( ! empty( $this->dtend )) {
-                    $output[Util::$DTEND] = 1;
-                }
-                if( ! empty( $this->due )) {
-                    $output[Util::$DUE] = 1;
-                }
-                if( ! empty( $this->duration )) {
-                    $output[Util::$DURATION] = 1;
-                }
-                if( ! empty( $this->rrule )) {
-                    $output[Util::$RRULE] = count( $this->rrule );
-                }
-                if( ! empty( $this->rdate )) {
-                    $output[Util::$RDATE] = count( $this->rdate );
-                }
-                if( ! empty( $this->exdate )) {
-                    $output[Util::$EXDATE] = count( $this->exdate );
-                }
-                if( ! empty( $this->exrule )) {
-                    $output[Util::$EXRULE] = count( $this->exrule );
-                }
-                if( ! empty( $this->action )) {
-                    $output[Util::$ACTION] = 1;
-                }
-                if( ! empty( $this->attach )) {
-                    $output[Util::$ATTACH] = count( $this->attach );
-                }
-                if( ! empty( $this->attendee )) {
-                    $output[Util::$ATTENDEE] = count( $this->attendee );
-                }
-                if( ! empty( $this->categories )) {
-                    $output[Util::$CATEGORIES] = count( $this->categories );
-                }
-                if( ! empty( $this->class )) {
-                    $output[Util::$CLASS] = 1;
-                }
-                if( ! empty( $this->comment )) {
-                    $output[Util::$COMMENT] = count( $this->comment );
-                }
-                if( ! empty( $this->completed )) {
-                    $output[Util::$COMPLETED] = 1;
-                }
-                if( ! empty( $this->contact )) {
-                    $output[Util::$CONTACT] = count( $this->contact );
-                }
-                if( ! empty( $this->created )) {
-                    $output[Util::$CREATED] = 1;
-                }
-                if( ! empty( $this->freebusy )) {
-                    $output[Util::$FREEBUSY] = count( $this->freebusy );
-                }
-                if( ! empty( $this->geo )) {
-                    $output[Util::$GEO] = 1;
-                }
-                if( ! empty( $this->lastmodified )) {
-                    $output[Util::$LAST_MODIFIED] = 1;
-                }
-                if( ! empty( $this->location )) {
-                    $output[Util::$LOCATION] = 1;
-                }
-                if( ! empty( $this->organizer )) {
-                    $output[Util::$ORGANIZER] = 1;
-                }
-                if( ! empty( $this->percentcomplete )) {
-                    $output[Util::$PERCENT_COMPLETE] = 1;
-                }
-                if( ! empty( $this->priority )) {
-                    $output[Util::$PRIORITY] = 1;
-                }
-                if( ! empty( $this->recurrenceid )) {
-                    $output[Util::$RECURRENCE_ID] = 1;
-                }
-                if( ! empty( $this->relatedto )) {
-                    $output[Util::$RELATED_TO] = count( $this->relatedto );
-                }
-                if( ! empty( $this->repeat )) {
-                    $output[Util::$REPEAT] = 1;
-                }
-                if( ! empty( $this->requeststatus )) {
-                    $output[Util::$REQUEST_STATUS] = count( $this->requeststatus );
-                }
-                if( ! empty( $this->resources )) {
-                    $output[Util::$RESOURCES] = count( $this->resources );
-                }
-                if( ! empty( $this->sequence )) {
-                    $output[Util::$SEQUENCE] = 1;
-                }
-                if( ! empty( $this->status )) {
-                    $output[Util::$STATUS] = 1;
-                }
-                if( ! empty( $this->transp )) {
-                    $output[Util::$TRANSP] = 1;
-                }
-                if( ! empty( $this->trigger )) {
-                    $output[Util::$TRIGGER] = 1;
-                }
-                if( ! empty( $this->tzid )) {
-                    $output[Util::$TZID] = 1;
-                }
-                if( ! empty( $this->tzname )) {
-                    $output[Util::$TZNAME] = count( $this->tzname );
-                }
-                if( ! empty( $this->tzoffsetfrom )) {
-                    $output[Util::$TZOFFSETFROM] = 1;
-                }
-                if( ! empty( $this->tzoffsetto )) {
-                    $output[Util::$TZOFFSETTO] = 1;
-                }
-                if( ! empty( $this->tzurl )) {
-                    $output[Util::$TZURL] = 1;
-                }
-                if( ! empty( $this->url )) {
-                    $output[Util::$URL] = 1;
-                }
-                if( ! empty( $this->xprop )) {
-                    $output[Util::$X_PROP] = count( $this->xprop );
-                }
-                return $output;
+            case self::SETPROPERTYNAMES:
+                return array_keys( $this->getConfig( self::PROPINFO ));
                 break;
-            case Util::$SETPROPERTYNAMES:
-                return array_keys( $this->getConfig( Util::$PROPINFO ));
-                break;
-            case Util::$TZID:
-                if( isset( $this->config[Util::$TZID] )) {
-                    return $this->config[Util::$TZID];
-                }
-                break;
-            case Util::$UNIQUE_ID:
-                if( empty( $this->config[Util::$UNIQUE_ID] )) {
-                    $this->config[Util::$UNIQUE_ID] = ( isset( $_SERVER[Util::$SERVER_NAME] ))
-                        ? gethostbyname( $_SERVER[Util::$SERVER_NAME] )
-                        : Util::$LOCALHOST;
-                }
-                return $this->config[Util::$UNIQUE_ID];
+            default :
                 break;
         }
         return false;
     }
 
     /**
-     * General component config setting
+     * Return array( propertyName => count )
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.23.12 - 2017-04-22
+     * @return array
+     * @access protected
+     * @since  2.27.11 - 2019-01-03
+     */
+    protected function getpropInfo() {
+        static $PROPNAMES  = [
+            self::ACTION, self::ATTACH, self::ATTENDEE, self::CATEGORIES,
+            self::KLASS, self::COMMENT, self::COMPLETED, self::CONTACT,
+            self::CREATED, self::DESCRIPTION, self::DTEND, self::DTSTAMP,
+            self::DTSTART, self::DUE, self::DURATION, self::EXDATE, self::EXRULE,
+            self::FREEBUSY, self::GEO, self::LAST_MODIFIED, self::LOCATION,
+            self::ORGANIZER, self::PERCENT_COMPLETE, self::PRIORITY,
+            self::RECURRENCE_ID, self::RELATED_TO, self::REPEAT,
+            self::REQUEST_STATUS, self::RESOURCES, self::RRULE, self::RDATE,
+            self::SEQUENCE, self::STATUS, self::SUMMARY, self::TRANSP,
+            self::TRIGGER, self::TZNAME, self::TZID, self::TZOFFSETFROM,
+            self::TZOFFSETTO, self::TZURL, self::UID, self::URL, self::X_PROP,
+        ];
+        if( ! Util::isCompInList( $this->getCompType(), self::$SUBCOMPS )) {
+            $this->getUid();
+            $this->getDtstamp();
+        }
+        $output = [];
+        foreach( $PROPNAMES as $propName ) {
+            $propName2 = IcalBase::getInternalPropName( $propName );
+            switch( true ) {
+                case ( ! property_exists( $this, $propName2 )) :
+                    break;
+                case ( empty( $this->{$propName2} )) :
+                    break;
+                case ( self::X_PROP == $propName ) :
+                    foreach( array_keys( $this->{$propName2}) as $propName3 ) {
+                        $output[$propName3] = 1;
+                    }
+                    break;
+                case ( Util::isPropInList( $propName, Util::$MPROPS2 )) :
+                    $output[$propName] = count( $this->{$propName2} );
+                    break;
+                default :
+                    $output[$propName] = 1;
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * Set Vcalendar/component config
+     *
      * @param mixed  $config
      * @param string $value
      * @param bool   $softUpdate
-     * @return bool   true on success
+     * @return static
+     * @throws InvalidArgumentException
+     * @since  2.27.8 - 2019-01-19
      */
     public function setConfig( $config, $value = null, $softUpdate = null ) {
-        if( is_null( $softUpdate )) {
-            $softUpdate = false;
-        }
+        static $ERRMSG1 = 'Directory \'%s\' does not exist';
+        static $ERRMSG2 = 'File \'%s\' NOT readable or writable';
+        static $ERRMSG3 = 'Directory \'%s\' NOT readable or writable';
+        static $ERRMSG9 = 'Invalid config value %s';
+        $isComponent = ( ! property_exists( $this, self::getInternalPropName( self::PRODID )));
         if( is_array( $config )) {
             $config = array_change_key_case( $config, CASE_UPPER );
+            if( ! $isComponent && isset( $config[self::DELIMITER] )) {
+                $this->setConfig( self::DELIMITER, $config[self::DELIMITER] );
+                unset( $config[self::DELIMITER] );
+            }
+            if( ! $isComponent && isset( $config[self::DIRECTORY] )) {
+                $this->setConfig( self::DIRECTORY, $config[self::DIRECTORY] );
+                unset( $config[self::DIRECTORY] );
+            }
             foreach( $config as $cKey => $cValue ) {
-                if( false === $this->setConfig( $cKey, $cValue, $softUpdate )) {
-                    return false;
+                $this->setConfig( $cKey, $cValue );
+            }
+            return $this;
+        }
+        $key    = strtoupper( $config );
+        $subCfg = null;
+        switch( true ) {
+            case ( self::ALLOWEMPTY == $key ) :
+                $this->config[self::ALLOWEMPTY] = $value;
+                $subCfg = [ self::ALLOWEMPTY => $value ];
+                break;
+            case ( self::LANGUAGE == $key ) :
+                // set language for calendar component as defined in [RFC 1766]
+                $value  = trim( $value );
+                if( empty( $this->config[self::LANGUAGE] ) || ! $softUpdate ) { // ??
+                    $this->config[self::LANGUAGE] = $value;
+                }
+                if( ! $isComponent ) {
+                    $this->makeProdid();
+                }
+                $subCfg = [ self::LANGUAGE => $value ];
+                break;
+            case ( self::UNIQUE_ID == $key ) :
+                $value  = trim( $value );
+                $this->config[self::UNIQUE_ID] = $value;
+                if( ! $isComponent ) {
+                    $this->makeProdid();
+                }
+                $subCfg = [ self::UNIQUE_ID => $value ];
+                break;
+            case ( $isComponent ) :
+                break;
+            case ( self::DIRFILE == $key ) :
+                break;
+            case ( self::FILESIZE == $key ) :
+                break;
+            case ( self::DELIMITER == $key ) :
+                $this->config[self::DELIMITER] = $value;
+                return $this;
+                break;
+            case ( self::DIRECTORY == $key ) :
+                if( empty( $value ) || ( Util::$DOT == $value )) {
+                    break;
+                }
+                $path = rtrim( trim( $value ));
+                switch( true ) {
+                    case ( false === ( $value = rtrim( realpath( $path ), $this->config[self::DELIMITER] ))) :
+                        throw new InvalidArgumentException( sprintf( $ERRMSG1, $path ));
+                        break;
+                    case ( ! is_readable( $value ) || ! is_writable( $value )) :
+                        throw new InvalidArgumentException( sprintf( $ERRMSG3, $value ));
+                        break;
+                    default :  /* local directory */
+                        $this->config[self::DIRECTORY] = $value;
+                        $this->config[self::URL]       = null;
+                        break;
+                }
+                return $this;
+                break;
+            case ( self::FILENAME == $key ) :
+                $value   = trim( $value );
+                if( empty( $value ))  {
+                    break;
+                }
+//                $dirFile = $this->config[self::DIRECTORY] . $this->config[self::DELIMITER] . $value;
+                $dirFile = $this->getConfig( self::DIRECTORY ) .
+                           $this->getConfig( self::DELIMITER ) . $value;
+                switch( true ) {
+                    case ( file_exists( $dirFile )) :
+                        /* local file exists */
+                        if( ! is_readable( $dirFile ) && ! is_writable( $dirFile )) {
+                            throw new InvalidArgumentException( sprintf( $ERRMSG2, $dirFile ));
+                        }
+                        clearstatcache();
+                        $this->config[self::FILENAME] = $value;
+                        break;
+                    case ( is_readable( $this->config[self::DIRECTORY] ) ||
+                        is_writable( $this->config[self::DIRECTORY] )) :
+                        /* read- or writable directory */
+                        clearstatcache();
+                        $this->config[self::FILENAME] = $value;
+                        break;
+                    default :
+                        throw new InvalidArgumentException( sprintf( $ERRMSG3, $this->config[self::DIRECTORY] ));
+                        break;
+                }
+                return $this;
+                break;
+            case ( self::URL == $key ) :
+                /* remote file - URL */
+                HttpFactory::assertUrl( $value );
+                $this->config[self::DIRECTORY] = Util::$DOT;
+                $this->config[self::URL]       = $value;
+                if( self::$DOTICS != strtolower( substr( $value, -4 ))) {
+                    unset( $this->config[self::FILENAME] );
+                }
+                else {
+                    $this->config[self::FILENAME] = basename( $value );
+                }
+                return $this;
+                break;
+            default:  // any invalid config key.. .
+                throw new InvalidArgumentException( sprintf( $ERRMSG9, $config ));
+        }
+        if( ! empty( $subCfg ) && ! empty( $this->components )) {
+            foreach( $subCfg as $cfgkey => $cfgValue ) {
+                foreach( $this->components as $cix => $component ) {
+                    $this->components[$cix]->setConfig( $cfgkey, $cfgValue, true );
                 }
             }
-            return true;
         }
-        $res = false;
-        switch( strtoupper( $config )) {
-            case Util::$ALLOWEMPTY:
-                $this->config[Util::$ALLOWEMPTY] = $value;
-                $subcfg = [ Util::$ALLOWEMPTY => $value ];
-                $res    = true;
-                break;
-            case Util::$LANGUAGE: // set language for component as defined in [RFC 1766]
-                $value  = trim( $value );
-                if( empty( $this->config[Util::$LANGUAGE] ) || ! $softUpdate ) {
-                    $this->config[Util::$LANGUAGE] = $value;
-                }
-                $subcfg = [ Util::$LANGUAGE => $value ];
-                $res    = true;
-                break;
-            case Util::$TZID:
-                $this->config[Util::$TZID] = trim( $value );
-                $subcfg = [ Util::$TZID => trim( $value ) ];
-                $res    = true;
-                break;
-            case Util::$UNIQUE_ID:
-                $value  = trim( $value );
-                $this->config[Util::$UNIQUE_ID] = $value;
-                $subcfg = [ Util::$UNIQUE_ID => $value ];
-                $res    = true;
-                break;
-            default:  // any unvalid config key.. .
-                return true;
+        return $this;
+    }
+
+    /**
+     * Return faked filename
+     *
+     * @return string $propName
+     * @access protected
+     * @static
+     * @since  2.27.1 - 2018-12-12
+     */
+    protected static function getFakedFilename() {
+        return date( self::$YMDHIS, intval( microtime( true ))) . self::$DOTICS;
+    }
+
+    /**
+     * Assert empty value
+     *
+     * @param mixed  $value
+     * @param string $propName
+     * @access protected
+     * @throws InvalidArgumentException
+     * @since  2.27.1 - 2018-12-12
+     */
+    protected function assertEmptyValue( $value, $propName ) {
+        static $ERRMSG = 'Empty %s value not allowed';
+        if( empty( $value ) && ! $this->getConfig( self::ALLOWEMPTY )) {
+            throw new InvalidArgumentException( sprintf( $ERRMSG, $propName ));
         }
-        if( ! $res ) {
+    }
+
+    /**
+     * Return index
+     *
+     * @param array $indexArr
+     * @param mixed $propName
+     * @param int   $index
+     * @return bool   true on success
+     * @access protected
+     * @static
+     * @since  2.27.1 - 2018-12-15
+     */
+    protected static function getIndex( array & $indexArr, $propName, $index = null ) {
+        if( is_null( $index )) {
+            $index = ( isset( $indexArr[$propName] )) ? $indexArr[$propName] + 2 : 1;
+        }
+        $index -= 1;
+        $indexArr[$propName] = $index;
+        return $index;
+    }
+
+    /**
+     * Return internal name for property
+     *
+     * @param string $propName
+     * @return string
+     * @access protected
+     * @static
+     * @since  2.27.1 - 2018-12-16
+     */
+    protected static function getInternalPropName( $propName ) {
+        $internalName = strtolower( $propName );
+        if( false !== strpos( $internalName, Util::$MINUS )) {
+            $internalName = implode( explode( Util::$MINUS, $internalName ));
+        }
+        return $internalName;
+    }
+
+    /**
+     * Return method from format and propName
+     *
+     * @param string $format
+     * @param string $propName
+     * @return string
+     * @access private
+     * @static
+     * @since  2.27.14 - 2019-02-18
+     */
+    private static function getMethodName( $format, $propName ) {
+        return sprintf( $format, ucfirst( self::getInternalPropName( $propName )));
+    }
+
+    /**
+     * Return name for property delete-method
+     *
+     * @param string $propName
+     * @return string
+     * @static
+     * @since  2.27.1 - 2019-01-17
+     */
+    public static function getCreateMethodName( $propName ) {
+        static $FMT = 'create%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property delete-method
+     *
+     * @param string $propName
+     * @return string
+     * @static
+     * @since  2.27.1 - 2018-12-12
+     */
+    public static function getDeleteMethodName( $propName ) {
+        static $FMT = 'delete%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property get-method
+     *
+     * @param string $propName
+     * @return string
+     * @static
+     * @since  2.27.1 - 2018-12-12
+     */
+    public static function getGetMethodName( $propName ) {
+        static $FMT = 'get%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property set-method
+     *
+     * @param string $propName
+     * @return string
+     * @static
+     * @since  2.27.1 - 2018-12-16
+     */
+    public static function getSetMethodName( $propName ) {
+        static $FMT = 'set%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Recount property propIx, used at consecutive getProperty calls
+     *
+     * @param array $propArr   component (multi-)property
+     * @param int   $propIx getter counter
+     * @return bool true
+     * @access protected
+     * @static
+     * @since  2.27.1 - 2018-12-15
+     */
+    protected static function recountMvalPropix( array $propArr, & $propIx ) {
+        if( empty( $propArr )) {
             return false;
         }
-        if( isset( $subcfg ) && ! empty( $this->components )) {
-            foreach( $subcfg as $cfgkey => $cfgvalue ) {
-                foreach( $this->components as $cix => $component ) {
-                    $res = $this->components[$cix]->setConfig( $cfgkey, $cfgvalue, $softUpdate );
-                    if( ! $res ) {
-                        break 2;
-                    }
-                }
-            }
+        $last = key( array_slice( $propArr, -1, 1, true ));
+        while( ! isset( $propArr[$propIx] ) && ( $last > $propIx )) {
+            $propIx++;
         }
-        return $res;
+        return true;
+    }
+
+    /**
+     * Check index and set (an indexed) content in a multiple value array
+     *
+     * @param array $valArr
+     * @param mixed $value
+     * @param array $params
+     * @param array $defaults
+     * @param int   $index
+     * @access protected
+     * @static
+     * @since  2.22.23 - 2017-04-08
+     */
+    protected static function setMval(
+        & $valArr,
+        $value,
+        $params   = null,
+        $defaults = null,
+        $index    = null
+    ) {
+        if( ! is_array( $valArr )) {
+            $valArr = [];
+        }
+        if( empty( $params )) {
+            $params = [];
+        }
+        $params = ParameterFactory::setParams( $params, $defaults );
+        if( is_null( $index )) { // i.e. next
+            $valArr[] = [
+                Util::$LCvalue  => $value,
+                Util::$LCparams => $params,
+            ];
+            return;
+        }
+        $index = $index - 1;
+        if( isset( $valArr[$index] )) { // replace
+            $valArr[$index] = [
+                Util::$LCvalue  => $value,
+                Util::$LCparams => $params,
+            ];
+            return;
+        }
+        $valArr[$index] = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params,
+        ];
+        ksort( $valArr ); // order
+    }
+
+    /**
+     * Delete calendar component multiProp property[ix]
+     *
+     * @param array $multiProp component (multi-)property
+     * @param mixed $propName
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool   true on success
+     * @access protected
+     * @since  2.27.1 - 2018-12-15
+     */
+    protected function deletePropertyM( & $multiProp, $propName, $propDelIx = null ) {
+        if( empty( $multiProp )) {
+            unset( $this->propDelIx[$propName] );
+            return false;
+        }
+        if( false === $propDelIx ) {
+            $propDelIx = null; // tidy up, altered default value
+        }
+        $propDelIx = self::getIndex( $this->propDelIx, $propName, $propDelIx );
+        if( isset( $multiProp[$propDelIx] )) {
+            unset( $multiProp[$propDelIx] );
+        }
+        if( empty( $multiProp )) {
+            $multiProp = null;
+            unset( $this->propDelIx[$propName] );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Get calendar component multpProp property
+     *
+     * @param array  $multiProp component (multi-)property
+     * @param string $propName
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @access protected
+     * @since  2.27.1 - 2018-12-15
+     */
+    protected function getPropertyM( $multiProp, $propName, $propIx = null, $inclParam = false ) {
+        if( empty( $multiProp )) {
+            unset( $this->propIx[$propName] );
+            return false;
+        }
+        if( false === $propIx ) {
+            $propIx = null; // tidy up, altered default value
+        }
+        $propIx = self::getIndex( $this->propIx, $propName, $propIx );
+        if( ! self::recountMvalPropix( $multiProp, $propIx )) {
+            unset( $this->propIx[$propName] );
+            return false;
+        }
+        $this->propIx[$propName] = $propIx;
+        if( ! isset( $multiProp[$propIx] )) {
+            unset( $this->propIx[$propName] );
+            return false;
+        }
+        return ( $inclParam ) ? $multiProp[$propIx] : $multiProp[$propIx][Util::$LCvalue];
     }
 
     /**
      * Return number of components
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.23.5 - 2017-04-13
      * @return int
+     * @since  2.23.5 - 2017-04-13
      */
     public function countComponents() {
         return ( empty( $this->components )) ? 0 : count( $this->components );
     }
 
-    /**
-     * Return new calendar component, included in calendar or component
-     *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26 - 2018-11-10
-     * @param string $compType component type
-     * @return mixed CalendarComponent|bool
-     */
-    public function newComponent( $compType ) {
-        $config = $this->getConfig();
-        $ix     = ( empty( $this->components ))
-            ? 0
-            : key( array_slice( $this->components, -1, 1, true )) + 1;
-        switch( ucfirst( \strtolower( $compType ))) {
-            case self::VALARM :
-                $this->components[$ix] = new Valarm( $config );
-                break;
-            case self::VEVENT :
-                $this->components[$ix] = new Vevent( $config );
-                break;
-            case self::VTODO :
-                $this->components[$ix] = new Vtodo( $config );
-                break;
-            case self::VJOURNAL :
-                $this->components[$ix] = new Vjournal( $config );
-                break;
-            case self::VFREEBUSY :
-                $this->components[$ix] = new Vfreebusy( $config );
-                break;
-            case self::VTIMEZONE :
-                array_unshift( $this->components, new Vtimezone( $config ));
-                $ix = 0;
-                break;
-            case self::STANDARD :
-                array_unshift( $this->components, new Vtimezone( self::STANDARD, $config ));
-                $ix = 0;
-                break;
-            case self::DAYLIGHT :
-                $this->components[$ix] = new Vtimezone( self::DAYLIGHT, $config );
-                break;
-            default:
-                return false;
-        }
-        return $this->components[$ix];
-    }
 
     /**
      * Delete calendar subcomponent from component container
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.1 - 2018-11-17
      * @param mixed $arg1 ordno / component type / component uid
      * @param mixed $arg2 ordno if arg1 = component type
-     * @return bool  true on success
+     * @return bool  true on success, false on not found (last one deleted)
+     * @since  2.26.14 - 2019-02-25
+     * @todo Exception mgnt on unknown component
      */
     public function deleteComponent( $arg1, $arg2 = false ) {
         if( ! isset( $this->components )) {
@@ -493,7 +887,9 @@ abstract class IcalBase implements IcalInterface
             $argType = self::$INDEX;
             $index   = (int) $arg1 - 1;
         }
-        elseif( Util::isCompInList( $arg1, Util::$ALLCOMPS )) {
+        elseif( property_exists( $this, self::getInternalPropName( self::PRODID )) &&
+            ( Util::isCompInList( $arg1, self::$MCOMPS ) &&
+            ( 0 != strcasecmp( $arg1, self::VALARM )))) {
             $argType = ucfirst( strtolower( $arg1 ));
             $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 )) ? (( int ) $arg2 - 1 ) : 0;
         }
@@ -505,16 +901,21 @@ abstract class IcalBase implements IcalInterface
                 $remove = true;
                 break;
             }
-            elseif( $argType == $component->compType ) {
+            elseif( $argType == $component->getCompType()) {
                 if( $index == $cix2dC ) {
                     unset( $this->components[$cix] );
+                    $argType = strtolower( $argType );
+                    if( isset( $this->compix[$argType] )) {
+                        unset( $this->compix[$argType] );
+                    }
                     $remove = true;
                     break;
                 }
                 $cix2dC++;
             }
             elseif( ! $argType &&
-                ( $arg1 == $component->getProperty( Util::$UID ))) {
+                ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS ) &&
+                ( $arg1 == $component->getUid())) {
                 unset( $this->components[$cix] );
                 $remove = true;
                 break;
@@ -528,36 +929,47 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
+     * Return next component index
+     *
+     * @return int
+     * @access protected
+     * @since  2.27.2 - 2018-12-21
+     */
+    protected function getNextComponentIndex() {
+        return ( empty( $this->components ))
+            ? 0
+            : key( array_slice( $this->components, -1, 1, true )) + 1;
+    }
+
+    /**
      * Add calendar component as subcomponent to container for subcomponents
      *
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.1 - 2018-11-17
-     * @param object $component CalendarComponent
-     * @param mixed  $arg1      ordno/component type/ component uid
-     * @param mixed  $arg2      ordno if arg1 = component type
-     * @return bool
+     * @param CalendarComponent $component
+     * @param mixed             $arg1      ordno/component type/ component uid
+     * @param mixed             $arg2      ordno if arg1 = component type
+     * @throws InvalidArgumentException
+     * @return static
+     * @since  2.27.3 - 2018-12-21
      */
-    public function setComponent( $component, $arg1 = false, $arg2 = false ) {
-        if( ! isset( $this->components )) {
-            return false;
-        }
+    public function setComponent( CalendarComponent $component, $arg1 = false, $arg2 = false ) {
         $component->setConfig( $this->getConfig(), false, true );
-        if( ! Util::isCompInList( $component->compType, Util::$SUBCOMPS )) {
+        if( ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS )) {
             /* make sure dtstamp and uid is set */
-            $component->getProperty( Util::$DTSTAMP );
-            $component->getProperty( Util::$UID );
+            $component->getDtstamp();
+            $component->getUid();
         }
         if( ! $arg1 ) { // plain insert, last in chain
+            self::assertComponents( $this, $component );
             $this->components[] = clone $component;
-            return true;
+            return $this;
         }
         $argType = $index = null;
         if( ctype_digit((string) $arg1 )) { // index insert/replace
             $argType = self::$INDEX;
             $index   = (int) $arg1 - 1;
         }
-        elseif( Util::isCompInList( $arg1, Util::$MCOMPS )) {
-            $argType = ucfirst( \strtolower( $arg1 ));
+        elseif( Util::isCompInList( $arg1, self::$MCOMPS )) {
+            $argType = ucfirst( strtolower( $arg1 ));
             $index   = ( ctype_digit((string) $arg2 )) ? ((int) $arg2 ) - 1 : 0;
         }
         // else if arg1 is set, arg1 must be an UID
@@ -566,30 +978,99 @@ abstract class IcalBase implements IcalInterface
             if( empty( $component2 )) {
                 continue;
             }
-            if(( self::$INDEX == $argType ) && ( $index == $cix )) { // index insert/replace
+            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
+                // index insert/replace
                 $this->components[$cix] = clone $component;
-                return true;
+                return $this;
             }
-            elseif( $argType == $component2->compType ) {       // component Type index insert/replace
+            elseif( $argType == $component2->getCompType()) {
+                // component Type index insert/replace
                 if( $index == $cix2sC ) {
                     $this->components[$cix] = clone $component;
-                    return true;
+                    return $this;
                 }
                 $cix2sC++;
             }
-            elseif( ! $argType && ( $arg1 == $component2->getProperty( Util::$UID ))) {
-                $this->components[$cix] = clone $component;      // UID insert/replace
-                return true;
+            elseif( ! $argType &&
+                ! Util::isCompInList( $component2->getCompType(), self::$SUBCOMPS ) &&
+                ( $arg1 == $component2->getUid())) { // UID insert/replace
+                $this->components[$cix] = clone $component;
+                return $this;
             }
         }
-        /* arg1=index and not found.. . insert at index .. .*/
-        if( self::$INDEX == $argType ) {
+        if( self::$INDEX == $argType ) { // arg1=index and not found.. . insert at index .. .
             $this->components[$index] = clone $component;
-            \ksort( $this->components, SORT_NUMERIC );
+            ksort( $this->components, SORT_NUMERIC );
         }
         else {   /* not found.. . insert last in chain anyway .. .*/
             $this->components[] = clone $component;
         }
-        return true;
+        return $this;
     }
+
+    /**
+     * Assert base components
+     *
+     * @param IcalBase $component
+     * @access protected
+     * @static
+     * @throws InvalidArgumentException
+     * @since  2.27.6 - 2018-12-28
+     */
+    protected static function assertBaseComponents( IcalBase $component ) {
+        static $ERRMSG = 'Invalid component type \'%s\'';
+        $compType = $component->getCompType();
+        if( ! Util::isCompInList( $compType, self::$VCOMPS ) &&
+             ( self::VTIMEZONE != $compType )) {
+            throw new InvalidArgumentException( sprintf( $ERRMSG, $compType ));
+        }
+    }
+
+    /**
+     * Assert components
+     *
+     * @param IcalBase $comp
+     * @param CalendarComponent $subComp
+     * @throws InvalidArgumentException
+     * @access private
+     * @static
+     * @since  2.27.6 - 2018-12-28
+     */
+    private static function assertComponents( IcalBase $comp, CalendarComponent $subComp ) {
+        static $MSG = 'Unknown component %s';
+        $type    = $comp->getCompType();
+        $subType = $subComp->getCompType();
+        switch( $type ) {
+            case Vcalendar::VCALENDAR :
+                self::assertBaseComponents( $subComp );
+                break;
+            case self::VTIMEZONE :
+                switch( $subType ) {
+                    case self::STANDARD :
+                        break 2;
+                    case self::DAYLIGHT :
+                        break 2;
+                    default :
+                        throw new InvalidArgumentException( sprintf( $MSG, $subType ));
+                }
+                break;
+            case self::VEVENT :
+                // fall through
+            case self::VTODO :
+                switch( $subType ) {
+                    case self::VALARM :
+                        break 2;
+                    default :
+                        throw new InvalidArgumentException( sprintf( $MSG, $subType ));
+                }
+                break;
+            case self::VFREEBUSY :
+                break;
+            case self::VJOURNAL :
+                break;
+            default :
+                throw new InvalidArgumentException( sprintf( $MSG, $type ));
+        }
+    }
+
 }

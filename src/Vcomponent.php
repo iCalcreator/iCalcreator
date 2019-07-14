@@ -1,11 +1,11 @@
 <?php
 /**
- * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -28,46 +28,28 @@
  * This file is a part of iCalcreator.
 */
 
-namespace Kigkonsult\Icalcreator\Util;
+namespace Kigkonsult\Icalcreator;
 
-use function abs;
-use function sprintf;
-use function rtrim;
 
 /**
- * iCalcreator geo support class
+ * iCalcreator Vcomponents base class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.6 - 2018-12-28
  */
-class UtilGeo
+abstract class Vcomponent extends CalendarComponent
 {
-    /**
-     * @var string  GEO vars: output format for geo latitude and longitude (before rtrim) etc
-     * @access public
-     * @static
-     */
-    public static $geoLatFmt  = '%09.6f';
-    public static $geoLongFmt = '%8.6f';
-    public static $LATITUDE   = 'latitude';
-    public static $LONGITUDE  = 'longitude';
+    use Traits\DTSTAMPtrait;
 
     /**
-     * Return formatted geo output
+     * Constructor for calendar component
      *
-     * @param float  $ll
-     * @param string $format
-     * @return string
-     * @access public
-     * @static
+     * @param  array $config
+     * @since  2.27.6 - 2018-12-28
      */
-    public static function geo2str2( $ll, $format ) {
-        if( 0.0 < $ll ) {
-            $sign = Util::$PLUS;
-        }
-        else {
-            $sign = ( 0.0 > $ll ) ? Util::$MINUS : null;
-        }
-        return rtrim( rtrim( $sign . sprintf( $format, abs( $ll )), Util::$ZERO ), Util::$DOT );
+    public function __construct( $config = [] ) {
+        parent::__construct( $config );
+        $this->setDtstamp();
     }
+
 }

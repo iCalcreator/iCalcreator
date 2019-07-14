@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * ATTACH property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-20
  */
 trait ATTACHtrait
 {
@@ -58,17 +61,48 @@ trait ATTACHtrait
         $output = null;
         foreach( $this->attach as $aix => $attachPart ) {
             if( ! empty( $attachPart[Util::$LCvalue] )) {
-                $output .= Util::createElement(
-                    Util::$ATTACH,
-                    Util::createParams( $attachPart[Util::$LCparams] ),
+                $output .= StringFactory::createElement(
+                    self::ATTACH,
+                    ParameterFactory::createParams( $attachPart[Util::$LCparams] ),
                     $attachPart[Util::$LCvalue]
                 );
             }
-            elseif( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $output .= Util::createElement( Util::$ATTACH );
+            elseif( $this->getConfig( self::ALLOWEMPTY )) {
+                $output .= StringFactory::createElement( self::ATTACH );
             }
         }
         return $output;
+    }
+
+    /**
+     * Delete calendar component property attach
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteAttach( $propDelIx = null ) {
+        if( empty( $this->attach )) {
+            unset( $this->propDelIx[self::ATTACH] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->attach, self::ATTACH, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property attach
+     *
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-16
+     */
+    public function getAttach( $propIx = null, $inclParam = false ) {
+        if( empty( $this->attach )) {
+            unset( $this->propIx[self::ATTACH] );
+            return false;
+        }
+        return $this->getPropertyM( $this->attach, self::ATTACH, $propIx, $inclParam );
     }
 
     /**
@@ -77,18 +111,17 @@ trait ATTACHtrait
      * @param string  $value
      * @param array   $params
      * @param integer $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-20
      */
-    public function setAttach( $value, $params = null, $index = null ) {
+    public function setAttach( $value = null, $params = null, $index = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::ATTACH );
+            $value  = Util::$SP0;
+            $params = [];
         }
-        Util::setMval( $this->attach, $value, $params, false, $index );
-        return true;
+        $this->setMval( $this->attach, $value, $params, null, $index );
+        return $this;
     }
 }

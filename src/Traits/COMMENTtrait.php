@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.26.8
+ * Version   2.28
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,13 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use InvalidArgumentException;
 
 /**
  * COMMENT property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.22.23 - 2017-02-02
+ * @since 2.27.3 2018-12-22
  */
 trait COMMENTtrait
 {
@@ -56,21 +59,52 @@ trait COMMENTtrait
             return null;
         }
         $output = null;
-        $lang   = $this->getConfig( Util::$LANGUAGE );
+        $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->comment as $cx => $commentPart ) {
             if( empty( $commentPart[Util::$LCvalue] )) {
-                if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                    $output .= Util::createElement( Util::$COMMENT );
+                if( $this->getConfig( self::ALLOWEMPTY )) {
+                    $output .= StringFactory::createElement( self::COMMENT );
                 }
                 continue;
             }
-            $output .= Util::createElement(
-                Util::$COMMENT,
-                Util::createParams( $commentPart[Util::$LCparams], Util::$ALTRPLANGARR, $lang ),
-                Util::strrep( $commentPart[Util::$LCvalue] )
+            $output .= StringFactory::createElement(
+                self::COMMENT,
+                ParameterFactory::createParams( $commentPart[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                StringFactory::strrep( $commentPart[Util::$LCvalue] )
             );
         }
         return $output;
+    }
+
+    /**
+     * Delete calendar component property comment
+     *
+     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @return bool
+     * @since  2.27.1 - 2018-12-15
+     */
+    public function deleteComment( $propDelIx = null ) {
+        if( empty( $this->comment )) {
+            unset( $this->propDelIx[self::COMMENT] );
+            return false;
+        }
+        return $this->deletePropertyM( $this->comment, self::COMMENT, $propDelIx );
+    }
+
+    /**
+     * Get calendar component property comment
+     *
+     * @param int    $propIx specific property in case of multiply occurrence
+     * @param bool   $inclParam
+     * @return bool|array
+     * @since  2.27.1 - 2018-12-12
+     */
+    public function getComment( $propIx = null, $inclParam = false ) {
+        if( empty( $this->comment )) {
+            unset( $this->propIx[self::COMMENT] );
+            return false;
+        }
+        return $this->getPropertyM( $this->comment, self::COMMENT, $propIx, $inclParam );
     }
 
     /**
@@ -79,18 +113,17 @@ trait COMMENTtrait
      * @param string  $value
      * @param array   $params
      * @param integer $index
-     * @return bool
+     * @return static
+     * @throws InvalidArgumentException
+     * @since 2.27.3 2018-12-22
      */
-    public function setComment( $value, $params = null, $index = null ) {
+    public function setComment( $value = null, $params = null, $index = null ) {
         if( empty( $value )) {
-            if( $this->getConfig( Util::$ALLOWEMPTY )) {
-                $value = Util::$SP0;
-            }
-            else {
-                return false;
-            }
+            $this->assertEmptyValue( $value, self::COMMENT );
+            $value  = Util::$SP0;
+            $params = [];
         }
-        Util::setMval( $this->comment, $value, $params, false, $index );
-        return true;
+        $this->setMval( $this->comment, $value, $params, null, $index );
+        return $this;
     }
 }
