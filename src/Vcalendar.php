@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.28.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -77,7 +77,7 @@ use function usort;
  * Vcalendar class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.21 - 2019-06-06
+ * @since  2.28.2  2019-08-29
  */
 final class Vcalendar extends IcalBase
 {
@@ -794,7 +794,7 @@ final class Vcalendar extends IcalBase
      * @return static
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @since  2.27.6  2018-12-28
+     * @since  2.28.2  2019-08-29
      */
     public function parse( $unparsedtext = false, $context = null ) {
         static $ERR1            = 'No file given';
@@ -803,7 +803,6 @@ final class Vcalendar extends IcalBase
         static $ERR45           = 'Unknown #%d error on read file %s';
         static $ERR10           = 'Only %d rows in ical content :%s';
         static $ERR20           = 'Ical content not in sync (row %d) %s';
-        static $ERR91           = 'Ical content har no components: %s';
         static $NLCHARS         = '\n';
         static $BEGIN_VCALENDAR = 'BEGIN:VCALENDAR';
         static $END_VCALENDAR   = 'END:VCALENDAR';
@@ -867,10 +866,9 @@ final class Vcalendar extends IcalBase
             unset( $rows[$lix] );
         }
         $cnt = count( $rows );
-        if( 3 > $cnt ) {
-            /* err 10 */
+        if( 3 > $cnt ) { /* err 10 */
             throw new UnexpectedValueException(
-                sprintf( $ERR10. $cnt, PHP_EOL . implode( PHP_EOL, $rows ))
+                sprintf( $ERR10, $cnt, PHP_EOL . implode( PHP_EOL, $rows ))
             );
         }
         /* skip trailing empty lines and ensure an end row */
@@ -936,13 +934,10 @@ final class Vcalendar extends IcalBase
             } // switch( true )
         } // end foreach( $rows as $lix => $row )
         $this->parseCalendarData();
-        /* parse Components */
         if( empty( $this->countComponents())) {
-            /* err 91 */
-            throw new UnexpectedValueException(
-                sprintf( $ERR91, $lix, PHP_EOL . implode( PHP_EOL, $rows ))
-            );
+            return $this;
         }
+        /* parse Components */
         foreach( array_keys( $this->components ) as $ckey ) {
             if( ! empty( $this->components[$ckey] ) &&
                 ! empty( $this->components[$ckey]->unparsed )) {

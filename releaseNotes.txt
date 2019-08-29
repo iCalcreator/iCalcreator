@@ -1,5 +1,5 @@
 
-iCalcreator 2.27.16 releaseNotes
+iCalcreator 2.28.2 releaseNotes
 
  2.27.1  Deprecated Vcalendar/<component>::deleteProperty/getProperty()/setProperty methods,
          replaced by property delete-/get-/set-methods
@@ -49,3 +49,7 @@ iCalcreator 2.27.16 releaseNotes
  2.27.21 bug - Break/Continue mixup in Vcalendar.php
 
  2.27.22 CalendarComponent::parse() rewrite
+
+ 2.28.1 Vcalendar typo error
+
+ 2.28.2 Vcalendar parse count components test (err91) removed (ie no exception)
