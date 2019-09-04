@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,31 +30,25 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use Exception;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
- * class MiscTest, testing VALUE TEXT etc
- * ATTENDEE
- * CATEGORIES
- * CLASS
- * COMMENT
- * CONTACT
- * DESCRIPTION
- * LOCATION
- * ORGANIZER
- * RELATED-TO
- * RESOURCES
- * STATUS
- * SUMMARY
- * TRANSP
- * URL
+ * class MiscTest,
  *
+ * testing VALUE TEXT etc
+ *   ATTACH, ATTENDEE, CATEGORIES, CLASS, COMMENT, CONTACT, DESCRIPTION, LOCATION, ORGANIZER,
+ *   RELATED-TO, REQUEST_STATUS, RESOURCES, STATUS, SUMMARY, TRANSP, URL, X-PROP
+ *   COLOR, IMAGE, CONFERENCE, NAME
+ * testing GeoLocation
+ * testing empty properties
+ * testing parse eol-htab
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-02-19
+ * @since  2.29.5 - 2019-08-30
  */
 class MiscTest extends DtBase
 {
@@ -211,7 +205,7 @@ class MiscTest extends DtBase
                 Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
             $value,
-            $params,
+            $params + [ Vcalendar::EMAIL => 'ildoit@example.com' ],
             $getValue,
             strtoupper( Vcalendar::ORGANIZER ) .
             ParameterFactory::createParams(
@@ -330,6 +324,26 @@ class MiscTest extends DtBase
 
         ];
 
+        // COLOR
+        $value  = 'black';
+        $params = self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            1083,
+            [
+                Vcalendar::COLOR => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::COLOR ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
         return $dataArr;
     }
 
@@ -344,6 +358,7 @@ class MiscTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testMisc1(
         $case,
@@ -356,6 +371,13 @@ class MiscTest extends DtBase
         $c = new Vcalendar();
         foreach( $propComps as $propName => $theComps ) {
             foreach( $theComps as $theComp ) {
+                if( Vcalendar::COLOR == $propName ) {
+                    $c->setColor( $value, $params );
+                }
+                if( Vcalendar::URL == $propName ) {
+                    $c->setSource( $value, $params );
+                    $c->setUrl( $value, $params );
+                }
                 $newMethod = 'new' . $theComp;
                 $comp      = $c->{$newMethod}();
 
@@ -521,28 +543,6 @@ class MiscTest extends DtBase
             ':' . $value
         ];
 
-        // RESOURCES
-        $value  = ['EASEL','PROJECTOR','VCR'];
-        $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
-            ] + self::$STCPAR;
-        $dataArr[] = [
-            2052,
-            [
-                Vcalendar::RESOURCES => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
-            ],
-            $value,
-            $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
-            strtoupper( Vcalendar::RESOURCES ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
-            ':' . implode( ',', $value )
-        ];
-
         // ATTENDEE
         $value  = 'MAILTO:ildoit@example.com';
         $params = [
@@ -554,6 +554,7 @@ class MiscTest extends DtBase
                 Vcalendar::DELEGATED_TO   => 'MAILTO:bob@example.com',
                 Vcalendar::DELEGATED_FROM => 'MAILTO:jane@example.com',
                 Vcalendar::SENT_BY        => 'MAILTO:boss@example.com',
+                Vcalendar::EMAIL          => 'MAILTO:hammer@example.com',
                 Vcalendar::CN             => 'John Doe',
                 Vcalendar::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
                 Vcalendar::LANGUAGE       => 'EN'
@@ -595,7 +596,7 @@ class MiscTest extends DtBase
                 Vcalendar::ATTENDEE => [ Vcalendar::VFREEBUSY ] // , Vcalendar::VFREEBUSY
             ],
             $value,
-            $params,
+            $params + [ Vcalendar::EMAIL => 'ildoit@example.com' ],
             $getValue,
             $expectedString
         ];
@@ -660,6 +661,101 @@ class MiscTest extends DtBase
             ':' . $value
         ];
 
+        // ATTACH
+        $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        $params = [
+            Vcalendar::FMTTYPE  => 'image/vnd.microsoft.icon',
+            Vcalendar::ENCODING => Vcalendar::BASE64,
+            Vcalendar::VALUE    => Vcalendar::BINARY,
+        ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2083,
+            [
+                Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::ATTACH ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+
+        // IMAGE
+        $value  = 'CID:jsmith.part3.960817T083000.xyzMail@example.com';
+        $params = [ Vcalendar::VALUE => Vcalendar::URI ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2091,
+            [
+                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::IMAGE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+        // IMAGE
+        $value  = 'ftp://example.com/pub/reports/r-960812.png';
+        $params = [
+            Vcalendar::VALUE   => Vcalendar::URI,
+            Vcalendar::FMTTYPE => 'application/png',
+            Vcalendar::DISPLAY => Vcalendar::BADGE . ',' . Vcalendar::THUMBNAIL
+        ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2092,
+            [
+                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::IMAGE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+        // IMAGE
+        $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        $params = [
+                Vcalendar::VALUE    => Vcalendar::BINARY,
+                Vcalendar::FMTTYPE  => 'image/vnd.microsoft.icon',
+                Vcalendar::ENCODING => Vcalendar::BASE64,
+                Vcalendar::DISPLAY  => Vcalendar::BADGE . ',' . Vcalendar::THUMBNAIL
+            ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2093,
+            [
+                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::IMAGE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+
         // REQUEST_STATUS
         $value  = [
             Vcalendar::STATCODE => '3.70',
@@ -672,7 +768,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            2091,
+            2111,
             [
                 Vcalendar::REQUEST_STATUS => [
                     Vcalendar::VEVENT,
@@ -697,6 +793,110 @@ class MiscTest extends DtBase
             StringFactory::strrep( $value[Vcalendar::EXTDATA] )
         ];
 
+
+        // CONFERENCE
+        $value  = 'rtsp://audio.example.com/';
+        $params = [
+                Vcalendar::VALUE   => Vcalendar::URI,
+                Vcalendar::FEATURE => Vcalendar::AUDIO
+            ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2121,
+            [
+                Vcalendar::CONFERENCE => [
+                    Vcalendar::VEVENT,
+                    Vcalendar::VTODO,
+                ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::CONFERENCE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+        // CONFERENCE
+        $value  = 'https://video-chat.example.com/;group-id=1234';
+        $params = [
+                Vcalendar::VALUE    => Vcalendar::URI,
+                Vcalendar::FEATURE  => Vcalendar::AUDIO . ',' . Vcalendar::VIDEO,
+                Vcalendar::LANGUAGE => 'EN',
+            ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2122,
+            [
+                Vcalendar::CONFERENCE => [
+                    Vcalendar::VEVENT,
+                    Vcalendar::VTODO,
+                ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::CONFERENCE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+        // CONFERENCE
+        $value  = 'https://video-chat.example.com/;group-id=1234';
+        $params = [
+                Vcalendar::VALUE   => Vcalendar::URI,
+                Vcalendar::FEATURE => Vcalendar::VIDEO,
+                Vcalendar::LABEL   => "Web video chat, access code=76543"
+            ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2123,
+            [
+                Vcalendar::CONFERENCE => [
+                    Vcalendar::VEVENT,
+                    Vcalendar::VTODO,
+                ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::CONFERENCE ) .
+            ParameterFactory::createParams( $params ) .
+            ':' . $value
+        ];
+
+        // NAME
+        $value  = 'A calendar name';
+        $params = [
+                Vcalendar::ALTREP   => 'This is an alternative representation',
+                Vcalendar::LANGUAGE => 'EN'
+            ] + self::$STCPAR;
+        $getValue  = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params
+        ];
+        $dataArr[] = [
+            2401,
+            [
+                Vcalendar::NAME => []
+            ],
+            $value,
+            $params,
+            $getValue,
+            strtoupper( Vcalendar::NAME ) .
+            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            ':' . $value
+        ];
+
         return $dataArr;
     }
 
@@ -711,6 +911,7 @@ class MiscTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testMisc2(
         $case,
@@ -721,69 +922,178 @@ class MiscTest extends DtBase
         $expectedString
     ) {
         $c = new Vcalendar();
+
+        foreach( array_keys( $propComps ) as $propName ) {
+            if( in_array( $propName, [
+                Vcalendar::CATEGORIES,
+                Vcalendar::DESCRIPTION,
+                Vcalendar::IMAGE,
+                Vcalendar::NAME
+            ] )) {
+                $this->propNameTest(
+                    $case . '-1',
+                    $c,
+                    $propName,
+                    $value,
+                    $params,
+                    $expectedGet,
+                    $expectedString
+                );
+            }
+        } // end foreach
+        if( Vcalendar::NAME == $propName ) {
+            return;
+        }
+
         foreach( $propComps as $propName => $theComps ) {
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
                 $comp      = $c->{$newMethod}();
-
-                $getMethod    = Vcalendar::getGetMethodName( $propName );
-                $createMethod = Vcalendar::getCreateMethodName( $propName );
-                $deleteMethod = Vcalendar::getDeleteMethodName( $propName );
-                $setMethod    = Vcalendar::getSetMethodName( $propName );
-
-                if( Vcalendar::REQUEST_STATUS == $propName ) {
-                    $comp->{$setMethod}(
-                        $value[Vcalendar::STATCODE],
-                        $value[Vcalendar::STATDESC],
-                        $value[Vcalendar::EXTDATA],
-                        $params
-                    );
-                }
-                else {
-                    $comp->{$setMethod}( $value, $params );
-                }
-
-                $getValue = $comp->{$getMethod}( null, true );
-                $this->assertEquals(
+                $this->propNameTest(
+                    $case . '-2',
+                    $comp,
+                    $propName,
+                    $value,
+                    $params,
                     $expectedGet,
-                    $getValue,
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
+                    $expectedString
                 );
+            } // end foreach
+        } // end foreach
+        $calendar1    = $c->createCalendar();
+        $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1 );
+        $createString = str_replace( '\,', ',', $createString );
+        $this->assertNotFalse(
+            strpos( $createString, $expectedString ),
+            sprintf( self::$ERRFMT, null, $case . '-25', __FUNCTION__, 'Vcalendar', 'createComponent' )
+        );
 
-                $createString = str_replace( self::$EOLCHARS , null, $comp->{$createMethod}());
-                $createString = str_replace( '\,', ',', $createString );
-                $this->assertEquals(
-                    $expectedString,
-                    trim( $createString ),
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $createMethod )
-                );
+        $c2 = new Vcalendar();
+        $c2->parse( $calendar1 );
+        $this->assertEquals(
+            $calendar1,
+            $c2->createCalendar(),
+            sprintf( self::$ERRFMT, null, $case . '-26', __FUNCTION__, 'Vcalendar', 'parse, create and compare' )
+        );
 
-                $comp->{$deleteMethod}();
-                $this->assertFalse(
-                    $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
-                );
-
-                if( Vcalendar::REQUEST_STATUS == $propName ) {
-                    $comp->{$setMethod}(
-                        $value[Vcalendar::STATCODE],
-                        $value[Vcalendar::STATDESC],
-                        $value[Vcalendar::EXTDATA],
-                        $params
-                    );
-                }
-                else {
-                    $comp->{$setMethod}( $value, $params );
-                }
-            }
+        if( Vcalendar::DESCRIPTION == $propName ) {
+            $c->setName( $value, $params );
+            $c->setName( $value, $params );
         }
-
         $this->parseCalendarTest( $case, $c, $expectedString );
-
     }
 
     /**
-     * testMisc3 provider
+     * Testing calendar/component instance with multi-propName
+     *
+     * @param string   $case
+     * @param Vcalendar|CalendarComponent $instance
+     * @param string   $propName
+     * @param mixed    $value
+     * @param mixed    $params
+     * @param array    $expectedGet
+     * @param string   $expectedString
+     */
+    public function propNameTest(
+        $case,
+        $instance,
+        $propName,
+        $value,
+        $params,
+        $expectedGet,
+        $expectedString
+    ) {
+        $getMethod    = Vcalendar::getGetMethodName(    $propName );
+        $createMethod = Vcalendar::getCreateMethodName( $propName );
+        $deleteMethod = Vcalendar::getDeleteMethodName( $propName );
+        $setMethod    = Vcalendar::getSetMethodName(    $propName );
+
+        if( Vcalendar::REQUEST_STATUS == $propName ) {
+            $instance->{$setMethod}(
+                $value[Vcalendar::STATCODE],
+                $value[Vcalendar::STATDESC],
+                $value[Vcalendar::EXTDATA],
+                $params
+            );
+        }
+        else {
+            $instance->{$setMethod}( $value, $params );
+        }
+
+        $getValue = $instance->{$getMethod}( null, true );
+        $this->assertEquals(
+            $expectedGet,
+            $getValue,
+            sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $instance->getCompType(), $getMethod )
+        );
+
+        $createString = str_replace( Util::$CRLF . ' ' , null, $instance->{$createMethod}());
+        $createString = str_replace( '\,', ',', $createString );
+        $this->assertEquals(
+            $expectedString,
+            trim( $createString ),
+            sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $instance->getCompType(), $createMethod )
+        );
+
+        $instance->{$deleteMethod}();
+        $this->assertFalse(
+            $instance->{$getMethod}(),
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-3a', __FUNCTION__, $instance->getCompType(), $getMethod )
+        );
+        $instance->{$deleteMethod}();
+        $this->assertFalse(
+            $instance->{$getMethod}(),
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-3b', __FUNCTION__, $instance->getCompType(), $getMethod )
+        );
+
+        if( Vcalendar::REQUEST_STATUS == $propName ) {
+            $instance->{$setMethod}(
+                $value[Vcalendar::STATCODE],
+                $value[Vcalendar::STATDESC],
+                $value[Vcalendar::EXTDATA],
+                $params
+            );
+            $instance->{$setMethod}(
+                $value[Vcalendar::STATCODE],
+                $value[Vcalendar::STATDESC],
+                $value[Vcalendar::EXTDATA],
+                $params
+            );
+        }
+        else {
+            $instance->{$setMethod}( $value, $params );
+            $instance->{$setMethod}( $value, $params );
+        }
+
+        $instance->{$deleteMethod}();
+        $instance->{$deleteMethod}();
+        $this->assertFalse(
+            $instance->{$getMethod}(),
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-4', __FUNCTION__, $instance->getCompType(), $getMethod )
+        );
+
+        if( Vcalendar::REQUEST_STATUS == $propName ) {
+            $instance->{$setMethod}(
+                $value[Vcalendar::STATCODE],
+                $value[Vcalendar::STATDESC],
+                $value[Vcalendar::EXTDATA],
+                $params
+            );
+            $instance->{$setMethod}(
+                $value[Vcalendar::STATCODE],
+                $value[Vcalendar::STATDESC],
+                $value[Vcalendar::EXTDATA],
+                $params
+            );
+        }
+        else {
+            $instance->{$setMethod}( $value, $params );
+            $instance->{$setMethod}( $value, $params );
+        }
+    }
+
+    /**
+     * Testing component X-property
      */
     public function Misc3Provider() {
 
@@ -851,6 +1161,7 @@ class MiscTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testMisc3(
         $case,
@@ -1005,8 +1316,7 @@ class MiscTest extends DtBase
      *
      * @test
      */
-    public function AllowEmptyTest4(
-    ) {
+    public function geoLocationTest4() {
         $compProps = [
             Vcalendar::VEVENT,
             Vcalendar::VTODO,
@@ -1052,14 +1362,204 @@ class MiscTest extends DtBase
         }
     }
     /**
+     * Testing empty properties
+     *
+     * @test
+     */
+    public function emptyTest5() {
+        $c = Vcalendar::factory()
+                      ->setCalscale( 'gregorian' )
+                      ->setMethod( 'testing' )
+                      ->setXprop( 'X-vcalendar-empty' )
+
+                      ->setUid()
+                      ->setLastmodified()
+                      ->setUrl()
+                      ->setRefreshinterval()
+                      ->setSource()
+                      ->setColor()
+
+                      ->setName()
+                      ->setDescription()
+                      ->setCategories()
+                      ->setImage()
+        ;
+
+        $o = $c->newVevent()
+               ->setClass()
+               ->setComment()
+               ->setCreated()
+               ->setDtstart()
+               ->setDuration()
+               ->setGeo()
+               ->setExrule()
+               ->setRrule()
+               ->setExdate()
+               ->setOrganizer()
+               ->setRdate()
+               ->setPriority()
+               ->setResources()
+               ->setSummary()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-vevent-empty' );
+
+        $a1 = $o->newValarm()
+                ->setAction()
+                ->setAttach()
+                ->setDuration()
+                ->setRepeat()
+                ->setTrigger()
+                ->setXprop( 'X-valarm-empty' );
+
+        $a2 = $o->newValarm()
+                ->setAction()
+                ->setDescription()
+                ->setDuration()
+                ->setRepeat()
+                ->setTrigger()
+                ->setXprop( 'X-valarm-empty' );
+
+        $o = $c->newVevent()
+               ->setConfig( 'language', 'fr' )
+               ->setAttendee()
+               ->setAttendee()
+               ->setComment()
+               ->setComment()
+               ->setComment()
+               ->setDtstart()
+               ->setDuration()
+               ->setOrganizer()
+               ->setStatus()
+               ->setTransp()
+               ->setUid()
+               ->setUrl()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-ABC-MMSUBJ' )
+               ->setXprop( 'X-vevent-empty' );
+
+        $o = $c->newVtodo()
+               ->setComment()
+               ->setCompleted()
+               ->setDtstart()
+               ->setDuration()
+               ->setLocation()
+               ->setOrganizer()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-vtodo-empty' );
+
+        $o = $c->newVevent()
+               ->setCategories()
+               ->setCategories()
+               ->setComment()
+               ->setDtstart()
+               ->setDtend()
+               ->setExdate()
+               ->setRrule()
+               ->setExdate()
+               ->setRdate()
+               ->setLastmodified()
+               ->setOrganizer()
+               ->setRecurrenceid()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-vevent-empty' );
+
+        $o = $c->newVjournal()
+               ->setComment()
+               ->setContact()
+               ->setContact()
+               ->setDtstart()
+               ->setLastmodified()
+               ->setRecurrenceid()
+               ->setRequeststatus()
+
+               ->setImage()
+               ->setColor()
+
+               ->setXprop( 'X-vjournal-empty' );
+
+        $o = $c->newVfreebusy()
+               ->setComment()
+               ->setContact()
+               ->setDtstart()
+               ->setDuration()
+               ->setFreebusy()
+               ->setOrganizer()
+               ->setXprop( 'X-vfreebusy-empty' );
+
+        $o = $c->newVtodo()
+               ->setComment()
+               ->setContact()
+               ->setDtstart()
+               ->setDue()
+               ->setOrganizer()
+               ->setPercentcomplete()
+               ->setRelatedto()
+               ->setSequence()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-vtodo-empty' );
+
+        $o = $c->newVjournal()
+               ->setComment()
+               ->setContact()
+               ->setContact()
+               ->setDtstart()
+               ->setLastmodified()
+               ->setRequeststatus()
+
+               ->setImage()
+               ->setColor()
+
+               ->setXprop( 'X-vjournal-empty' );
+
+        $o = $c->newVtodo()
+               ->setComment()
+               ->setContact()
+               ->setDtstart()
+               ->setDuration()
+               ->setOrganizer()
+               ->setPercentcomplete()
+               ->setRelatedto()
+               ->setSequence()
+
+               ->setImage()
+               ->setColor()
+               ->setConference()
+
+               ->setXprop( 'X-vtodo-empty' );
+
+        $this->parseCalendarTest( 1, $c );
+    }
+
+    /**
      * Testing parse eol-htab
      *
      * @test
      * @dataProvider parse5Provider
      * @param int    $case
      * @paran string $value
+     * @throws Exception
      */
-    public function testparse5( $case, $value ) {
+    public function parseTest6( $case, $value ) {
         $c = new Vcalendar();
         $c->parse( $value );
 
@@ -1068,7 +1568,7 @@ class MiscTest extends DtBase
     }
 
     /**
-     * testparse5 provider
+     * parseTest6 provider
      */
     public function parse5Provider() {
 

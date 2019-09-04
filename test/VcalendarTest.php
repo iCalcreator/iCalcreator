@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,8 +30,9 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use PHPUnit\Framework\TestCase;
+use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * class VcalendarTest, testing Vcalendar properties AND (the default) components UID/DTSTAMP properties
@@ -60,34 +61,22 @@ class VcalendarTest extends TestCase
         $config = [
             Vcalendar::ALLOWEMPTY => false,
             Vcalendar::UNIQUE_ID  => 'kigkonsult.se',
-            Vcalendar::DELIMITER  => '-',
-            Vcalendar::DIRECTORY  => sys_get_temp_dir(),
-            Vcalendar::FILENAME   => 'abc.ics',
         ];
         $vcalendar    = new Vcalendar( $config );
-        $fakeFileName = $vcalendar->getConfig( Vcalendar::FILENAME );
-        $vcalendar->setConfig( Vcalendar::FILENAME, 'abc.ics' );
 
         $this->assertEquals( $config[Vcalendar::ALLOWEMPTY], $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
         $this->assertEquals( $config[Vcalendar::UNIQUE_ID],  $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
-        $this->assertEquals( $config[Vcalendar::DELIMITER],  $vcalendar->getConfig( Vcalendar::DELIMITER ));
-        $this->assertEquals( $config[Vcalendar::DIRECTORY],  $vcalendar->getConfig( Vcalendar::DIRECTORY ));
-        $this->assertEquals( $config[Vcalendar::FILENAME],   $vcalendar->getConfig( Vcalendar::FILENAME ));
 
-        $fileInfo = $vcalendar->getConfig( Vcalendar::FILEINFO );
-        $this->assertEquals( $fileInfo[0],  $vcalendar->getConfig( Vcalendar::DIRECTORY ));
-        $this->assertEquals( $fileInfo[1],  $vcalendar->getConfig( Vcalendar::FILENAME ));
-        $this->assertEquals( $fileInfo[2],  $vcalendar->getConfig( Vcalendar::FILESIZE ));
+        $vcalendar->setConfig( Vcalendar::LANGUAGE, 'EN' );
+        $this->assertEquals( 'EN',                 $vcalendar->getConfig( Vcalendar::LANGUAGE ));
+        $vcalendar->deleteConfig( Vcalendar::LANGUAGE );
+        $this->assertFalse( $vcalendar->getConfig( Vcalendar::LANGUAGE ));
 
-        $vcalendar->setConfig( Vcalendar::DELIMITER, DIRECTORY_SEPARATOR );
-        $dirFile = $config[Vcalendar::DIRECTORY] . DIRECTORY_SEPARATOR . $config[Vcalendar::FILENAME];
-        $this->assertEquals( $dirFile,   $vcalendar->getConfig( Vcalendar::DIRFILE ));
+        $vcalendar->deleteConfig( Vcalendar::ALLOWEMPTY );
+        $this->assertTrue( $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
 
-        $url      = 'url@exampel.com/' . $fakeFileName;
-        $vcalendar->setConfig( Vcalendar::URL, $url );
-        $this->assertEquals( $url,          $vcalendar->getConfig( Vcalendar::URL ));
-        $this->assertEquals( '.',   $vcalendar->getConfig( Vcalendar::DIRECTORY ));
-        $this->assertEquals( $fakeFileName, $vcalendar->getConfig( Vcalendar::FILENAME ));
+        $vcalendar->deleteConfig( Vcalendar::UNIQUE_ID );
+        $this->assertFalse( $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
     }
 
     /**
@@ -146,14 +135,9 @@ class VcalendarTest extends TestCase
      * @param mixed  $value
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
-    public function vcalendarTest1(
-        $case,
-        $propName,
-        $value,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function vcalendarTest1( $case, $propName, $value, $expectedGet, $expectedString ) {
         $vcalendar = Vcalendar::factory();
         
         $getMethod    = Vcalendar::getGetMethodName( $propName );
@@ -215,35 +199,10 @@ class VcalendarTest extends TestCase
         $this->assertEquals(
             $calendar1String,
             $vcalendar2->createCalendar(),
-            sprintf( "Error in compare (1) " . __FUNCTION__ )
+            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Error in calendar compare', null )
         );
 
-        $vcalendar2->setConfig( Vcalendar::DIRECTORY, sys_get_temp_dir());
-        $dirFile = $vcalendar2->getConfig( Vcalendar::DIRFILE );
-        $vcalendar2->saveCalendar();
-        $this->assertFileExists(
-            $dirFile,
-            sprintf( "File not found Error " . __FUNCTION__ )
-        );
-
-        $vcalendar3 = Vcalendar::factory( [
-            Vcalendar::DIRECTORY => $vcalendar2->getConfig( Vcalendar::DIRECTORY ),
-            Vcalendar::FILENAME  => $vcalendar2->getConfig( Vcalendar::FILENAME )
-        ]);
-        $vcalendar3->parse();
-        if( Vcalendar::VERSION == $propName ) {
-            $vcalendar3->{$setMethod}( $value );
-        }
-
-        $this->assertEquals(
-            $calendar1String,
-            $vcalendar3->createCalendar(),
-            sprintf( "Error in compare (2) " . __FUNCTION__ )
-        );
-
-        unlink( $dirFile );
-
-        unset( $vcalendar, $vcalendar2, $vcalendar3 );
+        unset( $vcalendar, $vcalendar2 );
         $this->assertFalse( isset( $vcalendar ));
     }
 
@@ -251,6 +210,7 @@ class VcalendarTest extends TestCase
      * Testing Vcalendar component management
      *
      * @test
+     * @throws Exception
      */
     public function vcalendarTest2() {
         $vcalendar = new Vcalendar();
@@ -262,9 +222,7 @@ class VcalendarTest extends TestCase
         $v2 = $vcalendar->getComponent( 6 );
         $this->assertEquals( $uid,  $v2->getUid());
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( 'now', Vcalendar::UTC )
-        );
+        $date = DateTimeFactory::factory( 'now', Vcalendar::UTC );
         $v2->setDtstart( $date );
         $vcalendar->setComponent( $v2, 6 );
         $v2 = $vcalendar->getComponent( 6 );
@@ -355,95 +313,79 @@ class VcalendarTest extends TestCase
         $v->setXprop( 'X-UPD_NO', 6 );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::DTSTART] = [ 7, $dateStr ];
         $v = $vcalendar->getComponent( 7 );
         $v->setDtstart( $date );
         $v->setComment( 7 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $v->setXprop( 'X-UPD_NO', 7 );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 8 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 8 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::DTSTAMP] = [ 8, $dateStr ];
         $v = $vcalendar->getComponent( 8 );
         $v->setDtstamp( $date );
         $v->setComment( 8 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $v->setXprop( 'X-UPD_NO', 8 );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 9 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 9 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::DTEND] = [ 9, $dateStr ];
         $v = $vcalendar->getComponent( 9 );
         $v->setDtend( $date );
         $v->setComment( 9 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 10 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 10 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::CREATED] = [ 10, $dateStr ];
         $v = $vcalendar->getComponent( 10 );
         $v->setCreated( $date );
         $v->setComment( 10 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 11 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 11 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::LAST_MODIFIED] = [ 11, $dateStr ];
         $v = $vcalendar->getComponent( 11 );
         $v->setLastmodified( $date );
         $v->setComment( 11 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::RECURRENCE_ID] = [ 12, $dateStr ];
         $v = $vcalendar->getComponent( 12 );
         $v->setRecurrenceid( $date );
         $v->setComment( 12 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 13 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 13 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::COMPLETED] = [ 13, $dateStr ]; // Vtodo
         $v = $vcalendar->getComponent( 13 );
         $v->setCompleted( $date );
         $v->setComment( 13 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date = DateTimeFactory::getDateArrayFromDateTime(
-            DateTimeFactory::factory( '+' . 14 . ' days', Vcalendar::UTC )
-        );
-        $dateStr = DateTimeFactory::getYMDString( $date ) . DateTimeFactory::getHisString( $date );
+        $date    = DateTimeFactory::factory( '+' . 14 . ' days', Vcalendar::UTC );
+        $dateStr = $date->format( DateTimeFactory::$YmdHis );
         $testArr[Vcalendar::DUE] = [ 14, $dateStr ]; // Vtodo
         $v = $vcalendar->getComponent( 14 );
         $v->setDue( $date );
         $v->setComment( 14 ); // remember $x
-        $v->setXprop( 'X-VALUE', $date );
+        $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
 
@@ -511,14 +453,13 @@ class VcalendarTest extends TestCase
                 $ordNo,
                 'getComponent-error 2 for #' . $testValues[0] . ' : ' . $propName
             );
-            // check set values
-            $getMethod = Vcalendar::getGetMethodName( $propName );
+            // check xProp values
             $this->assertEquals(
-                $v->{$getMethod}(),
+                $testValues[1],
                 $v->getXprop( 'X-VALUE' )[1],
                 'getComponent-error 3 for #' . $testValues[0] . ' : ' . $propName
             );
-        }
+        } // end foreach
 
         // check fetch on config compsinfo
         foreach( $vcalendar->getConfig( Vcalendar::COMPSINFO ) as $cix => $compInfo ) {
@@ -598,6 +539,7 @@ class VcalendarTest extends TestCase
             ( 30 == $vcalendar->countComponents() ),
             'deleteComponent-error 13, has ' . $vcalendar->countComponents()
         );
+
     }
 
 }

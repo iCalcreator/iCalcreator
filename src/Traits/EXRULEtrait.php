@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,18 +30,16 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\RecurFactory;
-use InvalidArgumentException;
 use Exception;
-use Kigkonsult\Icalcreator\Vcalendar;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Util\RecurFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * EXRULE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.13 - 2019-01-09
- * @todo follow rfc5545 restriction: RRULE .. SHOULD NOT occur more than once OR remove?
+ * @since 2.29.6 2019-06-23
  */
 trait EXRULEtrait
 {
@@ -62,42 +60,33 @@ trait EXRULEtrait
         return RecurFactory::formatRecur(
             self::EXRULE,
             $this->exrule,
-            $this->getConfig( self::ALLOWEMPTY ),
-            $this->getDtstartParams()
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
     /**
      * Delete calendar component property exrule
      *
-     * @param int   $propDelIx   specific property in case of multiply occurrence
-     * @return bool
-     * @since  2.27.1 - 2018-12-15
+     * @return static
+     * @since 2.29.6 2019-06-23
      */
-    public function deleteExrule( $propDelIx = null ) {
-        if( empty( $this->exrule )) {
-            unset( $this->propDelIx[self::EXRULE] );
-            return false;
-        }
-        $propDelIx = 1; // rfc5545 restriction: .. SHOULD NOT occur more than once
-        return $this->deletePropertyM( $this->exrule, self::EXRULE, $propDelIx );
+    public function deleteExrule() {
+        $this->exrule = null;
+        return $this;
     }
 
     /**
      * Get calendar component property exrule
      *
-     * @param int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
+     * @param bool $inclParam
      * @return bool|array
-     * @since  2.27.1 - 2018-12-12
+     * @since 2.29.6 2019-06-27
      */
-    public function getExrule( $propIx = null, $inclParam = false ) {
+    public function getExrule( $inclParam = false ) {
         if( empty( $this->exrule )) {
-            unset( $this->propIx[self::EXRULE] );
             return false;
         }
-        $propIx = 1; // rfc5545 restriction: .. SHOULD NOT occur more than once
-        return $this->getPropertyM( $this->exrule, self::EXRULE, $propIx, $inclParam );
+        return ( $inclParam ) ? $this->exrule : $this->exrule[Util::$LCvalue];
     }
 
     /**
@@ -105,25 +94,20 @@ trait EXRULEtrait
      *
      * @param array   $exruleset
      * @param array   $params
-     * @param integer $index
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.6 2019-06-23
      */
-    public function setExrule( $exruleset = null, $params = null, $index = null ) {
+    public function setExrule( $exruleset = null, $params = [] ) {
         if( empty( $exruleset )) {
             $this->assertEmptyValue( $exruleset, self::EXRULE );
             $exruleset = Util::$SP0;
             $params    = [];
         }
-        $index = 1; // rfc5545 restriction: .. SHOULD NOT occur more than once
-        $this->setMval(
-            $this->exrule,
-            RecurFactory::setRexrule( $exruleset, $this->getDtstartParams()),
-            $params,
-            false,
-            $index
+        $this->exrule = RecurFactory::setRexrule(
+            $exruleset,
+            array_merge( (array) $params, (array) $this->getDtstartParams())
         );
         return $this;
     }

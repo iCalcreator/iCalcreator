@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,19 +30,18 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use DateTime;
+use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
-
-use function is_array;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * DTEND property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.14 2019-01-28
+ * @since 2.29.1 2019-06-24
  */
 trait DTENDtrait
 {
@@ -57,28 +56,24 @@ trait DTENDtrait
      *
      * "The value type of the "DTEND" or "DUE" properties MUST match the value type of "DTSTART" property."
      * @return string
-     * @since  2.27.12 - 2019-01-09
+     * @since 2.29.1 2019-06-24
      */
     public function createDtend() {
         if( empty( $this->dtend )) {
             return null;
         }
-        if( DateTimeFactory::hasNoDate( $this->dtend )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::DTEND ) : null;
+        if( empty( $this->dtend[Util::$LCvalue] )) {
+            return ( $this->getConfig( self::ALLOWEMPTY ))
+                ? StringFactory::createElement( self::DTEND ) : null;
         }
-        if( ! empty( $this->dtstart )) {
-            $parNo = ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE ) ? 3 : null;
-        }
-        else {
-            $parNo = ParameterFactory::isParamsValueSet( $this->dtend, self::DATE ) ? 3 : null;
-        }
+        $isDATE = ( ! empty( $this->dtstart ))
+            ? ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE )
+            : ParameterFactory::isParamsValueSet( $this->dtend, self::DATE );
+        $isLocalTime = isset( $this->dtend[Util::$LCparams][Util::$ISLOCALTIME] );
         return StringFactory::createElement(
             self::DTEND,
             ParameterFactory::createParams( $this->dtend[Util::$LCparams] ),
-            DateTimeFactory::dateArrayToStr(
-                $this->dtend[Util::$LCvalue],
-                ParameterFactory::isParamsValueSet( $this->dtend, self::DATE )
-            )
+            DateTimeFactory::dateTime2Str( $this->dtend[Util::$LCvalue], $isDATE, $isLocalTime )
         );
     }
 
@@ -94,10 +89,10 @@ trait DTENDtrait
     }
 
     /**
-     * Get calendar component property dtend
+     * Return calendar component property dtend
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
     public function getDtend( $inclParam = false ) {
@@ -110,28 +105,13 @@ trait DTENDtrait
     /**
      * Set calendar component property dtend
      *
-     * @param mixed  $value
-     * @param mixed  $month
-     * @param int    $day
-     * @param int    $hour
-     * @param int    $min
-     * @param int    $sec
-     * @param string $tz
-     * @param array  $params
+     * @param string|DateTime $value
+     * @param array           $params
      * @return static
-     * @throws InvalidArgumentException
-     * @since 2.27.14 2019-02-10
+     * @throws \Exception
+     * @since 2.29.1 2019-06-24
      */
-    public function setDtend(
-        $value  = null,
-        $month  = null,
-        $day    = null,
-        $hour   = null,
-        $min    = null,
-        $sec    = null,
-        $tz     = null,
-        $params = null
-    ) {
+    public function setDtend( $value  = null, $params = [] ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DTEND );
             $this->dtend = [
@@ -140,28 +120,21 @@ trait DTENDtrait
             ];
             return $this;
         }
-        if( DateTimeFactory::isArgsDate( $value, $month, $day )) {
-            $value = DateTimeFactory::argsToStr( $value, $month, $day, $hour, $min, $sec, $tz );
-            if( is_array( $params )) {
-                $month = $params;
-            }
-            else {
-                $month = ( is_array( $hour )) ? $hour : [];
-            }
-        }
-        elseif( ! is_array( $month )) {
-            $month = [];
-        }
         $dtstart = $this->getDtstart( true );
         if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
-            $month[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+            $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+        }
+        if( isset( $dtstart[Util::$LCparams][Util::$ISLOCALTIME] )) {
+            $params[Util::$ISLOCALTIME] = true;
         }
         $this->dtend = DateTimeFactory::setDate(
             $value,
-            ParameterFactory::setParams( $month, DateTimeFactory::$DEFAULTVALUEDATETIME )
+            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
         );
         if( ! empty( $dtstart ) && ( Util::issetAndNotEmpty( $dtstart, Util::$LCvalue ))) {
-            DateTimeFactory::assertYmdArgsAsDatesAreInSequence( $dtstart, $this->dtend, self::DTEND );
+            DateTimeFactory::assertDatesAreInSequence(
+                $dtstart[Util::$LCvalue], $this->dtend[Util::$LCvalue], self::DTEND
+            );
         }
         return $this;
     }

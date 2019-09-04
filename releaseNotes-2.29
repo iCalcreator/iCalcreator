@@ -1,0 +1,66 @@
+
+iCalcreator 2.29.14 releaseNotes
+
+v2.29.1   Removal of all set-methods date(time)/interval ARRAY arguments
+          as well as get-methods return date(time)/interval ARRAY formats
+          DTSTART, DTEND, DUE, RECURRENCE_ID
+          CREATED, COMPLETED, DTSTAMP, LAST_MODIFIED
+
+v2.29.2   Removal of all set-methods DateInterval ARRAY arguments
+          as well as get-methods return DateInterval ARRAY formats
+          REFRESH_INTERVAL, DURATION, TRIGGER
+          RDATE, EXDATE
+          FREEBUSY, RRULE, EXRULE
+
+v2.29.3   Rewrite of Vcalendar::parse()
+          only string|array input allowed, file/url parse removed
+
+v2.29.4 Removal of deprecated methods
+          Vcalendar::saveCalendar()
+          Vcalendar::useCachedCalendar()
+
+          Vcalendar::deleteProperty()
+          Vcalendar::setProperty()
+          Vcalendar::addComponent()
+
+          CalendarComponent::deleteProperty()
+          CalendarComponent::getProperty()
+          CalendarComponent::setProperty()
+
+          VetComponent::newComponent()
+          VTimezone::newComponent()
+
+          IcalXMLFactory::XMLfile2iCal()
+          IcalXMLFactory::XMLstr2iCal()
+
+          Removal of deprecated config/keys
+          DELIMITER, DIRECTORY, FILENAME, DIRFILE, FILESIZE, FILEINFO
+
+          All keys and (fixed) property values as constants available in IcalInterface
+
+v2.29.5   Implement rfc7986
+          new properties; COLOR, NAME, CONFERENCE, IMAGE, REFRESH-INTERVAL, SOURCE
+          allow calendar-properties; UID, LAST-MODIFIED, URL, REFRESH-INTERVAL, SOURCE,
+                                     COLOR, NAME, DESCRIPTION, CATEGORIES, IMAGE
+          replace rfc5545 (date+unique_id) UID by rfc7986 guid UID
+
+v2.29.6   alter RRULE/EXRULE to single occurence
+
+v2.29.7   Allow iana-token (Other IANA-registered type) property PARAMETER names
+          For ACTION and CLASS, iana-token / x-name VALUES are allowed
+          However, IANA Properties still not supported
+
+v2.29.8   Vcalendar::sort() order adjustment
+
+v2.29.9   Conformed method names for Last-Modified, Request-Status, Related-to
+
+v2.29.10  fix other (Ms) timezones conversion to PHP timezones (ie map on offset)
+          in RegulateTimezoneFactory, to be used before Vcalendar::parse
+
+v2.29.11  code reworks: StringFactory, SortFactory, CalAddressFactory, *Traits etc
+
+v2.29.12  Vtimezone::populate() moved to Util/VtimezonePopulateFactory::process()
+
+v2.29.13  CATEGORIES, RESOURCES no longer accepts array input
+
+v2.29.14  String asserts in set-methods for TEXT Valuetype properties

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,6 +30,8 @@
 
 namespace Kigkonsult\Icalcreator;
 
+use DateTime;
+use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -66,6 +68,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function theRecurTestMethod(
         $case,
@@ -80,15 +83,16 @@ class DateTimeUTCTest extends DtBase
             $newMethod = 'new' . $theComp;
             $comp      = $calendar1->{$newMethod}();
             $comp->setDtstart( $value, $params );
-            foreach( $props as $propName ) {
-                $getMethod    = Vcalendar::getGetMethodName( $propName );
+
+            foreach( $props as $x2 => $propName ) {
+                $getMethod    = Vcalendar::getGetMethodName(    $propName );
                 $createMethod = Vcalendar::getCreateMethodName( $propName );
                 $deleteMethod = Vcalendar::getDeleteMethodName( $propName );
-                $setMethod    = Vcalendar::getSetMethodName( $propName );
+                $setMethod    = Vcalendar::getSetMethodName(    $propName );
 
                 $recurSet = [
                     Vcalendar::FREQ       => Vcalendar::YEARLY,
-                    Vcalendar::UNTIL      => $value,
+                    Vcalendar::UNTIL      => (( $value instanceof DateTime ) ? clone $value : $value ),
                     Vcalendar::INTERVAL   => 2,
                     Vcalendar::BYSECOND   => [1,2,3],
                     Vcalendar::BYMINUTE   => [12,23,45],
@@ -103,25 +107,26 @@ class DateTimeUTCTest extends DtBase
                 ];
                 $comp->{$setMethod}( $recurSet );
 
-                $getValue = $comp->{$getMethod}( null, true );
+                $getValue = $comp->{$getMethod}( true );
+
                 $this->assertEquals(
                     $expectedGet[Util::$LCvalue],
                     $getValue[Util::$LCvalue][Vcalendar::UNTIL],
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-1", __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     substr( $expectedString, 1 ),
                     trim( StringFactory::between( 'UNTIL=', ';INTERVAL', $comp->{$createMethod}())),
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $createMethod )
+                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-2", __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . "-r{$x2}-3", __FUNCTION__, $theComp, $getMethod )
                 );
                 $comp->{$setMethod}( $recurSet );
-            }
-        }
+            } // edn foreach
+        } // end foreach
         $calendar1Str = $calendar1->createCalendar();
         $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1Str );
         $createString = str_replace( '\,', ',', $createString );
@@ -130,7 +135,7 @@ class DateTimeUTCTest extends DtBase
         }
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Vcalendar', 'createComponent' )
+            sprintf( self::$ERRFMT, null, $case . '-r-5', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -145,6 +150,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function theFreebusyTestMethodDate(
         $case,
@@ -205,6 +211,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function theFreebusyTestMethodDateInterval(
         $case,
@@ -224,7 +231,7 @@ class DateTimeUTCTest extends DtBase
                 $deleteMethod = Vcalendar::getDeleteMethodName( $propName );
                 $setMethod    = Vcalendar::getSetMethodName( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
-                $comp->{$setMethod}( Vcalendar::BUSY, [$value, 'P1D'] );
+                $comp->{$setMethod}( Vcalendar::BUSY, [ $value, 'P1D' ] );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 $this->assertEquals(
@@ -265,6 +272,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function theTriggerTestMethod(
         $case,
@@ -291,17 +299,17 @@ class DateTimeUTCTest extends DtBase
                 $this->assertEquals(
                     $expectedGet[Util::$LCvalue],
                     $getValue[Util::$LCvalue],
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     strtoupper( $propName ) . ';VALUE=DATE-TIME' . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $createMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-3', __FUNCTION__, $theComp, $getMethod )
                 );
                 $comp->{$setMethod}( $value, [Vcalendar::VALUE => Vcalendar::DATE_TIME] );
             }
@@ -311,7 +319,7 @@ class DateTimeUTCTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Vcalendar', 'createComponent' )
+            sprintf( self::$ERRFMT, null, $case . '-5', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -326,6 +334,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function theTriggerTestMethod2(
         $case,
@@ -338,8 +347,8 @@ class DateTimeUTCTest extends DtBase
         static $keys = null;
         if( empty( $keys )) {
             $keys = [
-                Util::$LCYEAR, Util::$LCMONTH, Util::$LCDAY,
-                Util::$LCHOUR, Util::$LCMIN,   Util::$LCSEC
+                Util\RecurFactory::$LCYEAR, Util\RecurFactory::$LCMONTH, Util\RecurFactory::$LCDAY,
+                Util\RecurFactory::$LCHOUR, Util\RecurFactory::$LCMIN, Util\RecurFactory::$LCSEC
             ];
         }
         $calendar1 = new Vcalendar();
@@ -356,8 +365,8 @@ class DateTimeUTCTest extends DtBase
                 foreach( $keys as $key ) {
                     ${$key} = ( isset( $value[$key] )) ? $value[$key] : null;
                 }
-                $comp->{$setMethod}( ${Util::$LCYEAR}, ${Util::$LCMONTH}, ${Util::$LCDAY},
-                                     ${Util::$LCHOUR}, ${Util::$LCMIN},   ${Util::$LCSEC},
+                $comp->{$setMethod}( ${Util\RecurFactory::$LCYEAR}, ${Util\RecurFactory::$LCMONTH}, ${Util\RecurFactory::$LCDAY},
+                                     ${Util\RecurFactory::$LCHOUR}, ${Util\RecurFactory::$LCMIN}, ${Util\RecurFactory::$LCSEC},
                                      [Vcalendar::VALUE => Vcalendar::DATE_TIME] );
 
                 $getValue = $comp->{$getMethod}( true );
@@ -376,8 +385,8 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( ${Util::$LCYEAR}, ${Util::$LCMONTH}, ${Util::$LCDAY},
-                                     ${Util::$LCHOUR}, ${Util::$LCMIN},   ${Util::$LCSEC},
+                $comp->{$setMethod}( ${Util\RecurFactory::$LCYEAR}, ${Util\RecurFactory::$LCMONTH}, ${Util\RecurFactory::$LCDAY},
+                                     ${Util\RecurFactory::$LCHOUR}, ${Util\RecurFactory::$LCMIN}, ${Util\RecurFactory::$LCSEC},
                                      [Vcalendar::VALUE => Vcalendar::DATE_TIME] );
             }
         }
@@ -408,7 +417,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -421,7 +430,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -434,7 +443,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -447,7 +456,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -459,7 +468,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime2,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -471,7 +480,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime2,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -483,7 +492,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime2,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -495,7 +504,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime2,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -508,7 +517,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -521,7 +530,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -534,7 +543,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -547,7 +556,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -567,14 +576,9 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
-    public function testDateTime11(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function testDateTime11( $case, $value, $params, $expectedGet, $expectedString ) {
         static $compsProps = [
             Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
             Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
@@ -595,14 +599,9 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
-    public function testRecurDateTime11(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function testRecurDateTime11( $case, $value, $params, $expectedGet, $expectedString ) {
         static $compsProps = [
             Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
             Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
@@ -621,6 +620,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testFreebusyDateTime11(
         $case,
@@ -650,6 +650,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testTriggerDateTime11(
         $case,
@@ -664,2111 +665,6 @@ class DateTimeUTCTest extends DtBase
         $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
 
-    /**
-     * testDateTime12 provider
-     */
-    public function DateTime12Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12008,
-            array_merge( $timestampArr, [ Util::$LCtz => LTZ ] ),
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12012,
-            array_merge( $timestampArr, [ Util::$LCtz => LTZ ] ),
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12013,
-            array_merge( $timestampArr, [ Util::$LCtz => LTZ ] ),
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12014,
-            array_merge( $timestampArr, [ Util::$LCtz => LTZ ] ),
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12015,
-            $timestampArr,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12019,
-            $timestampArr,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12020,
-            $timestampArr,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12021,
-            $timestampArr,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12022,
-            array_merge( $timestampArr, [ Util::$LCtz => OFFSET ] ),
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis,  Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12026,
-            array_merge( $timestampArr, [ Util::$LCtz => OFFSET ] ),
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12027,
-            array_merge( $timestampArr, [ Util::$LCtz => OFFSET ] ),
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $timestampArr = [
-            Util::$LCTIMESTAMP => $dateTime->getTimestamp()
-        ];
-        $dataArr[] = [
-            12028,
-            array_merge( $timestampArr, [ Util::$LCtz => OFFSET ] ),
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with timestamp, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime12Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime12(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with timestamp, (EXRULE+)RRULE
-     *
-     * @test
-     * @dataProvider DateTime12Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testRecurDateTime12(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VJOURNAL => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-        ];
-        $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with timestamp, FREEBUSY
-     *
-     * @test
-     * @dataProvider DateTime12Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testFreebusyDateTime12(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
-        ];
-        $this->theFreebusyTestMethodDate(
-            $case, $compsProps, $value, $params, $expectedGet, $expectedString
-        );
-        $this->theFreebusyTestMethodDateInterval(
-            $case, $compsProps, $value, $params, $expectedGet, $expectedString
-        );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with timestamp, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime12Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime12(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * testDateTime13 provider
-     */
-    public function DateTime13Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd,  LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, TZ2 );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd,  Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dataArr[] = [
-            13006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            13015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            13019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            13020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            13021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime  = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            13028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime13Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime13(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array, (EXRULE+)RRULE
-     *
-     * @test
-     * @dataProvider DateTime13Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testRecurDateTime13(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VJOURNAL => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-        ];
-        $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array, FREEBUSY
-     *
-     * @test
-     * @dataProvider DateTime13Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testFreebusyDateTime13(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
-        ];
-        if( in_array( $case, [ 13001, 13005, 13007 ] )) { // n.a. covers by 13006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theFreebusyTestMethodDate(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-            $this->theFreebusyTestMethodDateInterval(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-        }
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime13Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime13(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( in_array( $case, [ 13001, 13005, 13007 ] )) { // n.a. covers by 13006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
-
-    /**
-     * testDateTime14 provider
-     */
-    public function DateTime14Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, TZ2 );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime2 = clone $dateTime;
-        $dataArr[] = [
-            14006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime  = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            14015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            14019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            14020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            14021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz   => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $y  = $dateTime2->format( 'Y' );
-        $m  = $dateTime2->format( 'm' );
-        $d  = $dateTime2->format( 'd' );
-        $h  = $dateTime2->format( 'H' );
-        $i  = $dateTime2->format( 'i' );
-        $dataArr[] = [
-            14022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz   => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz   => OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            14028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime14Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime14(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array, (EXRULE+)RRULE
-     *
-     * @test
-     * @dataProvider DateTime14Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testRecurDateTime14(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VJOURNAL => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-        ];
-        $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array, FREEBUSY
-     *
-     * @test
-     * @dataProvider DateTime14Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testFreebusyDateTime14(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
-        ];
-        if( in_array( $case, [ 14001, 14005, 14007 ] )) { // n.a. covers by 14006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theFreebusyTestMethodDate(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-            $this->theFreebusyTestMethodDateInterval(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-        }
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime14Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime14(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( in_array( $case, [ 14001, 14005, 14007 ] )) { // n.a. covers by 14006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
-
-    /**
-     * testDateTime15 provider
-     */
-    public function DateTime15Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, TZ2 );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            LTZ
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            15015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            Vcalendar::UTC
-        ];
-        $y  = $dateTime->format( 'Y' );
-        $m  = $dateTime->format( 'm' );
-        $d  = $dateTime->format( 'd' );
-        $h  = $dateTime->format( 'H' );
-        $i  = $dateTime->format( 'i' );
-        $dataArr[] = [
-            15019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            15020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            15021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            OFFSET
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            15028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short array, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime15Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime15(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short array, (EXRULE+)RRULE
-     *
-     * @test
-     * @dataProvider DateTime15Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testRecurDateTime15(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VJOURNAL => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-        ];
-        $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short array, FREEBUSY
-     *
-     * @test
-     * @dataProvider DateTime15Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testFreebusyDateTime15(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
-        ];
-        if( in_array( $case, [ 15001, 15005, 15007 ] )) { // n.a. covers by 15006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theFreebusyTestMethodDate(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-            $this->theFreebusyTestMethodDateInterval(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-        }
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short array, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime15Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime15(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( in_array( $case, [ 15001, 15005, 15007 ] )) { // n.a. covers by 15006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
-
-    /**
-     * testDateTime16 provider
-     */
-    public function DateTime16Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, TZ2 );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-        ];
-        $dataArr[] = [
-            16006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            LTZ,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            Vcalendar::UTC,
-        ];
-        $dataArr[] = [
-            16015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            Vcalendar::UTC,
-        ];
-        $dataArr[] = [
-            16019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            Vcalendar::UTC,
-        ];
-        $dataArr[] = [
-            16020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            Vcalendar::UTC,
-        ];
-        $dataArr[] = [
-            16021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            OFFSET,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            OFFSET,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            OFFSET,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' ),
-            OFFSET,
-        ];
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            16028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full array, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime16Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime16(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full array, (EXRULE+)RRULE
-     *
-     * @test
-     * @dataProvider DateTime16Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testRecurDateTime16(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT   => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VTODO    => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-            Vcalendar::VJOURNAL => [ Vcalendar::EXRULE, Vcalendar::RRULE ],
-        ];
-        $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full array, FREEBUSY
-     *
-     * @test
-     * @dataProvider DateTime16Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testFreebusyDateTime16(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
-        ];
-        if( in_array( $case, [ 16001, 16005, 16007 ] )) { // n.a. covers by 16006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theFreebusyTestMethodDate(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-            $this->theFreebusyTestMethodDateInterval(
-                $case, $compsProps, $value, $params, $expectedGet, $expectedString
-            );
-        }
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full array, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime16Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime16(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( in_array( $case, [ 16001, 16005, 16007 ] )) { // n.a. covers by 16006 (UTC)
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
 
     /**
      * testDateTime17 provider
@@ -2780,14 +676,13 @@ class DateTimeUTCTest extends DtBase
         $dataArr = [];
 
         $dateTime = DATEYmdTHis;
-        $dateTime2 = DateTimeFactory::factory( $dateTime, LTZ );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, Vcalendar::UTC );
+        $dateTime2 = DateTimeFactory::factory( $dateTime, Vcalendar::UTC );
         $dataArr[] = [
             17001,
             $dateTime,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2800,7 +695,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2813,7 +708,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2826,7 +721,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2840,7 +735,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . LTZ,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2853,7 +748,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . LTZ,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2866,7 +761,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . LTZ,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2879,7 +774,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . LTZ,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2892,7 +787,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . Vcalendar::UTC,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2904,7 +799,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2916,7 +811,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2928,7 +823,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2942,7 +837,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . OFFSET,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2955,7 +850,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . OFFSET,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2968,7 +863,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . OFFSET,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -2981,7 +876,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime . OFFSET,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3000,6 +895,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testDateTime17(
         $case,
@@ -3028,6 +924,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testRecurDateTime17(
         $case,
@@ -3054,6 +951,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testFreebusyDateTime17(
         $case,
@@ -3088,6 +986,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testTriggerDateTime17(
         $case,
@@ -3118,14 +1017,13 @@ class DateTimeUTCTest extends DtBase
 
         $dateTime  = DATEYmd;
 
-        $dateTime2 = DateTimeFactory::factory( $dateTime, LTZ );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, Vcalendar::UTC );
+        $dateTime2 = DateTimeFactory::factory( $dateTime, Vcalendar::UTC );
         $dataArr[] = [
             18001,
             $dateTime,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3138,7 +1036,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3150,7 +1048,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3163,7 +1061,7 @@ class DateTimeUTCTest extends DtBase
             $dateTime,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3177,7 +1075,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . LTZ,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3190,7 +1088,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . LTZ,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3203,7 +1101,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . LTZ,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3216,7 +1114,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . LTZ,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3229,7 +1127,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . Vcalendar::UTC,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3241,7 +1139,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3253,7 +1151,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3265,7 +1163,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . ' ' . Vcalendar::UTC,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3279,7 +1177,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . OFFSET,
             [],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3292,7 +1190,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . OFFSET,
             [ Vcalendar::TZID => TZ2 ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3305,7 +1203,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . OFFSET,
             [ Vcalendar::TZID => Vcalendar::UTC ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3318,7 +1216,7 @@ class DateTimeUTCTest extends DtBase
             DATEYmd . OFFSET,
             [ Vcalendar::TZID => OFFSET ],
             [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => []
             ],
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
@@ -3337,6 +1235,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testDateTime18(
         $case,
@@ -3365,6 +1264,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testRecurDateTime18(
         $case,
@@ -3391,6 +1291,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testFreebusyDateTime18(
         $case,
@@ -3425,6 +1326,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function testTriggerDateTime18(
         $case,
@@ -3441,748 +1343,6 @@ class DateTimeUTCTest extends DtBase
         }
         else {
             $this->theTriggerTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
-
-    /**
-     * testDateTime19 provider
-     */
-    public function DateTime19Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, TZ2 );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dataArr[] = [
-            19006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, TZ2 );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => TZ2
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC  );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            19013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz   => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            19015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $dataArr[] = [
-            19019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime2 = clone $dateTime;
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime2 ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, Vcalendar::UTC );
-        $dataArr[] = [
-            19021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmd, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            19028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array as args, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime19Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime19(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VTODO     => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED ],
-            Vcalendar::VJOURNAL  => [ Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DTSTAMP, Vcalendar::DTSTART ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod2( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with short assoc array as args, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime19Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime19(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( ! in_array( $case, [ 19006, 19015, 19019, 19020, 190021 ] )) { // n.a.
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod2( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        }
-    }
-
-    /**
-     * testDateTime20 provider
-     */
-    public function DateTime20Provider()
-    {
-        date_default_timezone_set( LTZ );
-
-        $dataArr = [];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20001,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, TZ2 );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20005,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dataArr[] = [
-            20006,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20007,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20008,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20012,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20013,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, LTZ );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => LTZ
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20014,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => Vcalendar::UTC
-        ];
-        $dataArr[] = [
-            20015,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $dataArr[] = [
-            20019,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $dataArr[] = [
-            20020,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
-        $dataArr[] = [
-            20021,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20022,
-            $arrayDate,
-            [],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20026,
-            $arrayDate,
-            [ Vcalendar::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20027,
-            $arrayDate,
-            [ Vcalendar::TZID => Vcalendar::UTC ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, OFFSET );
-        $arrayDate = [
-            Util::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util::$LCMONTH => $dateTime->format( 'm' ),
-            Util::$LCDAY   => $dateTime->format( 'd' ),
-            Util::$LCHOUR  => $dateTime->format( 'H' ),
-            Util::$LCMIN   => $dateTime->format( 'i' ),
-            Util::$LCSEC   => $dateTime->format( 's' ),
-            Util::$LCtz    => OFFSET
-        ];
-        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, Vcalendar::UTC );
-        $dataArr[] = [
-            20028,
-            $arrayDate,
-            [ Vcalendar::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $this->getDateTimeAsArray( $dateTime ),
-                Util::$LCparams => []
-            ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
-        ];
-
-        return $dataArr;
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array as args, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
-     *
-     * @test
-     * @dataProvider DateTime20Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testDateTime20(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VEVENT    => [
-                Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED
-            ],
-            Vcalendar::VTODO     => [
-                Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED, Vcalendar::COMPLETED
-            ],
-            Vcalendar::VJOURNAL  => [
-                Vcalendar::DTSTAMP, Vcalendar::LAST_MODIFIED, Vcalendar::CREATED
-            ],
-            Vcalendar::VFREEBUSY => [
-                Vcalendar::DTSTAMP, Vcalendar::DTSTART
-            ],
-            Vcalendar::VTIMEZONE => [ Vcalendar::LAST_MODIFIED ],
-        ];
-        $this->theTestMethod2( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-    }
-
-    /**
-     * Testing VALUE DATE-TIME with full assoc array as args, TRIGGER
-     *
-     * @test
-     * @dataProvider DateTime20Provider
-     * @param int    $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
-     * @param string $expectedString
-     */
-    public function testTriggerDateTime20(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
-        static $compsProps = [
-            Vcalendar::VALARM => [ Vcalendar::TRIGGER ],
-        ];
-        if( ! in_array( $case, [ 20006, 20015, 20019, 20020, 20021 ] )) { // n.a.
-            $this->assertTrue( true );
-        }
-        else {
-            $this->theTriggerTestMethod2( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         }
     }
 

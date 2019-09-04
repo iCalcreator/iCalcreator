@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -104,7 +104,7 @@ trait SEQUENCEtrait
      * @return static
      * @since  2.27.2 - 2019-01-04
      */
-    public function setSequence( $value = null, $params = null ) {
+    public function setSequence( $value = null, $params = [] ) {
         if(( empty( $value ) && ! is_numeric( $value )) && ( Util::$ZERO != $value )) {
             $value = ( isset( $this->sequence[Util::$LCvalue] ) &&
                 ( -1 < $this->sequence[Util::$LCvalue] ))
@@ -112,7 +112,7 @@ trait SEQUENCEtrait
                 : Util::$ZERO;
         }
         else {
-            self::assertIsInteger( $value, self::SEQUENCE );
+            Util::assertInteger( $value, self::SEQUENCE );
         }
         $this->sequence = [
             Util::$LCvalue  => $value,

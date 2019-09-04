@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,7 +39,7 @@ use function strtoupper;
  * iCalcreator VTODO component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.4 - 2018-12-19
+ * @since  2.29.9 - 2019-08-05
  */
 final class Vtodo extends VetComponent
 {
@@ -47,8 +47,10 @@ final class Vtodo extends VetComponent
         Traits\ATTENDEEtrait,
         Traits\CATEGORIEStrait,
         Traits\CLASStrait,
+        Traits\COLORrfc7986trait,
         Traits\COMMENTtrait,
         Traits\COMPLETEDtrait,
+        Traits\CONFERENCErfc7986trait,
         Traits\CONTACTtrait,
         Traits\CREATEDtrait,
         Traits\DESCRIPTIONtrait,
@@ -59,6 +61,7 @@ final class Vtodo extends VetComponent
         Traits\EXDATEtrait,
         Traits\EXRULEtrait,
         Traits\GEOtrait,
+        Traits\IMAGErfc7986trait,
         Traits\LAST_MODIFIEDtrait,
         Traits\LOCATIONtrait,
         Traits\ORGANIZERtrait,
@@ -73,7 +76,7 @@ final class Vtodo extends VetComponent
         Traits\SEQUENCEtrait,
         Traits\STATUStrait,
         Traits\SUMMARYtrait,
-        Traits\UIDtrait,
+        Traits\UIDrfc7986trait,
         Traits\URLtrait;
 
     /**
@@ -86,7 +89,7 @@ final class Vtodo extends VetComponent
     /**
      * Destructor
      *
-     * @since  2.26 - 2018-11-10
+     * @since  2.29.9 - 2019-08-05
      */
     public function __destruct() {
         if( ! empty( $this->components )) {
@@ -113,6 +116,8 @@ final class Vtodo extends VetComponent
             $this->attendee,
             $this->categories,
             $this->class,
+            $this->color,
+            $this->conference,
             $this->comment,
             $this->completed,
             $this->contact,
@@ -122,6 +127,7 @@ final class Vtodo extends VetComponent
             $this->dtstart,
             $this->due,
             $this->duration,
+            $this->image,
             $this->exdate,
             $this->exrule,
             $this->geo,
@@ -149,7 +155,7 @@ final class Vtodo extends VetComponent
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since  2.27.2 - 2018-12-21
+     * @since  2.29.9 - 2019-08-05
      */
     public function createComponent() {
         $compType    = strtoupper( $this->getCompType());
@@ -160,7 +166,9 @@ final class Vtodo extends VetComponent
         $component  .= $this->createAttendee();
         $component  .= $this->createCategories();
         $component  .= $this->createClass();
+        $component  .= $this->createColor();
         $component  .= $this->createComment();
+        $component  .= $this->createConference();
         $component  .= $this->createCompleted();
         $component  .= $this->createContact();
         $component  .= $this->createCreated();
@@ -170,15 +178,16 @@ final class Vtodo extends VetComponent
         $component  .= $this->createDuration();
         $component  .= $this->createExdate();
         $component  .= $this->createExrule();
+        $component  .= $this->createImage();
         $component  .= $this->createGeo();
-        $component  .= $this->createLastModified();
+        $component  .= $this->createLastmodified();
         $component  .= $this->createLocation();
         $component  .= $this->createOrganizer();
         $component  .= $this->createPercentcomplete();
         $component  .= $this->createPriority();
         $component  .= $this->createRdate();
-        $component  .= $this->createRelatedTo();
-        $component  .= $this->createRequestStatus();
+        $component  .= $this->createRelatedto();
+        $component  .= $this->createRequeststatus();
         $component  .= $this->createRecurrenceid();
         $component  .= $this->createResources();
         $component  .= $this->createRrule();

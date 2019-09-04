@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,7 +39,7 @@ use function strtoupper;
  * iCalcreator VEVENT component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.4 - 2018-12-17
+ * @since  2.29.9 - 2019-08-05
  */
 final class Vevent extends VetComponent
 {
@@ -47,7 +47,9 @@ final class Vevent extends VetComponent
         Traits\ATTENDEEtrait,
         Traits\CATEGORIEStrait,
         Traits\CLASStrait,
+        Traits\COLORrfc7986trait,
         Traits\COMMENTtrait,
+        Traits\CONFERENCErfc7986trait,
         Traits\CONTACTtrait,
         Traits\CREATEDtrait,
         Traits\DESCRIPTIONtrait,
@@ -57,6 +59,7 @@ final class Vevent extends VetComponent
         Traits\EXDATEtrait,
         Traits\EXRULEtrait,
         Traits\GEOtrait,
+        Traits\IMAGErfc7986trait,
         Traits\LAST_MODIFIEDtrait,
         Traits\LOCATIONtrait,
         Traits\ORGANIZERtrait,
@@ -71,7 +74,7 @@ final class Vevent extends VetComponent
         Traits\STATUStrait,
         Traits\SUMMARYtrait,
         Traits\TRANSPtrait,
-        Traits\UIDtrait,
+        Traits\UIDrfc7986trait,
         Traits\URLtrait;
 
     /**
@@ -84,7 +87,7 @@ final class Vevent extends VetComponent
     /**
      * Destructor
      *
-     * @since  2.27.3 - 2018-12-28
+     * @since  2.29.5 - 2019-06-20
      */
     public function __destruct() {
         if( ! empty( $this->components )) {
@@ -112,6 +115,8 @@ final class Vevent extends VetComponent
             $this->categories,
             $this->class,
             $this->comment,
+            $this->color,
+            $this->conference,
             $this->contact,
             $this->created,
             $this->description,
@@ -119,6 +124,7 @@ final class Vevent extends VetComponent
             $this->dtstamp,
             $this->dtstart,
             $this->duration,
+            $this->image,
             $this->exdate,
             $this->exrule,
             $this->geo,
@@ -146,7 +152,7 @@ final class Vevent extends VetComponent
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since  2.27.2 - 2018-12-21
+     * @since  2.29.9 - 2019-08-05
      */
     public function createComponent() {
         $compType    = strtoupper( $this->getCompType());
@@ -156,9 +162,11 @@ final class Vevent extends VetComponent
         $component  .= $this->createAttach();
         $component  .= $this->createAttendee();
         $component  .= $this->createCategories();
-        $component  .= $this->createComment();
-        $component  .= $this->createContact();
         $component  .= $this->createClass();
+        $component  .= $this->createColor();
+        $component  .= $this->createComment();
+        $component  .= $this->createConference();
+        $component  .= $this->createContact();
         $component  .= $this->createCreated();
         $component  .= $this->createDescription();
         $component  .= $this->createDtstart();
@@ -166,15 +174,16 @@ final class Vevent extends VetComponent
         $component  .= $this->createDuration();
         $component  .= $this->createExdate();
         $component  .= $this->createExrule();
+        $component  .= $this->createImage();
         $component  .= $this->createGeo();
-        $component  .= $this->createLastModified();
+        $component  .= $this->createLastmodified();
         $component  .= $this->createLocation();
         $component  .= $this->createOrganizer();
         $component  .= $this->createPriority();
         $component  .= $this->createRdate();
         $component  .= $this->createRrule();
-        $component  .= $this->createRelatedTo();
-        $component  .= $this->createRequestStatus();
+        $component  .= $this->createRelatedto();
+        $component  .= $this->createRequeststatus();
         $component  .= $this->createRecurrenceid();
         $component  .= $this->createResources();
         $component  .= $this->createSequence();

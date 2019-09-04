@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -103,7 +103,7 @@ trait PRIORITYtrait
      * @throws InvalidArgumentException
      * @since 2.27.2 2019-01-03
      */
-    public function setPriority( $value = null, $params = null ) {
+    public function setPriority( $value = null, $params = [] ) {
         if( empty( $value ) && ( Util::$ZERO != $value )) {
             $this->assertEmptyValue( $value, self::PRIORITY );
             $value  = Util::$SP0;
@@ -111,7 +111,7 @@ trait PRIORITYtrait
 
         }
         else {
-            self::assertIsInteger( $value, self::PRIORITY, 0, 9 );
+            Util::assertInteger( $value, self::PRIORITY, 0, 9 );
         }
         $this->priority = [
             Util::$LCvalue  => $value,

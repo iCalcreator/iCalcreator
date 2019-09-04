@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -106,14 +106,14 @@ trait PERCENT_COMPLETEtrait
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      */
-    public function setPercentcomplete( $value = null, $params = null ) {
+    public function setPercentcomplete( $value = null, $params = [] ) {
         if( empty( $value ) && ! is_numeric( $value )) {
             $this->assertEmptyValue( $value, self::PERCENT_COMPLETE );
             $value  = Util::$SP0;
             $params = [];
         }
         else {
-            self::assertIsInteger( $value, self::PERCENT_COMPLETE, 0, 100 );
+            Util::assertInteger( $value, self::PERCENT_COMPLETE, 0, 100 );
         }
         $this->percentcomplete = [
             Util::$LCvalue  => $value,

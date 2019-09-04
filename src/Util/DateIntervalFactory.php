@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -35,10 +35,8 @@ use DateTime;
 use Exception;
 use InvalidArgumentException;
 
-use function ctype_digit;
 use function floor;
 use function is_array;
-use function is_scalar;
 use function strlen;
 use function substr;
 use function trim;
@@ -94,7 +92,7 @@ class DateIntervalFactory
      * @since  2.27.8 - 2019-01-12
      */
     public static function factory( $dateIntervalString ) {
-        return DateIntervalFactory::assertDateIntervalString( $dateIntervalString );
+        return self::assertDateIntervalString( $dateIntervalString );
     }
 
     /**
@@ -130,8 +128,21 @@ class DateIntervalFactory
         if( ! is_string( $value )) {
             return false;
         }
-        $value = StringFactory::trimTrailNL( trim( $value ));
-        return ( 3 <= strlen( trim( $value ))) && ( in_array( $value{0}, $PREFIXARR ));
+        $value = trim( $value );
+        $value = StringFactory::trimTrailNL( $value );
+        return (( 3 <= strlen( $value )) && ( in_array( $value{0}, $PREFIXARR )));
+    }
+
+    /**
+     * Return bool true if dateInterval array 'invert' is set // fix pre 7.0.5 bug
+     *
+     * @param mixed $dateInterval
+     * @return bool
+     * @static
+     * @since  2.29.2 - 2019-06-27
+     */
+    public static function isDateIntervalArrayInvertSet( $dateInterval ) {
+        return( is_array( $dateInterval ) && isset( $dateInterval[self::$invert] ));
     }
 
     /**
@@ -144,7 +155,7 @@ class DateIntervalFactory
      * @todo remove -> $isMinus  = ( 0 > $value );  $tz = abs((int) $value );
      */
     public static function removePlusMinusPrefix( $value ) {
-        if( DateIntervalFactory::hasPlusMinusPrefix( $value )) {
+        if( self::hasPlusMinusPrefix( $value )) {
             $value = substr( $value, 1 );
         }
         return $value;
@@ -174,49 +185,49 @@ class DateIntervalFactory
      */
     public static function dateInterval2String( DateInterval $dateInterval, $showOptSign=false ) {
         $dateIntervalArr = (array) $dateInterval;
-        $result  = DateIntervalFactory::$P;
-        if( empty( $dateIntervalArr[DateIntervalFactory::$y] ) &&
-            empty( $dateIntervalArr[DateIntervalFactory::$m] ) &&
-            empty( $dateIntervalArr[DateIntervalFactory::$h] ) &&
-            empty( $dateIntervalArr[DateIntervalFactory::$i] ) &&
-            empty( $dateIntervalArr[DateIntervalFactory::$s] ) &&
-          ! empty( $dateIntervalArr[DateIntervalFactory::$d] ) &&
-            ( 0 == ( $dateIntervalArr[DateIntervalFactory::$d] % 7 ))) {
-            $result .= (int) floor( $dateIntervalArr[DateIntervalFactory::$d] / 7 ) .
-                DateIntervalFactory::$W;
-            return ( $showOptSign && ( 0 < $dateIntervalArr[DateIntervalFactory::$invert] ))
+        $result          = self::$P;
+        if( empty( $dateIntervalArr[self::$y] ) &&
+            empty( $dateIntervalArr[self::$m] ) &&
+            empty( $dateIntervalArr[self::$h] ) &&
+            empty( $dateIntervalArr[self::$i] ) &&
+            empty( $dateIntervalArr[self::$s] ) &&
+          ! empty( $dateIntervalArr[self::$d] ) &&
+            ( 0 == ( $dateIntervalArr[self::$d] % 7 ))) {
+            $result .= (int) floor( $dateIntervalArr[self::$d] / 7 ) .
+                self::$W;
+            return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
                 ? Util::$MINUS . $result : $result;
         }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$y] ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$y] . DateIntervalFactory::$Y;
+        if( 0 < $dateIntervalArr[self::$y] ) {
+            $result .= $dateIntervalArr[self::$y] . self::$Y;
         }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$m] ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$m] . DateIntervalFactory::$M;
+        if( 0 < $dateIntervalArr[self::$m] ) {
+            $result .= $dateIntervalArr[self::$m] . self::$M;
         }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$d] ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$d] . DateIntervalFactory::$D;
+        if( 0 < $dateIntervalArr[self::$d] ) {
+            $result .= $dateIntervalArr[self::$d] . self::$D;
         }
-        $hourIsSet = ! empty( $dateIntervalArr[DateIntervalFactory::$h] );
-        $minIsSet  = ! empty( $dateIntervalArr[DateIntervalFactory::$i] );
-        $secIsSet  = ! empty( $dateIntervalArr[DateIntervalFactory::$s] );
+        $hourIsSet = ! empty( $dateIntervalArr[self::$h] );
+        $minIsSet  = ! empty( $dateIntervalArr[self::$i] );
+        $secIsSet  = ! empty( $dateIntervalArr[self::$s] );
         if( ! $hourIsSet && ! $minIsSet && ! $secIsSet ) {
-            if( DateIntervalFactory::$P == $result ) {
-                $result = DateIntervalFactory::$PT0H0M0S;
+            if( self::$P == $result ) {
+                $result = self::$PT0H0M0S;
             }
-            return ( $showOptSign && ( 0 < $dateIntervalArr[DateIntervalFactory::$invert] ))
+            return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
                 ? Util::$MINUS . $result : $result;
         }
-        $result .= DateIntervalFactory::$T;
+        $result .= self::$T;
         if( $hourIsSet ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$h] . DateIntervalFactory::$H;
+            $result .= $dateIntervalArr[self::$h] . self::$H;
         }
         if( $minIsSet ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$i] . DateIntervalFactory::$M;
+            $result .= $dateIntervalArr[self::$i] . self::$M;
         }
         if( $secIsSet ) {
-            $result .= $dateIntervalArr[DateIntervalFactory::$s] . DateIntervalFactory::$S;
+            $result .= $dateIntervalArr[self::$s] . self::$S;
         }
-        return ( $showOptSign && ( 0 < $dateIntervalArr[DateIntervalFactory::$invert] ))
+        return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
             ? Util::$MINUS . $result : $result;
     }
 
@@ -231,25 +242,25 @@ class DateIntervalFactory
      */
     public static function conformDateInterval( DateInterval $dateInterval ) {
         $dateIntervalArr = (array) $dateInterval;
-        if( 60 <= $dateIntervalArr[DateIntervalFactory::$s] ) {
-            $dateIntervalArr[DateIntervalFactory::$i] +=
-                (int) floor( $dateIntervalArr[DateIntervalFactory::$s] / 60 );
-            $dateIntervalArr[DateIntervalFactory::$s] =
-                $dateIntervalArr[DateIntervalFactory::$s] % 60;
+        if( 60 <= $dateIntervalArr[self::$s] ) {
+            $dateIntervalArr[self::$i] +=
+                (int) floor( $dateIntervalArr[self::$s] / 60 );
+            $dateIntervalArr[self::$s] =
+                $dateIntervalArr[self::$s] % 60;
         }
-        if( 60 <= $dateIntervalArr[DateIntervalFactory::$i] ) {
-            $dateIntervalArr[DateIntervalFactory::$h] +=
-                (int) floor( $dateIntervalArr[DateIntervalFactory::$i] / 60 );
-            $dateIntervalArr[DateIntervalFactory::$i] =
-                $dateIntervalArr[DateIntervalFactory::$i] % 60;
+        if( 60 <= $dateIntervalArr[self::$i] ) {
+            $dateIntervalArr[self::$h] +=
+                (int) floor( $dateIntervalArr[self::$i] / 60 );
+            $dateIntervalArr[self::$i] =
+                $dateIntervalArr[self::$i] % 60;
         }
-        if( 24 <= $dateIntervalArr[DateIntervalFactory::$h] ) {
-            $dateIntervalArr[DateIntervalFactory::$d] +=
-                (int) floor( $dateIntervalArr[DateIntervalFactory::$h] / 24 );
-            $dateIntervalArr[DateIntervalFactory::$h] =
-                $dateIntervalArr[DateIntervalFactory::$h] % 24;
+        if( 24 <= $dateIntervalArr[self::$h] ) {
+            $dateIntervalArr[self::$d] +=
+                (int) floor( $dateIntervalArr[self::$h] / 24 );
+            $dateIntervalArr[self::$h] =
+                $dateIntervalArr[self::$h] % 24;
         }
-        return DateIntervalFactory::DateIntervalArr2DateInterval( $dateIntervalArr );
+        return self::DateIntervalArr2DateInterval( $dateIntervalArr );
     }
 
     /**
@@ -257,80 +268,47 @@ class DateIntervalFactory
      *
      * @param DateTime     $dateTime
      * @param DateInterval $dateInterval
-     * @access private
      * @static
-     * @since  2.26.7 - 2018-12-01
+     * @since  2.29.2 - 2019-06-20
      * @tofo error mgnt
      */
-    private static function modifyDateTimeFromDateInterval(
-        DateTime     $dateTime,
-        DateInterval $dateInterval ) {
-        // static $FMT = 'Can\'t modify date %s with (%s) %s';
+    public static function modifyDateTimeFromDateInterval( DateTime $dateTime, DateInterval $dateInterval ) {
+        static $YEAR  = 'year';
+        static $MONTH = 'month';
+        static $DAY   = 'day';
+        static $HOUR  = 'hour';
+        static $MIN   = 'minute';
+        static $SEC   = 'second';
+        static $KEYS = null;
+        if( empty( $KEYS )) {
+            $KEYS = [
+                self::$y => $YEAR,
+                self::$m => $MONTH,
+                self::$d => $DAY,
+                self::$h => $HOUR,
+                self::$i => $MIN,
+                self::$s => $SEC
+            ];
+        }
         $dateIntervalArr = (array) $dateInterval;
-        $operator = ( 0 < $dateIntervalArr[DateIntervalFactory::$invert] ) ? Util::$MINUS : Util::$PLUS;
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$y] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$y],
-                    Util::$LCYEAR
-                )
-            );
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$m] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$m],
-                    Util::$LCMONTH
-                )
-            );
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$d] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$d],
-                    Util::$LCDAY
-                )
-            );
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$h] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$h],
-                    Util::$LCHOUR
-                )
-            );
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$i] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$i],
-                    Util::$LCMIN
-                )
-            );
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$s] ) {
-            $dateTime->modify(
-                DateIntervalFactory::getModifyString (
-                    $operator,
-                    $dateIntervalArr[DateIntervalFactory::$s],
-                    Util::$LCSEC
-                )
-            );
+        $operator        = ( 0 < $dateIntervalArr[self::$invert] ) ? Util::$MINUS : Util::$PLUS;
+        foreach( $KEYS as $diKey => $dtKey ) {
+            if( 0 < $dateIntervalArr[$diKey] ) {
+                $dateTime->modify( self::getModifyString ( $operator, $dateIntervalArr[$diKey], $dtKey ) );
+            }
         }
     }
     private static function getModifyString ( $operator, $number, $unit ) {
-        return $operator . $number . Util::$SP1 . $unit . DateIntervalFactory::getOptPluralSuffix( $number );
+        static $MONTH = 'month';
+        $suffix = ( $MONTH != $unit ) ? self::getOptPluralSuffix( $number ) : null;
+        return $operator . $number . Util::$SP1 . $unit . $suffix;
     }
     private static function getOptPluralSuffix ( $number ) {
         static $PLS = 's';
         return ( 1 < $number ) ? $PLS : Util::$SP0;
     }
-        /**
+
+    /**
      * Get DateInterval from (DateInterval) array
      *
      * @param array $dateIntervalArr
@@ -340,11 +318,12 @@ class DateIntervalFactory
      * @since  2.27.2 - 2018-12-21
      */
     public static function DateIntervalArr2DateInterval( $dateIntervalArr ) {
+        static $P0D = 'P0D';
         if( ! is_array( $dateIntervalArr )) {
             $dateIntervalArr = [];
         }
         try {
-            $dateInterval = new DateInterval( 'P0D' );
+            $dateInterval = new DateInterval( $P0D );
         }
         catch( Exception $e ) {
             throw $e;
@@ -353,230 +332,6 @@ class DateIntervalFactory
             $dateInterval->{$key} = $value;
         }
         return $dateInterval;
-    }
-
-    /**
-     * Return datetime array (in internal format) for startdate + DateInterval
-     *
-     * @param array $startDate
-     * @param DateInterval $dateInterval
-     * @return array, date format
-     * @static
-     * @since  2.26.14 - 2019-02-04
-     */
-    public static function dateInterval2date( array $startDate, DateInterval $dateInterval ) {
-        static $T   = 'T';
-        static $FMT = 'Ymd\THis';
-        $dateOnly = (
-            isset( $startDate[Util::$LCHOUR] ) ||
-            isset( $startDate[Util::$LCMIN] )  ||
-            isset( $startDate[Util::$LCSEC] )) ? false : true;
-        if( ! isset( $startDate[Util::$LCHOUR] )) {
-            $startDate[Util::$LCHOUR] = 0;
-        }
-        if( ! isset( $startDate[Util::$LCMIN] )) {
-            $startDate[Util::$LCMIN] = 0;
-        }
-        if( ! isset( $startDate[Util::$LCSEC] )) {
-            $startDate[Util::$LCSEC] = 0;
-        }
-        $tz       = ( isset( $startDate[Util::$LCtz] )) ? $startDate[Util::$LCtz] : null;
-        $dString  = DateTimeFactory::getYMDString( $startDate ) . $T . DateTimeFactory::getHisString( $startDate );
-        $dateTime = DateTime::createFromFormat( $FMT, $dString );
-        DateIntervalFactory::modifyDateTimeFromDateInterval( $dateTime, $dateInterval );
-        $dateTimeArr = DateTimeFactory::getDateArrayFromDateTime( $dateTime, false, true );
-        if( ! empty( $tz )) {
-            $dateTimeArr[Util::$LCtz] = $tz;
-        }
-        if( $dateOnly &&
-            (( 0 == $dateTimeArr[Util::$LCHOUR] ) &&
-             ( 0 == $dateTimeArr[Util::$LCMIN] ) &&
-             ( 0 == $dateTimeArr[Util::$LCSEC] ))) {
-            unset(
-                $dateTimeArr[Util::$LCHOUR],
-                $dateTimeArr[Util::$LCMIN],
-                $dateTimeArr[Util::$LCSEC]
-            );
-        }
-        return $dateTimeArr;
-    }
-
-    /**
-     * Return DateInterval as (external) array
-     *
-     * @param DateInterval $dateInterval
-     * @return array
-     * @since  2.27.14 - 2019-03-09
-     */
-    public static function dateInterval2arr( DateInterval $dateInterval ) {
-        $dateIntervalArr = (array) $dateInterval;
-        $result = [];
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$y] ) {
-            $result[Util::$LCYEAR]  = $dateIntervalArr[DateIntervalFactory::$y];
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$m] ) {
-            $result[Util::$LCMONTH] = $dateIntervalArr[DateIntervalFactory::$m];
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$d] ) {
-            $result[Util::$LCDAY]   = $dateIntervalArr[DateIntervalFactory::$d];
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$h] ) {
-            $result[Util::$LCHOUR]  = $dateIntervalArr[DateIntervalFactory::$h];
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$i] ) {
-            $result[Util::$LCMIN]   = $dateIntervalArr[DateIntervalFactory::$i];
-        }
-        if( 0 < $dateIntervalArr[DateIntervalFactory::$s] ) {
-            $result[Util::$LCSEC]   = $dateIntervalArr[DateIntervalFactory::$s];
-        }
-        if( empty( $result )) {
-            $result[Util::$LCHOUR]  = 0;
-            $result[Util::$LCMIN]   = 0;
-            $result[Util::$LCSEC]   = 0;
-        }
-        // separate duration (arr) from datetime (arr)
-        $result[Util::$LCWEEK]      = 0;
-        return $result;
-    }
-
-    /**
-     * Return array (in internal format) for a (array) duration
-     *
-     * For num-array only W+D+HMS
-     * @param array $duration
-     * @return array
-     * @since  2.27.14 - 2019-02-13
-     */
-    public static function duration2arr( array $duration ) {
-        $result = [];
-        foreach( $duration as $durKey => $durValue ) {
-            if( empty( $durValue )) {
-                continue;
-            }
-            switch( $durKey ) {
-                case Util::$LCYEAR:
-                    $result[Util::$LCYEAR]  = $durValue;
-                    break;
-                case Util::$LCMONTH:
-                    $result[Util::$LCMONTH] = $durValue;
-                    break;
-                case Util::$ZERO:
-                case Util::$LCWEEK:
-                    $result[Util::$LCWEEK]  = $durValue;
-                    break;
-                case '1':
-                case Util::$LCDAY:
-                    $result[Util::$LCDAY]   = $durValue;
-                    break;
-                case '2':
-                case Util::$LCHOUR:
-                    $result[Util::$LCHOUR]  = $durValue;
-                    break;
-                case '3':
-                case Util::$LCMIN:
-                    $result[Util::$LCMIN]   = $durValue;
-                    break;
-                case '4':
-                case Util::$LCSEC:
-                    $result[Util::$LCSEC]   = $durValue;
-                    break;
-            } // end switch
-        } // end foreach
-        // separate duration (arr) from datetime (arr)
-        if( ! Util::issetAndNotEmpty( $result, Util::$LCWEEK )) {
-            $result[Util::$LCWEEK] = 0;
-        }
-        return $result;
-    }
-
-    /**
-     * Return bool true if (may be) duration array
-     *
-     * @param string|array $duration
-     * @return bool
-     * @static
-     * @since  2.27.11 - 2019-01-03
-     */
-    public static function isDurationArray( $duration ) {
-        if( ! is_array( $duration )) {
-            return false;
-        }
-        if( DateTimeFactory::isArrayDate( $duration ) ||
-            DateTimeFactory::isArrayTimestampDate( $duration ) ||
-            isset( $duration[Util::$LCtz] )) {
-            return false;
-        }
-        if( isset( $duration[Util::$LCYEAR] )  ||
-            isset( $duration[Util::$LCMONTH] ) ||
-            isset( $duration[Util::$LCDAY] )   ||
-            isset( $duration[Util::$LCWEEK] )  ||
-            isset( $duration[Util::$LCHOUR] )  ||
-            isset( $duration[Util::$LCMIN] )   ||
-            isset( $duration[Util::$LCSEC] )) {
-            return true;
-        }
-        foreach( $duration as $k => $v ) {
-            if( ! is_scalar( $v )) {
-                return false;
-            }
-            if( ! ctype_digit((string) $k ) ||
-                ! ctype_digit((string) $v )) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Return an iCal formatted string from (internal array) duration
-     *
-     * @param array $duration , array( year, month, day, week, day, hour, min, sec )
-     * @return string
-     * @static
-     * @since  2.26.14 - 2019-02-12
-     */
-    public static function durationArray2string( array $duration ) {
-        if( ! isset( $duration[Util::$LCYEAR] )  &&
-            ! isset( $duration[Util::$LCMONTH] ) &&
-            ! isset( $duration[Util::$LCDAY] )   &&
-            ! isset( $duration[Util::$LCWEEK] )  &&
-            ! isset( $duration[Util::$LCHOUR] )  &&
-            ! isset( $duration[Util::$LCMIN] )   &&
-            ! isset( $duration[Util::$LCSEC] )) {
-            return null;
-        }
-        if( Util::issetAndNotEmpty( $duration, Util::$LCWEEK )) {
-            return DateIntervalFactory::$P . $duration[Util::$LCWEEK] . DateIntervalFactory::$W;
-        }
-        $result = DateIntervalFactory::$P;
-        if( Util::issetAndNotEmpty( $duration, Util::$LCYEAR )) {
-            $result .= $duration[Util::$LCYEAR] . DateIntervalFactory::$Y;
-        }
-        if( Util::issetAndNotEmpty( $duration, Util::$LCMONTH )) {
-            $result .= $duration[Util::$LCMONTH] . DateIntervalFactory::$M;
-        }
-        if( Util::issetAndNotEmpty( $duration, Util::$LCDAY )) {
-            $result .= $duration[Util::$LCDAY] . DateIntervalFactory::$D;
-        }
-        $hourIsSet = ( Util::issetAndNotEmpty( $duration, Util::$LCHOUR ));
-        $minIsSet  = ( Util::issetAndNotEmpty( $duration, Util::$LCMIN ));
-        $secIsSet  = ( Util::issetAndNotEmpty( $duration, Util::$LCSEC ));
-        if( $hourIsSet || $minIsSet || $secIsSet ) {
-            $result .= DateIntervalFactory::$T;
-        }
-        if( $hourIsSet ) {
-            $result .= $duration[Util::$LCHOUR] . DateIntervalFactory::$H;
-        }
-        if( $minIsSet ) {
-            $result .= $duration[Util::$LCMIN] . DateIntervalFactory::$M;
-        }
-        if( $secIsSet ) {
-            $result .= $duration[Util::$LCSEC] . DateIntervalFactory::$S;
-        }
-        if( DateIntervalFactory::$P == $result ) {
-            $result = DateIntervalFactory::$PT0H0M0S;
-        }
-        return $result;
     }
 
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,17 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\Util;
 use InvalidArgumentException;
-
+use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Vcalendar;
+
 use function sprintf;
 
 /**
  * CALSCALE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.3 - 2019-03-13
+ * @since 2.29.14 2019-09-03
  */
 trait CALSCALEtrait
 {
@@ -92,13 +92,14 @@ trait CALSCALEtrait
      * @param string $value
      * @return static
      * @throws InvalidArgumentException;
-     * @since  2.27.3 - 2018-12-22
+     * @since  2.29.14 - 2019-09-03
      */
     public function setCalscale( $value ) {
         if( empty( $value )) {
             $value = Vcalendar::GREGORIAN;
         }
-        $this->calscale = $value;
+        Util::assertString( $value, self::CALSCALE );
+        $this->calscale = (string) $value;
         return $this;
     }
 }

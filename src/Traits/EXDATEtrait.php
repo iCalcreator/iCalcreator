@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,20 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\RexdateFactory;
 use DateTime;
 use InvalidArgumentException;
-
-use function is_scalar;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\RexdateFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * EXDATE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @throws InvalidArgumentException
- * @since 2.27.10 2018-12-29
+ * @since 2.29.2 2019-06-23
  */
 trait EXDATEtrait
 {
@@ -103,11 +100,13 @@ trait EXDATEtrait
      * @param array   $params
      * @param integer $index
      * @return static
-     * @throws InvalidArgumentException
+     * @throws \Exception
      * @since 2.27.14 2019-02-10
      */
-    public function setExdate( $value = null, $params = null, $index = null ) {
-        if( empty( $value ) || ( is_array( $value) && ( 1 == count( $value )) && empty( reset( $value )))) {
+    public function setExdate( $value = null, $params = [], $index = null ) {
+        if( empty( $value ) ||
+            ( is_array( $value) && ( 1 == count( $value )) && empty( reset( $value )))
+        ) {
             $this->assertEmptyValue( $value, self::EXDATE );
             $this->setMval( $this->exdate, Util::$SP0, [], null, $index );
             return $this;
@@ -125,7 +124,7 @@ trait EXDATEtrait
      * @return array
      * @access private
      * @static
-     * @since 2.27.14 2019-02-10
+     * @since 2.29.2 2019-06-23
      */
     private static function checkSingleExdates( $value ) {
         if( $value instanceof DateTime ) {
@@ -134,19 +133,6 @@ trait EXDATEtrait
         if( DateTimeFactory::isStringAndDate( $value )) {
             return [ $value ];
         }
-        if( ! is_array( $value )) {
-            return $value;
-        }
-        $value = array_change_key_case( $value );
-        if( isset( $value[Util::$LCYEAR] ) || isset( $value[Util::$LCTIMESTAMP] )) {
-            return [ $value ];
-        }
-        if( isset( $value[0] ) && isset( $value[1] ) && isset( $value[2] ) &&
-                is_scalar( $value[0] ) && is_scalar( $value[1] ) && is_scalar( $value[2] ) &&
-                DateTimeFactory::isArgsDate( $value[0], $value[1], $value[2] )) {
-            return [ $value ];
-        }
         return $value;
-
     }
 }

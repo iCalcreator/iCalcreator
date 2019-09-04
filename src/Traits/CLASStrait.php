@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,10 +30,10 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 use function strtoupper;
 
@@ -41,12 +41,12 @@ use function strtoupper;
  * CLASS property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.3 2018-12-22
+ * @since 2.29.14 2019-09-03
  */
 trait CLASStrait
 {
     /**
-     * @var string component property CLASS value
+     * @var array component property CLASS value
      * @access protected
      */
     protected $class = null;
@@ -109,16 +109,25 @@ trait CLASStrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.14 2019-09-03
      */
-    public function setClass( $value = null, $params = null ) {
+    public function setClass( $value = null, $params = [] ) {
+        $STDVALUES = [
+            self::P_BLIC,
+            self::P_IVATE,
+            self::CONFIDENTIAL
+        ];
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::KLASS );
             $value  = Util::$SP0;
             $params = [];
         }
+        elseif( Util::isPropInList( $value, $STDVALUES )) {
+            $value = strtoupper( $value );
+        }
+        Util::assertString( $value, self::KLASS );
         $this->{self::$KLASS} = [
-            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL((string) $value )),
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;

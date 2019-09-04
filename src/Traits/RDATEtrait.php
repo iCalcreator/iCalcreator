@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,27 +30,25 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\RexdateFactory;
-use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use DateTime;
-use InvalidArgumentException;
 use Exception;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\RexdateFactory;
+use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Vcalendar;
 
 use function count;
 use function is_array;
-use function is_string;
 use function reset;
 
 /**
  * RDATE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @throws InvalidArgumentException
- * @throws Exception
- * @since 2.27.3 2018-12-22
+ * @since 2.29.2 2019-06-23
  */
 trait RDATEtrait
 {
@@ -105,7 +103,7 @@ trait RDATEtrait
      * @param bool   $inclParam
      * @return bool|array
      * @throws Exception
-     * @since  2.27.2 - 2018-12-19
+     * @since 2.29.2 2019-06-23
      */
     public function getRdate( $propIx = null, $inclParam = false ) {
         if( empty( $this->rdate )) {
@@ -121,38 +119,31 @@ trait RDATEtrait
         }
         if( isset( $output[Util::$LCvalue] )) {
             foreach( $output[Util::$LCvalue] as $rIx => $rdatePart ) {
-                if( isset( $rdatePart[1]['invert'] )) { // fix pre 7.0.5 bug
-                    try {
-                        $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
+                if( is_array( $rdatePart ) && isset( $rdatePart[1] ) &&
+                    DateIntervalFactory::isDateIntervalArrayInvertSet( $rdatePart[1] )) {
+                    try {// fix pre 7.0.5 bug
+                        $output[Util::$LCvalue][$rIx][1] =
+                            DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
                     }
                     catch( Exception $e ) {
                         throw $e;
                     }
-                    $output[Util::$LCvalue][$rIx][1] = DateIntervalFactory::dateInterval2arr( $dateInterval );
-                    if( isset( $output[Util::$LCvalue][$rIx][1][Util::$LCWEEK] ) &&
-                        empty( $output[Util::$LCvalue][$rIx][1][Util::$LCWEEK] )) {
-                        unset( $output[Util::$LCvalue][$rIx][1][Util::$LCWEEK] );
-                    }
                 }
-            }
-        }
+            } // end foreach
+        } // end if
         else {
             foreach( $output as $rIx => $rdatePart ) {
-                if( isset( $rdatePart[1]['invert'] )) { // fix pre 7.0.5 bug
-                    try {
-                        $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
+                if( is_array( $rdatePart ) && isset( $rdatePart[1] ) &&
+                    DateIntervalFactory::isDateIntervalArrayInvertSet( $rdatePart[1] )) {
+                    try { // fix pre 7.0.5 bug
+                        $output[$rIx][1] = DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
                     }
                     catch( Exception $e ) {
                         throw $e;
                     }
-                    $output[$rIx][1] = DateIntervalFactory::dateInterval2arr( $dateInterval );
-                    if( isset( $output[$rIx][1][Util::$LCWEEK] ) &&
-                        empty( $output[$rIx][1][Util::$LCWEEK] )) {
-                        unset( $output[$rIx][1][Util::$LCWEEK] );
-                    }
                 }
-            }
-        }
+            } // end foreach
+        } // end else
         return $output;
     }
 
@@ -165,10 +156,12 @@ trait RDATEtrait
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.27.3 2019-01-06
+     * @since 2.29.2 2019-06-23
      */
-    public function setRdate( $value = null, $params = null, $index = null ) {
-        if( empty( $value ) || ( is_array( $value) && ( 1 == count( $value )) && empty( reset( $value )))) {
+    public function setRdate( $value = null, $params = [], $index = null ) {
+        if( empty( $value ) ||
+            ( is_array( $value) && ( 1 == count( $value )) && empty( reset( $value )))
+        ) {
             $this->assertEmptyValue( $value, self::RDATE );
             $this->setMval( $this->rdate, Util::$SP0, [], null, $index );
             return $this;
@@ -177,8 +170,11 @@ trait RDATEtrait
             $value,
             ParameterFactory::isParamsValueSet( [ Util::$LCparams => $params ], self::PERIOD )
         );
+        if( Util::isCompInList( $this->getCompType(), Vcalendar::$TZCOMPS )) {
+            $params[Util::$ISLOCALTIME] = true;
+        }
         try {
-            $input = RexdateFactory::prepInputRdate( $value, $params, $this->getCompType());
+            $input = RexdateFactory::prepInputRdate( $value, $params );
         }
         catch( Exception $e ) {
             throw $e;
@@ -195,48 +191,22 @@ trait RDATEtrait
      * @return array
      * @access private
      * @static
-     * @since 2.27.3 2019-01-06
+     * @since 2.29.2 2019-06-23
      */
     private static function checkSingleRdates( $rDates, $isPeriod ) {
         if( $rDates instanceof DateTime ) {
             return [ $rDates ];
         }
-        if(DateTimeFactory::isStringAndDate( $rDates )) {
+        if( DateTimeFactory::isStringAndDate( $rDates )) {
             return [ $rDates ];
-        }
-        if( is_array( $rDates ) && ! $isPeriod ) {
-            $first = array_change_key_case( $rDates );
-            if( isset( $first[Util::$LCYEAR] ) || isset( $first[Util::$LCTIMESTAMP] )) {
-                return [ $rDates ];
-            }
-            if( isset( $rDates[0] ) && isset( $rDates[1] ) && isset( $rDates[2] ) &&
-                is_scalar( $rDates[0] ) && is_scalar( $rDates[1] ) && is_scalar( $rDates[2] ) &&
-                DateTimeFactory::isArgsDate( $rDates[0], $rDates[1], $rDates[2] )) {
-                return [ $rDates ];
-            }
-            if( isset( $first[0] ) && is_scalar( $first[0] ) && ( false === strtotime( $first[0] ))) {
-                return [ $rDates ]; // what comes here ??
-            }
-            return $rDates;
         }
         if( $isPeriod && is_array( $rDates ) && ( 2 == count( $rDates ))) {
             $first = reset( $rDates );
-            if(( $first instanceof DateTime ) || is_string( $first )) {
+            if( $first instanceof DateTime ) {
                 return [ $rDates ];
             }
-            if( ! is_array( $first )) {
-                return $rDates;
-            }
-            if( isset( $first[0] ) && isset( $first[1] ) && isset( $first[2] ) &&
-                DateTimeFactory::isArgsDate( $first[0], $first[1], $first[2] )) {
+            if( DateTimeFactory::isStringAndDate( $first )) {
                 return [ $rDates ];
-            }
-            $first = array_change_key_case( $first );
-            if( isset( $first[Util::$LCYEAR] ) || isset( $first[Util::$LCTIMESTAMP] )) {
-                return [ $rDates ];
-            }
-            if( isset( $first[0] ) && is_int($first[0] )) {
-                $rDates = [ $rDates ]; // ??
             }
         }
         return $rDates;

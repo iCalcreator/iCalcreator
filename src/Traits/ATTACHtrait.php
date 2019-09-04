@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -115,7 +115,7 @@ trait ATTACHtrait
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-20
      */
-    public function setAttach( $value = null, $params = null, $index = null ) {
+    public function setAttach( $value = null, $params = [], $index = null ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTACH );
             $value  = Util::$SP0;

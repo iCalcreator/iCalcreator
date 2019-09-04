@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -107,11 +107,7 @@ class RecurMonthTest extends RecurBaseTest
                 if( ! checkdate( $month, $day, $year )) {
                     continue;
                 }
-                $Ymd = DateTimeFactory::getYMDString( [
-                    Util::$LCYEAR => $year,
-                    Util::$LCMONTH => $month,
-                    Util::$LCDAY => $day
-                ] );
+                $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
                 if( $endYmd < $Ymd ) {
                     break;
                 }
@@ -161,11 +157,7 @@ class RecurMonthTest extends RecurBaseTest
                 if( ! checkdate( $month, $day, $year )) {
                     continue;
                 }
-                $Ymd = DateTimeFactory::getYMDString( [
-                    Util::$LCYEAR  => $year,
-                    Util::$LCMONTH => $month,
-                    Util::$LCDAY   => $day
-                ] );
+                $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
                 if( $endYmd < $Ymd ) {
                     break;
                 }
@@ -223,12 +215,7 @@ class RecurMonthTest extends RecurBaseTest
                     }
                     $monthSave   = $month;
                     $day         = 1;
-                    $date        = DateTimeFactory::factory(
-                        DateTimeFactory::getYMDString(
-                            [ Util::$LCYEAR => $year, Util::$LCMONTH => $month, Util::$LCDAY => $day ]
-                        ),
-                        $tz
-                    );
+                    $date        = DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz );
                     $lastDayInMonth = (int) $date->format( 't' );
                 } // end if
                 elseif( $day == $lastDayInMonth ) {
@@ -253,9 +240,7 @@ class RecurMonthTest extends RecurBaseTest
                         }
                     }
                 } // end foreach
-                $Ymd = DateTimeFactory::getYMDString(
-                    [ Util::$LCYEAR => $year, Util::$LCMONTH => $month, Util::$LCDAY => $day ]
-                );
+                $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
                 if( $endYmd < $Ymd ) {
                     break;
                 }
@@ -321,12 +306,9 @@ class RecurMonthTest extends RecurBaseTest
                     $monthSave   = $month;
                     if( ! empty( $byMonthDay )) {
                         $day    = 1;
-                        $lastDayInMonth = (int) ( DateTimeFactory::factory(
-                            DateTimeFactory::getYMDString(
-                                [ Util::$LCYEAR => $year, Util::$LCMONTH => $month, Util::$LCDAY => $day ]
-                            ),
-                            $tz
-                        ))->format('t' );
+                        $lastDayInMonth = (int) (
+                            DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz ))
+                            ->format('t' );
                     }
                 } // end if
                 elseif( $day == $lastDayInMonth ) {
@@ -339,11 +321,7 @@ class RecurMonthTest extends RecurBaseTest
                 if( ! checkdate( $month, $day, $year )) {
                     continue;
                 }
-                $Ymd = DateTimeFactory::getYMDString( [
-                    Util::$LCYEAR => $year,
-                    Util::$LCMONTH => $month,
-                    Util::$LCDAY => $day
-                ] );
+                $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
                 if( $endYmd < $Ymd ) {
                     break;
                 }

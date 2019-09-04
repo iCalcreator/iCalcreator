@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -32,17 +32,13 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
-
-use function implode;
-use function is_array;
 
 /**
  * RESOURCES property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.3 2018-12-22
+ * @since 2.29.14 2019-09-03
  */
 trait RESOURCEStrait
 {
@@ -56,36 +52,16 @@ trait RESOURCEStrait
      * Return formatted output for calendar component property resources
      *
      * @return string
+     * @since  2.29.11 - 2019-08-30
      */
     public function createResources() {
-        if( empty( $this->resources )) {
-            return null;
-        }
-        $output = null;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->resources as $rx => $resource ) {
-            if( empty( $resource[Util::$LCvalue] )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::RESOURCES );
-                }
-                continue;
-            }
-            if( is_array( $resource[Util::$LCvalue] )) {
-                foreach( $resource[Util::$LCvalue] as $rix => $rValue ) {
-                    $resource[Util::$LCvalue][$rix] = StringFactory::strrep( $rValue );
-                }
-                $content = implode( Util::$COMMA, $resource[Util::$LCvalue] );
-            }
-            else {
-                $content = StringFactory::strrep( $resource[Util::$LCvalue] );
-            }
-            $output .= StringFactory::createElement(
-                self::RESOURCES,
-                ParameterFactory::createParams( $resource[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
-                $content
-            );
-        }
-        return $output;
+        return self::createCatRes(
+            self::RESOURCES,
+            $this->resources,
+            $this->getConfig( self::LANGUAGE ),
+            $this->getConfig( self::ALLOWEMPTY ),
+            self::$ALTRPLANGARR
+        );
     }
 
     /**
@@ -127,20 +103,16 @@ trait RESOURCEStrait
      * @param integer $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.14 2019-09-03
      */
-    public function setResources( $value = null, $params = null, $index = null ) {
+    public function setResources( $value = null, $params = [], $index = null ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RESOURCES );
             $value  = Util::$SP0;
             $params = [];
         }
-        if( is_array( $value )) {
-            foreach( $value as & $valuePart ) {
-                $valuePart = StringFactory::trimTrailNL( $valuePart );
-            }
-        }
         else {
+            Util::assertString( $value, self::RESOURCES );
             $value = StringFactory::trimTrailNL( $value );
         }
         $this->setMval( $this->resources, $value, $params, null, $index );

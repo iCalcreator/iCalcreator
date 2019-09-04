@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,19 +30,25 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
-use function microtime;
+use function bin2hex;
+use function chr;
+use function openssl_random_pseudo_bytes;
+use function ord;
+use function str_split;
+use function vsprintf;
+
 /**
  * UID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.11 - 2019-01-02
+ * @since 2.29.14 2019-09-03
  */
-trait UIDtrait
+trait UIDrfc7986trait
 {
     /**
      * @var array component property UID value
@@ -55,11 +61,11 @@ trait UIDtrait
      *
      * If uid is missing, uid is created
      * @return string
-     * @since  2.27.11 - 2019-01-02
+     * @since 2.29.5 2019-06-17
      */
     public function createUid() {
         if( self::isUidEmpty( $this->uid )) {
-            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
+            $this->uid = self::makeUid();
         }
         return StringFactory::createElement(
             self::UID,
@@ -72,7 +78,7 @@ trait UIDtrait
      * Delete calendar component property uid
      *
      * @return bool
-     * @since  2.27.1 - 2018-12-15
+     * @since 2.29.5 2019-06-17
      */
     public function deleteUid() {
         $this->uid = null;
@@ -84,11 +90,11 @@ trait UIDtrait
      *
      * @param bool   $inclParam
      * @return bool|array
-     * @since  2.27.11 - 2019-01-02
+     * @since 2.29.5 2019-06-17
      */
     public function getUid( $inclParam = false ) {
         if( self::isUidEmpty( $this->uid )) {
-            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
+            $this->uid = self::makeUid();
         }
         return ( $inclParam ) ? $this->uid : $this->uid[Util::$LCvalue];
     }
@@ -100,7 +106,7 @@ trait UIDtrait
      * @return bool
      * @access private
      * @static
-     * @since 2.27.11 2019-01-02
+     * @since 2.29.5 2019-06-17
      */
     private static function isUidEmpty( array $array = null ) {
         if( empty( $array )) {
@@ -116,22 +122,27 @@ trait UIDtrait
     /**
      * Return an unique id for a calendar component object instance
      *
-     * @param string $unique_id
      * @return array
      * @access private
      * @static
-     * @since  2.22.23 - 2017-02-17
+     * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
+     * @since 2.29.5 2019-06-17
      */
-    private static function makeUid( $unique_id ) {
-        static $FMT     = '%s-%s@%s';
-        static $TMDTHIS = 'Ymd\THisT';
+    private static function makeUid() {
+        static $FMT = '%s%s-%s-%s-%s-%s%s%s';
+        static $MAX = 10;
+        $cnt = 0;
+        do {
+            do {
+                $bytes = openssl_random_pseudo_bytes( 16, $cStrong );
+            } while ( false === $bytes );
+            $cnt += 1;
+        } while(( $MAX > $cnt ) && ( false === $cStrong ));
+        $bytes[6] = chr(ord( $bytes[6] ) & 0x0f | 0x40 ); // set version to 0100
+        $bytes[8] = chr(ord( $bytes[8] ) & 0x3f | 0x80 ); // set bits 6-7 to 10
+        $uid      = vsprintf( $FMT, str_split( bin2hex( $bytes ), 4 ));
         return [
-            Util::$LCvalue  => sprintf(
-                $FMT,
-                date( $TMDTHIS ),
-                substr( microtime(), 2, 4 ) . StringFactory::getRandChars( 6 ),
-                $unique_id
-            ),
+            Util::$LCvalue  => $uid,
             Util::$LCparams => null,
         ];
     }
@@ -144,13 +155,14 @@ trait UIDtrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2019-01-02
+     * @since 2.29.14 2019-09-03
      */
-    public function setUid( $value = null, $params = null ) {
+    public function setUid( $value = null, $params = [] ) {
         if( empty( $value ) && ( Util::$ZERO != $value )) {
-            $this->uid = self::makeUid( $this->getConfig( self::UNIQUE_ID ));
+            $this->uid = self::makeUid();
             return $this;
         } // no allowEmpty check here !!!!
+        Util::assertString( $value, self::UID );
         $this->uid = [
             Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
             Util::$LCparams => ParameterFactory::setParams( $params ),

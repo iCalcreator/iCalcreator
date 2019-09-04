@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -100,11 +100,7 @@ class Exception1Test extends TestCase
      * @param string  $dateTimeString
      * @param string  $timezoneString
      */
-    public function DateTimeFactoryFactoryTest(
-        $case,
-        $dateTimeString,
-        $timezoneString
-    ) {
+    public function DateTimeFactoryFactoryTest( $case, $dateTimeString, $timezoneString ) {
         $ok = false;
         try {
             $dateTime = DateTimeFactory::factory( $dateTimeString, $timezoneString );
@@ -153,214 +149,11 @@ class Exception1Test extends TestCase
      * @param string  $dateTimeString
      * @param string  $timezoneString
      */
-    public function getYmdFromTimestampTest(
-        $case,
-        $dateTimeString,
-        $timezoneString
-    ) {
+    public function getYmdFromTimestampTest( $case, $dateTimeString, $timezoneString ) {
         $ok = false;
         try {
-            $dateTime = DateTimeFactory::getYmdFromTimestamp( $dateTimeString, $timezoneString );
-        }
-        catch ( Exception $e ) {
-            $ok = true;
-        }
-        $this->assertTrue( $ok, 'error in case #' . $case );
-    }
-
-    /**
-     * DateTimeFactoryassertArrayDateTest provider
-     */
-    public function DateTimeFactoryAssertArrayDateTestProvider() {
-
-        $dataArr = [];
-
-        $dataArr[] = [
-            1,
-            [ 'grodan Boll'],
-            true
-        ];
-
-        $dataArr[] = [
-            2,
-            [ Util::$LCYEAR => -1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            3,
-            [ Util::$LCYEAR => -1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            4,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12 ],
-            true
-        ];
-
-        $dataArr[] = [
-            5,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12 ],
-            false
-        ];
-
-        $dataArr[] = [
-            6,
-            [ Util::$LCYEAR => -1, Util::$LCMONTH => 12, Util::$LCDAY => 1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            7,
-            [ Util::$LCYEAR => -1, Util::$LCMONTH => 12, Util::$LCDAY => 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            8,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 13, Util::$LCDAY => 1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            9,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 13, Util::$LCDAY => 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            10,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 33 ],
-            true
-        ];
-
-        $dataArr[] = [
-            11,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 33 ],
-            false
-        ];
-
-        $dataArr[] = [
-            12,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 25, Util::$LCMIN => 1, Util::$LCSEC => 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            13,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 1, Util::$LCMIN => 61, Util::$LCSEC => 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            14,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 1, Util::$LCMIN => 1, Util::$LCSEC => 61 ],
-            false
-        ];
-
-        $dataArr[] = [
-            15,
-            [ -1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            16,
-            [ -1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            17,
-            [ 1,  12 ],
-            true
-        ];
-
-        $dataArr[] = [
-            18,
-            [ 1,  12 ],
-            false
-        ];
-
-        $dataArr[] = [
-            19,
-            [ -1, 13, 1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            20,
-            [ -1, 13, 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            21,
-            [ 1, 13, 1 ],
-            true
-        ];
-
-        $dataArr[] = [
-            22,
-            [ 1, 13, 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            23,
-            [ 1, 12, 33 ],
-            true
-        ];
-
-        $dataArr[] = [
-            24,
-            [ 1, 12, 33 ],
-            false
-        ];
-
-        $dataArr[] = [
-            25,
-            [ 1, 12, 1, 25, 1, 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            26,
-            [ 1, 12, 1, 1, 61, 1 ],
-            false
-        ];
-
-        $dataArr[] = [
-            27,
-            [ 1, 12, 1, 1, 1, 61 ],
-            false
-        ];
-
-        return $dataArr;
-
-    }
-
-    /**
-     * Testing DateTimeFactory::assertArrayDate
-     *
-     * @test
-     * @dataProvider DateTimeFactoryAssertArrayDateTestProvider
-     * @param int    $case
-     * @param mixed  $date
-     * @param bool   $isValueDate
-     */
-    public function assertArrayDateTest(
-        $case,
-        $date,
-        $isValueDate
-    ) {
-        $ok = false;
-        try {
-            DateTimeFactory::assertArrayDate( $date, $isValueDate );
+            $dateTime = DateTimeFactory::factory( $dateTimeString, $timezoneString )
+                                       ->format( DateTimeFactory::$Ymd );
         }
         catch ( Exception $e ) {
             $ok = true;
@@ -382,139 +175,22 @@ class Exception1Test extends TestCase
         ];
 
         $dataArr[] = [
-            2,
-            [ Util::$LCYEAR => -1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            3,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12 ],
-            []
-        ];
-
-        $dataArr[] = [
-            4,
-            [ Util::$LCYEAR => -1, Util::$LCMONTH => 12, Util::$LCDAY => 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            5,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 13, Util::$LCDAY => 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            6,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 33 ],
-            []
-        ];
-        $dataArr[] = [
-            7,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 3 ],
-            [ Vcalendar::TZID => 'invalid/timezone' ]
-        ];
-
-        $dataArr[] = [
-            8,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 25, Util::$LCMIN => 1, Util::$LCSEC => 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            9,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 1, Util::$LCMIN => 61, Util::$LCSEC => 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            10,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 1, Util::$LCMIN => 1, Util::$LCSEC => 61 ],
-            []
-        ];
-
-        $dataArr[] = [
-            11,
-            [ Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-              Util::$LCHOUR => 1, Util::$LCMIN => 1, Util::$LCSEC => 1 ],
-            [ Vcalendar::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            12,
-            [ -1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            13,
-            [ 1,  12 ],
-            []
-        ];
-
-        $dataArr[] = [
-            14,
-            [ -1, 13, 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            15,
-            [ 1, 13, 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            16,
-            [ 1, 12, 33 ],
-            []
-        ];
-
-        $dataArr[] = [
-            16,
-            [ 1, 12, 3 ],
-            [ Vcalendar::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            17,
-            [ 1, 12, 1, 25, 1, 1 ],
-            []
-        ];
-
-        $dataArr[] = [
-            18,
-            [ 1, 12, 1, 1, 61, 1 ],
-            []
-        ];
-
-        $dataArr[] = [
             19,
-            [ 1, 12, 1, 1, 1, 61 ],
-            []
-        ];
-
-        $dataArr[] = [
-            19,
-            [ 1, 12, 1, 1, 1, 1 ],
+            '011201010101',
             [ Vcalendar::TZID => 'invalid/timezone']
         ];
 
         $dataArr[] = [
             18,
-            [ Util::$LCTIMESTAMP => 'Papegojan Ragatha' ],
+            [ 'timestamp' => 'Papegojan Ragatha' ],
             []
         ];
 
         $dataArr[] = [
             19,
             [
-                Util::$LCTIMESTAMP => '1',
-                Util::$LCtz        => 'invalid/timezone'
+                'timestamp'              => '1',
+                Util\RecurFactory::$LCtz => 'invalid/timezone'
             ],
             []
         ];
@@ -522,8 +198,8 @@ class Exception1Test extends TestCase
         $dataArr[] = [
             20,
             [
-                Util::$LCTIMESTAMP => '1',
-                Util::$LCtz        => Vcalendar::UTC
+                'timestamp'              => '1',
+                Util\RecurFactory::$LCtz => Vcalendar::UTC
             ],
             [ Vcalendar::TZID => 'invalid/timezone']
         ];
@@ -546,11 +222,7 @@ class Exception1Test extends TestCase
      * @param mixed  $value
      * @param array  $params
      */
-    public function DateTimeFactorySetDateTest(
-        $case,
-        $value,
-        $params
-    ) {
+    public function DateTimeFactorySetDateTest(  $case,  $value,  $params ) {
         $ok = false;
         try {
             $result = DateTimeFactory::setDate( $value, $params );

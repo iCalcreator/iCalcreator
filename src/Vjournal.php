@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,7 +39,7 @@ use function strtoupper;
  * iCalcreator VJOURNAL component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.4 - 2018-12-19
+ * @since  2.29.9 - 2019-08-05
  */
 final class Vjournal extends Vcomponent
 {
@@ -47,6 +47,7 @@ final class Vjournal extends Vcomponent
         Traits\ATTENDEEtrait,
         Traits\CATEGORIEStrait,
         Traits\CLASStrait,
+        Traits\COLORrfc7986trait,
         Traits\COMMENTtrait,
         Traits\CONTACTtrait,
         Traits\CREATEDtrait,
@@ -55,6 +56,7 @@ final class Vjournal extends Vcomponent
         Traits\DTSTARTtrait,
         Traits\EXDATEtrait,
         Traits\EXRULEtrait,
+        Traits\IMAGErfc7986trait,
         Traits\LAST_MODIFIEDtrait,
         Traits\ORGANIZERtrait,
         Traits\RDATEtrait,
@@ -65,7 +67,7 @@ final class Vjournal extends Vcomponent
         Traits\SEQUENCEtrait,
         Traits\STATUStrait,
         Traits\SUMMARYtrait,
-        Traits\UIDtrait,
+        Traits\UIDrfc7986trait,
         Traits\URLtrait;
 
     /**
@@ -78,7 +80,7 @@ final class Vjournal extends Vcomponent
     /**
      * Destructor
      *
-     * @since  2.26 - 2018-11-10
+     * @since  2.29.9 - 2019-08-05
      */
     public function __destruct() {
         unset(
@@ -100,6 +102,7 @@ final class Vjournal extends Vcomponent
             $this->attendee,
             $this->categories,
             $this->class,
+            $this->color,
             $this->comment,
             $this->contact,
             $this->created,
@@ -108,6 +111,7 @@ final class Vjournal extends Vcomponent
             $this->dtstart,
             $this->exdate,
             $this->exrule,
+            $this->image,
             $this->lastmodified,
             $this->organizer,
             $this->rdate,
@@ -128,7 +132,7 @@ final class Vjournal extends Vcomponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since  2.27.2 - 2018-12-21
+     * @since  2.29.9 - 2019-08-05
      */
     public function createComponent() {
         $compType    = strtoupper( $this->getCompType());
@@ -139,6 +143,7 @@ final class Vjournal extends Vcomponent
         $component  .= $this->createAttendee();
         $component  .= $this->createCategories();
         $component  .= $this->createClass();
+        $component  .= $this->createColor();
         $component  .= $this->createComment();
         $component  .= $this->createContact();
         $component  .= $this->createCreated();
@@ -146,12 +151,13 @@ final class Vjournal extends Vcomponent
         $component  .= $this->createDtstart();
         $component  .= $this->createExdate();
         $component  .= $this->createExrule();
-        $component  .= $this->createLastModified();
+        $component  .= $this->createImage();
+        $component  .= $this->createLastmodified();
         $component  .= $this->createOrganizer();
         $component  .= $this->createRdate();
-        $component  .= $this->createRequestStatus();
+        $component  .= $this->createRequeststatus();
         $component  .= $this->createRecurrenceid();
-        $component  .= $this->createRelatedTo();
+        $component  .= $this->createRelatedto();
         $component  .= $this->createRrule();
         $component  .= $this->createSequence();
         $component  .= $this->createStatus();

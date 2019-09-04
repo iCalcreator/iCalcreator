@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -66,111 +66,10 @@ class Exception2Test extends TestCase
         ];
 
         $dataArr[] = [
-            2,
-            [
-                [
-                    Util::$LCYEAR => -1
-                ]
-            ],
-            [ Vcalendar::VALUE => Vcalendar::DATE ]
-        ];
-
-        $dataArr[] = [
-            3,
-            [
-                [
-                    Util::$LCYEAR => -1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            4,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12
-                ]
-            ],
-            [ Vcalendar::VALUE => Vcalendar::DATE ]
-        ];
-
-        $dataArr[] = [
-            5,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            6,
-            [
-                [
-                    Util::$LCYEAR => -1, Util::$LCMONTH => 12, Util::$LCDAY => 1
-                ]
-            ],
-            [ Vcalendar::VALUE => Vcalendar::DATE ]
-        ];
-
-        $dataArr[] = [
-            7,
-            [
-                [
-                    Util::$LCYEAR => -1, Util::$LCMONTH => 12, Util::$LCDAY => 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            8,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 13, Util::$LCDAY => 1
-                ]
-            ],
-            [ Vcalendar::VALUE => Vcalendar::DATE ]
-        ];
-
-        $dataArr[] = [
-            9,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 13, Util::$LCDAY => 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            10,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 33
-                ]
-            ],
-            [ Vcalendar::VALUE => Vcalendar::DATE ]
-        ];
-
-
-        $dataArr[] = [
-            11,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 33
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
             12,
             [
                 [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 3
+                    '011201250101'
                 ]
             ],
             [ Vcalendar::TZID => 'invalid/timezone' ]
@@ -179,177 +78,9 @@ class Exception2Test extends TestCase
         $dataArr[] = [
             13,
             [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-                    Util::$LCHOUR => 25, Util::$LCMIN => 1, Util::$LCSEC => 1
-                ]
+                '011201250101'
             ],
             []
-        ];
-
-        $dataArr[] = [
-            14,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-                    Util::$LCHOUR => 1, Util::$LCMIN => 61, Util::$LCSEC => 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            15,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-                    Util::$LCHOUR => 1, Util::$LCMIN => 1, Util::$LCSEC => 61
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            16,
-            [
-                [
-                    Util::$LCYEAR => 1, Util::$LCMONTH => 12, Util::$LCDAY => 1,
-                    Util::$LCHOUR => 1, Util::$LCMIN => 1, Util::$LCSEC => 1
-                ]
-            ],
-            [ Vcalendar::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            17,
-            [
-                [
-                    -1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            18,
-            [
-                [
-                    1,  12
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            19,
-            [
-                [
-                    -1, 13, 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            20,
-            [
-                [
-                    1, 13, 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            21,
-            [
-                [
-                    1, 12, 33
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            22,
-            [
-                [
-                    1, 12, 3
-                ]
-            ],
-            [ Vcalendar::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            23,
-            [
-                [
-                    1, 12, 1, 25, 1, 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            24,
-            [
-                [
-                    1, 12, 1, 1, 61, 1
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            25,
-            [
-                [
-                    1, 12, 1, 1, 1, 61
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            26,
-            [
-                [
-                    1, 12, 1, 1, 1, 1
-                ]
-            ],
-            [ Vcalendar::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            27,
-            [
-                [
-                    Util::$LCTIMESTAMP => 'Papegojan Ragatha'
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            28,
-            [
-                [
-                    Util::$LCTIMESTAMP => '1',
-                    Util::$LCtz        => 'invalid/timezone'
-                ]
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            29,
-            [
-                [
-                    Util::$LCTIMESTAMP => '1',
-                    Util::$LCtz        => Vcalendar::UTC
-                ]
-            ],
-            [ Vcalendar::TZID => 'invalid/timezone']
         ];
 
         $dataArr[] = [
@@ -374,11 +105,7 @@ class Exception2Test extends TestCase
      * @param mixed  $value
      * @param array  $params
      */
-    public function RexdateFactoryPrepInputExdateTest(
-        $case,
-        $value,
-        $params
-    ) {
+    public function RexdateFactoryPrepInputExdateTest( $case, $value, $params ) {
         $ok = false;
         try {
             $result = RexdateFactory::prepInputExdate( $value, $params );
@@ -399,11 +126,7 @@ class Exception2Test extends TestCase
      * @param mixed  $value
      * @param array  $params
      */
-    public function RexdateFactoryprepInputRdateTest(
-        $case,
-        $value,
-        $params
-    ) {
+    public function RexdateFactoryprepInputRdateTest( $case, $value, $params ) {
         $ok = false;
         try {
             $result = RexdateFactory::prepInputRdate( $value, $params );

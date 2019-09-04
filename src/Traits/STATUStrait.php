@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -103,9 +103,9 @@ trait STATUStrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.2 2019-03-14
+     * @since 2.29.14 2019-09-03
      */
-    public function setStatus( $value = null, $params = null ) {
+    public function setStatus( $value = null, $params = [] ) {
         static $ALLOWED_VEVENT = [
             self::CONFIRMED,
             self::CANCELLED,
@@ -122,7 +122,7 @@ trait STATUStrait
             self::DRAFT,
             self::F_NAL,
         ];
-
+        $value = strtoupper( StringFactory::trimTrailNL( $value ));
         switch( true ) {
             case ( empty( $value )) :
                 $this->assertEmptyValue( $value, self::STATUS );
@@ -130,17 +130,17 @@ trait STATUStrait
                 $params = [];
                 break;
             case ( Vcalendar::VEVENT == $this->getCompType()) :
-                self::assertInEnumeration( $value, $ALLOWED_VEVENT, self::STATUS );
+                Util::assertInEnumeration( $value, $ALLOWED_VEVENT, self::STATUS );
                 break;
             case ( Vcalendar::VTODO == $this->getCompType()) :
-                self::assertInEnumeration( $value, $ALLOWED_VTODO, self::STATUS );
+                Util::assertInEnumeration( $value, $ALLOWED_VTODO, self::STATUS );
                 break;
             case ( Vcalendar::VJOURNAL == $this->getCompType()) :
-                self::assertInEnumeration( $value, $ALLOWED_VJOURNAL, self::STATUS );
+                Util::assertInEnumeration( $value, $ALLOWED_VJOURNAL, self::STATUS );
                 break;
         }
         $this->status = [
-            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCvalue  => $value ,
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;

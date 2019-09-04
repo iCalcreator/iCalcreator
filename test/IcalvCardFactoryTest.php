@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -111,12 +111,7 @@ class IcalvCardFactoryTest extends TestCase
      * @param string    $version
      * @param bool      $inclParams  fetch from values or include from parameters
      */
-    public function IcalvCardFactoryTest(
-                  $case,
-        Vcalendar $vcalendar,
-                  $version,
-                  $inclParams
-    ) {
+    public function IcalvCardFactoryTest( $case, Vcalendar $vcalendar, $version, $inclParams ) {
         $vCards = IcalvCardFactory::iCal2vCards( $vcalendar, $version, $inclParams, $count );
 
         if( ! empty( $version )) {

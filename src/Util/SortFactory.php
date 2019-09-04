@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,11 +30,12 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
-use Kigkonsult\Icalcreator\Vcalendar;
+use DateTime;
 use Kigkonsult\Icalcreator\CalendarComponent;
-use DateInterval;
+use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_slice;
+use function ctype_digit;
 use function is_null;
 use function key;
 use function reset;
@@ -44,23 +45,20 @@ use function strcmp;
  * iCalcreator SortFactory class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26.7 - 2018-12-02
+ * @since 2.29.8 2019-07-23
  */
 class SortFactory
 {
     /**
      * Vcalendar sort callback function
      *
-     * @since 2.26 - 2018-11-10
      * @param CalendarComponent $a
      * @param CalendarComponent $b
      * @return int
      * @static
+     * @since 2.29.8 2019-07-23
      */
-    public static function cmpfcn(
-        CalendarComponent $a,
-        CalendarComponent $b
-    ) {
+    public static function cmpfcn( CalendarComponent $a, CalendarComponent $b ) {
         if( empty( $a )) {
             return -1;
         }
@@ -88,7 +86,13 @@ class SortFactory
             elseif( empty( $b->srtk[$k] )) {
                 return 1;
             }
-            $sortStat = strcmp( $a->srtk[$k], $b->srtk[$k] );
+            $aKey = ctype_digit( $a->srtk[$k] )
+                ? str_pad( $a->srtk[$k], 20, '0', STR_PAD_LEFT )
+                : $a->srtk[$k];
+            $bKey = ctype_digit( $b->srtk[$k] )
+                ? str_pad( $b->srtk[$k], 20, '0', STR_PAD_LEFT )
+                : $b->srtk[$k];
+            $sortStat = strcmp( $aKey, $bKey );
             if( 0 == $sortStat ) {
                 continue;
             }
@@ -100,22 +104,17 @@ class SortFactory
     /**
      * Set sort arguments/parameters in component
      *
-     * @since 2.27.14 - 2019-02-19
      * @param CalendarComponent $c valendar component
      * @param string            $sortArg
      * @static
+     * @since 2.29.8 2019-07-23
      */
-    public static function setSortArgs(
-        CalendarComponent $c,
-        $sortArg = null
-    ) {
+    public static function setSortArgs( CalendarComponent $c, $sortArg = null ) {
         static $INITARR = [ '0', '0', '0', '0' ];
         $c->srtk  = $INITARR;
         $compType = $c->getCompType();
         if( Vcalendar::VTIMEZONE == $compType ) {
-            if( false === ( $c->srtk[0] = $c->getTzid())) {
-                $c->srtk[0] = $c->cno; // set order
-            }
+            $c->srtk[0] = $c->cno; // set order
             return;
         }
         elseif( ! is_null( $sortArg )) {
@@ -132,11 +131,10 @@ class SortFactory
             else {
                 $method = Vcalendar::getGetMethodName( $sortArg );
                 if( false !== ( $d = $c->{$method}())) {
-                    $c->srtk[0] = ( DateTimeFactory::isArrayDate( $d )) ? self::arrDate2str( $d ) : $d;
+                    $c->srtk[0] = ( $d instanceof DateTime ) ? $d->getTimestamp() : $d;
                     if( Vcalendar::UID == $sortArg ) {
-                        if(( Vcalendar::VFREEBUSY != $compType  ) &&
-                            ( false !== ( $d = $c->getRecurrenceid()))) {
-                            $c->srtk[1] = self::arrDate2str( $d );
+                        if(( Vcalendar::VFREEBUSY != $compType  ) && ( false !== ( $d = $c->getRecurrenceid()))) {
+                            $c->srtk[1] = $d->getTimestamp();
                             if( false === ( $c->srtk[2] = $c->getSequence())) {
                                 $c->srtk[2] = 0; // missing sequence equals sequence:0 in comb. with recurr.-id
                             }
@@ -154,7 +152,7 @@ class SortFactory
                 $c->srtk[0] = $d[1];
                 break;
             case ( false !== ( $d = $c->getDtstart())) :
-                $c->srtk[0] = self::arrDate2str( $d );
+                $c->srtk[0] = $d->getTimestamp();
                 break;
         }
         switch( true ) { // sortkey 1 : dtend/due(/duration)
@@ -164,26 +162,25 @@ class SortFactory
             case ((( Vcalendar::VEVENT == $compType ) ||
                    ( Vcalendar::VFREEBUSY == $compType  )) &&
                 ( false !== ( $d = $c->getDtend()))) :
-                $c->srtk[1] = self::arrDate2str( $d );
+                $c->srtk[1] = $d->getTimestamp();
                 break;
             case ( false !== ( $d = $c->getXprop( Vcalendar::X_CURRENT_DUE ))) :
                 $c->srtk[1] = $d[1];
                 break;
             case (( Vcalendar::VTODO == $compType  ) && ( false !== ( $d = $c->getDue()))) :
-                $c->srtk[1] = self::arrDate2str( $d );
+                $c->srtk[1] = $d->getTimestamp();
                 break;
-            case ( (( Vcalendar::VEVENT == $compType  ) ||
-                    ( Vcalendar::VTODO == $compType )) &&
+            case ((( Vcalendar::VEVENT == $compType  ) || ( Vcalendar::VTODO == $compType )) &&
                 ( false !== ( $d = $c->getDuration( null, true )))) :
-                $c->srtk[1] = self::arrDate2str( $d );
+                $c->srtk[1] = $d->getTimestamp();
                 break;
         }
         switch( true ) { // sortkey 2 : created/dtstamp
             case (( Vcalendar::VFREEBUSY != $compType  ) && ( false !== ( $d = $c->getCreated()))) :
-                $c->srtk[2] = self::arrDate2str( $d );
+                $c->srtk[2] = $d->getTimestamp();
                 break;
             case ( false !== ( $d = $c->getDtstamp())) :
-                $c->srtk[2] = self::arrDate2str( $d );
+                $c->srtk[2] = $d->getTimestamp();
                 break;
         }
         // sortkey 3 : uid
@@ -193,22 +190,16 @@ class SortFactory
     }
 
     /**
-     * Return formatted string from (array) date/datetime
+     * Sort callback function for exdate
      *
-     * @param array $aDate
-     * @return string
-     * @access private
+     * @param DateTime $a
+     * @param DateTime $b
+     * @return int
      * @static
+     * @since 2.29.2 2019-06-23
      */
-    private static function arrDate2str( array $aDate ) {
-        $str = DateTimeFactory::getYMDString( $aDate );
-        if( isset( $aDate[Util::$LCHOUR] )) {
-            $str .= DateTimeFactory::getHisString( $aDate );
-        }
-        if( isset( $aDate[Util::$LCtz] ) && ! empty( $aDate[Util::$LCtz] )) {
-            $str .= $aDate[Util::$LCtz];
-        }
-        return $str;
+    public static function sortExdate1( DateTime $a, DateTime $b ) {
+        return strcmp( $a->format( DateTimeFactory::$YmdTHis), $b->format( DateTimeFactory::$YmdTHis) );
     }
 
     /**
@@ -218,75 +209,36 @@ class SortFactory
      * @param array $b
      * @return int
      * @static
-     */
-    public static function sortExdate1( array $a, array $b ) {
-        $as  = DateTimeFactory::getYMDString( $a );
-        $as .= ( isset( $a[Util::$LCHOUR] )) ? DateTimeFactory::getHisString( $a ) : null;
-        $bs  = DateTimeFactory::getYMDString( $b );
-        $bs .= ( isset( $b[Util::$LCHOUR] )) ? DateTimeFactory::getHisString( $b ) : null;
-        return strcmp( $as, $bs );
-    }
-
-    /**
-     * Sort callback function for exdate
-     *
-     * @param array $a
-     * @param array $b
-     * @return int
-     * @static
+     * @since 2.29.2 2019-06-23
      */
     public static function sortExdate2( array $a, array $b ) {
-        $val = reset( $a[Util::$LCvalue] );
-        $as  = DateTimeFactory::getYMDString( $val );
-        $as .= ( isset( $val[Util::$LCHOUR] )) ? DateTimeFactory::getHisString( $val ) : null;
-        $val = reset( $b[Util::$LCvalue] );
-        $bs  = DateTimeFactory::getYMDString( $val );
-        $bs .= ( isset( $val[Util::$LCHOUR] )) ? DateTimeFactory::getHisString( $val ) : null;
-        return strcmp( $as, $bs );
+        $a1 = reset( $a[Util::$LCvalue] );
+        $b1 = reset( $b[Util::$LCvalue] );
+        return strcmp( $a1->format( DateTimeFactory::$YmdTHis), $b1->format( DateTimeFactory::$YmdTHis) );
     }
 
     /**
-     * Sort callback function for freebusy and rdate, sort single property (inside values)
+     * Sort callback function for freebusy and rdate, sort single property
      *
-     * @param array|DateInterval $a
-     * @param array|DateInterval $b
+     * @param array|DateTime $a
+     * @param array|DateTime $b
      * @return int
      * @static
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.7 - 2018-12-03
+     * @since 2.29.2 2019-06-23
      */
     public static function sortRdate1( $a, $b ) {
-        $as = null;
-        if( $a instanceof DateInterval ) {
-            $as = DateIntervalFactory::dateInterval2String( $a, true );
+        $as = $bs = null;
+        if( $a instanceof DateTime ) {
+            $as = $a->format( DateTimeFactory::$YmdTHis);
         }
-        elseif( isset( $a[Util::$LCYEAR] )) {
-            $as = self::formatdatePart( $a );
+        elseif( is_array( $a ) && ( $a[0] instanceof DateTime )) {
+            $as = $a[0]->format( DateTimeFactory::$YmdTHis);
         }
-        elseif( isset( $a[0][Util::$LCYEAR] )) {
-            $as  = self::formatdatePart( $a[0] );
-            if( isset( $a[1] )) {
-                $as .= self::formatdatePart( $a[1] );
-            }
+        if( $b instanceof DateTime ) {
+            $bs = $b->format( DateTimeFactory::$YmdTHis);
         }
-        else {
-            return 1;
-        }
-        $bs = null;
-        if( $b instanceof DateInterval ) {
-            $bs = DateIntervalFactory::dateInterval2String( $b, true );
-        }
-        elseif( isset( $b[Util::$LCYEAR] )) {
-            $bs = self::formatdatePart( $b );
-        }
-        elseif( isset( $b[0][Util::$LCYEAR] )) {
-            $bs  = self::formatdatePart( $b[0] );
-            if( isset( $b[1] )) {
-                $bs .= self::formatdatePart( $b[1] );
-            }
-        }
-        else {
-            return -1;
+        elseif( is_array( $b ) && ( $b[0] instanceof DateTime )) {
+            $bs = $b[0]->format( DateTimeFactory::$YmdTHis);
         }
         return strcmp( $as, $bs );
     }
@@ -294,68 +246,38 @@ class SortFactory
     /**
      * Sort callback function for rdate, sort multiple RDATEs in order (after 1st datetime/date/period)
      *
-     * @param array|DateInterval $a
-     * @param array|DateInterval $b
+     * @param array|DateTime $a
+     * @param array|DateTime $b
      * @return int
      * @static
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.7 - 2018-12-03
+     * @since 2.29.11 2019-08-29
      */
     public static function sortRdate2( $a, $b ) {
-        $as = null;
-        if( $a instanceof DateInterval ) {
-            $as  = DateIntervalFactory::dateInterval2String( $a, true );
-        }
-        elseif( isset( $a[Util::$LCvalue][0][Util::$LCYEAR] )) {
-            $as  = self::formatdatePart( $a[Util::$LCvalue][0] );
-        }
-        elseif( isset( $a[Util::$LCvalue][0][0][Util::$LCYEAR] )) {
-            $as  = self::formatdatePart( $a[Util::$LCvalue][0][0] );
-            if( isset( $a[Util::$LCvalue][0][1] )) {
-                $as .= self::formatdatePart( $a[Util::$LCvalue][0][1] );
-            }
-        }
-        else {
-            return 1;
-        }
-        $bs = null;
-        if( $b instanceof DateInterval ) {
-            $bs  = DateIntervalFactory::dateInterval2String( $b, true );
-        }
-        elseif( isset( $b[Util::$LCvalue][0][Util::$LCYEAR] )) {
-            $bs  = self::formatdatePart( $b[Util::$LCvalue][0] );
-        }
-        elseif( isset( $a[Util::$LCvalue][0][0][Util::$LCYEAR] )) {
-            $bs  = self::formatdatePart( $b[Util::$LCvalue][0][0] );
-            if( isset( $b[Util::$LCvalue][0][1] )) {
-                $bs .= self::formatdatePart( $b[Util::$LCvalue][0][1] );
-            }
-        }
-        else {
-            return -1;
-        }
-        return strcmp( $as, $bs );
+        return strcmp(
+            self::sortRdate2GetValue( $a[Util::$LCvalue] ),
+            self::sortRdate2GetValue( $b[Util::$LCvalue] )
+        );
     }
 
     /**
-     * Format date
+     * Return sortValue from RDATE value
      *
-     * @param array|DateInterval $part
+     * @param array|DateTime $v
      * @return string
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
-     * @since  2.26.7 - 2018-11-29
+     * @static
+     * @since 2.29.2 2019-06-23
      */
-    private static function formatdatePart( $part ) {
-        if( $part instanceof DateInterval ) {
-            $str = DateIntervalFactory::dateInterval2String( $part, true );
+    private static function sortRdate2GetValue( $v ) {
+        if( $v instanceof DateTime ) {
+            return $v->format( DateTimeFactory::$YmdTHis);
         }
-        elseif( isset( $part[Util::$LCYEAR] )) {
-            $str  = DateTimeFactory::getYMDString( $part );
-            $str .= ( isset( $part[Util::$LCHOUR] )) ? DateTimeFactory::getHisString( $part ) : null;
+        elseif( is_array( $v ) && ( $v[0] instanceof DateTime )) {
+            return $v[0]->format( DateTimeFactory::$YmdTHis);
         }
-        else {
-            $str = DateIntervalFactory::durationArray2string( $part );
+        elseif( is_array( $v[0] ) && ( $v[0][0] instanceof DateTime )) {
+            return $v[0][0]->format( DateTimeFactory::$YmdTHis);
         }
-        return $str;
+        return null;
     }
+
 }

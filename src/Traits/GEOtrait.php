@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -112,7 +112,7 @@ trait GEOtrait
             return false;
         }
         $loc     = $this->getLocation();
-        $content = ( empty( $loc )) ? null : $loc . Util::$L;
+        $content = ( empty( $loc )) ? null : $loc . Util::$SLASH;
         return $content .
             GeoFactory::geo2str2( $geo[self::LATITUDE], GeoFactory::$geoLatFmt ) .
             GeoFactory::geo2str2( $geo[self::LONGITUDE], GeoFactory::$geoLongFmt);
@@ -127,7 +127,7 @@ trait GEOtrait
      * @return static
      * @since 2.27.3 2018-12-22
      */
-    public function setGeo( $latitude = null, $longitude = null, $params = null ) {
+    public function setGeo( $latitude = null, $longitude = null, $params = [] ) {
         if( isset( $latitude ) && isset( $longitude )) {
             if( ! is_array( $this->geo )) {
                 $this->geo = [];

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -113,30 +113,33 @@ trait ORGANIZERtrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since  2.27.8 - 2019-03-17
+     * @since  2.29.5 - 2019-08-30
      */
-    public function setOrganizer( $value = null, $params = null ) {
+    public function setOrganizer( $value = null, $params = [] ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ORGANIZER );
             $value  = Util::$SP0;
             $params = [];
-
         }
         $value = CalAddressFactory::conformCalAddress( $value );
         if( ! empty( $value )) {
             CalAddressFactory::assertCalAddress( $value );
         }
+        $params = array_change_key_case( (array) $params, CASE_UPPER );
+        CalAddressFactory::sameValueAndEMAILparam( $value, $params );
         $this->organizer = [
             Util::$LCvalue  => $value,
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
-        if( isset( $this->organizer[Util::$LCparams][self::SENT_BY] )) {
-            $sentBy = CalAddressFactory::conformCalAddress(
-                trim( $this->organizer[Util::$LCparams][self::SENT_BY], Util::$QQ )
-            );
-            CalAddressFactory::assertCalAddress( $sentBy );
-            $this->organizer[Util::$LCparams][self::SENT_BY] = $sentBy;
-        }
+        foreach( [ self::EMAIL, self::SENT_BY ] as $key ) {
+            if( isset( $this->organizer[Util::$LCparams][$key] )) {
+                $pVal = CalAddressFactory::conformCalAddress(
+                    trim( $this->organizer[Util::$LCparams][$key], StringFactory::$QQ )
+                );
+                CalAddressFactory::assertCalAddress( $pVal );
+                $this->organizer[Util::$LCparams][$key] = $pVal;
+            }
+        } // end foreach
         return $this;
     }
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,10 +30,9 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\HttpFactory;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * ATTENDEE property functions
@@ -105,7 +104,7 @@ trait ATTENDEEtrait
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-17
      */
-    public function setAttendee( $value = null, $params = null, $index = null ) {
+    public function setAttendee( $value = null, $params = [], $index = null ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTENDEE );
             $value  = Util::$SP0;
@@ -115,17 +114,14 @@ trait ATTENDEEtrait
         if( ! empty( $value )) {
             CalAddressFactory::assertCalAddress( $value );
         }
-        $this->setMval(
-            $this->attendee,
-            $value,
-            CalAddressFactory::inputPrepAttendeeParams(
-                $params,
-                $this->getCompType(),
-                $this->getConfig( self::LANGUAGE )
-            ),
-            null,
-            $index
+        $params = array_change_key_case( (array) $params, CASE_UPPER );
+        CalAddressFactory::sameValueAndEMAILparam( $value, $params );
+        $params = CalAddressFactory::inputPrepAttendeeParams(
+            $params,
+            $this->getCompType(),
+            $this->getConfig( self::LANGUAGE )
         );
+        $this->setMval($this->attendee, $value, $params,null, $index );
         return $this;
     }
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -35,6 +35,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
+use function array_change_key_case;
 use function count;
 use function implode;
 use function is_array;
@@ -46,7 +47,7 @@ use function strtoupper;
  * X-property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.3 2018-12-22
+ * @since 2.29.14 2019-09-03
  */
 trait X_PROPtrait
 {
@@ -87,7 +88,7 @@ trait X_PROPtrait
             $output .= StringFactory::createElement(
                 $xpropName,
                 ParameterFactory::createParams( $xpropPart[Util::$LCparams], [ self::LANGUAGE ], $lang ),
-                StringFactory::trimTrailNL( $xpropPart[Util::$LCvalue] )
+                $xpropPart[Util::$LCvalue]
             );
         }
         return $output;
@@ -181,7 +182,7 @@ trait X_PROPtrait
             $propIx = ( isset( $this->propIx[$propName] )) ? $this->propIx[$propName] + 2 : 1;
         }
         $this->propIx[$propName] = --$propIx;
-        $class = get_class();
+        $class = get_class( $this );
         $class::recountMvalPropix( $this->xprop, $propIx );
         $this->propIx[$propName] = $propIx;
         $xpropNo = 0;
@@ -201,22 +202,30 @@ trait X_PROPtrait
     /**
      * Set calendar property x-prop
      *
-     * @param string $xpropName
+     * @param string $xPropName
      * @param string $value
      * @param array  $params   optional
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.14 2019-09-03
+     * @todo more value typed asserts ??
      */
-    public function setXprop( $xpropName, $value=null, $params = null ) {
+    public function setXprop( $xPropName, $value=null, $params = [] ) {
         static $MSG = 'Invalid X-property name : \'%s\'';
-        if( empty( $xpropName ) || ! StringFactory::isXprefixed( $xpropName )) {
-            throw new InvalidArgumentException( sprintf( $MSG, $xpropName ));
+        if( empty( $xPropName ) || ! StringFactory::isXprefixed( $xPropName )) {
+            throw new InvalidArgumentException( sprintf( $MSG, $xPropName ));
         }
+        $xPropName = strtoupper( $xPropName );
+        $params    = array_change_key_case( $params, CASE_UPPER );
         if( empty( $value )) {
-            $this->assertEmptyValue( $value, $xpropName );
+            $this->assertEmptyValue( $value, $xPropName );
             $value  = Util::$SP0;
             $params = [];
+        }
+        elseif( ! isset( $params[self::VALUE] ) ||
+                ( self::TEXT == $params[self::VALUE] )) {
+            Util::assertString( $value, $xPropName );
+            $value = StringFactory::trimTrailNL( $value );
         }
         $xprop = [
             Util::$LCvalue  => $value,
@@ -225,7 +234,7 @@ trait X_PROPtrait
         if( ! is_array( $this->xprop )) {
             $this->xprop = [];
         }
-        $this->xprop[strtoupper( $xpropName )] = $xprop;
+        $this->xprop[$xPropName] = $xprop;
         return $this;
     }
 

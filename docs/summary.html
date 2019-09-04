@@ -5,7 +5,7 @@
  copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.28.2
+ Version   2.29.14
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -29,12 +29,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.28.2 summary</title>
+    <title>iCalcreator 2.29.14 summary</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
     <meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.28.2">
+    <meta name="description" content="using iCalcreator v2.29.14">
     <style type="text/css">
         * {
             FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -144,9 +144,9 @@
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.28.2</p>
+<p class="header">iCalcreator v2.29.14</p>
 <p>
-    iCalcreator v2.28.2<br>
+    iCalcreator v2.29.14<br>
     Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
     <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -192,7 +192,10 @@
     events, agendas, tasks, reports, totos and journaling information.
 </p>
 <p>
-For iCalcreator 2.28.2 version (and later), <em>PHP</em> version 5.6+ is required.
+    iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
+</p>
+<p>
+For iCalcreator 2.29.14 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
@@ -222,6 +225,10 @@ obsoletes, respectively,
 </p>
 <p>
 Any references to rfc2445, below, corresponds to rfc5545.
+</p>
+<p>
+    The <a href="https://tools.ietf.org/html/rfc7986" title="Download rfc7986" target="_blank">rfc7986</a> &quot;iCalendar Property Extensions&quot;
+    are supported but may NOT be supported by all calendaring software.
 </p>
 
 <h4>xCal</h4>
@@ -280,23 +287,19 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.28.2/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.14/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 
 <p>
-iCalcreator 2.28.2 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.29.14 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
 <h4>Notes</h4>
 <p>
 When creating a new Vcalendar(/component) instance, review config settings.
-</p>
-<p>
-You will find a complete iCalcreator function list (ex. getProperty, deleteProperty) in
-<a href="https://github.com/iCalcreator/iCalcreator/docs" title="iCalcreator complete manual" target="_blank">iCalcreator manual</a>.
 </p>
 <p>
 Note, to ease up usage, you will find convenient constants for component names,
@@ -314,8 +317,10 @@ use DateTimezone;
         // <span class="comment">define time zone</span>
 $tz = &quot;Europe/Stockholm&quot;;
         // <span class="comment">set Your unique id, </span>
-        // <span class="comment">required if any component UID is missing</span>
-$config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+        // <span class="comment">site info for the Vcalendar PRODID property</span>
+$config = [
+    Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;,
+];
         // <span class="comment">create a new Vcalendar instance</span>
 $calendar = Vcalendar::factory( $config )
 
@@ -455,8 +460,8 @@ $calendarString = $vcalendar
 use Kigkonsult\Icalcreator\Vcalendar;
 
         // <span class="comment">set Your unique id, </span>
-        // <span class="comment">required if any component UID is missing</span>
-$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+        // <span class="comment">site info for the Vcalendar PRODID property</span>
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ] );
 
         // <span class="comment">get iCal contents from file</span>
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -474,13 +479,11 @@ use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
 
         // <span class="comment">set Your unique id, </span>
-        // <span class="comment">required if any component UID is missing</span>
+        // <span class="comment">site info for the Vcalendar PRODID property</span>
 $config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 
-        // <span class="comment">use a local xCal file</span>
+        // <span class="comment">use a local or remote xCal file</span>
 $filename = &quot;xmlfile.xml&quot;;
-        // <span class="comment">  or a remote xCal resource</span>
-/* $filename = 'http://kigkonsult.se/xcal.php?a=1&amp;b=2&amp;c=3'; */
 
         // <span class="comment">get XML contents from file</span>
 $iCalContent = file_get_contents( $filename );
@@ -507,8 +510,7 @@ catch( Exception $e ) {
 use Kigkonsult\Icalcreator\Vcalendar;
 
         // <span class="comment">create a new Vcalendar instance</span>
-$config   = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
-$calendar = new Vcalendar( $config );
+$calendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
         // <span class="comment">get iCal contents from file</span>
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -533,10 +535,10 @@ while( $vevent = $calendar-&gt;getComponent( Vcalendar::VEVENT )) {
         // <span class="comment">get uid (unique id/key for component), required, one occurrence </span>
     $uid = $vevent-&gt;getUid();
 
-        // <span class="comment">get dtstart required, one occurrence</span>
+        // <span class="comment">get dtstart, required, one occurrence</span>
     $dtstart = $vevent-&gt;getDtstart();
 
-        // <span class="comment">opt. (first) description</span>
+        // <span class="comment">opt. description</span>
     if( false != ( $description = $vevent-&gt;getDescription())) {
 
         // <span class="comment">edit the description</span>
@@ -673,7 +675,7 @@ exit;
 $calendarStr = $calendar-&gt;createCalendar();
 
         // <span class="comment">Save string as file</span>
-$iCalContent = file_put_contents( &quot;calendar.ics&quot;, $calendarStr );
+file_put_contents( &quot;calendar.ics&quot;, $calendarStr );
 
 </p>
 
@@ -708,7 +710,7 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
     <tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.28.2
+    <tr><td>Version  <td>2.29.14
     <tr><td class="top">License  <td>
         Subject matter of licence is the software iCalcreator.<br>
         The above copyright, link, package and version notices,<br>

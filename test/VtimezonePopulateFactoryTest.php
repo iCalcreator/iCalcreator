@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -28,20 +28,20 @@
  * This file is a part of iCalcreator.
 */
 
-namespace Kigkonsult\Icalcreator;
+namespace Kigkonsult\Icalcreator\Util;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\DtBase;
+use Kigkonsult\Icalcreator\Vcalendar;
 use InvalidArgumentException;
 use Exception;
 
 /**
- * class VtimezoneTest, testing Vtimezone::populate
+ * class VtimezonePopulateFactoryTest
  *
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.27.14 - 2019-02-21
  */
-class VtimezoneTest extends DtBase
+class VtimezonePopulateFactoryTest extends DtBase
 {
     private static $ERRFMT = "%s Error in case #%s, %s, exp %s, got %s";
     private static $STCPAR = [ 'X-Y-Z' => 'VaLuE' ];
@@ -59,18 +59,19 @@ class VtimezoneTest extends DtBase
     }
 
     /**
-     * Testing Vtimezone::populate, UTC
+     * Testing VtimezonePopulateFactory::process, UTC
      *
      * @test
      * @throws Exception
      * @throws InvalidArgumentException;
      */
-    public function VtimezonePopulateTest1() {
+    public function processTest1() {
         $calendar1 = new Vcalendar();
 
         $event     = $calendar1->newVevent()->setDtstart( DATEYmdTHis );
+        $vtimezone = $calendar1->newVtimezone();
 
-        $calendar2 = Vtimezone::populate( $calendar1 );
+        $calendar2 = VtimezonePopulateFactory::process( $calendar1 );
 
         $vtimezone = $calendar2->getComponent( Vcalendar::VTIMEZONE );
 
@@ -84,24 +85,22 @@ class VtimezoneTest extends DtBase
         $this->assertFalse( $vtimezone->getComponent( Vcalendar::STANDARD ));
 
         $this->parseCalendarTest( 12, $calendar1 );
-
     }
 
     /**
-     * Testing Vtimezone::populate, UTC
+     * Testing VtimezonePopulateFactory::process, UTC
      *
      * @test
      * @throws Exception
      * @throws InvalidArgumentException;
      */
-    public function VtimezonePopulateTest2() {
+    public function processTest2() {
         $calendar1 = new Vcalendar();
 
         $event     = $calendar1->newVevent()->setDtstart(
             DATEYmdTHis,
             [ Vcalendar::TZID => OFFSET ]
         );
-
         $calendar2 = $calendar1->vtimezonePopulate();
 
         $vtimezone = $calendar2->getComponent( Vcalendar::VTIMEZONE );
@@ -116,13 +115,12 @@ class VtimezoneTest extends DtBase
         $this->assertFalse( $vtimezone->getComponent( Vcalendar::STANDARD ));
 
         $this->parseCalendarTest( 21, $calendar1 );
-
     }
 
     /**
-     * VtimezonePopulateTest3 provider
+     * processTest3 provider
      */
-    public function VtimezonePopulateTest3Provider() {
+    public function processTest3Provider() {
 
         $dataArr = [];
 
@@ -132,7 +130,7 @@ class VtimezoneTest extends DtBase
             1,
             $timezone,
             null,
-            null, null,
+            null, null,  // from/to
             []
         ];
 
@@ -140,7 +138,7 @@ class VtimezoneTest extends DtBase
             2,
             $timezone,
             null,
-            null, null,
+            null, null,  // from/to
             [ '20170312' ]
         ];
 
@@ -148,7 +146,7 @@ class VtimezoneTest extends DtBase
             3,
             $timezone,
             null,
-            null, null,
+            null, null,  // from/to
             [ '20160912', '20181113' ]
         ];
 
@@ -156,7 +154,7 @@ class VtimezoneTest extends DtBase
             3,
             null,
             $timezone,
-            null, null,
+            null, null,  // from/to
             [ '20170312' ]
         ];
 
@@ -164,7 +162,7 @@ class VtimezoneTest extends DtBase
             4,
             null,
             $timezone,
-            null, null,
+            null, null,  // from/to
             [ '20170312' ]
         ];
 
@@ -172,7 +170,7 @@ class VtimezoneTest extends DtBase
             5,
             null,
             $timezone,
-            null, null,
+            null, null,  // from/to
             [ '20160912', '20181113' ]
         ];
 
@@ -182,7 +180,7 @@ class VtimezoneTest extends DtBase
             6,
             $timezone,
             null,
-            $from, null,
+            $from, null,  // from/to
             []
         ];
 
@@ -191,7 +189,7 @@ class VtimezoneTest extends DtBase
             7,
             $timezone,
             null,
-            null, $to,
+            null, $to,  // from/to
             []
         ];
 
@@ -201,7 +199,7 @@ class VtimezoneTest extends DtBase
             8,
             $timezone,
             null,
-            $from, $to,
+            $from, $to,  // from/to
             []
         ];
 
@@ -211,7 +209,7 @@ class VtimezoneTest extends DtBase
             9,
             null,
             $timezone,
-            $from, null,
+            $from, null,  // from/to
             []
         ];
 
@@ -221,7 +219,7 @@ class VtimezoneTest extends DtBase
             10,
             null,
             $timezone,
-            null, $to,
+            null, $to,  // from/to
             []
         ];
 
@@ -231,7 +229,7 @@ class VtimezoneTest extends DtBase
             11,
             null,
             $timezone,
-            $from, $to,
+            $from, $to,  // from/to
             []
         ];
 
@@ -239,10 +237,10 @@ class VtimezoneTest extends DtBase
     }
 
     /**
-     * Testing Vtimezone::populate
+     * Testing VtimezonePopulateFactory::process
      *
      * @test
-     * @dataProvider VtimezonePopulateTest3Provider
+     * @dataProvider processTest3Provider
      * @param int    $case
      * @param string $xParamTz
      * @param string $mParamTz
@@ -252,14 +250,7 @@ class VtimezoneTest extends DtBase
      * @throws Exception
      * @throws InvalidArgumentException;
      */
-    public function VtimezonePopulateTest3(
-        $case,
-        $xParamTz,
-        $mParamTz,
-        $from,
-        $to,
-        $dtstarts
-    ) {
+    public function processTest3( $case, $xParamTz, $mParamTz, $from, $to, $dtstarts ) {
 
         $calendar1 = new Vcalendar();
 
@@ -275,7 +266,7 @@ class VtimezoneTest extends DtBase
             $e = $calendar1->newVevent()->setDtstart( $dtstartValue );
         }
 
-        $c2 = Vtimezone::populate(
+        $c2 = VtimezonePopulateFactory::process(
             $calendar1,
             $mParamTz ?: null,
             $params,
@@ -290,7 +281,7 @@ class VtimezoneTest extends DtBase
         $this->assertEquals(
             $expTz,
             $vtTzid,
-            sprintf( self::$ERRFMT, __FUNCTION__, $case . 1, Vcalendar::TZID, $expTz, $vtTzid )
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-1', Vcalendar::TZID, $expTz, $vtTzid )
         );
 
         $standard = $vtimezone->getComponent( Vcalendar::STANDARD );
@@ -299,7 +290,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 2,
+                $case . '-2',
                 Vcalendar::STANDARD,
                 Vcalendar::STANDARD,
                 'false'
@@ -313,7 +304,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 3,
+                $case . '-3',
                 Vcalendar::STANDARD . '::' . Vcalendar::TZOFFSETFROM,
                 '+0200',
                 $getValue
@@ -327,7 +318,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 4,
+                $case . '-4',
                 Vcalendar::STANDARD . '::' . Vcalendar::TZOFFSETTO,
                 '+0100',
                 $getValue
@@ -337,13 +328,13 @@ class VtimezoneTest extends DtBase
         $getValue = $standard->getRdate( 1 );
         $this->assertTrue(
              ( false == $getValue ) ||
-            (( 10 == $getValue[0][Util::$LCMONTH] ) &&
-             (  3 == $getValue[0][Util::$LCHOUR] ) &&
-             (  0 == $getValue[0][Util::$LCMIN] )),
+            (( 10 == $getValue[0]->format( 'm' )) &&
+             (  3 == $getValue[0]->format( 'H' )) &&
+             (  0 == $getValue[0]->format( 'i' ) )),
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 5,
+                $case . '-5',
                 Vcalendar::STANDARD . '::' . Vcalendar::RDATE,
                 '20xx-10-xx-03-00-00',
                 var_export( $getValue[0], true )
@@ -356,7 +347,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 6,
+                $case . '-6',
                 Vcalendar::DAYLIGHT,
                 Vcalendar::DAYLIGHT,
                 'false'
@@ -370,7 +361,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 7,
+                $case . '-7',
                 Vcalendar::DAYLIGHT . '::' . Vcalendar::TZOFFSETFROM,
                 '+0100',
                 $getValue
@@ -384,7 +375,7 @@ class VtimezoneTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 8,
+                $case . '-8',
                 Vcalendar::DAYLIGHT . '::' . Vcalendar::TZOFFSETTO,
                 '+0200',
                 $getValue
@@ -394,13 +385,13 @@ class VtimezoneTest extends DtBase
         $getValue = $daylight->getRdate( 1 );
         $this->assertTrue(
             ( ( false == $getValue ) ||
-            (( 3 == $getValue[0][Util::$LCMONTH] ) &&
-             ( 2 == $getValue[0][Util::$LCHOUR] ) &&
-             ( 0 == $getValue[0][Util::$LCMIN] ))),
+            (( 3 == $getValue[0]->format( 'm' )) &&
+             ( 2 == $getValue[0]->format( 'H' )) &&
+             ( 0 == $getValue[0]->format( 'i' ) ))),
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . 9,
+                $case . '-9',
                 Vcalendar::DAYLIGHT . '::' . Vcalendar::RDATE,
                 '20xx-03-xx-02-00-00',
                 var_export( $getValue[0], true )
@@ -420,8 +411,8 @@ class VtimezoneTest extends DtBase
             $x += 1;
         }
         $this->assertTrue(
-            ( 0 == $vtimezone->countComponents() ),
-            'deleteComponent-error 10, has ' . $vtimezone->countComponents()
+            ( 0 == $vtimezone->countComponents()),
+            'deleteComponent-error ' . $case . '-10, has ' . $vtimezone->countComponents()
         );
         // check components are set
         foreach( $compArr as $comp ) {
@@ -430,7 +421,7 @@ class VtimezoneTest extends DtBase
         // check number of components
         $this->assertTrue(
             ( count( $compArr ) == $vtimezone->countComponents()),
-            'setComponent-error 11, has ' . $vtimezone->countComponents()
+            'setComponent-error ' . $case . '-11, has ' . $vtimezone->countComponents()
         );
 
         $vtimezone2 = $calendar1->getComponent( Vcalendar::VTIMEZONE, 1 );
@@ -440,8 +431,7 @@ class VtimezoneTest extends DtBase
         $this->assertEquals(
             $calendar1Str,
             $calendar1->createCalendar(),
-            'calendar compare error 12'
+            'calendar compare error ' . $case . '-12'
         );
     }
-
 }

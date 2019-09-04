@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,7 +39,7 @@ use function strtoupper;
  * iCalcreator VFREEBUSY component class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.4 - 2018-12-19
+ * @since 2.29.9 2019-08-05
  */
 final class Vfreebusy extends Vcomponent
 {
@@ -53,7 +53,7 @@ final class Vfreebusy extends Vcomponent
         Traits\FREEBUSYtrait,
         Traits\ORGANIZERtrait,
         Traits\REQUEST_STATUStrait,
-        Traits\UIDtrait,
+        Traits\UIDrfc7986trait,
         Traits\URLtrait;
 
     /**
@@ -104,7 +104,7 @@ final class Vfreebusy extends Vcomponent
      *
      * @return string
      * @throws Exception  (on Duration/Freebusy err)
-     * @since  2.27.2 - 2018-12-21
+     * @since 2.29.9 2019-08-05
      */
     public function createComponent() {
         $compType    = strtoupper( $this->getCompType());
@@ -119,7 +119,7 @@ final class Vfreebusy extends Vcomponent
         $component  .= $this->createDuration();
         $component  .= $this->createFreebusy();
         $component  .= $this->createOrganizer();
-        $component  .= $this->createRequestStatus();
+        $component  .= $this->createRequeststatus();
         $component  .= $this->createUrl();
         $component  .= $this->createXprop();
         return $component . sprintf( self::$FMTEND, $compType );

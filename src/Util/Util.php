@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,8 +30,7 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
-use Kigkonsult\Icalcreator\Vcalendar;
-
+use InvalidArgumentException;
 use function array_key_exists;
 use function in_array;
 use function is_array;
@@ -47,370 +46,16 @@ use function ucfirst;
  */
 class Util
 {
-
-    /**
-     * @var string  some common X-properties
-     * @see http://en.wikipedia.org/wiki/ICalendar#Calendar_extensions
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $X_WR_CALNAME    = 'X-WR-CALNAME';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $X_WR_CALDESC    = 'X-WR-CALDESC';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $X_WR_RELCALID   = 'X-WR-RELCALID';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $X_WR_TIMEZONE   = 'X-WR-TIMEZONE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $X_LIC_LOCATION  = 'X-LIC-LOCATION';
-
-    /**
-     * @var string  iCal property names
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $ACTION           = 'ACTION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $ATTACH           = 'ATTACH';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $ATTENDEE         = 'ATTENDEE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CALSCALE         = 'CALSCALE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CATEGORIES       = 'CATEGORIES';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CLASS            = 'CLASS';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $COMMENT          = 'COMMENT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $COMPLETED        = 'COMPLETED';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CONTACT          = 'CONTACT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CREATED          = 'CREATED';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DESCRIPTION      = 'DESCRIPTION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DTEND            = 'DTEND';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DTSTAMP          = 'DTSTAMP';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DTSTART          = 'DTSTART';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DUE              = 'DUE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DURATION         = 'DURATION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $EXDATE           = 'EXDATE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $EXRULE           = 'EXRULE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $FREEBUSY         = 'FREEBUSY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $GEO              = 'GEO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $GEOLOCATION      = 'GEOLOCATION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $LAST_MODIFIED    = 'LAST-MODIFIED';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $LOCATION         = 'LOCATION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $METHOD           = 'METHOD';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $ORGANIZER        = 'ORGANIZER';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PERCENT_COMPLETE = 'PERCENT-COMPLETE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PRIORITY         = 'PRIORITY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PRODID           = 'PRODID';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RECURRENCE_ID    = 'RECURRENCE-ID';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RELATED_TO       = 'RELATED-TO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $REPEAT           = 'REPEAT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $REQUEST_STATUS   = 'REQUEST-STATUS';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RESOURCES        = 'RESOURCES';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RDATE            = 'RDATE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RRULE            = 'RRULE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $SEQUENCE         = 'SEQUENCE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $STATUS           = 'STATUS';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $SUMMARY          = 'SUMMARY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TRANSP           = 'TRANSP';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TRIGGER          = 'TRIGGER';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TZID             = 'TZID';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TZNAME           = 'TZNAME';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TZOFFSETFROM     = 'TZOFFSETFROM';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TZOFFSETTO       = 'TZOFFSETTO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $TZURL            = 'TZURL';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $UID              = 'UID';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $URL              = 'URL';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $VERSION          = 'VERSION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $X_PROP           = 'X-PROP';
-
-    /**
-     * @var array  iCal V*-component collection
-     * @static
-     * @deprecated moved to IcalBase
-     */
-    public static $VCOMPS   = [
-        Vcalendar::VEVENT,
-        Vcalendar::VTODO,
-        Vcalendar::VJOURNAL,
-        Vcalendar::VFREEBUSY
-    ];
-
-    /**
-     * @var array  iCal component collection
-     * @static
-     * @deprecated moved to IcalBase
-     * @usedby IcalBase+Vcalendar
-     */
-    public static $MCOMPS   = [
-        Vcalendar::VEVENT,
-        Vcalendar::VTODO,
-        Vcalendar::VJOURNAL,
-        Vcalendar::VFREEBUSY,
-        Vcalendar::VALARM,
-        Vcalendar::VTIMEZONE
-    ];
-
-    /**
-     * @var array  iCal sub-component collection
-     * @static
-     * @deprecated moved to IcalBase
-     * @usedby CalendarComponent+IcalBase+DTSTAMPtrait
-     */
-    public static $SUBCOMPS = [
-        Vcalendar::VALARM,
-        Vcalendar::VTIMEZONE,
-        Vcalendar::STANDARD,
-        Vcalendar::DAYLIGHT
-    ];
-
-    /**
-     * @var array  iCal timezone component collection
-     * @static
-     * @deprecated moved to IcalBase
-     * @usedby DTSTARTtrait+RexdateFactory
-     */
-    public static $TZCOMPS  = [
-        Vcalendar::VTIMEZONE,
-        Vcalendar::STANDARD,
-        Vcalendar::DAYLIGHT
-    ];
-
-    /**
-     * @var array  iCal component misc. property collection
-     * @static
-     * @deprecated moved to IcalBase
-     * @usedby Vcalendar + SelectFactory
-     */
-    public static $OTHERPROPS = [
-        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT, Vcalendar::LOCATION,
-        Vcalendar::ORGANIZER, Vcalendar::PRIORITY, Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
-        Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::UID, Vcalendar::URL,
-    ];
-
-    /**
-     * @var array  iCal component multiple property sub-collection
-     * @static
-     * @deprecated moved to IcalBase
-     * @usedby CalendarComponent + Vcalendar + SelectFactory + SortFactory
-     */
-    public static $MPROPS1    = [
-        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT,
-        Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
-    ];
-
-    /**
-     * @var array  iCal component multiple property collection
-     * @static
-     * @usedby CalendarComponent(deprecated) + IcalBase
-     * @deprecated moved to IcalBase
-     */
-    public static $MPROPS2    = [
-        Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
-        Vcalendar::COMMENT, Vcalendar::CONTACT, Vcalendar::DESCRIPTION,
-        Vcalendar::EXDATE, Vcalendar::EXRULE, Vcalendar::FREEBUSY, Vcalendar::RDATE,
-        Vcalendar::RELATED_TO, Vcalendar::RESOURCES, Vcalendar::RRULE,
-        Vcalendar::REQUEST_STATUS, Vcalendar::TZNAME, Vcalendar::X_PROP,
-    ];
-
-    /**
-     * @var string  iCalcreator config keys
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $ALLOWEMPTY       = 'ALLOWEMPTY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $COMPSINFO        = 'COMPSINFO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DELIMITER        = 'DELIMITER';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DIRECTORY        = 'DIRECTORY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $FILENAME         = 'FILENAME';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DIRFILE          = 'DIRFILE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $FILESIZE         = 'FILESIZE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $FILEINFO         = 'FILEINFO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $LANGUAGE         = 'LANGUAGE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PROPINFO         = 'PROPINFO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $SETPROPERTYNAMES = 'SETPROPERTYNAMES';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $UNIQUE_ID        = 'UNIQUE_ID';
-
-    /**
-     * @var string  iCal date/time parameter key values
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $VALUE                = 'VALUE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DATE                 = 'DATE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PERIOD               = 'PERIOD';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DATE_TIME            = 'DATE-TIME';
-
-    /**
-     * @var string  iCal date/time parameter key values
-     * @static
-     */
-    /* @deprecated in favor of IcalInterface constants */
-    public static $Z                    = 'Z';
-    public static $LCYEAR               = 'year';
-    public static $LCMONTH              = 'month';
-    public static $LCDAY                = 'day';
-    public static $LCHOUR               = 'hour';
-    public static $LCMIN                = 'min';
-    public static $LCSEC                = 'sec';
-    public static $LCtz                 = 'tz';
-    public static $LCWEEK               = 'week';
-    public static $LCTIMESTAMP          = 'timestamp';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $UTC                  = 'UTC';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $GMT                  = 'GMT';
-
-    /**
-     * @var string  iCal ATTENDEE, ORGANIZER etc param keywords
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $CUTYPE          = 'CUTYPE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $MEMBER          = 'MEMBER';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $ROLE            = 'ROLE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $PARTSTAT        = 'PARTSTAT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $RSVP            = 'RSVP';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DELEGATED_TO    = 'DELEGATED-TO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DELEGATED_FROM  = 'DELEGATED-FROM';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $SENT_BY         = 'SENT-BY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $CN              = 'CN';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DIR             = 'DIR';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $INDIVIDUAL      = 'INDIVIDUAL';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $NEEDS_ACTION    = 'NEEDS-ACTION';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $REQ_PARTICIPANT = 'REQ-PARTICIPANT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $false           = 'false';
-
-    /**
-     * @var string  iCal RRULE, EXRULE etc param keywords
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $FREQ       = 'FREQ';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $UNTIL      = 'UNTIL';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $COUNT      = 'COUNT';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $INTERVAL   = 'INTERVAL';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $WKST       = 'WKST';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYMONTHDAY = 'BYMONTHDAY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYYEARDAY  = 'BYYEARDAY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYWEEKNO   = 'BYWEEKNO';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYMONTH    = 'BYMONTH';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYSETPOS   = 'BYSETPOS';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYDAY      = 'BYDAY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYHOUR     = 'BYHOUR';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYMINUTE   = 'BYMINUTE';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $BYSECOND   = 'BYSECOND';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DAY        = 'DAY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $DAILY      = 'DAILY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $WEEKLY     = 'WEEKLY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $MONTHLY    = 'MONTHLY';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $YEARLY     = 'YEARLY';
-
-    /**
-     * @var string  misc. values
-     * @static
-     * @deprecated in favor of IcalInterface constants
-     */
-    public static $BINARY     = 'BINARY';
-
     /**
      * @var string  misc. values
      * @static
      */
     public static $LCvalue       = 'value';
     public static $LCparams      = 'params';
+    public static $ISLOCALTIME   = 'ISLOCALTIME';
     public static $CRLF          = "\r\n";
     public static $COMMA         = ',';
     public static $COLON         = ':';
-    public static $QQ            = '"';
     public static $SEMIC         = ';';
     public static $MINUS         = '-';
     public static $PLUS          = '+';
@@ -418,9 +63,7 @@ class Util
     public static $SP1           = ' ';
     public static $ZERO          = '0';
     public static $DOT           = '.';
-    public static $L             = '/';
-    /* @deprecated in favor of IcalInterface constants */
-    public static $UNPARSEDTEXT  = 'unparsedtext';
+    public static $SLASH         = '/';
 
     /**
      * Return bool true if compType is in array
@@ -484,6 +127,72 @@ class Util
             return false;
         }
         return ( $value == $base[$key] );
+    }
+
+    /**
+     * Assert value is integer
+     *
+     * @param mixed  $value
+     * @param string $propName
+     * @param int $rangeMin
+     * @param int $rangeMax
+     * @throws InvalidArgumentException
+     * @access protected
+     * @static
+     * @since  2.27.14 - 2019-02-19
+     */
+    public static function assertInteger( $value, $propName, $rangeMin = null, $rangeMax = null ) {
+        static $ERR1 = '%s expects integer value, got %s';
+        static $ERR2 = '%s value %s not in range (%d-%d)';
+        if( ! is_scalar( $value ) || ! ctype_digit( (string) $value )) {
+            throw new InvalidArgumentException(
+                sprintf( $ERR1, $propName, var_export( $value, true ))
+            );
+        }
+        if( ( ! is_null( $rangeMin ) && ( $rangeMin > $value )) ||
+            ( ! is_null( $rangeMax )) && ( $rangeMax < $value )) {
+            throw new InvalidArgumentException(
+                sprintf( $ERR2, $propName, $value, $rangeMin, $rangeMax )
+            );
+        }
+
+    }
+
+    /**
+     * Assert value is string
+     *
+     * @param mixed  $value
+     * @param string $propName
+     * @throws InvalidArgumentException
+     * @access protected
+     * @static
+     * @since  2.29.14 - 2019-09-03
+     */
+    public static function assertString( $value, $propName ) {
+        static $ERR1 = '%s expects string value, got (%s) %s';
+        if( ! is_scalar( $value )) {
+            throw new InvalidArgumentException(
+                sprintf( $ERR1, $propName, gettype( $value ), var_export( $value, true ))
+            );
+        }
+    }
+
+    /**
+     * Assert value in enumeration
+     *
+     * @param mixed  $value
+     * @param array  $enumeration - all upper case
+     * @param string $propName
+     * @throws InvalidArgumentException
+     * @access protected
+     * @static
+     * @since  2.27.2 - 2019-01-04
+     */
+    public static function assertInEnumeration( $value, array $enumeration, $propName ) {
+        static $ERR = 'Invalid %s value : %s';
+        if( ! in_array( strtoupper( $value ), $enumeration )) {
+            throw new InvalidArgumentException( sprintf( $ERR, $propName, var_export( $value, true )));
+        }
     }
 
 }

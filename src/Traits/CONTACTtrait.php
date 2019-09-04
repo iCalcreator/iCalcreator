@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -40,7 +40,7 @@ use InvalidArgumentException;
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @throws InvalidArgumentException
- * @since 2.27.3 2018-12-22
+ * @since 2.29.14 2019-09-03
  */
 trait CONTACTtrait
 {
@@ -115,14 +115,15 @@ trait CONTACTtrait
      * @param integer $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-28
+     * @since 2.29.14 2019-09-03
      */
-    public function setContact( $value = null, $params = null, $index = null ) {
+    public function setContact( $value = null, $params = [], $index = null ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONTACT );
             $value  = Util::$SP0;
             $params = [];
         }
+        Util::assertString( $value, self::CONTACT );
         $this->setMval( $this->contact, StringFactory::trimTrailNL( $value ), $params, null, $index );
         return $this;
     }

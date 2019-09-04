@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -132,10 +132,7 @@ class Exception5Test extends TestCase
      * @param int    $case
      * @param array  $compProps
      */
-    public function AllowEmptyTest1(
-        $case,
-        $compProps
-    ) {
+    public function AllowEmptyTest1( $case, $compProps ) {
         $calendar = new Vcalendar( [ Vcalendar::ALLOWEMPTY => false ] );
         foreach( $compProps as $theComp => $propNames ) {
             $newMethod = 'new' . $theComp;
@@ -159,8 +156,7 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest2(
-    ) {
+    public function AllowEmptyTest2() {
         $comps = [
             Vcalendar::VEVENT,
             Vcalendar::VTODO,
@@ -187,8 +183,7 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest3(
-    ) {
+    public function AllowEmptyTest3() {
         $compProps = [
             Vcalendar::VEVENT => [
                 Vcalendar::ACTION, Vcalendar::DESCRIPTION, Vcalendar::TRIGGER, Vcalendar::SUMMARY,
@@ -226,8 +221,7 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest4(
-    ) {
+    public function AllowEmptyTest4() {
         $compProps = [
             Vcalendar::VEVENT => [
                 Vcalendar::VALARM

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -102,15 +102,16 @@ trait TZIDtrait
      * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
+     * @todo assert PHP timezone ?
      */
-    public function setTzid( $value = null, $params = null ) {
+    public function setTzid( $value = null, $params = [] ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZID );
             $value  = Util::$SP0;
             $params = [];
         }
         $this->tzid = [
-            Util::$LCvalue  => trim( StringFactory::trimTrailNL( $value )),
+            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;

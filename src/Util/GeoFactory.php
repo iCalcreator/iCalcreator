@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -38,7 +38,7 @@ use function rtrim;
  * iCalcreator geo support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.26 - 2018-11-10
+ * @since  2.27.4 - 2019-07-02
  */
 class GeoFactory
 {
@@ -49,10 +49,6 @@ class GeoFactory
      */
     public static $geoLatFmt  = '%09.6f';
     public static $geoLongFmt = '%8.6f';
-    /* @deprecated */
-    public static $LATITUDE   = 'latitude';
-    /* @deprecated */
-    public static $LONGITUDE  = 'longitude';
 
     /**
      * Return formatted geo output

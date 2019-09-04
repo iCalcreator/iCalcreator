@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,10 +30,10 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimezone;
 use Exception;
+use PHPUnit\Framework\TestCase;
 
 /**
  * class SelectComponentsTest
@@ -441,8 +441,7 @@ class SelectComponentsTest extends TestCase
      * @throws Exception
      */
     public function SelectComponentsTest( $case, Vcalendar $vcalendar, $compType = null ) {
-        static $FMTerr = 'error in case#%d';
-        $errStr = sprintf( $FMTerr, $case );
+        static $FMTerr = 'error in case#%d, date %d-%d-%d';
 
         $selectComponents = $vcalendar->selectComponents(
             new DateTime( '20190421T000000', new DateTimezone( 'Europe/Stockholm' )),
@@ -450,19 +449,25 @@ class SelectComponentsTest extends TestCase
             ,null, null, null, null,
             $compType
         );
-
-// 2019-04-21
-        $this->assertTrue( isset( $selectComponents[2019][4][21][0] ), $errStr . 10 );
         /*
-        $this->assertEquals(
-            '2019-04-21 09:00:00 Europe/Stockholm',
-            $selectComponents[2019][4][21][0]->getXrop( Vcalendar::X_RECURRENCE )[1]
-        );
+        foreach( $selectComponents[2019] as $month => $monthArr ) {
+            foreach( $monthArr as $day => $dayArr ) {
+                foreach( $dayArr as $no => $comp ) {
+                    echo 'keys found 2019-' . $month . '-' . $day . ' #' . $no . PHP_EOL; // test ###
+                }
+            }
+        }
         */
+// 2019-04-21
+        $this->assertTrue(
+            isset( $selectComponents[2019][4][21][0] ),
+            sprintf( $FMTerr, 10, 2019, 4, 21 )
+        );
+
         $this->assertEquals(
             '2019-04-21 09:00:00 Europe/Stockholm',
             $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
-            $errStr . 11
+            sprintf( $FMTerr, 11, 2019, 4, 21 )
         );
         if( false == ( $value = $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][4][21][0]->getXprop( Vcalendar::X_CURRENT_DUE );
@@ -470,7 +475,7 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             '2019-04-21 10:00:00 Europe/Stockholm',
             $value[1],
-            $errStr . 12
+            sprintf( $FMTerr, 12, 2019, 4, 21 )
         );
 
 // 2019-04-28
@@ -478,12 +483,12 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             2,
             $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
-            $errStr . 13
+            sprintf( $FMTerr, 13, 2019, 4, 28 )
         );
         $this->assertEquals(
             '2019-04-28 09:00:00 Europe/Stockholm',
             $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
-            $errStr . 14
+            sprintf( $FMTerr, 14, 2019, 4, 28 )
         );
         if( false == ( $value = $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][4][28][0]->getXprop( Vcalendar::X_CURRENT_DUE );
@@ -491,7 +496,7 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             '2019-04-28 10:00:00 Europe/Stockholm',
             $value[1],
-            $errStr . 15
+            sprintf( $FMTerr, 15, 2019, 4, 28 )
         );
 
 // 2019-05-04
@@ -499,12 +504,12 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             3,
             $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
-            $errStr . 16
+            sprintf( $FMTerr, 16, 2019, 5, 4 )
         );
         $this->assertEquals(
             '2019-05-04 10:00:00 Europe/Stockholm',
             $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
-            $errStr . 17
+            sprintf( $FMTerr, 17, 2019, 5, 4 )
         );
         if( false == ( $value = $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][5][4][0]->getXprop( Vcalendar::X_CURRENT_DUE );
@@ -512,7 +517,7 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             '2019-05-04 12:00:00 Europe/Stockholm',
             $value[1],
-            $errStr . 18
+            sprintf( $FMTerr, 18, 2019, 5, 4 )
         );
 
 // 2019-05-19
@@ -520,12 +525,12 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             4,
             $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
-            $errStr . 19
+            sprintf( $FMTerr, 19, 2019, 5, 19 )
         );
         $this->assertEquals(
             '2019-05-19 09:00:00 Europe/Stockholm',
             $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
-            $errStr . 20
+            sprintf( $FMTerr, 20, 2019, 5, 19 )
         );
         if( false == ( $value = $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][5][19][0]->getXprop( Vcalendar::X_CURRENT_DUE );
@@ -533,7 +538,7 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             '2019-05-19 10:00:00 Europe/Stockholm',
             $value[1],
-            $errStr . 21
+            sprintf( $FMTerr, 21, 2019, 5, 19 )
         );
 
 // 2019-06-09
@@ -541,12 +546,12 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             5,
             $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_RECURRENCE )[1],
-            $errStr . 22
+            sprintf( $FMTerr, 22, 2019, 6, 9 )
         );
         $this->assertEquals(
             '2019-06-09 09:00:00 Europe/Stockholm',
             $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DTSTART )[1],
-            $errStr . 23
+            sprintf( $FMTerr, 23, 2019, 6, 9 )
         );
         if( false == ( $value = $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DTEND ))) {
             $value = $selectComponents[2019][6][9][0]->getXprop( Vcalendar::X_CURRENT_DUE );
@@ -554,7 +559,7 @@ class SelectComponentsTest extends TestCase
         $this->assertEquals(
             '2019-06-09 11:00:00 Europe/Stockholm',
             $value[1],
-            $errStr . 24
+            sprintf( $FMTerr, 24, 2019, 6, 9 )
         );
 
     }

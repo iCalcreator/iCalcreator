@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -103,9 +103,9 @@ trait TRANSPtrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.14 2019-09-03
      */
-    public function setTransp( $value = null, $params = null ) {
+    public function setTransp( $value = null, $params = [] ) {
         static $ALLOWED = [
             self::OPAQUE,
             self::TRANSPARENT
@@ -116,10 +116,11 @@ trait TRANSPtrait
             $params = [];
         }
         else {
-            self::assertInEnumeration( $value, $ALLOWED, self::TRANSP );
+            $value = strtoupper( StringFactory::trimTrailNL( $value ));
+            Util::assertInEnumeration( $value, $ALLOWED, self::TRANSP );
         }
         $this->transp = [
-            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCvalue  => $value,
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;

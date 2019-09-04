@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -36,7 +36,6 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function number_format;
-use function floatval;
 use function filter_var;
 use function sprintf;
 use function var_export;
@@ -45,7 +44,7 @@ use function var_export;
  * REQUEST-STATUS property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.14 2019-02-20
+ * @since 2.29.14 2019-09-03
  */
 trait REQUEST_STATUStrait
 {
@@ -59,9 +58,9 @@ trait REQUEST_STATUStrait
      * Return formatted output for calendar component property request-status
      *
      * @return string
-     * @since 2.27.14 2019-02-20
+     * @since 2.29.9 2019-08-05
      */
-    public function createRequestStatus() {
+    public function createRequeststatus() {
         if( empty( $this->requeststatus )) {
             return null;
         }
@@ -111,9 +110,9 @@ trait REQUEST_STATUStrait
      * @param int    $propIx specific property in case of multiply occurrence
      * @param bool   $inclParam
      * @return bool|array
-     * @since  2.27.1 - 2018-12-12
+     * @since 2.29.9 2019-08-05
      */
-    public function getRequestStatus( $propIx = null, $inclParam = false ) {
+    public function getRequeststatus( $propIx = null, $inclParam = false ) {
         if( empty( $this->requeststatus )) {
             unset( $this->propIx[self::REQUEST_STATUS] );
             return false;
@@ -124,16 +123,16 @@ trait REQUEST_STATUStrait
     /**
      * Set calendar component property request-status
      *
-     * @param float   $statCode 1*DIGIT 1*2("." 1*DIGIT)
-     * @param string  $text
-     * @param string  $extData
-     * @param array   $params
-     * @param integer $index
+     * @param array|float $statCode 1*DIGIT 1*2("." 1*DIGIT)
+     * @param string      $text
+     * @param string      $extData
+     * @param array       $params
+     * @param integer     $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.14 2019-02-20
+     * @since 2.29.14 2019-09-03
      */
-    public function setRequestStatus(
+    public function setRequeststatus(
         $statCode = null,
         $text     = null,
         $extData  = null,
@@ -146,17 +145,20 @@ trait REQUEST_STATUStrait
             $statCode = $text = Util::$SP0;
             $params = [];
         }
-        elseif( ! is_numeric( $statCode ) ||
-            ( floatval( $statCode ) != filter_var( $statCode, FILTER_VALIDATE_FLOAT ))) {
-            throw new InvalidArgumentException(
-                sprintf( $ERR, self::REQUEST_STATUS, var_export( $statCode, true ))
-            );
+        else {
+            if( false === ( $cmp = filter_var( $statCode, FILTER_VALIDATE_FLOAT ))) {
+                throw new InvalidArgumentException(
+                    sprintf( $ERR, self::REQUEST_STATUS, var_export( $statCode, true ) )
+                );
+            }
+            Util::assertString( $text, self::REQUEST_STATUS );
         }
         $input = [
             self::STATCODE => number_format( (float) $statCode, 2, Util::$DOT, null ),
             self::STATDESC => StringFactory::trimTrailNL( $text ),
         ];
         if( ! empty( $extData )) {
+            Util::assertString( $extData, self::REQUEST_STATUS );
             $input[self::EXTDATA] = StringFactory::trimTrailNL( $extData );
         }
         $this->setMval( $this->requeststatus, $input, $params, null, $index );

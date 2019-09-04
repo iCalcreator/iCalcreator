@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -113,7 +113,7 @@ class RecurWeekTest extends RecurBaseTest
                 $end,
                 [
                     Vcalendar::FREQ     => Vcalendar::WEEKLY,
-                    Vcalendar::UNTIL    => DateTimeFactory::getDateArrayFromDateTime( $end ),
+                    Vcalendar::UNTIL    => clone $end,
                     Vcalendar::INTERVAL => $interval,
                     Vcalendar::BYDAY    => [
                         [ Vcalendar::DAY => Vcalendar::TH ],
@@ -153,7 +153,7 @@ class RecurWeekTest extends RecurBaseTest
                 $end,
                 [
                     Vcalendar::FREQ     => Vcalendar::WEEKLY,
-                    Vcalendar::UNTIL    => DateTimeFactory::getDateArrayFromDateTime( $end ),
+                    Vcalendar::UNTIL    => clone $end,
                     Vcalendar::INTERVAL => $interval,
                     Vcalendar::BYMONTH  => $byMonth
                 ],
@@ -214,7 +214,7 @@ class RecurWeekTest extends RecurBaseTest
                 $end,
                 [
                     Vcalendar::FREQ     => Vcalendar::WEEKLY,
-                    Vcalendar::UNTIL    => DateTimeFactory::getDateArrayFromDateTime( $end ),
+                    Vcalendar::UNTIL    => clone $end,
                     Vcalendar::INTERVAL => $interval,
                     Vcalendar::BYMONTH  => $byMonth,
                     Vcalendar::BYDAY    => [

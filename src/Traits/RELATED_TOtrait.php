@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,7 +39,7 @@ use InvalidArgumentException;
  * RELATED-TO property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.3 2018-12-22
+ * @since 2.29.14 2019-09-03
  */
 trait RELATED_TOtrait
 {
@@ -53,8 +53,9 @@ trait RELATED_TOtrait
      * Return formatted output for calendar component property related-to
      *
      * @return string
+     * @since 2.29.9 2019-08-05
      */
-    public function createRelatedTo() {
+    public function createRelatedto() {
         if( empty( $this->relatedto )) {
             return null;
         }
@@ -113,9 +114,9 @@ trait RELATED_TOtrait
      * @param int    $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.29.14 2019-09-03
      */
-    public function setRelatedTo( $value = null, $params = [], $index = null ) {
+    public function setRelatedto( $value = null, $params = [], $index = null ) {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
         if( empty( $value )) {
@@ -125,8 +126,9 @@ trait RELATED_TOtrait
 
         }
         if( ! empty( $params )) {
-            ParameterFactory::existRem( $params, $RELTYPE, $PARENT, true ); // remove default
+            ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
         }
+        Util::assertString( $value, self::RELATED_TO );
         $this->setMval( $this->relatedto, StringFactory::trimTrailNL( $value ), $params, null, $index );
         return $this;
     }

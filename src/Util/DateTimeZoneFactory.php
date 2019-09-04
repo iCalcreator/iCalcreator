@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -58,7 +58,7 @@ class DateTimeZoneFactory
      * @var array
      * @static
      */
-    public static $UTCARR       = [ 'Z', Vcalendar::UTC, Vcalendar::GMT ];
+    public static $UTCARR = [ 'Z', Vcalendar::UTC, Vcalendar::GMT ];
 
     /**
      * Return new DateTimeZone object instance
@@ -87,10 +87,10 @@ class DateTimeZoneFactory
         if( empty( $tzString ) && ( 0 != intval( $tzString ))) {
             throw new InvalidArgumentException( sprintf( $ERR, $tzString ));
         }
-        if( DateTimeZoneFactory::hasOffset( $tzString )) {
-            $tzString = DateTimeZoneFactory::getTimeZoneNameFromOffset( $tzString );
+        if( self::hasOffset( $tzString )) {
+            $tzString = self::getTimeZoneNameFromOffset( $tzString );
         }
-        elseif( in_array( $tzString, DateTimeZoneFactory::$UTCARR )) {
+        elseif( in_array( $tzString, self::$UTCARR )) {
             $tzString = Vcalendar::UTC;
         }
         try {
@@ -103,9 +103,9 @@ class DateTimeZoneFactory
     }
 
     /**
-     * Return (array) all transtions from timezone
+     * Return (array) all transitions from timezone
      *
-     * @param DateTimeZone $dateTimeZone
+     * @param string|DateTimeZone $dateTimeZone
      * @param int $from
      * @param int $to
      * @return array
@@ -136,10 +136,10 @@ class DateTimeZoneFactory
         if( $UTCOFFSET  == $offset ) {
             return self::$UTCARR[1];
         }
-        $seconds = DateTimeZoneFactory::offsetToSeconds( $offset );
+        $seconds = self::offsetToSeconds( $offset );
         $res     =  timezone_name_from_abbr( Util::$SP0, $seconds );
         if( false === $res ) {
-            $res = timezone_name_from_abbr( Util::$SP0, $seconds, 0);
+            $res = timezone_name_from_abbr( Util::$SP0, $seconds, 0 );
         }
         if( false === $res ) {
             $res = timezone_name_from_abbr( Util::$SP0, $seconds, 1 );
@@ -229,13 +229,13 @@ class DateTimeZoneFactory
         if( empty( $timeZoneString )) {
             return false;
         }
-        if( DateTimeZoneFactory::hasOffset( $timeZoneString )) {
+        if( self::hasOffset( $timeZoneString )) {
             if( false !== strpos( $timeZoneString, Util::$COLON )) {
                 $timeZoneString = str_replace( Util::$COLON, null, $timeZoneString );
             }
             return ( empty( intval( $timeZoneString, 10 )));
         }
-        return ( in_array( strtoupper( $timeZoneString ), DateTimeZoneFactory::$UTCARR ));
+        return ( in_array( strtoupper( $timeZoneString ), self::$UTCARR ));
     }
 
     /**
@@ -283,11 +283,11 @@ class DateTimeZoneFactory
         static $FMT = '%02d';
         switch( substr( $offset, 0, 1 )) {
             case Util::$MINUS :
-                $output  = Util::$MINUS;
+                $output = Util::$MINUS;
                 $offset = substr( $offset, 1 );
                 break;
             case Util::$PLUS :
-                $output  = Util::$PLUS;
+                $output = Util::$PLUS;
                 $offset = substr( $offset, 1 );
                 break;
             default :

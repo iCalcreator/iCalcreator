@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -103,6 +103,15 @@ interface IcalInterface
     const VERSION          = 'VERSION';
     const X_PROP           = 'X-PROP';
 
+    /**
+     * Class constants, iCal rfc7986 property names
+     */
+    const COLOR            = 'COLOR';
+    const CONFERENCE       = 'CONFERENCE';
+    const IMAGE            = 'IMAGE';
+    const NAME             = 'NAME';
+    const REFRESH_INTERVAL = 'REFRESH-INTERVAL';
+    const SOURCE           = 'SOURCE';
 
     /**
      * iCal property METHOD types
@@ -131,7 +140,7 @@ interface IcalInterface
     const VALUE            = 'VALUE';
 
     /**
-     * iCal component properties  VALUE parameter key values
+     * iCal component properties VALUE parameter key values
      *
      * DURATION, set above,                      // TRIGGERtrait
      */
@@ -236,7 +245,7 @@ interface IcalInterface
 
 
     /**
-     * iCal component property ACTION values
+     * iCal component property ACTION, IMAGE values
      */
     const AUDIO            = 'AUDIO';
     const DISPLAY          = 'DISPLAY';
@@ -244,15 +253,43 @@ interface IcalInterface
     const PROCEDURE        = 'PROCEDURE';        // Deprecated in rfc5545
 
     /**
-     * iCal component property ATTACH parameter keywords
+     * iCal component property IMAGE parameter key DISPLAY values
+     */
+    const BADGE            = 'BADGE';          // default
+    const GRAPHIC          = 'GRAPHIC';
+    const FULLSIZE         = 'FULLSIZE';
+    const THUMBNAIL        = 'THUMBNAIL';
+
+    /**
+     * iCal component property ATTACH, IMAGE parameter keywords
      *
-     * VALUE, set above
+     * VALUE, defined above
      */
     const ENCODING         = 'ENCODING';         // Inline Encoding
     const FMTTYPE          = 'FMTTYPE';          // (Inline ) Format Type (media type [RFC4288])
 
     /**
-     * iCal component property ATTACH parameter key ENCODING values
+     * iCal component property CONFERENCE parameter keywords
+     *
+     * VALUE, defined above
+     */
+    const FEATURE          = 'FEATURE';
+    const LABEL            = 'LABEL';
+
+    /**
+     * iCal component property CONFERENCE parameter key FEATURE values
+     *
+     * AUDIO, defined above
+     */
+    const CHAT             = 'CHAT';
+    const FEED             = 'FEED';
+    const MODERATOR        = 'MODERATOR';
+    const PHONE            = 'PHONE';
+    const SCREEN           = 'SCREEN';
+    const VIDEO            = 'VIDEO';
+
+    /**
+     * iCal component property ATTACH, IMAGE parameter key ENCODING values
      */
     const EIGHTBIT         = '8BIT';             // e.i 8BIT...
     const BASE64           = 'BASE64';
@@ -327,9 +364,9 @@ interface IcalInterface
     /**
      * iCal component property STATUS values
      *
-     * NEEDS_ACTION, set above                   // Vtodo
-     * TENTATIVE, set above                      // Vevent
-     * COMPLETED, set above                      // Vtodo
+     * NEEDS_ACTION, defined above               // Vtodo
+     * TENTATIVE, defined above                  // Vevent
+     * COMPLETED, defined above                  // Vtodo
      * IN_PROCESS                                // Vtodo
      */
     const CONFIRMED        = 'CONFIRMED';        // Vevent
@@ -375,19 +412,10 @@ interface IcalInterface
      * Class constants, config keys
      *
      * LANGUAGE, TZID and URL, set above
-     *   deprecated : DELIMITER, DIRECTORY, FILENAME, DIRFILE, FILESIZE, FILEINFO
      */
     const ALLOWEMPTY       = 'ALLOWEMPTY';
     const COMPSINFO        = 'COMPSINFO';
     const UNIQUE_ID        = 'UNIQUE_ID';
-
-    const DELIMITER        = 'DELIMITER';
-    const DIRECTORY        = 'DIRECTORY';
-    const FILENAME         = 'FILENAME';
-    const DIRFILE          = 'DIRFILE';
-    const FILESIZE         = 'FILESIZE';
-    const FILEINFO         = 'FILEINFO';
-
     const PROPINFO         = 'PROPINFO';
     const SETPROPERTYNAMES = 'SETPROPERTYNAMES';
 

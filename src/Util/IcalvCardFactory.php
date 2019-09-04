@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,8 +30,8 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
-use Kigkonsult\Icalcreator\Vcalendar;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_reverse;
 use function array_shift;

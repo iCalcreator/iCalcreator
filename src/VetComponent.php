@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,41 +30,14 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use InvalidArgumentException;
-
-use function sprintf;
-use function strtolower;
-use function ucfirst;
-
 /**
  * iCalcreator VEVENT/VTODO component base class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.6 - 2018-12-27
+ * @since  2.29.24 - 2019-07-02
  */
 abstract class VetComponent extends Vcomponent
 {
-    /**
-     * Return new calendar component, included in component
-     *
-     * @param string $compType component type
-     * @return CalendarComponent
-     * @throws InvalidArgumentException
-     * @deprecated in favor of new<component> methods
-     * @since  2.27.2 - 2018-12-21
-     */
-    public function newComponent( $compType ) {
-        static $ERRMSG = 'Unknown component %s';
-        switch( ucfirst( strtolower( $compType ))) {
-            case self::VALARM :
-                return $this->newValarm();
-                break;
-            default:
-                break;
-        }
-        throw new InvalidArgumentException( sprintf( $ERRMSG, $compType ));
-    }
-
     /**
      * Return Valarm object instance
      *

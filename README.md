@@ -22,19 +22,17 @@ __Builds__
 Please review the releaseNotes for a brief overview, 
 docs/summary and docs/using for details.
 
-Stable 2.28 *(master)*.
+Stable 2.28.2 *(master)*.
 
-Release 2.30 candidate (tag 2.29.8)
+Release 2.30 candidate (2.29.14)
 
 Unsupported (tags): 
 - 2.26.9
-- 2.26
 - 2.24.2
-- 2.24
 - 2.22.5
 
 
-Brief 2.28 demo :
+Brief 2.29.9 demo :
 
 ``` php
 <?php

@@ -5,7 +5,7 @@
  copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.28
+ Version   2.29.14
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -33,9 +33,9 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         processIsolation="false"
+         processIsolation="true"
          syntaxCheck="false"
-         bootstrap="test/autoload.php"
+         bootstrap="autoload.php"
         >
     <testsuites>
         <testsuite name="Vcalendar Tests">
@@ -52,7 +52,9 @@
         </testsuite>
         <testsuite name="DateInterval Tests">
             <file>./test/Exceptions3Test.php</file>
-            <file>./test/DateIntervalTest.php</file>
+            <file>./test/DateIntervalTest1.php</file>
+            <file>./test/DateIntervalTest2.php</file>
+            <file>./test/DateIntervalTest3.php</file>
         </testsuite>
         <testsuite name="Integer property Tests">
             <file>./test/Exceptions4Test.php</file>
@@ -66,7 +68,10 @@
             <file>./test/ValarmTest.php</file>
         </testsuite>
         <testsuite name="Vtimezone populate Tests">
-            <file>./test/VtimezoneTest.php</file>
+            <file>./test/VtimezonePopulateFactoryTest.php</file>
+        </testsuite>
+        <testsuite name="Timezone regulate Tests">
+            <file>./test/RegulateTimezoneFactoryTest.php</file>
         </testsuite>
         <testsuite name="Recur Tests">
             <file>./test/RecurYearTest.php</file>
@@ -85,9 +90,10 @@
                 processUncoveredFilesFromWhitelist="true"
         >
             <file>./src/CalendarComponent.php</file>
-            <file>./src/IcalInterface.php</file>
             <file>./src/Daylight.php</file>
+            <file>./src/DScomponent.php</file>
             <file>./src/IcalBase.php</file>
+            <file>./src/IcalInterface.php</file>
             <file>./src/Standard.php</file>
             <file>./src/Valarm.php</file>
             <file>./src/Vcalendar.php</file>
@@ -104,8 +110,10 @@
             <file>./src/Traits/CALSCALEtrait.php</file>
             <file>./src/Traits/CATEGORIEStrait.php</file>
             <file>./src/Traits/CLASStrait.php</file>
+            <file>./src/Traits/COLORrfc7986trait.php</file>
             <file>./src/Traits/COMMENTtrait.php</file>
             <file>./src/Traits/COMPLETEDtrait.php</file>
+            <file>./src/Traits/CONFERENCErfc7986trait.php</file>
             <file>./src/Traits/CONTACTtrait.php</file>
             <file>./src/Traits/CREATEDtrait.php</file>
             <file>./src/Traits/DESCRIPTIONtrait.php</file>
@@ -117,21 +125,25 @@
             <file>./src/Traits/EXDATEtrait.php</file>
             <file>./src/Traits/EXRULEtrait.php</file>
             <file>./src/Traits/FREEBUSYtrait.php</file>
+            <file>./src/Traits/IMAGErfc7986trait.php</file>
             <file>./src/Traits/GEOtrait.php</file>
             <file>./src/Traits/LAST_MODIFIEDtrait.php</file>
             <file>./src/Traits/LOCATIONtrait.php</file>
             <file>./src/Traits/METHODtrait.php</file>
+            <file>./src/Traits/NAMErfc7986trait.php</file>
             <file>./src/Traits/ORGANIZERtrait.php</file>
             <file>./src/Traits/PERCENT_COMPLETEtrait.php</file>
             <file>./src/Traits/PRIORITYtrait.php</file>
             <file>./src/Traits/PRODIDtrait.php</file>
             <file>./src/Traits/RDATEtrait.php</file>
+            <file>./src/Traits/REFRESH_INTERVALrfc7986trait.php</file>
             <file>./src/Traits/RECURRENCE_IDtrait.php</file>
             <file>./src/Traits/RELATED_TOtrait.php</file>
             <file>./src/Traits/REPEATtrait.php</file>
             <file>./src/Traits/REQUEST_STATUStrait.php</file>
             <file>./src/Traits/RESOURCEStrait.php</file>
             <file>./src/Traits/RRULEtrait.php</file>
+            <file>./src/Traits/SOURCErfc7986trait.php</file>
             <file>./src/Traits/SEQUENCEtrait.php</file>
             <file>./src/Traits/STATUStrait.php</file>
             <file>./src/Traits/SUMMARYtrait.php</file>
@@ -142,7 +154,7 @@
             <file>./src/Traits/TZOFFSETFROMtrait.php</file>
             <file>./src/Traits/TZOFFSETTOtrait.php</file>
             <file>./src/Traits/TZURLtrait.php</file>
-            <file>./src/Traits/UIDtrait.php</file>
+            <file>./src/Traits/UIDrfc7986trait.php</file>
             <file>./src/Traits/URLtrait.php</file>
             <file>./src/Traits/VERSIONtrait.php</file>
             <file>./src/Traits/X_PROPtrait.php</file>
@@ -156,12 +168,14 @@
             <file>./src/Util/IcalXMLFactory.php</file>
             <file>./src/Util/ParameterFactory.php</file>
             <file>./src/Util/RecurFactory.php</file>
+            <file>./src/Util/RegulateTimezoneFactory.php</file>
             <file>./src/Util/RexdateFactory.php</file>
             <file>./src/Util/SelectFactory.php</file>
             <file>./src/Util/SortFactory.php</file>
             <file>./src/Util/StringFactory.php</file>
             <file>./src/Util/Util.php</file>
             <file>./src/Util/UtilDateTime.php</file>
+            <file>./src/Util/VtimezonePopulateFactory.php</file>
         </whitelist>
     </filter>
   <logging>
@@ -175,9 +189,9 @@
            target="testDocs/coverage.xml"/-->
       <!--log type="coverage-php"
            target="testDocs/coverage.serialized"/-->
-      <!--log type="coverage-text"
+      <log type="coverage-text"
            target="testDocs/PHPUnitReport.txt"
-           showUncoveredFiles="true"/-->
+           showUncoveredFiles="true"/>
       <!--log type="json"
            target="testDocs/logfile.json"/-->
       <!--log type="tap"

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.9
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,9 +30,11 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Exception;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
+use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * class ValarmTest, testing Integers in
@@ -103,11 +105,7 @@ class ValarmTest extends DtBase
             $value,
             self::$STCPAR,
             [
-                Util::$LCvalue  => [
-                    Util::$LCDAY   => 1,
-                    'before'       => false,
-                    'relatedStart' => true
-                ],
+                Util::$LCvalue  => DateIntervalFactory::factory( $value ),
                 Util::$LCparams => self::$STCPAR
             ],
             ParameterFactory::createParams( self::$STCPAR ) .
@@ -134,9 +132,7 @@ class ValarmTest extends DtBase
             $value,
             self::$STCPAR,
             [
-                Util::$LCvalue  => [
-                    Util::$LCDAY   => 1,
-                ],
+                Util::$LCvalue  => DateIntervalFactory::factory( $value ),
                 Util::$LCparams => self::$STCPAR
             ],
             ParameterFactory::createParams( self::$STCPAR ) .
@@ -329,6 +325,7 @@ class ValarmTest extends DtBase
      * @param mixed  $params
      * @param array  $expectedGet
      * @param string $expectedString
+     * @throws Exception
      */
     public function valarmTest(
         $case,
@@ -357,7 +354,7 @@ class ValarmTest extends DtBase
             $this->assertEquals(
                 $expectedGet,
                 $getValue,
-                sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Valarm', $getMethod )
+                sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, 'Valarm', $getMethod )
             );
             $actualString = $a1->{$createMethod}();
             $actualString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $actualString );
@@ -365,12 +362,12 @@ class ValarmTest extends DtBase
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,
                 trim( $actualString ),
-                sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Valarm', $createMethod )
+                sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, 'Valarm', $createMethod )
             );
             $a1->{$deleteMethod}();
             $this->assertFalse(
                 $a1->{$getMethod}(),
-                sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, 'Valarm', $getMethod )
+                sprintf( self::$ERRFMT, '(after delete) ', $case . '-3', __FUNCTION__, 'Valarm', $getMethod )
             );
             $a1->{$setMethod}( $value, $params );
 
@@ -387,7 +384,7 @@ class ValarmTest extends DtBase
             }
             $this->assertTrue(
                 ( 0 == $comp->countComponents() ),
-                'deleteComponent-error 2, has ' . $comp->countComponents()
+                $case .  '-5 deleteComponent-error 2, has ' . $comp->countComponents()
             );
             // check components are set
             foreach( $compArr as $subComp ) {
@@ -396,7 +393,7 @@ class ValarmTest extends DtBase
             // check number of components
             $this->assertTrue(
                 ( count( $compArr ) == $comp->countComponents() ),
-                'setComponent-error 3, has ' . $comp->countComponents()
+                $case .  '-6 setComponent-error 3, has ' . $comp->countComponents()
             );
         }
     }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,19 +30,18 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use DateTime;
+use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
-
-use function is_array;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * DUE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.14 2019-01-28
+ * @since 2.29.1 2019-06-24
  */
 trait DUEtrait
 {
@@ -57,28 +56,24 @@ trait DUEtrait
      *
      * "The value type of the "DTEND" or "DUE" properties MUST match the value type of "DTSTART" property."
      * @return string
-     * @since  2.27.12 - 2019-01-09
+     * @since 2.29.1 2019-06-24
      */
     public function createDue() {
         if( empty( $this->due )) {
             return null;
         }
-        if( DateTimeFactory::hasNoDate( $this->due )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::DUE ) : null;
+        if( empty( $this->due[Util::$LCvalue] )) {
+            return ( $this->getConfig( self::ALLOWEMPTY ))
+                ? StringFactory::createElement( self::DUE ) : null;
         }
-        if( ! empty( $this->dtstart )) {
-            $parNo = ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE ) ? 3 : null;
-        }
-        else {
-            $parNo = ParameterFactory::isParamsValueSet( $this->due, self::DATE ) ? 3 : null;
-        }
+        $isDATE = ( ! empty( $this->dtstart ))
+            ? ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE )
+            : ParameterFactory::isParamsValueSet( $this->due, self::DATE );
+        $isLocalTime = isset( $this->due[Util::$LCparams][Util::$ISLOCALTIME] );
         return StringFactory::createElement(
             self::DUE,
             ParameterFactory::createParams( $this->due[Util::$LCparams] ),
-            DateTimeFactory::dateArrayToStr(
-                $this->due[Util::$LCvalue],
-                ParameterFactory::isParamsValueSet( $this->due, self::DATE )
-            )
+            DateTimeFactory::dateTime2Str( $this->due[Util::$LCvalue], $isDATE, $isLocalTime )
         );
     }
 
@@ -94,10 +89,10 @@ trait DUEtrait
     }
 
     /**
-     * Get calendar component property due
+     * Return calendar component property due
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
     public function getDue( $inclParam = false ) {
@@ -110,28 +105,13 @@ trait DUEtrait
     /**
      * Set calendar component property due
      *
-     * @param mixed  $value
-     * @param mixed  $month
-     * @param int    $day
-     * @param int    $hour
-     * @param int    $min
-     * @param int    $sec
-     * @param string $tz
-     * @param array  $params
+     * @param string|DateTime $value
+     * @param array           $params
      * @return static
-     * @throws InvalidArgumentException
-     * @since 2.27.14 2019-02-10
+     * @throws \Exception
+     * @since 2.29.1 2019-06-24
      */
-    public function setDue(
-        $value  = null,
-        $month  = null,
-        $day    = null,
-        $hour   = null,
-        $min    = null,
-        $sec    = null,
-        $tz     = null,
-        $params = null
-    ) {
+    public function setDue( $value  = null, $params = [] ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DUE );
             $this->due = [
@@ -140,28 +120,21 @@ trait DUEtrait
             ];
             return $this;
         }
-        if( DateTimeFactory::isArgsDate( $value, $month, $day )) {
-            $value = DateTimeFactory::argsToStr( $value, $month, $day, $hour, $min, $sec, $tz );
-            if( is_array( $params )) {
-                $month = $params;
-            }
-            else {
-                $month = ( is_array( $hour )) ? $hour : [];
-            }
-        }
-        elseif( ! is_array( $month )) {
-            $month = [];
-        }
         $dtstart = $this->getDtstart( true );
         if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
-            $month[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+            $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+        }
+        if( isset( $dtstart[Util::$LCparams][Util::$ISLOCALTIME] )) {
+            $params[Util::$ISLOCALTIME] = true;
         }
         $this->due = DateTimeFactory::setDate(
             $value,
-            ParameterFactory::setParams( $month, DateTimeFactory::$DEFAULTVALUEDATETIME )
+            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
         );
         if( ! empty( $dtstart ) && Util::issetAndNotEmpty( $dtstart, Util::$LCvalue )) {
-            DateTimeFactory::assertYmdArgsAsDatesAreInSequence( $dtstart, $this->due, self::DUE );
+            DateTimeFactory::assertDatesAreInSequence(
+                $dtstart[Util::$LCvalue], $this->due[Util::$LCvalue], self::DUE
+            );
         }
         return $this;
     }

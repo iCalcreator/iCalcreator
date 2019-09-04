@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.28
+ * Version   2.29.14
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -41,7 +41,7 @@ use function strtoupper;
  * ACTION property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.2 2019-01-03
+ * @since 2.29.14 2019-09-03
  */
 trait ACTIONtrait
 {
@@ -102,10 +102,10 @@ trait ACTIONtrait
      * @param mixed  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.2 2019-01-03
+     * @since 2.29.14 2019-09-03
      */
-    public function setAction( $value = null, $params = null ) {
-        static $ALLOWED = [
+    public function setAction( $value = null, $params = [] ) {
+        static $STDVALUES = [
             self::AUDIO,
             self::DISPLAY,
             self::EMAIL,
@@ -116,11 +116,12 @@ trait ACTIONtrait
             $value  = Util::$SP0;
             $params = [];
         }
-        else {
-            self::assertInEnumeration( $value, $ALLOWED, self::ACTION );
+        elseif( Util::isPropInList( $value, $STDVALUES )) {
+            $value = strtoupper( $value );
         }
+        Util::assertString( $value, self::ACTION );
         $this->action = [
-            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL( $value )),
+            Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL((string) $value )),
             Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
