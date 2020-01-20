@@ -1,10 +1,10 @@
 <!DOCTYPE html><!--
  iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
 
- copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.29.14
+ Version   2.29.15
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-<title>iCalcreator 2.29.14 manual</title>
+<title>iCalcreator 2.29.15 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-<meta name="copyright"   content="2007-2019 Kjell-Inge Gustafsson, kigkonsult">
+<meta name="copyright"   content="2007-2020 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.29.14">
+<meta name="description" content="using iCalcreator v2.29.15">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -158,10 +158,10 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.29.14</p>
+<p class="header">iCalcreator v2.29.15</p>
 <p>
-iCalcreator v2.29.14<br>
-Copyright &copy; 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
+iCalcreator v2.29.15<br>
+Copyright &copy; 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
 Contact iCal_at_kigkonsult_dot_se
@@ -210,7 +210,7 @@ This document makes previous versions obsolete.
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.29.14 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
+For iCalcreator 2.29.15 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -298,7 +298,7 @@ This style is used for <em>PHP</em> coding examples.
 
 <a name="Support"></a><h2>1.4 Support</h2>
 <p>
-For support report, use <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>.
+For bug report or support request, use <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>.
 </p>
 <p>
 For non emergency issues, support upon (paid) request only.
@@ -335,11 +335,11 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.14/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.15/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
-iCalcreator 2.29.14 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.29.15 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -2816,7 +2816,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.14//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.15//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -2868,25 +2868,23 @@ echo $str;
 <a name="returnCalendar"></a><h4>3.1.4.3 returnCalendar</h4>
 <p>
 Redirect the Vcalendar instance content to user browser.
-Filename, addressed to browser, is automatically generated if missing or not set
-and the filename will look like it is set using<br>
+Filename, addressed to browser, is automatically generated if missing or not set,
+the filename will look like it is set using<br>
 </p>
 <p class="example">$filename = date( &quot;YmdHis&quot; ).&quot;.ics&quot;</p>
 <p>
 The method do not stop PHP script (exit), returns (bool) true on success.
 </p>
-<p>
-Note, the returnCalendar method is subject for change in future versions.
-</p>
 <p class="label">Format</p>
-<p class="format">Vcalendar::returnCalendar( [ utf8Encode [, gzip [, cdType ]]] )</p>
+<p class="format">Vcalendar::returnCalendar( [ utf8Encode [, gzip [, cdType [, fileName ]]]] )</p>
 <p class="comment">utf8Encode = (bool) true:  utf8 encoded output,
                     false: (default) no encoding
 gzip       = (bool) true:  gzip compressed output
                            Header &quot;Content-Length&quot; only sent when gzip=true
                     false: (default) no compressing
 cdType     = (bool) true: (default) Content-Disposition: attachment
-                    false: Content-Disposition: inline</p>
+                    false: Content-Disposition: inline
+fileName   = (string) returned file Name</p>
 <p class="label">Example 1</p>
 <p class="example">use Kigkonsult\Icalcreator\Vcalendar;
 
@@ -8152,7 +8150,7 @@ $vcalendar-&gt;setComponent( $vevent );
 
 <a name="vtimezone_populate"></a><h4>3.4.4 Vtimezone populate</h4>
 <p>
-    The Util/VtimezonePopulateFactory::process (static) method, 
+    The Util/VtimezonePopulateFactory::process (static) method,
     applied on a Vcalendar instance,
     return the Vcalendar instance with <a href="#VTIMEZONE">Vtimezone</a>,
     <a href="#VTIMEZONE">Standard</a> and <a href="#VTIMEZONE">Daylight</a> components,
@@ -8405,10 +8403,10 @@ Return vCard(s) string.
 <a name="Copyright_and_Licence"></a><h1>5 COPYRIGHT AND LICENSE</h1>
 
 <table>
-<tr><td>Copyright<td>(c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+<tr><td>Copyright<td>(c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.29.14
+<tr><td>Version  <td>2.29.15
 <tr><td class="top">License  <td>
     Subject matter of licence is the software iCalcreator.<br>
     The above copyright, link, package and version notices,<br>

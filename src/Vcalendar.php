@@ -2,10 +2,10 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.15
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -70,7 +70,7 @@ use function usort;
  * Vcalendar class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.5 - 2019-06-30
+ * @since  2.29.15 - 2020-01-19
  */
 final class Vcalendar extends IcalBase
 {
@@ -918,15 +918,16 @@ final class Vcalendar extends IcalBase
      * Return created, updated and/or parsed calendar,
      * sending a HTTP redirect header.
      *
-     * @param bool $utf8Encode
-     * @param bool $gzip
-     * @param bool $cdType true : Content-Disposition: attachment... (default), false : ...inline...
+     * @param bool    $utf8Encode
+     * @param bool    $gzip
+     * @param bool    $cdType true : Content-Disposition: attachment... (default), false : ...inline...
+     * @param string  $fileName
      * @return bool true on success, false on error
      * @throws Exception
-     * @since  2.27.2 - 2018-12-21
+     * @since  2.29.15 - 2020-01-19
      */
-    public function returnCalendar( $utf8Encode = false, $gzip = false, $cdType = true ) {
-        return HttpFactory::returnCalendar( $this, $utf8Encode, $gzip, $cdType );
+    public function returnCalendar( $utf8Encode = false, $gzip = false, $cdType = true, $fileName = null ) {
+        return HttpFactory::returnCalendar( $this, $utf8Encode, $gzip, $cdType, $fileName );
     }
 
 }

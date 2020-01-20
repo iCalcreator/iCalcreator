@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.15
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -51,10 +51,10 @@ use function unlink;
 use function utf8_encode;
 
 /**
- * iCalcreator http support class, also rfc2368 support (iCal cal-address)
+ * iCalcreator http support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.4 - 2019-07-02
+ * @since  2.29.15 - 2020-01-19
  */
 class HttpFactory
 {
@@ -82,18 +82,26 @@ class HttpFactory
      * @param bool      $utf8Encode
      * @param bool      $gzip
      * @param bool      $cdType true : Content-Disposition: attachment... (default), false : ...inline...
+     * @param string    $fileName
      * @return bool true on success, false on error
      * @throws Exception
      * @static
+     * @since  2.29.15 - 2020-01-19
      */
     public static function returnCalendar(
         Vcalendar $calendar,
         $utf8Encode = false,
         $gzip       = false,
-        $cdType     = true
+        $cdType     = true,
+        $fileName   = null
     ) {
         static $ICR = 'iCr';
-        $filename = self::getFakedFilename();
+        $utf8Encode ?: false;
+        $gzip ?: false;
+        $cdType ?: false;
+        if( empty( $fileName ) ) {
+            $fileName = self::getFakedFilename();
+        }
         $output   = $calendar->createCalendar();
         if( $utf8Encode ) {
             $output = utf8_encode( $output );
@@ -119,7 +127,7 @@ class HttpFactory
         }
         header( self::$headers[3] );
         $cdType = ( $cdType ) ? 4 : 5;
-        header( sprintf( self::$headers[$cdType], $filename ));
+        header( sprintf( self::$headers[$cdType], $fileName ));
         header( self::$headers[6] );
         echo $output;
         return true;

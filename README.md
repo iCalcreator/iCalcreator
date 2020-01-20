@@ -17,22 +17,17 @@ iCalcreator supports systems like
 * other applications...
 
 ~~~~~~~~
-__Builds__
+###### Builds
 
 Please review the releaseNotes for a brief overview, 
 docs/summary and docs/using for details.
 
 Stable 2.28.2 *(master)*.
 
-Release 2.30 candidate (2.29.14)
-
-Unsupported (tags): 
-- 2.26.9
-- 2.24.2
-- 2.22.5
+Release 2.30 candidate (tag 2.29.15)
 
 
-Brief 2.29.9 demo :
+###### Usage
 
 ``` php
 <?php
