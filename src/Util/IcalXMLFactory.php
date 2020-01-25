@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.18
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -61,7 +61,7 @@ use function ucfirst;
  * iCalcreator XML (rfc6321) support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.4 - 2019-07-02
+ * @since  2.29.18 - 2020-01-25
  */
 class IcalXMLFactory
 {
@@ -128,7 +128,7 @@ class IcalXMLFactory
     private static $interval       = 'interval';
     private static $wkst           = 'wkst';
 
-    public static $XMLstart = '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- kigkonsult %s, iCal2XMl (rfc6321), %s --></icalendar>';
+    public static $XMLstart = '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- kigkonsult.se %s, iCal2XMl (rfc6321), %s --></icalendar>';
 
     /**
      * Return iCal XML (rfc6321) output, using PHP SimpleXMLElement

@@ -112,7 +112,7 @@ trait GEOtrait
             return false;
         }
         $loc     = $this->getLocation();
-        $content = ( empty( $loc )) ? null : $loc . Util::$SLASH;
+        $content = ( empty( $loc )) ? Util::$SP0 : $loc . Util::$SLASH;
         return $content .
             GeoFactory::geo2str2( $geo[self::LATITUDE], GeoFactory::$geoLatFmt ) .
             GeoFactory::geo2str2( $geo[self::LONGITUDE], GeoFactory::$geoLongFmt);

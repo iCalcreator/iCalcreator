@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.18
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,11 +31,13 @@
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\RecurFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use PHPUnit\Framework\TestCase;
 use SimpleXMLElement;
@@ -44,7 +46,7 @@ use SimpleXMLElement;
  * class DtBase
  *
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-01-24
+ * @since 2.29.18 2020-01-25
  */
 class DtBase extends TestCase
 {
@@ -264,7 +266,7 @@ class DtBase extends TestCase
      * @throws Exception
      */
     public function parseCalendarTest( $case, Vcalendar $calendar, $expectedString = null, $theComp = null, $propName = null ) {
-        static $xmlStartChars = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<icalendar xmlns=\"urn:ietf:params:xml:ns:icalendar-2.0\"><!-- kigkonsult iCalcreator";
+        static $xmlStartChars = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<icalendar xmlns=\"urn:ietf:params:xml:ns:icalendar-2.0\"><!-- kigkonsult.se iCalcreator";
         static $xmlEndChars   = "</icalendar>\n";
 
         // echo $case . ' ' . __FUNCTION__ . ' ' . $theComp . '::' . $propName . ' start' . PHP_EOL; // test ###
@@ -350,15 +352,15 @@ class DtBase extends TestCase
      */
     public function getDateTimeAsArray( DateTime $dateTime ) {
         $output =  [
-            Util\RecurFactory::$LCYEAR  => $dateTime->format( 'Y' ),
-            Util\RecurFactory::$LCMONTH => $dateTime->format( 'm' ),
-            Util\RecurFactory::$LCDAY   => $dateTime->format( 'd' ),
-            Util\RecurFactory::$LCHOUR  => $dateTime->format( 'H' ),
-            Util\RecurFactory::$LCMIN   => $dateTime->format( 'i' ),
-            Util\RecurFactory::$LCSEC   => $dateTime->format( 's' ),
+            RecurFactory::$LCYEAR  => $dateTime->format( 'Y' ),
+            RecurFactory::$LCMONTH => $dateTime->format( 'm' ),
+            RecurFactory::$LCDAY   => $dateTime->format( 'd' ),
+            RecurFactory::$LCHOUR  => $dateTime->format( 'H' ),
+            RecurFactory::$LCMIN   => $dateTime->format( 'i' ),
+            RecurFactory::$LCSEC   => $dateTime->format( 's' ),
         ];
         if( DateTimeZoneFactory::isUTCtimeZone( $dateTime->getTimezone()->getName() )) {
-            $output[Util\RecurFactory::$LCtz] = 'Z';
+            $output[RecurFactory::$LCtz] = 'Z';
         }
         return $output;
     }
@@ -366,27 +368,15 @@ class DtBase extends TestCase
     /**
      * Return the datetime as (ical create-) long string
      *
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      * @param string   $tz
      * @return string
      */
-    public function getDateTimeAsCreateLongString( DateTime $dateTime, $tz = null ) {
+    public function getDateTimeAsCreateLongString( DateTimeInterface $dateTime, $tz = null ) {
         static $FMT1   = ';TZID=%s:';
-        static $FMT2   = '%04d%02d%02dT%02d%02d%02d';
         $isUTCtimeZone = ( empty( $tz )) ? false : DateTimeZoneFactory::isUTCtimeZone( $tz );
         $output        = ( empty( $tz ) || $isUTCtimeZone ) ? Util::$COLON : sprintf( $FMT1, $tz );
         $output       .= $dateTime->format( DateTimeFactory::$YmdTHis );
-        /*
-        $output .= sprintf(
-            $FMT2,
-            $dateTime->format( 'Y' ),
-            $dateTime->format( 'm' ),
-            $dateTime->format( 'd' ),
-            $dateTime->format( 'H' ),
-            $dateTime->format( 'i' ),
-            $dateTime->format( 's' )
-        );
-        */
         if( $isUTCtimeZone ) {
             $output   .= 'Z';
         }
@@ -396,11 +386,11 @@ class DtBase extends TestCase
     /**
      * Return the datetime as (ical create-) short string
      *
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      * @param bool     $prefix
      * @return string
      */
-    public function getDateTimeAsCreateShortString( DateTime $dateTime, $prefix = true ) {
+    public function getDateTimeAsCreateShortString( DateTimeInterface $dateTime, $prefix = true ) {
         static $FMT1 = ';VALUE=DATE:%d';
         static $FMT2 = ':%d';
         $fmt = $prefix ? $FMT1 : $FMT2;

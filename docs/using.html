@@ -4,7 +4,7 @@
  copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.29.15
+ Version   2.29.18
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-<title>iCalcreator 2.29.15 manual</title>
+<title>iCalcreator 2.29.18 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2020 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.29.15">
+<meta name="description" content="using iCalcreator v2.29.18">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -158,9 +158,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.29.15</p>
+<p class="header">iCalcreator v2.29.18</p>
 <p>
-iCalcreator v2.29.15<br>
+iCalcreator v2.29.18<br>
 Copyright &copy; 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -210,7 +210,7 @@ This document makes previous versions obsolete.
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.29.15 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
+For iCalcreator 2.29.18 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -315,11 +315,9 @@ of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle manage
 <a name="Donate"></a><h2>1.5 Donate</h2>
 <p>
 You can show your appreciation for our free software,
-and can support future development by making a donation to the kigkonsult project iCalcreator.
-</p>
-<p>
-Make a donation of any size by clicking <a href="http://kigkonsult.se/index.php#Donate" title="Donate" target="_blank">here</a>.
-Thanks in advance!
+and can support future development by making a donation to the kigkonsult project iCalcreator
+using <a href="https://paypal.me/kigkonsult?locale.x=en_US" rel="nofollow">paypal.me/kigkonsult</a>.
+For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </p>
 
 <br>
@@ -335,11 +333,11 @@ Thanks in advance!
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.15/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.18/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
-iCalcreator 2.29.15 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.29.18 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -441,6 +439,14 @@ Here are update headlines in this version.
     <li>CATEGORIES, RESOURCES no longer accepts array input</li>
 
     <li>String asserts in set-methods for TEXT Valuetype properties</li>
+
+    <li>Vcalendar::returnCalendar() new fileName arg</li>
+
+    <li>Methods with DateTime arg now accepts DateTimeInterface</li>
+
+    <li>assert for method exists</li>
+
+    <li>xml header update</li>
 
 </ul>
 
@@ -2574,9 +2580,9 @@ Throws InvalidArgumentException on argument error, Exception on DateTime/DateInt
                 [, cType [, flat [, any [, split]]]]]])
 </p>
 <p class="comment">startYear  : (int) start year  (4*digit),   default current year
-             (object) DateTime, start date<sup>*</sup>
+             (object) DateTimeInterface instance, start date<sup>*</sup>
 startMonth : (int) start month (1-2*digit), default current month
-             (object) DateTime, end date<sup>*</sup>
+             (object) DateTimeInterface instance, end date<sup>*</sup>
 startDay   : (int) start day   (1-2*digit), default current day
 endYear    : (int) end year    (4*digit),   default startYear
 endMonth   : (int) end month   (1-2*digit), default startMonth
@@ -2593,7 +2599,7 @@ split      : (bool) true (default) =&gt; one component copy for every day it occ
                                       within the period
                     false =&gt; one occurrence of component in output array,
                              start date/recurrence (start) date
-<sup>*</sup>When using datetime objects, other start/end arguments are ignored.
+<sup>*</sup>When using DateTimeInterface instances, other start/end arguments are ignored.
 
 valid         flat    any     split
 combinations                          (defaults in upper case)
@@ -2816,7 +2822,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.15//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.18//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -3015,8 +3021,8 @@ Throws Exception on invalid (<em>PHP</em>) timezone.
 <p class="format">Vcalendar::vtimezonePopulate( [ timezone [, xprops, [ start [, end ]]]] )</p>
 <p class="comment">timezone = (string) valid timezone, acceptable by <em>PHP</em> DateTimeZone
 xprops   = (array) ( *[ x-propName =&gt; value ] ), timezone non-standard properties
-from     = DateTime | (int) timestamp, period start date<sup>*</sup>
-to       = DateTime | (int) timestamp, period end date<sup>*</sup>
+from     = DateTimeInterface | (int) timestamp, period start date<sup>*</sup>
+to       = DateTimeInterface | (int) timestamp, period end date<sup>*</sup>
 </p>
 <p>
 
@@ -4260,7 +4266,7 @@ The method throws Exception on DateTime error.
 <p class="label">Format</p>
 <p class="format">calendarComponent::setCreated( [ createdDate [, xparams ]] )</p>
 <p class="comment">
-createdDate  = (object) DateTime class instance, will be set to UTC if not UTC timezone
+createdDate  = (object) DateTimeInterface instance, will be set to UTC if not UTC timezone
 createdDate  = (string) date/datetime string<sup>*</sup>
 xparams<sup>2</sup>     = array( *[ (string) key =&gt; (string) value ] )
 <br>date/datetime string<sup>*</sup> please notice <a href="#date_restraints">date restraints</a>.
@@ -4461,7 +4467,7 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="label">Format</p>
 <p class="format">calendarComponent::setDtend( dtendDate [, params<sup>2</sup> ] )
 <p class="comment">
-dtendDate     = (object) DateTime class instance
+dtendDate     = (object) DateTimeInterface instance
 dtendDate     = (string) date/datetime string<sup>*</sup>
 params<sup>2</sup>       = (array) ([ tzidparam/datetimeparam/dateparam ] *[,xparams])
 tzidparam     = Vcalendar::TZID =&gt; (string) &lt;timezone identifier&gt;
@@ -4774,7 +4780,7 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="format">calendarComponent::setExdate( exdates [, params [, propOrderNo ]] )</p>
 <p class="comment">exdates<sup>1</sup>      = date / (array) ( date *[, date ] )
 
-date          = (object) DateTime class instance
+date          = (object) DateTimeInterface instance
 date          = (string) date/datetime string<sup>*</sup>
 
 params<sup>2</sup>       = (array) ([(datetimeparam/dateparam)&nbsp;/ tzidparam] *[,xparams])
@@ -4919,7 +4925,7 @@ fbperiods         = (array) ( periods<sup>2</sup> )&nbsp;
 periods<sup>2</sup>          = (array) ( startdate, enddate/duration ) /
                     (array) ( *[, (array) ( startdate, enddate/duration )] )
 
-startdate/enddate = (object) DateTime class instance, will be set to UTC if not UTC timezone
+startdate/enddate = (object) DateTimeInterface instance, will be set to UTC if not UTC timezone
 startdate/enddate = (string) datetime string<sup>*</sup>
 
 duration          = (object) DateInterval class instance
@@ -5566,7 +5572,7 @@ singledate    = date
 startdate     = date
 enddate       = date
 
-date          = (object) DateTime class instance
+date          = (object) DateTimeInterface instance
 date          = (string) date/datetime string<sup>*</sup>
 
 duration      = (object) DateInterval class instance
@@ -6243,7 +6249,7 @@ freq        =
 
 enddate     = date // <span class="comment">a DATE value or a <a href="#DATE_WITH_UTC_TIME">UTC</a> timezone DATE-TIME value</span>
 
-date        = (object) DateTime class instance, will be set to UTC if not UTC timezone
+date        = (object) DateTimeInterface instance, will be set to UTC if not UTC timezone
 date        = (string) date/datetime string<sup>*</sup>
 
 
@@ -6729,7 +6735,7 @@ dur-hour      = 1*DIGIT &quot;H&quot; [dur-minute]
 dur-minute    = 1*DIGIT &quot;M&quot; [dur-second]
 dur-second    = 1*DIGIT &quot;S&quot;
 
-date<sup>3</sup>         = (object) DateTime class instance, will be set to UTC if not UTC timezone
+date<sup>3</sup>         = (object) DateTimeInterface instance, will be set to UTC if not UTC timezone
 date<sup>3</sup>         = (string) datetime string<sup>*</sup>
 
 params<sup>4</sup>       = (array) ( [[ reltype [, trigRelparam ]] / datetimeparam ] *[, xparams ] )
@@ -8175,8 +8181,8 @@ $vcalendar-&gt;setComponent( $vevent );
 <p class="comment">calendar = (object) Vcalendar instance
 timezone = (string) valid timezone, acceptable by <em>PHP</em> DateTimeZone<sup>*</sup>
 xprops   = (array) ( *[ x-propName =&gt; value ] ), timezone non-standard properties
-from     = Datime | (int) timestamp, period start date<sup>**</sup>
-to       = Datime | (int) timestamp, period end date<sup>**</sup>
+from     = DateTimeInterface | (int) timestamp, period start date<sup>**</sup>
+to       = DateTimeInterface | (int) timestamp, period end date<sup>**</sup>
 
 <sup>*</sup>  If no argument timezone, the argument xProps is searched for &quot;X-WR-TIMEZONE&quot; and &quot;X-LIC-LOCATION&quot; keys.
    If not found then calendar are searched for the X-properties.
@@ -8406,7 +8412,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.29.15
+<tr><td>Version  <td>2.29.18
 <tr><td class="top">License  <td>
     Subject matter of licence is the software iCalcreator.<br>
     The above copyright, link, package and version notices,<br>

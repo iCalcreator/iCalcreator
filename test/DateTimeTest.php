@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator;
 
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -41,7 +42,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * class DateTimeTest, testing DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
  *
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-01-24
+ * @since  2.29.16 - 2020-01-24
  */
 class DateTimeTest extends DtBase
 {
@@ -95,9 +96,9 @@ class DateTimeTest extends DtBase
     {
         date_default_timezone_set( LTZ );
 
-        $dataArr = [];
+        $dataArr   = [];
 
-        $dateTime = new DateTime( DATEYmdTHis . ' ' . LTZ );
+        $dateTime  = new DateTime( DATEYmdTHis . ' ' . LTZ );
         $dataArr[] = [
             1008,
             $dateTime,
@@ -109,8 +110,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime, LTZ)
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis . ' ' . LTZ );
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . ' ' . LTZ );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2->setTimezone( DateTimeZoneFactory::factory( TZ2 ));
         $dataArr[] = [
             1012,
@@ -123,8 +124,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, TZ2 )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis . ' ' . LTZ );
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTime( DATEYmdTHis . ' ' . LTZ );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2->setTimezone( DateTimeZoneFactory::factory( Vcalendar::UTC ));
         $dataArr[] = [
             1013,
@@ -137,8 +138,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis . ' ' . LTZ );
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . ' ' . LTZ );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2->setTimezone( DateTimeZoneFactory::factory( OFFSET ));
         $tz = $dateTime2->getTimezone()->getName();
         $dataArr[] = [
@@ -164,8 +165,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( Vcalendar::UTC));
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis, DateTimeZoneFactory::factory( Vcalendar::UTC));
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2->setTimezone( DateTimeZoneFactory::factory( TZ2 ));
         $dataArr[] = [
             1019,
@@ -192,8 +193,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( Vcalendar::UTC));
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis, DateTimeZoneFactory::factory( Vcalendar::UTC));
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2->setTimezone( DateTimeZoneFactory::factory( OFFSET ));
         $tz = $dateTime2->getTimezone()->getName();
         $dataArr[] = [
@@ -207,22 +208,22 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, $tz )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis . OFFSET );
-        DateTimeFactory::setDateTimeTimeZone( $dateTime, $dateTime->getTimezone()->getName());
-        $tz = $dateTime->getTimezone()->getName();
+        $dateTime  = new DateTime( DATEYmdTHis . OFFSET );
+        $tz        = DateTimeZoneFactory::getTimeZoneNameFromOffset( OFFSET );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime, $tz );
         $dataArr[] = [
             1022,
             $dateTime,
             [],
             [
-                Util::$LCvalue  => clone $dateTime,
+                Util::$LCvalue  => $dateTime2,
                 Util::$LCparams => [ Vcalendar::TZID => $tz ]
             ],
-            $this->getDateTimeAsCreateLongString( $dateTime, $tz )
+            $this->getDateTimeAsCreateLongString( $dateTime2, $tz )
         ];
 
-        $dateTime  = new DateTime( DATEYmdTHis . OFFSET );
-        $dateTime2 = clone $dateTime;
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . OFFSET );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, TZ2 );
         $dataArr[] = [
             1026,
@@ -249,7 +250,7 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( OFFSET ));
+        $dateTime = new DateTimeImmutable( DATEYmdTHis, DateTimeZoneFactory::factory( OFFSET ));
         $tz = $dateTime->getTimezone()->getName();
         $dataArr[] = [
             1028,
@@ -266,7 +267,7 @@ class DateTimeTest extends DtBase
     }
 
     /**
-     * Testing VALUE DATE-TIME with DateTime, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
+     * Testing VALUE DATE-TIME with DateTimeInterface, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
      *
      * @test
      * @dataProvider DateTime1Provider

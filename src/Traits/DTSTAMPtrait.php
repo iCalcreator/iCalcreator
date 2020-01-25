@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -45,7 +46,7 @@ use function array_change_key_case;
  * DTSTAMP property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.1 2019-06-22
+ * @since 2.29.16 2020-01-24
  */
 trait DTSTAMPtrait
 {
@@ -113,12 +114,12 @@ trait DTSTAMPtrait
     /**
      * Set calendar component property dtstamp
      *
-     * @param string|DateTime  $value
+     * @param string|DateTimeInterface  $value
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.29.1 2019-06-30
+     * @since 2.29.16 2020-01-24
      */
     public function setDtstamp( $value  = null, $params = [] ) {
         if( empty( $value )) {

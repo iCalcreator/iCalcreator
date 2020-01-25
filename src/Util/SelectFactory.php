@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.17
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use DateInterval;
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -45,6 +46,7 @@ use function in_array;
 use function is_array;
 use function is_null;
 use function ksort;
+use function method_exists;
 use function sprintf;
 use function stripos;
 use function strtolower;
@@ -56,7 +58,7 @@ use function usort;
  * iCalcreator geo support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.18 - 2019-04-08
+ * @since 2.27.17 - 2020-01-25
  */
 class SelectFactory
 {
@@ -77,11 +79,11 @@ class SelectFactory
      * No check of date.
      *
      * @param Vcalendar $calendar
-     * @param int|array|DateTime $startY    (int) start Year,  default current Year
-     *                                      ALT. DateTime start date
+     * @param int|array|DateTimeInterface $startY    (int) start Year,  default current Year
+     *                                      ALT. (object) DateTimeInterface start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
-     * @param int|array|DateTime $startM    (int) start Month, default current Month
-     *                                      ALT. DateTime end date
+     * @param int|DateTimeInterface $startM    (int) start Month, default current Month
+     *                                      ALT. (object) DateTimeInterface end date
      * @param int       $startD    start Day,   default current Day
      * @param int       $endY      end   Year,  default $startY
      * @param int       $endM      end   Month, default $startM
@@ -98,7 +100,7 @@ class SelectFactory
      * @throws RuntimeException
      * @throws Exception
      * @static
-     * @since 2.27.18 - 2019-04-08
+     * @since  2.29.16 - 2020-01-24
      */
     public static function selectComponents(
         Vcalendar $calendar,
@@ -113,13 +115,13 @@ class SelectFactory
         $any    = null,
         $split  = null
     ) {
-        static $P1D            = 'P1D';
-        static $YMDHIS2        = 'Y-m-d H:i:s';
-        static $PRA            = '%a';
-        static $YMDn           = 'Ymd';
-        static $HIS            = '%02d%02d%02d';
-        static $DAYOFDAYS      = 'day %d of %d';
-        static $SORTER         = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'cmpfcn' ];
+        static $P1D       = 'P1D';
+        static $YMDHIS2   = 'Y-m-d H:i:s';
+        static $PRA       = '%a';
+        static $YMDn      = 'Ymd';
+        static $HIS       = '%02d%02d%02d';
+        static $DAYOFDAYS = 'day %d of %d';
+        static $SORTER    = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'cmpfcn' ];
         /* check  if empty calendar */
         if( 1 > $calendar->countComponents()) {
             return false;
@@ -256,7 +258,7 @@ class SelectFactory
                     }         // copy original to output (but not anyone with recurrence-id)
                 }
                 elseif( $split ) { // split the original component
-                    $rStart = ( $compStart->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 )) 
+                    $rStart = ( $compStart->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 ))
                         ? $fcnStart->getClone() : $compStart->getClone();
                     $rEnd = ( $compEnd->format( $YMDHIS2 ) > $fcnEnd->format( $YMDHIS2 ))
                         ? $fcnEnd->getClone()   : $compEnd->getClone();
@@ -273,7 +275,7 @@ class SelectFactory
                                 $rEnd->add( $compDuration );
                             }
                             $endHis     = $rEnd->getTime();
-                            $component2 = ( isset( $recurIdList[$k][4] )) 
+                            $component2 = ( isset( $recurIdList[$k][4] ))
                                 ? clone $recurIdList[$k][4] : clone $component;
                         }
                         else {
@@ -321,7 +323,7 @@ class SelectFactory
                 else { // !$flat && !$split, i.e. no flat array and DTSTART within period
                     if( isset( $recurIdList[$compStart->key] )) {
                         $rStart     = $recurIdList[$compStart->key][0]->getClone();
-                        $component2 = ( isset( $recurIdList[$compStart->key][4] )) 
+                        $component2 = ( isset( $recurIdList[$compStart->key][4] ))
                             ? $recurIdList[$compStart->key][4] : clone $component;
                     }
                     else {
@@ -776,15 +778,15 @@ class SelectFactory
     /**
      * Assert date arguments
      *
-     * @param mixed     $startY
-     * @param mixed     $startM
+     * @param int|DateTimeInterface $startY
+     * @param int|DateTimeInterface $startM
      * @param int       $startD
      * @param int       $endY
      * @param int       $endM
      * @param int       $endD
      * @access private
      * @static
-     * @since 2.26.2 - 2018-11-15
+     * @since  2.29.16 - 2020-01-24
      */
     private static function assertDateArguments(
         & $startY = null,
@@ -797,8 +799,8 @@ class SelectFactory
         static $Y = 'Y';
         static $M = 'm';
         static $D = 'd';
-        if(( $startY instanceof DateTime ) &&
-           ( $startM instanceof DateTime )) {
+        if(( $startY instanceof DateTimeInterface ) &&
+           ( $startM instanceof DateTimeInterface )) {
             $endY   = $startM->format( $Y );
             $endM   = $startM->format( $M );
             $endD   = $startM->format( $D );
@@ -1024,16 +1026,16 @@ class SelectFactory
             if( ! empty( $summary )) {
                 $value = $recurIdComps[$RecurrIdKey][4]->getSummary();
                 if( empty( $value )) {
-                    $recurIdComps[$RecurrIdKey][4]->setSummary( 
-                        $summary[Util::$LCvalue], 
+                    $recurIdComps[$RecurrIdKey][4]->setSummary(
+                        $summary[Util::$LCvalue],
                         $summary[Util::$LCparams] );
                 }
             }
             if( ! empty( $description )) {
                 $value = $recurIdComps[$RecurrIdKey][4]->getDescription();
                 if( empty( $value )) {
-                    $recurIdComps[$RecurrIdKey][4]->setDescription( 
-                        $description[Util::$LCvalue], 
+                    $recurIdComps[$RecurrIdKey][4]->setDescription(
+                        $description[Util::$LCvalue],
                         $description[Util::$LCparams]
                     );
                 }
@@ -1046,8 +1048,8 @@ class SelectFactory
                 continue;
             }
             foreach( $comments as $prop ) {
-                $recurIdComps[$RecurrIdKey][4]->setComment( 
-                    $prop[Util::$LCvalue], 
+                $recurIdComps[$RecurrIdKey][4]->setComment(
+                    $prop[Util::$LCvalue],
                     $prop[Util::$LCparams] );
             }
         } // end foreach
@@ -1061,7 +1063,7 @@ class SelectFactory
      * @return array
      * @access private
      * @static
-     * @since 2.27.1 - 2018-12-16
+     * @since 2.27.17 - 2020-01-25
      */
     private static function selectComponents2(
         Vcalendar $calendar,
@@ -1102,7 +1104,8 @@ class SelectFactory
                 } // end   elseif( // multiple occurrence?
                 else {
                     $method = Vcalendar::getGetMethodName( $propName );
-                    if( false === ( $d = $component3->{$method}())) { // single occurrence
+                    if( ! method_exists( $component3, $method ) ||
+                        ( false === ( $d = $component3->{$method}()))) { // single occurrence
                         continue;
                     }
                 }

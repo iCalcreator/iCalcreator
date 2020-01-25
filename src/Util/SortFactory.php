@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.17
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -38,6 +38,7 @@ use function array_slice;
 use function ctype_digit;
 use function is_null;
 use function key;
+use function method_exists;
 use function reset;
 use function strcmp;
 
@@ -45,7 +46,7 @@ use function strcmp;
  * iCalcreator SortFactory class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.8 2019-07-23
+ * @since 2.29.17 2020-01-25
  */
 class SortFactory
 {
@@ -107,7 +108,7 @@ class SortFactory
      * @param CalendarComponent $c valendar component
      * @param string            $sortArg
      * @static
-     * @since 2.29.8 2019-07-23
+     * @since 2.29.17 2020-01-25
      */
     public static function setSortArgs( CalendarComponent $c, $sortArg = null ) {
         static $INITARR = [ '0', '0', '0', '0' ];
@@ -130,7 +131,7 @@ class SortFactory
             } // end if( Util::isPropInList( $sortArg, Util::$MPROPS1 ))
             else {
                 $method = Vcalendar::getGetMethodName( $sortArg );
-                if( false !== ( $d = $c->{$method}())) {
+                if( method_exists( $c, $method ) && ( false !== ( $d = $c->{$method}()))) {
                     $c->srtk[0] = ( $d instanceof DateTime ) ? $d->getTimestamp() : $d;
                     if( Vcalendar::UID == $sortArg ) {
                         if(( Vcalendar::VFREEBUSY != $compType  ) && ( false !== ( $d = $c->getRecurrenceid()))) {
@@ -143,7 +144,7 @@ class SortFactory
                             $c->srtk[1] = $c->srtk[2] = PHP_INT_MAX;
                         }
                     } // end if( Vcalendar::UID == $sortArg )
-                }
+                } // end if
             } // end elseif( false !== ( $d = $c->getProperty( $sortArg )))
             return;
         } // end elseif( $sortArg )

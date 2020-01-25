@@ -1,5 +1,5 @@
 
-iCalcreator 2.29.15 releaseNotes
+iCalcreator 2.29.18 releaseNotes
 
 v2.29.1   Removal of all set-methods date(time)/interval ARRAY arguments
           as well as get-methods return date(time)/interval ARRAY formats
@@ -66,3 +66,9 @@ v2.29.13  CATEGORIES, RESOURCES no longer accepts array input
 v2.29.14  String asserts in set-methods for TEXT Valuetype properties
 
 v2.29.15  Vcalendar::returnCalendar() new fileName arg
+
+v2.29.16  Methods with DateTime arg now accepts DateTimeInterface
+
+v2.29.17  assert for method exists
+
+v2.29.18  xml header update

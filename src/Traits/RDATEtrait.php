@@ -30,7 +30,7 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
@@ -154,8 +154,8 @@ trait RDATEtrait
      * @param array   $params
      * @param integer $index
      * @return static
-     * @throws InvalidArgumentException
      * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.2 2019-06-23
      */
     public function setRdate( $value = null, $params = [], $index = null ) {
@@ -190,19 +190,21 @@ trait RDATEtrait
      * @param bool $isPeriod
      * @return array
      * @access private
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @static
-     * @since 2.29.2 2019-06-23
+     * @since 2.29.16 2020-01-24
      */
     private static function checkSingleRdates( $rDates, $isPeriod ) {
-        if( $rDates instanceof DateTime ) {
-            return [ $rDates ];
+        if( $rDates instanceof DateTimeInterface ) {
+            return [ DateTimeFactory::cnvrtDateTimeInterface( $rDates ) ];
         }
         if( DateTimeFactory::isStringAndDate( $rDates )) {
             return [ $rDates ];
         }
         if( $isPeriod && is_array( $rDates ) && ( 2 == count( $rDates ))) {
             $first = reset( $rDates );
-            if( $first instanceof DateTime ) {
+            if( $first instanceof DateTimeInterface ) {
                 return [ $rDates ];
             }
             if( DateTimeFactory::isStringAndDate( $first )) {

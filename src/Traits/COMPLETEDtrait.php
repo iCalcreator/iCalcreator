@@ -31,6 +31,8 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateTime;
+use DateTimeInterface;
+use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -44,7 +46,7 @@ use function array_change_key_case;
  * COMPLETED property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.1 2019-06-22
+ * @since 2.29.16 2020-01-24
  */
 trait COMPLETEDtrait
 {
@@ -102,11 +104,12 @@ trait COMPLETEDtrait
     /**
      * Set calendar component property completed
      *
-     * @param string|DateTime $value
+     * @param string|DateTimeInterface $value
      * @param array           $params
      * @return static
-     * @throws \Exception
-     * @since 2.29.1 2019-06-22
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.29.16 2020-01-24
      */
     public function setCompleted( $value = null, $params = [] ) {
         if( empty( $value )) {

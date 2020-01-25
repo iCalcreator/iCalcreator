@@ -31,17 +31,19 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateTime;
+use DateTimeInterface;
+use Exception;
+use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * RECURRENCE-ID property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.1 2019-06-22
+ * @since 2.29.16 2020-01-24
  */
 trait RECURRENCE_IDtrait
 {
@@ -102,13 +104,14 @@ trait RECURRENCE_IDtrait
     /**
      * Set calendar component property recurrence-id
      *
-     * @param string|DateTime $value
+     * @param string|DateTimeInterface $value
      * @param array           $params
      * @return static
-     * @throws \Exception
-     * @since 2.29.1 2019-06-22
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.29.16 2020-01-24
      */
-    public function setRecurrenceid( $value  = null, $params = [] ) {
+    public function setRecurrenceid( $value = null, $params = [] ) {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RECURRENCE_ID );
             $this->recurrenceid = [

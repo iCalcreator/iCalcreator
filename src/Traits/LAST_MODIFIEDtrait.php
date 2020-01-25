@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -45,7 +46,7 @@ use function array_change_key_case;
  * LAST-MODIFIED property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.9 2019-08-05
+ * @since 2.29.16 2020-01-24
  */
 trait LAST_MODIFIEDtrait
 {
@@ -100,14 +101,14 @@ trait LAST_MODIFIEDtrait
     /**
      * Set calendar component property last-modified
      *
-     * @param string|DateTime  $value
+     * @param string|DateTimeInterface  $value
      * @param array  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.9 2019-08-05
+     * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( $value  = null, $params = [] ) {
+    public function setLastmodified( $value = null, $params = [] ) {
         if( empty( $value )) {
             $this->lastmodified = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),

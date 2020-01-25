@@ -30,16 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
+use DateTime;
+use DateTimeInterface;
+use DateInterval;
+use Exception;
+use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use DateTime;
-use DateInterval;
-use Exception;
-use InvalidArgumentException;
 
 use function count;
 use function in_array;
@@ -54,7 +55,7 @@ use function var_export;
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @throws InvalidArgumentException
- * @since 2.29.2 2019-06-23
+ * @since 2.29.16 2020-01-24
  */
 trait FREEBUSYtrait
 {
@@ -235,13 +236,13 @@ trait FREEBUSYtrait
      * Set calendar component property freebusy
      *
      * @param string  $fbType
-     * @param DateTime|string|array $fbValues
+     * @param string|DateTimeInterface|array $fbValues
      * @param array   $params
      * @param integer $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.2 2019-09-02
+     * @since 2.29.16 2020-01-24
      * @todo Applications MUST treat x-name and iana-token values they don't recognize the same way as they would the BUSY value.
      */
     public function setFreebusy( $fbType = null, $fbValues = null, $params = [], $index = null ) {
@@ -263,6 +264,7 @@ trait FREEBUSYtrait
             }
             $freebusyPeriod = [];
             foreach( $fbPeriod as $fbix2 => $fbMember ) { // pairs => singlepart
+                $fbMember = DateTimeFactory::cnvrtDateTimeInterface( $fbMember );
                 switch( true ) {
                     case ( $fbMember instanceof DateTime ) :     // datetime
                         $freebusyPeriod[$fbix2] = DateTimeFactory::setDateTimeTimeZone( $fbMember, Vcalendar::UTC );
@@ -313,7 +315,7 @@ trait FREEBUSYtrait
      *
      * @param array $fbValues
      * @return array
-     * @since 2.29.2 2019-06-23
+     * @since 2.29.16 2020-01-24
      */
     private static function checkSingleValues( array $fbValues ) {
         if( ! is_array( $fbValues )) {
@@ -322,8 +324,8 @@ trait FREEBUSYtrait
         if( 2 != count( $fbValues )) {
             return $fbValues;
         }
-        $first  = reset( $fbValues );
-        if( $first instanceof DateTime ) {
+        $first = reset( $fbValues );
+        if( $first instanceof DateTimeInterface ) {
             return [ $fbValues ];
         }
         if( DateTimeFactory::isStringAndDate( $first )) {

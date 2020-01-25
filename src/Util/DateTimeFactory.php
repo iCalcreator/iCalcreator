@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -53,7 +54,7 @@ use function var_export;
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.1 2019-06-22
+ * @since 2.29.16 2020-01-24
  */
 class DateTimeFactory
 {
@@ -141,18 +142,42 @@ class DateTimeFactory
     }
 
     /**
+     * Return DateTime if DateTimeInterface else string
+     *
+     * @param string|DateTimeInterface $datetime
+     * @return string|DateTime
+     * @throws Exception
+     * @static
+     * @since 2.29.16 2020-01-24
+     */
+    public static function cnvrtDateTimeInterface( $value ) {
+        if( $value instanceof DateTimeInterface ) {
+            try {
+                $dtTmp = new DateTime( null, $value->getTimezone());
+                $dtTmp->setTimestamp( $value->getTimestamp() );
+            }
+            catch( Exception $e ) {
+                throw $e;
+            }
+            return $dtTmp;
+        }
+        return $value;
+    }
+
+    /**
      * Return internal date (format) with parameters based on input date
      *
-     * @param string|DateTime  $value
+     * @param string|DateTimeInterface  $value
      * @param array  $params
      * @param bool   $forceUTC
      * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since 2.29.1 2019-06-24
+     * @since 2.29.16 2020-01-24
      */
     public static function setDate( $value, $params = [], $forceUTC = false ) {
+        $value       = self::cnvrtDateTimeInterface( $value );
         $output      = [ Util::$LCparams => $params ];
         $isValueDate = ParameterFactory::isParamsValueSet( $output, Vcalendar::DATE );
         $paramTZid   = ParameterFactory::getParamTzid( $output );
@@ -487,14 +512,16 @@ class DateTimeFactory
     /*
      * Return DateTime modified from (ext) timezone
      *
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      * @param string   $tz
      * @return DateTime
+     * @throws Exception
      * @throws InvalidArgumentException
      * @static
      * @since  2.27.14 - 2019-02-04
      */
-    public static function setDateTimeTimeZone( DateTime $dateTime, $tz ) {
+    public static function setDateTimeTimeZone( DateTimeInterface $dateTime, $tz ) {
+        $dateTime = self::cnvrtDateTimeInterface( $dateTime );
         if( empty( $tz )) {
             return $dateTime;
         }

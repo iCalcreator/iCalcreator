@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.15
+ * Version   2.29.18
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -54,6 +55,7 @@ use function is_array;
 use function is_null;
 use function is_string;
 use function ksort;
+use function method_exists;
 use function property_exists;
 use function rtrim;
 use function strcasecmp;
@@ -70,7 +72,7 @@ use function usort;
  * Vcalendar class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.15 - 2020-01-19
+ * @since  2.29.16 - 2020-01-25
  */
 final class Vcalendar extends IcalBase
 {
@@ -203,7 +205,7 @@ final class Vcalendar extends IcalBase
      * RELATED-TO, URL, UID
      * @param string $propName
      * @return mixed
-     * @since  2.29.4 - 2019-07-02
+     * @since  2.29.17 - 2020-01-25
      */
     public function getProperty( $propName ) {
         static $PROPS = [
@@ -238,22 +240,23 @@ final class Vcalendar extends IcalBase
                 case ( Util::isPropInList( $propName, self::$MPROPS1 )) :
                     $component->getProperties( $propName, $output );
                     continue 2;
-                case ( ( 3 < strlen( $propName )) && ( self::UID == substr( $propName, -3 ))) :
+                case (( 3 < strlen( $propName )) && ( self::UID == substr( $propName, -3 ))) :
                     if( false !== ( $content = $component->getRecurrenceid())) {
                         $content = $component->getUid();
                     }
                     break;
-                case ( ( self::GEOLOCATION == $propName ) &&
+                case (( self::GEOLOCATION == $propName ) &&
                     ( ! property_exists( $component, strtolower( self::GEO )) ||
                         ( false === ( $content = $component->getGeoLocation())))) :
                     continue 2;
                 default :
                     $method = parent::getGetMethodName( $propName );
-                    if( false === ( $content = $component->{$method}())) {
+                    if( ! method_exists( $component, $method ) ||
+                        ( false === ( $content = $component->{$method}()))) {
                         continue 2;
                     }
             } // end switch
-            if( ( false === $content ) || empty( $content )) {
+            if(( false === $content ) || empty( $content )) {
                 continue;
             }
             switch( true ) {
@@ -408,7 +411,7 @@ final class Vcalendar extends IcalBase
      * @return bool
      * @access private
      * @static
-     * @since  2.29.1 - 2019-07-01
+     * @since  2.29.17 - 2020-01-25
      */
     private static function isFoundInCompsProps( CalendarComponent $component, array $argList ) {
         foreach( $argList as $propName => $propValue ) {
@@ -430,6 +433,9 @@ final class Vcalendar extends IcalBase
                     break;
             } // end switch
             $method = parent::getGetMethodName( $propName );
+            if( ! method_exists( $component, $method )) {
+                continue;
+            }
             if( false === ( $value = $component->{$method}())) { // single occurrence
                 continue; // missing/empty property
             }
@@ -605,11 +611,11 @@ final class Vcalendar extends IcalBase
      * DTSTART MUST be set for every component.
      * No date check.
      *
-     * @param mixed $startY                  (int) start Year,  default current Year
-     *                                       ALT. (obj) start date (datetime)
-     *                                       ALT. array selecOptions ( *[ <propName> => <uniqueValue> ] )
-     * @param mixed $startM                  (int) start Month, default current Month
-     *                                       ALT. (obj) end date (datetime)
+     * @param int|array|DateTimeInterface $startY    (int) start Year,  default current Year
+     *                                      ALT. DateTime start date
+     *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
+     * @param int|DateTimeInterface $startM    (int) start Month, default current Month
+     *                                      ALT. DateTime end date
      * @param int   $startD                  start Day,   default current Day
      * @param int   $endY                    end   Year,  default $startY
      * @param int   $endM                    end   Month, default $startM
@@ -624,7 +630,7 @@ final class Vcalendar extends IcalBase
      *                                       false          - one occurance of component only in output array
      * @return mixed   array on success, bool false on error
      * @throws Exception
-     * @since  2.26 - 2018-11-10
+     * @since  2.29.16 - 2020-01-24
      */
     public function selectComponents(
         $startY = null,
@@ -866,12 +872,12 @@ final class Vcalendar extends IcalBase
      *
      * @param string        $timezone valid timezone acceptable by PHP5 DateTimeZone
      * @param array         $xProp    *[x-propName => x-propValue]
-     * @param DateTime|int  $start    .. or unix timestamp
-     * @param DateTime|int  $end      .. or unix timestamp
+     * @param DateTimeInterface|int  $start    .. or unix timestamp
+     * @param DateTimeInterface|int  $end      .. or unix timestamp
      * @return Vcalendar
      * @throws Exception
      * @throws InvalidArgumentException;
-     * @since  2.27.15 - 2019-08-26
+     * @since  2.29.16 - 2020-01-25
      */
     public function vtimezonePopulate( $timezone = null, $xProp = [], $start = null, $end = null ) {
         return VtimezonePopulateFactory::process( $this, $timezone, $xProp, $start, $end );

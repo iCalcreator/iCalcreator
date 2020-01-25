@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateTime;
+use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
@@ -64,7 +65,7 @@ use function substr;
  * TRIGGER property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.14 2019-03-21
+ * @since 2.29.16 2020-01-24
  */
 trait TRIGGERtrait
 {
@@ -159,12 +160,12 @@ trait TRIGGERtrait
     /**
      * Set calendar component property trigger
      *
-     * @param DateTime|DateInterval|string $value
+     * @param DateTimeInterface|DateInterval|string $value
      * @param array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.2 2019-06-23
+     * @since 2.29.16 2020-01-24
      * @todo "If the trigger is set relative to START, then the "DTSTART"
      *        property MUST be present in the associated "VEVENT" or "VTODO"
      *        calendar component.  If an alarm is specified for an event with
@@ -197,10 +198,10 @@ trait TRIGGERtrait
             case ( ! $isParamsDateTimeSet && ( $value instanceof DateInterval )) :
                 return $this->setTriggerDateIntervalValue( $value, $params2 );
                 break;
-            // datetime DateTime
-            case ( $value instanceof DateTime ) :
+            // datetime DateTimeInterface
+            case ( $value instanceof DateTimeInterface ) :
                 $arg2[Vcalendar::VALUE] = Vcalendar::DATE_TIME; // force date-time...
-                return $this->setTriggerDateTimeValue( $value, $params2 );
+                return $this->setTriggerDateTimeValue( DateTimeFactory::cnvrtDateTimeInterface( $value ), $params2 );
                 break;
             // duration in a string
             case ( ! $isParamsDateTimeSet && DateIntervalFactory::isStringAndDuration( $value )) :

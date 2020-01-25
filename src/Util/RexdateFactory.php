@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
@@ -49,7 +50,7 @@ use function var_export;
  * iCalcreator EXDATE/RDATE support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.2 2019-06-23
+ * @since 2.29.16 2020-01-24
  */
 class RexdateFactory
 {
@@ -124,13 +125,13 @@ class RexdateFactory
     /**
      * Return prepared calendar component property exdate input
      *
-     * @param array $exdates
+     * @param string[]|DateTimeInterface[] $exdates
      * @param array $params
      * @return mixed array|bool
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since 2.29.2 2019-06-26
+     * @since 2.29.16 2020-01-24
      */
     public static function prepInputExdate( $exdates, $params = null ) {
         $output = [
@@ -150,7 +151,7 @@ class RexdateFactory
             }
         }
         foreach(( array_keys( $exdates )) as $eix ) {
-            $theExdate = $exdates[$eix];
+            $theExdate = DateTimeFactory::cnvrtDateTimeInterface( $exdates[$eix] );
             $wDate     = null;
             switch( true ) {
                 case ( $theExdate instanceof DateTime ) :
@@ -305,7 +306,7 @@ class RexdateFactory
      * @throws InvalidArgumentException
      * @throws Exception
      * @static
-     * @since 2.29.2 2019-06-26
+     * @since 2.29.16 2020-01-24
      */
     public static function prepInputRdate( array $rDates, $params=null ) {
         $output    = [ Util::$LCparams => ParameterFactory::setParams( $params, self::$DEFAULTVALUEDATETIME ) ];
@@ -336,7 +337,8 @@ class RexdateFactory
                     );
                     $output[Util::$LCvalue][] = $wDate;
                     break;
-                case ( $theRdate instanceof DateTime ) : // SINGLE DateTime
+                case ( $theRdate instanceof DateTimeInterface ) : // SINGLE DateTime
+                    $theRdate = DateTimeFactory::cnvrtDateTimeInterface( $theRdate );
                     $output[Util::$LCvalue][] = DateTimeFactory::conformDateTime(
                         $theRdate, $isValueDate, $forceUTC, $paramTZid
                     );
@@ -367,11 +369,11 @@ class RexdateFactory
      * @param string $paramTZid
      * @param bool   $isLocalTime
      * @return array
-     * @throws InvalidArgumentException
      * @throws Exception
+     * @throws InvalidArgumentException
      * @access private
      * @static
-     * @since 2.29.2 2019-06-26
+     * @since 2.29.16 2020-01-24
      */
     private static function getPeriod( array $period, $rpix, $isValueDate, & $paramTZid, & $isLocalTime ) {
         $forceUTC = ( Vcalendar::UTC == $paramTZid );
@@ -388,7 +390,8 @@ class RexdateFactory
                 $rPeriod = reset( $rPeriod );
             }
             switch( true ) {
-                case ( $rPeriod instanceof DateTime ) :
+                case ( $rPeriod instanceof DateTimeInterface ) :
+                    $rPeriod = DateTimeFactory::cnvrtDateTimeInterface( $rPeriod );
                     $wDate[$perX] = DateTimeFactory::conformDateTime(
                         $rPeriod, $isValueDate, $forceUTC, $paramTZid
                     );

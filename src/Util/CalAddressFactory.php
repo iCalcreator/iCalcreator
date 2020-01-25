@@ -39,6 +39,7 @@ use function ctype_digit;
 use function explode;
 use function in_array;
 use function is_array;
+use function method_exists;
 use function sprintf;
 use function strcasecmp;
 use function strpos;

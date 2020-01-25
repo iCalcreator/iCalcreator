@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.17
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -48,6 +48,7 @@ use function implode;
 use function is_array;
 use function is_null;
 use function ksort;
+use function method_exists;
 use function property_exists;
 use function sprintf;
 use function strcasecmp;
@@ -63,7 +64,7 @@ use function ucfirst;
  *  Parent class for calendar components
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.6 - 2019-01-02
+ * @since  2.29.17 - 2020-01-25
  */
 abstract class CalendarComponent extends IcalBase
 {
@@ -114,7 +115,7 @@ abstract class CalendarComponent extends IcalBase
      *
      * @param string $propName
      * @param array  $output incremented result array
-     * @since  2.27.1 - 2018-12-15
+     * @since  2.29.17 - 2020-01-25
      */
     public function getProperties( $propName, & $output ) {
         if( empty( $output )) {
@@ -124,6 +125,9 @@ abstract class CalendarComponent extends IcalBase
             return;
         }
         $method = parent::getGetMethodName( $propName );
+        if( ! method_exists( $this, $method )) {
+            return;
+        }
         while( false !== ( $content = $this->{$method}())) {
             if( empty( $content )) {
                 continue;

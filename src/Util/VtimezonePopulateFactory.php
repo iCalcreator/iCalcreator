@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.18
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,7 +30,7 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
-use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -64,7 +64,7 @@ use function sprintf;
  * END:VTIMEZONE
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.22 - 2019-08-26
+ * @since  2.29.16 - 2020-01-25
  *
  * Contributors :
  *   Yitzchok Lavi <icalcreator@onebigsystem.com>
@@ -93,13 +93,13 @@ class VtimezonePopulateFactory
      * @param Vcalendar $calendar iCalcreator calendar instance
      * @param string    $timezone valid timezone acceptable by PHP5 DateTimeZone
      * @param array     $xProp    *[x-propName => x-propValue]
-     * @param DateTime|int  $start    .. or unix timestamp
-     * @param DateTime|int  $end      .. or unix timestamp
+     * @param DateTimeInterface|int  $start    .. or unix timestamp
+     * @param DateTimeInterface|int  $end      .. or unix timestamp
      * @return Vcalendar
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since  2.27.15 - 2019-03-10
+     * @since  2.29.16 - 2020-01-25
      */
     public static function process( Vcalendar $calendar, $timezone = null, $xProp = [], $start = null, $end = null ) {
         $timezone   = self::getTimezone( $calendar, $timezone, $xProp );
@@ -186,8 +186,8 @@ class VtimezonePopulateFactory
      *
      * @param Vcalendar     $calendar
      * @param string        $timezone  valid timezone acceptable by PHP5 DateTimeZone
-     * @param DateTime|int  $start    .. or unix timestamp
-     * @param DateTime|int  $end      .. or unix timestamp
+     * @param DateTimeInterface|int  $start    .. or unix timestamp
+     * @param DateTimeInterface|int  $end      .. or unix timestamp
      * @return array
      * @access private
      * @throws  InvalidArgumentException
@@ -201,22 +201,26 @@ class VtimezonePopulateFactory
         static $NUMBEROFDAYSAFTER  = 548;
         static $FMTAFTER           = '+%d days';
         static $ERRMSG = 'Date are not in order: %d - %d';
-        if( ! empty( $start )) {
-            if( $start instanceof DateTime ) {
+        switch( true ) {
+            case empty( $start ) :
+                break;
+            case ( $start instanceof DateTimeInterface ) :
                 $start = $start->getTimestamp();
-            }
-            else {
+                break;
+            default :
                 Util::assertInteger( $start, __METHOD__ );
-            }
-        }
-        if( ! empty( $end )) {
-            if( $end instanceof DateTime ) {
+                break;
+        } // end switch
+        switch( true ) {
+            case empty( $end ) :
+                break;
+            case ( $end instanceof DateTimeInterface ) :
                 $end = $end->getTimestamp();
-            }
-            else {
+                break;
+            default :
                 Util::assertInteger( $end, __METHOD__ );
-            }
-        }
+                break;
+        } // end switch
         switch( true ) {
             case ( ! empty( $start ) && ! empty( $end )) :
                 break;

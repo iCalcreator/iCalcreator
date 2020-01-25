@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -363,12 +364,12 @@ class RecurFactory
      */
     public static function setRexrule( $rexrule, array $params ) {
         static $ERR    = 'Invalid input date \'%s\'';
-        static $RKEYS1 = [ 
-            Vcalendar::FREQ, Vcalendar::UNTIL, Vcalendar::COUNT, Vcalendar::INTERVAL, 
+        static $RKEYS1 = [
+            Vcalendar::FREQ, Vcalendar::UNTIL, Vcalendar::COUNT, Vcalendar::INTERVAL,
             Vcalendar::BYSECOND, Vcalendar::BYHOUR, Vcalendar::BYHOUR
         ];
-        static $RKEYS2 = [ 
-            Vcalendar::BYMONTHDAY, Vcalendar::BYYEARDAY, Vcalendar::BYWEEKNO, 
+        static $RKEYS2 = [
+            Vcalendar::BYMONTHDAY, Vcalendar::BYYEARDAY, Vcalendar::BYWEEKNO,
             Vcalendar::BYMONTH, Vcalendar::BYSETPOS, Vcalendar::WKST
         ];
         $input  = [];
@@ -384,7 +385,8 @@ class RecurFactory
                 case ( Vcalendar::UNTIL != $ruleLabel ) :
                     $input[$ruleLabel] = $ruleValue;
                     break;
-                case ( $ruleValue instanceof DateTime ) :
+                case ( $ruleValue instanceof DateTimeInterface ) :
+                    $ruleValue = DateTimeFactory::cnvrtDateTimeInterface( $ruleValue );
                     $input[$ruleLabel] = DateTimeFactory::setDateTimeTimeZone( $ruleValue, Vcalendar::UTC );
                     ParameterFactory::ifExistRemove( $params[Util::$LCparams], Vcalendar::TZID );
                     break;
@@ -1668,7 +1670,7 @@ class RecurFactory
             $date[self::$LCSEC] = 0;
         }
         if( isset( $step[self::$LCDAY] )) {
-            $daysInMonth = self::getDaysInMonth( 
+            $daysInMonth = self::getDaysInMonth(
                 $date[self::$LCHOUR],
                 $date[self::$LCMIN],
                 $date[self::$LCSEC],

@@ -30,8 +30,9 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use DateTime;
 use Exception;
+use DateTime;
+use DateTimeImmutable;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -40,7 +41,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * class DateTest, testing DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
  *
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-01-24
+ * @since  2.29.16 - 2020-01-24
  */
 class DateTimeUTCTest extends DtBase
 {
@@ -423,8 +424,9 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . ' ' . LTZ );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, Vcalendar::UTC );
         $dataArr[] = [
             11012,
             $dateTime,
@@ -462,7 +464,8 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime2 = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . ' ' . Vcalendar::UTC );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
         $dataArr[] = [
             11015,
             $dateTime2,
@@ -510,8 +513,9 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, Vcalendar::UTC )
         ];
 
-        $dateTime  = DateTimeFactory::factory( DATEYmdTHis . OFFSET );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, Vcalendar::UTC );
+        $dateTime  = new DateTimeImmutable( DATEYmdTHis . OFFSET );
+        $dateTime2 = DateTimeFactory::cnvrtDateTimeInterface( $dateTime );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, Vcalendar::UTC );
         $dataArr[] = [
             11022,
             $dateTime,

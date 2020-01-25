@@ -30,7 +30,8 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use DateTime;
+use DateTimeInterface;
+use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
@@ -96,12 +97,13 @@ trait EXDATEtrait
     /**
      * Set calendar component property exdate
      *
-     * @param mixed   $value
+     * @param string|string[]|DateTimeInterface|DateTimeInterface[] $value
      * @param array   $params
      * @param integer $index
      * @return static
-     * @throws \Exception
-     * @since 2.27.14 2019-02-10
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.29.16 2020-01-24
      */
     public function setExdate( $value = null, $params = [], $index = null ) {
         if( empty( $value ) ||
@@ -120,14 +122,14 @@ trait EXDATEtrait
     /**
      * Return $value is single input
      *
-     * @param mixed $value
+     * @param string|string[]|DateTimeInterface|DateTimeInterface[] $value
      * @return array
      * @access private
      * @static
-     * @since 2.29.2 2019-06-23
+     * @since 2.29.16 2020-01-24
      */
     private static function checkSingleExdates( $value ) {
-        if( $value instanceof DateTime ) {
+        if( $value instanceof DateTimeInterface ) {
             return [ $value ];
         }
         if( DateTimeFactory::isStringAndDate( $value )) {
