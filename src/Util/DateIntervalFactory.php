@@ -131,7 +131,7 @@ class DateIntervalFactory
             return false;
         }
         $value = StringFactory::trimTrailNL( trim( $value ));
-        return ( 3 <= strlen( trim( $value ))) && ( in_array( $value{0}, $PREFIXARR ));
+        return ( 3 <= strlen( trim( $value ))) && ( in_array( $value[0], $PREFIXARR ));
     }
 
     /**

@@ -76,7 +76,7 @@ class StringFactory
             $line = rtrim( $rows[$i], Util::$CRLF );
             $i1 = $i + 1;
             while(( $i < $cnt ) && isset( $rows[$i1] ) && ! empty( $rows[$i1] ) &&
-                in_array( $rows[$i1]{0}, $CHARs )) {
+                in_array( $rows[$i1][0], $CHARs )) {
                 $i += 1;
                 $line .= rtrim( substr( $rows[$i], 1 ), Util::$CRLF );
                 $i1 = $i + 1;
