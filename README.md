@@ -24,7 +24,7 @@ docs/summary and docs/using for details.
 
 Stable 2.28.2 *(master)*.
 
-Release 2.30 candidate (tag 2.29.18)
+Release 2.30 candidate (tag 2.29.19)
 
 ###### Sponsorship
 
@@ -275,3 +275,6 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 ```
+###### License
+
+iCalcreator is licensed under the LGPLv3 License.

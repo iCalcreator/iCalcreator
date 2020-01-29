@@ -9,6 +9,9 @@
         "management",
         "calendar",
         "vCalendar",
+        "event",
+        "todo",
+        "alarm",
         "vevent",
         "vtodo",
         "vjournal",
@@ -18,8 +21,7 @@
         "standard",
         "daylight"
     ],
-    "time" : "2019-09-04",
-    "license": "LGPL-3.0-or-later",
+    "license": "lgpl-3.0",
     "support": {
        "issues": "https://github.com/iCalcreator/iCalcreator/issues"
     },
