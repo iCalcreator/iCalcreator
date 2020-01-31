@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.20
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -46,7 +46,7 @@ use function trim;
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.14 - 2019-02-14
+ * @since  2.29.20 - 2020-01-31
  */
 class DateIntervalFactory
 {
@@ -121,7 +121,7 @@ class DateIntervalFactory
      * @param mixed  $value
      * @return bool
      * @static
-     * @since  2.16.7 - 2018-11-26
+     * @since  2.29.20 - 2020-01-31
      */
     public static function isStringAndDuration( $value ) {
         static $PREFIXARR = [ 'P', '+', '-' ];
@@ -130,7 +130,7 @@ class DateIntervalFactory
         }
         $value = trim( $value );
         $value = StringFactory::trimTrailNL( $value );
-        return (( 3 <= strlen( $value )) && ( in_array( $value{0}, $PREFIXARR )));
+        return (( 3 <= strlen( $value )) && ( in_array( $value[0], $PREFIXARR )));
     }
 
     /**

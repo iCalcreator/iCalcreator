@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.20
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -56,7 +56,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.14 - 2019-09-03
+ * @since  2.29.20 - 2020-01-31
  */
 class StringFactory
 {
@@ -74,7 +74,7 @@ class StringFactory
      * @param array $rows
      * @return array
      * @static
-     * @since  2.29.9 - 2019-03-30
+     * @since  2.29.20 - 2020-01-31
      */
     public static function concatRows( $rows ) {
         static $CHARs = [ ' ', "\t" ];
@@ -85,7 +85,7 @@ class StringFactory
             $i1 = $i + 1;
             while(( $i < $cnt ) && isset( $rows[$i1] ) &&
                  ! empty( $rows[$i1] ) &&
-                in_array( $rows[$i1]{0}, $CHARs )) {
+                in_array( $rows[$i1][0], $CHARs )) {
                 $i += 1;
                 $line .= rtrim( substr( $rows[$i], 1 ), Util::$CRLF );
                 $i1 = $i + 1;

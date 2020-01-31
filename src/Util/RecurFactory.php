@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.21
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -64,7 +64,7 @@ use function var_export;
  * iCalcreator recur support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.16 - 2019-03-08
+ * @since  2.29.21 - 2020-01-31
  */
 class RecurFactory
 {
@@ -972,7 +972,7 @@ class RecurFactory
      * @return array            array([Ymd] => bool)
      * @throws Exception
      * @static
-     * @since  2.27.16 - 2019-03-06
+     * @since  2.29.21 - 2020-01-31
      */
     public static function recurYearlySimple1( array $recur, $wDateIn, $fcnStartIn, $fcnEndIn = false ) {
         list( $wDate, $wDateYmd, $fcnStartYmd, $endYmd ) =
@@ -1020,9 +1020,15 @@ class RecurFactory
                         break;
                     default :
                         $nextKey   = array_keys( $byMonthList, $month )[0] + 1;
-                        $currMonth = $month = $byMonthList[$nextKey];
+                        if( isset( $byMonthList[$nextKey] )) {
+                            $currMonth = $month = $byMonthList[$nextKey];
+                            break;
+                        }
+                        $currYear    = null;
+                        $isLastMonth = true;
+                        continue 2;
                         break;
-                }
+                } // end switch
                 $isLastMonth = ( $month == end( $byMonthList ));
                 $wDate->setDate( $year, $month, $day );
             } // end if currMonth
@@ -1080,7 +1086,8 @@ class RecurFactory
         $byMonthList = [];
         if( isset( $recur[Vcalendar::BYMONTH] )) {
             $byMonthList = is_array( $recur[Vcalendar::BYMONTH] )
-                ? $recur[Vcalendar::BYMONTH] : [ $recur[Vcalendar::BYMONTH] ];
+                ? $recur[Vcalendar::BYMONTH]
+                : [ $recur[Vcalendar::BYMONTH] ];
             sort( $byMonthList, SORT_NUMERIC );
             $hasMonth = true;
         }
@@ -1799,7 +1806,7 @@ class RecurFactory
      * @access private
      * @throws Exception
      * @static
-     * @since  2.29.2 - 2019-07-02
+     * @since  2.29.21 - 2020-01-31
      */
     private static function reFormatDate( $inputDate ) {
         static $Y = 'Y';
@@ -1808,6 +1815,9 @@ class RecurFactory
         static $H = 'H';
         static $I = 'i';
         static $S = 'i';
+        if( is_array( $inputDate )) {
+            return $inputDate;
+        }
         if( ! $inputDate instanceof DateTime ) {
             $inputDate = DateTimeFactory::factory( $inputDate );
         }

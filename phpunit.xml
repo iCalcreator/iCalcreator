@@ -181,10 +181,13 @@
   <logging>
       <!-- Remove or comment after your own choice-->
       <!-- All logs will be saved in 'testDocs' folder -->
+
+      <!--
       <log type="coverage-html"
            target="testDocs/PHPUnitCoverage"
            lowUpperBound="35"
            highLowerBound="70"/>
+      -->
       <!--log type="coverage-clover"
            target="testDocs/coverage.xml"/-->
       <!--log type="coverage-php"

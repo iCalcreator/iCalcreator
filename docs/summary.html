@@ -5,7 +5,7 @@
  copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.29.18
+ Version   2.29.21
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -29,12 +29,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.29.18 summary</title>
+    <title>iCalcreator 2.29.21 summary</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
     <meta name="copyright"   content="2007-2020 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.29.18">
+    <meta name="description" content="using iCalcreator v2.29.21">
     <style type="text/css">
         * {
             FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -144,9 +144,9 @@
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.29.18</p>
+<p class="header">iCalcreator v2.29.21</p>
 <p>
-    iCalcreator v2.29.18<br>
+    iCalcreator v2.29.21<br>
     Copyright &copy; 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
     <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -195,7 +195,7 @@
     iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.29.18 version (and later), <em>PHP</em> version 5.6+ is required.
+For iCalcreator 2.29.21 version (and later), <em>PHP</em> version 5.6+ is required.
 </p>
 
 <h4>iCal</h4>
@@ -243,12 +243,10 @@ Any references to rfc2445, below, corresponds to rfc5545.
 
 <h4>Support</h4>
 <p>
-For previous iCalcreator releases support upon (paid) request only.
+For bug report or support request, use <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>.
 </p>
 <p>
-Use the issues <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank">page</a>
-for queries, improvement/development issues or professional support and development.
-Please note that paid support or consulting service has the highest priority.
+For previous iCalcreator (master) releases or non-emergency issues, support upon (paid) request only.
 </p>
 <p>
 kigkonsult offer professional services for software support, design and new/re-development, customizations and adaptations
@@ -259,15 +257,8 @@ of <em>PHP</em>/<em>MySQL</em> solutions with focus on software lifecycle manage
 <p>
 You can show your appreciation for our free software,
 and can support future development by making a donation to the kigkonsult project iCalcreator
-using <a href="https://paypal.me/kigkonsult?locale.x=en_US" rel="nofollow">paypal.me/kigkonsult</a>.
+using <a href="https://paypal.me/kigkonsult" rel="nofollow" target="_blank">paypal.me/kigkonsult</a>.
 For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
-</p>
-
-<h4>Contact</h4>
-<p>
-Use the <a href="https://github.com/iCalcreator/iCalcreator/issues" title="kigkonsult.se issues" target="_blank"> github issues</a>
-for queries, improvement/development issues or professional support and development.
-Please note that paid support or consulting service has the highest priority.
 </p>
 
 <h4>Downloads and usage examples</h4>
@@ -285,13 +276,13 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.18/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.21/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 <dd>The iCalcreator invoker has changed since previous version!
 </dl>
 
 <p>
-iCalcreator 2.29.18 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.29.21 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -452,8 +443,8 @@ $calendarString = $vcalendar
 
 <h2>PARSE</h2>
 <h4>iCal, rfc5545 / rfc2445 </h4>
-<p>How to parse an iCal (external/file) resource</p>
-<p class="example">&lt;?php
+<p>How to parse an iCal (local file) resource</p>
+<p class="example 1">&lt;?php
 
 use Kigkonsult\Icalcreator\Vcalendar;
 
@@ -466,6 +457,25 @@ $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 
         // <span class="comment">parse iCal contents</span>
 $vcalendar-&gt;parse( $iCalContent );
+
+<p class="label">parse example 2</p>
+<p>
+Here using <a href="https://github.com/iCalcreator/UrlRsrc" target="_blank" title="download UrlRsrc">UrlRsrc</a> to download an internet (URL) resource.
+</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Http\UrlRsrc;
+
+        // <span class="comment">set Your unique id, </span>
+        // <span class="comment">site info for the Vcalendar PRODID property</span>
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+        // <span class="comment">get iCal contents from URL resource</span>
+$iCalContent = UrlRsrc::getContent( &quot;http://www.ical.net/calendars/calendar.ics&quot; );
+
+        // <span class="comment">parse iCal contents</span>
+$vcalendar-&gt;parse( $iCalContent );
+
+</p>
 
 <h4>xCal, rfc6321 (XML)</h4>
 <p>
@@ -708,7 +718,7 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
     <tr><td>Copyright<td>(c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.29.18
+    <tr><td>Version  <td>2.29.21
     <tr><td class="top">License  <td>
         Subject matter of licence is the software iCalcreator.<br>
         The above copyright, link, package and version notices,<br>

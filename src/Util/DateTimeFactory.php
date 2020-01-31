@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.21
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -39,6 +39,7 @@ use Kigkonsult\Icalcreator\Vcalendar;
 use function ctype_digit;
 use function date_default_timezone_get;
 use function in_array;
+use function is_null;
 use function is_string;
 use function sprintf;
 use function strcasecmp;
@@ -54,7 +55,7 @@ use function var_export;
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.16 2020-01-24
+ * @since  2.29.21 - 2020-01-31
  */
 class DateTimeFactory
 {
@@ -86,16 +87,19 @@ class DateTimeFactory
     /**
      * Return new DateTime object instance
      *
-     * @param string $dateTimeString
+     * @param string $dateTimeString  default 'now'
      * @param string $timeZoneString
      * @return DateTime
      * @throws InvalidArgumentException
      * @throws Exception
      * @static
-     * @since  2.27.14 - 2019-07-02
+     * @since  2.29.21 - 2020-01-31
      */
-    public static function factory( $dateTimeString = 'now', $timeZoneString = null ) {
+    public static function factory( $dateTimeString = null, $timeZoneString = null ) {
         static $AT = '@';
+        if( is_null( $dateTimeString )) {
+            $dateTimeString = 'now';
+        }
         if(( $AT == $dateTimeString[0] ) && ctype_digit( substr( $dateTimeString, 1 ))) {
             try {
                 $dateTime = new DateTime( $dateTimeString );
@@ -420,22 +424,24 @@ class DateTimeFactory
     /**
      * Return string formatted DateTime, if offset then set timezone UTC
      *
-     * @param DateTime $datetime
+     * @param DateTimeInterface $dateTime
      * @param bool     $isDATE
      * @param bool     $isLocalTime
      * @return string
+     * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since  2.29.1 - 2019-06-24
+     * @since  2.29.21 - 2020-01-31
      * @usedby RexdateFactory::getPeriod()/prepInputRdate() + <dateProp>::get<dateProp>()
      */
-    public static function dateTime2Str( $datetime, $isDATE = false, $isLocalTime = false ) {
-        if( self::dateTimeHasOffset( $datetime )) {
-            $datetime = self::setDateTimeTimeZone( $datetime, $datetime->getTimezone()->getName());
+    public static function dateTime2Str( $dateTime, $isDATE = false, $isLocalTime = false ) {
+        $dateTime = self::cnvrtDateTimeInterface( $dateTime );
+        if( self::dateTimeHasOffset( $dateTime )) {
+            $dateTime = self::setDateTimeTimeZone( $dateTime, $dateTime->getTimezone()->getName());
         }
         $fmt    = $isDATE ? self::$Ymd : self::$YmdTHis;
-        $output = $datetime->format( $fmt );
-        if( ! $isDATE && ! $isLocalTime && DateTimeZoneFactory::isUTCtimeZone( $datetime->getTimezone()->getName())) {
+        $output = $dateTime->format( $fmt );
+        if( ! $isDATE && ! $isLocalTime && DateTimeZoneFactory::isUTCtimeZone( $dateTime->getTimezone()->getName())) {
             $output .= DateTimeZoneFactory::$UTCARR[0];
         }
         return $output;

@@ -24,11 +24,11 @@ docs/summary and docs/using for details.
 
 Stable 2.28.2 *(master)*.
 
-Release 2.30 candidate (tag 2.29.19)
+Release 2.30 candidate (tag 2.29.21)
 
 ###### Sponsorship
 
-Donation using <a href="https://paypal.me/kigkonsult?locale.x=en_US" rel="nofollow">paypal.me/kigkonsult</a> are appreciated. 
+Donation using <a href="https://paypal.me/kigkonsult" rel="nofollow">paypal.me/kigkonsult</a> are appreciated. 
 For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 
 ###### Usage

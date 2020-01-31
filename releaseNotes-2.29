@@ -72,3 +72,7 @@ v2.29.16  Methods with DateTime arg now accepts DateTimeInterface
 v2.29.17  assert for method exists
 
 v2.29.18  xml header update
+
+v2.29.20  PHP 7.4 compability (Util/DateIntervalFactory, Util/StringFactory)
+
+v2.29.21  more 2.29.16 (DateTimeFactory, RecurFactory)
