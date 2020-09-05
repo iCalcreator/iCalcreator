@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,9 +49,9 @@ abstract class Vcomponent extends CalendarComponent
      * @since  2.27.6 - 2018-12-28
      * @throws Exception
      */
-    public function __construct( $config = [] ) {
+    public function __construct( $config = [] )
+    {
         parent::__construct( $config );
         $this->setDtstamp();
     }
-
 }

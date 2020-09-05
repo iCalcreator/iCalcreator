@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -42,13 +42,12 @@ use Kigkonsult\Icalcreator\Util\Util;
  * REFRESH_INTERVAL property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.25 2019-06-29
+ * @since 2.29.5 2019-06-29
  */
 trait REFRESH_INTERVALrfc7986trait
 {
     /**
      * @var array component property REFRESH_INTERVAL value
-     * @access protected
      */
     protected $refreshinterval = null;
 
@@ -58,18 +57,24 @@ trait REFRESH_INTERVALrfc7986trait
      * @return string
      * @throws Exception
      */
-    public function createRefreshinterval() {
+    public function createRefreshinterval()
+    {
         if( empty( $this->refreshinterval )) {
             return null;
         }
         if( empty( $this->refreshinterval[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
+            return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::REFRESH_INTERVAL )
                 : null;
         }
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet( $this->refreshinterval[Util::$LCvalue] )) {
+        if( DateIntervalFactory::isDateIntervalArrayInvertSet(
+            $this->refreshinterval[Util::$LCvalue] )
+        ) {
             try { // fix pre 7.0.5 bug
-                $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval( $this->refreshinterval[Util::$LCvalue] );
+                $dateInterval =
+                    DateIntervalFactory::DateIntervalArr2DateInterval(
+                        $this->refreshinterval[Util::$LCvalue]
+                    );
             }
             catch( Exception $e ) {
                 throw $e;
@@ -90,7 +95,8 @@ trait REFRESH_INTERVALrfc7986trait
      *
      * @return bool
      */
-    public function deleteRefreshinterval( ) {
+    public function deleteRefreshinterval()
+    {
         $this->refreshinterval = null;
         return true;
     }
@@ -102,18 +108,25 @@ trait REFRESH_INTERVALrfc7986trait
      * @return bool|array
      * @throws Exception
      */
-    public function getRefreshinterval( $inclParam = false ) {
+    public function getRefreshinterval( $inclParam = false )
+    {
         if( empty( $this->refreshinterval )) {
             return false;
         }
         if( empty( $this->refreshinterval[Util::$LCvalue] )) {
-            return ( $inclParam ) ? $this->refreshinterval : $this->refreshinterval[Util::$LCvalue];
+            return ( $inclParam )
+                ? $this->refreshinterval
+                : $this->refreshinterval[Util::$LCvalue];
         }
         $refreshinterval = $this->refreshinterval;
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet( $refreshinterval[Util::$LCvalue] )) {
+        if( DateIntervalFactory::isDateIntervalArrayInvertSet(
+            $refreshinterval[Util::$LCvalue] )
+        ) {
             try { // fix pre 7.0.5 bug
                 $refreshinterval[Util::$LCvalue] =
-                    DateIntervalFactory::DateIntervalArr2DateInterval( $this->refreshinterval[Util::$LCvalue] );
+                    DateIntervalFactory::DateIntervalArr2DateInterval(
+                        $this->refreshinterval[Util::$LCvalue]
+                    );
             }
             catch( Exception $e ) {
                 throw $e;
@@ -131,7 +144,8 @@ trait REFRESH_INTERVALrfc7986trait
      * @throws InvalidArgumentException
      * @throws Exception
      */
-    public function setRefreshinterval( $value  = null, $params = [] ) {
+    public function setRefreshinterval( $value  = null, $params = [] )
+    {
         static $FMTERR = 'Invalid %s value';
         switch( true ) {
             case ( empty( $value )) :
@@ -150,14 +164,17 @@ trait REFRESH_INTERVALrfc7986trait
                 $value = DateIntervalFactory::removePlusMinusPrefix( $value ); // can only be positive
                 try {
                     $dateInterval = new DateInterval( $value );
-                    $value        = DateIntervalFactory::conformDateInterval( $dateInterval );
+                    $value        =
+                        DateIntervalFactory::conformDateInterval( $dateInterval );
                 }
                 catch( Exception $e ) {
                     throw new InvalidArgumentException( $e->getMessage(), null, $e );
                 }
                 break;
             default :
-                throw new InvalidArgumentException( sprintf( $FMTERR, self::REFRESH_INTERVAL ));
+                throw new InvalidArgumentException(
+                    sprintf( $FMTERR, self::REFRESH_INTERVAL )
+                );
                 break;
         } // end switch
         $this->refreshinterval = [

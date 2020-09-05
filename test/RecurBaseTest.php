@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -99,31 +99,41 @@ abstract class RecurBaseTest extends TestCase
 
         $strCase = str_pad( $case, 12 );
         echo PHP_EOL .  // test ###
-            $strCase . 'resultOld  time:' . number_format( $execTime1, 6 ) . ' : ' . implode( ' - ', array_keys( $result1 )
-            ) . PHP_EOL; // test ###
+            $strCase . 'resultOld  time:' . number_format( $execTime1, 6 ) . ' : ' . implode( ' - ', array_keys( $result1 )) . PHP_EOL; // test ###
         echo   // test ###
-            $strCase . 'resultNew  time:' . number_format( $execTime2, 6 ) . ' : ' . implode( ' - ', array_keys( $result2 )
-            ) . PHP_EOL; // test ###
+            $strCase . 'resultNew  time:' . number_format( $execTime2, 6 ) . ' : ' . implode( ' - ', array_keys( $result2 )) . PHP_EOL; // test ###
         echo
-            $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects
-            ) . PHP_EOL; // test ###
+            $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects  ) . PHP_EOL; // test ###
 
+        $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
+        $result = array_keys( $result1 );
         $this->assertEquals(
             $expects,
-            array_keys( $result1 ),
-            sprintf( self::$ERRFMT, __FUNCTION__, $case,
-                     $saveStartDate->format( 'Ymd' ),
-                     $end->format( 'Ymd' ),
-                     var_export( $recur, true )
+            $result,
+            sprintf(
+                self::$ERRFMT,
+                __FUNCTION__,
+                $case . ' test #1',
+                $saveStartDate->format( 'Ymd' ),
+                $end->format( 'Ymd' ),
+                PHP_EOL . $recurDisp .
+                PHP_EOL . 'got : ' . implode( ',', $result ) .
+                PHP_EOL . 'exp : ' . implode( ',', $expects )
             )
         );
+        $result = array_keys( $result2 );
         $this->assertEquals(
             $expects,
-            array_keys( $result2 ),
-            sprintf( self::$ERRFMT, __FUNCTION__, $case,
-                     $saveStartDate->format( 'Ymd' ),
-                     $end->format( 'Ymd' ),
-                     var_export( $recur, true )
+            $result,
+            sprintf(
+                self::$ERRFMT,
+                __FUNCTION__,
+                $case . ' test #2',
+                $saveStartDate->format( 'Ymd' ),
+                $end->format( 'Ymd' ),
+                $recurDisp .
+                PHP_EOL . 'exp : ' . implode( ',', $expects ) .
+                PHP_EOL . 'got : ' . implode( ',', $result )
             )
         );
         return $result1;

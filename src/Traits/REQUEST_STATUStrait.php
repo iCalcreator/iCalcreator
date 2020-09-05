@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -50,7 +50,6 @@ trait REQUEST_STATUStrait
 {
     /**
      * @var array component property REQUEST-STATUS value
-     * @access protected
      */
     protected $requeststatus = null;
 
@@ -60,7 +59,8 @@ trait REQUEST_STATUStrait
      * @return string
      * @since 2.29.9 2019-08-05
      */
-    public function createRequeststatus() {
+    public function createRequeststatus()
+    {
         if( empty( $this->requeststatus )) {
             return null;
         }
@@ -78,14 +78,19 @@ trait REQUEST_STATUStrait
                 Util::$SEMIC .
                 StringFactory::strrep( $rStat[Util::$LCvalue][self::STATDESC] );
             if( isset( $rStat[Util::$LCvalue][self::EXTDATA] )) {
-                $content .= Util::$SEMIC . StringFactory::strrep( $rStat[Util::$LCvalue][self::EXTDATA] );
+                $content .= Util::$SEMIC .
+                    StringFactory::strrep( $rStat[Util::$LCvalue][self::EXTDATA] );
             }
             $output .= StringFactory::createElement(
                 self::REQUEST_STATUS,
-                ParameterFactory::createParams( $rStat[Util::$LCparams], [ self::LANGUAGE ], $lang ),
+                ParameterFactory::createParams(
+                    $rStat[Util::$LCparams],
+                    [ self::LANGUAGE ],
+                    $lang
+                ),
                 $content
             );
-        }
+        } // end foreach
         return $output;
     }
 
@@ -96,12 +101,17 @@ trait REQUEST_STATUStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRequeststatus( $propDelIx = null ) {
+    public function deleteRequeststatus( $propDelIx = null )
+    {
         if( empty( $this->requeststatus )) {
             unset( $this->propDelIx[self::REQUEST_STATUS] );
             return false;
         }
-        return $this->deletePropertyM( $this->requeststatus, self::REQUEST_STATUS, $propDelIx );
+        return $this->deletePropertyM(
+            $this->requeststatus,
+            self::REQUEST_STATUS,
+            $propDelIx
+        );
     }
 
     /**
@@ -112,12 +122,18 @@ trait REQUEST_STATUStrait
      * @return bool|array
      * @since 2.29.9 2019-08-05
      */
-    public function getRequeststatus( $propIx = null, $inclParam = false ) {
+    public function getRequeststatus( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->requeststatus )) {
             unset( $this->propIx[self::REQUEST_STATUS] );
             return false;
         }
-        return $this->getPropertyM( $this->requeststatus, self::REQUEST_STATUS, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->requeststatus,
+            self::REQUEST_STATUS,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**

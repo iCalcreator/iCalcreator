@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -81,8 +81,6 @@ final class Vtodo extends VetComponent
 
     /**
      * @var string
-     * @access protected
-     * @static
      */
     protected static $compSgn = 't';
 
@@ -91,7 +89,8 @@ final class Vtodo extends VetComponent
      *
      * @since  2.29.9 - 2019-08-05
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if( ! empty( $this->components )) {
             foreach( $this->components as $cix => $component ) {
                 $this->components[$cix]->__destruct();
@@ -157,7 +156,8 @@ final class Vtodo extends VetComponent
      * @throws Exception  (on Duration/Rdate err)
      * @since  2.29.9 - 2019-08-05
      */
-    public function createComponent() {
+    public function createComponent()
+    {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createUid();
@@ -199,5 +199,4 @@ final class Vtodo extends VetComponent
         $component  .= $this->createSubComponent();
         return $component . sprintf( self::$FMTEND, $compType );
     }
-
 }

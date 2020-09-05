@@ -5,7 +5,7 @@
  copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.29.18
+ Version   2.29.25
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -36,7 +36,7 @@
          processIsolation="true"
          syntaxCheck="false"
          bootstrap="autoload.php"
-        >
+>
     <testsuites>
         <testsuite name="Vcalendar Tests">
             <file>./test/VcalendarTest.php</file>
@@ -78,6 +78,7 @@
             <file>./test/RecurMonthTest.php</file>
             <file>./test/RecurWeekTest.php</file>
             <file>./test/RecurDayTest.php</file>
+            <file>./test/Exceptions7Test.php</file>
             <file>./test/SelectComponentsTest.php</file>
         </testsuite>
         <testsuite name="vCard Tests">
@@ -87,8 +88,7 @@
     <filter>
         <whitelist
                 addUncoveredFilesFromWhitelist="true"
-                processUncoveredFilesFromWhitelist="true"
-        >
+                processUncoveredFilesFromWhitelist="true">
             <file>./src/CalendarComponent.php</file>
             <file>./src/Daylight.php</file>
             <file>./src/DScomponent.php</file>
@@ -168,6 +168,7 @@
             <file>./src/Util/IcalXMLFactory.php</file>
             <file>./src/Util/ParameterFactory.php</file>
             <file>./src/Util/RecurFactory.php</file>
+            <file>./src/Util/RecurFactory2.php</file>
             <file>./src/Util/RegulateTimezoneFactory.php</file>
             <file>./src/Util/RexdateFactory.php</file>
             <file>./src/Util/SelectFactory.php</file>
@@ -178,35 +179,38 @@
             <file>./src/Util/VtimezonePopulateFactory.php</file>
         </whitelist>
     </filter>
-  <logging>
-      <!-- Remove or comment after your own choice-->
-      <!-- All logs will be saved in 'testDocs' folder -->
+    <logging>
+        <!-- Remove or comment after your own choice-->
+        <!-- All logs will be saved in 'testDocs' folder -->
 
-      <!--
-      <log type="coverage-html"
-           target="testDocs/PHPUnitCoverage"
-           lowUpperBound="35"
-           highLowerBound="70"/>
-      -->
-      <!--log type="coverage-clover"
-           target="testDocs/coverage.xml"/-->
-      <!--log type="coverage-php"
-           target="testDocs/coverage.serialized"/-->
-      <log type="coverage-text"
-           target="testDocs/PHPUnitReport.txt"
-           showUncoveredFiles="true"/>
-      <!--log type="json"
-           target="testDocs/logfile.json"/-->
-      <!--log type="tap"
-           target="testDocs/logfile.tap"/-->
-      <!--log type="junit"
-           target="testDocs/logfile.xml"
-           logIncompleteSkipped="false"/-->
-      <!--log type="testdox-html"
-           target="testDocs/testdox.html"/-->
-      <!--log type="testdox-text"
-           target="testDocs/testdox.txt"/-->
-  </logging>
+        <!-- -->
+        <log type="coverage-html"
+             target="testDocs/PHPUnitCoverage"
+             lowUpperBound="35"
+             highLowerBound="70"/>
+        <!-- -->
+
+        <!--log type="coverage-clover"
+             target="testDocs/coverage.xml"/-->
+        <!--log type="coverage-php"
+             target="testDocs/coverage.serialized"/-->
+        <!--
+        <log type="coverage-text"
+             target="testDocs/PHPUnitReport.txt"
+             showUncoveredFiles="true"/>
+        -->
+        <!--log type="json"
+             target="testDocs/logfile.json"/-->
+        <!--log type="tap"
+             target="testDocs/logfile.tap"/-->
+        <!--log type="junit"
+             target="testDocs/logfile.xml"
+             logIncompleteSkipped="false"/-->
+        <!--log type="testdox-html"
+             target="testDocs/testdox.html"/-->
+        <!--log type="testdox-text"
+             target="testDocs/testdox.txt"/-->
+    </logging>
     <php>
         <!-- define the (YmdTHis) dateTime -->
         <const name="DATEYmdTHis" value="20160229T010000"/>

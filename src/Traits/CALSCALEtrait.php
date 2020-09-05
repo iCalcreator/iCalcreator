@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -46,7 +46,6 @@ trait CALSCALEtrait
 {
     /**
      * @var string calendar property CALSCALE
-     * @access protected
      */
     protected $calscale = null;
 
@@ -55,7 +54,8 @@ trait CALSCALEtrait
      *
      * @return string
      */
-    public function createCalscale() {
+    public function createCalscale()
+    {
         if( empty( $this->calscale )) {
             $this->calscale = Vcalendar::GREGORIAN;
         }
@@ -68,7 +68,8 @@ trait CALSCALEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteCalscale() {
+    public function deleteCalscale()
+    {
         $this->calscale = null;
         return true;
     }
@@ -79,7 +80,8 @@ trait CALSCALEtrait
      * @return string
      * @since  2.27.1 - 2018-12-15
      */
-    public function getCalscale() {
+    public function getCalscale()
+    {
         if( empty( $this->calscale )) {
             $this->calscale = Vcalendar::GREGORIAN;
         }
@@ -94,7 +96,8 @@ trait CALSCALEtrait
      * @throws InvalidArgumentException;
      * @since  2.29.14 - 2019-09-03
      */
-    public function setCalscale( $value ) {
+    public function setCalscale( $value )
+    {
         if( empty( $value )) {
             $value = Vcalendar::GREGORIAN;
         }

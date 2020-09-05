@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait COLORrfc7986trait
 {
     /**
      * @var array component property COLOR value
-     * @access protected
      */
     protected $color = null;
 
@@ -55,13 +54,15 @@ trait COLORrfc7986trait
      * @return string
      * @since 2.29.5 2019-06-16
      */
-    public function createColor() {
+    public function createColor()
+    {
         if( empty( $this->color )) {
             return null;
         }
         if( empty( $this->color[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
-                ? StringFactory::createElement( self::COLOR ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::COLOR )
+                : null;
         }
         return StringFactory::createElement(
             self::COLOR,
@@ -76,7 +77,8 @@ trait COLORrfc7986trait
      * @return bool
      * @since 2.29.5 2019-06-16
      */
-    public function deleteColor() {
+    public function deleteColor()
+    {
         $this->color = null;
         return true;
     }
@@ -88,7 +90,8 @@ trait COLORrfc7986trait
      * @return bool|array
      * @since 2.29.5 2019-06-16
      */
-    public function getColor( $inclParam = false ) {
+    public function getColor( $inclParam = false )
+    {
         if( empty( $this->color )) {
             return false;
         }
@@ -103,7 +106,8 @@ trait COLORrfc7986trait
      * @return static
      * @since 2.29.14 2019-09-03
      */
-    public function setColor( $value = null, $params = [] ) {
+    public function setColor( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COLOR );
             $value  = Util::$SP0;

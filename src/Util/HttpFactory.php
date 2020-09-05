@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.15
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -141,9 +141,13 @@ class HttpFactory
      * @static
      * @since  2.29.4 - 2019-07-02
      */
-    private static function getFakedFilename() {
+    private static function getFakedFilename()
+    {
         static $DOTICS = '.ics';
-        return date( DateTimeFactory::$YmdHis, intval( microtime( true ))) . $DOTICS;
+        return date(
+            DateTimeFactory::$YmdHis,
+            intval( microtime( true ))
+            ) . $DOTICS;
     }
 
     /**
@@ -154,12 +158,15 @@ class HttpFactory
      * @static
      * @since  2.27.3 - 2018-12-28
      */
-    public static function assertUrl( $url ) {
+    public static function assertUrl( $url )
+    {
         static $UC   = '_';
         static $URN  = 'urn';
         static $HTTP = 'http://';
         static $MSG  = 'URL validity error #%d, \'%s\'';
-        $url2 = ( false !== strpos( $url, $UC )) ? str_replace( $UC, Util::$MINUS, $url ) : $url;
+        $url2 = ( false !== strpos( $url, $UC ))
+            ? str_replace( $UC, Util::$MINUS, $url )
+            : $url;
         $no   = 0;
         do {
             if( false !== filter_var( $url2, FILTER_VALIDATE_URL )) {
@@ -179,5 +186,4 @@ class HttpFactory
             throw new InvalidArgumentException( sprintf( $MSG, $no, $url ));
         }
     }
-
 }

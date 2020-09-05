@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.17
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -64,7 +64,6 @@ class SelectFactory
 {
     /**
      * @var string  component end date properties
-     * @access private
      * @static
      */
     private static $DTENDEXIST     = 'dtendExist';
@@ -206,8 +205,10 @@ class SelectFactory
                     $dtStartTz
                 );
                 $rangeSet = Util::issetKeyAndEquals(
-                    $prop[Util::$LCparams], Vcalendar::RANGE, Vcalendar::THISANDFUTURE
-                ) ? true : false;
+                    $prop[Util::$LCparams],
+                    Vcalendar::RANGE,
+                    Vcalendar::THISANDFUTURE
+                );
                 $recurIdList[$recurId->key] = [
                     $compStart->getClone(),
                     $compEnd->getClone(),
@@ -258,8 +259,10 @@ class SelectFactory
                     }         // copy original to output (but not anyone with recurrence-id)
                 }
                 elseif( $split ) { // split the original component
-                    $rStart = ( $compStart->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 ))
-                        ? $fcnStart->getClone() : $compStart->getClone();
+                    $rStart = ( $compStart->format( $YMDHIS2 ) <
+                        $fcnStart->format( $YMDHIS2 ))
+                        ? $fcnStart->getClone()
+                        : $compStart->getClone();
                     $rEnd = ( $compEnd->format( $YMDHIS2 ) > $fcnEnd->format( $YMDHIS2 ))
                         ? $fcnEnd->getClone()   : $compEnd->getClone();
                     if( ! isset( $exdateList[$rStart->key] )) {      // not excluded in exrule/exdate
@@ -312,9 +315,18 @@ class SelectFactory
                             if( ! empty( $compDuration )) { // DateInterval
                                 $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
                                     ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
-                                self::setDurationEndTime( $rStart, $rEnd, $cnt, $occurenceDays, $endHis );
-                                $component2->setXprop( $propName, $rStart->format( $compEnd->dateFormat ));
-                            }
+                                self::setDurationEndTime(
+                                    $rStart,
+                                    $rEnd,
+                                    $cnt,
+                                    $occurenceDays,
+                                    $endHis
+                                );
+                                $component2->setXprop(
+                                    $propName,
+                                    $rStart->format( $compEnd->dateFormat )
+                                );
+                            } // end if
                             $result[$xY][$xM][$xD][$compUID] = clone $component2;    // copy to output
                             $rStart->add( $INTERVAL_P1D );
                         } // end while(( $rStart->format( 'Ymd' ) < $rEnd->format( 'Ymd' ))
@@ -350,7 +362,10 @@ class SelectFactory
                         $compStartHis, $exdateList, $compDuration
                     );
                     $workStart = $fcnStart->getClone();
-                    $workStart->sub( ( empty( $compDuration )) ? $INTERVAL_P1D : $compDuration );
+                    $workStart->sub( ( empty( $compDuration ))
+                        ? $INTERVAL_P1D
+                        : $compDuration
+                    );
                     self::getAllRDATEdates(
                         $component, $recurList,
                         $dtStartTz, $workStart, $fcnEnd, $compStart->dateFormat,
@@ -364,7 +379,10 @@ class SelectFactory
                     $component2 = clone $component;
                     $compUID    = $component2->getUid();
                     $workStart  = $fcnStart->getClone();
-                    $workStart->sub(( empty( $compDuration )) ? $INTERVAL_P1D : $compDuration );// DateInterval
+                    $workStart->sub(( empty( $compDuration ))
+                        ? $INTERVAL_P1D
+                        : $compDuration// DateInterval
+                    );
                     $YmdOld = null;
                     foreach( $recurList as $recurKey => $durationInterval ) {
                         $recurKeyYmd = substr( $recurKey, 0, 8 );
@@ -394,10 +412,12 @@ class SelectFactory
                                     $recurFound       = true;
                                     break;
                                 }
-                            }
+                            } // end foreach
                             if( ! $recurFound ) {
                                 $component3        = clone $component2;
-                                $durationInterval2 = ( ! empty( $durationInterval )) ? $durationInterval : null;
+                                $durationInterval2 = ( ! empty( $durationInterval ))
+                                    ? $durationInterval
+                                    : null;
                             }
                             $rEnd = $rStart->getClone();
                             if( ! empty( $durationInterval2 )) {
@@ -413,7 +433,8 @@ class SelectFactory
                             $occurenceDays = 1 + (int) $rStart->diff( $rEnd )->format( $PRA );
                             while( $rStart->format( $YMDn ) <= $rEnd->format( $YMDn )) {   // iterate.. .
                                 $cnt += 1;
-                                if( $rStart->format( $YMDn ) < $fcnStart->format( $YMDn )) { // date before dtstart
+                                if( $rStart->format( $YMDn ) <
+                                    $fcnStart->format( $YMDn )) { // date before dtstart
                                     $rStart->add( $INTERVAL_P1D ); // cycle rstart to dtstart
                                     $rStart->setTime( 0, 0, 0 );
                                     continue;
@@ -422,7 +443,10 @@ class SelectFactory
                                     $rStart->setTime( 0, 0, 0 );
                                 }
                                 list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
-                                $component3->setXprop( Vcalendar::X_RECURRENCE, $xRecurrence );
+                                $component3->setXprop(
+                                    Vcalendar::X_RECURRENCE,
+                                    $xRecurrence
+                                );
                                 if( 1 < $occurenceDays ) {
                                     $component3->setXprop(
                                         Vcalendar::X_OCCURENCE,
@@ -437,14 +461,24 @@ class SelectFactory
                                     $rStart->format( $compStart->dateFormat )
                                 );
                                 $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
-                                    ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
+                                    ? Vcalendar::X_CURRENT_DUE
+                                    : Vcalendar::X_CURRENT_DTEND;
                                 if( empty( $durationInterval2 )) {
                                     $component3->deleteXprop( $propName );
                                 }
                                 else {
-                                    self::setDurationEndTime( $rStart, $rEnd, $cnt, $occurenceDays, $endHis );
-                                    $component3->setXprop( $propName, $rStart->format( $compEnd->dateFormat ));
-                                }
+                                    self::setDurationEndTime(
+                                        $rStart,
+                                        $rEnd,
+                                        $cnt,
+                                        $occurenceDays,
+                                        $endHis
+                                    );
+                                    $component3->setXprop(
+                                        $propName,
+                                        $rStart->format( $compEnd->dateFormat )
+                                    );
+                                } // end else
                                 $result[$xY][$xM][$xD][$compUID] = clone $component3;     // copy to output
                                 $rStart->add( $INTERVAL_P1D );
                             } // end while( $rStart->format( 'Ymd' ) <= $rEnd->format( 'Ymd' ))
@@ -453,7 +487,10 @@ class SelectFactory
                         elseif( $rStart->format( $YMDn ) >= $fcnStart->format( $YMDn )) {
                             // date within period, flat=false && split=false => one comp every recur startdate
                             $xRecurrence += 1;
-                            $component2->setXprop( Vcalendar::X_RECURRENCE, $xRecurrence );
+                            $component2->setXprop(
+                                Vcalendar::X_RECURRENCE,
+                                $xRecurrence
+                            );
                             $component2->setXprop(
                                 Vcalendar::X_CURRENT_DTSTART,
                                 $rStart->format( $compStart->dateFormat )
@@ -465,7 +502,10 @@ class SelectFactory
                             }
                             else {
                                 $rStart->add( $durationInterval );
-                                $component2->setXprop( $propName, $rStart->format( $compEnd->dateFormat ));
+                                $component2->setXprop(
+                                    $propName,
+                                    $rStart->format( $compEnd->dateFormat )
+                                );
                             }
                             list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
                             $result[$xY][$xM][$xD][$compUID] = clone $component2; // copy to output
@@ -488,7 +528,9 @@ class SelectFactory
                             $result[$y][$m][$d] = array_values( $dList ); // skip tricky UID-index
                             if( 1 < count( $result[$y][$m][$d] )) {
                                 foreach( $result[$y][$m][$d] as $cix => $d2List ) { // sort
-                                    SortFactory::setSortArgs( $result[$y][$m][$d][$cix] );
+                                    SortFactory::setSortArgs(
+                                        $result[$y][$m][$d][$cix]
+                                    );
                                 }
                                 usort( $result[$y][$m][$d], $SORTER );
                             }
@@ -527,7 +569,6 @@ class SelectFactory
      * @param UtilDateTime $scopeEnd
      * @param string       $format
      * @return bool
-     * @access private
      * @static
      */
     private static function inScope(
@@ -575,7 +616,13 @@ class SelectFactory
                 );
             }
             $exdateList2 = [];
-            RecurFactory::recur2date( $exdateList2, $prop, $compStart, $workStart, $workEnd );
+            RecurFactory::recur2date(
+                $exdateList2,
+                $prop,
+                $compStart,
+                $workStart,
+                $workEnd
+            );
             foreach( $exdateList2 as $k => $v ) { // point out exact every excluded ocurrence (incl. opt. His)
                 $exdateList[$k . $compStartHis] = $v;
             }
@@ -598,10 +645,14 @@ class SelectFactory
     ) {
         while( false !== ( $prop = $component->getExdate( false, true ))) {
             foreach( $prop[Util::$LCvalue] as $exdate ) {
-                $exdate = UtilDateTime::factory( $exdate, $prop[Util::$LCparams], $dtStartTz );
+                $exdate = UtilDateTime::factory(
+                    $exdate,
+                    $prop[Util::$LCparams],
+                    $dtStartTz
+                );
                 $exdateList[$exdate->key] = true;
             } // end - foreach( $exdate as $exdate )
-        }
+        } // end while
     }
 
     /**
@@ -644,7 +695,13 @@ class SelectFactory
                 );
             }
             $recurList2  = [];
-            RecurFactory::recur2date( $recurList2, $prop, $compStart, $workStart, $workEnd );
+            RecurFactory::recur2date(
+                $recurList2,
+                $prop,
+                $compStart,
+                $workStart,
+                $workEnd
+            );
             foreach( $recurList2 as $recurKey => $recurValue ) { // recurkey=Ymd
                 if( isset( $exdateYmdList[$recurKey] )) {  // exclude on Ymd basis
                     continue;
@@ -657,7 +714,7 @@ class SelectFactory
                 if( ! isset( $exdateList[$YmdHisKey] )) {
                     $recurList[$YmdHisKey] = $compDuration; // DateInterval or false
                 }
-            }
+            } // end foreach
         } // end while
     }
 
@@ -698,7 +755,8 @@ class SelectFactory
             foreach( $prop as $rix => $theRdate ) {
                 if( Vcalendar::PERIOD == $rDateFmt ) {            // all days within PERIOD
                     $rDate = UtilDateTime::factory( $theRdate[0], $params, $dtStartTz );
-                    if( ! self::inScope( $rDate, $workStart, $rDate, $fcnEnd, $format )) {
+                    if( ! self::inScope( $rDate, $workStart, $rDate, $fcnEnd, $format )
+                    ) {
                         continue;
                     }
                     $cmpKey = substr( $rDate->key, 0, 8 );
@@ -721,7 +779,10 @@ class SelectFactory
                         continue;
                     }
                     try {                                   // period duration
-                        $recurList[$rDate->key] = DateIntervalFactory::DateIntervalArr2DateInterval( $theRdate[1] );
+                        $recurList[$rDate->key] =
+                            DateIntervalFactory::DateIntervalArr2DateInterval(
+                                $theRdate[1]
+                            );
                     }
                     catch( Exception $e ) {
                         throw $e;
@@ -745,7 +806,13 @@ class SelectFactory
                 switch( true ) {
                     case ( isset( $exdateYmdList[$cmpKey] )) : // excluded on Ymd basis
                         break;
-                    case ( ! self::inScope( $rDate, $workStart, $rDate, $fcnEnd, $format )) :
+                    case ( ! self::inScope(
+                        $rDate,
+                        $workStart,
+                        $rDate,
+                        $fcnEnd,
+                        $format
+                    )) :
                         break;
                     default :
                         if( isset( $recurYmdList[$cmpKey] )) {  // rDate replaces rRule
@@ -753,7 +820,7 @@ class SelectFactory
                         }
                         $recurList[$rDateYmdHisKey] = $compDuration;
                         break;
-                }
+                } // end switch
             } // end foreach
         }  // end while
     }
@@ -763,11 +830,11 @@ class SelectFactory
      *
      * @param array $YmdHisArr
      * @return array
-     * @access private
      * @static
      * @since 2.26.2 - 2018-11-15
      */
-    private static function getYmdList( array $YmdHisArr ) {
+    private static function getYmdList( array $YmdHisArr )
+    {
         $res = [];
         foreach( $YmdHisArr as $key => $value ) {
             $res[substr( $key, 0, 8 )] = $key;
@@ -784,7 +851,6 @@ class SelectFactory
      * @param int       $endY
      * @param int       $endM
      * @param int       $endD
-     * @access private
      * @static
      * @since  2.29.16 - 2020-01-24
      */
@@ -835,11 +901,11 @@ class SelectFactory
      *
      * @param array|string $cType
      * @return array
-     * @access private
      * @static
      * @since 2.27.18 - 2019-04-07
      */
-    private static function assertComponentTypes( $cType = null ) {
+    private static function assertComponentTypes( $cType = null )
+    {
         if( empty( $cType )) {
             return Vcalendar::$VCOMPS;
         }
@@ -861,7 +927,6 @@ class SelectFactory
      * @param bool      $flat
      * @param bool      $any
      * @param bool      $split
-     * @access private
      * @static
      * @since 2.26.2 - 2018-11-15
      */
@@ -890,7 +955,6 @@ class SelectFactory
      * @param CalendarComponent $component
      * @param string            $dtStartTz
      * @return UtilDateTime
-     * @access private
      * @throws Exception
      * @static
      * @since 2.27.6 - 2018-12-29
@@ -933,7 +997,8 @@ class SelectFactory
             );
             $compEnd->SCbools[self::$DURATIONEXIST] = true;
         }
-        if( ! empty( $prop ) && ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE )) {
+        if( ! empty( $prop ) &&
+            ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE )) {
             /* a DTEND without time part denotes an end of an event that actually ends the day before,
                for an all-day event DTSTART=20071201 DTEND=20071202, taking place 20071201!!! */
             $compEnd->SCbools[self::$ENDALLDAYEVENT] = true;
@@ -951,7 +1016,6 @@ class SelectFactory
      * @param int          $cnt
      * @param int          $occurenceDays
      * @param array        $endHis
-     * @access private
      * @static
      * @since 2.26 - 2018-11-10
      */
@@ -980,7 +1044,6 @@ class SelectFactory
      *
      * @param UtilDateTime $icaldateTime
      * @return array
-     * @access private
      * @static
      * @since 2.26.2 - 2018-11-15
      */
@@ -1002,7 +1065,6 @@ class SelectFactory
      *
      * @param CalendarComponent $component     (Vevent/Vtodo/Vjournal)
      * @param array             $recurIdComps
-     * @access private
      * @static
      * @since 2.27.1 - 2018-12-16
      */
@@ -1039,7 +1101,7 @@ class SelectFactory
                         $description[Util::$LCparams]
                     );
                 }
-            }
+            } // end if
             if( empty( $comments )) {
                 continue;
             }
@@ -1061,7 +1123,6 @@ class SelectFactory
      * @param Vcalendar $calendar
      * @param array     $selectOptions (string) key => (mixed) value, (key=propertyName)
      * @return array
-     * @access private
      * @static
      * @since 2.27.17 - 2020-01-25
      */
@@ -1141,5 +1202,4 @@ class SelectFactory
         }
         return $output;
     }
-
 }

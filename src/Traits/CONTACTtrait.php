@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -46,7 +46,6 @@ trait CONTACTtrait
 {
     /**
      * @var array component property CONTACT value
-     * @access protected
      */
     protected $contact = null;
 
@@ -55,7 +54,8 @@ trait CONTACTtrait
      *
      * @return string
      */
-    public function createContact() {
+    public function createContact()
+    {
         if( empty( $this->contact )) {
             return null;
         }
@@ -65,14 +65,18 @@ trait CONTACTtrait
             if( ! empty( $contact[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::CONTACT,
-                    ParameterFactory::createParams( $contact[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                    ParameterFactory::createParams(
+                        $contact[Util::$LCparams],
+                        self::$ALTRPLANGARR,
+                        $lang
+                    ),
                     StringFactory::strrep( $contact[Util::$LCvalue] )
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
                 $output .= StringFactory::createElement( self::CONTACT );
             }
-        }
+        } // end foreach
         return $output;
     }
 
@@ -83,7 +87,8 @@ trait CONTACTtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteContact( $propDelIx = null ) {
+    public function deleteContact( $propDelIx = null )
+    {
         if( empty( $this->contact )) {
             unset( $this->propDelIx[self::CONTACT] );
             return false;
@@ -99,12 +104,18 @@ trait CONTACTtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getContact( $propIx = null, $inclParam = false ) {
+    public function getContact( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->contact )) {
             unset( $this->propIx[self::CONTACT] );
             return false;
         }
-        return $this->getPropertyM( $this->contact, self::CONTACT, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->contact,
+            self::CONTACT,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -117,14 +128,21 @@ trait CONTACTtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setContact( $value = null, $params = [], $index = null ) {
+    public function setContact( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONTACT );
             $value  = Util::$SP0;
             $params = [];
         }
         Util::assertString( $value, self::CONTACT );
-        $this->setMval( $this->contact, StringFactory::trimTrailNL( $value ), $params, null, $index );
+        $this->setMval(
+            $this->contact,
+            StringFactory::trimTrailNL( $value ),
+            $params,
+            null,
+            $index
+        );
         return $this;
     }
 }

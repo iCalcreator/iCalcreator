@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -44,7 +44,6 @@ trait ATTENDEEtrait
 {
     /**
      * @var array component property ATTENDEE value
-     * @access protected
      */
     protected $attendee = null;
 
@@ -53,7 +52,8 @@ trait ATTENDEEtrait
      *
      * @return string
      */
-    public function createAttendee() {
+    public function createAttendee()
+    {
         if( empty( $this->attendee )) {
             return null;
         }
@@ -70,7 +70,8 @@ trait ATTENDEEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteAttendee( $propDelIx = null ) {
+    public function deleteAttendee( $propDelIx = null )
+    {
         if( empty( $this->attendee )) {
             unset( $this->propDelIx[self::ATTENDEE] );
             return false;
@@ -86,7 +87,8 @@ trait ATTENDEEtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getAttendee( $propIx = null, $inclParam = false ) {
+    public function getAttendee( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->attendee )) {
             unset( $this->propIx[self::ATTENDEE] );
             return false;
@@ -104,7 +106,8 @@ trait ATTENDEEtrait
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-17
      */
-    public function setAttendee( $value = null, $params = [], $index = null ) {
+    public function setAttendee( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTENDEE );
             $value  = Util::$SP0;

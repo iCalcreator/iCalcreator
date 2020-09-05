@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -1347,7 +1347,7 @@ class MiscTest extends DtBase
                 $getValue[0],
                 sprintf( self::$ERRFMT, null, 2, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
-            $tLat = substr( StringFactory::before_last('+', $getValue[1] ), 1 );
+            $tLat = substr( StringFactory::beforeLast('+', $getValue[1] ), 1 );
             $this->assertEquals(
                 $latitude,
                 $tLat,
@@ -1556,7 +1556,7 @@ class MiscTest extends DtBase
      * @test
      * @dataProvider parse5Provider
      * @param int    $case
-     * @paran string $value
+     * @param string $value
      * @throws Exception
      */
     public function parseTest6( $case, $value ) {

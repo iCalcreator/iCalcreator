@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait ATTACHtrait
 {
     /**
      * @var array component property ATTACH value
-     * @access protected
      */
     protected $attach = null;
 
@@ -54,7 +53,8 @@ trait ATTACHtrait
      *
      * @return string
      */
-    public function createAttach() {
+    public function createAttach()
+    {
         if( empty( $this->attach )) {
             return null;
         }
@@ -70,7 +70,7 @@ trait ATTACHtrait
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
                 $output .= StringFactory::createElement( self::ATTACH );
             }
-        }
+        } // end foreach
         return $output;
     }
 
@@ -81,7 +81,8 @@ trait ATTACHtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteAttach( $propDelIx = null ) {
+    public function deleteAttach( $propDelIx = null )
+    {
         if( empty( $this->attach )) {
             unset( $this->propDelIx[self::ATTACH] );
             return false;
@@ -97,7 +98,8 @@ trait ATTACHtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-16
      */
-    public function getAttach( $propIx = null, $inclParam = false ) {
+    public function getAttach( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->attach )) {
             unset( $this->propIx[self::ATTACH] );
             return false;
@@ -115,7 +117,8 @@ trait ATTACHtrait
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-20
      */
-    public function setAttach( $value = null, $params = [], $index = null ) {
+    public function setAttach( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTACH );
             $value  = Util::$SP0;

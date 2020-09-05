@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -46,7 +46,6 @@ trait TZURLtrait
 {
     /**
      * @var array component property TZURL value
-     * @access protected
      */
     protected $tzurl = null;
 
@@ -55,12 +54,15 @@ trait TZURLtrait
      *
      * @return string
      */
-    public function createTzurl() {
+    public function createTzurl()
+    {
         if( empty( $this->tzurl )) {
             return null;
         }
         if( empty( $this->tzurl[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::TZURL ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::TZURL )
+                : null;
         }
         return StringFactory::createElement(
             self::TZURL,
@@ -75,7 +77,8 @@ trait TZURLtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteTzurl() {
+    public function deleteTzurl()
+    {
         $this->tzurl = null;
         return true;
     }
@@ -87,7 +90,8 @@ trait TZURLtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzurl( $inclParam = false ) {
+    public function getTzurl( $inclParam = false )
+    {
         if( empty( $this->tzurl )) {
             return false;
         }
@@ -106,7 +110,8 @@ trait TZURLtrait
      * This URI form can be useful within an organization, but is problematic
      * in the Internet.
      */
-    public function setTzurl( $value = null, $params = [] ) {
+    public function setTzurl( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZURL );
             $value  = Util::$SP0;

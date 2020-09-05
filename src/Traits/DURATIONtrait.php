@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -50,7 +50,6 @@ trait DURATIONtrait
 {
     /**
      * @var array component property DURATION value
-     * @access protected
      */
     protected $duration = null;
 
@@ -61,18 +60,21 @@ trait DURATIONtrait
      * @throws Exception
      * @since  2.29.2 - 2019-06-27
      */
-    public function createDuration() {
+    public function createDuration()
+    {
         if( empty( $this->duration )) {
             return null;
         }
         if( empty( $this->duration[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
+            return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::DURATION )
                 : null;
         }
         if( DateIntervalFactory::isDateIntervalArrayInvertSet( $this->duration[Util::$LCvalue] )) { // fix pre 7.0.5 bug
             try {
-                $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval( $this->duration[Util::$LCvalue] );
+                $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval(
+                    $this->duration[Util::$LCvalue]
+                );
             }
             catch( Exception $e ) {
                 throw $e;
@@ -94,7 +96,8 @@ trait DURATIONtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteDuration( ) {
+    public function deleteDuration()
+    {
         $this->duration = null;
         return true;
     }
@@ -108,7 +111,8 @@ trait DURATIONtrait
      * @throws Exception
      * @since  2.29.2 - 2019-06-29
      */
-    public function getDuration( $inclParam = false, $specform = false ) {
+    public function getDuration( $inclParam = false, $specform = false )
+    {
         if( empty( $this->duration )) {
             return false;
         }
@@ -117,7 +121,9 @@ trait DURATIONtrait
         }
         if( DateIntervalFactory::isDateIntervalArrayInvertSet( $this->duration[Util::$LCvalue] )) { // fix pre 7.0.5 bug
             try {
-                $value = DateIntervalFactory::DateIntervalArr2DateInterval( $this->duration[Util::$LCvalue] );
+                $value = DateIntervalFactory::DateIntervalArr2DateInterval(
+                    $this->duration[Util::$LCvalue]
+                );
             }
             catch( Exception $e ) {
                 throw $e;
@@ -136,7 +142,9 @@ trait DURATIONtrait
                 $params = array_merge( $params, $dtStart[Util::$LCparams] );
             }
         }
-        return ( $inclParam ) ? [ Util::$LCvalue  => $value, Util::$LCparams => (array) $params, ] : $value;
+        return ( $inclParam )
+            ? [ Util::$LCvalue  => $value, Util::$LCparams => (array) $params, ]
+            : $value;
     }
 
     /**
@@ -153,7 +161,8 @@ trait DURATIONtrait
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
      *        value."
      */
-    public function setDuration( $value  = null, $params = [] ) {
+    public function setDuration( $value  = null, $params = [] )
+    {
         switch( true ) {
             case ( empty( $value ) && ( empty( $params ) || is_array( $params ))) :
                 $this->assertEmptyValue( $value, self::DURATION );
@@ -179,7 +188,11 @@ trait DURATIONtrait
                 break;
             default :
                 throw new InvalidArgumentException(
-                    sprintf( self::$FMTERRPROPFMT, self::DURATION, var_export( $value, true ))
+                    sprintf(
+                        self::$FMTERRPROPFMT,
+                        self::DURATION,
+                        var_export( $value, true )
+                    )
                 );
                 break;
         } // end switch

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -44,6 +44,7 @@ use function in_array;
 use function sprintf;
 use function strlen;
 use function strpos;
+use function substr;
 use function ucfirst;
 
 /**
@@ -56,8 +57,6 @@ class IcalvCardFactory
 {
     /*
      * $var array
-     * @access private
-     * @static
      */
     private static $VCARDVERSIONS = [ 2 => '2.1', 3 => '3.0', 4 => '4.0' ];
     /*
@@ -75,10 +74,10 @@ class IcalvCardFactory
      * @param string $version   vCard version (default 2.1)
      * @return string
      * @throws InvalidArgumentException
-     * @static
      * @since  2.27.8 - 2019-03-18
      */
-    public static function iCal2vCard( $email, $version = null ) {
+    public static function iCal2vCard( $email, $version = null )
+    {
         static $FMTFN      = "FN:%s\r\n";
         static $FMTEMAIL   = "EMAIL:%s\r\n";
         static $BEGINVCARD = "BEGIN:VCARD\r\n";
@@ -95,7 +94,9 @@ class IcalvCardFactory
         }
         CalAddressFactory::assertCalAddress( $email );
         /* prepare vCard name */
-        $names   = self::splitNameInNameparts( CalAddressFactory::extractNamepartFromEmail( $email ));
+        $names   = self::splitNameInNameparts(
+            CalAddressFactory::extractNamepartFromEmail( $email )
+        );
         /* create vCard */
         $vCard   = $BEGINVCARD;
         $vCard  .= sprintf( $FMTVERSION, $version );
@@ -117,10 +118,14 @@ class IcalvCardFactory
      * @param bool      $inclParams  fetch from values or include from parameters
      * @param int       $count       on return, count of hits
      * @return string   vCards
-     * @static
      * @since  2.27.8 - 2019-03-17
      */
-    public static function iCal2vCards( Vcalendar $calendar, $version = null, $inclParams = true, & $count = null ) {
+    public static function iCal2vCards(
+        Vcalendar $calendar,
+        $version = null,
+        $inclParams = true,
+        & $count = null
+    ) {
         $hits   = CalAddressFactory::getCalAddresses( $calendar, null, $inclParams );
         $output = null;
         $count  = 0;
@@ -142,11 +147,10 @@ class IcalvCardFactory
      *
      * @param string $version
      * @throws InvalidArgumentException
-     * @access private
-     * @static
      * @since  2.27.8 - 2019-03-18
      */
-    private static function assertVcardVersion( $version ) {
+    private static function assertVcardVersion( $version )
+    {
         static $ERRMSG1 = 'Invalid version %s';
         if( ! in_array( $version, self::$VCARDVERSIONS )) {
             throw new InvalidArgumentException( sprintf( $ERRMSG1, $version ));
@@ -154,15 +158,14 @@ class IcalvCardFactory
     }
 
     /**
-     * Split name in nameParts
+     * Split string name into array nameParts
      *
      * @param string $name
      * @return array
-     * @access private
-     * @static
      * @since  2.27.8 - 2019-03-17
      */
-    private static function splitNameInNameparts( $name ) {
+    private static function splitNameInNameparts( $name )
+    {
         switch( true ) {
             case ( ctype_upper( $name ) || ctype_lower( $name )) :
                 $nameParts = [ $name ];
@@ -174,7 +177,7 @@ class IcalvCardFactory
                 }
                 break;
             default : // split camelCase
-                $nameParts = [ $name[0] ];
+                $nameParts = [ substr( $name, 0, 1 ) ];
                 $k         = 0;
                 $x         = 1;
                 $len       = strlen( $name );
@@ -185,9 +188,9 @@ class IcalvCardFactory
                     }
                     $nameParts[$k] .= $name[$x];
                     $x++;
-                }
+                } // end while
                 break;
-        }
+        } // end switch
         return $nameParts;
     }
 
@@ -197,11 +200,10 @@ class IcalvCardFactory
      * @param array $names
      * @param string $version
      * @return string
-     * @access private
-     * @static
      * @since  2.27.8 - 2019-03-18
      */
-    private static function getVcardN( array $names, $version ) {
+    private static function getVcardN( array $names, $version )
+    {
         static $FMTN = 'N:%s';
         $name   = array_reverse( $names );
         $vCardN = sprintf( $FMTN, array_shift( $name ));
@@ -211,12 +213,11 @@ class IcalvCardFactory
                 $scCnt += 1;
             }
             $vCardN .= Util::$SEMIC . $part;
-        }
+        } // end while
         while(( self::$VCARDVERSIONS[4] == $version ) && ( 4 > $scCnt )) {
             $vCardN .= Util::$SEMIC;
             $scCnt += 1;
-        }
+        } // end while
         return $vCardN . Util::$CRLF;
     }
-
 }

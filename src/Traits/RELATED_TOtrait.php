@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait RELATED_TOtrait
 {
     /**
      * @var array component property RELATED_TO value
-     * @access protected
      */
     protected $relatedto = null;
 
@@ -55,7 +54,8 @@ trait RELATED_TOtrait
      * @return string
      * @since 2.29.9 2019-08-05
      */
-    public function createRelatedto() {
+    public function createRelatedto()
+    {
         if( empty( $this->relatedto )) {
             return null;
         }
@@ -82,7 +82,8 @@ trait RELATED_TOtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRelatedto( $propDelIx = null ) {
+    public function deleteRelatedto( $propDelIx = null )
+    {
         if( empty( $this->relatedto )) {
             unset( $this->propDelIx[self::RELATED_TO] );
             return false;
@@ -98,12 +99,18 @@ trait RELATED_TOtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getRelatedto( $propIx = null, $inclParam = false ) {
+    public function getRelatedto( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->relatedto )) {
             unset( $this->propIx[self::RELATED_TO] );
             return false;
         }
-        return $this->getPropertyM( $this->relatedto, self::RELATED_TO, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->relatedto,
+            self::RELATED_TO,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -116,7 +123,8 @@ trait RELATED_TOtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setRelatedto( $value = null, $params = [], $index = null ) {
+    public function setRelatedto( $value = null, $params = [], $index = null )
+    {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
         if( empty( $value )) {
@@ -129,7 +137,13 @@ trait RELATED_TOtrait
             ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
         }
         Util::assertString( $value, self::RELATED_TO );
-        $this->setMval( $this->relatedto, StringFactory::trimTrailNL( $value ), $params, null, $index );
+        $this->setMval(
+            $this->relatedto,
+            StringFactory::trimTrailNL( $value ),
+            $params,
+            null,
+            $index
+        );
         return $this;
     }
 }

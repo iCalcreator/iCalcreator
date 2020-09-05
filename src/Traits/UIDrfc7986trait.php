@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,7 +52,6 @@ trait UIDrfc7986trait
 {
     /**
      * @var array component property UID value
-     * @access protected
      */
     protected $uid = null;
 
@@ -63,8 +62,10 @@ trait UIDrfc7986trait
      * @return string
      * @since 2.29.5 2019-06-17
      */
-    public function createUid() {
-        if( self::isUidEmpty( $this->uid )) {
+    public function createUid()
+    {
+        if( self::isUidEmpty( $this->uid ))
+        {
             $this->uid = self::makeUid();
         }
         return StringFactory::createElement(
@@ -80,7 +81,8 @@ trait UIDrfc7986trait
      * @return bool
      * @since 2.29.5 2019-06-17
      */
-    public function deleteUid() {
+    public function deleteUid()
+    {
         $this->uid = null;
         return true;
     }
@@ -92,7 +94,8 @@ trait UIDrfc7986trait
      * @return bool|array
      * @since 2.29.5 2019-06-17
      */
-    public function getUid( $inclParam = false ) {
+    public function getUid( $inclParam = false )
+    {
         if( self::isUidEmpty( $this->uid )) {
             $this->uid = self::makeUid();
         }
@@ -104,11 +107,11 @@ trait UIDrfc7986trait
      *
      * @param array  $array
      * @return bool
-     * @access private
      * @static
      * @since 2.29.5 2019-06-17
      */
-    private static function isUidEmpty( array $array = null ) {
+    private static function isUidEmpty( array $array = null )
+    {
         if( empty( $array )) {
             return true;
         }
@@ -123,12 +126,12 @@ trait UIDrfc7986trait
      * Return an unique id for a calendar component object instance
      *
      * @return array
-     * @access private
      * @static
      * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
      * @since 2.29.5 2019-06-17
      */
-    private static function makeUid() {
+    private static function makeUid()
+    {
         static $FMT = '%s%s-%s-%s-%s-%s%s%s';
         static $MAX = 10;
         $cnt = 0;
@@ -157,7 +160,8 @@ trait UIDrfc7986trait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setUid( $value = null, $params = [] ) {
+    public function setUid( $value = null, $params = [] )
+    {
         if( empty( $value ) && ( Util::$ZERO != $value )) {
             $this->uid = self::makeUid();
             return $this;

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,7 +52,6 @@ trait LAST_MODIFIEDtrait
 {
     /**
      * @var array component property LAST-MODIFIED value
-     * @access protected
      */
     protected $lastmodified = null;
 
@@ -60,9 +59,12 @@ trait LAST_MODIFIEDtrait
      * Return formatted output for calendar component property last-modified
      *
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.9 2019-08-05
      */
-    public function createLastmodified() {
+    public function createLastmodified()
+    {
         if( empty( $this->lastmodified )) {
             return null;
         }
@@ -79,7 +81,8 @@ trait LAST_MODIFIEDtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteLastmodified() {
+    public function deleteLastmodified()
+    {
         $this->lastmodified = null;
         return true;
     }
@@ -91,11 +94,14 @@ trait LAST_MODIFIEDtrait
      * @return bool|DateTime|array
      * @since 2.29.9 2019-08-05
      */
-    public function getLastmodified( $inclParam = false ) {
+    public function getLastmodified( $inclParam = false )
+    {
         if( empty( $this->lastmodified )) {
             return false;
         }
-        return ( $inclParam ) ? $this->lastmodified : $this->lastmodified[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->lastmodified
+            : $this->lastmodified[Util::$LCvalue];
     }
 
     /**
@@ -108,7 +114,8 @@ trait LAST_MODIFIEDtrait
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( $value = null, $params = [] ) {
+    public function setLastmodified( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->lastmodified = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -34,6 +34,7 @@ use Exception;
 use DateTime;
 use DateTimeImmutable;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\RecurFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -95,15 +96,15 @@ class DateTimeUTCTest extends DtBase
                     Vcalendar::FREQ       => Vcalendar::YEARLY,
                     Vcalendar::UNTIL      => (( $value instanceof DateTime ) ? clone $value : $value ),
                     Vcalendar::INTERVAL   => 2,
-                    Vcalendar::BYSECOND   => [1,2,3],
-                    Vcalendar::BYMINUTE   => [12,23,45],
-                    Vcalendar::BYHOUR     => [3,5,7] ,
-                    Vcalendar::BYDAY      => [1, Vcalendar::MO],
-                    Vcalendar::BYMONTHDAY => [-1],
-                    Vcalendar::BYYEARDAY  => [100,200,300],
-                    Vcalendar::BYWEEKNO   => [20,39,40],
-                    Vcalendar::BYMONTH    => [1,2,3,4,5, 7,8,9,10,11],
-                    Vcalendar::BYSETPOS   => [1,2,3,4,5],
+                    Vcalendar::BYSECOND   => [ 1, 2, 3 ],
+                    Vcalendar::BYMINUTE   => [ 12, 23, 45 ],
+                    Vcalendar::BYHOUR     => [ 3, 5, 7 ] ,
+                    Vcalendar::BYDAY      => [ Vcalendar::DAY => Vcalendar::MO ],
+                    Vcalendar::BYMONTHDAY => [ -1 ],
+                    Vcalendar::BYYEARDAY  => [ 100, 200, 300 ],
+                    Vcalendar::BYWEEKNO   => [ 20, 39, 40 ],
+                    Vcalendar::BYMONTH    => [ 1, 2, 3, 4, 5, 7, 8, 9, 10, 11 ],
+                    Vcalendar::BYSETPOS   => [ 1, 2, 3, 4, 5 ],
                     Vcalendar::WKST       => Vcalendar::SU
                 ];
                 $comp->{$setMethod}( $recurSet );
@@ -348,8 +349,8 @@ class DateTimeUTCTest extends DtBase
         static $keys = null;
         if( empty( $keys )) {
             $keys = [
-                Util\RecurFactory::$LCYEAR, Util\RecurFactory::$LCMONTH, Util\RecurFactory::$LCDAY,
-                Util\RecurFactory::$LCHOUR, Util\RecurFactory::$LCMIN, Util\RecurFactory::$LCSEC
+                RecurFactory::$LCYEAR, RecurFactory::$LCMONTH, RecurFactory::$LCDAY,
+                RecurFactory::$LCHOUR, RecurFactory::$LCMIN,   RecurFactory::$LCSEC
             ];
         }
         $calendar1 = new Vcalendar();
@@ -366,8 +367,8 @@ class DateTimeUTCTest extends DtBase
                 foreach( $keys as $key ) {
                     ${$key} = ( isset( $value[$key] )) ? $value[$key] : null;
                 }
-                $comp->{$setMethod}( ${Util\RecurFactory::$LCYEAR}, ${Util\RecurFactory::$LCMONTH}, ${Util\RecurFactory::$LCDAY},
-                                     ${Util\RecurFactory::$LCHOUR}, ${Util\RecurFactory::$LCMIN}, ${Util\RecurFactory::$LCSEC},
+                $comp->{$setMethod}( ${RecurFactory::$LCYEAR}, ${RecurFactory::$LCMONTH}, ${RecurFactory::$LCDAY},
+                                     ${RecurFactory::$LCHOUR}, ${RecurFactory::$LCMIN}, ${RecurFactory::$LCSEC},
                                      [Vcalendar::VALUE => Vcalendar::DATE_TIME] );
 
                 $getValue = $comp->{$getMethod}( true );
@@ -386,8 +387,8 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( ${Util\RecurFactory::$LCYEAR}, ${Util\RecurFactory::$LCMONTH}, ${Util\RecurFactory::$LCDAY},
-                                     ${Util\RecurFactory::$LCHOUR}, ${Util\RecurFactory::$LCMIN}, ${Util\RecurFactory::$LCSEC},
+                $comp->{$setMethod}( ${RecurFactory::$LCYEAR}, ${RecurFactory::$LCMONTH}, ${RecurFactory::$LCDAY},
+                                     ${RecurFactory::$LCHOUR}, ${RecurFactory::$LCMIN}, ${RecurFactory::$LCSEC},
                                      [Vcalendar::VALUE => Vcalendar::DATE_TIME] );
             }
         }

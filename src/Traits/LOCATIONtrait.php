@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait LOCATIONtrait
 {
     /**
      * @var array component property LOCATION value
-     * @access protected
      */
     protected $location = null;
 
@@ -54,12 +53,15 @@ trait LOCATIONtrait
      *
      * @return string
      */
-    public function createLocation() {
+    public function createLocation()
+    {
         if( empty( $this->location )) {
             return null;
         }
         if( empty( $this->location[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::LOCATION ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::LOCATION )
+                : null;
         }
         return StringFactory::createElement(
             self::LOCATION,
@@ -78,7 +80,8 @@ trait LOCATIONtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteLocation() {
+    public function deleteLocation()
+    {
         $this->location = null;
         return true;
     }
@@ -90,11 +93,14 @@ trait LOCATIONtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getLocation( $inclParam = false ) {
+    public function getLocation( $inclParam = false )
+    {
         if( empty( $this->location )) {
             return false;
         }
-        return ( $inclParam ) ? $this->location : $this->location[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->location
+            : $this->location[Util::$LCvalue];
     }
 
     /**
@@ -106,7 +112,8 @@ trait LOCATIONtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setLocation( $value = null, $params = [] ) {
+    public function setLocation( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::LOCATION );
             $value = Util::$SP0;

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -44,7 +44,6 @@ trait METHODtrait
 {
     /**
      * @var string calendar property METHOD
-     * @access protected
      */
     protected $method = null;
 
@@ -53,7 +52,8 @@ trait METHODtrait
      *
      * @return string
      */
-    public function createMethod() {
+    public function createMethod()
+    {
         return ( empty( $this->method ))
             ? null
             : sprintf( self::$FMTICAL, self::METHOD, $this->method );
@@ -65,7 +65,8 @@ trait METHODtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteMethod() {
+    public function deleteMethod()
+    {
         $this->method = null;
         return true;
     }
@@ -90,7 +91,8 @@ trait METHODtrait
      * @return static
      * @since  2.29.14 - 2019-09-03
      */
-    public function setMethod( $value ) {
+    public function setMethod( $value )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::METHOD );
             $value = Util::$SP0;

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -47,7 +47,6 @@ trait REPEATtrait
 {
     /**
      * @var array component property REPEAT value
-     * @access protected
      */
     protected $repeat = null;
 
@@ -56,13 +55,17 @@ trait REPEATtrait
      *
      * @return string
      */
-    public function createRepeat() {
+    public function createRepeat()
+    {
         if( empty( $this->repeat )) {
             return null;
         }
         if( ! isset( $this->repeat[Util::$LCvalue] ) ||
-            ( empty( $this->repeat[Util::$LCvalue] ) && ! is_numeric( $this->repeat[Util::$LCvalue] ))) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::REPEAT ) : null;
+            ( empty( $this->repeat[Util::$LCvalue] ) &&
+                ! is_numeric( $this->repeat[Util::$LCvalue] ))) {
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::REPEAT )
+                : null;
         }
         return StringFactory::createElement(
             self::REPEAT,
@@ -77,7 +80,8 @@ trait REPEATtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRepeat() {
+    public function deleteRepeat()
+    {
         $this->repeat = null;
         return true;
     }
@@ -89,7 +93,8 @@ trait REPEATtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getRepeat( $inclParam = false ) {
+    public function getRepeat( $inclParam = false )
+    {
         if( empty( $this->repeat )) {
             return false;
         }
@@ -105,7 +110,8 @@ trait REPEATtrait
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      */
-    public function setRepeat( $value = null, $params = [] ) {
+    public function setRepeat( $value = null, $params = [] )
+    {
         if( empty( $value ) && ( Util::$ZERO != $value )) {
             $this->assertEmptyValue( $value, self::REPEAT );
             $value  = Util::$SP0;

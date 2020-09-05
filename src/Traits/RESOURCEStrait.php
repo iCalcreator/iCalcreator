@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -44,7 +44,6 @@ trait RESOURCEStrait
 {
     /**
      * @var array component property RESOURCES value
-     * @access protected
      */
     protected $resources = null;
 
@@ -54,7 +53,8 @@ trait RESOURCEStrait
      * @return string
      * @since  2.29.11 - 2019-08-30
      */
-    public function createResources() {
+    public function createResources()
+    {
         return self::createCatRes(
             self::RESOURCES,
             $this->resources,
@@ -71,7 +71,8 @@ trait RESOURCEStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteResources( $propDelIx = null ) {
+    public function deleteResources( $propDelIx = null )
+    {
         if( empty( $this->resources )) {
             unset( $this->propDelIx[self::RESOURCES] );
             return false;
@@ -87,12 +88,18 @@ trait RESOURCEStrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getResources( $propIx = null, $inclParam = false ) {
+    public function getResources( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->resources )) {
             unset( $this->propIx[self::RESOURCES] );
             return false;
         }
-        return $this->getPropertyM( $this->resources, self::RESOURCES, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->resources,
+            self::RESOURCES,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -105,7 +112,8 @@ trait RESOURCEStrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setResources( $value = null, $params = [], $index = null ) {
+    public function setResources( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RESOURCES );
             $value  = Util::$SP0;

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,6 @@ trait TZOFFSETFROMtrait
 {
     /**
      * @var array component property TZOFFSETFROM value
-     * @access protected
      */
     protected $tzoffsetfrom = null;
 
@@ -58,13 +57,15 @@ trait TZOFFSETFROMtrait
      *
      * @return string
      */
-    public function createTzoffsetfrom() {
+    public function createTzoffsetfrom()
+    {
         if( empty( $this->tzoffsetfrom )) {
             return null;
         }
         if( empty( $this->tzoffsetfrom[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
-                ? StringFactory::createElement( self::TZOFFSETFROM ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::TZOFFSETFROM )
+                : null;
         }
         return StringFactory::createElement(
             self::TZOFFSETFROM,
@@ -79,7 +80,8 @@ trait TZOFFSETFROMtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteTzoffsetfrom() {
+    public function deleteTzoffsetfrom()
+    {
         $this->tzoffsetfrom = null;
         return true;
     }
@@ -91,11 +93,14 @@ trait TZOFFSETFROMtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzoffsetfrom( $inclParam = false ) {
+    public function getTzoffsetfrom( $inclParam = false )
+    {
         if( empty( $this->tzoffsetfrom )) {
             return false;
         }
-        return ( $inclParam ) ? $this->tzoffsetfrom : $this->tzoffsetfrom[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->tzoffsetfrom
+            : $this->tzoffsetfrom[Util::$LCvalue];
     }
 
     /**

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,7 +52,6 @@ trait COMPLETEDtrait
 {
     /**
      * @var array component property COMPLETED value
-     * @access protected
      */
     protected $completed = null;
 
@@ -60,14 +59,19 @@ trait COMPLETEDtrait
      * Return formatted output for calendar component property completed
      *
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.1 2019-06-22
      */
-    public function createCompleted() {
+    public function createCompleted()
+    {
         if( empty( $this->completed )) {
             return null;
         }
         if( empty( $this->completed[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::COMPLETED ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::COMPLETED )
+                : null;
         }
         return StringFactory::createElement(
             self::COMPLETED,
@@ -82,7 +86,8 @@ trait COMPLETEDtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteCompleted( ) {
+    public function deleteCompleted( )
+    {
         $this->completed = null;
         return true;
     }
@@ -94,7 +99,8 @@ trait COMPLETEDtrait
      * @return bool|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getCompleted( $inclParam = false ) {
+    public function getCompleted( $inclParam = false )
+    {
         if( empty( $this->completed )) {
             return false;
         }
@@ -111,7 +117,8 @@ trait COMPLETEDtrait
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setCompleted( $value = null, $params = [] ) {
+    public function setCompleted( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COMPLETED );
             $this->completed = [

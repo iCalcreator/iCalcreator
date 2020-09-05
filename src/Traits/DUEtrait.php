@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,6 @@ trait DUEtrait
 {
     /**
      * @var array component property DUE value
-     * @access protected
      */
     protected $due = null;
 
@@ -57,16 +56,21 @@ trait DUEtrait
      * Return formatted output for calendar component property due
      *
      * "The value type of the "DTEND" or "DUE" properties MUST match the value type of "DTSTART" property."
+     *
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.1 2019-06-24
      */
-    public function createDue() {
+    public function createDue()
+    {
         if( empty( $this->due )) {
             return null;
         }
         if( empty( $this->due[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
-                ? StringFactory::createElement( self::DUE ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::DUE )
+                : null;
         }
         $isDATE = ( ! empty( $this->dtstart ))
             ? ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE )
@@ -75,7 +79,10 @@ trait DUEtrait
         return StringFactory::createElement(
             self::DUE,
             ParameterFactory::createParams( $this->due[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->due[Util::$LCvalue], $isDATE, $isLocalTime )
+            DateTimeFactory::dateTime2Str(
+                $this->due[Util::$LCvalue],
+                $isDATE, $isLocalTime
+            )
         );
     }
 
@@ -85,7 +92,8 @@ trait DUEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteDue( ) {
+    public function deleteDue()
+    {
         $this->due = null;
         return true;
     }
@@ -97,7 +105,8 @@ trait DUEtrait
      * @return bool|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getDue( $inclParam = false ) {
+    public function getDue( $inclParam = false )
+    {
         if( empty( $this->due )) {
             return false;
         }
@@ -114,7 +123,8 @@ trait DUEtrait
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setDue( $value = null, $params = [] ) {
+    public function setDue( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DUE );
             $this->due = [
@@ -132,7 +142,10 @@ trait DUEtrait
         }
         $this->due = DateTimeFactory::setDate(
             $value,
-            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
+            ParameterFactory::setParams(
+                $params,
+                DateTimeFactory::$DEFAULTVALUEDATETIME
+            )
         );
         if( ! empty( $dtstart ) && Util::issetAndNotEmpty( $dtstart, Util::$LCvalue )) {
             DateTimeFactory::assertDatesAreInSequence(

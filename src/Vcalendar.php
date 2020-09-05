@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.18
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -93,7 +93,6 @@ final class Vcalendar extends IcalBase
         Traits\CATEGORIEStrait,
         Traits\IMAGErfc7986trait;
 
-
     /**
      * @const
      */
@@ -101,15 +100,11 @@ final class Vcalendar extends IcalBase
 
     /**
      * @var string property output formats, used by CALSCALE, METHOD, PRODID and VERSION
-     * @access private
-     * @static
      */
     private static $FMTICAL = "%s:%s\r\n";
 
     /**
      * @var array  iCal component date-property collection
-     * @access private
-     * @static
      */
     private static $DATEPROPS  = [
         self::DTSTART, self::DTEND, self::DUE, self::CREATED, self::COMPLETED,
@@ -122,13 +117,16 @@ final class Vcalendar extends IcalBase
      * @param array $config
      * @since  2.29.5 - 2019-06-20
      */
-    public function __construct( $config = [] ) {
+    public function __construct( $config = [] )
+    {
         static $SERVER_NAME = 'SERVER_NAME';
         static $LOCALHOST   = 'localhost';
         $this->compType     = self::VCALENDAR;
         $this->setConfig(
             self::UNIQUE_ID,
-            ( isset( $_SERVER[$SERVER_NAME] )) ? gethostbyname( $_SERVER[$SERVER_NAME] ) : $LOCALHOST
+            ( isset( $_SERVER[$SERVER_NAME] ))
+                ? gethostbyname( $_SERVER[$SERVER_NAME] )
+                : $LOCALHOST
         );
         $this->setConfig( $config );
         $this->setUid();
@@ -139,7 +137,8 @@ final class Vcalendar extends IcalBase
      *
      * @since  2.29.5 - 2019-06-20
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if( ! empty( $this->components )) {
             foreach( $this->components as $cix => $comp ) {
                 $this->components[$cix]->__destruct();
@@ -178,10 +177,10 @@ final class Vcalendar extends IcalBase
      *
      * @param array $config
      * @return static
-     * @static
      * @since  2.18.5 - 2013-08-29
      */
-    public static function factory( $config = [] ) {
+    public static function factory( $config = [] )
+    {
         return new self( $config );
     }
 
@@ -191,8 +190,14 @@ final class Vcalendar extends IcalBase
      * @return string
      * @since  2.18.5 - 2013-08-29
      */
-    public static function iCalcreatorVersion() {
-        return trim( substr( ICALCREATOR_VERSION, strpos( ICALCREATOR_VERSION, Util::$SP1 )));
+    public static function iCalcreatorVersion()
+    {
+        return trim(
+            substr(
+                ICALCREATOR_VERSION,
+                strpos( ICALCREATOR_VERSION, Util::$SP1 )
+            )
+        );
     }
 
     /**
@@ -207,7 +212,8 @@ final class Vcalendar extends IcalBase
      * @return mixed
      * @since  2.29.17 - 2020-01-25
      */
-    public function getProperty( $propName ) {
+    public function getProperty( $propName )
+    {
         static $PROPS = [
             self::ATTENDEE,
             self::CATEGORIES,
@@ -235,12 +241,16 @@ final class Vcalendar extends IcalBase
             switch( true ) {
                 case ( ! Util::isCompInList( $component->getCompType(), self::$VCOMPS )) :
                     continue 2;
-                case ( ! property_exists( $component, self::getInternalPropName( $propName ))) :
+                case ( ! property_exists(
+                    $component,
+                    self::getInternalPropName( $propName ))
+                ) :
                     continue 2;
                 case ( Util::isPropInList( $propName, self::$MPROPS1 )) :
                     $component->getProperties( $propName, $output );
                     continue 2;
-                case (( 3 < strlen( $propName )) && ( self::UID == substr( $propName, -3 ))) :
+                case (( 3 < strlen( $propName )) &&
+                    ( self::UID == substr( $propName, -3 ))) :
                     if( false !== ( $content = $component->getRecurrenceid())) {
                         $content = $component->getUid();
                     }
@@ -277,7 +287,7 @@ final class Vcalendar extends IcalBase
                         else {
                             $output[$partKey] += $partValue;
                         }
-                    }
+                    } // end foreach
                     break;
                 case ( ! isset( $output[$content] )) :
                     $output[$content] = 1;
@@ -302,7 +312,8 @@ final class Vcalendar extends IcalBase
      * @since  2.27.14 - 2019-02-20
      * @todo throw InvalidArgumentException on unknown component
      */
-    public function getComponent( $arg1 = null, $arg2 = null ) {
+    public function getComponent( $arg1 = null, $arg2 = null )
+    {
         $index = $argType = null;
         switch( true ) {
             case is_null( $arg1 ) : // first or next in component chain
@@ -376,7 +387,10 @@ final class Vcalendar extends IcalBase
                 case (( self::$INDEX == $argType ) && ( $index == $cix )) :
                     return clone $this->components[$cix];
                     break;
-                case ( 0 == strcasecmp( $argType, $this->components[$cix]->getCompType())) :
+                case ( 0 == strcasecmp(
+                    $argType,
+                    $this->components[$cix]->getCompType()
+                    )) :
                     if( $index == $cix1gC ) {
                         return clone $this->components[$cix];
                     }
@@ -409,11 +423,12 @@ final class Vcalendar extends IcalBase
      * @param CalendarComponent $component
      * @param array             $argList
      * @return bool
-     * @access private
-     * @static
      * @since  2.29.17 - 2020-01-25
      */
-    private static function isFoundInCompsProps( CalendarComponent $component, array $argList ) {
+    private static function isFoundInCompsProps(
+        CalendarComponent $component,
+        array $argList
+    ) {
         foreach( $argList as $propName => $propValue ) {
             switch( true ) {
                 case ( ! Util::isPropInList( $propName, self::$DATEPROPS ) &&
@@ -447,7 +462,9 @@ final class Vcalendar extends IcalBase
                     continue 2;
                     break;
                 case ( Util::isPropInList( $propName, self::$DATEPROPS )) :
-                    $fmt       = ( 9 > strlen( $propValue )) ? DateTimeFactory::$Ymd : DateTimeFactory::$YmdHis;
+                    $fmt       = ( 9 > strlen( $propValue ))
+                        ? DateTimeFactory::$Ymd
+                        : DateTimeFactory::$YmdHis;
                     $valueDate = $value->format( $fmt );
                     if( $propValue == $valueDate ) {
                         return true;
@@ -459,7 +476,9 @@ final class Vcalendar extends IcalBase
                     break;
             } // end switch
             foreach( $value as $part ) {
-                $part = ( false !== strpos( $part, Util::$COMMA )) ? explode( Util::$COMMA, $part ) : [ $part ];
+                $part = ( false !== strpos( $part, Util::$COMMA ))
+                    ? explode( Util::$COMMA, $part )
+                    : [ $part ];
                 foreach( $part as $subPart ) {
                     if( $propValue == $subPart ) {
                         return true;
@@ -478,7 +497,8 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.27.14 - 2018-02-19
      */
-    public function newVevent() {
+    public function newVevent()
+    {
         $comp = new Vevent( $this->getConfig());
         $comp->getDtstamp();
         $comp->getUid();
@@ -495,7 +515,8 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.27.14 - 2018-02-19
      */
-    public function newVtodo() {
+    public function newVtodo()
+    {
         $comp = new Vtodo( $this->getConfig());
         $comp->getDtstamp();
         $comp->getUid();
@@ -512,7 +533,8 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.27.14 - 2018-02-19
      */
-    public function newVjournal() {
+    public function newVjournal()
+    {
         $comp = new Vjournal( $this->getConfig());
         $comp->getDtstamp();
         $comp->getUid();
@@ -529,7 +551,8 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.27.14 - 2018-02-19
      */
-    public function newVfreebusy() {
+    public function newVfreebusy()
+    {
         $comp = new Vfreebusy( $this->getConfig());
         $comp->getDtstamp();
         $comp->getUid();
@@ -544,7 +567,8 @@ final class Vcalendar extends IcalBase
      * @return Vtimezone
      * @since  2.29.8 - 2019-07-03
      */
-    public function newVtimezone() {
+    public function newVtimezone()
+    {
         $vTimezones = $others = [];
         foreach( array_keys( $this->components ) as $cix ) {
             if( self::VTIMEZONE == $this->components[$cix]->getCompType()) {
@@ -573,7 +597,8 @@ final class Vcalendar extends IcalBase
      * @throws InvalidArgumentException
      * @since  2.27.3 - 2018-12-28
      */
-    public function replaceComponent( CalendarComponent $component ) {
+    public function replaceComponent( CalendarComponent $component )
+    {
         static $ERRMSG1 = 'Invalid component type \'%s\'';
         static $ERRMSG2 = 'Vtimezone with tzid \'%s\' not found, found \'%s\'';
         if( Util::isCompInList( $component->getCompType(), self::$VCOMPS )) {
@@ -581,7 +606,9 @@ final class Vcalendar extends IcalBase
         }
         if(( self::VTIMEZONE != $component->getCompType()) ||
             ( false === ( $tzId = $component->getTzid()))) {
-            throw new InvalidArgumentException( sprintf( $ERRMSG1, $component->getCompType()));
+            throw new InvalidArgumentException(
+                sprintf( $ERRMSG1, $component->getCompType())
+            );
         }
         $found = [];
         foreach( $this->components as $cix => $comp ) {
@@ -595,7 +622,7 @@ final class Vcalendar extends IcalBase
                 return $this;
             }
             $found[] = $foundTxid;
-        }
+        } // end foreach
         throw new InvalidArgumentException(
             sprintf(
                 $ERRMSG2,
@@ -667,7 +694,8 @@ final class Vcalendar extends IcalBase
      * @return static
      * @since  2.27.3 - 2018-12-28
      */
-    public function sort( $sortArg = null ) {
+    public function sort( $sortArg = null )
+    {
         static $SORTER = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'cmpfcn' ];
         if( 2 > $this->countComponents()) {
             return $this;
@@ -696,7 +724,8 @@ final class Vcalendar extends IcalBase
      * @throws UnexpectedValueException
      * @since  2.29.3  2019-08-29
      */
-    public function parse( $unParsedText ) {
+    public function parse( $unParsedText )
+    {
         $rows = StringFactory::conformParseInput( $unParsedText );
         $this->parse2intoComps( $rows );
         $this->parse3thisProperties();
@@ -711,12 +740,12 @@ final class Vcalendar extends IcalBase
      * Parse into calendar and comps data
      *
      * @param array $rows
-     * @access private
      * @throws Exception
      * @throws UnexpectedValueException
      * @since  2.29.3 - 2019-08-26
      */
-    private function parse2intoComps( array $rows ) {
+    private function parse2intoComps( array $rows )
+    {
         static $ERR20           = 'Ical content not in sync (row %d) %s';
         static $BEGIN_VCALENDAR = 'BEGIN:VCALENDAR';
         static $END_VCALENDAR   = 'END:VCALENDAR';
@@ -776,13 +805,14 @@ final class Vcalendar extends IcalBase
      * Parse calendar data
      *
      * @throws UnexpectedValueException
-     * @access private
-     * @since  2.29.3 - 2019-08-26
+     * @since  2.29.22 - 2020-08-26
      */
-    private function parse3thisProperties() {
+    private function parse3thisProperties()
+    {
         static $NLCHARS   = '\n';
         static $BEGIN     = 'BEGIN:';
         static $ERR       = 'Unknown ical component (row %d) %s';
+        static $PVPROPS   = [ self::PRODID, self::VERSION ];
         static $CALPROPS  = [
             self::CALSCALE,
             self::METHOD,
@@ -811,7 +841,9 @@ final class Vcalendar extends IcalBase
         $rows = StringFactory::concatRows( $this->unparsed );
         foreach( $rows as $lix => $row ) {
             if( StringFactory::startsWith( $row, $BEGIN )) {
-                throw new UnexpectedValueException( sprintf( $ERR, $lix, PHP_EOL . implode( PHP_EOL, $rows )));
+                throw new UnexpectedValueException(
+                    sprintf( $ERR, $lix, PHP_EOL . implode( PHP_EOL, $rows ))
+                );
             }
             /* split property name  and  opt.params and value */
             list( $propName, $row ) = StringFactory::getPropName( $row );
@@ -819,7 +851,7 @@ final class Vcalendar extends IcalBase
                 case ( StringFactory::isXprefixed( $propName ) ||
                        Util::isPropInList( $propName, $RFC7986PROPS )) :
                     break;
-                case ( Util::isPropInList( $propName, [ self::PRODID, self::VERSION ] )) :
+                case Util::isPropInList( $propName, $PVPROPS ) :
                     continue 2;  // ignore version/prodid properties
                     break;
                 case ( ! Util::isPropInList( $propName, $CALPROPS )) :
@@ -830,7 +862,11 @@ final class Vcalendar extends IcalBase
             list( $value, $propAttr ) = StringFactory::splitContent( $row );
             /* update Property */
             if( StringFactory::isXprefixed( $propName )) {
-                $this->setXprop( $propName, StringFactory::strunrep( $value ), $propAttr );
+                $this->setXprop(
+                    $propName,
+                    StringFactory::strunrep( $value ),
+                    $propAttr
+                );
                 continue;
             }
             if(( $NLCHARS == strtolower( substr( $value, -2 ))) &&
@@ -855,10 +891,10 @@ final class Vcalendar extends IcalBase
     /**
      * Parse sub-components
      *
-     * @access private
      * @since  2.29.3 - 2019-07-02
      */
-    private function parse4subComps() {
+    private function parse4subComps()
+    {
         foreach( array_keys( $this->components ) as $ckey ) {
             if( ! empty( $this->components[$ckey] ) &&
                 ! empty( $this->components[$ckey]->unparsed )) {
@@ -879,8 +915,19 @@ final class Vcalendar extends IcalBase
      * @throws InvalidArgumentException;
      * @since  2.29.16 - 2020-01-25
      */
-    public function vtimezonePopulate( $timezone = null, $xProp = [], $start = null, $end = null ) {
-        return VtimezonePopulateFactory::process( $this, $timezone, $xProp, $start, $end );
+    public function vtimezonePopulate(
+        $timezone = null,
+        $xProp = [],
+        $start = null,
+        $end = null
+    ) {
+        return VtimezonePopulateFactory::process(
+            $this,
+            $timezone,
+            $xProp,
+            $start,
+            $end
+        );
     }
 
     /**
@@ -890,7 +937,8 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.29.05 - 2019-07-02
      */
-    public function createCalendar() {
+    public function createCalendar()
+    {
         static $BEGIN_VCALENDAR = "BEGIN:VCALENDAR";
         static $END_VCALENDAR   = "END:VCALENDAR";
         $calendar  = $BEGIN_VCALENDAR . Util::$CRLF;
@@ -932,8 +980,19 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @since  2.29.15 - 2020-01-19
      */
-    public function returnCalendar( $utf8Encode = false, $gzip = false, $cdType = true, $fileName = null ) {
-        return HttpFactory::returnCalendar( $this, $utf8Encode, $gzip, $cdType, $fileName );
+    public function returnCalendar(
+        $utf8Encode = false,
+        $gzip = false,
+        $cdType = true,
+        $fileName = null
+    ) {
+        return HttpFactory::returnCalendar(
+            $this,
+            $utf8Encode,
+            $gzip,
+            $cdType,
+            $fileName
+        );
     }
 
 }

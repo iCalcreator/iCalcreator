@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -96,7 +96,8 @@ abstract class DScomponent extends CalendarComponent
      * @throws Exception  (on Rdate err)
      * @since  2.29.11 - 2019-08-30
      */
-    public function createComponent() {
+    public function createComponent()
+    {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createTzname();
@@ -109,5 +110,4 @@ abstract class DScomponent extends CalendarComponent
         $component  .= $this->createXprop();
         return $component . sprintf( self::$FMTEND, $compType );
     }
-
 }

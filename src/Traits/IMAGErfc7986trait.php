@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -48,7 +48,6 @@ trait IMAGErfc7986trait
 {
     /**
      * @var array component property IMAGE value
-     * @access protected
      */
     protected $image = null;
 
@@ -57,7 +56,8 @@ trait IMAGErfc7986trait
      *
      * @return string
      */
-    public function createImage() {
+    public function createImage()
+    {
         if( empty( $this->image )) {
             return null;
         }
@@ -66,14 +66,17 @@ trait IMAGErfc7986trait
             if( ! empty( $imagePart[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::IMAGE,
-                    ParameterFactory::createParams( $imagePart[Util::$LCparams],[ self::ALTREP, self::DISPLAY ] ),
+                    ParameterFactory::createParams(
+                        $imagePart[Util::$LCparams],
+                        [ self::ALTREP, self::DISPLAY ]
+                    ),
                     $imagePart[Util::$LCvalue]
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
                 $output .= StringFactory::createElement( self::IMAGE );
             }
-        }
+        } // end foreach
         return $output;
     }
 
@@ -83,7 +86,8 @@ trait IMAGErfc7986trait
      * @param int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      */
-    public function deleteImage( $propDelIx = null ) {
+    public function deleteImage( $propDelIx = null )
+    {
         if( empty( $this->image )) {
             unset( $this->propDelIx[self::IMAGE] );
             return false;
@@ -98,7 +102,8 @@ trait IMAGErfc7986trait
      * @param bool   $inclParam
      * @return bool|array
      */
-    public function getImage( $propIx = null, $inclParam = false ) {
+    public function getImage( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->image )) {
             unset( $this->propIx[self::IMAGE] );
             return false;
@@ -115,7 +120,8 @@ trait IMAGErfc7986trait
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setImage( $value = null, $params = [], $index = null ) {
+    public function setImage( $value = null, $params = [], $index = null )
+    {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::IMAGE );
@@ -132,17 +138,23 @@ trait IMAGErfc7986trait
             case ( ! isset( $params[self::VALUE] )) :
                 $params[self::VALUE] = self::URI;
                 break;
-            case ( self::URI == $params[self::VALUE] ) :
+            case ( self::URI === $params[self::VALUE] ) :
                 break;
-            case ( self::BINARY == $params[self::VALUE] ) :
+            case ( self::BINARY === $params[self::VALUE] ) :
                 $params[self::ENCODING] = self::BASE64;
                 break;
             default :
-                throw new InvalidArgumentException( sprintf( $FMTERR2, $params[self::VALUE] ));
+                throw new InvalidArgumentException(
+                    sprintf( $FMTERR2, $params[self::VALUE] )
+                );
                 break;
-        }
+        } // end switch
         // remove defaults
-        ParameterFactory::ifExistRemove( $params, self::DISPLAY, self::BADGE );
+        ParameterFactory::ifExistRemove(
+            $params,
+            self::DISPLAY,
+            self::BADGE
+        );
         $this->setMval( $this->image, $value, $params, null, $index );
         return $this;
     }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -54,7 +54,6 @@ trait RDATEtrait
 {
     /**
      * @var array component property RDATE value
-     * @access protected
      */
     protected $rdate = null;
 
@@ -64,7 +63,8 @@ trait RDATEtrait
      * @return string
      * @throws Exception
      */
-    public function createRdate() {
+    public function createRdate()
+    {
         if( empty( $this->rdate )) {
             return null;
         }
@@ -88,7 +88,8 @@ trait RDATEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRdate( $propDelIx = null ) {
+    public function deleteRdate( $propDelIx = null )
+    {
         if( empty( $this->rdate )) {
             unset( $this->propDelIx[self::RDATE] );
             return false;
@@ -105,7 +106,8 @@ trait RDATEtrait
      * @throws Exception
      * @since 2.29.2 2019-06-23
      */
-    public function getRdate( $propIx = null, $inclParam = false ) {
+    public function getRdate( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->rdate )) {
             unset( $this->propIx[self::RDATE] );
             return false;
@@ -136,7 +138,8 @@ trait RDATEtrait
                 if( is_array( $rdatePart ) && isset( $rdatePart[1] ) &&
                     DateIntervalFactory::isDateIntervalArrayInvertSet( $rdatePart[1] )) {
                     try { // fix pre 7.0.5 bug
-                        $output[$rIx][1] = DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
+                        $output[$rIx][1] =
+                            DateIntervalFactory::DateIntervalArr2DateInterval( $rdatePart[1] );
                     }
                     catch( Exception $e ) {
                         throw $e;
@@ -158,7 +161,8 @@ trait RDATEtrait
      * @throws InvalidArgumentException
      * @since 2.29.2 2019-06-23
      */
-    public function setRdate( $value = null, $params = [], $index = null ) {
+    public function setRdate( $value = null, $params = [], $index = null )
+    {
         if( empty( $value ) ||
             ( is_array( $value) && ( 1 == count( $value )) && empty( reset( $value )))
         ) {
@@ -168,7 +172,10 @@ trait RDATEtrait
         }
         $value = self::checkSingleRdates(
             $value,
-            ParameterFactory::isParamsValueSet( [ Util::$LCparams => $params ], self::PERIOD )
+            ParameterFactory::isParamsValueSet(
+                [ Util::$LCparams => $params ],
+                self::PERIOD
+            )
         );
         if( Util::isCompInList( $this->getCompType(), Vcalendar::$TZCOMPS )) {
             $params[Util::$ISLOCALTIME] = true;
@@ -179,7 +186,13 @@ trait RDATEtrait
         catch( Exception $e ) {
             throw $e;
         }
-        $this->setMval( $this->rdate, $input[Util::$LCvalue], $input[Util::$LCparams], null, $index );
+        $this->setMval(
+            $this->rdate,
+            $input[Util::$LCvalue],
+            $input[Util::$LCparams],
+            null,
+            $index
+        );
         return $this;
     }
 
@@ -189,13 +202,13 @@ trait RDATEtrait
      * @param array $rDates
      * @param bool $isPeriod
      * @return array
-     * @access private
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleRdates( $rDates, $isPeriod ) {
+    private static function checkSingleRdates( $rDates, $isPeriod )
+    {
         if( $rDates instanceof DateTimeInterface ) {
             return [ DateTimeFactory::cnvrtDateTimeInterface( $rDates ) ];
         }

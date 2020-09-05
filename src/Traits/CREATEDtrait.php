@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,7 +52,6 @@ trait CREATEDtrait
 {
     /**
      * @var array component property CREATED value
-     * @access protected
      */
     protected $created = null;
 
@@ -60,9 +59,12 @@ trait CREATEDtrait
      * Return formatted output for calendar component property created
      *
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.1 2019-06-22
      */
-    public function createCreated() {
+    public function createCreated()
+    {
         if( empty( $this->created )) {
             return null;
         }
@@ -79,7 +81,8 @@ trait CREATEDtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteCreated( ) {
+    public function deleteCreated()
+    {
         $this->created = null;
         return true;
     }
@@ -91,7 +94,8 @@ trait CREATEDtrait
      * @return bool|DateTime|array
      * @since  2.27.14 - 2019-01-27
      */
-    public function getCreated( $inclParam = false ) {
+    public function getCreated( $inclParam = false )
+    {
         if( empty( $this->created )) {
             return false;
         }
@@ -108,7 +112,8 @@ trait CREATEDtrait
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setCreated(  $value  = null, $params = [] ) {
+    public function setCreated(  $value  = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->created = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),

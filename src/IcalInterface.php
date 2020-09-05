@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -125,12 +125,10 @@ interface IcalInterface
     const COUNTER        = 'COUNTER';
     const DECLINECOUNTER = 'DECLINECOUNTER';
 
-
     /**
      * iCal property CALSCALE default value
      */
     const GREGORIAN      = 'GREGORIAN';
-
 
     /**
      * iCal global component parameter keywords
@@ -157,7 +155,6 @@ interface IcalInterface
     const TIME             = 'TIME';             // HHMMSS
     const URI              = 'URI';              // Section 3 of [RFC3986]
     const UTC_OFFSET       = 'UTC-OFFSET';       // ("+" / "-") time-hour time-minute [time-second
-
 
     /**
      * iCal component properties ATTENDEE/ORGANIZER parameter keywords
@@ -194,7 +191,6 @@ interface IcalInterface
     const DELEGATED        = 'DELEGATED';        // Vevent, Vtodo
     const IN_PROCESS       = 'IN-PROCESS';       // Vtodo
 
-
     /**
      * iCal component properties ATTENDEE ROLE parameter keywords
      */
@@ -208,7 +204,6 @@ interface IcalInterface
      */
     const FALSE            = 'FALSE';
     const TRUE             = 'TRUE';
-
 
     /**
      * iCal component properties RRULE, EXRULE 'RECUR' keywords
@@ -242,7 +237,6 @@ interface IcalInterface
     const TH               = 'TH';               // THURSDAY
     const FR               = 'FR';               // FRIDAY
     const SA               = 'SA';               // SATURDAY
-
 
     /**
      * iCal component property ACTION, IMAGE values
@@ -374,13 +368,11 @@ interface IcalInterface
     const DRAFT            = 'DRAFT';            // Vjournal
     const F_NAL            = 'FINAL';            // Vjournal
 
-
     /**
      * iCal component property TRANSP values
      */
     const OPAQUE           = 'OPAQUE';           // default
     const TRANSPARENT      = 'TRANSPARENT';
-
 
     /**
      * UTC DateTimezones
@@ -418,5 +410,4 @@ interface IcalInterface
     const UNIQUE_ID        = 'UNIQUE_ID';
     const PROPINFO         = 'PROPINFO';
     const SETPROPERTYNAMES = 'SETPROPERTYNAMES';
-
 }

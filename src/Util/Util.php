@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -74,7 +74,8 @@ class Util
      * @static
      * @since  2.26 - 2018-11-03
      */
-    public static function isCompInList( $compType, array $compList ) {
+    public static function isCompInList( $compType, array $compList )
+    {
         if( empty( $compType )) {
             return false;
         }
@@ -90,7 +91,8 @@ class Util
      * @static
      * @since  2.26 - 2018-11-04
      */
-    public static function isPropInList( $propName, array $propList ) {
+    public static function isPropInList( $propName, array $propList )
+    {
         return in_array( strtoupper( $propName ), $propList);
     }
 
@@ -103,7 +105,8 @@ class Util
      * @static
      * @since  2.26.14 - 2019-01-28
      */
-    public static function issetAndNotEmpty( $array = null, $key = null) {
+    public static function issetAndNotEmpty( $array = null, $key = null)
+    {
         if( empty( $array ) ||
             ! is_array( $array ) ||
             ! array_key_exists( $key, $array )) {
@@ -122,8 +125,11 @@ class Util
      * @static
      * @since  2.26.14 - 2019-03-01
      */
-    public static function issetKeyAndEquals( $base, $key, $value ) {
-        if( empty( $base ) || ! is_array( $base ) || ! array_key_exists( $key, $base )) {
+    public static function issetKeyAndEquals( $base, $key, $value )
+    {
+        if( empty( $base ) ||
+            ! is_array( $base ) ||
+            ! array_key_exists( $key, $base )) {
             return false;
         }
         return ( $value == $base[$key] );
@@ -137,11 +143,15 @@ class Util
      * @param int $rangeMin
      * @param int $rangeMax
      * @throws InvalidArgumentException
-     * @access protected
      * @static
      * @since  2.27.14 - 2019-02-19
      */
-    public static function assertInteger( $value, $propName, $rangeMin = null, $rangeMax = null ) {
+    public static function assertInteger(
+        $value,
+        $propName,
+        $rangeMin = null,
+        $rangeMax = null
+    ) {
         static $ERR1 = '%s expects integer value, got %s';
         static $ERR2 = '%s value %s not in range (%d-%d)';
         if( ! is_scalar( $value ) || ! ctype_digit( (string) $value )) {
@@ -164,15 +174,20 @@ class Util
      * @param mixed  $value
      * @param string $propName
      * @throws InvalidArgumentException
-     * @access protected
      * @static
      * @since  2.29.14 - 2019-09-03
      */
-    public static function assertString( $value, $propName ) {
+    public static function assertString( $value, $propName )
+    {
         static $ERR1 = '%s expects string value, got (%s) %s';
         if( ! is_scalar( $value )) {
             throw new InvalidArgumentException(
-                sprintf( $ERR1, $propName, gettype( $value ), var_export( $value, true ))
+                sprintf(
+                    $ERR1,
+                    $propName,
+                    gettype( $value ),
+                    var_export( $value, true )
+                )
             );
         }
     }
@@ -184,16 +199,18 @@ class Util
      * @param array  $enumeration - all upper case
      * @param string $propName
      * @throws InvalidArgumentException
-     * @access protected
      * @static
      * @since  2.27.2 - 2019-01-04
      */
-    public static function assertInEnumeration( $value, array $enumeration, $propName ) {
+    public static function assertInEnumeration(
+        $value,
+        array $enumeration,
+        $propName
+    ) {
         static $ERR = 'Invalid %s value : %s';
         if( ! in_array( strtoupper( $value ), $enumeration )) {
             throw new InvalidArgumentException( sprintf( $ERR, $propName, var_export( $value, true )));
         }
     }
-
 }
 

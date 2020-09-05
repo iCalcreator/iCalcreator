@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait CONFERENCErfc7986trait
 {
     /**
      * @var array component property CONFERENCE value
-     * @access protected
      */
     protected $conference = null;
 
@@ -54,7 +53,8 @@ trait CONFERENCErfc7986trait
      *
      * @return string
      */
-    public function createConference() {
+    public function createConference()
+    {
         if( empty( $this->conference )) {
             return null;
         }
@@ -75,7 +75,7 @@ trait CONFERENCErfc7986trait
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
                 $output .= StringFactory::createElement( self::CONFERENCE );
             }
-        }
+        } // end foreach
         return $output;
     }
 
@@ -85,12 +85,17 @@ trait CONFERENCErfc7986trait
      * @param int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      */
-    public function deleteConference( $propDelIx = null ) {
+    public function deleteConference( $propDelIx = null )
+    {
         if( empty( $this->conference )) {
             unset( $this->propDelIx[self::CONFERENCE] );
             return false;
         }
-        return $this->deletePropertyM( $this->conference, self::CONFERENCE, $propDelIx );
+        return $this->deletePropertyM(
+            $this->conference,
+            self::CONFERENCE,
+            $propDelIx
+        );
     }
 
     /**
@@ -100,12 +105,18 @@ trait CONFERENCErfc7986trait
      * @param bool   $inclParam
      * @return bool|array
      */
-    public function getConference( $propIx = null, $inclParam = false ) {
+    public function getConference( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->conference )) {
             unset( $this->propIx[self::CONFERENCE] );
             return false;
         }
-        return $this->getPropertyM( $this->conference, self::CONFERENCE, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->conference,
+            self::CONFERENCE,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -119,7 +130,8 @@ trait CONFERENCErfc7986trait
      * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token
      * @todo fix labelparam   - LABEL
      */
-    public function setConference( $value = null, $params = [], $index = null ) {
+    public function setConference( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONFERENCE );
             $value  = Util::$SP0;

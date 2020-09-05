@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait RRULEtrait
 {
     /**
      * @var array component property RRULE value
-     * @access protected
      */
     protected $rrule = null;
 
@@ -54,9 +53,12 @@ trait RRULEtrait
      *
      * "Recur UNTIL, the value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since  2.27.13 - 2019-01-09
      */
-    public function createRrule() {
+    public function createRrule()
+    {
         return RecurFactory::formatRecur(
             self::RRULE,
             $this->rrule,
@@ -70,7 +72,8 @@ trait RRULEtrait
      * @return static
      * @since 2.29.6 2019-06-23
      */
-    public function deleteRrule() {
+    public function deleteRrule()
+    {
         $this->rrule = null;
         return $this;
     }
@@ -82,7 +85,8 @@ trait RRULEtrait
      * @return bool|array
      * @since 2.29.6 2019-06-23
      */
-    public function getRrule( $inclParam = false ) {
+    public function getRrule( $inclParam = false )
+    {
         if( empty( $this->rrule )) {
             return false;
         }
@@ -99,7 +103,8 @@ trait RRULEtrait
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setRrule( $rruleset = null, $params = [] ) {
+    public function setRrule( $rruleset = null, $params = [] )
+    {
         if( empty( $rruleset )) {
             $this->assertEmptyValue( $rruleset, self::RRULE );
             $rruleset = Util::$SP0;
@@ -107,7 +112,7 @@ trait RRULEtrait
         }
         $this->rrule = RecurFactory::setRexrule(
             $rruleset,
-            array_merge( (array) $params, (array) $this->getDtstartParams())
+            array_merge( (array) $params, $this->getDtstartParams())
         );
         return $this;
     }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -47,13 +47,11 @@ trait CLASStrait
 {
     /**
      * @var array component property CLASS value
-     * @access protected
      */
     protected $class = null;
 
     /**
      * @var string
-     * @access protected
      * @static
      */
     protected static $KLASS = 'class';
@@ -64,11 +62,14 @@ trait CLASStrait
      * @return string
      */
     public function createClass() {
-        if( empty( $this->{self::$KLASS} )) {
+        if( empty( $this->{self::$KLASS} ))
+        {
             return null;
         }
         if( empty( $this->{self::$KLASS}[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::KLASS ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::KLASS )
+                : null;
         }
         return StringFactory::createElement(
             self::KLASS,
@@ -83,7 +84,8 @@ trait CLASStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteClass( ) {
+    public function deleteClass( )
+    {
         $this->{self::$KLASS} = null;
         return true;
     }
@@ -95,11 +97,14 @@ trait CLASStrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getClass( $inclParam = false ) {
+    public function getClass( $inclParam = false )
+    {
         if( empty( $this->{self::$KLASS} )) {
             return false;
         }
-        return ( $inclParam ) ? $this->{self::$KLASS} : $this->{self::$KLASS}[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->{self::$KLASS}
+        : $this->{self::$KLASS}[Util::$LCvalue];
     }
 
     /**
@@ -111,7 +116,8 @@ trait CLASStrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setClass( $value = null, $params = [] ) {
+    public function setClass( $value = null, $params = [] )
+    {
         $STDVALUES = [
             self::P_BLIC,
             self::P_IVATE,

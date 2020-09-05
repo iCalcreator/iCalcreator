@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -48,13 +48,11 @@ trait DESCRIPTIONtrait
 {
     /**
      * @var array component property DESCRIPTION value
-     * @access protected
      */
     protected $description = null;
 
     /**
      * @var array
-     * @access private
      * @static
      */
     private static $MULTIDESCRCOMPS = [ Vcalendar::VCALENDAR, Vcalendar::VJOURNAL ];
@@ -65,7 +63,8 @@ trait DESCRIPTIONtrait
      * @return string
      * @since 2.27.3 2018-12-22
      */
-    public function createDescription() {
+    public function createDescription()
+    {
         if( empty( $this->description )) {
             return null;
         }
@@ -75,7 +74,11 @@ trait DESCRIPTIONtrait
             if( ! empty( $description[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::DESCRIPTION,
-                    ParameterFactory::createParams( $description[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                    ParameterFactory::createParams(
+                        $description[Util::$LCparams],
+                        self::$ALTRPLANGARR,
+                        $lang
+                    ),
                     StringFactory::strrep( $description[Util::$LCvalue] )
                 );
             }
@@ -93,7 +96,8 @@ trait DESCRIPTIONtrait
      * @return bool
      * @since 2.29.5 2019-07-03
      */
-    public function deleteDescription( $propDelIx = null ) {
+    public function deleteDescription( $propDelIx = null )
+    {
         if( empty( $this->description )) {
             unset( $this->propDelIx[self::DESCRIPTION] );
             return false;
@@ -101,7 +105,11 @@ trait DESCRIPTIONtrait
         if( ! Util::isCompInList( $this->getCompType(), self::$MULTIDESCRCOMPS )) {
             $propDelIx = 1;
         }
-        return $this->deletePropertyM( $this->description, self::DESCRIPTION, $propDelIx );
+        return $this->deletePropertyM(
+            $this->description,
+            self::DESCRIPTION,
+            $propDelIx
+        );
     }
 
     /**
@@ -112,18 +120,24 @@ trait DESCRIPTIONtrait
      * @return bool|array
      * @since 2.29.5 2019-07-03
      */
-    public function getDescription( $propIx = null, $inclParam = null ) {
+    public function getDescription( $propIx = null, $inclParam = null )
+    {
         if( empty( $this->description )) {
             unset( $this->propIx[self::DESCRIPTION] );
             return false;
         }
         if( ! Util::isCompInList( $this->getCompType(), self::$MULTIDESCRCOMPS )) {
             if( ! is_bool( $inclParam )) {
-                $inclParam = ( true == $propIx ) ? true : false; // note ==
+                $inclParam = ( true == $propIx ); // note ==
             }
             $propIx = 1;
         }
-        return $this->getPropertyM( $this->description, self::DESCRIPTION, $propIx, $inclParam );
+        return $this->getPropertyM(
+            $this->description,
+            self::DESCRIPTION,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -136,7 +150,8 @@ trait DESCRIPTIONtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setDescription( $value = null, $params = [], $index = null ) {
+    public function setDescription( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DESCRIPTION );
             $value  = Util::$SP0;

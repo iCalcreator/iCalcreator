@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -58,8 +58,6 @@ final class Vfreebusy extends Vcomponent
 
     /**
      * @var string
-     * @access protected
-     * @static
      */
     protected static $compSgn = 'f';
 
@@ -68,7 +66,8 @@ final class Vfreebusy extends Vcomponent
      *
      * @since  2.26 - 2018-11-10
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         unset(
             $this->compType,
             $this->xprop,
@@ -106,7 +105,8 @@ final class Vfreebusy extends Vcomponent
      * @throws Exception  (on Duration/Freebusy err)
      * @since 2.29.9 2019-08-05
      */
-    public function createComponent() {
+    public function createComponent()
+    {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createUid();

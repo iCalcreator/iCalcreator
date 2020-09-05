@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait NAMErfc7986trait
 {
     /**
      * @var array component property NAME value
-     * @access protected
      */
     protected $name = null;
 
@@ -55,7 +54,8 @@ trait NAMErfc7986trait
      * @return string
      * @since 2.29.5 2019-06-16
      */
-    public function createName() {
+    public function createName()
+    {
         if( empty( $this->name )) {
             return null;
         }
@@ -70,7 +70,11 @@ trait NAMErfc7986trait
             }
             $output .= StringFactory::createElement(
                 self::NAME,
-                ParameterFactory::createParams( $namePart[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                ParameterFactory::createParams(
+                    $namePart[Util::$LCparams],
+                    self::$ALTRPLANGARR,
+                    $lang
+                ),
                 StringFactory::strrep( $namePart[Util::$LCvalue] )
             );
         }
@@ -84,7 +88,8 @@ trait NAMErfc7986trait
      * @return bool
      * @since 2.29.5 2019-06-16
      */
-    public function deleteName( $propDelIx = null ) {
+    public function deleteName( $propDelIx = null )
+    {
         if( empty( $this->name )) {
             unset( $this->propDelIx[self::NAME] );
             return false;
@@ -100,7 +105,8 @@ trait NAMErfc7986trait
      * @return bool|array
      * @since 2.29.5 2019-06-16
      */
-    public function getName( $propIx = null, $inclParam = false ) {
+    public function getName( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->name )) {
             unset( $this->propIx[self::NAME] );
             return false;
@@ -118,7 +124,8 @@ trait NAMErfc7986trait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setName( $value = null, $params = [], $index = null ) {
+    public function setName( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::NAME );
             $value  = Util::$SP0;

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -47,7 +47,6 @@ trait TRANSPtrait
 {
     /**
      * @var array component property TRANSP value
-     * @access protected
      */
     protected $transp = null;
 
@@ -56,13 +55,15 @@ trait TRANSPtrait
      *
      * @return string
      */
-    public function createTransp() {
+    public function createTransp()
+    {
         if( empty( $this->transp )) {
             return null;
         }
         if( empty( $this->transp[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
-                ? StringFactory::createElement( self::TRANSP ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::TRANSP )
+                : null;
         }
         return StringFactory::createElement(
             self::TRANSP,
@@ -77,7 +78,8 @@ trait TRANSPtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteTransp() {
+    public function deleteTransp()
+    {
         $this->transp = null;
         return true;
     }
@@ -89,7 +91,8 @@ trait TRANSPtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTransp( $inclParam = false ) {
+    public function getTransp( $inclParam = false )
+    {
         if( empty( $this->transp )) {
             return false;
         }
@@ -105,7 +108,8 @@ trait TRANSPtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setTransp( $value = null, $params = [] ) {
+    public function setTransp( $value = null, $params = [] )
+    {
         static $ALLOWED = [
             self::OPAQUE,
             self::TRANSPARENT

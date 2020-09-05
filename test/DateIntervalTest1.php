@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -58,7 +58,7 @@ class DateIntervalTest1 extends DtBase
     /**
      * DateInterval123Provider Generator
      *
-     * @param int $inclYearMonth
+     * @param bool $inclYearMonth
      * @return array
      * @throws Exception
      * @static
@@ -66,25 +66,25 @@ class DateIntervalTest1 extends DtBase
      */
     public static function DateIntervalArrayGenerator( $inclYearMonth = true) {
         $base = [
-            RecurFactory::$LCYEAR  => random_int( 1, 2 ),
-            RecurFactory::$LCMONTH => random_int( 1, 12 ),
-            RecurFactory::$LCDAY   => random_int( 1, 28 ),
-            RecurFactory::$LCWEEK  => random_int( 1, 4 ),
-            RecurFactory::$LCHOUR  => random_int( 1, 23 ),
-            RecurFactory::$LCMIN   => random_int( 1, 59 ),
-            RecurFactory::$LCSEC   => random_int( 1, 59 )
+            RecurFactory::$LCYEAR  => array_rand( array_flip( [ 1, 2 ] )),
+            RecurFactory::$LCMONTH => array_rand( array_flip( [ 1, 12 ] )),
+            RecurFactory::$LCDAY   => array_rand( array_flip( [ 1, 28 ] )),
+            RecurFactory::$LCWEEK  => array_rand( array_flip( [ 1, 4 ] )),
+            RecurFactory::$LCHOUR  => array_rand( array_flip( [ 1, 23 ] )),
+            RecurFactory::$LCMIN   => array_rand( array_flip( [ 1, 59 ] )),
+            RecurFactory::$LCSEC   => array_rand( array_flip( [ 1, 59 ] ))
         ];
 
         do {
             $random = [];
-            $cnt = random_int( 1, 7 );
+            $cnt = array_rand( array_flip( [ 1, 7 ] ));
             for( $x = 0; $x < $cnt; $x++ ) {
                 $random = array_merge(
                     $random,
-                    array_slice( $base, random_int( 1, 7 ), 1, true )
+                    array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
                 );
             }
-            if( 1 == random_int( 1, 2 )) {
+            if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
                 $random = array_filter( $random );
             }
@@ -164,7 +164,7 @@ class DateIntervalTest1 extends DtBase
         }
         return $result;
     }
-    
+
     /**
      * DateInterval123ProviderDateInterval sub-provider
      *

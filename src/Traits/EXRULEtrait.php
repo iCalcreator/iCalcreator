@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait EXRULEtrait
 {
     /**
      * @var array component property EXRULE value
-     * @access protected
      */
     protected $exrule = null;
 
@@ -54,9 +53,12 @@ trait EXRULEtrait
      *
      * "Recur UNTIL, the value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since  2.27.13 - 2019-01-09
      */
-    public function createExrule() {
+    public function createExrule()
+    {
         return RecurFactory::formatRecur(
             self::EXRULE,
             $this->exrule,
@@ -70,7 +72,8 @@ trait EXRULEtrait
      * @return static
      * @since 2.29.6 2019-06-23
      */
-    public function deleteExrule() {
+    public function deleteExrule()
+    {
         $this->exrule = null;
         return $this;
     }
@@ -82,7 +85,8 @@ trait EXRULEtrait
      * @return bool|array
      * @since 2.29.6 2019-06-27
      */
-    public function getExrule( $inclParam = false ) {
+    public function getExrule( $inclParam = false )
+    {
         if( empty( $this->exrule )) {
             return false;
         }
@@ -99,7 +103,8 @@ trait EXRULEtrait
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setExrule( $exruleset = null, $params = [] ) {
+    public function setExrule( $exruleset = null, $params = [] )
+    {
         if( empty( $exruleset )) {
             $this->assertEmptyValue( $exruleset, self::EXRULE );
             $exruleset = Util::$SP0;
@@ -107,7 +112,7 @@ trait EXRULEtrait
         }
         $this->exrule = RecurFactory::setRexrule(
             $exruleset,
-            array_merge( (array) $params, (array) $this->getDtstartParams())
+            array_merge( (array) $params, $this->getDtstartParams())
         );
         return $this;
     }

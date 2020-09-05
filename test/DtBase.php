@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.18
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -116,7 +116,7 @@ class DtBase extends TestCase
                             $fmt = DateTimeFactory::$Ymd;
                             break;
                         case isset( $getValue[Util::$LCparams][Util::$ISLOCALTIME] ) :
-                            $fmt = DateTimeFactory::$YMDHIS;
+                            $fmt = DateTimeFactory::$YmdHis;
                             break;
                         default :
                             $fmt = DateTimeFactory::$YMDHISe;
@@ -202,7 +202,7 @@ class DtBase extends TestCase
                             $fmt = DateTimeFactory::$Ymd;
                             break;
                         case isset( $getValue[Util::$LCparams][Util::$ISLOCALTIME] ) :
-                            $fmt = DateTimeFactory::$YMDHIS;
+                            $fmt = DateTimeFactory::$YmdHis;
                             break;
                         default :
                             $fmt = DateTimeFactory::$YMDHISe;
@@ -263,6 +263,8 @@ class DtBase extends TestCase
      * @param int       $case
      * @param Vcalendar $calendar
      * @param string    $expectedString
+     * @param mixed     $theComp
+     * @param string    $propName
      * @throws Exception
      */
     public function parseCalendarTest( $case, Vcalendar $calendar, $expectedString = null, $theComp = null, $propName = null ) {

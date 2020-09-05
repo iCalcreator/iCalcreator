@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,6 @@ trait TZOFFSETTOtrait
 {
     /**
      * @var array component property TZOFFSETTO value
-     * @access protected
      */
     protected $tzoffsetto = null;
 
@@ -58,12 +57,15 @@ trait TZOFFSETTOtrait
      *
      * @return string
      */
-    public function createTzoffsetto() {
+    public function createTzoffsetto()
+    {
         if( empty( $this->tzoffsetto )) {
             return null;
         }
         if( empty( $this->tzoffsetto[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::TZOFFSETTO ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::TZOFFSETTO )
+                : null;
         }
         return StringFactory::createElement(
             self::TZOFFSETTO,
@@ -78,7 +80,8 @@ trait TZOFFSETTOtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteTzoffsetto() {
+    public function deleteTzoffsetto()
+    {
         $this->tzoffsetto = null;
         return true;
     }
@@ -90,7 +93,8 @@ trait TZOFFSETTOtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzoffsetto( $inclParam = false ) {
+    public function getTzoffsetto( $inclParam = false )
+    {
         if( empty( $this->tzoffsetto )) {
             return false;
         }
@@ -106,7 +110,8 @@ trait TZOFFSETTOtrait
      * @throws InvalidArgumentException
      * @since 2.27.3 2019-03-14
      */
-    public function setTzoffsetto( $value = null, $params = [] ) {
+    public function setTzoffsetto( $value = null, $params = [] )
+    {
         static $ERR = 'Invalid %s offset value %s';
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZOFFSETTO );
@@ -114,7 +119,9 @@ trait TZOFFSETTOtrait
             $params = [];
         }
         elseif( ! DateTimeZoneFactory::hasOffset( $value )) {
-            throw new InvalidArgumentException( sprintf( $ERR, Vcalendar::TZOFFSETTO, $value ));
+            throw new InvalidArgumentException(
+                sprintf( $ERR, Vcalendar::TZOFFSETTO, $value )
+            );
         }
         $this->tzoffsetto = [
             Util::$LCvalue  => $value,

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,7 @@ use function trim;
  * iCalcreator iCal parameters support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.27.6 - 2019-01-05
+ * @since  2.29.25 - 2020-09-02
  */
 class ParameterFactory
 {
@@ -61,17 +61,29 @@ class ParameterFactory
      * @param string $lang
      * @return string
      * @static
-     * @since  2.29.7 - 2019-07-02
+     * @since  2.29.25 - 2020-09-02
      */
-    public static function createParams( $inputParams = null, $ctrKeys = null, $lang = null ) {
+    public static function createParams(
+        $inputParams = null, $ctrKeys = null, $lang = null ) {
         static $FMTFMTTYPE = ';FMTTYPE=%s%s';
         static $FMTKEQV    = '%s=%s';
         static $FMTQ       = '"%s"';
         static $FMTQTD     = ';%s=%s%s%s';
         static $FMTCMN     = ';%s=%s';
-        static $KEYGRP1    = [ Vcalendar::VALUE, Vcalendar::TZID, Vcalendar::RANGE, Vcalendar::RELTYPE ];
+        static $DFKEYS     = [ Vcalendar::DISPLAY, Vcalendar::FEATURE ];
+        static $KEYGRP1    = [
+            Vcalendar::VALUE,
+            Vcalendar::TZID,
+            Vcalendar::RANGE,
+            Vcalendar::RELTYPE
+        ];
         static $KEYGRP2    = [ Vcalendar::DIR, Vcalendar::ALTREP ];
-        static $KEYGRP3    = [ Vcalendar::SENT_BY, Vcalendar::DISPLAY, Vcalendar::FEATURE, Vcalendar::LABEL ];
+        static $KEYGRP3    = [
+            Vcalendar::SENT_BY,
+            Vcalendar::DISPLAY,
+            Vcalendar::FEATURE,
+            Vcalendar::LABEL
+        ];
 
         if( isset( $inputParams[Util::$ISLOCALTIME ] )) {
             unset( $inputParams[Util::$ISLOCALTIME ] );
@@ -89,15 +101,18 @@ class ParameterFactory
             $ctrKeys = [ $ctrKeys ];
         }
         $attrLANG       = $attr1 = $attr2 = null;
-        $hasCNattrKey   = ( in_array( Vcalendar::CN, $ctrKeys ));
-        $hasLANGattrKey = ( in_array( Vcalendar::LANGUAGE, $ctrKeys ));
+        $hasCNattrKey   = in_array( Vcalendar::CN, $ctrKeys );
+        $hasLANGattrKey = in_array( Vcalendar::LANGUAGE, $ctrKeys );
         $CNattrExist    = false;
         $params = $xparams = [];
-        foreach( array_change_key_case( $inputParams, CASE_UPPER ) as $paramKey => $paramValue ) {
+        foreach(
+            array_change_key_case( $inputParams, CASE_UPPER )
+            as $paramKey => $paramValue
+        ) {
             if(( false !== strpos( $paramValue, Util::$COLON )) ||
                ( false !== strpos( $paramValue, Util::$SEMIC )) ||
                ( false !== strpos( $paramValue, Util::$COMMA ))) {
-                if( ! in_array( $paramKey, [ Vcalendar::DISPLAY, Vcalendar::FEATURE ] )) {
+                if( ! in_array( $paramKey, $DFKEYS )) { // DISPLAY, FEATURE
                     $paramValue = sprintf( $FMTQ, $paramValue );
                 }
             }
@@ -120,17 +135,23 @@ class ParameterFactory
                 ? $paramValue
                 : sprintf( $FMTKEQV, $paramKey, $paramValue );
         }
-        if( isset( $params[Vcalendar::FMTTYPE] ) && ! in_array( Vcalendar::FMTTYPE, $ctrKeys )) {
+        if( isset( $params[Vcalendar::FMTTYPE] ) &&
+            ! in_array( Vcalendar::FMTTYPE, $ctrKeys )) {
             $attr1 .= sprintf( $FMTFMTTYPE, $params[Vcalendar::FMTTYPE], $attr2 );
             $attr2 = null;
             unset( $params[Vcalendar::FMTTYPE] );
         }
-        if( isset( $params[Vcalendar::ENCODING] ) && ! in_array( Vcalendar::ENCODING, $ctrKeys )) {
+        if( isset( $params[Vcalendar::ENCODING] ) &&
+            ! in_array( Vcalendar::ENCODING, $ctrKeys )) {
             if( ! empty( $attr2 )) {
                 $attr1 .= $attr2;
                 $attr2 = null;
             }
-            $attr1 .= sprintf( $FMTCMN, Vcalendar::ENCODING, $params[Vcalendar::ENCODING] );
+            $attr1 .= sprintf(
+                $FMTCMN,
+                Vcalendar::ENCODING,
+                $params[Vcalendar::ENCODING]
+            );
             unset( $params[Vcalendar::ENCODING] );
         }
         foreach( $KEYGRP1 as $key ) { // VALUE, TZID, RANGE, RELTYPE
@@ -146,7 +167,9 @@ class ParameterFactory
         }
         foreach( $KEYGRP2 as $key ) { // DIR, ALTREP
             if( isset( $params[$key] ) && in_array( $key, $ctrKeys )) {
-                $delim  = ( false !== strpos( $params[$key], StringFactory::$QQ )) ? null : StringFactory::$QQ;
+                $delim  = ( false !== strpos( $params[$key], StringFactory::$QQ ))
+                    ? null
+                    : StringFactory::$QQ;
                 $attr1 .= sprintf( $FMTQTD, $key, $delim, $params[$key], $delim );
                 unset( $params[$key] );
             }
@@ -158,7 +181,11 @@ class ParameterFactory
             }
         } // end foreach
         if( isset( $params[Vcalendar::LANGUAGE] ) && $hasLANGattrKey ) {
-            $attrLANG .= sprintf( $FMTCMN, Vcalendar::LANGUAGE, $params[Vcalendar::LANGUAGE] );
+            $attrLANG .= sprintf(
+                $FMTCMN,
+                Vcalendar::LANGUAGE,
+                $params[Vcalendar::LANGUAGE]
+            );
             unset( $params[Vcalendar::LANGUAGE] );
         }
         elseif(( $CNattrExist || $hasLANGattrKey ) && ! empty( $lang )) {
@@ -181,13 +208,18 @@ class ParameterFactory
      * @static
      * @since  2.29.1 - 2019-06-24
      */
-    public static function ifExistRemove( array & $array, $expectedKey, $expectedValue  = null ) {
+    public static function ifExistRemove(
+        array & $array,
+        $expectedKey,
+        $expectedValue  = null
+    ) {
         if( empty( $array )) {
             return;
         }
         foreach( $array as $key => $value ) {
             if( 0 == strcasecmp( $expectedKey, $key )) {
-                if( empty( $expectedValue ) || ( 0 == strcasecmp( $expectedValue, $value ))) {
+                if( empty( $expectedValue ) ||
+                    ( 0 == strcasecmp( $expectedValue, $value ))) {
                     unset( $array[$key] );
                     $array = array_filter( $array );
                     break;
@@ -205,11 +237,16 @@ class ParameterFactory
      * @static
      * @since  2.27.14 - 2019-03-01
      */
-    public static function isParamsValueSet( $parameterArr, $arg ) {
+    public static function isParamsValueSet( $parameterArr, $arg )
+    {
         if( empty( $parameterArr ) || ! isset( $parameterArr[Util::$LCparams] )) {
             return  false;
         }
-        return Util::issetKeyAndEquals( $parameterArr[Util::$LCparams], Vcalendar::VALUE, strtoupper( $arg ));
+        return Util::issetKeyAndEquals(
+            $parameterArr[Util::$LCparams],
+            Vcalendar::VALUE,
+            strtoupper( $arg )
+        );
     }
 
     /**
@@ -220,9 +257,11 @@ class ParameterFactory
      * @static
      * @since  2.27.14 - 2019-02-10
      */
-    public static function getParamTzid( $parameterArr ) {
+    public static function getParamTzid( $parameterArr )
+    {
         return ( isset( $parameterArr[Util::$LCparams][Vcalendar::TZID] ))
-            ? $parameterArr[Util::$LCparams][Vcalendar::TZID] : null;
+            ? $parameterArr[Util::$LCparams][Vcalendar::TZID]
+            : null;
     }
 
     /**
@@ -234,9 +273,10 @@ class ParameterFactory
      * @param array $defaults
      * @return array
      * @static
-     * @since  2.29.6 - 2019-07-01
+     * @since  2.29.25 - 2020-08-25
      */
-    public static function setParams( $params, $defaults = null ) {
+    public static function setParams( $params, $defaults = null )
+    {
         $output = [];
         if( empty( $params ) && empty( $defaults )) {
             return $output;
@@ -244,9 +284,12 @@ class ParameterFactory
         if( ! is_array( $params )) {
             $params = [];
         }
-        foreach( array_change_key_case( $params, CASE_UPPER ) as $paramKey => $paramValue ) {
-            if( Vcalendar::FEATURE == $paramKey ) {
-                $output[Vcalendar::FEATURE] = trim( $paramValue, StringFactory::$QQ ); // accept comma in value
+        foreach(
+            array_change_key_case( $params, CASE_UPPER )
+            as $paramKey => $paramValue ) {
+            if( Vcalendar::FEATURE === $paramKey ) {
+                $output[Vcalendar::FEATURE] =
+                    trim( $paramValue, StringFactory::$QQ ); // accept comma in value
                 continue;
             }
             if( is_array( $paramValue )) {
@@ -257,7 +300,7 @@ class ParameterFactory
             else {
                 $paramValue = trim( $paramValue, StringFactory::$QQ );
             }
-            if( Vcalendar::VALUE == $paramKey ) {
+            if( Vcalendar::VALUE === $paramKey ) {
                 $output[Vcalendar::VALUE] = strtoupper( $paramValue );
             }
             else {
@@ -265,9 +308,12 @@ class ParameterFactory
             }
         } // end foreach
         if( is_array( $defaults )) {
-            $output = array_merge( array_change_key_case( $defaults, CASE_UPPER ), $output );
+            $output = array_merge(
+                array_change_key_case(
+                    $defaults, CASE_UPPER ),
+                $output
+            );
         }
         return $output;
     }
-
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -46,7 +46,6 @@ trait SOURCErfc7986trait
 {
     /**
      * @var array component property SOURCE value
-     * @access protected
      */
     protected $source = null;
 
@@ -55,12 +54,15 @@ trait SOURCErfc7986trait
      *
      * @return string
      */
-    public function createSource() {
+    public function createSource()
+    {
         if( empty( $this->source )) {
             return null;
         }
         if( empty( $this->source[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::SOURCE ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::SOURCE )
+                : null;
         }
         return StringFactory::createElement(
             self::SOURCE,
@@ -74,7 +76,8 @@ trait SOURCErfc7986trait
      *
      * @return bool
      */
-    public function deleteSource() {
+    public function deleteSource()
+    {
         $this->source = null;
         return true;
     }
@@ -85,7 +88,8 @@ trait SOURCErfc7986trait
      * @param bool   $inclParam
      * @return bool|array
      */
-    public function getSource( $inclParam = false ) {
+    public function getSource( $inclParam = false )
+    {
         if( empty( $this->source )) {
             return false;
         }
@@ -100,7 +104,8 @@ trait SOURCErfc7986trait
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setSource( $value = null, $params = [] ) {
+    public function setSource( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SOURCE );
             $value  = Util::$SP0;
@@ -111,7 +116,8 @@ trait SOURCErfc7986trait
         }
         $this->source = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params, [ self::VALUE => self::URI ] ),
+            Util::$LCparams =>
+                ParameterFactory::setParams( $params, [ self::VALUE => self::URI ] ),
         ];
         return $this;
     }

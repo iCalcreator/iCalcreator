@@ -17,14 +17,17 @@ iCalcreator supports systems like
 * other applications...
 
 ~~~~~~~~
-###### Builds
 
-Please review the releaseNotes for a brief overview, 
+Please review the releaseNotes for release brief overview, 
 docs/summary and docs/using for details.
 
-Stable 2.28.2 *(master)*.
+###### Builds
 
-Release 2.30 candidate (tag 2.29.21)
+v2.28.2 - *(master)* stable
+
+v2.29.25 -  *(tag)* release 2.30 candidate 
+
+Note v2.29.25 asserts PHP 7+ compability using <a href="https://github.com/PHPCompatibility/PHPCompatibility">PHPCompatibility</a>
 
 ###### Sponsorship
 
@@ -278,3 +281,4 @@ END:VCALENDAR
 ###### License
 
 iCalcreator is licensed under the LGPLv3 License.
+

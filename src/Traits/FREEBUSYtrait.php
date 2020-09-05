@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -61,16 +61,19 @@ trait FREEBUSYtrait
 {
     /**
      * @var array component property FREEBUSY value
-     * @access protected
      */
     protected $freebusy = null;
 
     /**
      * @var array FREEBUSY param keywords
-     * @access protected
      * @static
      */
-    protected static $FREEBUSYKEYS = [ self::FREE, self::BUSY, self::BUSY_UNAVAILABLE, self::BUSY_TENTATIVE ];
+    protected static $FREEBUSYKEYS = [
+        self::FREE,
+        self::BUSY,
+        self::BUSY_UNAVAILABLE,
+        self::BUSY_TENTATIVE
+    ];
 
     /**
      * Return formatted output for calendar component property freebusy
@@ -79,7 +82,8 @@ trait FREEBUSYtrait
      * @throws Exception
      * @since 2.29.2 2019-06-27
      */
-    public function createFreebusy() {
+    public function createFreebusy()
+    {
         static $FMT = ';FBTYPE=%s';
         static $SORTER = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'sortRdate1' ];
         if( empty( $this->freebusy )) {
@@ -97,14 +101,20 @@ trait FREEBUSYtrait
             }
             $attributes = $content = null;
             if( isset( $freebusyPart[Util::$LCvalue][self::FBTYPE] )) {
-                $attributes .= sprintf( $FMT, $freebusyPart[Util::$LCvalue][self::FBTYPE] );
+                $attributes .= sprintf(
+                    $FMT,
+                    $freebusyPart[Util::$LCvalue][self::FBTYPE]
+                );
                 unset( $freebusyPart[Util::$LCvalue][self::FBTYPE] );
-                $freebusyPart[Util::$LCvalue] = array_values( $freebusyPart[Util::$LCvalue] );
+                $freebusyPart[Util::$LCvalue] =
+                    array_values( $freebusyPart[Util::$LCvalue] );
             }
             else {
                 $attributes .= sprintf( $FMT, self::BUSY );
             }
-            $attributes .= ParameterFactory::createParams( $freebusyPart[Util::$LCparams] );
+            $attributes .= ParameterFactory::createParams(
+                $freebusyPart[Util::$LCparams]
+            );
             $fno         = 1;
             $cnt         = count( $freebusyPart[Util::$LCvalue] );
             if( 1 < $cnt ) {
@@ -115,7 +125,8 @@ trait FREEBUSYtrait
                 $content .= Util::$SLASH;
                 if( DateIntervalFactory::isDateIntervalArrayInvertSet( $freebusyPeriod[1] )) { // fix pre 7.0.5 bug
                     try {
-                        $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
+                        $dateInterval =
+                            DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
                     }
                     catch( Exception $e ) {
                         throw $e;
@@ -131,7 +142,11 @@ trait FREEBUSYtrait
                 }
                 $fno++;
             } // end foreach
-            $output .= StringFactory::createElement( self::FREEBUSY, $attributes, $content );
+            $output .= StringFactory::createElement(
+                self::FREEBUSY,
+                $attributes,
+                $content
+            );
         } // end foreach( $this->freebusy as $fx => $freebusyPart )
         return $output;
     }
@@ -143,7 +158,8 @@ trait FREEBUSYtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteFreebusy( $propDelIx = null ) {
+    public function deleteFreebusy( $propDelIx = null )
+    {
         if( empty( $this->freebusy )) {
             unset( $this->propDelIx[self::FREEBUSY] );
             return false;
@@ -160,12 +176,18 @@ trait FREEBUSYtrait
      * @throws Exception
      * @since 2.29.2 2019-06-27
      */
-    public function getFreebusy( $propIx = null, $inclParam = false ) {
+    public function getFreebusy( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->freebusy )) {
             unset( $this->propIx[self::FREEBUSY] );
             return false;
         }
-        $output = $this->getPropertyM( $this->freebusy, self::FREEBUSY, $propIx, $inclParam );
+        $output = $this->getPropertyM(
+            $this->freebusy,
+            self::FREEBUSY,
+            $propIx,
+            $inclParam
+        );
         if( empty( $output )) {
             return false;
         }
@@ -189,7 +211,8 @@ trait FREEBUSYtrait
             foreach( $output as $perIx => $freebusyPeriod ) {
                 if( DateIntervalFactory::isDateIntervalArrayInvertSet( $freebusyPeriod[1] )) { // fix pre 7.0.5 bug
                     try {
-                        $output[$perIx][1] = DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
+                        $output[$perIx][1] =
+                            DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
                     }
                     catch( Exception $e ) {
                         throw $e;
@@ -208,7 +231,8 @@ trait FREEBUSYtrait
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    protected static function parseFreebusy( $row, array $propAttr ) {
+    protected static function parseFreebusy( $row, array $propAttr )
+    {
         static $SS = '/';
         $fbtype = $values = null;
         if( ! empty( $propAttr )) {
@@ -245,7 +269,12 @@ trait FREEBUSYtrait
      * @since 2.29.16 2020-01-24
      * @todo Applications MUST treat x-name and iana-token values they don't recognize the same way as they would the BUSY value.
      */
-    public function setFreebusy( $fbType = null, $fbValues = null, $params = [], $index = null ) {
+    public function setFreebusy(
+        $fbType = null,
+        $fbValues = null,
+        $params = [],
+        $index = null
+    ) {
         static $ERR2 = 'Unknown (%d) freebusy value (#%d/%d) : \'%s\'';
         if( empty( $fbValues )) {
             $this->assertEmptyValue( $fbValues, self::FREEBUSY );
@@ -253,7 +282,8 @@ trait FREEBUSYtrait
             return $this;
         }
         $fbType = ( empty( $fbType )) ? self::BUSY : strtoupper( $fbType );
-        if( ! in_array( $fbType, self::$FREEBUSYKEYS ) && ! StringFactory::isXprefixed( $fbType )) {
+        if( ! in_array( $fbType, self::$FREEBUSYKEYS ) &&
+            ! StringFactory::isXprefixed( $fbType )) {
             $fbType = self::BUSY;
         }
         $input    = [ self::FBTYPE => $fbType ];
@@ -267,13 +297,15 @@ trait FREEBUSYtrait
                 $fbMember = DateTimeFactory::cnvrtDateTimeInterface( $fbMember );
                 switch( true ) {
                     case ( $fbMember instanceof DateTime ) :     // datetime
-                        $freebusyPeriod[$fbix2] = DateTimeFactory::setDateTimeTimeZone( $fbMember, Vcalendar::UTC );
+                        $freebusyPeriod[$fbix2] =
+                            DateTimeFactory::setDateTimeTimeZone( $fbMember, Vcalendar::UTC );
                         break;
                     case ( $fbMember instanceof DateInterval ) : // interval
                         $freebusyPeriod[$fbix2] = (array) $fbMember; // fix pre 7.0.5 bug
                         break;
                     case ( DateTimeFactory::isStringAndDate( $fbMember )) :   // text date ex. 2006-08-03 10:12:18
-                        list( $dateStr, $timezonePart ) = DateTimeFactory::splitIntoDateStrAndTimezone( $fbMember );
+                        list( $dateStr, $timezonePart ) =
+                            DateTimeFactory::splitIntoDateStrAndTimezone( $fbMember );
                         $dateTime = DateTimeFactory::getDateTimeWithTimezoneFromString(
                             $dateStr,
                             $timezonePart,
@@ -317,7 +349,8 @@ trait FREEBUSYtrait
      * @return array
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleValues( array $fbValues ) {
+    private static function checkSingleValues( array $fbValues )
+    {
         if( ! is_array( $fbValues )) {
             return $fbValues;
         }
@@ -333,5 +366,4 @@ trait FREEBUSYtrait
         }
         return $fbValues;
     }
-
 }

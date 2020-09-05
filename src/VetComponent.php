@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -44,7 +44,8 @@ abstract class VetComponent extends Vcomponent
      * @return Valarm
      * @since  2.27.2 - 2018-12-21
      */
-    public function newValarm() {
+    public function newValarm()
+    {
         $ix = $this->getNextComponentIndex();
         $this->components[$ix] = new Valarm( $this->getConfig());
         return $this->components[$ix];

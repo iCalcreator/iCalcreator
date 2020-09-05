@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -54,8 +54,6 @@ final class Valarm extends CalendarComponent
 
     /**
      * @var string
-     * @access protected
-     * @static
      */
     protected static $compSgn = 'a';
 
@@ -64,7 +62,8 @@ final class Valarm extends CalendarComponent
      *
      * @since  2.27.3 - 2018-12-28
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         unset(
             $this->compType,
             $this->xprop,
@@ -97,7 +96,8 @@ final class Valarm extends CalendarComponent
      * @throws Exception  (on Duration/Trigger err)
      * @since  2.26 - 2018-11-10
      */
-    public function createComponent() {
+    public function createComponent()
+    {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createAction();
@@ -111,5 +111,4 @@ final class Valarm extends CalendarComponent
         $component  .= $this->createXprop();
         return $component . sprintf( self::$FMTEND, $compType );
     }
-
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -45,7 +45,6 @@ trait CATEGORIEStrait
 {
     /**
      * @var array component property CATEGORIES value
-     * @access protected
      */
     protected $categories = null;
 
@@ -55,7 +54,8 @@ trait CATEGORIEStrait
      * @return string
      * @since  2.29.11 - 2019-08-30
      */
-    public function createCategories() {
+    public function createCategories()
+    {
         return self::createCatRes(
             self::CATEGORIES,
             $this->categories,
@@ -76,7 +76,13 @@ trait CATEGORIEStrait
      * @return string
      * @since  2.29.13 - 2019-09-03
      */
-    private static function createCatRes( $propName, $pValArr, $lang, $allowEmpty, $specPkeys ) {
+    private static function createCatRes(
+        $propName,
+        $pValArr,
+        $lang,
+        $allowEmpty,
+        $specPkeys
+    ) {
         if( empty( $pValArr )) {
             return null;
         }
@@ -91,7 +97,11 @@ trait CATEGORIEStrait
             $content = StringFactory::strrep( $valuePart[Util::$LCvalue] );
             $output .= StringFactory::createElement(
                 $propName,
-                ParameterFactory::createParams( $valuePart[Util::$LCparams], $specPkeys, $lang ),
+                ParameterFactory::createParams(
+                    $valuePart[Util::$LCparams],
+                    $specPkeys,
+                    $lang
+                ),
                 $content
             );
         }
@@ -105,12 +115,17 @@ trait CATEGORIEStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteCategories( $propDelIx = null ) {
+    public function deleteCategories( $propDelIx = null )
+    {
         if( empty( $this->categories )) {
             unset( $this->propDelIx[self::CATEGORIES] );
             return false;
         }
-        return $this->deletePropertyM( $this->categories, self::CATEGORIES, $propDelIx );
+        return $this->deletePropertyM(
+            $this->categories,
+            self::CATEGORIES,
+            $propDelIx
+        );
     }
 
     /**
@@ -121,12 +136,17 @@ trait CATEGORIEStrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getCategories( $propIx = null, $inclParam = false ) {
+    public function getCategories( $propIx = null, $inclParam = false )
+    {
         if( empty( $this->categories )) {
             unset( $this->propIx[self::CATEGORIES] );
             return false;
         }
-        return $this->getPropertyM( $this->categories, self::CATEGORIES, $propIx, $inclParam );
+        return $this->getPropertyM( $this->categories,
+            self::CATEGORIES,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
@@ -139,7 +159,8 @@ trait CATEGORIEStrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setCategories( $value = null, $params = [], $index = null ) {
+    public function setCategories( $value = null, $params = [], $index = null )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CATEGORIES );
             $value  = Util::$SP0;

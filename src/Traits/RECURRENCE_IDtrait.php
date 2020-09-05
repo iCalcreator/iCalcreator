@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,6 @@ trait RECURRENCE_IDtrait
 {
     /**
      * @var array component property RECURRENCE_ID value
-     * @access protected
      */
     protected $recurrenceid = null;
 
@@ -57,22 +56,33 @@ trait RECURRENCE_IDtrait
      * Return formatted output for calendar component property recurrence-id
      *
      * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @since 2.29.1 2019-06-24
      */
-    public function createRecurrenceid() {
+    public function createRecurrenceid()
+    {
         if( empty( $this->recurrenceid )) {
             return null;
         }
         if( empty( $this->recurrenceid[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY ))
-                ? StringFactory::createElement( self::RECURRENCE_ID ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::RECURRENCE_ID )
+                : null;
         }
-        $isDATE      = ParameterFactory::isParamsValueSet( $this->recurrenceid, self::DATE );
+        $isDATE      = ParameterFactory::isParamsValueSet(
+            $this->recurrenceid,
+            self::DATE
+        );
         $isLocalTime = isset( $this->recurrenceid[Util::$LCparams][Util::$ISLOCALTIME] );
         return StringFactory::createElement(
             self::RECURRENCE_ID,
             ParameterFactory::createParams( $this->recurrenceid[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->recurrenceid[Util::$LCvalue], $isDATE, $isLocalTime )
+            DateTimeFactory::dateTime2Str(
+                $this->recurrenceid[Util::$LCvalue],
+                $isDATE,
+                $isLocalTime
+            )
         );
     }
 
@@ -82,7 +92,8 @@ trait RECURRENCE_IDtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRecurrenceid() {
+    public function deleteRecurrenceid()
+    {
         $this->recurrenceid = null;
         return true;
     }
@@ -94,11 +105,14 @@ trait RECURRENCE_IDtrait
      * @return bool|DateTime|array
      * @since 2.29.1 2019-06-22
      */
-    public function getRecurrenceid( $inclParam = false ) {
+    public function getRecurrenceid( $inclParam = false )
+    {
         if( empty( $this->recurrenceid )) {
             return false;
         }
-        return ( $inclParam ) ? $this->recurrenceid : $this->recurrenceid[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->recurrenceid
+            : $this->recurrenceid[Util::$LCvalue];
     }
 
     /**
@@ -111,7 +125,8 @@ trait RECURRENCE_IDtrait
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setRecurrenceid( $value = null, $params = [] ) {
+    public function setRecurrenceid( $value = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RECURRENCE_ID );
             $this->recurrenceid = [
@@ -122,7 +137,10 @@ trait RECURRENCE_IDtrait
         }
         $this->recurrenceid = DateTimeFactory::setDate(
             $value,
-            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
+            ParameterFactory::setParams(
+                $params,
+                DateTimeFactory::$DEFAULTVALUEDATETIME
+            )
         );
         return $this;
     }

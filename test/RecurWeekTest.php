@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.9
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,10 +30,9 @@
 
 namespace Kigkonsult\Icalcreator;
 
-use PHPUnit\Framework\TestCase;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\RecurFactory2;
 use DateTime;
 use Exception;
 
@@ -268,11 +267,11 @@ class RecurWeekTest extends RecurBaseTest
         if( ! isset( $recur[Vcalendar::INTERVAL] )) {
             $recur[Vcalendar::INTERVAL] = 1;
         }
-        if( RecurFactory::isSimpleWeeklyRecur1( $recur )) {
+        $strCase  = str_pad( $case, 12 );
+        if( RecurFactory2::isRecurWeekly1( $recur )) {
             $time     = microtime( true );
-            $resultX  = RecurFactory::recurWeeklySimple1( $recur, $start, clone $start, $end );
+            $resultX  = RecurFactory2::recurWeekly1( $recur, $start, clone $start, $end );
             $execTime = microtime( true ) - $time;
-            $strCase  = str_pad( $case, 12 );
             echo $strCase . 'week smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
                 implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
             $this->assertEquals(
@@ -285,11 +284,10 @@ class RecurWeekTest extends RecurBaseTest
                 )
             );
         }
-        elseif( RecurFactory::isSimpleWeeklyRecur2( $recur )) {
+        elseif( RecurFactory2::isRecurWeekly2( $recur )) {
             $time     = microtime( true );
-            $resultX  = RecurFactory::recurWeeklySimple2( $recur, $start, clone $start, $end );
+            $resultX  = RecurFactory2::recurWeekly2( $recur, $start, clone $start, $end );
             $execTime = microtime( true ) - $time;
-            $strCase  = str_pad( $case, 12 );
             echo $strCase . 'week smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
                 implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
             $this->assertEquals(
@@ -301,6 +299,11 @@ class RecurWeekTest extends RecurBaseTest
                          var_export( $recur, true )
                 )
             );
+        }
+        else {
+            $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
+            echo $strCase . ' NOT isRecurWeekly1/2 ' . $recurDisp . PHP_EOL;
+            $this->assertTrue( false );
         }
     }
 

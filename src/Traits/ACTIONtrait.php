@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -47,7 +47,6 @@ trait ACTIONtrait
 {
     /**
      * @var array component property ACTION value
-     * @access protected
      */
     protected $action = null;
 
@@ -56,12 +55,15 @@ trait ACTIONtrait
      *
      * @return string
      */
-    public function createAction() {
+    public function createAction()
+    {
         if( empty( $this->action )) {
             return null;
         }
         if( empty( $this->action[Util::$LCvalue] )) {
-            return ( $this->getConfig( self::ALLOWEMPTY )) ? StringFactory::createElement( self::ACTION ) : null;
+            return $this->getConfig( self::ALLOWEMPTY )
+                ? StringFactory::createElement( self::ACTION )
+                : null;
         }
         return StringFactory::createElement(
             self::ACTION,
@@ -76,7 +78,8 @@ trait ACTIONtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteAction() {
+    public function deleteAction()
+    {
         $this->action = null;
         return true;
     }
@@ -88,7 +91,8 @@ trait ACTIONtrait
      * @return bool|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getAction( $inclParam = false ) {
+    public function getAction( $inclParam = false )
+    {
         if( empty( $this->action )) {
             return false;
         }
@@ -104,7 +108,8 @@ trait ACTIONtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setAction( $value = null, $params = [] ) {
+    public function setAction( $value = null, $params = [] )
+    {
         static $STDVALUES = [
             self::AUDIO,
             self::DISPLAY,

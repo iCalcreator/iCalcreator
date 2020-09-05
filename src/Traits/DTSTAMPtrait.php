@@ -5,7 +5,7 @@
  * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.14
+ * Version   2.29.25
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,7 +52,6 @@ trait DTSTAMPtrait
 {
     /**
      * @var array component property DTSTAMP value
-     * @access protected
      */
     protected $dtstamp = null;
 
@@ -64,8 +63,10 @@ trait DTSTAMPtrait
      * @throws Exception
      * @since 2.29.1 2019-06-22
      */
-    public function createDtstamp() {
-        if( empty( $this->dtstamp[Util::$LCvalue] )) {
+    public function createDtstamp()
+    {
+        if( empty( $this->dtstamp[Util::$LCvalue] ))
+        {
             $this->dtstamp = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
                 Util::$LCparams => [],
@@ -84,7 +85,8 @@ trait DTSTAMPtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteDtstamp( ) {
+    public function deleteDtstamp()
+    {
         $this->dtstamp = null;
         return true;
     }
@@ -98,7 +100,8 @@ trait DTSTAMPtrait
      * @throws Exception
      * @since 2.29.1 2019-06-22
      */
-    public function getDtstamp( $inclParam = false ) {
+    public function getDtstamp( $inclParam = false )
+    {
         if( Util::isCompInList( $this->getCompType(), self::$SUBCOMPS )) {
             return false;
         }
@@ -121,7 +124,8 @@ trait DTSTAMPtrait
      * @throws Exception
      * @since 2.29.16 2020-01-24
      */
-    public function setDtstamp( $value  = null, $params = [] ) {
+    public function setDtstamp( $value  = null, $params = [] )
+    {
         if( empty( $value )) {
             $this->dtstamp = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
