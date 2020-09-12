@@ -4,7 +4,7 @@
  copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  Link      https://kigkonsult.se
  Package   iCalcreator
- Version   2.29.25
+ Version   2.29.29
  License   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-<title>iCalcreator 2.29.25 manual</title>
+<title>iCalcreator 2.29.29 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2020 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.29.25">
+<meta name="description" content="using iCalcreator v2.29.29">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -158,9 +158,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.29.25</p>
+<p class="header">iCalcreator v2.29.29</p>
 <p>
-iCalcreator v2.29.25<br>
+iCalcreator v2.29.29<br>
 Copyright &copy; 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -210,7 +210,7 @@ This document makes previous versions obsolete.
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.29.25 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
+For iCalcreator 2.29.29 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -330,11 +330,11 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.25/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.29.29/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
-iCalcreator 2.29.25 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.29.29 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -2930,7 +2930,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.25//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.29.29//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -4002,7 +4002,7 @@ while( $vevent-&gt;deleteCategories()) {
 <p class="format">calendarComponent::getCategories( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
 <p class="comment">output = array( &quot;value&quot;  =&gt; categories<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>3</sup> )</p>
+              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getCategories( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -4027,14 +4027,13 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p>Parameters will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setCategories( categories [, params [, propOrderNo ]] )</p>
-<p class="comment">categories<sup>1</sup>    = (string) categoryValue / (array) ( *categoryValue )
-categoryValue<sup>2</sup> = (string) textual categories or subtypes of the <strong>calendar</strong> component,
-                can be specified as a list of categories
-                separated by the COMMA character
-params<sup>3</sup>        = (array) ( [Vcalendar::LANGUAGE =&gt; (string) &quot;&lt;lang<sup>*</sup>&gt;&quot;] *[, xparams] )
-xparams        = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo    = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
-lang<sup>*</sup>         = as defined in [RFC5546]</p>
+<p class="comment">categories<sup>1</sup> = (string) textual categories or subtypes of the <strong>calendar</strong> component,
+              can be specified as a list of categories
+              separated by the COMMA character
+params<sup>2</sup>     = (array) ( [Vcalendar::LANGUAGE =&gt; (string) &quot;&lt;lang<sup>*</sup>&gt;&quot;] *[, xparams] )
+xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
+propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
+lang<sup>*</sup>       = as defined in [RFC5546]</p>
 <p class="label">Example</p>
 <p class="example">
 $vevent-&gt;setCategories( &quot;project_x&quot; );
@@ -6198,14 +6197,13 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p>Parameters will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setResources( resources [, params [, propOrderNo ]] )</p>
-<p class="comment">resources<sup>1</sup>  = (string) resource / (array) ( *resource )
-resource    = (string) textual resources or subtypes of the <strong>calendar</strong> component,
-                       can be specified as a list of resources
-                       separated by the COMMA character.
+<p class="comment">resources<sup>1</sup>  = (string) textual resources or subtypes of the <strong>calendar</strong> component,
+              can be specified as a list of resources
+              separated by the COMMA character.
 params<sup>2</sup>     = (array) (
-                      Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
-                      Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;,
-                      *xparams )
+              Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
+              Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;,
+              *xparams )
 xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
 propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>       = as defined in [RFC5546]</p>
@@ -6221,8 +6219,8 @@ $vevent-&gt;setResources( &quot;COMPUTER PROJECTOR&quot; );
 <a name="RRULE"></a><h3>3.2.35 RRULE</h3>
 <p>
 This property defines a rule or repeating pattern for recurring <a href="#VEVENT">EVENTs</a>, <a href="#VTODO">TODOs</a>,
-<a href="#VTIMEZONE">STANDARD</a> or <a href="#VTIMEZONE">DAYLIGHT</a> definitions and is OPTIONAL and MAY occur more than once ([RFC5545]),
-SHOULD NOT occur more than once ([RFC5545]).
+<a href="#VTIMEZONE">STANDARD</a> or <a href="#VTIMEZONE">DAYLIGHT</a> definitions and is OPTIONAL and MAY occur more than once ([RFC2445]),
+SHOULD NOT occur more than once ([RFC5545]). iCalcreator allows only one in component.
 </p>
 <p>
     To ease up usage, constants<br>
@@ -6297,14 +6295,9 @@ while( $vevent-&gt;deleteRrule()) {
 <p class="format">calendarComponent::getRrule()</p>
 <p class="comment">output = recur<sup>1</sup></p>
 <p class="label">Format 2</p>
-<p class="format">calendarComponent::getRrule( propOrderNo/null, true )</p>
-<p class="comment">propOrderNo = (int) specific property value</p>
+<p class="format">calendarComponent::getRrule( true )</p>
 <p class="comment">output = array( &quot;value&quot;  =&gt; recur<sup>1</sup>
               , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
-<p class="label">Format 3</p>
-<p class="format">calendarComponent::getRrule( propOrderNo )</p>
-<p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">Get propOrderNo RRULE</p>
 <p class="label">Example</p>
 <p class="example">
 $rrules = $vtodo-&gt;getRrule();
@@ -6430,18 +6423,18 @@ xparams<sup>2</sup>    = (array) ( *[ (string) key =&gt; (string) value ] ) // <
         Vcalendar::INTERVAL   =&gt; 2,
         Vcalendar::WKST       =&gt; Vcalendar::SU,
         Vcalendar::BYSECOND   =&gt; 2,
-        Vcalendar::BYMINUTE   =&gt; [ 2, -4, 6 ],               // (*)
-        Vcalendar::BYHOUR     =&gt; [ 2, 4, -6 ],               // (*)
-        Vcalendar::BYMONTHDAY =&gt; -2,                         // (*)
-        Vcalendar::BYYEARDAY  =&gt; 2,                          // (*)
-        Vcalendar::BYWEEKNO   =&gt; [ 2, -4, 6 ],               // (*)
-        Vcalendar::BYMONTH    =&gt; 2,                          // (*)
-        Vcalendar::BYSETPOS   =&gt; [ 2, -4, 6 [,               // (*)
-        Vcalendar::BYDAY      =&gt; [                           // (**)
-            [ -2, Vcalendar::DAY =&gt; Vcalendar::WE ],
-            [  3, Vcalendar::DAY =&gt; Vcalendar::TH ],
-            [  5, Vcalendar::DAY =&gt; Vcalendar::FR ],
-            [     Vcalendar::DAY =&gt; Vcalendar::MO ]
+        Vcalendar::BYMINUTE   =&gt; [ 2, -4, 6 ],       // (*)
+        Vcalendar::BYHOUR     =&gt; [ 2, 4, -6 ],       // (*)
+        Vcalendar::BYMONTHDAY =&gt; -2,                 // (*)
+        Vcalendar::BYYEARDAY  =&gt; 2,                  // (*)
+        Vcalendar::BYWEEKNO   =&gt; [ 2, -4, 6 ],       // (*)
+        Vcalendar::BYMONTH    =&gt; 2,                  // (*)
+        Vcalendar::BYSETPOS   =&gt; [ 2, -4, 6 [,       // (*)
+        Vcalendar::BYDAY      =&gt; [                   //
+            [ -1, Vcalendar::DAY =&gt; Vcalendar::WE ], // last WE
+            [  3, Vcalendar::DAY =&gt; Vcalendar::TH ], // third TH
+            [  5, Vcalendar::DAY =&gt; Vcalendar::FR ], // fifth FR
+            [     Vcalendar::DAY =&gt; Vcalendar::MO ]  // every MO
         ],
         [ &quot;x-key&quot;     =&gt; &quot;xparamValue&quot; ]
     );
@@ -6455,21 +6448,22 @@ $vtodo-&gt;setRrule(
         Vcalendar::COUNT       =&gt; 2,
         Vcalendar::INTERVAL    =&gt; 2,
         Vcalendar::WKST        =&gt; Vcalendar::SU,
-        Vcalendar::BYSECOND    =&gt; [ -2, 4, 6 ],              // (*)
-        Vcalendar::BYMINUTE    =&gt; -2,                        // (*)
-        Vcalendar::BYHOUR      =&gt; 2,                         // (*)
-        Vcalendar::BYMONTHDAY  =&gt; [ 2, -4, 6 ],              // (*)
-        Vcalendar::BYYEARDAY   =&gt; [ -2, 4, 6 ],              // (*)
-        Vcalendar::BYWEEKNO    =&gt; -2,                        // (*)
-        Vcalendar::BYMONTH     =&gt; [ 2, 4, -6 ],              // (*)
-        Vcalendar::BYSETPOS    =&gt; -2,                        // (*)
-        Vcalendar::BYday       =&gt; [ 5, Vcalendar::DAY; =&gt; Vcalendar::WE ], // (**)
+        Vcalendar::BYSECOND    =&gt; [ -2, 4, 6 ],      // (*)
+        Vcalendar::BYMINUTE    =&gt; -2,                // (*)
+        Vcalendar::BYHOUR      =&gt; 2,                 // (*)
+        Vcalendar::BYMONTHDAY  =&gt; [ 2, -4, 6 ],      // (*)
+        Vcalendar::BYYEARDAY   =&gt; [ -2, 4, 6 ],      // (*)
+        Vcalendar::BYWEEKNO    =&gt; -2,                // (*)
+        Vcalendar::BYMONTH     =&gt; [ 2, 4, -6 ],      // (*)
+        Vcalendar::BYSETPOS    =&gt; -2,                // (*)
+//      Vcalendar::BYday       =&gt; Vcalendar::WE                           // one day
+//      Vcalendar::BYday       =&gt; [ Vcalendar::WE, Vcalendar::TH ],       // days
+        Vcalendar::BYday       =&gt; [ 5, Vcalendar::DAY =&gt; Vcalendar::WE ], // pos. day
     ],
     [ &quot;x-key&quot;              =&gt; &quot;xparamValue&quot; ]
 );
 
     // <span class="comment">(*)  single value/array of values</span>
-    // <span class="comment">(**) single value array /array of arrays</span>
 
 </p>
 <br>
@@ -8537,7 +8531,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.29.25
+<tr><td>Version  <td>2.29.29
 <tr><td class="top">License  <td>
     Subject matter of licence is the software iCalcreator.<br>
     The above copyright, link, package and version notices,<br>

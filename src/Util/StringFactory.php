@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.29
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -56,7 +56,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.25 - 2020-09-02
+ * @since  2.29.29 - 2020-09-11
  */
 class StringFactory
 {
@@ -340,7 +340,7 @@ class StringFactory
      * @return string
      * @static
      * @link   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-     * @since  2.29.22 - 2020-09-01
+     * @since  2.29.29 - 2020-09-11
      */
     public static function size75( $string )
     {
@@ -359,19 +359,24 @@ class StringFactory
                 break;
             }
             elseif(( 74 <= $cCnt ) &&
-                ( self::$BS2 == substr( $tmp, $x, 1 ) ) &&
+                ( self::$BS2 == substr( $tmp, $x, 1 ) ) && // '\\'
                 (( $LCN == substr( $tmp, $x1, 1 )) ||
                     ( $UCN == substr( $tmp, $x1, 1 )))) {
                 $string .= Util::$CRLF . $SPBSLCN; // don't break lines inside '\n'
                 $x      += 2;
                 if( $len < $x ) {
                     $string .= Util::$CRLF;
-                    break;              // or here...
+                    break; // or here...
                 }
                 $cCnt = 3;
             }
             elseif( 75 <= $cCnt ) {
-                $string .= Util::$CRLF . $SP1;
+                // $string .= Util::$CRLF . $SP1;
+                $string .= Util::$CRLF;
+                if( $len == $x ) {
+                    break; // or here..
+                }
+                $string .= $SP1;
                 $cCnt    = 1;
             }
             $str1    = substr( $tmp, $x, 1 );

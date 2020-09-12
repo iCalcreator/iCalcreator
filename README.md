@@ -25,7 +25,7 @@ docs/summary and docs/using for details.
 
 v2.28.2 - *(master)* stable
 
-v2.29.25 -  *(tag)* release 2.30 candidate 
+v2.29.29 -  *(tag)* release 2.30 candidate 
 
 Note v2.29.25 asserts PHP 7+ compability using <a href="https://github.com/PHPCompatibility/PHPCompatibility">PHPCompatibility</a>
 

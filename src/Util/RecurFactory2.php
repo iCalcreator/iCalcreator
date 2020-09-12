@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.29
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -56,7 +56,7 @@ use function var_export;
  * iCalcreator 'newer' recur support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.25 - 2020-09-02
+ * @since  2.27.28 - 2020-09-10
  */
 class RecurFactory2
 {
@@ -101,7 +101,7 @@ class RecurFactory2
      *
      * @param array $recur
      * @throws LogicException
-     * @since  2.27.25 - 2020-09-01
+     * @since  2.27.26 - 2020-09-10
      */
     public static function assertRecur( array $recur )
     {
@@ -110,28 +110,35 @@ class RecurFactory2
         if( ! isset( $recur[Vcalendar::FREQ] )) {
             throw new LogicException( $ERR1TXT . $recurDisp );
         }
-        static $ERR2TXT = '#2 Unkown BYDAY day : ';
+        static $ERR2TXT = '#2 NO BYDAY days : ';
+        static $ERR3TXT = '#3 Unkown BYDAY day : ';
+        $cntDays        = 0;
         if( isset( $recur[Vcalendar::BYDAY] )) {
             foreach( $recur[Vcalendar::BYDAY] as $BYDAYx => $BYDAYv ) {
                 if(((int) $BYDAYx === $BYDAYx ) && is_array( $BYDAYv )) {
-                    // multi ByDay recur
                     foreach( $BYDAYv as $BYDAYx2 => $BYDAYv2 ) {
-                        if(( Vcalendar::DAY === $BYDAYx2 ) &&
-                            ! in_array( $BYDAYv2, RecurFactory::$DAYNAMES )) {
-                            throw new LogicException( $ERR2TXT . $recurDisp );
+                        if( Vcalendar::DAY === $BYDAYx2 ) {
+                            if( ! in_array( $BYDAYv2, RecurFactory::$DAYNAMES )) {
+                                throw new LogicException( $ERR3TXT . $recurDisp );
+                            }
+                            $cntDays += 1;
                         }
                     } // end foreach
                     $dayN = $pos = false;
                     continue;
                 } // end if
-                // single ByDay recur
-                elseif(( Vcalendar::DAY === $BYDAYx ) &&
-                    ! in_array( $BYDAYv, RecurFactory::$DAYNAMES )) {
-                    throw new LogicException( $ERR2TXT . var_export( $recur, true ));
+                elseif(( Vcalendar::DAY === $BYDAYx )) {
+                    if( ! in_array( $BYDAYv, RecurFactory::$DAYNAMES )) {
+                        throw new LogicException( $ERR3TXT . var_export( $recur, true ));
+                    }
+                    $cntDays += 1;
                 }
             } // end foreach
+            if( empty( $cntDays )) {
+                throw new LogicException( $ERR2TXT . var_export( $recur, true ));
+            }
         } // end if BYDAY
-        static $ERR3TXT =
+        static $ERR4TXT =
             '#3 The BYDAY rule part MUST NOT ' .
             'be specified with a numeric value ' .
             'when the FREQ rule part is not set to MONTHLY or YEARLY. ';
@@ -139,9 +146,9 @@ class RecurFactory2
         if( isset( $recur[Vcalendar::BYDAY] ) &&
             ! in_array( $recur[Vcalendar::FREQ], $FREQ1 ) &&
             self::hasRecurByDaysWithRelativeWeekdays( $recur[Vcalendar::BYDAY] )) {
-            throw new LogicException( $ERR3TXT . $recurDisp );
+            throw new LogicException( $ERR4TXT . $recurDisp );
         } // end if
-        static $ERR4TXT =
+        static $ERR5TXT =
             '#4 The BYDAY rule part MUST NOT ' .
             'be specified with a numeric value ' .
             'with the FREQ rule part set to YEARLY ' .
@@ -150,29 +157,29 @@ class RecurFactory2
             ( $recur[Vcalendar::FREQ] == Vcalendar::YEARLY ) &&
             isset( $recur[Vcalendar::BYWEEKNO] ) &&
             self::hasRecurByDaysWithRelativeWeekdays( $recur[Vcalendar::BYDAY] )) {
-            throw new LogicException( $ERR4TXT . $recurDisp );
+            throw new LogicException( $ERR5TXT . $recurDisp );
         } // end if
-        static $ERR5TXT =
+        static $ERR6TXT =
             '#5 The BYMONTHDAY rule part MUST NOT be specified ' .
             'when the FREQ rule part is set to WEEKLY. ';
         if(( $recur[Vcalendar::FREQ] == Vcalendar::WEEKLY ) &&
             isset( $recur[Vcalendar::BYMONTHDAY] )) {
-            throw new LogicException( $ERR5TXT . $recurDisp );
+            throw new LogicException( $ERR6TXT . $recurDisp );
         } // end if
-        static $ERR6TXT =
+        static $ERR7TXT =
             '#6 The BYYEARDAY rule part MUST NOT be specified ' .
             'when the FREQ rule part is set to DAILY, WEEKLY, or MONTHLY. ';
         static $FREQ4 = [ Vcalendar::DAILY, Vcalendar::WEEKLY, Vcalendar::MONTHLY ];
         if( isset( $recur[Vcalendar::BYYEARDAY] ) &&
             in_array( $recur[Vcalendar::FREQ], $FREQ4 )) {
-            throw new LogicException( $ERR6TXT . $recurDisp );
+            throw new LogicException( $ERR7TXT . $recurDisp );
         } // end if
-        static $ERR7TXT =
+        static $ERR8TXT =
             '#7 The BYWEEKNO rule part MUST NOT be used ' .
             'when the FREQ rule part is set to anything other than YEARLY.';
         if( isset( $recur[Vcalendar::BYWEEKNO] ) &&
             ( $recur[Vcalendar::FREQ] != Vcalendar::YEARLY )) {
-            throw new LogicException( $ERR7TXT . $recurDisp );
+            throw new LogicException( $ERR8TXT . $recurDisp );
         } // end if
     }
 
@@ -702,7 +709,7 @@ class RecurFactory2
      * @param mixed $fcnEndIn   end date, string / array / (datetime) obj
      * @return array            array([Ymd] => bool)
      * @throws Exception
-     * @since  2.27.16 - 2019-03-03
+     * @since  2.27.28 - 2029-09-10
      */
     public static function recurWeekly2(
         array $recur,
@@ -716,10 +723,10 @@ class RecurFactory2
         if( $wDateYmd > $endYmd ) {
             return [];
         }
-        $result    = [];
-        $x         = 1;
-        $count     = self::getCount( $recur );
-        $byDayList = self::getRecurByDaysWithNoRelativeWeekdays(
+        $result       = [];
+        $x            = 1;
+        $count        = self::getCount( $recur );
+        $byDayList    = self::getRecurByDaysWithNoRelativeWeekdays(
             $recur[Vcalendar::BYDAY] // number(s) for day in week
         );
         $hasByMonth   = false;
@@ -739,11 +746,12 @@ class RecurFactory2
                     $wDate = $wDate->modify( $modify1 );
                     break;
                 case( $endYmd < $Ymd ) :
-                    break 2;
+                    break 2; // leave while !
                 case( $currWeekNo == $targetWeekNo ) :
                     if( self::inList( $wDate->format( self::$LCM ), $byMonthList )) {
                         if( self::inList( $wDate->format( self::$LCW ), $byDayList )) {
                             $result[$Ymd] = true;
+                            $x           += 1;
                         }
                     }
                     $wDate = $wDate->modify( $modify1 );
@@ -751,12 +759,10 @@ class RecurFactory2
                 default :
                     // now is the first day of next week
                     if( 1 < $recur[Vcalendar::INTERVAL] ) {
-                        $modifyX =
-                            sprintf(
-                                self::$FMTX,
-                                ( 7 * ( $recur[Vcalendar::INTERVAL] - 1 ))
-                            );
-                        $wDate    = $wDate->modify( $modifyX );
+                        // advance interval weeks
+                        $dayNo   = ( 7 * ( $recur[Vcalendar::INTERVAL] - 1 ));
+                        $modifyX = sprintf( self::$FMTX,$dayNo );
+                        $wDate   = $wDate->modify( $modifyX );
                     }
                     $targetWeekNo = (int) $wDate->format( self::$UCW );
                     break;

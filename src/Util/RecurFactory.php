@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.29
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -52,6 +52,7 @@ use function in_array;
 use function is_array;
 use function is_null;
 use function is_string;
+use function ksort;
 use function mktime;
 use function sprintf;
 use function strcasecmp;
@@ -66,7 +67,7 @@ use function var_export;
  * iCalcreator recur support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.25 - 2020-09-02
+ * @since  2.29.27 - 2020-09-19
  */
 class RecurFactory
 {
@@ -223,10 +224,10 @@ class RecurFactory
                             ! ctype_digit( substr( $byday[$bx], -1 ))) {
                             $byday[++$bx] = Util::$SP0;
                         }
-                        if( ! is_array( $bydayPart )) {  // day without order number
+                        if( ! is_array( $bydayPart )) {  // day without rel pos number
                             $byday[$bx] .= (string) $bydayPart;
                         }
-                        else {                          // day with order number
+                        else {                          // day with rel pos number
                             foreach( $bydayPart as $bix2 => $bydayPart2 ) {
                                 $byday[$bx] .= (string) $bydayPart2;
                             }
@@ -307,7 +308,7 @@ class RecurFactory
     }
 
     /*
-     * Return array, day occurence number (opt) and day name
+     * Return array, day rel pos number (opt) and day name abbr
      *
      * @param string $dayValueBase
      * @return array
@@ -500,43 +501,73 @@ class RecurFactory
 
     /**
      * Ensure RRULE BYDAY array and upper case.. .
-     * 
+     *
      * @param array $input
      * @param array $output
-     * @since  2.29.25 - 2020-09-04
+     * @since  2.29.27 - 2020-09-19
      */
     private static function orderRRuleBydayKey( array $input, array & $output )
     {
+        if( empty( $input[Vcalendar::BYDAY] )) {
+            // results in error
+            $output[Vcalendar::BYDAY] = [];
+            return;
+        }
         if( ! is_array( $input[Vcalendar::BYDAY] )) {
+            // single day
             $output[Vcalendar::BYDAY] = [
                 Vcalendar::DAY => strtoupper( $input[Vcalendar::BYDAY] ),
             ];
             return;
         }
+        $cntStr = $cntNum = 0;
         foreach( $input[Vcalendar::BYDAY] as $BYDAYx => $BYDAYv ) {
-            switch( true ) {
-                case (( 0 == strcasecmp( Vcalendar::DAY, $BYDAYx )) ||
-                    is_string( $BYDAYv )) :
-                    $output[Vcalendar::BYDAY][Vcalendar::DAY] =
-                        strtoupper( $BYDAYv );
-                    break;
-                case is_array( $BYDAYv ) :
-                    foreach( $BYDAYv as $BYDAYx2 => $BYDAYv2 ) {
-                        if(( 0 == strcasecmp( Vcalendar::DAY, $BYDAYx2 )) ||
-                            is_string( $BYDAYv2 )) {
-                            $output[Vcalendar::BYDAY][$BYDAYx][Vcalendar::DAY] =
-                                strtoupper( $BYDAYv2 );
-                        }
-                        else {
-                            $output[Vcalendar::BYDAY][$BYDAYx][$BYDAYx2] = $BYDAYv2;
-                        }
-                    } // end foreach
-                    break;
-                default:
-                    $output[Vcalendar::BYDAY][$BYDAYx] = $BYDAYv;
-                    break;
-            } // end switch
+            if( is_array( $BYDAYv )) {
+                break;
+            }
+            if( is_string( $BYDAYv ) && ctype_alpha( $BYDAYv )) {
+                $cntStr += 1;
+                continue;
+            }
+            if( empty( $BYDAYv )) {
+                $input[Vcalendar::BYDAY] = [ Util::$SP0 ];
+                $cntStr += 1;
+                continue;
+            }
+            $cntNum += 1;
         } // end foreach
+        if(( 1 == $cntStr ) || ( 1 < $cntNum )) { // single day OR invalid format...
+            $input[Vcalendar::BYDAY] = [ $input[Vcalendar::BYDAY] ];
+        }
+        elseif( 1 < $cntStr ) { // split (single) days
+            $days = [];
+            foreach( $input[Vcalendar::BYDAY] as $BYDAYx => $BYDAYv ) {
+                $days[] = [ Vcalendar::DAY => $BYDAYv ];
+            }
+            $input[Vcalendar::BYDAY] = $days;
+        }
+        foreach( $input[Vcalendar::BYDAY] as $BYDAYx => $BYDAYv ) {
+            $nIx = 0;
+            foreach( $BYDAYv as $BYDAYx2 => $BYDAYv2 ) {
+                switch( true ) {
+                    case ( 0 == strcasecmp( Vcalendar::DAY, $BYDAYx2 )) :
+                        // day abbr with key
+                        $output[Vcalendar::BYDAY][$BYDAYx][$BYDAYx2] = strtoupper( $BYDAYv2 );
+                        break;
+                    case ( is_string( $BYDAYv2 ) && ctype_alpha( $BYDAYv2 )) :
+                        // day abbr without key, set key
+                        $output[Vcalendar::BYDAY][$BYDAYx][Vcalendar::DAY] =
+                            strtoupper( $BYDAYv2 );
+                        break;
+                    default :
+                        // rel pos day number. force key from 0 (1++ results in error)
+                        $output[Vcalendar::BYDAY][$BYDAYx][$nIx++] = $BYDAYv2;
+                        break;
+                } // end switch
+            } // end foreach
+            ksort( $output[Vcalendar::BYDAY][$BYDAYx], SORT_NATURAL );
+        } // end foreach
+        ksort( $output[Vcalendar::BYDAY], SORT_NATURAL );
     }
 
     /**
