@@ -2,10 +2,10 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.30
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -40,7 +40,7 @@ use InvalidArgumentException;
  * SOURCE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.21 2019-06-16
+ * @since 2.29.30 2020-12-07
  */
 trait SOURCErfc7986trait
 {
@@ -103,21 +103,22 @@ trait SOURCErfc7986trait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
+     * @since 2.29.30 2020-12-07
      */
     public function setSource( $value = null, $params = [] )
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SOURCE );
-            $value  = Util::$SP0;
-            $params = [];
+            $this->source = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
+            return $this;
         }
-        else {
-            HttpFactory::assertUrl( $value );
-        }
+        HttpFactory::assertUrl( $value );
         $this->source = [
             Util::$LCvalue  => $value,
-            Util::$LCparams =>
-                ParameterFactory::setParams( $params, [ self::VALUE => self::URI ] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

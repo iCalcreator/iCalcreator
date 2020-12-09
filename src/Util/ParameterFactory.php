@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.20
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -49,7 +49,7 @@ use function trim;
  * iCalcreator iCal parameters support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.25 - 2020-09-02
+ * @since  2.29.30 - 2020-12-09
  */
 class ParameterFactory
 {
@@ -63,8 +63,8 @@ class ParameterFactory
      * @static
      * @since  2.29.25 - 2020-09-02
      */
-    public static function createParams(
-        $inputParams = null, $ctrKeys = null, $lang = null ) {
+    public static function createParams( $inputParams = null, $ctrKeys = null, $lang = null )
+    {
         static $FMTFMTTYPE = ';FMTTYPE=%s%s';
         static $FMTKEQV    = '%s=%s';
         static $FMTQ       = '"%s"';

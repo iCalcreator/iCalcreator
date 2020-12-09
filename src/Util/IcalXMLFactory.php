@@ -2,10 +2,10 @@
 /**
   * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.30
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -61,7 +61,7 @@ use function ucfirst;
  * iCalcreator XML (rfc6321) support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.18 - 2020-01-25
+ * @since  2.29.30 - 2020-12-09
  */
 class IcalXMLFactory
 {
@@ -1011,7 +1011,7 @@ class IcalXMLFactory
         $content,
         $params = []
     ) {
-        self::addXMLchild($parent, $name, self::$uri, $content, $params );
+        self::addXMLchild( $parent, $name, self::$uri, $content, $params );
     }
 
     /**
@@ -1025,7 +1025,7 @@ class IcalXMLFactory
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since  2.29.2 - 2019-06-29
+     * @since  2.29.30 - 2020-12-09
      */
     private static function addXMLchild(
         SimpleXMLElement $parent,
@@ -1070,12 +1070,17 @@ class IcalXMLFactory
                 $parameters = $child->addChild( self::$PARAMETERS );
                 foreach( $params as $param => $parVal ) {
                     if( Vcalendar::VALUE === $param ) {
-                        if( 0 != strcasecmp( $type, $parVal )) {
+                        if( false !== strpos( $parVal, Util::$COLON )) {
+                            $p1   = $parameters->addChild( strtolower( $param ));
+                            $p2   = $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
+                            $type = strtolower( StringFactory::before( Util::$COLON, $parVal ));
+                        }
+                        elseif( 0 != strcasecmp( $type, $parVal )) {
                             $type = strtolower( $parVal );
                         }
                         continue;
                     }
-                    if( Util::$ISLOCALTIME == $param ) {
+                    elseif( Util::$ISLOCALTIME == $param ) {
                         continue;
                     }
                     $param = strtolower( $param );
@@ -1416,7 +1421,7 @@ class IcalXMLFactory
      * @param  IcalInterface $iCalComp iCalcreator calendar/component instance
      * @param  string        $xml
      * @static
-     * @since  2.29.14 - 2019-09-03
+     * @since  2.29.30 - 2020-12-09
      */
     private static function XMLgetProps( IcalInterface $iCalComp, $xml )
     {
@@ -1605,7 +1610,7 @@ class IcalXMLFactory
                 default:
                     switch( $valueType ) {
                         case self::$uri :
-                            if( Vcalendar::ATTACH == $propName ) {
+                            if( in_array( $propName, [ Vcalendar::ATTACH, Vcalendar::SOURCE ] )) {
                                 break;
                             }
                             $params[Vcalendar::VALUE] = Vcalendar::URI;

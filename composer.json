@@ -6,6 +6,7 @@
         "rfc2445",
         "rfc5545",
         "rfc6321",
+        "rfc7986",
         "management",
         "calendar",
         "vCalendar",

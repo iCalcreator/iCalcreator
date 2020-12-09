@@ -5,7 +5,7 @@
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.29
+ * Version   2.29.30
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -33,12 +33,12 @@
  * iCalcreator package autoloader
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.29 - 2020-09-11
+ * @since  2.29.30 - 2020-12-09
  */
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.29.29' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.29.30' );
 /**
  * load iCalcreator src and support classes and Traits
  */

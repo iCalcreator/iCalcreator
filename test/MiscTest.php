@@ -2,10 +2,10 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.29.30
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -48,7 +48,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * testing empty properties
  * testing parse eol-htab
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.29.5 - 2019-08-30
+ * @since  2.29.30 - 2020-12-09
  */
 class MiscTest extends DtBase
 {
@@ -168,13 +168,13 @@ class MiscTest extends DtBase
             ':' . $value
         ];
 
-        // URL
+        // SOURCE
         $value  = 'http://example.com/pub/calendars/jsmith/mytime.ics';
         $params = []  + self::$STCPAR;
         $dataArr[] = [
             1051,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                Vcalendar::SOURCE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
             ],
             $value,
             $params,
@@ -182,9 +182,29 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( Vcalendar::SOURCE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
+        ];
+        // URL
+        $value1  = '%3C01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com%3E';
+        $value2  = '01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com';
+        $params1 = [  Vcalendar::VALUE => 'URI:message' ]  + self::$STCPAR;
+        $params2 = [  Vcalendar::VALUE => 'URI:MESSAGE' ]  + self::$STCPAR;
+        $dataArr[] = [
+            1061,
+            [
+                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+            ],
+            $value1,
+            $params1,
+            [
+                Util::$LCvalue  => $value2,
+                Util::$LCparams => $params2
+            ],
+            strtoupper( Vcalendar::URL ) .
+            ParameterFactory::createParams( $params2 ) .
+            ':' . $value2
         ];
 
         // ORGANIZER
@@ -200,7 +220,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1061,
+            1071,
             [
                 Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -228,7 +248,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1071,
+            1081,
             [
                 Vcalendar::KLASS => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -248,7 +268,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1081,
+            1091,
             [
                 Vcalendar::STATUS => [ Vcalendar::VEVENT ]
             ],
@@ -268,7 +288,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1082,
+            1092,
             [
                 Vcalendar::STATUS => [ Vcalendar::VTODO ]
             ],
@@ -288,7 +308,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1083,
+            1093,
             [
                 Vcalendar::STATUS => [ Vcalendar::VJOURNAL ]
             ],
@@ -308,7 +328,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1091,
+            1101,
             [
                 Vcalendar::GEO => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
             ],
@@ -332,7 +352,7 @@ class MiscTest extends DtBase
             Util::$LCparams => $params
         ];
         $dataArr[] = [
-            1083,
+            1103,
             [
                 Vcalendar::COLOR => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
             ],
@@ -369,15 +389,23 @@ class MiscTest extends DtBase
         $expectedString
     ) {
         $c = new Vcalendar();
+        $urlIsSet = false;
         foreach( $propComps as $propName => $theComps ) {
+            if( Vcalendar::SOURCE == $propName ) {
+                $c->setSource( $value, $params );
+                $c->setUrl( $value, $params );
+                continue;
+            }
             foreach( $theComps as $theComp ) {
                 if( Vcalendar::COLOR == $propName ) {
                     $c->setColor( $value, $params );
                 }
-                if( Vcalendar::URL == $propName ) {
-                    $c->setSource( $value, $params );
+
+                if( ! $urlIsSet && ( Vcalendar::URL == $propName )) {
                     $c->setUrl( $value, $params );
+                    $urlIsSet = true;
                 }
+
                 $newMethod = 'new' . $theComp;
                 $comp      = $c->{$newMethod}();
 

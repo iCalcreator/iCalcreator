@@ -93,3 +93,7 @@ v2.20.27 docs: setCategories/setResources don't accepts array parameter
 v2.29.28 bug RecurFactory2::recurWeekly2()
 
 v2.29.29 bug StringFactory::size75(), max rowlength
+
+
+v2.29.30 Issue #89 URL adapt, strip of value opt (urlencoded) prefix/suffix '<>'
+         (IcalXMLFactory) SOURCE value-type conform

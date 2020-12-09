@@ -91,7 +91,7 @@ class RecurWeekTest extends RecurBaseTest
         ];
         for( $ix = 311; $ix <= 315; $ix++ ) {
             $time    = microtime( true );
-            $start   = DateTimeFactory::factory( 'now', 'Europe/Stockholm' );
+            $start   = DateTimeFactory::factory( '20200909', 'Europe/Stockholm' );
             $count   = 5;
             $dataArr[] = [
                 $ix . '-' . $interval,
