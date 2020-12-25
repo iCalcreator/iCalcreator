@@ -1,11 +1,11 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * copyright (c) 2007-2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.29
+ * Version   2.29.30b
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -26,7 +26,7 @@
  *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  *
  * This file is a part of iCalcreator.
-*/
+ */
 
 namespace Kigkonsult\Icalcreator\Util;
 
@@ -56,14 +56,13 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.29 - 2020-09-11
+ * @since  2.29.30b - 2020-12-22
  */
 class StringFactory
 {
 
     /**
      * @var string
-     * @static
      */
     public static $BS2 = '\\';
     public static $QQ  = '"';
@@ -73,7 +72,6 @@ class StringFactory
      *
      * @param array $rows
      * @return array
-     * @static
      * @since  2.29.20 - 2020-01-31
      */
     public static function concatRows( $rows )
@@ -98,7 +96,6 @@ class StringFactory
 
     /**
      * @var string
-     * @static
      */
     private static $BEGIN_VCALENDAR = 'BEGIN:VCALENDAR';
     private static $END_VCALENDAR   = 'END:VCALENDAR';
@@ -111,7 +108,6 @@ class StringFactory
      * @param string|array $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return array
      * @throws UnexpectedValueException
-     * @static
      * @since  2.29.3 - 2019-08-29
      */
     public static function conformParseInput( $unParsedText = null )
@@ -150,7 +146,6 @@ class StringFactory
      *
      * @param array $rows
      * @return array
-     * @static
      * @since  2.29.3 - 2019-08-29
      */
     private static function trimLeadingRows( $rows )
@@ -170,7 +165,6 @@ class StringFactory
      *
      * @param array $rows
      * @return array
-     * @static
      * @since  2.29.3 - 2019-08-29
      */
     private static function trimTrailingRows( $rows )
@@ -204,7 +198,6 @@ class StringFactory
      *
      * @param string $text
      * @return array
-     * @static
      * @since  2.29.9 - 2019-03-30
      */
     public static function convEolChar( & $text )
@@ -239,7 +232,6 @@ class StringFactory
      * @param string $attributes property attributes
      * @param string $content    property content
      * @return string
-     * @static
      * @since  2.22.20 - 2017-01-30
      */
     public static function createElement(
@@ -260,7 +252,6 @@ class StringFactory
      *
      * @param  string $row
      * @return array   propName and the trailing part of the row
-     * @static
      * @since  2.29.11 - 2019-08-26
      */
     public static function getPropName( $row )
@@ -292,7 +283,6 @@ class StringFactory
      *
      * @param int $cnt
      * @return string
-     * @static
      * @since  2.27.3 - 2018-12-28
      */
     public static function getRandChars( $cnt )
@@ -311,7 +301,6 @@ class StringFactory
      *
      * @param string $name
      * @return bool
-     * @static
      * @since  2.29.5 - 2019-08-30
      */
     public static function isXprefixed( $name )
@@ -338,7 +327,6 @@ class StringFactory
      *
      * @param string $string
      * @return string
-     * @static
      * @link   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
      * @since  2.29.29 - 2020-09-11
      */
@@ -439,8 +427,6 @@ class StringFactory
      * Attributes are prefixed by ';', value by ':', BUT they may exists in attr/values
      * @param string $line     property content
      * @return array           [line, [*propAttr]]
-     * @static
-     * @todo   same as in CalAddressFactory::calAddressCheck() ??
      * @todo   fix 2-5 pos port number
      * @since  2.29.22 - 2020-09-01
      */
@@ -518,13 +504,14 @@ class StringFactory
      * @param int    $cix
      * @return bool
      * @accvess private
-     * @static
-     * @since  2.27.14 - 2019-02-20
+     * @since  2.29.30b - 2020-12-23
      */
     private static function colonIsPrefixedByProtocol( $line, $cix )
     {
         static $MSTZ   = [ 'utc-', 'utc+', 'gmt-', 'gmt+' ];
-        static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:' ]; // 'fax:' removed
+        static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'
+            ,'uri:' // somewhat odd type here...
+        ]; // 'fax:' removed
         static $PROTO4 = [ 'crid:', 'news:', 'pres:' ];
         static $PROTO5 = [ 'mailto:', 'telnet:' ];
         $line = strtolower( $line );
@@ -539,7 +526,6 @@ class StringFactory
      *
      * @param string $string
      * @return bool
-     * @static
      * @since  2.27.22 - 2020-09-01
      */
     private static function hasPortNUmber( $string )
@@ -562,7 +548,6 @@ class StringFactory
      *
      * @param string $string
      * @return string
-     * @static
      * @since  2.27.14 - 2019-02-20
      */
     public static function strrep( $string )
@@ -635,7 +620,6 @@ class StringFactory
      *
      * @param string $string
      * @return string
-     * @static
      * @since  2.22.2 - 2015-06-25
      */
     public static function strunrep( $string )
@@ -654,7 +638,6 @@ class StringFactory
      *
      * @param string $value
      * @return string
-     * @static
      * @since  2.29.14 - 2019-09-03
      */
     public static function trimTrailNL( $value )
@@ -699,7 +682,6 @@ class StringFactory
      * @param string $needle
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function after( $needle, $haystack )
     {
@@ -719,7 +701,6 @@ class StringFactory
      * @param string $needle
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function afterLast( $needle, $haystack )
     {
@@ -739,7 +720,6 @@ class StringFactory
      * @param string $needle
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function before( $needle, $haystack )
     {
@@ -758,7 +738,6 @@ class StringFactory
      * @param string $needle
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function beforeLast( $needle, $haystack )
     {
@@ -781,7 +760,6 @@ class StringFactory
      * @param string $needle2
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function between( $needle1, $needle2, $haystack )
     {
@@ -813,7 +791,6 @@ class StringFactory
      * @param string $needle2
      * @param string $haystack
      * @return string
-     * @static
      */
     public static function betweenLast( $needle1, $needle2, $haystack )
     {
@@ -829,7 +806,6 @@ class StringFactory
      * @param string $haystack
      * @param string $needle
      * @return int
-     * @static
      */
     public static function strrevpos( $haystack, $needle )
     {
@@ -847,7 +823,6 @@ class StringFactory
      * @param string $needle
      * @param string $len       if found contains length of needle
      * @return bool
-     * @static
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.29.11 - 2019-08-28
      */
@@ -874,7 +849,6 @@ class StringFactory
      * @param string $needle
      * @param string $len       if found contains length of needle
      * @return bool
-     * @static
      * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.29.23 - 2020-07-28
      */
