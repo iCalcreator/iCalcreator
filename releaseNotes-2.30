@@ -97,3 +97,5 @@ v2.29.29 bug StringFactory::size75(), max rowlength
 
 v2.29.30 Issue #89 URL adapt, strip of value opt (urlencoded) prefix/suffix '<>'
          (IcalXMLFactory) SOURCE value-type conform
+
+v2.29.30b More issue #89 URL adapt, parse parameter

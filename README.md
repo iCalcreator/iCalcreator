@@ -23,9 +23,7 @@ docs/summary and docs/using for details.
 
 ###### Builds
 
-v2.28.2 - *(master)* stable
-
-v2.29.30 -  *(tag)* release 2.30 candidate 
+v2.30 - *(master)* stable
 
 Note, v2.29.25 and later asserts PHP 7+ compability using <a href="https://github.com/PHPCompatibility/PHPCompatibility">PHPCompatibility</a>
 

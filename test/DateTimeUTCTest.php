@@ -2,10 +2,10 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2019 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.29.25
+ * Version   2.30
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -132,7 +132,7 @@ class DateTimeUTCTest extends DtBase
         $calendar1Str = $calendar1->createCalendar();
         $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1Str );
         $createString = str_replace( '\,', ',', $createString );
-        if( ':' == $expectedString{0} ) { // opt excl lead ':'
+        if( ':' == substr( $expectedString, 0, 1 )) { // opt excl lead ':'
             $expectedString = substr( $expectedString, 1 );
         }
         $this->assertNotFalse(
