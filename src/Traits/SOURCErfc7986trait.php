@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -40,7 +40,7 @@ use InvalidArgumentException;
  * SOURCE property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.30 2020-12-07
+ * @since  2.30.2 - 2021-02-04
  */
 trait SOURCErfc7986trait
 {
@@ -103,7 +103,7 @@ trait SOURCErfc7986trait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.30 2020-12-07
+     * @since  2.30.2 - 2021-02-04
      */
     public function setSource( $value = null, $params = [] )
     {
@@ -115,11 +115,7 @@ trait SOURCErfc7986trait
             ];
             return $this;
         }
-        HttpFactory::assertUrl( $value );
-        $this->source = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        HttpFactory::urlSet( $this->source, $value, $params );
         return $this;
     }
 }

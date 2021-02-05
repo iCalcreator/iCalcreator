@@ -105,7 +105,7 @@ trait REFRESH_INTERVALrfc7986trait
      * Get calendar component property refresh_interval
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|array|DateInterval
      * @throws Exception
      */
     public function getRefreshinterval( $inclParam = false )

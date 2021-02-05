@@ -99,3 +99,12 @@ v2.29.30 Issue #89 URL adapt, strip of value opt (urlencoded) prefix/suffix '<>'
          (IcalXMLFactory) SOURCE value-type conform
 
 v2.29.30b More issue #89 URL adapt, parse parameter
+
+
+v3.30.2 #89, URL (TZURL/SOURCE) for rfc (prescribed) property value,
+        parameter VALUE type URI removed, parse adapt
+        ParameterFactory::ifExistRemove()
+        StringFactory::splitContent()
+        StringFactory::colonIsPrefixedByProtocol()
+        HttpFcatory::urlSet()
+        URLTrait::setUrl() (also TZURL/SOURCE traits)

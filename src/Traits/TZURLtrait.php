@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -40,7 +40,7 @@ use InvalidArgumentException;
  * TZURL property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.3 2018-12-22
+ * @since  2.30.2 - 2021-02-04
  */
 trait TZURLtrait
 {
@@ -101,29 +101,27 @@ trait TZURLtrait
     /**
      * Set calendar component property tzurl
      *
+     * Note, "TZURL" values SHOULD NOT be specified as a file URI type.
+     * This URI form can be useful within an organization, but is problematic
+     * in the Internet.
+     *
      * @param string $value
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
-     * @todo "TZURL" values SHOULD NOT be specified as a file URI type.
-     * This URI form can be useful within an organization, but is problematic
-     * in the Internet.
+     * @since  2.30.2 - 2021-02-04
      */
     public function setTzurl( $value = null, $params = [] )
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZURL );
-            $value  = Util::$SP0;
-            $params = [];
+            $this->tzurl = [
+                Util::$LCvalue  => Util::$SP0,
+                Util::$LCparams => [],
+            ];
+            return $this;
         }
-        else {
-            HttpFactory::assertUrl( $value );
-        }
-        $this->tzurl = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        HttpFactory::urlSet( $this->tzurl, $value, $params );
         return $this;
     }
 }

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -48,7 +48,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * testing empty properties
  * testing parse eol-htab
  * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
- * @since  2.29.30 - 2020-12-09
+ * @since  2.30.2 - 2021-02-04
  */
 class MiscTest extends DtBase
 {
@@ -186,7 +186,8 @@ class MiscTest extends DtBase
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
-        // URL
+
+        // URL 1
         $value1  = '%3C01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com%3E';
         $value2  = '01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com';
         $params1 = [  Vcalendar::VALUE => 'URI:message' ]  + self::$STCPAR;
@@ -203,8 +204,47 @@ class MiscTest extends DtBase
                 Util::$LCparams => $params2
             ],
             strtoupper( Vcalendar::URL ) .
-            ParameterFactory::createParams( $params2 ) .
-            ':' . $value2
+            ParameterFactory::createParams( $params2 ) . ':' . $value2
+        ];
+
+        // URL 2
+        $value1  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
+        $value2  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
+        $params1 = [  Vcalendar::VALUE => 'URI' ]  + self::$STCPAR;
+        $params2 = self::$STCPAR;
+        $dataArr[] = [
+            1062,
+            [
+                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+            ],
+            $value1,
+            $params1,
+            [
+                Util::$LCvalue  => $value2,
+                Util::$LCparams => $params2
+            ],
+            strtoupper( Vcalendar::URL ) .
+            ParameterFactory::createParams( $params2 ) . ':' . $value2
+        ];
+
+        // URL 3
+        $value1  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
+        $value2  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
+        $params1 = self::$STCPAR + [  Vcalendar::VALUE => 'URI:message' ];
+        $params2 = [  Vcalendar::VALUE => 'URI:MESSAGE' ] + self::$STCPAR;
+        $dataArr[] = [
+            1063,
+            [
+                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+            ],
+            $value1,
+            $params1,
+            [
+                Util::$LCvalue  => $value2,
+                Util::$LCparams => $params2
+            ],
+            strtoupper( Vcalendar::URL ) .
+            ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
         // ORGANIZER
@@ -1579,40 +1619,27 @@ class MiscTest extends DtBase
     }
 
     /**
-     * Testing parse eol-htab
-     *
-     * @test
-     * @dataProvider parse5Provider
-     * @param int    $case
-     * @param string $value
-     * @throws Exception
-     */
-    public function parseTest6( $case, $value ) {
-        $c = new Vcalendar();
-        $c->parse( $value );
-
-        $this->parseCalendarTest( $case, $c );
-
-    }
-
-    /**
      * parseTest6 provider
      */
-    public function parse5Provider() {
+    public function parse6Provider() {
 
         $dataArr = [];
 
         $dataArr[] = [
-            501,
+            601,
             "BEGIN:VCALENDAR\r\n" .
             "VERSION:2.0\r\n" .
             "PRODID:-//ShopReply Inc//CalReply 1.0//EN\r\n" .
             "METHOD:REFRESH\r\n" .
+            "SOURCE;x-a=first;VALUE=uri:message:https://www.masked.de/account/subscripti\r\n" .
+            " on/delivery/8878/%3Fweek=2021-W03\r\n" .
             "X-WR-CALNAME:ESPN Daily Calendar\r\n" .
             "X-WR-RELCALID:657d63b8-df1d-e611-8b88-06bb54d48d13\r\n" .
             "X-PUBLISH-TTL:P1D\r\n" .
             "BEGIN:VTIMEZONE\r\n" .
             "TZID:America/New_York\r\n" .
+            "TZURL;x-a=first;VALUE=uri:message:https://www.masked.de/account/subscriptio\r\n" .
+            " n/delivery/8878/%3Fweek=2021-W03" .
             "BEGIN:STANDARD\r\n" .
             "DTSTART:20070101T020000\r\n" .
             "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;\r\n" .
@@ -1645,6 +1672,8 @@ class MiscTest extends DtBase
             "DTSTAMP:20190315T211012Z\r\n" .
             "LAST-MODIFIED:20190315T211012Z\r\n" .
             "SEQUENCE:1\r\n" .
+            "URL;x-a=first;VALUE=uri:message:https://www.masked.de/account/subscription/\r\n" .
+            " delivery/8878/%3Fweek=2021-W03\r\n" .
             "BEGIN:VALARM\r\n" .
             "ACTION:DISPLAY\r\n" .
             "DESCRIPTION:Reminder\r\n" .
@@ -1657,4 +1686,20 @@ class MiscTest extends DtBase
         return $dataArr;
     }
 
+    /**
+     * Testing parse eol-htab
+     *
+     * @test
+     * @dataProvider parse6Provider
+     * @param int    $case
+     * @param string $value
+     * @throws Exception
+     */
+    public function parseTest6( $case, $value ) {
+        $c = new Vcalendar();
+        $c->parse( $value );
+
+        $this->parseCalendarTest( $case, $c );
+
+    }
 }

@@ -34,6 +34,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
+use function array_change_key_case;
 
 /**
  * CONFERENCE property functions

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,7 +31,6 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use UnexpectedValueException;
-
 use function bin2hex;
 use function count;
 use function ctype_digit;
@@ -56,7 +55,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.30b - 2020-12-22
+ * @since  2.30.2 - 2021-02-04
  */
 class StringFactory
 {
@@ -424,17 +423,20 @@ class StringFactory
     /**
      * Return property value and attributes
      *
-     * Attributes are prefixed by ';', value by ':', BUT they may exists in attr/values
+     * Attributes are prefixed by ';', value by ':', BUT they may exists in attr/values (quoted?)
+     *
      * @param string $line     property content
      * @return array           [line, [*propAttr]]
      * @todo   fix 2-5 pos port number
-     * @since  2.29.22 - 2020-09-01
+     * @since  2.30.2 - 2021-02-04
      */
     public static function splitContent( $line )
     {
-        static $CSS    = '://';
-        static $EQ     = '=';
-        $clnPos        = strpos( $line, Util::$COLON );
+        static $CSS      = '://';
+        static $CHT1PCSS = ':http://';
+        static $CHT2PCSS = ':https://';
+        static $EQ       = '=';
+        $clnPos          = strpos( $line, Util::$COLON );
         if(( false === $clnPos )) {
             return [ $line, [] ]; // no params
         }
@@ -466,9 +468,16 @@ class StringFactory
             $cix1 = $cix + 1;
             if( ! $WithinQuotes &&
                 ( Util::$COLON == $str1 ) &&
-                ( $CSS != substr( $line, $cix, 3 )) &&
+                ( $CSS != substr( $line, $cix, 3 )) && // '://'
                 ! self::colonIsPrefixedByProtocol( $line, $cix ) &&
                 ! self::hasPortNUmber( substr( $line, $cix1, 7 ))) {
+                $line = substr( $line, $cix1 );
+                break;
+            }
+            if( ! $WithinQuotes && // (URI-)value starts  with 'http://' OR 'https://'
+                ( Util::$COLON == $str1 ) &&
+                (( $CHT1PCSS == substr( $line, $cix, 8 )) ||
+                 ( $CHT2PCSS == substr( $line, $cix, 9 )))) {
                 $line = substr( $line, $cix1 );
                 break;
             }
@@ -504,21 +513,22 @@ class StringFactory
      * @param int    $cix
      * @return bool
      * @accvess private
-     * @since  2.29.30b - 2020-12-23
+     * @since  2.30.2 - 2021-02-04
      */
     private static function colonIsPrefixedByProtocol( $line, $cix )
     {
         static $MSTZ   = [ 'utc-', 'utc+', 'gmt-', 'gmt+' ];
-        static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'
-            ,'uri:' // somewhat odd type here...
-        ]; // 'fax:' removed
-        static $PROTO4 = [ 'crid:', 'news:', 'pres:' ];
-        static $PROTO5 = [ 'mailto:', 'telnet:' ];
+        static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'  ]; // 'fax:' removed
+        static $PROTO4 = [
+            'crid:', 'news:', 'pres:'
+            ,'=uri:' // somewhat very odd type here...
+        ];
+        static $PROTO6 = [ 'mailto:', 'telnet:' ];  // test ###
         $line = strtolower( $line );
         return (( in_array( substr( $line, $cix - 6, 4 ), $MSTZ )) || // ?? -6
                 ( in_array( substr( $line, $cix - 3, 4 ), $PROTO3 )) ||
                 ( in_array( substr( $line, $cix - 4, 5 ), $PROTO4 )) ||
-                ( in_array( substr( $line, $cix - 6, 7 ), $PROTO5 )));
+                ( in_array( substr( $line, $cix - 6, 7 ), $PROTO6 )));
     }
 
     /**

@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.2
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,17 +30,17 @@
 
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 use InvalidArgumentException;
 
 /**
  * URL property functions
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.29.30 2020-12-07
+ * @since  2.30.2 - 2021-02-04
  */
 trait URLtrait
 {
@@ -106,36 +106,19 @@ trait URLtrait
      * @param array  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.30 2020-12-07
+     * @since  2.30.2 - 2021-02-04
      */
     public function setUrl( $value = null, $params = [] )
     {
-        static $PFCHARS1 = '%3C';
-        static $SFCHARS1 = '%3E';
-        static $PFCHARS2 = '<';
-        static $SFCHARS2 = '>';
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::URL );
             $this->url = [
-                Util::$LCvalue  => $value,
+                Util::$LCvalue  => Util::$SP0,
                 Util::$LCparams => [],
             ];
             return $this;
         }
-        switch( true ) {
-            case (( $PFCHARS1 == substr( $value, 0, 3 )) &&
-                ( $SFCHARS1 == substr( $value, -3 ))) :
-                $value = substr( $value, 3, -3 );
-                break;
-            case (( $PFCHARS2 == substr( $value, 0, 1 )) &&
-                ( $SFCHARS2 == substr( $value, -1 ))) :
-                $value = substr( $value, 1, -1 );
-        } // end switch
-        HttpFactory::assertUrl( $value );
-        $this->url = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        HttpFactory::urlSet( $this->url, $value, $params );
         return $this;
     }
 }

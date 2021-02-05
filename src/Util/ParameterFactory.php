@@ -49,7 +49,7 @@ use function trim;
  * iCalcreator iCal parameters support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.30 - 2020-12-09
+ * @since  2.30.2 - 2021-02-04
  */
 class ParameterFactory
 {
@@ -206,25 +206,24 @@ class ParameterFactory
      * @param string  $expectedKey    expected key
      * @param string  $expectedValue  expected value
      * @static
-     * @since  2.29.1 - 2019-06-24
+     * @since  2.30.2 - 2021-02-04
      */
     public static function ifExistRemove(
         array & $array,
         $expectedKey,
-        $expectedValue  = null
+        $expectedValue = null
     ) {
         if( empty( $array )) {
             return;
         }
         foreach( $array as $key => $value ) {
-            if( 0 == strcasecmp( $expectedKey, $key )) {
-                if( empty( $expectedValue ) ||
-                    ( 0 == strcasecmp( $expectedValue, $value ))) {
-                    unset( $array[$key] );
-                    $array = array_filter( $array );
-                    break;
-                }
-            }
+            if(( 0 == strcasecmp( $expectedKey, $key )) &&
+                ( empty( $expectedValue ) ||
+                ( 0 == strcasecmp( $expectedValue, $value )))) {
+                unset( $array[$key] );
+                $array = array_filter( $array );
+                break;
+            } // end if
         } // end foreach
     }
 
