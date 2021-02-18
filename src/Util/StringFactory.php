@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30.2
+ * Version   2.30.3
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -30,6 +30,7 @@
 
 namespace Kigkonsult\Icalcreator\Util;
 
+use Kigkonsult\Icalcreator\Vcalendar;
 use UnexpectedValueException;
 use function bin2hex;
 use function count;
@@ -41,8 +42,10 @@ use function openssl_random_pseudo_bytes;
 use function ord;
 use function rtrim;
 use function sprintf;
+use function str_ireplace;
 use function str_replace;
 use function strlen;
+use function stripos;
 use function strpos;
 use function strrev;
 use function strtolower;
@@ -55,7 +58,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.30.2 - 2021-02-04
+ * @since  2.30.3 - 2021-02-14
  */
 class StringFactory
 {
@@ -426,16 +429,16 @@ class StringFactory
      * Attributes are prefixed by ';', value by ':', BUT they may exists in attr/values (quoted?)
      *
      * @param string $line     property content
+     * @param string $propName
      * @return array           [line, [*propAttr]]
      * @todo   fix 2-5 pos port number
-     * @since  2.30.2 - 2021-02-04
+     * @since  2.30.3 - 2021-02-14
      */
-    public static function splitContent( $line )
+    public static function splitContent( $line, $propName = null )
     {
         static $CSS      = '://';
-        static $CHT1PCSS = ':http://';
-        static $CHT2PCSS = ':https://';
         static $EQ       = '=';
+        static $URIprops = [ Vcalendar::SOURCE, Vcalendar::URL, Vcalendar::TZURL ];
         $clnPos          = strpos( $line, Util::$COLON );
         if(( false === $clnPos )) {
             return [ $line, [] ]; // no params
@@ -443,11 +446,10 @@ class StringFactory
         if( 0 == $clnPos ) { // no params,  most frequent
             return [ substr( $line, 1 ) , [] ];
         }
-        $sclnPos       = strpos( $line, Util::$SEMIC );
-        if(( 0 === $sclnPos ) &&
-            ( 1 == substr_count( $line, Util::$SEMIC )) &&
-            ( 1 == substr_count( $line, Util::$COLON ))) {
-            // single param only (and no colons in param values), 2nd most frequent
+        if( in_array( strtoupper( $propName ), $URIprops )) {
+            self::checkFixUriValue( $line );
+        }
+        if( self::checkSingleParam( $line )) { // one param
             $param = self::between( Util::$SEMIC, Util::$COLON, $line );
             return [
                 self::after( Util::$COLON, $line ),
@@ -471,13 +473,6 @@ class StringFactory
                 ( $CSS != substr( $line, $cix, 3 )) && // '://'
                 ! self::colonIsPrefixedByProtocol( $line, $cix ) &&
                 ! self::hasPortNUmber( substr( $line, $cix1, 7 ))) {
-                $line = substr( $line, $cix1 );
-                break;
-            }
-            if( ! $WithinQuotes && // (URI-)value starts  with 'http://' OR 'https://'
-                ( Util::$COLON == $str1 ) &&
-                (( $CHT1PCSS == substr( $line, $cix, 8 )) ||
-                 ( $CHT2PCSS == substr( $line, $cix, 9 )))) {
                 $line = substr( $line, $cix1 );
                 break;
             }
@@ -505,6 +500,55 @@ class StringFactory
     }
 
     /**
+     * Return true if single param only (and no colons in param values)
+     *
+     * 2nd most frequent
+     *
+     * @param $line
+     * @return bool
+     * @since  2.30.3 - 2021-02-14
+     */
+    private static function checkSingleParam( $line )
+    {
+        if( 0 !== strpos( $line, Util::$SEMIC ))  {
+            return false;
+        }
+        return (( 1 == substr_count( $line, Util::$SEMIC )) &&
+            ( 1 == substr_count( $line, Util::$COLON )));
+    }
+
+    /**
+     * Replace opt value prefix 'VALUE=URI:message://' by ':' also (opt un-urldecoded) '<'|'>'|'@'
+
+     * orginating from any Apple device
+     *
+     * @param $line
+     * @since  2.30.3 - 2021-02-14
+     */
+    public static function checkFixUriValue( & $line )
+    {
+        static $VEQU     = ';VALUE=URI';
+        static $PFCHARS1 = '%3C';
+        static $SFCHARS1 = '%3E';
+        static $PFCHARS2 = '<';
+        static $SFCHARS2 = '>';
+        static $SCHAR31 = '%40';
+        static $SCHAR32 = '@';
+        if( false !== stripos( $line, $VEQU )) {
+            $line = str_ireplace( $VEQU, Util::$SP0, $line );
+        }
+        if(( false !== strpos( $line, $PFCHARS1 )) && ( false !== strpos( $line, $SFCHARS1 ))) {
+            $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line );
+        }
+        elseif(( false !== strpos( $line, $PFCHARS2 )) && ( false !== strpos( $line, $SFCHARS2 ))) {
+            $line = str_replace( [ $PFCHARS2, $SFCHARS2 ], Util::$SP0, $line );
+        }
+        if( false !== strpos( $line, $SCHAR31 )) {
+            $line = str_replace( $SCHAR31, $SCHAR32, $line );
+        }
+    }
+
+    /**
      * Return bool true if colon-pos is prefixed by protocol
      *
      * @see  https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml overkill !!
@@ -519,16 +563,17 @@ class StringFactory
     {
         static $MSTZ   = [ 'utc-', 'utc+', 'gmt-', 'gmt+' ];
         static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'  ]; // 'fax:' removed
-        static $PROTO4 = [
-            'crid:', 'news:', 'pres:'
-            ,'=uri:' // somewhat very odd type here...
-        ];
-        static $PROTO6 = [ 'mailto:', 'telnet:' ];  // test ###
+        static $PROTO4 = [ 'crid:', 'news:', 'pres:', 'http:' ];
+        static $PROTO5 = [ 'https:' ];
+        static $PROTO6 = [ 'mailto:', 'telnet:' ];
+        static $PROTO7 = [ 'message:' ];
         $line = strtolower( $line );
         return (( in_array( substr( $line, $cix - 6, 4 ), $MSTZ )) || // ?? -6
                 ( in_array( substr( $line, $cix - 3, 4 ), $PROTO3 )) ||
                 ( in_array( substr( $line, $cix - 4, 5 ), $PROTO4 )) ||
-                ( in_array( substr( $line, $cix - 6, 7 ), $PROTO6 )));
+                ( in_array( substr( $line, $cix - 5, 6 ), $PROTO5 )) ||
+                ( in_array( substr( $line, $cix - 6, 7 ), $PROTO6 )) ||
+                ( in_array( substr( $line, $cix - 7, 8 ), $PROTO7 )));
     }
 
     /**

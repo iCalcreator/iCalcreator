@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.3
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -61,7 +61,7 @@ use function ucfirst;
  * iCalcreator XML (rfc6321) support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.30 - 2020-12-09
+ * @since  2.30.3 - 2021-02-14
  */
 class IcalXMLFactory
 {
@@ -1003,7 +1003,7 @@ class IcalXMLFactory
      * @throws Exception
      * @throws InvalidArgumentException
      * @static
-     * @since  2.29.2 - 2019-06-29
+     * @since  2.30.3 - 2021-02-15
      */
     private static function addXMLchildUri(
         SimpleXMLElement $parent,
@@ -1011,7 +1011,7 @@ class IcalXMLFactory
         $content,
         $params = []
     ) {
-        self::addXMLchild( $parent, $name, self::$uri, $content, $params );
+        self::addXMLchild( $parent, $name, self::$uri, htmlentities( $content ), $params );
     }
 
     /**
@@ -1421,7 +1421,7 @@ class IcalXMLFactory
      * @param  IcalInterface $iCalComp iCalcreator calendar/component instance
      * @param  string        $xml
      * @static
-     * @since  2.29.30 - 2020-12-09
+     * @since  2.30.3 - 2021-02-15
      */
     private static function XMLgetProps( IcalInterface $iCalComp, $xml )
     {
@@ -1508,6 +1508,7 @@ class IcalXMLFactory
             switch( $propName ) {
                 case Vcalendar::URL : // fall through
                 case Vcalendar::TZURL :
+                    $value = html_entity_decode( $value );
                     break;
                 case Vcalendar::EXDATE :   // multiple single-date(-times) may exist
                 // fall through
@@ -1610,6 +1611,7 @@ class IcalXMLFactory
                 default:
                     switch( $valueType ) {
                         case self::$uri :
+                            $value = html_entity_decode( $value );
                             if( in_array( $propName, [ Vcalendar::ATTACH, Vcalendar::SOURCE ] )) {
                                 break;
                             }

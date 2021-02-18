@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.3
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -64,7 +64,7 @@ use function ucfirst;
  *  Parent class for calendar components
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.17 - 2020-01-25
+ * @since  2.30.3 - 2021-02-15
  */
 abstract class CalendarComponent extends IcalBase
 {
@@ -323,7 +323,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Parse this properties
      *
-     * @since  2.29.14 - 2019-09-03
+     * @since  2.30.3 - 2021-02-15
      * @todo report invalid properties ??
      */
     private function parse3thisProperties()
@@ -347,7 +347,7 @@ abstract class CalendarComponent extends IcalBase
                 continue; // todo report invalid properties ??
             } // skip property names not in comp
             /* separate attributes from value */
-            list( $value, $propAttr ) = StringFactory::splitContent( $row );
+            list( $value, $propAttr ) = StringFactory::splitContent( $row, $propName );
             if(( self::$NLCHARS == strtolower( substr( $value, -2 ))) &&
                 ! Util::isPropInList( $propName, self::$TEXTPROPS ) &&
                 ( ! StringFactory::isXprefixed( $propName ))) {
