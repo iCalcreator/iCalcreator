@@ -114,3 +114,6 @@ v3.30.3 #89, URL (TZURL/SOURCE) value prefix (protocol)
         StringFactory::splitContent() / checkFixUriValue()
         HttpFcatory::urlSet()
         IcalXMLFactory::addXMLchildUri() / XMLgetProps()
+
+
+v3.30.4 #89, URL value message prefix (protocol) fix

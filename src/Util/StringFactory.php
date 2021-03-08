@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30.3
+ * Version   2.30.4
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -58,7 +58,7 @@ use function trim;
  * iCalcreator TEXT support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.30.3 - 2021-02-14
+ * @since  2.30.4 - 2021-03-07
  */
 class StringFactory
 {
@@ -523,11 +523,13 @@ class StringFactory
      * orginating from any Apple device
      *
      * @param $line
-     * @since  2.30.3 - 2021-02-14
+     * @since  2.30.4 - 2021-03-07
      */
     public static function checkFixUriValue( & $line )
     {
         static $VEQU     = ';VALUE=URI';
+        static $MSGPFX1  = 'message:';
+        static $MSGPFX2  = 'message://';
         static $PFCHARS1 = '%3C';
         static $SFCHARS1 = '%3E';
         static $PFCHARS2 = '<';
@@ -536,6 +538,9 @@ class StringFactory
         static $SCHAR32 = '@';
         if( false !== stripos( $line, $VEQU )) {
             $line = str_ireplace( $VEQU, Util::$SP0, $line );
+        }
+        if(( false !== stripos( $line, $MSGPFX1 )) && ( false === stripos( $line, $MSGPFX2 ))) {
+            $line = str_ireplace( $MSGPFX1, $MSGPFX2, $line );
         }
         if(( false !== strpos( $line, $PFCHARS1 )) && ( false !== strpos( $line, $SFCHARS1 ))) {
             $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line );
