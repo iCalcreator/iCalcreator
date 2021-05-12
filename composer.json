@@ -23,15 +23,21 @@
         "daylight"
     ],
     "license": "lgpl-3.0",
-    "support": {
-       "issues": "https://github.com/iCalcreator/iCalcreator/issues"
-    },
     "authors": [
         {
             "name": "Kjell-Inge Gustafsson",
             "email": "ical@kigkonsult.se"
         }
     ],
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://paypal.me/kigkonsult"
+        }
+    ],
+    "support": {
+       "issues": "https://github.com/iCalcreator/iCalcreator/issues"
+    },
     "autoload": {
         "files": ["autoload.php"],
         "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/Util/", "src/Traits/"] }
@@ -52,3 +58,4 @@
         "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
     }
 }
+
