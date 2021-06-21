@@ -2,32 +2,30 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -39,12 +37,10 @@ use Exception;
 /**
  * class RecurTest, testing selectComponents
  *
- * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.29.29 - 2020-09-11
  */
 class RecurWeekTest extends RecurBaseTest
 {
-
     /**
      * recur2dateTest3Weekly provider
      */
@@ -78,7 +74,7 @@ class RecurWeekTest extends RecurBaseTest
                 $execTime
             ];
             $interval += 2;
-        }
+        } // end for
 
         // same as above but with BYDAY MO
         $interval = 1;
@@ -107,7 +103,7 @@ class RecurWeekTest extends RecurBaseTest
                 0.0
             ];
             $interval += 2;
-        }
+        } // end for
 
         $interval = 1;
         for( $ix = 321; $ix <= 329; $ix++ ) {
@@ -152,7 +148,7 @@ class RecurWeekTest extends RecurBaseTest
                 $execTime
             ];
             $interval += 2;
-        }
+        } // end for
 
         $interval = 1;
         $byMonth  = [ 12 ];
@@ -191,7 +187,7 @@ class RecurWeekTest extends RecurBaseTest
             $interval += 2;
             $byMonth[] = $interval;
             sort( $byMonth );
-        }
+        } // end for
 
         $interval = 1;
         $byMonth  = [ 1, 12 ];
@@ -255,11 +251,10 @@ class RecurWeekTest extends RecurBaseTest
             $interval += 3;
             $byMonth[] = $interval;
             sort( $byMonth );
-        }
+        } // end for
 
         return $dataArr;
     }
-
 
     /**
      * Testing recur2date
@@ -280,7 +275,8 @@ class RecurWeekTest extends RecurBaseTest
         $end,
         array $recur,
         array $expects,
-        $prepTime ) {
+        $prepTime
+    ) {
         $saveStartDate = clone $start;
 
         $case3 = substr( $case, 0, 3 );
@@ -342,5 +338,4 @@ class RecurWeekTest extends RecurBaseTest
             $this->assertTrue( false );
         }
     }
-
 }

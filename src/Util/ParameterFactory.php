@@ -1,33 +1,32 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -38,6 +37,8 @@ use function array_merge;
 use function ctype_digit;
 use function in_array;
 use function is_array;
+use function is_bool;
+use function is_string;
 use function ksort;
 use function sprintf;
 use function strcasecmp;
@@ -48,7 +49,6 @@ use function trim;
 /**
  * iCalcreator iCal parameters support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.30.2 - 2021-02-04
  */
 class ParameterFactory
@@ -56,14 +56,17 @@ class ParameterFactory
     /**
      * Return formatted output for calendar component property parameters
      *
-     * @param array  $inputParams
-     * @param array  $ctrKeys
-     * @param string $lang
+     * @param null|array  $inputParams
+     * @param null|array  $ctrKeys
+     * @param bool|string $lang  bool false if config lang not found
      * @return string
-     * @static
      * @since  2.29.25 - 2020-09-02
      */
-    public static function createParams( $inputParams = null, $ctrKeys = null, $lang = null )
+    public static function createParams(
+        $inputParams = null,
+        $ctrKeys = null,
+        $lang = null
+    ) : string
     {
         static $FMTFMTTYPE = ';FMTTYPE=%s%s';
         static $FMTKEQV    = '%s=%s';
@@ -205,7 +208,6 @@ class ParameterFactory
      * @param array   $array          iCal property parameters
      * @param string  $expectedKey    expected key
      * @param string  $expectedValue  expected value
-     * @static
      * @since  2.30.2 - 2021-02-04
      */
     public static function ifExistRemove(
@@ -233,10 +235,9 @@ class ParameterFactory
      * @param array  $parameterArr
      * @param string $arg
      * @return bool
-     * @static
      * @since  2.27.14 - 2019-03-01
      */
-    public static function isParamsValueSet( $parameterArr, $arg )
+    public static function isParamsValueSet( array $parameterArr, string $arg ) : bool
     {
         if( empty( $parameterArr ) || ! isset( $parameterArr[Util::$LCparams] )) {
             return  false;
@@ -249,56 +250,58 @@ class ParameterFactory
     }
 
     /**
-     * Return param[TZID] or null
+     * Return param[TZID] or empty string
      *
      * @param array  $parameterArr
-     * @return string|null
-     * @static
+     * @return string
      * @since  2.27.14 - 2019-02-10
      */
-    public static function getParamTzid( $parameterArr )
+    public static function getParamTzid( array $parameterArr ) : string
     {
-        return ( isset( $parameterArr[Util::$LCparams][Vcalendar::TZID] ))
-            ? $parameterArr[Util::$LCparams][Vcalendar::TZID]
-            : null;
+        return ( $parameterArr[Util::$LCparams][Vcalendar::TZID] ?? Util::$SP0 );
     }
 
     /**
      * Return (conformed) iCal component property parameters
      *
      * Trim quoted values, default parameters may be set, if missing
+     * Non-string values set to string
      *
      * @param array $params
      * @param array $defaults
      * @return array
-     * @static
      * @since  2.29.25 - 2020-08-25
      */
-    public static function setParams( $params, $defaults = null )
+    public static function setParams( array $params, $defaults = null ) : array
     {
-        $output = [];
+        static $ONE = '1';
         if( empty( $params ) && empty( $defaults )) {
-            return $output;
+            return [];
         }
-        if( ! is_array( $params )) {
-            $params = [];
-        }
+        $output = [];
         foreach(
             array_change_key_case( $params, CASE_UPPER )
             as $paramKey => $paramValue ) {
-            if( Vcalendar::FEATURE === $paramKey ) {
-                $output[Vcalendar::FEATURE] =
-                    trim( $paramValue, StringFactory::$QQ ); // accept comma in value
-                continue;
-            }
-            if( is_array( $paramValue )) {
-                foreach( $paramValue as $pkey => $pValue ) {
-                    $paramValue[$pkey] = trim( $pValue, StringFactory::$QQ );
-                }
-            }
-            else {
-                $paramValue = trim( $paramValue, StringFactory::$QQ );
-            }
+            switch( true ) {
+                case is_array( $paramValue ) :
+                    foreach( $paramValue as $pkey => $pValue ) {
+                        $output[$paramKey][$pkey] =
+                            trim( trim( $pValue ), StringFactory::$QQ );
+                    }
+                    continue 2;
+                case ( Vcalendar::FEATURE === $paramKey ) :
+                    $paramValue = trim( $paramValue, StringFactory::$QQ ); // accept comma in value
+                    break;
+                case is_string( $paramValue ) :
+                    $paramValue = trim( $paramValue, StringFactory::$QQ );
+                    break;
+                case is_bool( $paramValue ) :
+                    $paramValue = $paramValue ? $ONE : Util::$ZERO;
+                    break;
+                default :
+                    $paramValue = (string) $paramValue;
+                    break;
+            } // end switch
             if( Vcalendar::VALUE === $paramKey ) {
                 $output[Vcalendar::VALUE] = strtoupper( $paramValue );
             }
@@ -306,10 +309,9 @@ class ParameterFactory
                 $output[$paramKey] = $paramValue;
             }
         } // end foreach
-        if( is_array( $defaults )) {
+        if( is_array( $defaults ) && ! empty( $defaults )) {
             $output = array_merge(
-                array_change_key_case(
-                    $defaults, CASE_UPPER ),
+                array_change_key_case( $defaults, CASE_UPPER ),
                 $output
             );
         }

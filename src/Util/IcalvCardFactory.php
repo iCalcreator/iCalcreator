@@ -1,31 +1,30 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
 */
 
 namespace Kigkonsult\Icalcreator\Util;
@@ -50,7 +49,6 @@ use function ucfirst;
 /**
  * iCalcreator vCard support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.27.8 - 2019-03-18
  */
 class IcalvCardFactory
@@ -76,7 +74,7 @@ class IcalvCardFactory
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-18
      */
-    public static function iCal2vCard( $email, $version = null )
+    public static function iCal2vCard( string $email, $version = null ) : string
     {
         static $FMTFN      = "FN:%s\r\n";
         static $FMTEMAIL   = "EMAIL:%s\r\n";
@@ -90,7 +88,7 @@ class IcalvCardFactory
             $version = self::$VCARDVERSIONS[2];
         }
         else {
-            self::assertVcardVersion( $version );
+            self::assertVcardVersion((string) $version );
         }
         CalAddressFactory::assertCalAddress( $email );
         /* prepare vCard name */
@@ -102,7 +100,7 @@ class IcalvCardFactory
         $vCard  .= sprintf( $FMTVERSION, $version );
         $vCard  .= sprintf( $FMTPRODID, ICALCREATOR_VERSION );
         $vCard  .= self::getVcardN( $names, $version );
-        $vCard  .= sprintf( $FMTFN, implode( utiL::$SP1, $names ));
+        $vCard  .= sprintf( $FMTFN, implode( Util::$SP1, $names ));
         $vCard  .= sprintf( $FMTEMAIL, CalAddressFactory::removeMailtoPrefix( $email ));
         $vCard  .= sprintf( $FMTREV, gmdate( $YMDTHISZ ));
         $vCard  .= $ENDVCARD;
@@ -113,21 +111,25 @@ class IcalvCardFactory
      * Convert ATTENDEEs, CONTACTs and ORGANIZERs (in email format) to vCard 2.1 or 4.0
      *
      * Skips ATTENDEEs, CONTACTs and ORGANIZERs not in email format
-     * @param Vcalendar $calendar    iCalcreator Vcalendar instance
-     * @param string    $version     vCard version (default 2.1)
-     * @param bool      $inclParams  fetch from values or include from parameters
-     * @param int       $count       on return, count of hits
+     *
+     * @param Vcalendar   $calendar    iCalcreator Vcalendar instance
+     * @param null|string $version     vCard version (default 2.1)
+     * @param null|bool   $inclParam
+     * @param null|int    $count       on return, count of hits
      * @return string   vCards
      * @since  2.27.8 - 2019-03-17
      */
     public static function iCal2vCards(
         Vcalendar $calendar,
         $version = null,
-        $inclParams = true,
+        $inclParam = null,
         & $count = null
-    ) {
-        $hits   = CalAddressFactory::getCalAddresses( $calendar, null, $inclParams );
-        $output = null;
+    ) : string
+    {
+        $hits   = ( true === $inclParam )
+            ? CalAddressFactory::getCalAdressesAllFromProperty( $calendar )
+            : CalAddressFactory::getCalAddresses( $calendar );
+        $output = Util::$SP0;
         $count  = 0;
         foreach( $hits as $email ) {
             try {
@@ -149,7 +151,7 @@ class IcalvCardFactory
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-18
      */
-    private static function assertVcardVersion( $version )
+    private static function assertVcardVersion( string $version )
     {
         static $ERRMSG1 = 'Invalid version %s';
         if( ! in_array( $version, self::$VCARDVERSIONS )) {
@@ -164,7 +166,7 @@ class IcalvCardFactory
      * @return array
      * @since  2.27.8 - 2019-03-17
      */
-    private static function splitNameInNameparts( $name )
+    private static function splitNameInNameparts( string $name ) : array
     {
         switch( true ) {
             case ( ctype_upper( $name ) || ctype_lower( $name )) :
@@ -202,7 +204,7 @@ class IcalvCardFactory
      * @return string
      * @since  2.27.8 - 2019-03-18
      */
-    private static function getVcardN( array $names, $version )
+    private static function getVcardN( array $names, string $version ) : string
     {
         static $FMTN = 'N:%s';
         $name   = array_reverse( $names );

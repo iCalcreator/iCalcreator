@@ -2,34 +2,34 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -46,14 +46,12 @@ use function strtoupper;
 /**
  * X-property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.29.14 2019-09-03
  */
 trait X_PROPtrait
 {
     /**
      * @var array component property X-property value
-     * @access protected
      */
     protected $xprop = null;
 
@@ -62,13 +60,12 @@ trait X_PROPtrait
      *
      * @return string
      */
-    public function createXprop()
+    public function createXprop() : string
     {
-        if( empty( $this->xprop ) || ! is_array( $this->xprop ))
-        {
-            return null;
+        if( empty( $this->xprop ) || ! is_array( $this->xprop )) {
+            return Util::$SP0;
         }
-        $output = null;
+        $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->xprop as $xpropName => $xpropPart ) {
             if( ! isset( $xpropPart[Util::$LCvalue] ) ||
@@ -107,12 +104,12 @@ trait X_PROPtrait
     /**
      * Delete component property X-prop value
      *
-     * @param string $propName
-     * @param int    $propDelIx removal counter
+     * @param null|string $propName
+     * @param null|int    $propDelIx removal counter
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteXprop( $propName, $propDelIx=null )
+    public function deleteXprop( $propName, $propDelIx=null ) : bool
     {
         $propName = ( $propName ) ? strtoupper( $propName ) : self::X_PROP;
         if( empty( $this->xprop )) {
@@ -169,9 +166,9 @@ trait X_PROPtrait
     /**
      * Get calendar component property x-prop
      *
-     * @param string $propName
-     * @param int    $propIx    specific property in case of multiply occurrence
-     * @param bool   $inclParam
+     * @param null|string $propName
+     * @param null|int    $propIx    specific property in case of multiply occurrence
+     * @param null|bool   $inclParam
      * @return bool|array
      * @since  2.27.11 - 2019-01-02
      */
@@ -200,8 +197,7 @@ trait X_PROPtrait
                 : 1;
         }
         $this->propIx[$propName] = --$propIx;
-        $class = get_class( $this );
-        $class::recountMvalPropix( $this->xprop, $propIx );
+        CalendarComponent::recountMvalPropix( $this->xprop, $propIx );
         $this->propIx[$propName] = $propIx;
         $xpropNo = 0;
         foreach( $this->xprop as $xpropKey => $xpropValue ) {
@@ -220,15 +216,15 @@ trait X_PROPtrait
     /**
      * Set calendar property x-prop
      *
-     * @param string $xPropName
-     * @param string $value
-     * @param array  $params   optional
+     * @param null|string $xPropName
+     * @param null|string $value
+     * @param null|array  $params   optional
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      * @todo more value typed asserts ??
      */
-    public function setXprop( $xPropName, $value=null, $params = [] )
+    public function setXprop( $xPropName, $value=null, $params = [] ) : self
     {
         static $MSG = 'Invalid X-property name : \'%s\'';
         if( empty( $xPropName ) || ! StringFactory::isXprefixed( $xPropName )) {
@@ -243,12 +239,12 @@ trait X_PROPtrait
         }
         elseif( ! isset( $params[self::VALUE] ) ||
                 ( self::TEXT === $params[self::VALUE] )) {
-            Util::assertString( $value, $xPropName );
+            $value = Util::assertString( $value, $xPropName );
             $value = StringFactory::trimTrailNL( $value );
         }
         $xprop = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params )
+            Util::$LCparams => ParameterFactory::setParams( $params ?? [] )
         ];
         if( ! is_array( $this->xprop )) {
             $this->xprop = [];

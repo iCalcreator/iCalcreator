@@ -18,19 +18,8 @@ iCalcreator supports systems like
 
 ~~~~~~~~
 
-Please review the releaseNotes for release brief overview, 
+Please review the releaseNotes for release brief overview,
 docs/summary and docs/using for details.
-
-###### Builds
-
-v2.30 - *(master)* stable
-
-Note, v2.29.25 and later asserts PHP 7+ compability using <a href="https://github.com/PHPCompatibility/PHPCompatibility">PHPCompatibility</a>
-
-###### Sponsorship
-
-Donation using <a href="https://paypal.me/kigkonsult" rel="nofollow">paypal.me/kigkonsult</a> are appreciated. 
-For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 
 ###### Usage
 
@@ -72,7 +61,7 @@ $event1 = $vcalendar->newVevent()
               ->setSummary( 'Scheduled meeting with five occurrences' )
               ->setDescription(
                    'Agenda for the the meeting...',
-                   [ Vcalendar::ALTREP => 
+                   [ Vcalendar::ALTREP =>
                        'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
               )
               ->setComment( 'It\'s going to be fun..' )
@@ -93,7 +82,7 @@ $event1 = $vcalendar->newVevent()
                   )
               )
     // with recurrence rule
-              ->setRrule( 
+              ->setRrule(
                   [
                       Vcalendar::FREQ  => Vcalendar::WEEKLY,
                       Vcalendar::COUNT => 5,
@@ -152,7 +141,7 @@ $event1 = $vcalendar->newVevent()
                       Vcalendar::CN       => 'Participant2 CoffeeBean',
                   ]
               );
-              
+
     // add alarm for the event
 $alarm = $event1->newValarm()
              ->setAction( Vcalendar::DISPLAY )
@@ -170,14 +159,14 @@ $event2 = $vcalendar->newVevent()
               ->setSequence( 2 )
     // pointer to event in the recurrence set
               ->setRecurrenceid( '20190505T090000 Europe/Stockholm' )
-    // reason text 
+    // reason text
               ->setDescription(
                   'Altered day and time for event 2019-05-05',
-                  [ Vcalendar::ALTREP => 
+                  [ Vcalendar::ALTREP =>
                       'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
               )
               ->setComment( 'Now we are working hard for two hours' )
-    // the altered day and time with duration 
+    // the altered day and time with duration
               ->setDtstart(
                   new DateTime(
                       '20190504T100000',
@@ -186,12 +175,12 @@ $event2 = $vcalendar->newVevent()
               )
               ->setDuration( 'PT2H' )
     // add alarm (copy from event1)
-              ->setComponent( 
+              ->setComponent(
                   $event1->getComponent( Vcalendar::VALARM )
               );
 
-$vcalendarString = 
-    // apply appropriate Vtimezone with Standard/DayLight components 
+$vcalendarString =
+    // apply appropriate Vtimezone with Standard/DayLight components
     $vcalendar->vtimezonePopulate()
     // and create the (string) calendar
     ->createCalendar();
@@ -276,7 +265,48 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 ```
+
+###### Builds
+
+v2.39 - *(master)* stable
+
+Assert PHP 7+ compability using [PHPCompatibility] and [PHPStan].
+
+###### Support
+
+For support use [github.com iCalcreator]. Non-emergence support issues are, unless sponsored, fixed in due time.
+
+
+###### Sponsorship
+
+Donation using <a href="https://paypal.me/kigkonsult" rel="nofollow">paypal.me/kigkonsult</a> are appreciated.
+For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
+
+###### Installation
+
+Composer
+
+From the Command Line:
+
+```
+composer require kigkonsult/icalcreator
+```
+
+In your composer.json:
+
+```
+{
+    "require": {
+        "kigkonsult/icalcreator": ">=2.39"
+    }
+}
+```
+
 ###### License
 
 iCalcreator is licensed under the LGPLv3 License.
 
+
+[github.com iCalcreator]:https://github.com/iCalcreator/iCalcreator/issues
+[PHPCompatibility]:https://github.com/PHPCompatibility/PHPCompatibility
+[PHPStan]:https://github.com/phpstan/phpstan

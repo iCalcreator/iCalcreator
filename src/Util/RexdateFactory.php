@@ -1,36 +1,34 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
-use DateTime;
 use DateTimeInterface;
 use DateInterval;
 use Exception;
@@ -49,14 +47,12 @@ use function var_export;
 /**
  * iCalcreator EXDATE/RDATE support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.29.16 2020-01-24
  */
 class RexdateFactory
 {
     /**
      * @var array
-     * @static
      */
     private static $DEFAULTVALUEDATETIME = [
         Vcalendar::VALUE => Vcalendar::DATE_TIME
@@ -64,7 +60,6 @@ class RexdateFactory
 
     /**
      * @var string
-     * @static
      */
     private static $REXDATEERR = 'Unknown %s value (#%d) : %s';
 
@@ -76,10 +71,9 @@ class RexdateFactory
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @static
      * @since 2.29.2 2019-06-23
      */
-    public static function formatExdate( $exdateData, $allowEmpty )
+    public static function formatExdate( array $exdateData, bool $allowEmpty ) : string
     {
         static $SORTER1 = [
             'Kigkonsult\Icalcreator\Util\SortFactory',
@@ -89,7 +83,7 @@ class RexdateFactory
             'Kigkonsult\Icalcreator\Util\SortFactory',
             'sortExdate2',
         ];
-        $output  = null;
+        $output  = Util::$SP0;
         $exdates = [];
         foreach(( array_keys( $exdateData )) as $ex ) {
             $theExdate = $exdateData[$ex];
@@ -137,18 +131,17 @@ class RexdateFactory
      *
      * @param string[]|DateTimeInterface[] $exdates
      * @param array $params
-     * @return mixed array|bool
+     * @return array|bool  false on empty
      * @throws Exception
      * @throws InvalidArgumentException
-     * @static
      * @since 2.29.16 2020-01-24
      */
-    public static function prepInputExdate( $exdates, $params = null )
+    public static function prepInputExdate( array $exdates, $params = null )
     {
         $output = [
             Util::$LCvalue  => [],
             Util::$LCparams => ParameterFactory::setParams(
-                $params,
+                ( $params ?? [] ),
                 self::$DEFAULTVALUEDATETIME
             )
         ];
@@ -165,12 +158,12 @@ class RexdateFactory
             }
         }
         foreach(( array_keys( $exdates )) as $eix ) {
-            $theExdate = DateTimeFactory::cnvrtDateTimeInterface( $exdates[$eix] );
+            $theExdate = $exdates[$eix];
             $wDate     = null;
             switch( true ) {
-                case ( $theExdate instanceof DateTime ) :
+                case ( $theExdate instanceof DateTimeInterface ) :
                     $wDate = DateTimeFactory::conformDateTime(
-                        $theExdate,
+                        DateTimeFactory::toDateTime( $theExdate ),
                         $isValueDate,
                         $forceUTC,
                         $paramTZid
@@ -194,7 +187,6 @@ class RexdateFactory
                             var_export( $theExdate, true )
                         )
                     );
-                    break;
             } // end switch
             $output[Util::$LCvalue][] = $wDate;
         } // end foreach(( array_keys( $exdates...
@@ -214,11 +206,14 @@ class RexdateFactory
      * @param bool   $allowEmpty
      * @param string $compType
      * @return string
-     * @static
      * @throws Exception
      * @since  2.29.2 - 2019-06-27
      */
-    public static function formatRdate( $rdateData, $allowEmpty, $compType )
+    public static function formatRdate(
+        array $rdateData,
+        bool $allowEmpty,
+        string $compType
+    ) : string
     {
         static $SORTER1 = [
             'Kigkonsult\Icalcreator\Util\SortFactory',
@@ -229,7 +224,7 @@ class RexdateFactory
             'sortRdate2',
         ];
         $utcTime     = Util::isCompInList( $compType, Vcalendar::$TZCOMPS );
-        $output      = null;
+        $output      = Util::$SP0;
         $rDates      = [];
         foreach(( array_keys( $rdateData )) as $rpix ) {
             $theRdate    = $rdateData[$rpix];
@@ -328,7 +323,7 @@ class RexdateFactory
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    public static function parseRexdate( $row, array $propAttr )
+    public static function parseRexdate( string $row, array $propAttr ) : array
     {
         static $SS = '/';
         if( empty( $row )) {
@@ -351,18 +346,17 @@ class RexdateFactory
      * Return prepared calendar component property rdate input
      *
      * @param array  $rDates
-     * @param array  $params
+     * @param null|array  $params
      * @return array
      * @throws InvalidArgumentException
      * @throws Exception
-     * @static
      * @since 2.29.16 2020-01-24
      */
-    public static function prepInputRdate( array $rDates, $params=null )
+    public static function prepInputRdate( array $rDates, $params = null ) : array
     {
-        $output    = [
+        $output = [
             Util::$LCparams => ParameterFactory::setParams(
-                $params,
+                ( $params ?? [] ),
                 self::$DEFAULTVALUEDATETIME
             )
         ];
@@ -405,9 +399,11 @@ class RexdateFactory
                     $output[Util::$LCvalue][] = $wDate;
                     break;
                 case ( $theRdate instanceof DateTimeInterface ) : // SINGLE DateTime
-                    $theRdate = DateTimeFactory::cnvrtDateTimeInterface( $theRdate );
                     $output[Util::$LCvalue][] = DateTimeFactory::conformDateTime(
-                        $theRdate, $isValueDate, $forceUTC, $paramTZid
+                        DateTimeFactory::toDateTime( $theRdate ),
+                        $isValueDate,
+                        $forceUTC,
+                        $paramTZid
                     );
                     break;
                 case ( DateTimeFactory::isStringAndDate( $theRdate )) : // SINGLE string date(time)
@@ -446,16 +442,16 @@ class RexdateFactory
      * @return array
      * @throws Exception
      * @throws InvalidArgumentException
-     * @static
      * @since 2.29.16 2020-01-24
      */
     private static function getPeriod(
         array $period,
-        $rpix,
-        $isValueDate,
+        int $rpix,
+        bool $isValueDate,
         & $paramTZid,
         & $isLocalTime
-    ) {
+    ) : array
+    {
         $forceUTC = ( Vcalendar::UTC == $paramTZid );
         $wDate    = [];
         $perX     = -1;
@@ -471,9 +467,8 @@ class RexdateFactory
             }
             switch( true ) {
                 case ( $rPeriod instanceof DateTimeInterface ) :
-                    $rPeriod = DateTimeFactory::cnvrtDateTimeInterface( $rPeriod );
                     $wDate[$perX] = DateTimeFactory::conformDateTime(
-                        $rPeriod,
+                        DateTimeFactory::toDateTime( $rPeriod ),
                         $isValueDate,
                         $forceUTC,
                         $paramTZid
@@ -496,7 +491,6 @@ class RexdateFactory
                         throw $e;
                     }
                     continue 2;
-                    break;
                 case ( DateTimeFactory::isStringAndDate( $rPeriod )) : // text date ex. 2006-08-03 10:12:18
                     $wDate[$perX] = DateTimeFactory::conformStringDate(
                         $rPeriod,
@@ -515,7 +509,6 @@ class RexdateFactory
                             var_export( $rPeriod, true )
                         )
                     );
-                    break;
             } // end switch
         } // end foreach( $theRdate as $rix => $rPeriod )
         return [ $wDate, $paramTZid ];

@@ -2,32 +2,30 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTimeZone;
@@ -42,7 +40,6 @@ use UnexpectedValueException;
  *
  * @covers \Kigkonsult\Icalcreator\Util\RegulateTimezoneFactory
  *
- * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.27.14 - 2019-02-27
  */
 class RegulateTimezoneFactoryTest extends DtBase
@@ -50,8 +47,8 @@ class RegulateTimezoneFactoryTest extends DtBase
     /**
      * TzTest1 provider
      */
-    public function TzTest1Provider() {
-
+    public function TzTest1Provider()
+    {
         $dataArr = [];
 
         $case = 100;
@@ -91,7 +88,8 @@ class RegulateTimezoneFactoryTest extends DtBase
      * @param int    $hitsAfterProcess
      * @throws Exception
      */
-    public function TzTest1( $case, $otherTimezone, $hitsAfterProcess ) {
+    public function TzTest1( $case, $otherTimezone, $hitsAfterProcess )
+    {
         $case += 1000;
         static $CALFMT =
             'BEGIN:VCALENDAR
@@ -160,7 +158,8 @@ END:VCALENDAR
      * @test
      * @throws Exception
      */
-    public function TzTest2() {
+    public function TzTest2()
+    {
         $calendar =
 'BEGIN:VCALENDAR
 METHOD:PUBLISH
@@ -245,7 +244,6 @@ END:VCALENDAR
             100,
             Vcalendar::factory()->parse( $calendar2 )
         );
-
     }
 
     private static $calendar2 =
@@ -275,7 +273,8 @@ END:VCALENDAR
      * @param int    $hitsAfterProcess
      * @throws Exception
      */
-    public function TzTest3( $case, $otherTimezone, $hitsAfterProcess ) {
+    public function TzTest3( $case, $otherTimezone, $hitsAfterProcess )
+    {
         $case += 3000;
         $calendar = sprintf( self::$calendar2, $otherTimezone );
         $calendar2 = RegulateTimezoneFactory::process( $calendar );
@@ -303,7 +302,8 @@ END:VCALENDAR
      * @test
      * @throws Exception
      */
-    public function TzTest5() {
+    public function TzTest5()
+    {
         RegulateTimezoneFactory::addMStimezoneToOffset( 'otherTimezone', 12345 );
         $this->assertArrayHasKey(
             'otherTimezone',
@@ -333,7 +333,8 @@ END:VCALENDAR
      * @expectedException InvalidArgumentException
      * @throws Exception
      */
-    public function TzTest6() {
+    public function TzTest6()
+    {
         $calendar2 = RegulateTimezoneFactory::process(
             sprintf( self::$calendar2, '̈́Europe/Stockholm' ),
             [ 'otherTimezone' => 'phpTimezone' ]
@@ -347,7 +348,8 @@ END:VCALENDAR
      * @expectedException InvalidArgumentException
      * @throws Exception
      */
-    public function TzTest7() {
+    public function TzTest7()
+    {
         $tzFactory = RegulateTimezoneFactory::factory();
         $this->assertFalse( $tzFactory->isInputiCalSet());
 
@@ -361,8 +363,8 @@ END:VCALENDAR
      * @expectedException UnexpectedValueException
      * @throws Exception
      */
-    public function TzTest8() {
+    public function TzTest8()
+    {
         $calendar2 = RegulateTimezoneFactory::process( 'grodan boll' );
     }
-
 }

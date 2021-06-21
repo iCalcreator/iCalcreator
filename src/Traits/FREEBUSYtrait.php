@@ -2,35 +2,33 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use DateTime;
 use DateTimeInterface;
 use DateInterval;
 use Exception;
@@ -53,7 +51,6 @@ use function var_export;
 /**
  * FREEBUSY property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @throws InvalidArgumentException
  * @since 2.29.16 2020-01-24
  */
@@ -66,7 +63,6 @@ trait FREEBUSYtrait
 
     /**
      * @var array FREEBUSY param keywords
-     * @static
      */
     protected static $FREEBUSYKEYS = [
         self::FREE,
@@ -82,14 +78,14 @@ trait FREEBUSYtrait
      * @throws Exception
      * @since 2.29.2 2019-06-27
      */
-    public function createFreebusy()
+    public function createFreebusy() : string
     {
         static $FMT = ';FBTYPE=%s';
         static $SORTER = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'sortRdate1' ];
         if( empty( $this->freebusy )) {
-            return null;
+            return Util::$SP0;
         }
-        $output = null;
+        $output = Util::$SP0;
         foreach( $this->freebusy as $fx => $freebusyPart ) {
             if( empty( $freebusyPart[Util::$LCvalue] ) ||
                 (( 1 == count( $freebusyPart[Util::$LCvalue] )) &&
@@ -154,24 +150,29 @@ trait FREEBUSYtrait
     /**
      * Delete calendar component property freebusy
      *
-     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteFreebusy( $propDelIx = null )
+    public function deleteFreebusy( $propDelIx = null ) : bool
     {
         if( empty( $this->freebusy )) {
             unset( $this->propDelIx[self::FREEBUSY] );
             return false;
         }
-        return $this->deletePropertyM( $this->freebusy, self::FREEBUSY, $propDelIx );
+        return  self::deletePropertyM(
+            $this->freebusy,
+            self::FREEBUSY,
+            $this,
+            $propDelIx
+        );
     }
 
     /**
      * Get calendar component property freebusy
      *
-     * @param int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
+     * @param null|int    $propIx specific property in case of multiply occurrence
+     * @param null|bool   $inclParam
      * @return bool|array
      * @throws Exception
      * @since 2.29.2 2019-06-27
@@ -182,9 +183,10 @@ trait FREEBUSYtrait
             unset( $this->propIx[self::FREEBUSY] );
             return false;
         }
-        $output = $this->getPropertyM(
+        $output =  self::getPropertyM(
             $this->freebusy,
             self::FREEBUSY,
+            $this,
             $propIx,
             $inclParam
         );
@@ -231,7 +233,7 @@ trait FREEBUSYtrait
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    protected static function parseFreebusy( $row, array $propAttr )
+    protected static function parseFreebusy( $row, array $propAttr ) : array
     {
         static $SS = '/';
         $fbtype = $values = null;
@@ -259,10 +261,10 @@ trait FREEBUSYtrait
     /**
      * Set calendar component property freebusy
      *
-     * @param string  $fbType
-     * @param string|DateTimeInterface|array $fbValues
-     * @param array   $params
-     * @param integer $index
+     * @param null|string  $fbType
+     * @param null|string|DateTimeInterface|array $fbValues
+     * @param null|array   $params
+     * @param null|integer $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -274,11 +276,12 @@ trait FREEBUSYtrait
         $fbValues = null,
         $params = [],
         $index = null
-    ) {
+    ) : self
+    {
         static $ERR2 = 'Unknown (%d) freebusy value (#%d/%d) : \'%s\'';
         if( empty( $fbValues )) {
             $this->assertEmptyValue( $fbValues, self::FREEBUSY );
-            $this->setMval($this->freebusy, Util::$SP0, [],null, $index );
+             self::setMval( $this->freebusy, Util::$SP0, [], null, $index );
             return $this;
         }
         $fbType = ( empty( $fbType )) ? self::BUSY : strtoupper( $fbType );
@@ -294,11 +297,13 @@ trait FREEBUSYtrait
             }
             $freebusyPeriod = [];
             foreach( $fbPeriod as $fbix2 => $fbMember ) { // pairs => singlepart
-                $fbMember = DateTimeFactory::cnvrtDateTimeInterface( $fbMember );
                 switch( true ) {
-                    case ( $fbMember instanceof DateTime ) :     // datetime
+                    case ( $fbMember instanceof DateTimeInterface ) :     // datetime
                         $freebusyPeriod[$fbix2] =
-                            DateTimeFactory::setDateTimeTimeZone( $fbMember, Vcalendar::UTC );
+                            DateTimeFactory::setDateTimeTimeZone(
+                                DateTimeFactory::toDateTime( $fbMember ),
+                                Vcalendar::UTC
+                            );
                         break;
                     case ( $fbMember instanceof DateInterval ) : // interval
                         $freebusyPeriod[$fbix2] = (array) $fbMember; // fix pre 7.0.5 bug
@@ -333,23 +338,22 @@ trait FREEBUSYtrait
                         throw new InvalidArgumentException(
                             sprintf( $ERR2, 2, $fbix1, $fbix2, var_export( $fbMember, true ))
                         );
-                        break;
                 } // end switch
             } // end foreach
             $input[] = $freebusyPeriod;
         }
-        $this->setMval( $this->freebusy, $input, $params, null, $index );
+         self::setMval( $this->freebusy, $input, $params, null, $index );
         return $this;
     }
 
     /**
      * Check for single values and , if so, put into array
      *
-     * @param array $fbValues
+     * @param string|array $fbValues
      * @return array
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleValues( array $fbValues )
+    private static function checkSingleValues( $fbValues ) : array
     {
         if( ! is_array( $fbValues )) {
             return $fbValues;

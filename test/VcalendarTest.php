@@ -2,36 +2,35 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,22 +41,19 @@ use PHPUnit\Framework\TestCase;
  *    PRODID (implicit)
  *    Not X-property, tested in MiscTest
  *
- * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.27.14 - 2019-01-24
  */
 class VcalendarTest extends TestCase
 {
-    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-
+    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s()";
 
     /**
      * Testing Vcalendar config
      *
      * @test
      */
-    public function vcalendarTest0() {
-
-
+    public function vcalendarTest0()
+    {
         $config = [
             Vcalendar::ALLOWEMPTY => false,
             Vcalendar::UNIQUE_ID  => 'kigkonsult.se',
@@ -82,8 +78,8 @@ class VcalendarTest extends TestCase
     /**
      * vcalendarTest1 provider
      */
-    public function vcalendarTest1Provider() {
-
+    public function vcalendarTest1Provider()
+    {
         $dataArr = [];
 
         $value     = 'GREGORIAN';
@@ -137,13 +133,14 @@ class VcalendarTest extends TestCase
      * @param string $expectedString
      * @throws Exception
      */
-    public function vcalendarTest1( $case, $propName, $value, $expectedGet, $expectedString ) {
+    public function vcalendarTest1( $case, $propName, $value, $expectedGet, $expectedString )
+    {
         $vcalendar = Vcalendar::factory();
 
-        $getMethod    = Vcalendar::getGetMethodName( $propName );
-        $createMethod = Vcalendar::getCreateMethodName( $propName );
-        $deleteMethod = Vcalendar::getDeleteMethodName( $propName );
-        $setMethod    = Vcalendar::getSetMethodName( $propName );
+        $getMethod    = StringFactory::getGetMethodName( $propName );
+        $createMethod = StringFactory::getCreateMethodName( $propName );
+        $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+        $setMethod    = StringFactory::getSetMethodName( $propName );
         $vcalendar->{$setMethod}( $value );
         $getValue = $vcalendar->{$getMethod}();
         $this->assertEquals(
@@ -178,9 +175,9 @@ class VcalendarTest extends TestCase
         }
 
         $v = $vcalendar->newVevent();
-        $v->deleteUID();
+        $v->deleteUid();
         $this->assertNotFalse(
-            $v->getUID(),
+            $v->getUid(),
             sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'VEVENT', 'getUid' )
         );
         $v->deleteDtstamp();
@@ -203,7 +200,6 @@ class VcalendarTest extends TestCase
         );
 
         unset( $vcalendar, $vcalendar2 );
-        $this->assertFalse( isset( $vcalendar ));
     }
 
     /**
@@ -212,7 +208,8 @@ class VcalendarTest extends TestCase
      * @test
      * @throws Exception
      */
-    public function vcalendarTest2() {
+    public function vcalendarTest2()
+    {
         $vcalendar = new Vcalendar();
 
         $v = new Vevent();
@@ -228,7 +225,7 @@ class VcalendarTest extends TestCase
         $v2 = $vcalendar->getComponent( 6 );
         $this->assertEquals( $date, $v2->getDtstart());
 
-        $vcalendar->deleteComponent( 6 );
+        $vcalendar->deleteComponent( 6, false );
         $this->assertFalse( $vcalendar->getComponent( 6 ));
         $this->assertFalse( $vcalendar->getComponent());
 
@@ -240,16 +237,16 @@ class VcalendarTest extends TestCase
 
         for( $x = 1; $x <= 12; $x++ ) {
             $vx1   = $vcalendar->newVevent();
-            $vx1->setXprop( 'X-SET_NO', $x );
+            $vx1->setXprop( 'X-SET_NO', (string) $x );
         }
 
         for( $x = 13; $x <= 14; $x++ ) {
             $vx1   = $vcalendar->newVtodo();
-            $vx1->setXprop( 'X-SET_NO', $x );
+            $vx1->setXprop( 'X-SET_NO', (string) $x );
         }
         for( $x = 15; $x <= 30; $x++ ) {
             $vx1   = $vcalendar->newVevent();
-            $vx1->setXprop( 'X-SET_NO', $x );
+            $vx1->setXprop( 'X-SET_NO', (string) $x );
         }
         $this->assertTrue(
             ( 30 == $vcalendar->countComponents()),
@@ -493,15 +490,15 @@ class VcalendarTest extends TestCase
 
         for( $x = 18; $x <= 1; $x-- ) {
             $this->assertTrue(
-                $vcalendar->deleteComponent( Vcalendar::VEVENT, $x ),
+                $vcalendar->deleteComponent(  Vcalendar::VEVENT, $x ),
                 'deleteComponent-error 7 on #' . $x
             );
         }
-        while( $vcalendar->deleteComponent( Vcalendar::VEVENT ) ) {
+        while( $vcalendar->deleteComponent(  Vcalendar::VEVENT, false ) ) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent( Vcalendar::VEVENT ),
+            $vcalendar->deleteComponent(  Vcalendar::VEVENT, false ),
             'deleteComponent-error 8'
         );
         $this->assertTrue(
@@ -509,11 +506,11 @@ class VcalendarTest extends TestCase
             'deleteComponent-error 9, has ' . $vcalendar->countComponents()
         );
 
-        while( $vcalendar->deleteComponent( Vcalendar::VTODO ) ) {
+        while( $vcalendar->deleteComponent(  Vcalendar::VTODO, false ) ) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent( Vcalendar::VTODO ),
+            $vcalendar->deleteComponent(  Vcalendar::VTODO, false ),
             'deleteComponent-error 10'
         );
         $this->assertTrue(
@@ -539,7 +536,5 @@ class VcalendarTest extends TestCase
             ( 30 == $vcalendar->countComponents() ),
             'deleteComponent-error 13, has ' . $vcalendar->countComponents()
         );
-
     }
-
 }

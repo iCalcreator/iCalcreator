@@ -2,32 +2,30 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
 namespace Kigkonsult\Icalcreator;
 
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -39,18 +37,15 @@ use Exception;
 /**
  * class RecurTest, testing selectComponents
  *
- * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.27.20 - 2019-05-20
  */
 class RecurMonthTest extends RecurBaseTest
 {
-
     /**
      * recurMonthly1Test provider
      */
     public function recurMonthly1Provider()
     {
-
         $dataArr   = [];
         $dataSetNo = 0;
         $DATASET   = 'DATASET';
@@ -102,7 +97,7 @@ class RecurMonthTest extends RecurBaseTest
                 $month += $interval;
                 if( 12 < $month ) {
                     $year  += (int) floor( $month / 12 );
-                    $month  = (int) ( $month % 12 );
+                    $month  = ( $month % 12 );
                     if( 0 == $month ) {
                         $month = 12;
                     }
@@ -153,7 +148,7 @@ class RecurMonthTest extends RecurBaseTest
                 $month += $interval;
                 if( 12 < $month ) {
                     $year += (int) floor( $month / 12 );
-                    $month = (int) ( $month % 12 );
+                    $month = ( $month % 12 );
                     if( 0 == $month ) {
                         $month = 12;
                     }
@@ -213,7 +208,7 @@ class RecurMonthTest extends RecurBaseTest
                     $month += $interval;
                     if( 12 < $month ) {
                         $year  += (int) floor( $month / 12 );
-                        $month = (int) ( $month % 12 );
+                        $month  = ( $month % 12 );
                         if( 0 == $month ) {
                             $month = 12;
                         }
@@ -301,7 +296,7 @@ class RecurMonthTest extends RecurBaseTest
                     $month += $interval;
                     if( 12 < $month ) {
                         $year += (int) floor( $month / 12 );
-                        $month = (int) ( $month % 12 );
+                        $month = ( $month % 12 );
                         if( 0 == $month ) {
                             $month = 12;
                         }
@@ -690,18 +685,18 @@ class RecurMonthTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurMonthly1Provider
-     * @param int      $case
-     * @param DateTime $start
-     * @param array|DateTime $end
-     * @param array    $recur
-     * @param array    $expects
-     * @param float    $prepTime
+     * @param int|string  $case
+     * @param DateTime    $start
+     * @param DateTime    $end
+     * @param array       $recur
+     * @param array       $expects
+     * @param float       $prepTime
      * @throws Exception
      */
     public function recurMonthly1Test(
         $case,
         DateTime $start,
-        $end,
+        DateTime $end,
         array $recur,
         array $expects,
         $prepTime
@@ -712,7 +707,6 @@ class RecurMonthTest extends RecurBaseTest
             return;
         }
         */
-
         $saveStartDate = clone $start;
 
         if( in_array( $case, [ '29-21-18C', '29-21-18D', '29-21-18E', '29-21-18F', '31' ] )) {
@@ -761,7 +755,6 @@ class RecurMonthTest extends RecurBaseTest
      */
     public function getRecurByDaysInMonthProvider()
     {
-
         $dataArr = [];
 
         $dataArr[] = [
@@ -889,7 +882,6 @@ class RecurMonthTest extends RecurBaseTest
      */
     public function recurMonthly2Provider()
     {
-
         $dataArr   = [];
         $dataSetNo = 0;
         $DATASET   = 'DATASET';
@@ -1118,7 +1110,6 @@ class RecurMonthTest extends RecurBaseTest
             return;
         }
         */
-
         $saveStartDate = clone $start;
 
         $result = $expects;

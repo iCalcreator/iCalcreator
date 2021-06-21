@@ -101,6 +101,7 @@ v2.29.30 Issue #89 URL adapt, strip of value opt (urlencoded) prefix/suffix '<>'
 v2.29.30b More issue #89 URL adapt, parse parameter
 
 
+
 v3.30.2 #89, URL (TZURL/SOURCE) for rfc (prescribed) property value,
         parameter VALUE type URI removed, parse adapt
         ParameterFactory::ifExistRemove()
@@ -116,4 +117,13 @@ v3.30.3 #89, URL (TZURL/SOURCE) value prefix (protocol)
         IcalXMLFactory::addXMLchildUri() / XMLgetProps()
 
 
-v3.30.4 #89, URL value message prefix (protocol) fix
+v3.39   3.4 release candidate
+        PHP 7 (PHPStan/strict types)
+        iCalBase static methodName methods moved to StringFactory
+        iCalBase Component multi-prop methods moved to CalendarComponent
+        CalAddressFactory::getCalAddresses() arg inclParams removed
+        TRIGGERtrait : setTrigger() bug fix
+        ATTENDEE/ORGANIZER (CalAddressFactory)
+          value MAILTO prefix
+          parameter EMAIL etc logic upd
+        IcalvCard::iCal2vCards() arg bug

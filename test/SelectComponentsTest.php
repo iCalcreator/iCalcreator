@@ -2,36 +2,34 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
-use DateTimezone;
+use DateTimeZone;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -40,7 +38,6 @@ use PHPUnit\Framework\TestCase;
  *
  * Testing exceptions in DateIntervalFactory
  *
- * @author      Kjell-Inge Gustafsson <ical@kigkonsult.se>
  * @since  2.27.18 - 2019-04-09
  */
 class SelectComponentsTest extends TestCase
@@ -50,8 +47,8 @@ class SelectComponentsTest extends TestCase
      *
      * demo calendar
      */
-    public static function veventCalendarSubProvider() {
-
+    public static function veventCalendarSubProvider()
+    {
         // create a new calendar
         $vcalendar = Vcalendar::factory( [ Vcalendar::UNIQUE_ID => "kigkonsult.se", ] )
             // with calendaring info
@@ -91,13 +88,13 @@ class SelectComponentsTest extends TestCase
                             ->setDtstart(
                                 new DateTime(
                                     '20190421T090000',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
                             ->setDtend(
                                 new DateTime(
                                     '20190421T100000',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
             // with recurrence rule
@@ -112,11 +109,11 @@ class SelectComponentsTest extends TestCase
                                 [
                                     new DateTime(
                                         '20190609T090000',
-                                        new DateTimezone( 'Europe/Stockholm' )
+                                        new DateTimeZone( 'Europe/Stockholm' )
                                     ),
                                     new DateTime(
                                         '20190609T110000',
-                                        new DateTimezone( 'Europe/Stockholm' )
+                                        new DateTimeZone( 'Europe/Stockholm' )
                                     ),
                                 ],
                                 [ Vcalendar::VALUE => Vcalendar::PERIOD ]
@@ -125,7 +122,7 @@ class SelectComponentsTest extends TestCase
                             ->setExdate(
                                 new DateTime(
                                     '2019-05-12 09:00:00',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
             // organizer, chair  and some participants
@@ -205,7 +202,7 @@ class SelectComponentsTest extends TestCase
                             ->setDtstart(
                 new DateTime(
                     '20190504T100000',
-                    new DateTimezone( 'Europe/Stockholm' )
+                    new DateTimeZone( 'Europe/Stockholm' )
                 )
             )
                             ->setDuration( 'PT2H' )
@@ -221,8 +218,8 @@ class SelectComponentsTest extends TestCase
     /**
      * Vtodo calendar sub-provider
      */
-    public static function vtodoCalendarSubProvider() {
-
+    public static function vtodoCalendarSubProvider()
+    {
         // create a new calendar
         $vcalendar = Vcalendar::factory( [ Vcalendar::UNIQUE_ID => "kigkonsult.se", ] )
             // with calendaring info
@@ -261,13 +258,13 @@ class SelectComponentsTest extends TestCase
                             ->setDtstart(
                                 new DateTime(
                                     '20190421T090000',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
                             ->setDue(
                                 new DateTime(
                                     '20190421T100000',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
             // with recurrence rule
@@ -282,11 +279,11 @@ class SelectComponentsTest extends TestCase
                                 [
                                     new DateTime(
                                         '20190609T090000',
-                                        new DateTimezone( 'Europe/Stockholm' )
+                                        new DateTimeZone( 'Europe/Stockholm' )
                                     ),
                                     new DateTime(
                                         '20190609T110000',
-                                        new DateTimezone( 'Europe/Stockholm' )
+                                        new DateTimeZone( 'Europe/Stockholm' )
                                     ),
                                 ],
                                 [ Vcalendar::VALUE => Vcalendar::PERIOD ]
@@ -295,7 +292,7 @@ class SelectComponentsTest extends TestCase
                             ->setExdate(
                                 new DateTime(
                                     '2019-05-12 09:00:00',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
             // organizer, chair  and some participants
@@ -368,7 +365,7 @@ class SelectComponentsTest extends TestCase
                             ->setDtstart(
                                 new DateTime(
                                     '20190504T100000',
-                                    new DateTimezone( 'Europe/Stockholm' )
+                                    new DateTimeZone( 'Europe/Stockholm' )
                                 )
                             )
                             ->setDuration( 'PT2H' )
@@ -384,8 +381,8 @@ class SelectComponentsTest extends TestCase
     /**
      * SelectComponentsTest provider
      */
-    public function SelectComponentsTestProvider() {
-
+    public function SelectComponentsTestProvider()
+    {
         $veventCalendar = self::veventCalendarSubProvider();
         $todoCalendar   = self::vtodoCalendarSubProvider();
 
@@ -440,12 +437,13 @@ class SelectComponentsTest extends TestCase
      * @param string|array $compType
      * @throws Exception
      */
-    public function SelectComponentsTest( $case, Vcalendar $vcalendar, $compType = null ) {
+    public function SelectComponentsTest( $case, Vcalendar $vcalendar, $compType = null )
+    {
         static $FMTerr = 'error in case#%d, date %d-%d-%d';
 
         $selectComponents = $vcalendar->selectComponents(
-            new DateTime( '20190421T000000', new DateTimezone( 'Europe/Stockholm' )),
-            new DateTime( '20190630T000000', new DateTimezone( 'Europe/Stockholm' ))
+            new DateTime( '20190421T000000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190630T000000', new DateTimeZone( 'Europe/Stockholm' ))
             ,null, null, null, null,
             $compType
         );
@@ -561,7 +559,5 @@ class SelectComponentsTest extends TestCase
             $value[1],
             sprintf( $FMTerr, 24, 2019, 6, 9 )
         );
-
     }
-
 }

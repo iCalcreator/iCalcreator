@@ -2,20 +2,21 @@
 <!--
  iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
 
- copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- Link      https://kigkonsult.se
- Package   iCalcreator
- Version   2.30
- License   Subject matter of licence is the software iCalcreator.
+ This file is a part of iCalcreator.
+
+ author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ link      https://kigkonsult.se
+ license   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
            as implemented and invoked in iCalcreator shall be included in
            all copies or substantial portions of the iCalcreator.
 
            iCalcreator is free software: you can redistribute it and/or modify
-           it under the terms of the GNU Lesser General Public License as published
-           by the Free Software Foundation, either version 3 of the License,
-           or (at your option) any later version.
+           it under the terms of the GNU Lesser General Public License as
+           published by the Free Software Foundation, either version 3 of
+           the License, or (at your option) any later version.
 
            iCalcreator is distributed in the hope that it will be useful,
            but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +25,6 @@
 
            You should have received a copy of the GNU Lesser General Public License
            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
-
- This file is a part of iCalcreator.
 -->
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
@@ -39,144 +38,144 @@
 >
     <testsuites>
         <testsuite name="Vcalendar Tests">
-            <file>./test/VcalendarTest.php</file>
+            <file>test/VcalendarTest.php</file>
         </testsuite>
         <testsuite name="Date Tests">
-            <file>./test/Exceptions1Test.php</file>
-            <file>./test/DateTest.php</file>
-            <file>./test/Exceptions6Test.php</file>
-            <file>./test/DateTzTest.php</file>
-            <file>./test/Exceptions2Test.php</file>
-            <file>./test/DateTimeTest.php</file>
-            <file>./test/DateTimeUTCTest.php</file>
+            <file>test/Exceptions1Test.php</file>
+            <file>test/DateTest.php</file>
+            <file>test/Exceptions6Test.php</file>
+            <file>test/DateTzTest.php</file>
+            <file>test/Exceptions2Test.php</file>
+            <file>test/DateTimeTest.php</file>
+            <file>test/DateTimeUTCTest.php</file>
         </testsuite>
         <testsuite name="DateInterval Tests">
-            <file>./test/Exceptions3Test.php</file>
-            <file>./test/DateIntervalTest1.php</file>
-            <file>./test/DateIntervalTest2.php</file>
-            <file>./test/DateIntervalTest3.php</file>
+            <file>test/Exceptions3Test.php</file>
+            <file>test/DateIntervalTest1.php</file>
+            <file>test/DateIntervalTest2.php</file>
+            <file>test/DateIntervalTest3.php</file>
         </testsuite>
         <testsuite name="Integer property Tests">
-            <file>./test/Exceptions4Test.php</file>
-            <file>./test/IntegerTest.php</file>
+            <file>test/Exceptions4Test.php</file>
+            <file>test/IntegerTest.php</file>
         </testsuite>
         <testsuite name="Misc. property Tests">
-            <file>./test/Exceptions5Test.php</file>
-            <file>./test/MiscTest.php</file>
+            <file>test/Exceptions5Test.php</file>
+            <file>test/MiscTest.php</file>
         </testsuite>
         <testsuite name="Valarm property Tests">
-            <file>./test/ValarmTest.php</file>
+            <file>test/ValarmTest.php</file>
         </testsuite>
         <testsuite name="Vtimezone populate Tests">
-            <file>./test/VtimezonePopulateFactoryTest.php</file>
+            <file>test/VtimezonePopulateFactoryTest.php</file>
         </testsuite>
         <testsuite name="Timezone regulate Tests">
-            <file>./test/RegulateTimezoneFactoryTest.php</file>
+            <file>test/RegulateTimezoneFactoryTest.php</file>
         </testsuite>
         <testsuite name="Recur Tests">
-            <file>./test/RecurYearTest.php</file>
-            <file>./test/RecurMonthTest.php</file>
-            <file>./test/RecurWeekTest.php</file>
-            <file>./test/RecurDayTest.php</file>
-            <file>./test/Exceptions7Test.php</file>
-            <file>./test/SelectComponentsTest.php</file>
+            <file>test/RecurYearTest.php</file>
+            <file>test/RecurMonthTest.php</file>
+            <file>test/RecurWeekTest.php</file>
+            <file>test/RecurDayTest.php</file>
+            <file>test/Exceptions7Test.php</file>
+            <file>test/SelectComponentsTest.php</file>
         </testsuite>
         <testsuite name="vCard Tests">
-            <file>./test/IcalvCardFactoryTest.php</file>
+            <file>test/IcalvCardFactoryTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist
                 addUncoveredFilesFromWhitelist="true"
                 processUncoveredFilesFromWhitelist="true">
-            <file>./src/CalendarComponent.php</file>
-            <file>./src/Daylight.php</file>
-            <file>./src/DScomponent.php</file>
-            <file>./src/IcalBase.php</file>
-            <file>./src/IcalInterface.php</file>
-            <file>./src/Standard.php</file>
-            <file>./src/Valarm.php</file>
-            <file>./src/Vcalendar.php</file>
-            <file>./src/Vcomponent.php</file>
-            <file>./src/VetComponent.php</file>
-            <file>./src/Vevent.php</file>
-            <file>./src/Vfreebusy.php</file>
-            <file>./src/Vjournal.php</file>
-            <file>./src/Vtimezone.php</file>
-            <file>./src/Vtodo.php</file>
-            <file>./src/Traits/ACTIONtrait.php</file>
-            <file>./src/Traits/ATTACHtrait.php</file>
-            <file>./src/Traits/ATTENDEEtrait.php</file>
-            <file>./src/Traits/CALSCALEtrait.php</file>
-            <file>./src/Traits/CATEGORIEStrait.php</file>
-            <file>./src/Traits/CLASStrait.php</file>
-            <file>./src/Traits/COLORrfc7986trait.php</file>
-            <file>./src/Traits/COMMENTtrait.php</file>
-            <file>./src/Traits/COMPLETEDtrait.php</file>
-            <file>./src/Traits/CONFERENCErfc7986trait.php</file>
-            <file>./src/Traits/CONTACTtrait.php</file>
-            <file>./src/Traits/CREATEDtrait.php</file>
-            <file>./src/Traits/DESCRIPTIONtrait.php</file>
-            <file>./src/Traits/DTENDtrait.php</file>
-            <file>./src/Traits/DTSTAMPtrait.php</file>
-            <file>./src/Traits/DTSTARTtrait.php</file>
-            <file>./src/Traits/DUEtrait.php</file>
-            <file>./src/Traits/DURATIONtrait.php</file>
-            <file>./src/Traits/EXDATEtrait.php</file>
-            <file>./src/Traits/EXRULEtrait.php</file>
-            <file>./src/Traits/FREEBUSYtrait.php</file>
-            <file>./src/Traits/IMAGErfc7986trait.php</file>
-            <file>./src/Traits/GEOtrait.php</file>
-            <file>./src/Traits/LAST_MODIFIEDtrait.php</file>
-            <file>./src/Traits/LOCATIONtrait.php</file>
-            <file>./src/Traits/METHODtrait.php</file>
-            <file>./src/Traits/NAMErfc7986trait.php</file>
-            <file>./src/Traits/ORGANIZERtrait.php</file>
-            <file>./src/Traits/PERCENT_COMPLETEtrait.php</file>
-            <file>./src/Traits/PRIORITYtrait.php</file>
-            <file>./src/Traits/PRODIDtrait.php</file>
-            <file>./src/Traits/RDATEtrait.php</file>
-            <file>./src/Traits/REFRESH_INTERVALrfc7986trait.php</file>
-            <file>./src/Traits/RECURRENCE_IDtrait.php</file>
-            <file>./src/Traits/RELATED_TOtrait.php</file>
-            <file>./src/Traits/REPEATtrait.php</file>
-            <file>./src/Traits/REQUEST_STATUStrait.php</file>
-            <file>./src/Traits/RESOURCEStrait.php</file>
-            <file>./src/Traits/RRULEtrait.php</file>
-            <file>./src/Traits/SOURCErfc7986trait.php</file>
-            <file>./src/Traits/SEQUENCEtrait.php</file>
-            <file>./src/Traits/STATUStrait.php</file>
-            <file>./src/Traits/SUMMARYtrait.php</file>
-            <file>./src/Traits/TRANSPtrait.php</file>
-            <file>./src/Traits/TRIGGERtrait.php</file>
-            <file>./src/Traits/TZIDtrait.php</file>
-            <file>./src/Traits/TZNAMEtrait.php</file>
-            <file>./src/Traits/TZOFFSETFROMtrait.php</file>
-            <file>./src/Traits/TZOFFSETTOtrait.php</file>
-            <file>./src/Traits/TZURLtrait.php</file>
-            <file>./src/Traits/UIDrfc7986trait.php</file>
-            <file>./src/Traits/URLtrait.php</file>
-            <file>./src/Traits/VERSIONtrait.php</file>
-            <file>./src/Traits/X_PROPtrait.php</file>
-            <file>./src/Util/CalAddressFactory.php</file>
-            <file>./src/Util/DateIntervalFactory.php</file>
-            <file>./src/Util/DateTimeFactory.php</file>
-            <file>./src/Util/DateTimeZoneFactory.php</file>
-            <file>./src/Util/GeoFactory.php</file>
-            <file>./src/Util/HttpFactory.php</file>
-            <file>./src/Util/IcalvCardFactory.php</file>
-            <file>./src/Util/IcalXMLFactory.php</file>
-            <file>./src/Util/ParameterFactory.php</file>
-            <file>./src/Util/RecurFactory.php</file>
-            <file>./src/Util/RecurFactory2.php</file>
-            <file>./src/Util/RegulateTimezoneFactory.php</file>
-            <file>./src/Util/RexdateFactory.php</file>
-            <file>./src/Util/SelectFactory.php</file>
-            <file>./src/Util/SortFactory.php</file>
-            <file>./src/Util/StringFactory.php</file>
-            <file>./src/Util/Util.php</file>
-            <file>./src/Util/UtilDateTime.php</file>
-            <file>./src/Util/VtimezonePopulateFactory.php</file>
+            <file>src/CalendarComponent.php</file>
+            <file>src/Daylight.php</file>
+            <file>src/DScomponent.php</file>
+            <file>src/IcalBase.php</file>
+            <file>src/IcalInterface.php</file>
+            <file>src/Standard.php</file>
+            <file>src/Valarm.php</file>
+            <file>src/Vcalendar.php</file>
+            <file>src/Vcomponent.php</file>
+            <file>src/VetComponent.php</file>
+            <file>src/Vevent.php</file>
+            <file>src/Vfreebusy.php</file>
+            <file>src/Vjournal.php</file>
+            <file>src/Vtimezone.php</file>
+            <file>src/Vtodo.php</file>
+            <file>src/Traits/ACTIONtrait.php</file>
+            <file>src/Traits/ATTACHtrait.php</file>
+            <file>src/Traits/ATTENDEEtrait.php</file>
+            <file>src/Traits/CALSCALEtrait.php</file>
+            <file>src/Traits/CATEGORIEStrait.php</file>
+            <file>src/Traits/CLASStrait.php</file>
+            <file>src/Traits/COLORrfc7986trait.php</file>
+            <file>src/Traits/COMMENTtrait.php</file>
+            <file>src/Traits/COMPLETEDtrait.php</file>
+            <file>src/Traits/CONFERENCErfc7986trait.php</file>
+            <file>src/Traits/CONTACTtrait.php</file>
+            <file>src/Traits/CREATEDtrait.php</file>
+            <file>src/Traits/DESCRIPTIONtrait.php</file>
+            <file>src/Traits/DTENDtrait.php</file>
+            <file>src/Traits/DTSTAMPtrait.php</file>
+            <file>src/Traits/DTSTARTtrait.php</file>
+            <file>src/Traits/DUEtrait.php</file>
+            <file>src/Traits/DURATIONtrait.php</file>
+            <file>src/Traits/EXDATEtrait.php</file>
+            <file>src/Traits/EXRULEtrait.php</file>
+            <file>src/Traits/FREEBUSYtrait.php</file>
+            <file>src/Traits/IMAGErfc7986trait.php</file>
+            <file>src/Traits/GEOtrait.php</file>
+            <file>src/Traits/LAST_MODIFIEDtrait.php</file>
+            <file>src/Traits/LOCATIONtrait.php</file>
+            <file>src/Traits/METHODtrait.php</file>
+            <file>src/Traits/NAMErfc7986trait.php</file>
+            <file>src/Traits/ORGANIZERtrait.php</file>
+            <file>src/Traits/PERCENT_COMPLETEtrait.php</file>
+            <file>src/Traits/PRIORITYtrait.php</file>
+            <file>src/Traits/PRODIDtrait.php</file>
+            <file>src/Traits/RDATEtrait.php</file>
+            <file>src/Traits/REFRESH_INTERVALrfc7986trait.php</file>
+            <file>src/Traits/RECURRENCE_IDtrait.php</file>
+            <file>src/Traits/RELATED_TOtrait.php</file>
+            <file>src/Traits/REPEATtrait.php</file>
+            <file>src/Traits/REQUEST_STATUStrait.php</file>
+            <file>src/Traits/RESOURCEStrait.php</file>
+            <file>src/Traits/RRULEtrait.php</file>
+            <file>src/Traits/SOURCErfc7986trait.php</file>
+            <file>src/Traits/SEQUENCEtrait.php</file>
+            <file>src/Traits/STATUStrait.php</file>
+            <file>src/Traits/SUMMARYtrait.php</file>
+            <file>src/Traits/TRANSPtrait.php</file>
+            <file>src/Traits/TRIGGERtrait.php</file>
+            <file>src/Traits/TZIDtrait.php</file>
+            <file>src/Traits/TZNAMEtrait.php</file>
+            <file>src/Traits/TZOFFSETFROMtrait.php</file>
+            <file>src/Traits/TZOFFSETTOtrait.php</file>
+            <file>src/Traits/TZURLtrait.php</file>
+            <file>src/Traits/UIDrfc7986trait.php</file>
+            <file>src/Traits/URLtrait.php</file>
+            <file>src/Traits/VERSIONtrait.php</file>
+            <file>src/Traits/X_PROPtrait.php</file>
+            <file>src/Util/CalAddressFactory.php</file>
+            <file>src/Util/DateIntervalFactory.php</file>
+            <file>src/Util/DateTimeFactory.php</file>
+            <file>src/Util/DateTimeZoneFactory.php</file>
+            <file>src/Util/GeoFactory.php</file>
+            <file>src/Util/HttpFactory.php</file>
+            <file>src/Util/IcalvCardFactory.php</file>
+            <file>src/Util/IcalXMLFactory.php</file>
+            <file>src/Util/ParameterFactory.php</file>
+            <file>src/Util/RecurFactory.php</file>
+            <file>src/Util/RecurFactory2.php</file>
+            <file>src/Util/RegulateTimezoneFactory.php</file>
+            <file>src/Util/RexdateFactory.php</file>
+            <file>src/Util/SelectFactory.php</file>
+            <file>src/Util/SortFactory.php</file>
+            <file>src/Util/StringFactory.php</file>
+            <file>src/Util/Util.php</file>
+            <file>src/Util/UtilDateTime.php</file>
+            <file>src/Util/VtimezonePopulateFactory.php</file>
         </whitelist>
     </filter>
     <logging>

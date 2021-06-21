@@ -2,32 +2,31 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
-
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateInterval;
@@ -44,7 +43,6 @@ use function array_unique;
 use function count;
 use function in_array;
 use function is_array;
-use function is_null;
 use function ksort;
 use function method_exists;
 use function sprintf;
@@ -57,14 +55,12 @@ use function usort;
 /**
  * iCalcreator geo support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.27.17 - 2020-01-25
  */
 class SelectFactory
 {
     /**
      * @var string  component end date properties
-     * @static
      */
     private static $DTENDEXIST     = 'dtendExist';
     private static $DUEEXIST       = 'dueExist';
@@ -95,10 +91,9 @@ class SelectFactory
      * @param bool      $split     true (default) - one component copy every DAY it occurs during the
      *                             period (implies flat=false)
      *                             false          - one occurance of component only in output array
-     * @return mixed  array on success, bool false on select error
+     * @return array|bool    false on select error
      * @throws RuntimeException
      * @throws Exception
-     * @static
      * @since  2.29.16 - 2020-01-24
      */
     public static function selectComponents(
@@ -385,13 +380,13 @@ class SelectFactory
                     );
                     $YmdOld = null;
                     foreach( $recurList as $recurKey => $durationInterval ) {
-                        $recurKeyYmd = substr( $recurKey, 0, 8 );
+                        $recurKeyYmd = substr((string) $recurKey, 0, 8 );
                         if( $YmdOld == $recurKeyYmd ) {
                             continue; // skip overlapping recur the same day, i.e. RDATE before RRULE
                         }
                         $YmdOld = $recurKeyYmd;
                         $rStart = $compStart->getClone();
-                        $rStart->setDateTimeFromString( $recurKey );
+                        $rStart->setDateTimeFromString((string) $recurKey );
                         /* add recurring components within valid dates to output array, only start date set */
                         if( $flat ) {
                             if( ! isset( $result[$compUID] )) { // only one comp
@@ -404,7 +399,7 @@ class SelectFactory
                             $component3  = null;
                             $recurFound = false;
                             foreach( $recurIdList as $k => $v ) {
-                                if( substr( $k, 0, 8 ) == $recurKeyYmd ) {
+                                if( substr((string) $k, 0, 8 ) == $recurKeyYmd ) {
                                     $rStart            = $recurIdList[$k][0]->getClone();
                                     $durationInterval2 = ( empty( $recurIdList[$k][2] ))
                                         ? null : $recurIdList[$k][2];  // DateInterval
@@ -569,7 +564,6 @@ class SelectFactory
      * @param UtilDateTime $scopeEnd
      * @param string       $format
      * @return bool
-     * @static
      */
     private static function inScope(
         UtilDateTime $start,
@@ -577,7 +571,8 @@ class SelectFactory
         UtilDateTime $end,
         UtilDateTime $scopeEnd,
         $format
-    ) {
+    ) : bool
+    {
         return (( $start->format( $format ) >= $scopeStart->format( $format )) &&
                   ( $end->format( $format ) <= $scopeEnd->format( $format )));
     }
@@ -826,18 +821,17 @@ class SelectFactory
     }
 
     /**
-     * Return YmdList from YmdHis keyed array
+     * Return Ymd-List from YmdHis-keyed array
      *
      * @param array $YmdHisArr
      * @return array
-     * @static
      * @since 2.26.2 - 2018-11-15
      */
-    private static function getYmdList( array $YmdHisArr )
+    private static function getYmdList( array $YmdHisArr ) : array
     {
         $res = [];
         foreach( $YmdHisArr as $key => $value ) {
-            $res[substr( $key, 0, 8 )] = $key;
+            $res[substr((string) $key, 0, 8 )] = $key;
         }
         return $res;
     }
@@ -851,7 +845,6 @@ class SelectFactory
      * @param int       $endY
      * @param int       $endM
      * @param int       $endD
-     * @static
      * @since  2.29.16 - 2020-01-24
      */
     private static function assertDateArguments(
@@ -901,10 +894,9 @@ class SelectFactory
      *
      * @param array|string $cType
      * @return array
-     * @static
      * @since 2.27.18 - 2019-04-07
      */
-    private static function assertComponentTypes( $cType = null )
+    private static function assertComponentTypes( $cType = null ) : array
     {
         if( empty( $cType )) {
             return Vcalendar::$VCOMPS;
@@ -927,7 +919,6 @@ class SelectFactory
      * @param bool      $flat
      * @param bool      $any
      * @param bool      $split
-     * @static
      * @since 2.26.2 - 2018-11-15
      */
     private static function assertBoolArguments(
@@ -936,9 +927,9 @@ class SelectFactory
         & $split = null
     ) {
         // defaults
-        $flat  = ( is_null( $flat ))  ? false : (bool) $flat;
-        $any   = ( is_null( $any ))   ? true  : (bool) $any;
-        $split = ( is_null( $split )) ? true  : (bool) $split;
+        $flat  = $flat ?? false;
+        $any   = $any ?? true;
+        $split = $split ?? true;
         if(( false === $flat ) && ( false === $any )) {
             // invalid combination
             $split = false;
@@ -956,15 +947,15 @@ class SelectFactory
      * @param string            $dtStartTz
      * @return UtilDateTime
      * @throws Exception
-     * @static
      * @since 2.27.6 - 2018-12-29
      */
     private static function getCompEndDate(
         CalendarComponent $component,
-                          $dtStartTz
-    ) {
+        string $dtStartTz
+    ) : UtilDateTime
+    {
         static $MINUS1DAY = '-1 day';
-        $compEnd  = $prop = null;
+        $prop = null;
         $compType = $component->getCompType();
         if((( Vcalendar::VEVENT == $compType ) ||
             ( Vcalendar::VFREEBUSY == $compType  )) &&
@@ -1016,14 +1007,13 @@ class SelectFactory
      * @param int          $cnt
      * @param int          $occurenceDays
      * @param array        $endHis
-     * @static
      * @since 2.26 - 2018-11-10
      */
     private static function setDurationEndTime(
         UtilDateTime $rStart,
         UtilDateTime $rEnd,
-        $cnt,
-        $occurenceDays,
+        int $cnt,
+        int $occurenceDays,
         array $endHis
     ) {
         static $YMDn = 'Ymd';
@@ -1044,12 +1034,12 @@ class SelectFactory
      *
      * @param UtilDateTime $icaldateTime
      * @return array
-     * @static
      * @since 2.26.2 - 2018-11-15
      */
     private static function getArrayYMDkeys(
         UtilDateTime $icaldateTime
-    ) {
+    ) : array
+    {
         static $Y = 'Y';
         static $M = 'm';
         static $D = 'd';
@@ -1065,12 +1055,11 @@ class SelectFactory
      *
      * @param CalendarComponent $component     (Vevent/Vtodo/Vjournal)
      * @param array             $recurIdComps
-     * @static
      * @since 2.27.1 - 2018-12-16
      */
     private static function updateRecurrIdComps(
         CalendarComponent $component,
-        array           & $recurIdComps
+        array & $recurIdComps
     ) {
         if( empty( $recurIdComps )) {
             return;
@@ -1123,13 +1112,13 @@ class SelectFactory
      * @param Vcalendar $calendar
      * @param array     $selectOptions (string) key => (mixed) value, (key=propertyName)
      * @return array
-     * @static
      * @since 2.27.17 - 2020-01-25
      */
     private static function selectComponents2(
         Vcalendar $calendar,
         array $selectOptions
-    ) {
+    ) : array
+    {
         $output        = [];
         $selectOptions = array_change_key_case( $selectOptions, CASE_UPPER );
         while( $component3 = $calendar->getComponent()) {
@@ -1164,7 +1153,7 @@ class SelectFactory
                     continue;
                 } // end   elseif( // multiple occurrence?
                 else {
-                    $method = Vcalendar::getGetMethodName( $propName );
+                    $method = StringFactory::getGetMethodName( $propName );
                     if( ! method_exists( $component3, $method ) ||
                         ( false === ( $d = $component3->{$method}()))) { // single occurrence
                         continue;

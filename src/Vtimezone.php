@@ -1,33 +1,32 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
- *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * This file is a part of iCalcreator.
-*/
-
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
@@ -39,7 +38,6 @@ use function strtoupper;
 /**
  * iCalcreator VTIMEZONE component class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.29.9 2019-08-05
  */
 final class Vtimezone extends CalendarComponent
@@ -96,8 +94,7 @@ final class Vtimezone extends CalendarComponent
             $this->tzname,
             $this->tzoffsetfrom,
             $this->tzoffsetto,
-            $this->tzurl,
-            $this->timezonetype
+            $this->tzurl
         );
     }
 
@@ -108,7 +105,7 @@ final class Vtimezone extends CalendarComponent
      * @throws Exception  (on Rdate err)
      * @since 2.29.9 2019-08-05
      */
-    public function createComponent()
+    public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
@@ -134,7 +131,7 @@ final class Vtimezone extends CalendarComponent
      * @since  2.27.2 - 2018-12-21
      * @throws Exception  (on Valarm/Standard/Daylight) err)
      */
-    public function createSubComponent()
+    public function createSubComponent() : string
     {
         if( self::VTIMEZONE == $this->getCompType()) {
             $this->sortVtimezonesSubComponents();
@@ -197,7 +194,7 @@ final class Vtimezone extends CalendarComponent
      * @return Standard
      * @since  2.27.2 - 2018-12-21
      */
-    public function newStandard()
+    public function newStandard() : Standard
     {
         array_unshift( $this->components, new Standard( $this->getConfig()));
         return $this->components[0];
@@ -209,7 +206,7 @@ final class Vtimezone extends CalendarComponent
      * @return Daylight
      * @since  2.27.2 - 2018-12-21
      */
-    public function newDaylight()
+    public function newDaylight() : Daylight
     {
         $ix = ( empty( $this->components ))
             ? 0

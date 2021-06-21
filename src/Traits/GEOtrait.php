@@ -2,32 +2,31 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -41,7 +40,6 @@ use function is_array;
 /**
  * GEO property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.27.3 2018-12-22
  */
 trait GEOtrait
@@ -56,15 +54,15 @@ trait GEOtrait
      *
      * @return string
      */
-    public function createGeo() {
+    public function createGeo() : string
+    {
         if( empty( $this->geo )) {
-            return null;
+            return Util::$SP0;
         }
-        if( empty( $this->geo[Util::$LCvalue] ))
-        {
+        if( empty( $this->geo[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::GEO )
-                : null;
+                : Util::$SP0;
         }
         return StringFactory::createElement(
             self::GEO,
@@ -89,7 +87,7 @@ trait GEOtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteGeo()
+    public function deleteGeo() : bool
     {
         $this->geo = null;
         return true;
@@ -98,7 +96,7 @@ trait GEOtrait
     /**
      * Get calendar component property geo
      *
-     * @param bool   $inclParam
+     * @param null|bool   $inclParam
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
@@ -132,13 +130,13 @@ trait GEOtrait
     /**
      * Set calendar component property geo
      *
-     * @param mixed $latitude
-     * @param mixed $longitude
-     * @param array $params
+     * @param null|mixed $latitude
+     * @param null|mixed $longitude
+     * @param null|array $params
      * @return static
      * @since 2.27.3 2018-12-22
      */
-    public function setGeo( $latitude = null, $longitude = null, $params = [] )
+    public function setGeo( $latitude = null, $longitude = null, $params = [] ) : self
     {
         if( isset( $latitude ) && isset( $longitude )) {
             if( ! is_array( $this->geo )) {
@@ -147,7 +145,7 @@ trait GEOtrait
             $this->geo[Util::$LCvalue][self::LATITUDE]  = floatval( $latitude );
             $this->geo[Util::$LCvalue][self::LONGITUDE] = floatval( $longitude );
             $this->geo[Util::$LCparams]                 =
-                ParameterFactory::setParams( $params );
+                ParameterFactory::setParams( $params ?? [] );
         }
         else {
             $this->assertEmptyValue( $latitude, self::GEO );

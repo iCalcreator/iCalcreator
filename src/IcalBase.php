@@ -2,41 +2,40 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30.4
- * License   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
- *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
- *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
  * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
+ *
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
+ *
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function define;
 use function defined;
 use function array_change_key_case;
-use function array_filter;
 use function array_keys;
 use function array_slice;
 use function count;
@@ -58,7 +57,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.30.4' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.39' );
 }
 
 /**
@@ -66,7 +65,6 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  *
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.29.4 - 2019-07-01
  */
 abstract class IcalBase implements IcalInterface
@@ -248,7 +246,7 @@ abstract class IcalBase implements IcalInterface
      * @return static
      * @since  2.27.14 - 2019-03-11
      */
-    public function reset()
+    public function reset() : self
     {
         $this->compix = [];
         return $this;
@@ -260,7 +258,7 @@ abstract class IcalBase implements IcalInterface
      * @return string
      * @since  2.27.2 - 2018-12-21
      */
-    public function getCompType()
+    public function getCompType() : string
     {
         return $this->compType;
     }
@@ -272,7 +270,7 @@ abstract class IcalBase implements IcalInterface
      * @return static
      * @since  2.27.14 - 2019-02-04
      */
-    public function deleteConfig( $key )
+    public function deleteConfig( $key ) : self
     {
         $key = strtoupper( $key );
         if( isset( $this->config[$key] )) {
@@ -310,7 +308,6 @@ abstract class IcalBase implements IcalInterface
                     $this->config[self::ALLOWEMPTY] = true;
                 }
                 return $this->config[self::ALLOWEMPTY];
-                break;
             case self::UNIQUE_ID:
                 if( isset( $this->config[self::UNIQUE_ID] )) {
                     return $this->config[self::UNIQUE_ID];
@@ -339,13 +336,10 @@ abstract class IcalBase implements IcalInterface
                     } // end foreach
                 }
                 return $info;
-                break;
             case self::PROPINFO:
                 return $this->getpropInfo();
-                break;
             case self::SETPROPERTYNAMES:
                 return array_keys( $this->getConfig( self::PROPINFO ));
-                break;
             default :
                 break;
         } // end switch
@@ -358,7 +352,7 @@ abstract class IcalBase implements IcalInterface
      * @return array
      * @since  2.29.05 - 2019-06-20
      */
-    protected function getpropInfo()
+    protected function getpropInfo() : array
     {
         static $PROPNAMES  = [
             self::ACTION, self::ATTACH, self::ATTENDEE, self::CATEGORIES,
@@ -381,7 +375,7 @@ abstract class IcalBase implements IcalInterface
         }
         $output = [];
         foreach( $PROPNAMES as $propName ) {
-            $propName2 = IcalBase::getInternalPropName( $propName );
+            $propName2 = StringFactory::getInternalPropName( $propName );
             switch( true ) {
                 case ( ! property_exists( $this, $propName2 )) :
                     break;
@@ -406,18 +400,18 @@ abstract class IcalBase implements IcalInterface
      * Set Vcalendar/component config
      *
      * @param mixed  $config
-     * @param string $value
+     * @param mixed $value
      * @param bool   $softUpdate
      * @return static
      * @throws InvalidArgumentException
      * @since  2.29.4 - 2019-07-02
      */
-    public function setConfig( $config, $value = null, $softUpdate = null )
+    public function setConfig( $config, $value = null, $softUpdate = false ) : self
     {
         static $ERRMSG9 = 'Invalid config value %s';
         $isComponent = ( ! property_exists(
             $this,
-            self::getInternalPropName( self::PRODID )
+            StringFactory::getInternalPropName( self::PRODID )
         ));
         if( is_array( $config )) {
             $config = array_change_key_case( $config, CASE_UPPER );
@@ -478,311 +472,14 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
-     * Return index
-     *
-     * @param array $indexArr
-     * @param mixed $propName
-     * @param int   $index
-     * @return bool   true on success
-     * @since  2.27.1 - 2018-12-15
-     */
-    protected static function getIndex( array & $indexArr, $propName, $index = null )
-    {
-        if( is_null( $index )) {
-            $index = ( isset( $indexArr[$propName] )) ? $indexArr[$propName] + 2 : 1;
-        }
-        $index -= 1;
-        $indexArr[$propName] = $index;
-        return $index;
-    }
-
-    /**
-     * Return internal name for property
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2018-12-16
-     */
-    protected static function getInternalPropName( $propName )
-    {
-        $internalName = strtolower( $propName );
-        if( false !== strpos( $internalName, Util::$MINUS )) {
-            $internalName = implode( explode( Util::$MINUS, $internalName ));
-        }
-        return $internalName;
-    }
-
-    /**
-     * Return method from format and propName
-     *
-     * @param string $format
-     * @param string $propName
-     * @return string
-     * @since  2.27.14 - 2019-02-18
-     */
-    private static function getMethodName( $format, $propName )
-    {
-        return sprintf( $format, ucfirst( self::getInternalPropName( $propName )));
-    }
-
-    /**
-     * Return name for property delete-method
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2019-01-17
-     */
-    public static function getCreateMethodName( $propName )
-    {
-        static $FMT = 'create%s';
-        return self::getMethodName( $FMT, $propName );
-    }
-
-    /**
-     * Return name for property delete-method
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2018-12-12
-     */
-    public static function getDeleteMethodName( $propName )
-    {
-        static $FMT = 'delete%s';
-        return self::getMethodName( $FMT, $propName );
-    }
-
-    /**
-     * Return name for property get-method
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2018-12-12
-     */
-    public static function getGetMethodName( $propName )
-    {
-        static $FMT = 'get%s';
-        return self::getMethodName( $FMT, $propName );
-    }
-
-    /**
-     * Return name for property set-method
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2018-12-16
-     */
-    public static function getSetMethodName( $propName )
-    {
-        static $FMT = 'set%s';
-        return self::getMethodName( $FMT, $propName );
-    }
-
-    /**
-     * Recount property propIx, used at consecutive getProperty calls
-     *
-     * @param array $propArr   component (multi-)property
-     * @param int   $propIx getter counter
-     * @return bool true
-     * @since  2.27.1 - 2018-12-15
-     */
-    protected static function recountMvalPropix( array $propArr, & $propIx )
-    {
-        if( empty( $propArr )) {
-            return false;
-        }
-        $last = key( array_slice( $propArr, -1, 1, true ));
-        while( ! isset( $propArr[$propIx] ) && ( $last > $propIx )) {
-            $propIx++;
-        }
-        return true;
-    }
-
-    /**
-     * Check index and set (an indexed) content in a multiple value array
-     *
-     * @param array $valArr
-     * @param mixed $value
-     * @param array $params
-     * @param array $defaults
-     * @param int   $index
-     * @since  2.22.23 - 2017-04-08
-     */
-    protected static function setMval(
-        & $valArr,
-        $value,
-        $params = null,
-        $defaults = null,
-        $index  = null
-    ) {
-        if( ! is_array( $valArr )) {
-            $valArr = [];
-        }
-        if( empty( $params )) {
-            $params = [];
-        }
-        $params = ParameterFactory::setParams( $params, $defaults );
-        if( is_null( $index )) { // i.e. next
-            $valArr[] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params,
-            ];
-            return;
-        }
-        $index = $index - 1;
-        if( isset( $valArr[$index] )) { // replace
-            $valArr[$index] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params,
-            ];
-            return;
-        }
-        $valArr[$index] = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params,
-        ];
-        ksort( $valArr ); // order
-    }
-
-    /**
-     * Delete calendar component multiProp property[ix]
-     *
-     * @param array $multiProp component (multi-)property
-     * @param mixed $propName
-     * @param int   $propDelIx   specific property in case of multiply occurrence
-     * @return bool   true on success
-     * @since  2.27.1 - 2018-12-15
-     */
-    protected function deletePropertyM( & $multiProp, $propName, $propDelIx = null )
-    {
-        if( empty( $multiProp )) {
-            unset( $this->propDelIx[$propName] );
-            return false;
-        }
-        if( false === $propDelIx ) {
-            $propDelIx = null; // tidy up, altered default value
-        }
-        $propDelIx = self::getIndex( $this->propDelIx, $propName, $propDelIx );
-        if( isset( $multiProp[$propDelIx] )) {
-            unset( $multiProp[$propDelIx] );
-        }
-        if( empty( $multiProp )) {
-            $multiProp = null;
-            unset( $this->propDelIx[$propName] );
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Get calendar component multpProp property
-     *
-     * @param array  $multiProp component (multi-)property
-     * @param string $propName
-     * @param int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
-     * @return bool|array
-     * @since  2.27.1 - 2018-12-15
-     */
-    protected function getPropertyM(
-        $multiProp,
-        $propName,
-        $propIx = null,
-        $inclParam = false
-    ) {
-        if( empty( $multiProp )) {
-            unset( $this->propIx[$propName] );
-            return false;
-        }
-        if( false === $propIx ) {
-            $propIx = null; // tidy up, altered default value
-        }
-        $propIx = self::getIndex( $this->propIx, $propName, $propIx );
-        if( ! self::recountMvalPropix( $multiProp, $propIx )) {
-            unset( $this->propIx[$propName] );
-            return false;
-        }
-        $this->propIx[$propName] = $propIx;
-        if( ! isset( $multiProp[$propIx] )) {
-            unset( $this->propIx[$propName] );
-            return false;
-        }
-        return ( $inclParam )
-            ? $multiProp[$propIx]
-            : $multiProp[$propIx][Util::$LCvalue];
-    }
-
-    /**
      * Return number of components
      *
      * @return int
      * @since  2.23.5 - 2017-04-13
      */
-    public function countComponents()
+    public function countComponents() : int
     {
         return ( empty( $this->components )) ? 0 : count( $this->components );
-    }
-
-
-    /**
-     * Delete calendar subcomponent from component container
-     *
-     * @param mixed $arg1 ordno / component type / component uid
-     * @param mixed $arg2 ordno if arg1 = component type
-     * @return bool  true on success, false on not found (last one deleted)
-     * @since  2.26.14 - 2019-02-25
-     * @todo Exception mgnt on unknown component
-     */
-    public function deleteComponent( $arg1, $arg2 = false )
-    {
-        if( ! isset( $this->components )) {
-            return false;
-        }
-        $argType = $index = null;
-        if( ctype_digit((string) $arg1 )) {
-            $argType = self::$INDEX;
-            $index   = (int) $arg1 - 1;
-        }
-        elseif( property_exists( $this, self::getInternalPropName( self::PRODID )) &&
-            ( Util::isCompInList( $arg1, self::$CALCOMPS ) &&
-            ( 0 != strcasecmp( $arg1, self::VALARM )))) {
-            $argType = ucfirst( strtolower( $arg1 ));
-            $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
-                ? (( int ) $arg2 - 1 )
-                : 0;
-        }
-        $cix2dC = 0;
-        $remove = false;
-        foreach( $this->components as $cix => $component ) {
-            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
-                unset( $this->components[$cix] );
-                $remove = true;
-                break;
-            }
-            elseif( $argType == $component->getCompType()) {
-                if( $index == $cix2dC ) {
-                    unset( $this->components[$cix] );
-                    $argType = strtolower( $argType );
-                    if( isset( $this->compix[$argType] )) {
-                        unset( $this->compix[$argType] );
-                    }
-                    $remove = true;
-                    break;
-                }
-                $cix2dC++;
-            }
-            elseif( ! $argType &&
-                ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS ) &&
-                ( $arg1 == $component->getUid())) {
-                unset( $this->components[$cix] );
-                $remove = true;
-                break;
-            }
-        } // end foreach( $this->components as $cix => $component )
-        if( $remove ) {
-            $this->components = array_filter( $this->components );
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -791,7 +488,7 @@ abstract class IcalBase implements IcalInterface
      * @return int
      * @since  2.27.2 - 2018-12-21
      */
-    protected function getNextComponentIndex()
+    protected function getNextComponentIndex() : int
     {
         return ( empty( $this->components ))
             ? 0
@@ -812,7 +509,8 @@ abstract class IcalBase implements IcalInterface
         CalendarComponent $component,
         $arg1 = false,
         $arg2 = false
-    ) {
+    ) : self
+    {
         $component->setConfig( $this->getConfig(), false, true );
         if( ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS )) {
             /* make sure dtstamp and uid is set */
@@ -870,6 +568,73 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
+     * Delete calendar subcomponent from component container
+     *
+     * @param mixed    $arg1 ordno / component type / component uid
+     * @param mixed    $arg2 ordno if arg1 = component type
+     * @return bool  true on success, false on not found (last one deleted)
+     * @since  2.26.14 - 2019-02-25
+     * @todo   Exception mgnt on unknown component
+     */
+    public function deleteComponent( $arg1, $arg2 = false ) : bool
+    {
+        if( ! isset( $this->components )) {
+            return false;
+        }
+        $argType = $index = null;
+        if( ctype_digit((string) $arg1 )) {
+            $argType = self::$INDEX;
+            $index   = (int)$arg1 - 1;
+        }
+        elseif( property_exists(
+                $this,
+                StringFactory::getInternalPropName( IcalInterface::PRODID )
+            )) {
+            $cmpArg = ucfirst( strtolower( $arg1 ));
+            if( Util::isCompInList( $cmpArg, IcalBase::$CALCOMPS ) &&
+                ( 0 != strcasecmp( $cmpArg, IcalInterface::VALARM ))) {
+                $argType = ucfirst( strtolower( $arg1 ) );
+                $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
+                    ? ((int) $arg2 - 1 )
+                    : 0;
+            }
+        } // end elseif
+        $cix2dC = 0;
+        $remove = false;
+        foreach( $this->components as $cix => $component ) {
+            if(( IcalBase::$INDEX == $argType ) && ( $index == $cix )) {
+                unset( $this->components[$cix] );
+                $remove = true;
+                break;
+            }
+            elseif( $argType == $component->getCompType()) {
+                if( $index == $cix2dC ) {
+                    unset( $this->components[$cix] );
+                    $argType = strtolower( $argType );
+                    if( isset( $this->compix[$argType] )) {
+                        unset( $this->compix[$argType] );
+                    }
+                    $remove = true;
+                    break;
+                }
+                $cix2dC++;
+            }
+            elseif( ! $argType &&
+                ! Util::isCompInList( $component->getCompType(), IcalBase::$SUBCOMPS ) &&
+                ( $arg1 == $component->getUid())) {
+                unset( $this->components[$cix] );
+                $remove = true;
+                break;
+            }
+        } // end foreach( $this->components as $cix => $component )
+        if( $remove ) {
+            $this->components = array_filter( $this->components );
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Assert base components
      *
      * @param IcalBase $component
@@ -914,7 +679,6 @@ abstract class IcalBase implements IcalInterface
                     default :
                         throw new InvalidArgumentException( sprintf( $MSG, $subType ));
                 }
-                break;
             case self::VEVENT :
                 // fall through
             case self::VTODO :
@@ -924,7 +688,6 @@ abstract class IcalBase implements IcalInterface
                     default :
                         throw new InvalidArgumentException( sprintf( $MSG, $subType ));
                 }
-                break;
             case self::VFREEBUSY :
                 break;
             case self::VJOURNAL :

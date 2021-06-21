@@ -1,33 +1,32 @@
 <?php
 /**
-  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
+ * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTimeZone;
@@ -48,7 +47,6 @@ use function trim;
 /**
  * iCalcreator DateTimeZone support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.27.8 - 2019-01-12
  */
 class DateTimeZoneFactory
@@ -56,7 +54,6 @@ class DateTimeZoneFactory
 
     /**
      * @var array
-     * @static
      */
     public static $UTCARR = [ 'Z', Vcalendar::UTC, Vcalendar::GMT ];
 
@@ -66,10 +63,9 @@ class DateTimeZoneFactory
      * @param string $tzString
      * @return DateTimeZone
      * @throws InvalidArgumentException
-     * @static
      * @since  2.27.8 - 2019-01-12
      */
-    public static function factory( $tzString = null )
+    public static function factory( string $tzString ) : DateTimeZone
     {
         return self::assertDateTimeZone( $tzString );
     }
@@ -80,10 +76,9 @@ class DateTimeZoneFactory
      * @param string $tzString
      * @return DateTimeZone
      * @throws InvalidArgumentException
-     * @static
      * @since  2.27.14 - 2019-01-31
      */
-    public static function assertDateTimeZone( $tzString )
+    public static function assertDateTimeZone( string $tzString ) : DateTimeZone
     {
         static $ERR = 'Invalid DateTimeZone \'%s\'';
         if( empty( $tzString ) && ( 0 != intval( $tzString ))) {
@@ -99,7 +94,7 @@ class DateTimeZoneFactory
             $timeZone = new DateTimeZone( $tzString );
         }
         catch( Exception $e ) {
-            throw new InvalidArgumentException( sprintf( $ERR, $tzString ), null, $e );
+            throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
         }
         return $timeZone;
     }
@@ -112,14 +107,14 @@ class DateTimeZoneFactory
      * @param int $to
      * @return array
      * @throws InvalidArgumentException
-     * @static
      * @since  2.27.8 - 2019-01-22
      */
     public static function getDateTimeZoneTransitions(
         $dateTimeZone,
         $from = null,
         $to = null
-    ) {
+    ) : array
+    {
         if( ! $dateTimeZone instanceof DateTimeZone ) {
             $dateTimeZone = self::factory( $dateTimeZone );
         }
@@ -133,10 +128,9 @@ class DateTimeZoneFactory
      * @param string $offset
      * @return string
      * @throws InvalidArgumentException
-     * @static
      * @since  2.27.14 - 2019-02-26
      */
-    public static function getTimeZoneNameFromOffset( $offset )
+    public static function getTimeZoneNameFromOffset( string $offset ) : string
     {
         static $UTCOFFSET = '+00:00';
         static $ERR       = 'Offset \'%s\' (%+d seconds) don\'t match any timezone';
@@ -163,13 +157,12 @@ class DateTimeZoneFactory
      * An offset is one of [+/-]NNNN, [+/-]NN:NN, [+/-]NNNNNN, [+/-]NN:NN:NN
      * @param string $dateString
      * @return string
-     * @static
 0     */
-    public static function getOffset( $dateString )
+    public static function getOffset( string $dateString ) : string
     {
         $dateString = trim( $dateString );
         $ix         = strlen( $dateString ) - 1;
-        $offset     = null;
+        $offset     = Util::$SP0;
         while( true ) {
             $dateX1 = substr( $dateString, $ix, 1 );
             switch( true ) {
@@ -200,12 +193,11 @@ class DateTimeZoneFactory
      * An offset is one of [+/-]NNNN, [+/-]NN:NN, [+/-]NNNNNN, [+/-]NN:NN:NN
      * @param string $string
      * @return bool
-     * @static
      * @since  2.27.14 - 2019-02-18
      */
-    public static function hasOffset( $string )
+    public static function hasOffset( string $string ) : bool
     {
-        $string = trim((string) $string );
+        $string = trim( $string );
         if( empty( $string )) {
             return false;
         }
@@ -229,19 +221,18 @@ class DateTimeZoneFactory
     /**
      * Return bool true if UTC timezone
      *
-     * @param string $timeZoneString
+     * @param null|string $timeZoneString
      * @return bool
-     * @static
      * @since  2.27.8 - 2019-01-21
      */
-    public static function isUTCtimeZone( $timeZoneString )
+    public static function isUTCtimeZone( $timeZoneString ) : bool
     {
         if( empty( $timeZoneString )) {
             return false;
         }
         if( self::hasOffset( $timeZoneString )) {
             if( false !== strpos( $timeZoneString, Util::$COLON )) {
-                $timeZoneString = str_replace( Util::$COLON, null, $timeZoneString );
+                $timeZoneString = str_replace( Util::$COLON, Util::$SP0, $timeZoneString );
             }
             return ( empty( intval( $timeZoneString, 10 )));
         }
@@ -252,16 +243,15 @@ class DateTimeZoneFactory
      * Return seconds based on an offset, [+/-]HHmm[ss], used when correcting UTC to localtime or v.v.
      *
      * @param string $offset
-     * @return string
-     * @static
+     * @return int
      * @since  2.26.7 - 2018-11-23
      */
-    public static function offsetToSeconds( $offset )
+    public static function offsetToSeconds( string $offset ) : int
     {
-        $offset  = trim( (string) $offset );
+        $offset  = trim( $offset );
         $seconds = 0;
         if( false !== strpos( $offset, Util::$COLON )) {
-            $offset = str_replace( Util::$COLON, null, $offset );
+            $offset = str_replace( Util::$COLON, Util::$SP0, $offset );
         }
         $strLen = strlen( $offset );
         if( ( 5 > $strLen ) || ( 7 < $strLen )) {
@@ -285,22 +275,22 @@ class DateTimeZoneFactory
     /**
      * Return iCal offset [-/+]hhmm[ss] (string) from UTC offset seconds
      *
-     * @param string $offset
+     * @param int $offset
      * @return string
-     * @static
      * @since  2.26 - 2018-11-10
      */
-    public static function secondsToOffset( $offset )
+    public static function secondsToOffset( int $offset ) : string
     {
         static $FMT = '%02d';
-        switch( substr( $offset, 0, 1 )) {
+        $offset2    = (string) $offset;
+        switch( substr( $offset2, 0, 1 )) {
             case Util::$MINUS :
                 $output = Util::$MINUS;
-                $offset = substr( $offset, 1 );
+                $offset = (int) substr( $offset2, 1 );
                 break;
             case Util::$PLUS :
                 $output = Util::$PLUS;
-                $offset = substr( $offset, 1 );
+                $offset = (int) substr( $offset2, 1 );
                 break;
             default :
                 $output = Util::$PLUS;

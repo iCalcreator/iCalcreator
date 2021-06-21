@@ -2,32 +2,31 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -39,7 +38,6 @@ use function is_numeric;
 /**
  * SEQUENCE property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since  2.27.3 - 2018-12-22
  */
 trait SEQUENCEtrait
@@ -54,10 +52,10 @@ trait SEQUENCEtrait
      *
      * @return string
      */
-    public function createSequence()
+    public function createSequence() : string
     {
         if( empty( $this->sequence )) {
-            return null;
+            return Util::$SP0;
         }
         if(( ! isset( $this->sequence[Util::$LCvalue] ) ||
                 ( empty( $this->sequence[Util::$LCvalue] ) &&
@@ -65,7 +63,7 @@ trait SEQUENCEtrait
                 ( Util::$ZERO != $this->sequence[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::SEQUENCE )
-                : null;
+                : Util::$SP0;
         }
         return StringFactory::createElement(
             self::SEQUENCE,
@@ -80,7 +78,7 @@ trait SEQUENCEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteSequence()
+    public function deleteSequence() : bool
     {
         $this->sequence = null;
         return true;
@@ -89,7 +87,7 @@ trait SEQUENCEtrait
     /**
      * Get calendar component property sequence
      *
-     * @param bool   $inclParam
+     * @param null|bool   $inclParam
      * @return bool|array
      * @since  2.27.1 - 2018-12-12
      */
@@ -104,12 +102,12 @@ trait SEQUENCEtrait
     /**
      * Set calendar component property sequence
      *
-     * @param int   $value
-     * @param array $params
+     * @param null|int   $value
+     * @param null|array $params
      * @return static
      * @since  2.27.2 - 2019-01-04
      */
-    public function setSequence( $value = null, $params = [] )
+    public function setSequence( $value = null, $params = [] ) : self
     {
         if(( empty( $value ) && ! is_numeric( $value )) && ( Util::$ZERO != $value )) {
             $value = ( isset( $this->sequence[Util::$LCvalue] ) &&
@@ -122,7 +120,7 @@ trait SEQUENCEtrait
         }
         $this->sequence = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
         ];
         return $this;
     }

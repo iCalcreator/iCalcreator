@@ -2,41 +2,43 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30.4
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
-
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
+use Kigkonsult\Icalcreator\IcalBase;
 use Kigkonsult\Icalcreator\Vcalendar;
 use UnexpectedValueException;
+
 use function bin2hex;
 use function count;
 use function ctype_digit;
 use function explode;
 use function floor;
+use function implode;
 use function in_array;
 use function openssl_random_pseudo_bytes;
 use function ord;
@@ -57,12 +59,10 @@ use function trim;
 /**
  * iCalcreator TEXT support class
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.30.4 - 2021-03-07
+ * @since  2.30.3 - 2021-02-14
  */
 class StringFactory
 {
-
     /**
      * @var string
      */
@@ -76,7 +76,7 @@ class StringFactory
      * @return array
      * @since  2.29.20 - 2020-01-31
      */
-    public static function concatRows( $rows )
+    public static function concatRows( array $rows ) : array
     {
         static $CHARs = [ ' ', "\t" ];
         $output = [];
@@ -112,7 +112,7 @@ class StringFactory
      * @throws UnexpectedValueException
      * @since  2.29.3 - 2019-08-29
      */
-    public static function conformParseInput( $unParsedText = null )
+    public static function conformParseInput( $unParsedText = null ) : array
     {
         static $ERR10 = 'Only %d rows in calendar content :%s';
         $arrParse = false;
@@ -150,7 +150,7 @@ class StringFactory
      * @return array
      * @since  2.29.3 - 2019-08-29
      */
-    private static function trimLeadingRows( $rows )
+    private static function trimLeadingRows( array $rows ) : array
     {
         foreach( $rows as $lix => $row ) {
             if( false !== stripos( $row, self::$BEGIN_VCALENDAR )) {
@@ -169,7 +169,7 @@ class StringFactory
      * @return array
      * @since  2.29.3 - 2019-08-29
      */
-    private static function trimTrailingRows( $rows )
+    private static function trimTrailingRows( array $rows ) : array
     {
         $lix = array_keys( $rows );
         $lix = end( $lix );
@@ -202,7 +202,7 @@ class StringFactory
      * @return array
      * @since  2.29.9 - 2019-03-30
      */
-    public static function convEolChar( & $text )
+    public static function convEolChar( string & $text ) : array
     {
         static $BASEDELIM  = null;
         static $BASEDELIMs = null;
@@ -237,15 +237,16 @@ class StringFactory
      * @since  2.22.20 - 2017-01-30
      */
     public static function createElement(
-        $label,
+        string $label,
         $attributes = null,
         $content = null
-    ) {
+    ) : string
+    {
         $output = strtoupper( $label );
         if( ! empty( $attributes )) {
             $output .= trim( $attributes );
         }
-        $output .= Util::$COLON . trim( $content );
+        $output .= Util::$COLON . trim((string) $content );
         return self::size75( $output );
     }
 
@@ -256,13 +257,13 @@ class StringFactory
      * @return array   propName and the trailing part of the row
      * @since  2.29.11 - 2019-08-26
      */
-    public static function getPropName( $row )
+    public static function getPropName( string $row ) : array
     {
         $sclnPos = strpos( $row, Util::$SEMIC );
         $clnPos  = strpos( $row, Util::$COLON );
         switch( true ) {
             case (( false === $sclnPos ) && ( false === $clnPos )) : // no params and no value
-                return [ $row, null ];
+                return [ $row, Util::$SP0 ];
                 break;
             case (( false !== $sclnPos ) && ( false === $clnPos )) : // param exist and NO value ??
                 $propName = self::before( Util::$SEMIC, $row );
@@ -270,7 +271,7 @@ class StringFactory
             case (( false === $sclnPos ) && ( false !== $clnPos )) : // no params
                 $propName = self::before( Util::$COLON, $row  );
                 break;
-            case ( $sclnPos < $clnPos ) :                            // param(s) with value ??
+            case ( $sclnPos < $clnPos ) :                            // param(s) and value ??
                 $propName = self::before( Util::$SEMIC, $row );
                 break;
             default : // ie $sclnPos > $clnPos                       // no params
@@ -287,7 +288,7 @@ class StringFactory
      * @return string
      * @since  2.27.3 - 2018-12-28
      */
-    public static function getRandChars( $cnt )
+    public static function getRandChars( int $cnt ) : string
     {
         $cnt = (int) floor( $cnt / 2 );
         $x   = 0;
@@ -305,10 +306,10 @@ class StringFactory
      * @return bool
      * @since  2.29.5 - 2019-08-30
      */
-    public static function isXprefixed( $name )
+    public static function isXprefixed( $name ) : bool
     {
         static $X_ = 'X-';
-        return ( $X_ == strtoupper( substr( $name, 0, 2 ) ));
+        return ( $X_ == strtoupper( substr( $name, 0, 2 )));
     }
 
     /**
@@ -332,7 +333,7 @@ class StringFactory
      * @link   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
      * @since  2.29.29 - 2020-09-11
      */
-    public static function size75( $string )
+    public static function size75( string $string ) : string
     {
         static $LCN     = 'n';
         static $UCN     = 'N';
@@ -340,7 +341,7 @@ class StringFactory
         static $SP1     = ' ';
         $tmp    = $string;
         $len    = strlen( $tmp );
-        $string = null;
+        $string = Util::$SP0;
         $cCnt   = $x = 0;
         while( true ) {
             $x1 = $x + 1;
@@ -349,7 +350,7 @@ class StringFactory
                 break;
             }
             elseif(( 74 <= $cCnt ) &&
-                ( self::$BS2 == substr( $tmp, $x, 1 ) ) && // '\\'
+                ( self::$BS2 == substr( $tmp, $x, 1 )) && // '\\'
                 (( $LCN == substr( $tmp, $x1, 1 )) ||
                     ( $UCN == substr( $tmp, $x1, 1 )))) {
                 $string .= Util::$CRLF . $SPBSLCN; // don't break lines inside '\n'
@@ -434,7 +435,7 @@ class StringFactory
      * @todo   fix 2-5 pos port number
      * @since  2.30.3 - 2021-02-14
      */
-    public static function splitContent( $line, $propName = null )
+    public static function splitContent( string $line, $propName = null ) : array
     {
         static $CSS      = '://';
         static $EQ       = '=';
@@ -446,7 +447,7 @@ class StringFactory
         if( 0 == $clnPos ) { // no params,  most frequent
             return [ substr( $line, 1 ) , [] ];
         }
-        if( in_array( strtoupper( $propName ), $URIprops )) {
+        if( ! empty( $propName ) && in_array( strtoupper( $propName ), $URIprops )) {
             self::checkFixUriValue( $line );
         }
         if( self::checkSingleParam( $line )) { // one param
@@ -504,11 +505,11 @@ class StringFactory
      *
      * 2nd most frequent
      *
-     * @param $line
+     * @param string $line
      * @return bool
      * @since  2.30.3 - 2021-02-14
      */
-    private static function checkSingleParam( $line )
+    private static function checkSingleParam( string $line ) : bool
     {
         if( 0 !== strpos( $line, Util::$SEMIC ))  {
             return false;
@@ -522,14 +523,12 @@ class StringFactory
 
      * orginating from any Apple device
      *
-     * @param $line
-     * @since  2.30.4 - 2021-03-07
+     * @param string $line
+     * @since  2.30.3 - 2021-02-14
      */
-    public static function checkFixUriValue( & $line )
+    public static function checkFixUriValue( string & $line )
     {
         static $VEQU     = ';VALUE=URI';
-        static $MSGPFX1  = 'message:';
-        static $MSGPFX2  = 'message://';
         static $PFCHARS1 = '%3C';
         static $SFCHARS1 = '%3E';
         static $PFCHARS2 = '<';
@@ -538,9 +537,6 @@ class StringFactory
         static $SCHAR32 = '@';
         if( false !== stripos( $line, $VEQU )) {
             $line = str_ireplace( $VEQU, Util::$SP0, $line );
-        }
-        if(( false !== stripos( $line, $MSGPFX1 )) && ( false === stripos( $line, $MSGPFX2 ))) {
-            $line = str_ireplace( $MSGPFX1, $MSGPFX2, $line );
         }
         if(( false !== strpos( $line, $PFCHARS1 )) && ( false !== strpos( $line, $SFCHARS1 ))) {
             $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line );
@@ -554,6 +550,18 @@ class StringFactory
     }
 
     /**
+     * Protocols
+     */
+    public static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'  ]; // 'fax:' removed
+    public static $PROTO4 = [
+        'crid:', 'news:', 'pres:',
+        ':http:'
+    ];
+    public static $PROTO5 = [ 'https:' ];
+    public static $PROTO6 = [ 'mailto:', 'telnet:' ];
+    public static $PROTO7 = [ 'message:' ];
+
+    /**
      * Return bool true if colon-pos is prefixed by protocol
      *
      * @see  https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml overkill !!
@@ -561,24 +569,20 @@ class StringFactory
      * @param string $line
      * @param int    $cix
      * @return bool
-     * @accvess private
      * @since  2.30.2 - 2021-02-04
      */
-    private static function colonIsPrefixedByProtocol( $line, $cix )
+    private static function colonIsPrefixedByProtocol( string $line, int $cix ) : bool
     {
+        static $CHT1PCSS = ':http://';
+        static $CHT2PCSS = ':https://';
         static $MSTZ   = [ 'utc-', 'utc+', 'gmt-', 'gmt+' ];
-        static $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:'  ]; // 'fax:' removed
-        static $PROTO4 = [ 'crid:', 'news:', 'pres:', 'http:' ];
-        static $PROTO5 = [ 'https:' ];
-        static $PROTO6 = [ 'mailto:', 'telnet:' ];
-        static $PROTO7 = [ 'message:' ];
         $line = strtolower( $line );
         return (( in_array( substr( $line, $cix - 6, 4 ), $MSTZ )) || // ?? -6
-                ( in_array( substr( $line, $cix - 3, 4 ), $PROTO3 )) ||
-                ( in_array( substr( $line, $cix - 4, 5 ), $PROTO4 )) ||
-                ( in_array( substr( $line, $cix - 5, 6 ), $PROTO5 )) ||
-                ( in_array( substr( $line, $cix - 6, 7 ), $PROTO6 )) ||
-                ( in_array( substr( $line, $cix - 7, 8 ), $PROTO7 )));
+                ( in_array( substr( $line, $cix - 3, 4 ), self::$PROTO3 )) ||
+                ( in_array( substr( $line, $cix - 4, 5 ), self::$PROTO4 )) ||
+                ( in_array( substr( $line, $cix - 5, 6 ), self::$PROTO5 )) ||
+                ( in_array( substr( $line, $cix - 6, 7 ), self::$PROTO6 )) ||
+                ( in_array( substr( $line, $cix - 7, 8 ), self::$PROTO7 )));
     }
 
     /**
@@ -588,7 +592,7 @@ class StringFactory
      * @return bool
      * @since  2.27.22 - 2020-09-01
      */
-    private static function hasPortNUmber( $string )
+    private static function hasPortNUmber( string $string ) : bool
     {
         $len      = strlen( $string );
         for( $x = 0; $x < $len; $x++ ) {
@@ -610,7 +614,7 @@ class StringFactory
      * @return string
      * @since  2.27.14 - 2019-02-20
      */
-    public static function strrep( $string )
+    public static function strrep( string $string ) : string
     {
         static $BSLCN    = '\n';
         static $SPECCHAR = [ 'n', 'N', 'r', ',', ';' ];
@@ -618,7 +622,6 @@ class StringFactory
         static $QBSLCR   = "\r";
         static $QBSLCN   = "\n";
         static $BSUCN    = '\N';
-        $string = (string) $string;
         $strLen = strlen( $string );
         $pos    = 0;
         // replace single (solo-)backslash by double ones
@@ -682,7 +685,7 @@ class StringFactory
      * @return string
      * @since  2.22.2 - 2015-06-25
      */
-    public static function strunrep( $string )
+    public static function strunrep( string $string ) : string
     {
         static $BS4 = '\\\\';
         static $BSCOMMA = '\,';
@@ -700,10 +703,9 @@ class StringFactory
      * @return string
      * @since  2.29.14 - 2019-09-03
      */
-    public static function trimTrailNL( $value )
+    public static function trimTrailNL( string $value ) : string
     {
         static $NL = '\n';
-        $value = (string) $value;
         if( $NL == strtolower( substr( $value, -2 ))) {
             $value = substr( $value, 0, ( strlen( $value ) - 2 ));
         }
@@ -724,11 +726,11 @@ class StringFactory
      *
      * Case-sensitive search for needle in haystack
      *
-     * @param $needle
-     * @param $haystack
+     * @param string $needle
+     * @param string $haystack
      * @return bool
      */
-    public static function isIn( $needle, $haystack )
+    public static function isIn( string $needle, string $haystack ) : bool
     {
         return ( false !== ( $pos = strpos( $haystack, $needle )));
     }
@@ -743,7 +745,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function after( $needle, $haystack )
+    public static function after( string $needle, string $haystack ) : string
     {
         if( ! self::isIn( $needle, $haystack )) {
             return self::$SP0;
@@ -762,7 +764,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function afterLast( $needle, $haystack )
+    public static function afterLast( string $needle, string $haystack ) : string
     {
         if( ! self::isIn( $needle, $haystack )) {
             return self::$SP0;
@@ -781,7 +783,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function before( $needle, $haystack )
+    public static function before( string $needle, string $haystack ) : string
     {
         if( ! self::isIn( $needle, $haystack )) {
             return self::$SP0;
@@ -799,7 +801,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function beforeLast( $needle, $haystack )
+    public static function beforeLast( string $needle, string $haystack ) : string
     {
         if( ! self::isIn( $needle, $haystack )) {
             return self::$SP0;
@@ -821,7 +823,11 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function between( $needle1, $needle2, $haystack )
+    public static function between(
+        string $needle1,
+        string $needle2,
+        string $haystack
+    ) : string
     {
         $exists1 = self::isIn( $needle1, $haystack );
         $exists2 = self::isIn( $needle2, $haystack );
@@ -852,7 +858,11 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function betweenLast( $needle1, $needle2, $haystack )
+    public static function betweenLast(
+        string $needle1,
+        string $needle2,
+        string $haystack
+    ) : string
     {
         return self::afterLast( $needle1, self::beforeLast( $needle2, $haystack ));
     }
@@ -865,9 +875,9 @@ class StringFactory
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $haystack
      * @param string $needle
-     * @return int
+     * @return bool|int    bool false on needle not in haystack
      */
-    public static function strrevpos( $haystack, $needle )
+    public static function strrevpos( string $haystack, string $needle )
     {
         return ( false !== ( $rev_pos = strpos( strrev( $haystack ), strrev( $needle ))))
             ? ( strlen( $haystack ) - $rev_pos - strlen( $needle ))
@@ -883,10 +893,13 @@ class StringFactory
      * @param string $needle
      * @param string $len       if found contains length of needle
      * @return bool
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.29.11 - 2019-08-28
      */
-    public static function startsWith( $haystack, $needle, & $len = null )
+    public static function startsWith(
+        string $haystack,
+        string $needle,
+        & $len = null
+    ) : bool
     {
         $len       = null;
         $needleLen = strlen( $needle );
@@ -909,10 +922,13 @@ class StringFactory
      * @param string $needle
      * @param string $len       if found contains length of needle
      * @return bool
-     * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
      * @since  2.29.23 - 2020-07-28
      */
-    public static function endsWith( $haystack, $needle, & $len = null )
+    public static function endsWith(
+        string $haystack,
+        string $needle,
+        & $len = null
+    ) : bool
     {
         $len       = null;
         $needleLen = strlen( $needle );
@@ -924,5 +940,90 @@ class StringFactory
             return true;
         }
         return false;
+    }
+
+    /**
+     * Component properties method name utility methods
+     */
+
+    /**
+     * Return internal name for property
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2018-12-16
+     */
+    public static function getInternalPropName( string $propName ) : string
+    {
+        $internalName = strtolower( $propName );
+        if( false !== strpos( $internalName, Util::$MINUS )) {
+            $internalName = implode( explode( Util::$MINUS, $internalName ));
+        }
+        return $internalName;
+    }
+
+    /**
+     * Return method from format and propName
+     *
+     * @param string $format
+     * @param string $propName
+     * @return string
+     * @since  2.27.14 - 2019-02-18
+     */
+    public static function getMethodName( string $format, string $propName ) : string
+    {
+        return sprintf( $format, ucfirst( self::getInternalPropName( $propName )));
+    }
+
+    /**
+     * Return name for property set-method
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2018-12-16
+     */
+    public static function getSetMethodName( string $propName ) : string
+    {
+        static $FMT = 'set%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property delete-method
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2019-01-17
+     */
+    public static function getCreateMethodName( string $propName ) : string
+    {
+        static $FMT = 'create%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property get-method
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2018-12-12
+     */
+    public static function getGetMethodName( string $propName ) : string
+    {
+        static $FMT = 'get%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property delete-method
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2018-12-12
+     */
+    public static function getDeleteMethodName( string $propName ) : string
+    {
+        static $FMT = 'delete%s';
+        return self::getMethodName( $FMT, $propName );
     }
 }

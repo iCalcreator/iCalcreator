@@ -1,20 +1,22 @@
-<!DOCTYPE html><!--
+<!DOCTYPE html>
+<!--
  iCalcreator, the PHP class package managing iCal (rfc2445/rfc5545) calendar information.
 
- copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- Link      https://kigkonsult.se
- Package   iCalcreator
- Version   2.30
- License   Subject matter of licence is the software iCalcreator.
+ This file is a part of iCalcreator.
+
+ author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ link      https://kigkonsult.se
+ license   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
            this licence notice and the invariant [rfc5545] PRODID result use
            as implemented and invoked in iCalcreator shall be included in
            all copies or substantial portions of the iCalcreator.
 
            iCalcreator is free software: you can redistribute it and/or modify
-           it under the terms of the GNU Lesser General Public License as published
-           by the Free Software Foundation, either version 3 of the License,
-           or (at your option) any later version.
+           it under the terms of the GNU Lesser General Public License as
+           published by the Free Software Foundation, either version 3 of
+           the License, or (at your option) any later version.
 
            iCalcreator is distributed in the hope that it will be useful,
            but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,17 +25,15 @@
 
            You should have received a copy of the GNU Lesser General Public License
            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
-
- This file is a part of iCalcreator.
 -->
 <html lang="en">
 <head>
-<title>iCalcreator 2.30 manual</title>
+<title>iCalcreator 2.39 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2021 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.30">
+<meta name="description" content="using iCalcreator v2.39">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -158,9 +158,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.30</p>
+<p class="header">iCalcreator v2.39</p>
 <p>
-iCalcreator v2.30<br>
+iCalcreator v2.39<br>
 Copyright &copy; 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -213,8 +213,11 @@ This document makes previous versions obsolete.
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.30 version (and later), <em>PHP</em> version &gt;= 5.6 is required.
-v2.29.25 and later asserts PHP 7+ compability using <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>
+For iCalcreator 2.39 version (and later), <em>PHP</em> version &gt;= 7.0 is required.
+v2.29.25 and later asserts PHP 7+ compability using
+    <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>
+    and (v2.39+)
+    <a href="https://github.com/phpstan/phpstan" title="PHPStan">PHPStan</a>.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -330,11 +333,11 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.30/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.39/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
-iCalcreator 2.30 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.39 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -347,114 +350,26 @@ Here are update headlines in this version.
 </p>
 
 <ul>
-    <li>Removal of all set-methods date(time)/interval ARRAY arguments<br>
-        as well as get-methods return date(time)/interval ARRAY formats<br>
-        <ul>
-            <li>DTSTART, DTEND, DUE, RECURRENCE_ID</li>
-            <li>CREATED, COMPLETED, DTSTAMP, LAST_MODIFIED</li>
-        </ul>
+
+    <li>PHP 7 (PHPStan/strict types)<br><br></li>
+
+    <li>iCalBase static methodName methods moved to StringFactory<br>
+    iCalBase Component multi-prop methods moved to CalendarComponent
+        <br><br>
     </li>
 
-    <li>Removal of all set-methods DateInterval ARRAY arguments<br>
-        as well as (most) get-methods return DateInterval ARRAY formats
-        <ul>
-            <li>REFRESH_INTERVAL, DURATION, TRIGGER</li>
-            <li>RDATE, EXDATE</li>
-            <li>FREEBUSY, RRULE, EXRULE</li>
-        </ul>
+    <li>TRIGGERtrait : setTrigger() bug fix<br><br></li>
+
+    <li>CalAddressFactory::getCalAddresses() arg inclParams removed<br>
+    ATTENDEE/ORGANIZER (CalAddressFactory)
+    <ul>
+        <li>value MAILTO prefix</li>
+        <li>parameter EMAIL etc logic upd</li>
+    </ul>
     </li>
+    <br><br>
 
-    <li>Rewrite Vcalendar::parse()<br>
-        only input string allowed, removing internal iCal file/url parse method
-    </li>
-
-    <li>Removing deprecated methods<br>
-        <ul>
-            <li>Vcalendar::saveCalendar()</li>
-            <li>Vcalendar::useCachedCalendar()</li>
-            <li>Vcalendar::deleteProperty()</li>
-            <li>Vcalendar::setProperty()</li>
-            <li>Vcalendar::addComponent()</li>
-            <li>CalendarComponent::deleteProperty()</li>
-            <li>CalendarComponent::getProperty()</li>
-            <li>CalendarComponent::setProperty()</li>
-            <li>VetComponent::newComponent()</li>
-            <li>IcalXMLFactory::XMLfile2iCal()</li>
-            <li>IcalXMLFactory::XMLstr2iCal()</li>
-            <li>Removal of deprecated config/keys<br>
-                DELIMITER, DIRECTORY, FILENAME, DIRFILE, FILESIZE, FILEINFO</li>
-            <li>All keys and (fixed) property values as constants available in IcalInterface</li>
-        </ul>
-    </li>
-
-
-    <li>Implement rfc7968<br>
-        new properties;
-        <ul>
-            <li>COLOR, NAME, CONFERENCE, IMAGE, REFRESH-INTERVAL, SOURCE</li>
-        </ul>
-        allow calendar-properties;
-        <ul>
-            <li>UID, LAST-MODIFIED, URL, REFRESH-INTERVAL, SOURCE, COLOR,
-                NAME, DESCRIPTION, CATEGORIES, IMAGE
-            </li>
-        </ul>
-         Replace rfc5545 (date+unique_id) UID by rfc7986 guid UID.<br>
-         Note, calendar UID is auto-created !!
-    </li>
-
-    <li>Alter RRULE/EXRULE to single occurence</li>
-
-    <li>Allow iana-token (Other IANA-registered type) property PARAMETER names<br>
-        For ACTION and CLASS, iana-token / x-name VALUES are allowed<br>
-        However, IANA Properties still not supported
-    </li>
-
-    <li>Vcalendar::sort()
-        <ul>
-            <li>order adjustment</li>
-        </ul>
-    </li>
-
-    <li>Conformed method names for
-        <ul>
-            <li>Last-Modified, Request-Status, Related-to</li>
-        </ul>
-    </li>
-
-    <li>Timezone conversion
-        <ul>
-            <li>Fix other (Ms) timezones conversion to PHP timezones (ie map on offset)
-                in RegulateTimezoneFactory, to be used before Vcalendar::parse</li>
-        </ul>
-    </li>
-
-    <li>Code reworks: StringFactory, SortFactory, CalAddressFactory, *Traits etc</li>
-
-    <li>Vtimezone::populate() moved to Util/VtimezonePopulateFactory::process()</li>
-
-    <li>CATEGORIES, RESOURCES no longer accepts array input</li>
-
-    <li>String asserts in set-methods for TEXT Valuetype properties</li>
-
-    <li>Vcalendar::returnCalendar() new fileName arg</li>
-
-    <li>Methods with DateTime arg now accepts DateTimeInterface</li>
-
-    <li>assert for method exists</li>
-
-    <li>xml header update</li>
-
-    <li>PHP 7.4 compability (Util/DateIntervalFactory, Util/StringFactory)</li>
-
-    <li>StringFactory needle/haystack functions</li>
-
-    <li>RecurFactory split in 2 and reworked,
-    more recur improved select base methods</li>
-
-    <li>Bug RecurFactory::setRexRule() + RecurFactory2::assertRecur() rules</li>
-
-    <li>Adapt URL, support of non-rfc value and parameter format</li>
+    <li>IcalvCard::iCal2vCards() arg bug</li>
 
 </ul>
 
@@ -2932,7 +2847,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.30//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.39//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -8536,7 +8451,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.30
+<tr><td>Version  <td>2.39
 <tr><td class="top">License  <td>
     Subject matter of licence is the software iCalcreator.<br>
     The above copyright, link, package and version notices,<br>

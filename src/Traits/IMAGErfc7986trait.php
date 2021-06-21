@@ -2,35 +2,35 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -41,7 +41,6 @@ use function sprintf;
 /**
  * IMAGE property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.29.21 2019-06-17
  */
 trait IMAGErfc7986trait
@@ -56,12 +55,12 @@ trait IMAGErfc7986trait
      *
      * @return string
      */
-    public function createImage()
+    public function createImage() : string
     {
         if( empty( $this->image )) {
-            return null;
+            return Util::$SP0;
         }
-        $output = null;
+        $output = Util::$SP0;
         foreach( $this->image as $aix => $imagePart ) {
             if( ! empty( $imagePart[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
@@ -83,23 +82,28 @@ trait IMAGErfc7986trait
     /**
      * Delete calendar component property image
      *
-     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      */
-    public function deleteImage( $propDelIx = null )
+    public function deleteImage( $propDelIx = null ) : bool
     {
         if( empty( $this->image )) {
             unset( $this->propDelIx[self::IMAGE] );
             return false;
         }
-        return $this->deletePropertyM( $this->image, self::IMAGE, $propDelIx );
+        return CalendarComponent::deletePropertyM(
+            $this->image,
+            self::IMAGE,
+            $this,
+            $propDelIx
+        );
     }
 
     /**
      * Get calendar component property image
      *
-     * @param int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
+     * @param null|int    $propIx specific property in case of multiply occurrence
+     * @param null|bool   $inclParam
      * @return bool|array
      */
     public function getImage( $propIx = null, $inclParam = false )
@@ -108,26 +112,30 @@ trait IMAGErfc7986trait
             unset( $this->propIx[self::IMAGE] );
             return false;
         }
-        return $this->getPropertyM( $this->image, self::IMAGE, $propIx, $inclParam );
+        return CalendarComponent::getPropertyM(
+            $this->image,
+            self::IMAGE,
+            $this,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
      * Set calendar component property image
      *
-     * @param string  $value
-     * @param array   $params
-     * @param integer $index
+     * @param null|string  $value
+     * @param null|array   $params
+     * @param null|integer $index
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setImage( $value = null, $params = [], $index = null )
+    public function setImage( $value = null, $params = [], $index = null ) : self
     {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::IMAGE );
-            $value  = Util::$SP0;
-            $params = [];
-            $this->setMval( $this->image, $value, $params, null, $index );
+            CalendarComponent::setMval( $this->image, Util::$SP0, [], null, $index );
             return $this;
         }
         $params     = array_change_key_case( $params, CASE_UPPER );
@@ -147,7 +155,6 @@ trait IMAGErfc7986trait
                 throw new InvalidArgumentException(
                     sprintf( $FMTERR2, $params[self::VALUE] )
                 );
-                break;
         } // end switch
         // remove defaults
         ParameterFactory::ifExistRemove(
@@ -155,7 +162,7 @@ trait IMAGErfc7986trait
             self::DISPLAY,
             self::BADGE
         );
-        $this->setMval( $this->image, $value, $params, null, $index );
+        CalendarComponent::setMval( $this->image, $value, $params, null, $index );
         return $this;
     }
 }

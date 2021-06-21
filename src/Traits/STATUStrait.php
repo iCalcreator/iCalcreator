@@ -2,32 +2,31 @@
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
- * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * Link      https://kigkonsult.se
- * Package   iCalcreator
- * Version   2.30
- * License   Subject matter of licence is the software iCalcreator.
+ * This file is a part of iCalcreator.
+ *
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
+*
+ *            iCalcreator is free software: you can redistribute it and/or modify
+ *            it under the terms of the GNU Lesser General Public License as
+ *            published by the Free Software Foundation, either version 3 of
+ *            the License, or (at your option) any later version.
  *
- *           iCalcreator is free software: you can redistribute it and/or modify
- *           it under the terms of the GNU Lesser General Public License as published
- *           by the Free Software Foundation, either version 3 of the License,
- *           or (at your option) any later version.
+ *            iCalcreator is distributed in the hope that it will be useful,
+ *            but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *            GNU Lesser General Public License for more details.
  *
- *           iCalcreator is distributed in the hope that it will be useful,
- *           but WITHOUT ANY WARRANTY; without even the implied warranty of
- *           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *           GNU Lesser General Public License for more details.
- *
- *           You should have received a copy of the GNU Lesser General Public License
- *           along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
- *
- * This file is a part of iCalcreator.
-*/
-
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
+ */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -41,7 +40,6 @@ use function strtoupper;
 /**
  * STATUS property functions
  *
- * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
  * @since 2.27.3 2018-12-22
  */
 trait STATUStrait
@@ -56,15 +54,15 @@ trait STATUStrait
      *
      * @return string
      */
-    public function createStatus()
+    public function createStatus() : string
     {
         if( empty( $this->status )) {
-            return null;
+            return Util::$SP0;
         }
         if( empty( $this->status[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::STATUS )
-                : null;
+                : Util::$SP0;
         }
         return StringFactory::createElement(
             self::STATUS,
@@ -79,7 +77,7 @@ trait STATUStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteStatus()
+    public function deleteStatus() : bool
     {
         $this->status = null;
         return true;
@@ -109,7 +107,7 @@ trait STATUStrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setStatus( $value = null, $params = [] )
+    public function setStatus( $value = null, $params = [] ) : self
     {
         static $ALLOWED_VEVENT = [
             self::CONFIRMED,
@@ -127,7 +125,7 @@ trait STATUStrait
             self::DRAFT,
             self::F_NAL,
         ];
-        $value = strtoupper( StringFactory::trimTrailNL( $value ));
+        $value = strtoupper( StringFactory::trimTrailNL( $value ?? Util::$SP0));
         switch( true ) {
             case ( empty( $value )) :
                 $this->assertEmptyValue( $value, self::STATUS );
@@ -146,7 +144,7 @@ trait STATUStrait
         } // end switch
         $this->status = [
             Util::$LCvalue  => $value ,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
+            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
         ];
         return $this;
     }

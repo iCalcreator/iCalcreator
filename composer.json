@@ -22,7 +22,7 @@
         "standard",
         "daylight"
     ],
-    "license": "lgpl-3.0",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Kjell-Inge Gustafsson",
@@ -36,26 +36,26 @@
         }
     ],
     "support": {
-       "issues": "https://github.com/iCalcreator/iCalcreator/issues"
+        "issues": "https://github.com/iCalcreator/iCalcreator/issues"
     },
     "autoload": {
         "files": ["autoload.php"],
         "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/Util/", "src/Traits/"] }
     },
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "ext-simplexml": "*",
         "ext-openssl": "*",
         "ext-zlib": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "6.5.13",
-        "phpcompatibility/php-compatibility": "9.3.5",
-        "squizlabs/php_codesniffer": "3.5.5"
+        "phpcompatibility/php-compatibility": ">=9.3.5",
+        "phpstan/phpstan": ">=0.9.3",
+        "phpunit/phpunit": ">=6.5.13",
+        "squizlabs/php_codesniffer": ">=3.5.5"
     },
     "scripts": {
         "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
         "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
     }
 }
-
