@@ -299,7 +299,7 @@ abstract class IcalBase implements IcalInterface
             if( false !== ( $cfg = $this->getConfig( self::LANGUAGE ))) {
                 $output[self::LANGUAGE]  = $cfg;
             }
-            $output[self::UNIQUE_ID]     = $this->getConfig( self::UNIQUE_ID );
+            $output[self::UNIQUE_ID]     = $this->getConfig( self::UNIQUE_ID ) ?: '';
             return $output;
         }
         switch( strtoupper( $config )) {
