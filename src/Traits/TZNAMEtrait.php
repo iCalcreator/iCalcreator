@@ -12,7 +12,7 @@
  *           this licence notice and the invariant [rfc5545] PRODID result use
  *           as implemented and invoked in iCalcreator shall be included in
  *           all copies or substantial portions of the iCalcreator.
-*
+ *
  *            iCalcreator is free software: you can redistribute it and/or modify
  *            it under the terms of the GNU Lesser General Public License as
  *            published by the Free Software Foundation, either version 3 of

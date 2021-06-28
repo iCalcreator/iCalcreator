@@ -41,7 +41,7 @@ use PHPUnit\Framework\TestCase;
  *    PRODID (implicit)
  *    Not X-property, tested in MiscTest
  *
- * @since  2.27.14 - 2019-01-24
+ * @since  2.39.1 - 2021-06-26
  */
 class VcalendarTest extends TestCase
 {
@@ -52,7 +52,7 @@ class VcalendarTest extends TestCase
      *
      * @test
      */
-    public function vcalendarTest0()
+    public function vcalendarTest1()
     {
         $config = [
             Vcalendar::ALLOWEMPTY => false,
@@ -63,6 +63,11 @@ class VcalendarTest extends TestCase
         $this->assertEquals( $config[Vcalendar::ALLOWEMPTY], $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
         $this->assertEquals( $config[Vcalendar::UNIQUE_ID],  $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
 
+        $vcalendar    = new Vcalendar();
+
+        $this->assertEquals( true, $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
+        $this->assertEquals( '', $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
+
         $vcalendar->setConfig( Vcalendar::LANGUAGE, 'EN' );
         $this->assertEquals( 'EN',                 $vcalendar->getConfig( Vcalendar::LANGUAGE ));
         $vcalendar->deleteConfig( Vcalendar::LANGUAGE );
@@ -72,13 +77,25 @@ class VcalendarTest extends TestCase
         $this->assertTrue( $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
 
         $vcalendar->deleteConfig( Vcalendar::UNIQUE_ID );
-        $this->assertFalse( $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
+        $this->assertEquals( '', $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
     }
 
     /**
-     * vcalendarTest1 provider
+     * Testing Component with empty config, issue #91
+     *
+     * @test
      */
-    public function vcalendarTest1Provider()
+    public function vcalendarTest2()
+    {
+        $vTimezone = new Vtimezone();
+        $standard  = $vTimezone->newStandard();
+        $this->assertTrue( $standard instanceof Standard );
+    }
+
+    /**
+     * vcalendarTest10 provider
+     */
+    public function vcalendarTest10Provider()
     {
         $dataArr = [];
 
@@ -125,7 +142,7 @@ class VcalendarTest extends TestCase
      * Testing Vcalendar
      *
      * @test
-     * @dataProvider vcalendarTest1Provider
+     * @dataProvider vcalendarTest10Provider
      * @param int    $case
      * @param string $propName
      * @param mixed  $value
@@ -133,7 +150,7 @@ class VcalendarTest extends TestCase
      * @param string $expectedString
      * @throws Exception
      */
-    public function vcalendarTest1( $case, $propName, $value, $expectedGet, $expectedString )
+    public function vcalendarTest10( $case, $propName, $value, $expectedGet, $expectedString )
     {
         $vcalendar = Vcalendar::factory();
 
@@ -208,7 +225,7 @@ class VcalendarTest extends TestCase
      * @test
      * @throws Exception
      */
-    public function vcalendarTest2()
+    public function vcalendarTest20()
     {
         $vcalendar = new Vcalendar();
 
@@ -461,7 +478,7 @@ class VcalendarTest extends TestCase
         // check fetch on config compsinfo
         foreach( $vcalendar->getConfig( Vcalendar::COMPSINFO ) as $cix => $compInfo ) {
 
-            $v = $vcalendar->getComponent( $compInfo['uid'] );
+            $v = $vcalendar->getComponent( $compInfo['uid'] ); // note lower case
 
             $this->assertEquals(
                 $compInfo['type'],

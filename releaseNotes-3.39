@@ -127,3 +127,7 @@ v3.39   3.4 release candidate
           value MAILTO prefix
           parameter EMAIL etc logic upd
         IcalvCard::iCal2vCards() arg bug
+
+
+v3.39.1 github issue #91, empty config unique_id
+        IcalBase, Vcalendar, PRODIDtrait, VcalendarTest, MiscTest

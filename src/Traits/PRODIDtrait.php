@@ -8,11 +8,11 @@
  * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
- *           The above copyright, link, package and version notices,
- *           this licence notice and the invariant [rfc5545] PRODID result use
- *           as implemented and invoked in iCalcreator shall be included in
- *           all copies or substantial portions of the iCalcreator.
-*
+ *            The above copyright, link, package and version notices,
+ *            this licence notice and the invariant [rfc5545] PRODID result use
+ *            as implemented and invoked in iCalcreator shall be included in
+ *            all copies or substantial portions of the iCalcreator.
+ *
  *            iCalcreator is free software: you can redistribute it and/or modify
  *            it under the terms of the GNU Lesser General Public License as
  *            published by the Free Software Foundation, either version 3 of
@@ -32,13 +32,14 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function gethostbyname;
 use function sprintf;
 use function strtoupper;
 
 /**
  * PRODID property functions
  *
- * @since  2.22.23 - 2017-03-15
+ * @since  2.39.1 - 2021-06-26
  */
 trait PRODIDtrait
 {
@@ -85,22 +86,25 @@ trait PRODIDtrait
      *  is a globally unique identifier; using some technique such as an FPI
      *  value, as defined in [ISO 9070]."
      *
-     * @since  2.26.2 - 2018-11-29
+     * @since  2.39.1 - 2021-06-26
      */
     public function makeProdid()
     {
-        static $FMT = '-//%s//NONSGML kigkonsult.se %s//%s';
+        static $SERVER_NAME = 'SERVER_NAME';
+        static $LOCALHOST   = 'localhost';
+        static $FMT         = '-//%s//NONSGML kigkonsult.se %s//%s';
+        $unique_id = $this->getConfig( self::UNIQUE_ID );
+        if( empty( $unique_id )) {
+            $unique_id = ( isset( $_SERVER[$SERVER_NAME] ))
+                ? gethostbyname( $_SERVER[$SERVER_NAME] )
+                : $LOCALHOST;
+        }
         if( false !== ( $lang = $this->getConfig( self::LANGUAGE ))) {
             $lang = strtoupper( $lang );
         }
         else {
             $lang = Util::$SP0;
         }
-        $this->prodid = sprintf(
-            $FMT,
-            $this->getConfig( self::UNIQUE_ID ),
-            ICALCREATOR_VERSION,
-            $lang
-        );
+        $this->prodid = sprintf( $FMT, $unique_id, ICALCREATOR_VERSION, $lang );
     }
 }

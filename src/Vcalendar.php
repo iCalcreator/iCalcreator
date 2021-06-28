@@ -47,7 +47,6 @@ use function count;
 use function ctype_digit;
 use function end;
 use function explode;
-use function gethostbyname;
 use function implode;
 use function in_array;
 use function is_array;
@@ -70,22 +69,24 @@ use function usort;
 /**
  * Vcalendar class
  *
- * @since  2.29.16 - 2020-01-25
+ * @since  2.39.1 - 2021-06-26
  */
 final class Vcalendar extends IcalBase
 {
-    use Traits\CALSCALEtrait,
-        Traits\METHODtrait,
-        Traits\PRODIDtrait,
+    // The following are REQUIRED, but MUST NOT occur more than once.
+    use Traits\PRODIDtrait,
         Traits\VERSIONtrait;
     // The following are OPTIONAL, but MUST NOT occur more than once.
+    use Traits\CALSCALEtrait,
+        Traits\METHODtrait;
+    // The following are OPTIONAL, but MUST NOT occur more than once (rfc7986).
     use Traits\UIDrfc7986trait,
         Traits\LAST_MODIFIEDtrait,
         Traits\URLtrait,
         Traits\REFRESH_INTERVALrfc7986trait,
         Traits\SOURCErfc7986trait,
         Traits\COLORrfc7986trait;
-    // The following are OPTIONAL, and MAY occur more than once.
+    // The following are OPTIONAL, and MAY occur more than once (rfc7986).
     use Traits\NAMErfc7986trait,
         Traits\DESCRIPTIONtrait,
         Traits\CATEGORIEStrait,
@@ -113,19 +114,11 @@ final class Vcalendar extends IcalBase
      * Constructor for calendar object
      *
      * @param array $config
-     * @since  2.29.5 - 2019-06-20
+     * @since  2.39.1 - 2021-06-26
      */
     public function __construct( $config = [] )
     {
-        static $SERVER_NAME = 'SERVER_NAME';
-        static $LOCALHOST   = 'localhost';
         $this->compType     = self::VCALENDAR;
-        $this->setConfig(
-            self::UNIQUE_ID,
-            ( isset( $_SERVER[$SERVER_NAME] ))
-                ? gethostbyname( $_SERVER[$SERVER_NAME] )
-                : $LOCALHOST
-        );
         $this->setConfig( $config );
         $this->setUid();
     }

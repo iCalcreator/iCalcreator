@@ -1802,7 +1802,7 @@ class MiscTest extends DtBase
     }
 
     /**
-     * Testing parse eol-htab
+     * Testing parse eol-htab, also test of empty unique_id
      *
      * @test
      * @dataProvider parse6Provider
@@ -1816,5 +1816,6 @@ class MiscTest extends DtBase
 
         $this->parseCalendarTest( $case, $c );
 
+        // echo $c->createCalendar(); // test ###
     }
 }

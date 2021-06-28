@@ -42,7 +42,6 @@ use function count;
 use function ctype_digit;
 use function get_object_vars;
 use function is_array;
-use function is_null;
 use function is_object;
 use function key;
 use function ksort;
@@ -57,7 +56,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.39' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.39.1' );
 }
 
 /**
@@ -65,7 +64,7 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  *
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
- * @since  2.29.4 - 2019-07-01
+ * @since  2.39.1 - 2021-06-26
  */
 abstract class IcalBase implements IcalInterface
 {
@@ -284,7 +283,7 @@ abstract class IcalBase implements IcalInterface
      *
      * @param mixed $config
      * @return mixed   bool false on not found or empty
-     * @since  2.29.4 - 2019-07-02
+     * @since  2.39.1 - 2021-06-26
      */
     public function getConfig( $config = null )
     {
@@ -293,7 +292,13 @@ abstract class IcalBase implements IcalInterface
         static $LCUID   = 'uid';
         static $LCPROPS = 'props';
         static $LCSUB   = 'sub';
-        if( is_null( $config )) {
+        if( ! isset( $this->config[self::ALLOWEMPTY] )) { // default
+            $this->config[self::ALLOWEMPTY] = true;
+        }
+        if( ! isset( $this->config[self::UNIQUE_ID] )) {
+            $this->config[self::UNIQUE_ID] = Util::$SP0;
+        }
+        if( empty( $config )) {
             $output                      = [];
             $output[self::ALLOWEMPTY]    = $this->getConfig( self::ALLOWEMPTY );
             if( false !== ( $cfg = $this->getConfig( self::LANGUAGE ))) {
@@ -304,15 +309,9 @@ abstract class IcalBase implements IcalInterface
         }
         switch( strtoupper( $config )) {
             case self::ALLOWEMPTY:
-                if( ! isset( $this->config[self::ALLOWEMPTY] )) { // default
-                    $this->config[self::ALLOWEMPTY] = true;
-                }
                 return $this->config[self::ALLOWEMPTY];
             case self::UNIQUE_ID:
-                if( isset( $this->config[self::UNIQUE_ID] )) {
-                    return $this->config[self::UNIQUE_ID];
-                }
-                break;
+                return $this->config[self::UNIQUE_ID];
             case self::LANGUAGE: // get language for calendar component as defined in [RFC 1766]
                 if( isset( $this->config[self::LANGUAGE] )) {
                     return $this->config[self::LANGUAGE];
