@@ -45,15 +45,16 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait REFRESH_INTERVALrfc7986trait
 {
     /**
-     * @var array component property REFRESH_INTERVAL value
+     * @var null|array component property REFRESH_INTERVAL value
      */
-    protected $refreshinterval = null;
+    protected ?array $refreshinterval = null;
 
     /**
      * Return formatted output for calendar component property refresh_interval
      *
      * @return string
      * @throws Exception
+     * @since 2.40 2021-10-04
      */
     public function createRefreshinterval() : string
     {
@@ -65,26 +66,10 @@ trait REFRESH_INTERVALrfc7986trait
                 ? StringFactory::createElement( self::REFRESH_INTERVAL )
                 : Util::$SP0;
         }
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet(
-            $this->refreshinterval[Util::$LCvalue] )
-        ) {
-            try { // fix pre 7.0.5 bug
-                $dateInterval =
-                    DateIntervalFactory::DateIntervalArr2DateInterval(
-                        $this->refreshinterval[Util::$LCvalue]
-                    );
-            }
-            catch( Exception $e ) {
-                throw $e;
-            }
-        }
-        else {
-            $dateInterval = $this->refreshinterval[Util::$LCvalue];
-        }
         return StringFactory::createElement(
             self::REFRESH_INTERVAL,
             ParameterFactory::createParams( $this->refreshinterval[Util::$LCparams] ),
-            DateIntervalFactory::dateInterval2String( $dateInterval )
+            DateIntervalFactory::dateInterval2String( $this->refreshinterval[Util::$LCvalue] )
         );
     }
 
@@ -103,10 +88,11 @@ trait REFRESH_INTERVALrfc7986trait
      * Get calendar component property refresh_interval
      *
      * @param null|bool   $inclParam
-     * @return bool|array|DateInterval
+     * @return bool|string|array|DateInterval
      * @throws Exception
+     * @since 2.40 2021-10-04
      */
-    public function getRefreshinterval( $inclParam = false )
+    public function getRefreshinterval( ? bool $inclParam = false ) : DateInterval | bool | string | array
     {
         if( empty( $this->refreshinterval )) {
             return false;
@@ -116,33 +102,22 @@ trait REFRESH_INTERVALrfc7986trait
                 ? $this->refreshinterval
                 : $this->refreshinterval[Util::$LCvalue];
         }
-        $refreshinterval = $this->refreshinterval;
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet(
-            $refreshinterval[Util::$LCvalue] )
-        ) {
-            try { // fix pre 7.0.5 bug
-                $refreshinterval[Util::$LCvalue] =
-                    DateIntervalFactory::DateIntervalArr2DateInterval(
-                        $this->refreshinterval[Util::$LCvalue]
-                    );
-            }
-            catch( Exception $e ) {
-                throw $e;
-            }
-        }
-        return ( $inclParam ) ? $refreshinterval : $refreshinterval[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->refreshinterval
+            : $this->refreshinterval[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property refresh_interval
      *
-     * @param null|mixed $value
-     * @param null|array $params
-     * @return static
+     * @param null|mixed   $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @throws Exception
+     * @since 2.40 2021-10-04
      */
-    public function setRefreshinterval( $value  = null, $params = [] ) : self
+    public function setRefreshinterval( mixed $value = null, ? array $params = [] ) : self
     {
         static $FMTERR = 'Invalid %s value';
         switch( true ) {
@@ -174,9 +149,9 @@ trait REFRESH_INTERVALrfc7986trait
                 );
         } // end switch
         $this->refreshinterval = [
-            Util::$LCvalue  => (array) $value,  // fix pre 7.0.5 bug
+            Util::$LCvalue  => $value,
             Util::$LCparams => ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 [ self::VALUE => self::DURATION ] // required
             ),
         ];

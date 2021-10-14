@@ -44,9 +44,9 @@ use function strtoupper;
 trait TRANSPtrait
 {
     /**
-     * @var array component property TRANSP value
+     * @var null|array component property TRANSP value
      */
-    protected $transp = null;
+    protected ?array $transp = null;
 
     /**
      * Return formatted output for calendar component property transp
@@ -86,10 +86,10 @@ trait TRANSPtrait
      * Get calendar component property transp
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTransp( $inclParam = false )
+    public function getTransp( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->transp )) {
             return false;
@@ -100,13 +100,13 @@ trait TRANSPtrait
     /**
      * Set calendar component property transp
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string  $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setTransp( $value = null, $params = [] ) : self
+    public function setTransp( ? string $value = null, ? array $params = [] ) : self
     {
         static $ALLOWED = [
             self::OPAQUE,

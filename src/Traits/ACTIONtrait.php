@@ -44,9 +44,9 @@ use function strtoupper;
 trait ACTIONtrait
 {
     /**
-     * @var array component property ACTION value
+     * @var null|array component property ACTION value
      */
-    protected $action = null;
+    protected ?array $action = null;
 
     /**
      * Return formatted output for calendar component property action
@@ -85,11 +85,11 @@ trait ACTIONtrait
     /**
      * Get calendar component property action
      *
-     * @param null|bool   $inclParam
-     * @return bool|array
+     * @param bool|null $inclParam
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getAction( $inclParam = false )
+    public function getAction( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->action )) {
             return false;
@@ -100,13 +100,13 @@ trait ACTIONtrait
     /**
      * Set calendar component property action
      *
-     * @param null|string $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
-     * @param null|mixed  $params
-     * @return static
+     * @param string|null $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setAction( $value = null, $params = [] ) : self
+    public function setAction( string $value = null, ? array $params = [] ) : self
     {
         static $STDVALUES = [
             self::AUDIO,

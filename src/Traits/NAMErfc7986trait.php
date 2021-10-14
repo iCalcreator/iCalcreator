@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait NAMErfc7986trait
 {
     /**
-     * @var array component property NAME value
+     * @var null|array component property NAME value
      */
-    protected $name = null;
+    protected ?array $name = null;
 
     /**
      * Return formatted output for calendar component property name
@@ -60,7 +60,7 @@ trait NAMErfc7986trait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->name as $cx => $namePart ) {
+        foreach( $this->name as $namePart ) {
             if( empty( $namePart[Util::$LCvalue] )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::NAME );
@@ -87,7 +87,7 @@ trait NAMErfc7986trait
      * @return bool
      * @since 2.29.5 2019-06-16
      */
-    public function deleteName( $propDelIx = null ) : bool
+    public function deleteName( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->name )) {
             unset( $this->propDelIx[self::NAME] );
@@ -106,10 +106,10 @@ trait NAMErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since 2.29.5 2019-06-16
      */
-    public function getName( $propIx = null, $inclParam = false )
+    public function getName( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->name )) {
             unset( $this->propIx[self::NAME] );
@@ -128,13 +128,13 @@ trait NAMErfc7986trait
      * Set calendar component property name
      *
      * @param null|string  $value
-     * @param null|array   $params
+     * @param null|string[] $params
      * @param null|integer $index
-     * @return static
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setName( $value = null, $params = [], $index = null ) : self
+    public function setName( ? string $value = null, ? array $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::NAME );

@@ -44,8 +44,9 @@ class Exception2Test extends TestCase
 {
     /**
      * RexdateFactoryPrepInputExdateTest provider
+     * @throws Exception
      */
-    public function Provider1()
+    public function Provider1() : array
     {
         $dataArr = [];
 
@@ -56,7 +57,7 @@ class Exception2Test extends TestCase
                     DateTimeFactory::factory( 'now' )
                 ]
             ],
-            [ Vcalendar::TZID => 'invalid/timezone' ]
+            [ IcalInterface::TZID => 'invalid/timezone' ]
         ];
 
         $dataArr[] = [
@@ -66,7 +67,7 @@ class Exception2Test extends TestCase
                     '011201250101'
                 ]
             ],
-            [ Vcalendar::TZID => 'invalid/timezone' ]
+            [ IcalInterface::TZID => 'invalid/timezone' ]
         ];
 
         $dataArr[] = [
@@ -96,11 +97,11 @@ class Exception2Test extends TestCase
      * @test
      * @dataProvider Provider1
      *
-     * @param int    $case
+     * @param int $case
      * @param mixed  $value
-     * @param array  $params
+     * @param array $params
      */
-    public function RexdateFactoryPrepInputExdateTest( $case, $value, $params )
+    public function RexdateFactoryPrepInputExdateTest( int $case, mixed $value, array $params ) : void
     {
         $ok = false;
         try {
@@ -119,11 +120,11 @@ class Exception2Test extends TestCase
      * @test
      * @dataProvider Provider1
      *
-     * @param int    $case
+     * @param int $case
      * @param mixed  $value
-     * @param array  $params
+     * @param array $params
      */
-    public function RexdateFactoryprepInputRdateTest( $case, $value, $params )
+    public function RexdateFactoryprepInputRdateTest( int $case, mixed $value, array $params ) : void
     {
         $ok = false;
         try {

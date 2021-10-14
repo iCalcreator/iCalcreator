@@ -129,5 +129,4 @@ v3.39   3.4 release candidate
         IcalvCard::iCal2vCards() arg bug
 
 
-v3.39.1 github issue #91, empty config unique_id
-        IcalBase, Vcalendar, PRODIDtrait, VcalendarTest, MiscTest
+2.40 PHP8

@@ -42,9 +42,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait COLORrfc7986trait
 {
     /**
-     * @var array component property COLOR value
+     * @var null|array component property COLOR value
      */
-    protected $color = null;
+    protected ?array $color = null;
 
     /**
      * Return formatted output for calendar (component property color
@@ -85,10 +85,10 @@ trait COLORrfc7986trait
      * Get calendar component property color
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since 2.29.5 2019-06-16
      */
-    public function getColor( $inclParam = false )
+    public function getColor( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->color )) {
             return false;
@@ -99,12 +99,12 @@ trait COLORrfc7986trait
     /**
      * Set calendar component property color
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @return self
      * @since 2.29.14 2019-09-03
      */
-    public function setColor( $value = null, $params = [] ) : self
+    public function setColor( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COLOR );

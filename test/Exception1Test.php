@@ -28,10 +28,11 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use PHPUnit\Framework\TestCase;
-use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Exception;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\RecurFactory;
+use PHPUnit\Framework\TestCase;
+use ValueError;
 
 /**
  * class Exception1Test
@@ -45,7 +46,7 @@ class Exception1Test extends TestCase
     /**
      * DateTimeFactoryFactoryTest provider
      */
-    public function DateTimeFactoryFactoryTestProvider()
+    public function DateTimeFactoryFactoryTestProvider() : array
     {
         $dataArr = [];
 
@@ -93,15 +94,18 @@ class Exception1Test extends TestCase
      *
      * @test
      * @dataProvider DateTimeFactoryFactoryTestProvider
-     * @param int    $case
-     * @param string  $dateTimeString
-     * @param string  $timezoneString
+     * @param int $case
+     * @param string $dateTimeString
+     * @param string $timezoneString
      */
-    public function DateTimeFactoryFactoryTest( $case, $dateTimeString, $timezoneString )
+    public function DateTimeFactoryFactoryTest( int $case, string $dateTimeString, string $timezoneString ) : void
     {
         $ok = false;
         try {
             $dateTime = DateTimeFactory::factory( $dateTimeString, $timezoneString );
+        }
+        catch ( ValueError $e ) {
+            $ok = true;
         }
         catch ( Exception $e ) {
             $ok = true;
@@ -111,8 +115,9 @@ class Exception1Test extends TestCase
 
     /**
      * DateTimeFactoryGetYmdFromTimestampTest provider
+     * @throws Exception
      */
-    public function DateTimeFactoryGetYmdFromTimestampTestProvider()
+    public function DateTimeFactoryGetYmdFromTimestampTestProvider() : array
     {
         $dataArr = [];
 
@@ -143,11 +148,11 @@ class Exception1Test extends TestCase
      *
      * @test
      * @dataProvider DateTimeFactoryGetYmdFromTimestampTestProvider
-     * @param int    $case
-     * @param string  $dateTimeString
-     * @param string  $timezoneString
+     * @param int $case
+     * @param string|int $dateTimeString
+     * @param string $timezoneString
      */
-    public function getYmdFromTimestampTest( $case, $dateTimeString, $timezoneString )
+    public function getYmdFromTimestampTest( int $case, string|int $dateTimeString, string $timezoneString ) : void
     {
         $ok = false;
         try {
@@ -162,21 +167,22 @@ class Exception1Test extends TestCase
 
     /**
      * DateTimeFactorySetDateTest provider
+     * @throws Exception
      */
-    public function DateTimeFactorySetDateTestProvider()
+    public function DateTimeFactorySetDateTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             1,
             DateTimeFactory::factory( 'now' ),
-            [ Vcalendar::TZID => 'invalid/timezone' ]
+            [ IcalInterface::TZID => 'invalid/timezone' ]
         ];
 
         $dataArr[] = [
             19,
             '011201010101',
-            [ Vcalendar::TZID => 'invalid/timezone']
+            [ IcalInterface::TZID => 'invalid/timezone']
         ];
 
         $dataArr[] = [
@@ -198,9 +204,9 @@ class Exception1Test extends TestCase
             20,
             [
                 'timestamp'         => '1',
-                RecurFactory::$LCtz => Vcalendar::UTC
+                RecurFactory::$LCtz => IcalInterface::UTC
             ],
-            [ Vcalendar::TZID => 'invalid/timezone']
+            [ IcalInterface::TZID => 'invalid/timezone']
         ];
 
         $dataArr[] = [
@@ -217,11 +223,11 @@ class Exception1Test extends TestCase
      *
      * @test
      * @dataProvider DateTimeFactorySetDateTestProvider
-     * @param int    $case
+     * @param int $case
      * @param mixed  $value
-     * @param array  $params
+     * @param array $params
      */
-    public function DateTimeFactorySetDateTest(  $case,  $value,  $params )
+    public function DateTimeFactorySetDateTest( int $case, mixed $value, array $params ) : void
     {
         $ok = false;
         try {

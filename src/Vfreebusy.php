@@ -45,7 +45,6 @@ final class Vfreebusy extends Vcomponent
         Traits\COMMENTtrait,
         Traits\CONTACTtrait,
         Traits\DTENDtrait,
-        Traits\DTSTAMPtrait,
         Traits\DTSTARTtrait,
         Traits\DURATIONtrait,   // Deprecated in rfc5545
         Traits\FREEBUSYtrait,
@@ -57,7 +56,7 @@ final class Vfreebusy extends Vcomponent
     /**
      * @var string
      */
-    protected static $compSgn = 'f';
+    protected static string $compSgn = 'f';
 
     /**
      * Destructor

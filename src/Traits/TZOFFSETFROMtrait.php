@@ -30,11 +30,11 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function sprintf;
 
@@ -46,9 +46,9 @@ use function sprintf;
 trait TZOFFSETFROMtrait
 {
     /**
-     * @var array component property TZOFFSETFROM value
+     * @var null|array component property TZOFFSETFROM value
      */
-    protected $tzoffsetfrom = null;
+    protected ?array $tzoffsetfrom = null;
 
     /**
      * Return formatted output for calendar component property tzoffsetfrom
@@ -88,10 +88,10 @@ trait TZOFFSETFROMtrait
      * Get calendar component property tzoffsetfrom
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzoffsetfrom( $inclParam = false )
+    public function getTzoffsetfrom( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzoffsetfrom )) {
             return false;
@@ -104,13 +104,13 @@ trait TZOFFSETFROMtrait
     /**
      * Set calendar component property tzoffsetfrom
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.3 2019-03-14
      */
-    public function setTzoffsetfrom( $value = null, $params = [] ) : self
+    public function setTzoffsetfrom( ? string $value = null, ? array $params = [] ) : self
     {
         static $ERR = 'Invalid %s offset value %s';
         if( empty( $value )) {
@@ -119,7 +119,7 @@ trait TZOFFSETFROMtrait
             $params = [];
         }
         elseif( ! DateTimeZoneFactory::hasOffset( $value )) {
-            throw new InvalidArgumentException( sprintf( $ERR, Vcalendar::TZOFFSETFROM, $value ));
+            throw new InvalidArgumentException( sprintf( $ERR, IcalInterface::TZOFFSETFROM, $value ));
         }
         $this->tzoffsetfrom = [
             Util::$LCvalue  => $value,

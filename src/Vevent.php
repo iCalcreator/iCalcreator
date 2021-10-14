@@ -78,7 +78,7 @@ final class Vevent extends VetComponent
     /**
      * @var string
      */
-    protected static $compSgn = 'e';
+    protected static string $compSgn = 'e';
 
     /**
      * Destructor

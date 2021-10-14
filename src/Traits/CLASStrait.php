@@ -44,14 +44,14 @@ use function strtoupper;
 trait CLASStrait
 {
     /**
-     * @var array component property CLASS value
+     * @var null|array component property CLASS value
      */
-    protected $class = null;
+    protected ?array $class = null;
 
     /**
      * @var string
      */
-    protected static $KLASS = 'class';
+    protected static string $KLASS = 'class';
 
     /**
      * Return formatted output for calendar component property class
@@ -91,29 +91,29 @@ trait CLASStrait
      * Get calendar component property class
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getClass( $inclParam = false )
+    public function getClass( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->{self::$KLASS} )) {
             return false;
         }
         return ( $inclParam )
             ? $this->{self::$KLASS}
-        : $this->{self::$KLASS}[Util::$LCvalue];
+            : $this->{self::$KLASS}[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property class
      *
-     * @param null|string $value "PUBLIC" / "PRIVATE" / "CONFIDENTIAL" / iana-token / x-name
-     * @param null|array  $params
-     * @return static
+     * @param null|string   $value  "PUBLIC" / "PRIVATE" / "CONFIDENTIAL" / iana-token / x-name
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setClass( $value = null, $params = [] ) : self
+    public function setClass( ? string $value = null, ? array $params = [] ) : self
     {
         $STDVALUES = [
             self::P_BLIC,

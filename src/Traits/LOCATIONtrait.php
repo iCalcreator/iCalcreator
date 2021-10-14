@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * LOCATION property functions
@@ -42,9 +41,9 @@ use InvalidArgumentException;
 trait LOCATIONtrait
 {
     /**
-     * @var array component property LOCATION value
+     * @var null|array component property LOCATION value
      */
-    protected $location = null;
+    protected ?array $location = null;
 
     /**
      * Return formatted output for calendar component property location
@@ -87,11 +86,11 @@ trait LOCATIONtrait
     /**
      * Get calendar component property location
      *
-     * @param bool   $inclParam
-     * @return bool|array
+     * @param null|bool   $inclParam
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getLocation( $inclParam = false )
+    public function getLocation( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->location )) {
             return false;
@@ -104,18 +103,17 @@ trait LOCATIONtrait
     /**
      * Set calendar component property location
      *
-     * @param string $value
-     * @param array  $params
-     * @return static
-     * @throws InvalidArgumentException
+     * @param string|null $value
+     * @param array|null $params
+     * @return self
      * @since 2.29.14 2019-09-03
      */
-    public function setLocation( $value = null, $params = [] ) : self
+    public function setLocation( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::LOCATION );
-            $value = Util::$SP0;
-            $params    = [];
+            $value  = Util::$SP0;
+            $params = [];
         }
         Util::assertString( $value, self::LOCATION );
         $this->location = [

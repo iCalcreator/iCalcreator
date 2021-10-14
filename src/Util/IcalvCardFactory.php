@@ -42,8 +42,6 @@ use function implode;
 use function in_array;
 use function sprintf;
 use function strlen;
-use function strpos;
-use function substr;
 use function ucfirst;
 
 /**
@@ -53,15 +51,10 @@ use function ucfirst;
  */
 class IcalvCardFactory
 {
-    /*
-     * $var array
+    /**
+     * @var string[]
      */
-    private static $VCARDVERSIONS = [ 2 => '2.1', 3 => '3.0', 4 => '4.0' ];
-    /*
-        $V2_1 = '2.1';
-    private static $V3_0 = '3.0';
-    private static $V4_0 = '4.0';
-    */
+    private static array $VCARDVERSIONS = [ 2 => '2.1', 3 => '3.0', 4 => '4.0' ];
 
     /**
      * Convert single ATTENDEE, CONTACT or ORGANIZER (in email format) to vCard 2.1, 3,0 or 4.0
@@ -69,12 +62,12 @@ class IcalvCardFactory
      * Returns vCard/true or if directory (if set) or file write is invalid, false
      *
      * @param string $email
-     * @param string $version   vCard version (default 2.1)
+     * @param null|string $version   vCard version (default 2.1)
      * @return string
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-18
      */
-    public static function iCal2vCard( string $email, $version = null ) : string
+    public static function iCal2vCard( string $email, ? string $version ) : string
     {
         static $FMTFN      = "FN:%s\r\n";
         static $FMTEMAIL   = "EMAIL:%s\r\n";
@@ -88,7 +81,7 @@ class IcalvCardFactory
             $version = self::$VCARDVERSIONS[2];
         }
         else {
-            self::assertVcardVersion((string) $version );
+            self::assertVcardVersion( $version );
         }
         CalAddressFactory::assertCalAddress( $email );
         /* prepare vCard name */
@@ -121,9 +114,9 @@ class IcalvCardFactory
      */
     public static function iCal2vCards(
         Vcalendar $calendar,
-        $version = null,
-        $inclParam = null,
-        & $count = null
+        ? string $version = null,
+        ? bool $inclParam = false,
+        ? int & $count = 0
     ) : string
     {
         $hits   = ( true === $inclParam )
@@ -138,7 +131,7 @@ class IcalvCardFactory
             catch( InvalidArgumentException $e ) {
                 continue;
             }
-            $count  += 1;
+            ++$count;
             $output .= $res;
         }
         return $output;
@@ -148,13 +141,14 @@ class IcalvCardFactory
      * Assert vCard version
      *
      * @param string $version
+     * @return void
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-18
      */
-    private static function assertVcardVersion( string $version )
+    private static function assertVcardVersion( string $version ) : void
     {
         static $ERRMSG1 = 'Invalid version %s';
-        if( ! in_array( $version, self::$VCARDVERSIONS )) {
+        if( ! in_array( $version, self::$VCARDVERSIONS, true ) ) {
             throw new InvalidArgumentException( sprintf( $ERRMSG1, $version ));
         }
     }
@@ -163,7 +157,7 @@ class IcalvCardFactory
      * Split string name into array nameParts
      *
      * @param string $name
-     * @return array
+     * @return string[]
      * @since  2.27.8 - 2019-03-17
      */
     private static function splitNameInNameparts( string $name ) : array
@@ -172,21 +166,21 @@ class IcalvCardFactory
             case ( ctype_upper( $name ) || ctype_lower( $name )) :
                 $nameParts = [ $name ];
                 break;
-            case ( false !== strpos( $name, Util::$DOT )) :
+            case (str_contains( $name, Util::$DOT )) :
                 $nameParts = explode( Util::$DOT, $name );
                 foreach( $nameParts as $k => $part ) {
                     $nameParts[$k] = ucfirst( $part );
                 }
                 break;
             default : // split camelCase
-                $nameParts = [ substr( $name, 0, 1 ) ];
+                $nameParts = [$name[0]];
                 $k         = 0;
                 $x         = 1;
                 $len       = strlen( $name );
                 while( $x < $len ) {
                     if( ctype_upper( $name[$x] )) {
-                        $k += 1;
-                        $nameParts[$k] = null;
+                        ++$k;
+                        $nameParts[$k] = Util::$SP0;
                     }
                     $nameParts[$k] .= $name[$x];
                     $x++;
@@ -199,7 +193,7 @@ class IcalvCardFactory
     /**
      * Return formatted vCard name
      *
-     * @param array $names
+     * @param string[] $names
      * @param string $version
      * @return string
      * @since  2.27.8 - 2019-03-18
@@ -210,15 +204,15 @@ class IcalvCardFactory
         $name   = array_reverse( $names );
         $vCardN = sprintf( $FMTN, array_shift( $name ));
         $scCnt  = 0;
-        while( null != ( $part = array_shift( $name ))) {
-            if(( self::$VCARDVERSIONS[4] != $version ) || ( 4 > $scCnt )) {
-                $scCnt += 1;
+        while( null !== ( $part = array_shift( $name ))) {
+            if(( self::$VCARDVERSIONS[4] !== $version ) || ( 4 > $scCnt )) {
+                ++$scCnt;
             }
             $vCardN .= Util::$SEMIC . $part;
         } // end while
-        while(( self::$VCARDVERSIONS[4] == $version ) && ( 4 > $scCnt )) {
+        while(( self::$VCARDVERSIONS[4] === $version ) && ( 4 > $scCnt )) {
             $vCardN .= Util::$SEMIC;
-            $scCnt += 1;
+            ++$scCnt;
         } // end while
         return $vCardN . Util::$CRLF;
     }

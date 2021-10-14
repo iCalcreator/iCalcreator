@@ -32,7 +32,7 @@ namespace Kigkonsult\Icalcreator\Util;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\IcalInterface;
 
 use function ctype_digit;
 use function floor;
@@ -40,7 +40,6 @@ use function in_array;
 use function sprintf;
 use function str_replace;
 use function strlen;
-use function strpos;
 use function substr;
 use function trim;
 
@@ -53,9 +52,9 @@ class DateTimeZoneFactory
 {
 
     /**
-     * @var array
+     * @var string[]
      */
-    public static $UTCARR = [ 'Z', Vcalendar::UTC, Vcalendar::GMT ];
+    public static array $UTCARR = [ 'Z', IcalInterface::UTC, IcalInterface::GMT ];
 
     /**
      * Return new DateTimeZone object instance
@@ -81,14 +80,14 @@ class DateTimeZoneFactory
     public static function assertDateTimeZone( string $tzString ) : DateTimeZone
     {
         static $ERR = 'Invalid DateTimeZone \'%s\'';
-        if( empty( $tzString ) && ( 0 != intval( $tzString ))) {
+        if( empty( $tzString ) && ( 0 !== (int) $tzString)) {
             throw new InvalidArgumentException( sprintf( $ERR, $tzString ));
         }
         if( self::hasOffset( $tzString )) {
             $tzString = self::getTimeZoneNameFromOffset( $tzString );
         }
-        elseif( in_array( $tzString, self::$UTCARR )) {
-            $tzString = Vcalendar::UTC;
+        elseif( in_array( $tzString, self::$UTCARR, true ) ) {
+            $tzString = IcalInterface::UTC;
         }
         try {
             $timeZone = new DateTimeZone( $tzString );
@@ -102,17 +101,17 @@ class DateTimeZoneFactory
     /**
      * Return (array) all transitions from timezone
      *
-     * @param string|DateTimeZone $dateTimeZone
-     * @param int $from
-     * @param int $to
-     * @return array
+     * @param DateTimeZone|string $dateTimeZone
+     * @param null|int $from
+     * @param null|int $to
+     * @return mixed[]
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-01-22
      */
     public static function getDateTimeZoneTransitions(
-        $dateTimeZone,
-        $from = null,
-        $to = null
+        DateTimeZone | string $dateTimeZone,
+        ? int $from,
+        ? int $to
     ) : array
     {
         if( ! $dateTimeZone instanceof DateTimeZone ) {
@@ -134,7 +133,7 @@ class DateTimeZoneFactory
     {
         static $UTCOFFSET = '+00:00';
         static $ERR       = 'Offset \'%s\' (%+d seconds) don\'t match any timezone';
-        if( $UTCOFFSET  == $offset ) {
+        if( $UTCOFFSET === $offset ) {
             return self::$UTCARR[1];
         }
         $seconds = self::offsetToSeconds( $offset );
@@ -155,6 +154,7 @@ class DateTimeZoneFactory
      * Return offset part from dateString
      *
      * An offset is one of [+/-]NNNN, [+/-]NN:NN, [+/-]NNNNNN, [+/-]NN:NN:NN
+     *
      * @param string $dateString
      * @return string
 0     */
@@ -164,25 +164,25 @@ class DateTimeZoneFactory
         $ix         = strlen( $dateString ) - 1;
         $offset     = Util::$SP0;
         while( true ) {
-            $dateX1 = substr( $dateString, $ix, 1 );
+            $dateX1 = $dateString[$ix];
             switch( true ) {
                 case ctype_digit( $dateX1 ) :
                     $offset = $dateX1 . $offset;
                     break;
-                case ( Util::$COLON == $dateX1 ) :
+                case ( Util::$COLON === $dateX1 ) :
                     $offset = $dateX1 . $offset;
                     break;
                 case DateIntervalFactory::hasPlusMinusPrefix( $dateX1 ) :
                     $offset = $dateX1 . $offset;
                     break 2;
                 default :
-                    $offset = null;
+                    $offset = Util::$SP0;
                     break 2;
             } // end switch
             if( 1 > $ix ) {
                 break;
             }
-            $ix -= 1;
+            --$ix;
         } // end while
         return $offset;
     }
@@ -191,6 +191,7 @@ class DateTimeZoneFactory
      * Return bool true if input string contains (trailing) UTC/iCal offset
      *
      * An offset is one of [+/-]NNNN, [+/-]NN:NN, [+/-]NNNNNN, [+/-]NN:NN:NN
+     *
      * @param string $string
      * @return bool
      * @since  2.27.14 - 2019-02-18
@@ -201,10 +202,10 @@ class DateTimeZoneFactory
         if( empty( $string )) {
             return false;
         }
-        if( Vcalendar::Z == substr( $string, -1 )) {
+        if( IcalInterface::Z === substr( $string, -1 )) {
             return false;
         }
-        if( false != strpos( $string, Util::$COLON )) {
+        if( str_contains( $string, Util::$COLON ) ) {
             $string = str_replace( Util::$COLON, Util::$SP0, $string );
         }
         if( DateIntervalFactory::hasPlusMinusPrefix( substr( $string, -5 )) &&
@@ -225,18 +226,18 @@ class DateTimeZoneFactory
      * @return bool
      * @since  2.27.8 - 2019-01-21
      */
-    public static function isUTCtimeZone( $timeZoneString ) : bool
+    public static function isUTCtimeZone( ? string $timeZoneString ) : bool
     {
         if( empty( $timeZoneString )) {
             return false;
         }
         if( self::hasOffset( $timeZoneString )) {
-            if( false !== strpos( $timeZoneString, Util::$COLON )) {
+            if( str_contains( $timeZoneString, Util::$COLON ) ) {
                 $timeZoneString = str_replace( Util::$COLON, Util::$SP0, $timeZoneString );
             }
-            return ( empty( intval( $timeZoneString, 10 )));
+            return ( empty((int) $timeZoneString ));
         }
-        return ( in_array( strtoupper( $timeZoneString ), self::$UTCARR ));
+        return ( in_array( strtoupper( $timeZoneString ), self::$UTCARR, true ) );
     }
 
     /**
@@ -250,7 +251,7 @@ class DateTimeZoneFactory
     {
         $offset  = trim( $offset );
         $seconds = 0;
-        if( false !== strpos( $offset, Util::$COLON )) {
+        if( str_contains( $offset, Util::$COLON ) ) {
             $offset = str_replace( Util::$COLON, Util::$SP0, $offset );
         }
         $strLen = strlen( $offset );
@@ -260,13 +261,13 @@ class DateTimeZoneFactory
         if( ! DateIntervalFactory::hasPlusMinusPrefix( $offset )) {
             return $seconds;
         }
-        $isMinus = ( Util::$MINUS == substr( $offset, 0, 1 ));
+        $isMinus = ( Util::$MINUS === $offset[0]);
         if( ! ctype_digit( substr( $offset, 1 ))) {
             return $seconds;
         }
         $seconds += ((int) substr( $offset, 1, 2 )) * 3600;
         $seconds += ((int) substr( $offset, 3, 2 )) * 60;
-        if( 7 == $strLen ) {
+        if( 7 === $strLen ) {
             $seconds += (int) substr( $offset, 5, 2 );
         }
         return ( $isMinus ) ? $seconds * -1 : $seconds;
@@ -283,7 +284,7 @@ class DateTimeZoneFactory
     {
         static $FMT = '%02d';
         $offset2    = (string) $offset;
-        switch( substr( $offset2, 0, 1 )) {
+        switch( $offset2[0] ) {
             case Util::$MINUS :
                 $output = Util::$MINUS;
                 $offset = (int) substr( $offset2, 1 );
@@ -299,7 +300,7 @@ class DateTimeZoneFactory
         $output .= sprintf( $FMT, ((int) floor( $offset / 3600 ))); // hour
         $seconds = $offset % 3600;
         $output .= sprintf( $FMT, ((int) floor( $seconds / 60 )));   // min
-        $seconds = $seconds % 60;
+        $seconds %= 60;
         if( 0 < $seconds ) {
             $output .= sprintf( $FMT, $seconds ); // sec
         }

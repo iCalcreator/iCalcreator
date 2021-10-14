@@ -44,22 +44,22 @@ use Exception;
  */
 class IntegerTest extends DtBase
 {
-    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-    private static $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    private static array $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
 
     /**
      * integerTest provider
      */
-    public function integerTestProvider()
+    public function integerTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             1,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
-                Vcalendar::PRIORITY         => [ Vcalendar::VEVENT, Vcalendar::VTODO ],
-                Vcalendar::REPEAT           => [ Vcalendar::VALARM ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
+                IcalInterface::PRIORITY         => [ IcalInterface::VEVENT, IcalInterface::VTODO ],
+                IcalInterface::REPEAT           => [ IcalInterface::VALARM ],
             ],
             null,
             self::$STCPAR,
@@ -74,7 +74,7 @@ class IntegerTest extends DtBase
         $dataArr[] = [
             5,
             [
-                Vcalendar::SEQUENCE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ],
+                IcalInterface::SEQUENCE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
             $value,
             self::$STCPAR,
@@ -90,10 +90,10 @@ class IntegerTest extends DtBase
         $dataArr[] = [
             9,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
-                Vcalendar::PRIORITY         => [ Vcalendar::VEVENT, Vcalendar::VTODO ],
-                Vcalendar::SEQUENCE         => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ],
-                Vcalendar::REPEAT           => [ Vcalendar::VALARM ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
+                IcalInterface::PRIORITY         => [ IcalInterface::VEVENT, IcalInterface::VTODO ],
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
+                IcalInterface::REPEAT           => [ IcalInterface::VALARM ],
             ],
             $value,
             self::$STCPAR,
@@ -109,7 +109,7 @@ class IntegerTest extends DtBase
         $dataArr[] = [
             19,
             [
-                Vcalendar::SEQUENCE         => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ],
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
             $value,
             self::$STCPAR,
@@ -125,7 +125,7 @@ class IntegerTest extends DtBase
         $dataArr[] = [
             109,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
             ],
             $value,
             self::$STCPAR,
@@ -145,21 +145,24 @@ class IntegerTest extends DtBase
      *
      * @test
      * @dataProvider integerTestProvider
-     * @param int    $case
-     * @param array  $propComps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array  $expectedGet
+     * @param int $case
+     * @param array $propComps
+     * @param mixed $value
+     * @param mixed $params
+     * @param array $expectedGet
      * @param string $expectedString
+     * @throws Exception
+     * @throws Exception
      */
     public function integerTest(
-        $case,
-        $propComps,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+        int    $case,
+        array  $propComps,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
+    {
         $c = new Vcalendar();
         foreach( $propComps as $propName => $theComps ) {
             $getMethod    = StringFactory::getGetMethodName( $propName );
@@ -168,7 +171,7 @@ class IntegerTest extends DtBase
             $setMethod    = StringFactory::getSetMethodName( $propName );
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
-                if( Vcalendar::VALARM == $theComp ) {
+                if( IcalInterface::VALARM === $theComp ) {
                     $comp      = $c->newVevent()->{$newMethod}();
                 }
                 else {
@@ -179,17 +182,17 @@ class IntegerTest extends DtBase
                 }
                 catch( Exception $e ) {
                     $ok = false;
-                    if(( Vcalendar::SEQUENCE == $propName ) && ( $value > 9 )) {
+                    if(( IcalInterface::SEQUENCE === $propName ) && ( $value > 9 )) {
                         $ok = true;
                     }
-                    elseif(( Vcalendar::PERCENT_COMPLETE == $propName ) && ( $value > 100 )) {
+                    elseif(( IcalInterface::PERCENT_COMPLETE === $propName ) && ( $value > 100 )) {
                         $ok = true;
                     }
                     $this->assertTrue( $ok );
                     return;
                 }
                 $getValue = $comp->{$getMethod}( true );
-                if(( empty( $getValue[Util::$LCvalue] ) && Vcalendar::SEQUENCE == $propName )) {
+                if(( empty( $getValue[Util::$LCvalue] ) && IcalInterface::SEQUENCE === $propName )) {
                     $expectedGet[Util::$LCvalue]  = 0;
                     $expectedGet[Util::$LCparams] = self::$STCPAR;
                 }

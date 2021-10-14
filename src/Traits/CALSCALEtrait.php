@@ -30,8 +30,8 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function sprintf;
 
@@ -43,9 +43,9 @@ use function sprintf;
 trait CALSCALEtrait
 {
     /**
-     * @var string calendar property CALSCALE
+     * @var null|string calendar property CALSCALE
      */
-    protected $calscale = null;
+    protected ?string $calscale = null;
 
     /**
      * Return formatted output for calendar property calscale
@@ -55,7 +55,7 @@ trait CALSCALEtrait
     public function createCalscale() : string
     {
         if( empty( $this->calscale )) {
-            $this->calscale = Vcalendar::GREGORIAN;
+            $this->calscale = IcalInterface::GREGORIAN;
         }
         return sprintf( self::$FMTICAL, self::CALSCALE, $this->calscale );
     }
@@ -81,7 +81,7 @@ trait CALSCALEtrait
     public function getCalscale() : string
     {
         if( empty( $this->calscale )) {
-            $this->calscale = Vcalendar::GREGORIAN;
+            $this->calscale = IcalInterface::GREGORIAN;
         }
         return $this->calscale;
     }
@@ -89,18 +89,18 @@ trait CALSCALEtrait
     /**
      * Set calendar property calscale
      *
-     * @param string $value
-     * @return static
+     * @param null|string $value
+     * @return self
      * @throws InvalidArgumentException;
      * @since  2.29.14 - 2019-09-03
      */
-    public function setCalscale( $value ) : self
+    public function setCalscale( ? string $value = null ) : self
     {
         if( empty( $value )) {
-            $value = Vcalendar::GREGORIAN;
+            $value = IcalInterface::GREGORIAN;
         }
         Util::assertString( $value, self::CALSCALE );
-        $this->calscale = (string) $value;
+        $this->calscale = $value;
         return $this;
     }
 }

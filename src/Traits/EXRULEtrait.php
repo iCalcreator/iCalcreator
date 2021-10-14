@@ -42,9 +42,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait EXRULEtrait
 {
     /**
-     * @var array component property EXRULE value
+     * @var null|array component property EXRULE value
      */
-    protected $exrule = null;
+    protected ?array $exrule = null;
 
     /**
      * Return formatted output for calendar component property exrule
@@ -67,7 +67,7 @@ trait EXRULEtrait
     /**
      * Delete calendar component property exrule
      *
-     * @return static
+     * @return self
      * @since 2.29.6 2019-06-23
      */
     public function deleteExrule() : self
@@ -80,10 +80,10 @@ trait EXRULEtrait
      * Get calendar component property exrule
      *
      * @param null|bool $inclParam
-     * @return bool|array
+     * @return bool|string|mixed|array
      * @since 2.29.6 2019-06-27
      */
-    public function getExrule( $inclParam = false )
+    public function getExrule( ?bool $inclParam = false ) : mixed
     {
         if( empty( $this->exrule )) {
             return false;
@@ -95,13 +95,13 @@ trait EXRULEtrait
      * Set calendar component property exrule
      *
      * @param null|array   $exruleset
-     * @param null|array   $params
-     * @return static
+     * @param null|string[]   $params
+     * @return self
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setExrule( $exruleset = null, $params = [] ) : self
+    public function setExrule( ? array $exruleset = null, ? array $params = [] ) : self
     {
         if( empty( $exruleset )) {
             $this->assertEmptyValue( $exruleset, self::EXRULE );

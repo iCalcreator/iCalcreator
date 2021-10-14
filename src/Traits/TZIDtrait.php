@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait TZIDtrait
 {
     /**
-     * @var array component property TZID value
+     * @var null|array component property TZID value
      */
-    protected $tzid = null;
+    protected ?array $tzid = null;
 
     /**
      * Return formatted output for calendar component property tzid
@@ -84,10 +84,10 @@ trait TZIDtrait
      * Get calendar component property tzid
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzid( $inclParam = false )
+    public function getTzid( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzid )) {
             return false;
@@ -99,14 +99,14 @@ trait TZIDtrait
      * Set calendar component property tzid
      *
      * @since 2.23.12 - 2017-04-22
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      * @todo assert PHP timezone ?
      */
-    public function setTzid( $value = null, $params = [] ) : self
+    public function setTzid( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZID );

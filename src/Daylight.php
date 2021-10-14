@@ -39,5 +39,5 @@ final class Daylight extends DScomponent
     /**
      * @var string
      */
-    protected static $compSgn = 'd';
+    protected static string $compSgn = 'd';
 }

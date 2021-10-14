@@ -50,7 +50,6 @@ final class Vjournal extends Vcomponent
         Traits\CONTACTtrait,
         Traits\CREATEDtrait,
         Traits\DESCRIPTIONtrait,
-        Traits\DTSTAMPtrait,
         Traits\DTSTARTtrait,
         Traits\EXDATEtrait,
         Traits\EXRULEtrait,
@@ -71,7 +70,7 @@ final class Vjournal extends Vcomponent
     /**
      * @var string
      */
-    protected static $compSgn = 'j';
+    protected static string $compSgn = 'j';
 
     /**
      * Destructor

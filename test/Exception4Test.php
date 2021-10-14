@@ -44,14 +44,14 @@ class Exception4Test extends TestCase
     /**
      * integerTest provider
      */
-    public function integerTestProvider()
+    public function integerTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             11,
             [
-                Vcalendar::SEQUENCE         => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ],
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
             'NaN',
         ];
@@ -59,7 +59,7 @@ class Exception4Test extends TestCase
         $dataArr[] = [
             12,
             [
-                Vcalendar::SEQUENCE         => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ],
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
             -1,
         ];
@@ -67,7 +67,7 @@ class Exception4Test extends TestCase
         $dataArr[] = [
             21,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
             ],
             'NaN',
         ];
@@ -75,7 +75,7 @@ class Exception4Test extends TestCase
         $dataArr[] = [
             22,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
             ],
             -1,
         ];
@@ -83,7 +83,7 @@ class Exception4Test extends TestCase
         $dataArr[] = [
             23,
             [
-                Vcalendar::PERCENT_COMPLETE => [ Vcalendar::VTODO ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
             ],
             101,
         ];
@@ -96,11 +96,11 @@ class Exception4Test extends TestCase
      *
      * @test
      * @dataProvider integerTestProvider
-     * @param int    $case
-     * @param array  $propComps
+     * @param int $case
+     * @param array $propComps
      * @param mixed  $value
      */
-    public function integerTest( $case, $propComps, $value )
+    public function integerTest( int $case, array $propComps, mixed $value ) : void
     {
         $calendar = new Vcalendar();
         foreach( $propComps as $propName => $theComps ) {

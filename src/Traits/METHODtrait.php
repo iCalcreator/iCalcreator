@@ -41,9 +41,9 @@ use function sprintf;
 trait METHODtrait
 {
     /**
-     * @var string calendar property METHOD
+     * @var string|null calendar property METHOD
      */
-    protected $method = null;
+    protected ?string $method = null;
 
     /**
      * Return formatted output for calendar property method
@@ -75,7 +75,7 @@ trait METHODtrait
      * @return bool|string
      * @since  3.4 - 2021-06-11
      */
-    public function getMethod()
+    public function getMethod() : bool | string
     {
         if( empty( $this->method )) {
             return false;
@@ -87,10 +87,10 @@ trait METHODtrait
      * Set calendar property method
      *
      * @param null|string $value
-     * @return static
+     * @return self
      * @since  2.29.14 - 2019-09-03
      */
-    public function setMethod( $value = null ) : self
+    public function setMethod( ? string $value = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::METHOD );

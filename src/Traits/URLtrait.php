@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait URLtrait
 {
     /**
-     * @var array component property URL value
+     * @var null|array component property URL value
      */
-    protected $url = null;
+    protected ?array $url = null;
 
     /**
      * Return formatted output for calendar component property url
@@ -85,10 +85,10 @@ trait URLtrait
      * Get calendar component property url
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getUrl( $inclParam = false )
+    public function getUrl( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->url )) {
             return false;
@@ -100,12 +100,12 @@ trait URLtrait
      * Set calendar component property url
      *
      * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string[]  $params
+     * @return self
      * @throws InvalidArgumentException
      * @since  2.30.2 - 2021-02-04
      */
-    public function setUrl( $value = null, $params = [] ) : self
+    public function setUrl( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::URL );

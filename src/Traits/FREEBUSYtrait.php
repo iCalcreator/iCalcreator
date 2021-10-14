@@ -33,8 +33,8 @@ use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -47,6 +47,7 @@ use function reset;
 use function sprintf;
 use function usort;
 use function var_export;
+use Kigkonsult\Icalcreator\Util\SortFactory;
 
 /**
  * FREEBUSY property functions
@@ -57,14 +58,14 @@ use function var_export;
 trait FREEBUSYtrait
 {
     /**
-     * @var array component property FREEBUSY value
+     * @var null|array component property FREEBUSY value
      */
-    protected $freebusy = null;
+    protected ?array $freebusy = null;
 
     /**
-     * @var array FREEBUSY param keywords
+     * @var string[] FREEBUSY param keywords
      */
-    protected static $FREEBUSYKEYS = [
+    protected static array $FREEBUSYKEYS = [
         self::FREE,
         self::BUSY,
         self::BUSY_UNAVAILABLE,
@@ -76,19 +77,19 @@ trait FREEBUSYtrait
      *
      * @return string
      * @throws Exception
-     * @since 2.29.2 2019-06-27
+     * @since 2.40 2021-10-04
      */
     public function createFreebusy() : string
     {
         static $FMT = ';FBTYPE=%s';
-        static $SORTER = [ 'Kigkonsult\Icalcreator\Util\SortFactory', 'sortRdate1' ];
+        static $SORTER = [ SortFactory::class, 'sortRdate1' ];
         if( empty( $this->freebusy )) {
             return Util::$SP0;
         }
         $output = Util::$SP0;
-        foreach( $this->freebusy as $fx => $freebusyPart ) {
+        foreach( $this->freebusy as $freebusyPart ) {
             if( empty( $freebusyPart[Util::$LCvalue] ) ||
-                (( 1 == count( $freebusyPart[Util::$LCvalue] )) &&
+                (( 1 === count( $freebusyPart[Util::$LCvalue] )) &&
                     isset( $freebusyPart[Util::$LCvalue][self::FBTYPE] ))) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::FREEBUSY );
@@ -116,21 +117,13 @@ trait FREEBUSYtrait
             if( 1 < $cnt ) {
                 usort( $freebusyPart[Util::$LCvalue], $SORTER );
             }
-            foreach( $freebusyPart[Util::$LCvalue] as $periodix => $freebusyPeriod ) {
+            foreach( $freebusyPart[Util::$LCvalue] as $freebusyPeriod ) {
                 $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[0] );
                 $content .= Util::$SLASH;
-                if( DateIntervalFactory::isDateIntervalArrayInvertSet( $freebusyPeriod[1] )) { // fix pre 7.0.5 bug
-                    try {
-                        $dateInterval =
-                            DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
-                    }
-                    catch( Exception $e ) {
-                        throw $e;
-                    }
-                        // period=  -> duration
-                    $content .= DateIntervalFactory::dateInterval2String( $dateInterval );
+                if( $freebusyPeriod[1] instanceof DateInterval ) {  // period with duration
+                    $content .= DateIntervalFactory::dateInterval2String( $freebusyPeriod[1] );
                 }
-                else {  // period=  -> date-time
+                else {  // period ends with date-time
                     $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[1] );
                 }
                 if( $fno < $cnt ) {
@@ -154,7 +147,7 @@ trait FREEBUSYtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteFreebusy( $propDelIx = null ) : bool
+    public function deleteFreebusy( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->freebusy )) {
             unset( $this->propDelIx[self::FREEBUSY] );
@@ -173,11 +166,11 @@ trait FREEBUSYtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return string|array|bool
      * @throws Exception
-     * @since 2.29.2 2019-06-27
+     * @since 2.40 2021-10-04
      */
-    public function getFreebusy( $propIx = null, $inclParam = false )
+    public function getFreebusy( ?int $propIx = null, ?bool $inclParam = false ) : bool | string | array
     {
         if( empty( $this->freebusy )) {
             unset( $this->propIx[self::FREEBUSY] );
@@ -193,35 +186,6 @@ trait FREEBUSYtrait
         if( empty( $output )) {
             return false;
         }
-        if( empty( $output[Util::$LCvalue] )) {
-            return $output;
-        }
-        if( isset( $output[Util::$LCvalue] )) {
-            foreach( $output[Util::$LCvalue] as $perIx => $freebusyPeriod ) {
-                if( DateIntervalFactory::isDateIntervalArrayInvertSet( $freebusyPeriod[1] )) { // fix pre 7.0.5 bug
-                    try {
-                        $output[Util::$LCvalue][$perIx][1] =
-                            DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
-                    }
-                    catch( Exception $e ) {
-                        throw $e;
-                    }
-                }
-            } // end foreach
-        }
-        else {
-            foreach( $output as $perIx => $freebusyPeriod ) {
-                if( DateIntervalFactory::isDateIntervalArrayInvertSet( $freebusyPeriod[1] )) { // fix pre 7.0.5 bug
-                    try {
-                        $output[$perIx][1] =
-                            DateIntervalFactory::DateIntervalArr2DateInterval( $freebusyPeriod[1] );
-                    }
-                    catch( Exception $e ) {
-                        throw $e;
-                    }
-                }
-            } // end foreach
-        }
         return $output;
     }
 
@@ -233,13 +197,13 @@ trait FREEBUSYtrait
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    protected static function parseFreebusy( $row, array $propAttr ) : array
+    protected static function parseFreebusy( string $row, array $propAttr ) : array
     {
         static $SS = '/';
         $fbtype = $values = null;
         if( ! empty( $propAttr )) {
             foreach( $propAttr as $k => $v ) {
-                if( 0 == strcasecmp( self::FBTYPE, $k )) {
+                if( 0 === strcasecmp( self::FBTYPE, $k )) {
                     $fbtype = $v;
                     unset( $propAttr[$k] );
                     break;
@@ -263,19 +227,19 @@ trait FREEBUSYtrait
      *
      * @param null|string  $fbType
      * @param null|string|DateTimeInterface|array $fbValues
-     * @param null|array   $params
+     * @param null|string[]   $params
      * @param null|integer $index
-     * @return static
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.40 2021-10-04
      * @todo Applications MUST treat x-name and iana-token values they don't recognize the same way as they would the BUSY value.
      */
     public function setFreebusy(
-        $fbType = null,
-        $fbValues = null,
-        $params = [],
-        $index = null
+        ? string $fbType = null,
+        mixed $fbValues = null,
+        mixed $params = [],
+        ? int $index = null
     ) : self
     {
         static $ERR2 = 'Unknown (%d) freebusy value (#%d/%d) : \'%s\'';
@@ -298,41 +262,37 @@ trait FREEBUSYtrait
             $freebusyPeriod = [];
             foreach( $fbPeriod as $fbix2 => $fbMember ) { // pairs => singlepart
                 switch( true ) {
-                    case ( $fbMember instanceof DateTimeInterface ) :     // datetime
+                    case ( $fbMember instanceof DateTimeInterface ) : // datetime
                         $freebusyPeriod[$fbix2] =
                             DateTimeFactory::setDateTimeTimeZone(
                                 DateTimeFactory::toDateTime( $fbMember ),
-                                Vcalendar::UTC
+                                IcalInterface::UTC
                             );
                         break;
                     case ( $fbMember instanceof DateInterval ) : // interval
-                        $freebusyPeriod[$fbix2] = (array) $fbMember; // fix pre 7.0.5 bug
+                        $freebusyPeriod[$fbix2] = $fbMember;
                         break;
                     case ( DateTimeFactory::isStringAndDate( $fbMember )) :   // text date ex. 2006-08-03 10:12:18
-                        list( $dateStr, $timezonePart ) =
+                        [ $dateStr, $timezonePart ] =
                             DateTimeFactory::splitIntoDateStrAndTimezone( $fbMember );
                         $dateTime = DateTimeFactory::getDateTimeWithTimezoneFromString(
                             $dateStr,
                             $timezonePart,
-                            Vcalendar::UTC,
+                            IcalInterface::UTC,
                             true
                         );
                         $dateTime = DateTimeFactory::setDateTimeTimeZone(
-                            $dateTime, Vcalendar::UTC
+                            $dateTime, IcalInterface::UTC
                         );
                         $freebusyPeriod[$fbix2] = $dateTime;
                         break;
                     case DateIntervalFactory::isStringAndDuration( $fbMember ) : // duration string
                         $fbMember = DateIntervalFactory::removePlusMinusPrefix( $fbMember ); // can only be positive
-                        try {  // fix pre 7.0.5 bug
-                            $freebusyPeriod[$fbix2] =
-                                (array) DateIntervalFactory::conformDateInterval(
-                                    DateIntervalFactory::factory( $fbMember )
-                                );
-                        }
-                        catch( Exception $e ) {
-                            throw $e;
-                        }
+                        // fix pre 7.0.5 bug
+                        $freebusyPeriod[$fbix2] =
+                            DateIntervalFactory::conformDateInterval(
+                                DateIntervalFactory::factory( $fbMember )
+                            );
                         break;
                     default :
                         throw new InvalidArgumentException(
@@ -342,23 +302,23 @@ trait FREEBUSYtrait
             } // end foreach
             $input[] = $freebusyPeriod;
         }
-         self::setMval( $this->freebusy, $input, $params, null, $index );
+        self::setMval( $this->freebusy, $input, ( $params ?? [] ), null, $index );
         return $this;
     }
 
     /**
      * Check for single values and , if so, put into array
      *
-     * @param string|array $fbValues
+     * @param array|string $fbValues
      * @return array
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleValues( $fbValues ) : array
+    private static function checkSingleValues( array | string $fbValues ) : array
     {
         if( ! is_array( $fbValues )) {
             return $fbValues;
         }
-        if( 2 != count( $fbValues )) {
+        if( 2 !== count( $fbValues )) {
             return $fbValues;
         }
         $first = reset( $fbValues );

@@ -63,82 +63,256 @@ use function ucfirst;
  */
 class IcalXMLFactory
 {
-    private static $Vcalendar      = 'vcalendar';
-    private static $calProps       = [
-        Vcalendar::VERSION,
-        Vcalendar::PRODID,
-        Vcalendar::CALSCALE,
-        Vcalendar::METHOD,
-    ];
-    private static $calPropsrfc7986Single = [
-        Vcalendar::UID,
-        Vcalendar::LAST_MODIFIED,
-        Vcalendar::URL,
-        Vcalendar::REFRESH_INTERVAL,
-        Vcalendar::SOURCE,
-        Vcalendar::COLOR
-    ];
-    private static $calPropsrfc7986Multi = [
-        Vcalendar::NAME,
-        Vcalendar::DESCRIPTION,
-        Vcalendar::CATEGORIES,
-        Vcalendar::IMAGE
-    ];
-    private static $properties     = 'properties';
-    private static $PARAMETERS     = 'parameters';
-    private static $components     = 'components';
+    /**
+     * @var string
+     */
+    private static string $Vcalendar      = 'vcalendar';
 
-    private static $text           = 'text';
-    private static $binary         = 'binary';
-    private static $uri            = 'uri';
-    private static $date           = 'date';
-    private static $date_time      = 'date-time';
-    private static $period         = 'period';
-    private static $rstatus        = 'rstatus';
-    private static $unknown        = 'unknown';
-    private static $recur          = 'recur';
-    private static $cal_address    = 'cal-address';
-    private static $integer        = 'integer';
-    private static $utc_offset     = 'utc-offset';
-    private static $code           = 'code';
-    private static $description    = 'description';
-    private static $data           = 'data';
-    private static $time           = 'time';
+    /**
+     * @var string[]
+     */
+    private static array $calProps       = [
+        IcalInterface::VERSION,
+        IcalInterface::PRODID,
+        IcalInterface::CALSCALE,
+        IcalInterface::METHOD,
+    ];
 
-    private static $altrep         = 'altrep';
-    private static $dir            = 'dir';
-    private static $delegated_from = 'delegated-from';
-    private static $delegated_to   = 'delegated-to';
-    private static $member         = 'member';
-    private static $sent_by        = 'sent-by';
-    private static $rsvp           = 'rsvp';
-    private static $bysecond       = 'bysecond';
-    private static $byminute       = 'byminute';
-    private static $byhour         = 'byhour';
-    private static $bymonthday     = 'bymonthday';
-    private static $byyearday      = 'byyearday';
-    private static $byweekno       = 'byweekno';
-    private static $bymonth        = 'bymonth';
-    private static $bysetpos       = 'bysetpos';
-    private static $byday          = 'byday';
-    private static $freq           = 'freq';
-    private static $count          = 'count';
-    private static $interval       = 'interval';
-    private static $wkst           = 'wkst';
+    /**
+     * @var string[]
+     */
+    private static array $calPropsrfc7986Single = [
+        IcalInterface::UID,
+        IcalInterface::LAST_MODIFIED,
+        IcalInterface::URL,
+        IcalInterface::REFRESH_INTERVAL,
+        IcalInterface::SOURCE,
+        IcalInterface::COLOR
+    ];
 
-    public static $XMLstart =
+    /**
+     * @var string[]
+     */
+    private static array $calPropsrfc7986Multi = [
+        IcalInterface::NAME,
+        IcalInterface::DESCRIPTION,
+        IcalInterface::CATEGORIES,
+        IcalInterface::IMAGE
+    ];
+
+    /**
+     * @var string
+     */
+    private static string $properties     = 'properties';
+
+    /**
+     * @var string
+     */
+    private static string $PARAMETERS     = 'parameters';
+
+    /**
+     * @var string
+     */
+    private static string $components     = 'components';
+
+
+    /**
+     * @var string
+     */
+    private static string $text           = 'text';
+
+    /**
+     * @var string
+     */
+    private static string $binary         = 'binary';
+
+    /**
+     * @var string
+     */
+    private static string $uri            = 'uri';
+
+    /**
+     * @var string
+     */
+    private static string $date           = 'date';
+
+    /**
+     * @var string
+     */
+    private static string $date_time      = 'date-time';
+
+    /**
+     * @var string
+     */
+    private static string $period         = 'period';
+
+    /**
+     * @var string
+     */
+    private static string $rstatus        = 'rstatus';
+
+    /**
+     * @var string
+     */
+    private static string $unknown        = 'unknown';
+
+    /**
+     * @var string
+     */
+    private static string $recur          = 'recur';
+
+    /**
+     * @var string
+     */
+    private static string $cal_address    = 'cal-address';
+
+    /**
+     * @var string
+     */
+    private static string $integer        = 'integer';
+
+    /**
+     * @var string
+     */
+    private static string $utc_offset     = 'utc-offset';
+
+    /**
+     * @var string
+     */
+    private static string $code           = 'code';
+
+    /**
+     * @var string
+     */
+    private static string $description    = 'description';
+
+    /**
+     * @var string
+     */
+    private static string $data           = 'data';
+
+    /**
+     * @var string
+     */
+    private static string $time           = 'time';
+
+
+    /**
+     * @var string
+     */
+    private static string $altrep         = 'altrep';
+
+    /**
+     * @var string
+     */
+    private static string $dir            = 'dir';
+
+    /**
+     * @var string
+     */
+    private static string $delegated_from = 'delegated-from';
+
+    /**
+     * @var string
+     */
+    private static string $delegated_to   = 'delegated-to';
+
+    /**
+     * @var string
+     */
+    private static string $member         = 'member';
+
+    /**
+     * @var string
+     */
+    private static string $sent_by        = 'sent-by';
+
+    /**
+     * @var string
+     */
+    private static string $rsvp           = 'rsvp';
+
+    /**
+     * @var string
+     */
+    private static string $bysecond       = 'bysecond';
+
+    /**
+     * @var string
+     */
+    private static string $byminute       = 'byminute';
+
+    /**
+     * @var string
+     */
+    private static string $byhour         = 'byhour';
+
+    /**
+     * @var string
+     */
+    private static string $bymonthday     = 'bymonthday';
+
+    /**
+     * @var string
+     */
+    private static string $byyearday      = 'byyearday';
+
+    /**
+     * @var string
+     */
+    private static string $byweekno       = 'byweekno';
+
+    /**
+     * @var string
+     */
+    private static string $bymonth        = 'bymonth';
+
+    /**
+     * @var string
+     */
+    private static string $bysetpos       = 'bysetpos';
+
+    /**
+     * @var string
+     */
+    private static string $byday          = 'byday';
+
+    /**
+     * @var string
+     */
+    private static string $freq           = 'freq';
+
+    /**
+     * @var string
+     */
+    private static string $count          = 'count';
+
+    /**
+     * @var string
+     */
+    private static string $interval       = 'interval';
+
+    /**
+     * @var string
+     */
+    private static string $wkst           = 'wkst';
+
+    /**
+     * @var string
+     */
+    public static string $XMLstart =
         '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- kigkonsult.se %s, iCal2XMl (rfc6321), %s --></icalendar>';
 
     /**
      * Return iCal XML (rfc6321) output, using PHP SimpleXMLElement
      *
      * @param Vcalendar $calendar iCalcreator Vcalendar instance reference
-     * @return string
-     * @since  2.29.6 - 2019-07-03
+     * @return bool|string
+     * @since  2.40 - 2021-10-04
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public static function iCal2XML( Vcalendar $calendar ) : string
+    public static function iCal2XML( Vcalendar $calendar ) : bool | string
     {
         static $YMDTHISZ = 'Ymd\THis\Z';
         /** fix an SimpleXMLElement instance and create root element */
@@ -146,7 +320,7 @@ class IcalXMLFactory
             sprintf( self::$XMLstart, ICALCREATOR_VERSION, gmdate( $YMDTHISZ ))
         );
         $Vcalendar = $xml->addChild( self::$Vcalendar );
-        $langCal   = $calendar->getConfig( Vcalendar::LANGUAGE );
+        $langCal   = $calendar->getConfig( IcalInterface::LANGUAGE );
         /** fix calendar properties */
         $properties = $Vcalendar->addChild( self::$properties );
         foreach( self::$calProps as $propName ) {
@@ -158,8 +332,8 @@ class IcalXMLFactory
         foreach( self::$calPropsrfc7986Single as $propName ) {
             $method = StringFactory::getGetMethodName( $propName );
             switch( strtoupper( $propName )) {
-                case Vcalendar::UID :   // fall through
-                case Vcalendar::COLOR :
+                case IcalInterface::UID :   // fall through
+                case IcalInterface::COLOR :
                     if( false !== ( $content = $calendar->{$method}( true ))) {
                         self::addXMLchildText(
                             $properties,
@@ -169,9 +343,9 @@ class IcalXMLFactory
                         );
                     }
                     break;
-                case Vcalendar::LAST_MODIFIED :
+                case IcalInterface::LAST_MODIFIED :
                     if( false !== ( $content = $calendar->{$method}( true ))) {
-                        unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                        unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                         self::addXMLchildDateTime(
                             $properties,
                             $propName,
@@ -180,8 +354,8 @@ class IcalXMLFactory
                         );
                     }
                     break;
-                case Vcalendar::SOURCE : // fall through
-                case Vcalendar::URL :
+                case IcalInterface::SOURCE : // fall through
+                case IcalInterface::URL :
                     if( false !== ( $content = $calendar->{$method}( true ))) {
                         self::addXMLchildUri(
                             $properties,
@@ -191,7 +365,7 @@ class IcalXMLFactory
                         );
                     }
                     break;
-                case Vcalendar::REFRESH_INTERVAL :
+                case IcalInterface::REFRESH_INTERVAL :
                     if( false !== ( $content = $calendar->{$method}( true ))) {
                         self::addXMLchildDuration(
                             $properties,
@@ -206,13 +380,13 @@ class IcalXMLFactory
         foreach( self::$calPropsrfc7986Multi as $propName ) {
             $method = StringFactory::getGetMethodName( $propName );
             switch( strtoupper( $propName )) {
-                case Vcalendar::NAME :        // fall through
-                case Vcalendar::CATEGORIES :  // fall through
-                case Vcalendar::DESCRIPTION :
+                case IcalInterface::NAME :        // fall through
+                case IcalInterface::CATEGORIES :  // fall through
+                case IcalInterface::DESCRIPTION :
                     while( false !== ( $content = $calendar->{$method}( null, true ))) {
-                        if( ! isset( $content[Util::$LCparams][Vcalendar::LANGUAGE] ) &&
+                        if( ! isset( $content[Util::$LCparams][IcalInterface::LANGUAGE] ) &&
                             $langCal ) {
-                            $content[Util::$LCparams][Vcalendar::LANGUAGE] = $langCal;
+                            $content[Util::$LCparams][IcalInterface::LANGUAGE] = $langCal;
                         }
                         self::addXMLchildText(
                             $properties,
@@ -222,10 +396,10 @@ class IcalXMLFactory
                         );
                     } // end while
                     break;
-                case Vcalendar::IMAGE :
+                case IcalInterface::IMAGE :
                     while( false !== ( $content = $calendar->{$method}( null, true ))) {
                         self::addXMLchildBinaryUri( $properties, $propName, $content );
-                    }
+                    } // end while
                     break;
             } // end switch
         } // end foreach
@@ -245,12 +419,12 @@ class IcalXMLFactory
             $compName   = $component->getCompType();
             $child      = $components->addChild( strtolower( $compName ));
             $properties = $child->addChild( self::$properties );
-            $langComp   = $component->getConfig( Vcalendar::LANGUAGE );
-            $props      = $component->getConfig( Vcalendar::SETPROPERTYNAMES );
-            foreach( $props as $pix => $propName ) {
+            $langComp   = $component->getConfig( IcalInterface::LANGUAGE );
+            $props      = $component->getConfig( IcalInterface::SETPROPERTYNAMES );
+            foreach( $props as $propName ) {
                 switch( strtoupper( $propName )) {
-                    case Vcalendar::ATTACH :          // may occur multiple times
-                    case Vcalendar::IMAGE :
+                    case IcalInterface::ATTACH :          // may occur multiple times
+                    case IcalInterface::IMAGE :
                         $method = StringFactory::getGetMethodName( $propName );
                         while( false !== ( $content = $component->{$method }( null, true ))) {
                             self::addXMLchildBinaryUri(
@@ -260,9 +434,9 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::ATTENDEE :
+                    case IcalInterface::ATTENDEE :
                         while( false !== ( $content = $component->getAttendee( null, true ))) {
-                            if( isset( $content[Util::$LCparams][Vcalendar::CN] ) && $langCal ) {
+                            if( isset( $content[Util::$LCparams][IcalInterface::CN] ) && $langCal ) {
                                 self::addLanguage(
                                     $content[Util::$LCparams],
                                     $langComp,
@@ -277,14 +451,14 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::EXDATE :
+                    case IcalInterface::EXDATE :
                         while( false !== ( $content = $component->getExdate( null, true ))) {
                             $isDateSet =
                                 ParameterFactory::isParamsValueSet(
                                     $content,
-                                    Vcalendar::DATE
+                                    IcalInterface::DATE
                                 );
-                            unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                            unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                             if( $isDateSet ) {
                                 self::addXMLchildDate(
                                     $properties,
@@ -303,15 +477,15 @@ class IcalXMLFactory
                             }
                         } // end while
                         break;
-                    case Vcalendar::FREEBUSY :
+                    case IcalInterface::FREEBUSY :
                         while( false !==
                             ( $content = $component->getFreebusy( null, true ))
                         ) {
                             if( is_array( $content ) &&
-                                isset( $content[Util::$LCvalue][Vcalendar::FBTYPE] )) {
-                                $content[Util::$LCparams][Vcalendar::FBTYPE] =
-                                    $content[Util::$LCvalue][Vcalendar::FBTYPE];
-                                unset( $content[Util::$LCvalue][Vcalendar::FBTYPE] );
+                                isset( $content[Util::$LCvalue][IcalInterface::FBTYPE] )) {
+                                $content[Util::$LCparams][IcalInterface::FBTYPE] =
+                                    $content[Util::$LCvalue][IcalInterface::FBTYPE];
+                                unset( $content[Util::$LCvalue][IcalInterface::FBTYPE] );
                             }
                             self::addXMLchild(
                                 $properties,
@@ -322,7 +496,7 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::REQUEST_STATUS :
+                    case IcalInterface::REQUEST_STATUS :
                         while( false !==
                             ( $content = $component->getRequeststatus( null, true ))
                         ) {
@@ -340,26 +514,26 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::RDATE :
+                    case IcalInterface::RDATE :
                         while( false !==
                             ( $content = $component->getRdate( null, true ))
                         ) {
                             $type = self::$date_time;
-                            if( isset( $content[Util::$LCparams][Vcalendar::VALUE] )) {
+                            if( isset( $content[Util::$LCparams][IcalInterface::VALUE] )) {
                                 if( ParameterFactory::isParamsValueSet(
                                     $content,
-                                    Vcalendar::DATE
+                                    IcalInterface::DATE
                                 )) {
                                     $type = self::$date;
                                 }
                                 elseif( ParameterFactory::isParamsValueSet(
                                     $content,
-                                    Vcalendar::PERIOD
+                                    IcalInterface::PERIOD
                                 )) {
                                     $type = self::$period;
                                 }
                             } // end if
-                            unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                            unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                             self::addXMLchild(
                                 $properties,
                                 $propName,
@@ -369,7 +543,7 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::DESCRIPTION :
+                    case IcalInterface::DESCRIPTION :
                         $method = StringFactory::getGetMethodName( $propName );
                         while( false !==
                             ( $content = $component->{$method}( null, true ))
@@ -380,21 +554,21 @@ class IcalXMLFactory
                                 $content[Util::$LCvalue],
                                 $content[Util::$LCparams]
                             );
-                            if( Vcalendar::VJOURNAL != $compName ) {
+                            if( IcalInterface::VJOURNAL !== $compName ) {
                                 break;
                             }
                         } // end while
                         break;
-                    case Vcalendar::CATEGORIES :  // fall through
-                    case Vcalendar::COMMENT :     // fall through
-                    case Vcalendar::CONTACT :     // fall through
-                    case Vcalendar::RELATED_TO :  // fall through
-                    case Vcalendar::RESOURCES :
+                    case IcalInterface::CATEGORIES :  // fall through
+                    case IcalInterface::COMMENT :     // fall through
+                    case IcalInterface::CONTACT :     // fall through
+                    case IcalInterface::RELATED_TO :  // fall through
+                    case IcalInterface::RESOURCES :
                         $method = StringFactory::getGetMethodName( $propName );
                         while( false !==
                             ( $content = $component->{$method}( null, true )
                             )) {
-                            if(( Vcalendar::RELATED_TO != $propName )) {
+                            if(( IcalInterface::RELATED_TO !== $propName )) {
                                 self::addLanguage(
                                     $content[Util::$LCparams],
                                     $langComp,
@@ -409,22 +583,22 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::CREATED :         // single occurrence below, if set
-                    case Vcalendar::COMPLETED :       // fall through
-                    case Vcalendar::DTSTAMP :         // fall through
-                    case Vcalendar::LAST_MODIFIED :   // fall through
-                    case Vcalendar::DTSTART :         // fall through
-                    case Vcalendar::DTEND :           // fall through
-                    case Vcalendar::DUE :             // fall through
-                    case Vcalendar::RECURRENCE_ID :   // fall through
+                    case IcalInterface::CREATED :         // single occurrence below, if set
+                    case IcalInterface::COMPLETED :       // fall through
+                    case IcalInterface::DTSTAMP :         // fall through
+                    case IcalInterface::LAST_MODIFIED :   // fall through
+                    case IcalInterface::DTSTART :         // fall through
+                    case IcalInterface::DTEND :           // fall through
+                    case IcalInterface::DUE :             // fall through
+                    case IcalInterface::RECURRENCE_ID :   // fall through
                         $method = StringFactory::getGetMethodName( $propName );
                         if( false !== ( $content = $component->{$method}( true ))) {
                             $isDateSet =
                                 ParameterFactory::isParamsValueSet(
                                     $content,
-                                    Vcalendar::DATE
+                                    IcalInterface::DATE
                                 );
-                            unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                            unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                             if( $isDateSet ) {
                                 self::addXMLchildDate(
                                     $properties,
@@ -443,7 +617,7 @@ class IcalXMLFactory
                             }
                         } // end if
                         break;
-                    case Vcalendar::DURATION :
+                    case IcalInterface::DURATION :
                         if( false !== ( $content = $component->getDuration( true ))) {
                             self::addXMLchildDuration(
                                 $properties,
@@ -453,8 +627,8 @@ class IcalXMLFactory
                             );
                         }
                         break;
-                    case Vcalendar::EXRULE :
-                    case Vcalendar::RRULE :
+                    case IcalInterface::EXRULE :
+                    case IcalInterface::RRULE :
                         $method = StringFactory::getGetMethodName( $propName );
                         if( false !== ( $content = $component->{$method}( true ))) {
                             self::addXMLchildRecur(
@@ -465,18 +639,18 @@ class IcalXMLFactory
                             );
                         }
                         break;
-                    case Vcalendar::COLOR :    // fall through
-                    case Vcalendar::KLASS :    // fall through
-                    case Vcalendar::LOCATION : // fall through
-                    case Vcalendar::STATUS :   // fall through
-                    case Vcalendar::SUMMARY :  // fall through
-                    case Vcalendar::TRANSP :   // fall through
-                    case Vcalendar::TZID :     // fall through
-                    case Vcalendar::UID :
+                    case IcalInterface::COLOR :    // fall through
+                    case IcalInterface::KLASS :    // fall through
+                    case IcalInterface::LOCATION : // fall through
+                    case IcalInterface::STATUS :   // fall through
+                    case IcalInterface::SUMMARY :  // fall through
+                    case IcalInterface::TRANSP :   // fall through
+                    case IcalInterface::TZID :     // fall through
+                    case IcalInterface::UID :
                         $method = StringFactory::getGetMethodName( $propName );
                         if( false !== ( $content = $component->{$method}( true ))) {
-                            if(( Vcalendar::LOCATION == $propName ) ||
-                                ( Vcalendar::SUMMARY == $propName ))  {
+                            if(( IcalInterface::LOCATION === $propName ) ||
+                                ( IcalInterface::SUMMARY === $propName ))  {
                                 self::addLanguage(
                                     $content[Util::$LCparams],
                                     $langComp,
@@ -491,20 +665,20 @@ class IcalXMLFactory
                             );
                         }
                         break;
-                    case Vcalendar::GEO :
+                    case IcalInterface::GEO :
                         if( false !== ( $content = $component->getGeo( true ))) {
                             self::addXMLchild(
                                 $properties,
                                 $propName,
-                                strtolower( Vcalendar::GEO ),
+                                strtolower( IcalInterface::GEO ),
                                 $content[Util::$LCvalue],
                                 $content[Util::$LCparams]
                             );
                         }
                         break;
-                    case Vcalendar::ORGANIZER :
+                    case IcalInterface::ORGANIZER :
                         if( false !== ( $content = $component->getOrganizer( true ))) {
-                            if( isset( $content[Util::$LCparams][Vcalendar::CN] )) {
+                            if( isset( $content[Util::$LCparams][IcalInterface::CN] )) {
                                 self::addLanguage(
                                     $content[Util::$LCparams],
                                     $langComp,
@@ -519,9 +693,9 @@ class IcalXMLFactory
                             );
                         }
                         break;
-                    case Vcalendar::PERCENT_COMPLETE : // fall through
-                    case Vcalendar::PRIORITY :         // fall through
-                    case Vcalendar::SEQUENCE :
+                    case IcalInterface::PERCENT_COMPLETE : // fall through
+                    case IcalInterface::PRIORITY :         // fall through
+                    case IcalInterface::SEQUENCE :
                         $method = StringFactory::getGetMethodName( $propName );
                         if( false !== ( $content = $component->{$method}( true ))) {
                             self::addXMLchildInteger(
@@ -532,7 +706,7 @@ class IcalXMLFactory
                             );
                         }
                         break;
-                    case Vcalendar::CONFERENCE :
+                    case IcalInterface::CONFERENCE :
                         $method = StringFactory::getGetMethodName( $propName );
                         while( false !==
                             ( $content = $component->{$method}( null, true )
@@ -545,8 +719,8 @@ class IcalXMLFactory
                             );
                         } // end while
                         break;
-                    case Vcalendar::TZURL :       // fall through
-                    case Vcalendar::URL :
+                    case IcalInterface::TZURL :       // fall through
+                    case IcalInterface::URL :
                         $method = StringFactory::getGetMethodName( $propName );
                         if( false !== ( $content = $component->{$method}( true ))) {
                             self::addXMLchildUri(
@@ -580,11 +754,11 @@ class IcalXMLFactory
                 $subCompName  = $subcomp->getCompType();
                 $child2       = $child->addChild( strtolower( $subCompName ));
                 $properties   = $child2->addChild( self::$properties );
-                $langComp     = $subcomp->getConfig( Vcalendar::LANGUAGE );
-                $subCompProps = $subcomp->getConfig( Vcalendar::SETPROPERTYNAMES );
-                foreach( $subCompProps as $pix2 => $propName ) {
+                $langComp     = $subcomp->getConfig( IcalInterface::LANGUAGE );
+                $subCompProps = $subcomp->getConfig( IcalInterface::SETPROPERTYNAMES );
+                foreach( $subCompProps as $propName ) {
                     switch( strtoupper( $propName )) {
-                        case Vcalendar::ATTACH :          // may occur multiple times, below
+                        case IcalInterface::ATTACH :          // may occur multiple times, below
                             while( false !==
                                 ( $content = $subcomp->getAttach( null, true )
                                 )) {
@@ -595,11 +769,11 @@ class IcalXMLFactory
                                 );
                             } // end while
                             break;
-                        case Vcalendar::ATTENDEE :
+                        case IcalInterface::ATTENDEE :
                             while( false !==
                                 ( $content = $subcomp->getAttendee( null, true )
                                 )) {
-                                if( isset( $content[Util::$LCparams][Vcalendar::CN] )) {
+                                if( isset( $content[Util::$LCparams][IcalInterface::CN] )) {
                                     self::addLanguage(
                                         $content[Util::$LCparams],
                                         $langComp,
@@ -614,8 +788,8 @@ class IcalXMLFactory
                                 );
                             } // end while
                             break;
-                        case Vcalendar::COMMENT : // fall through
-                        case Vcalendar::TZNAME :
+                        case IcalInterface::COMMENT : // fall through
+                        case IcalInterface::TZNAME :
                             $method = StringFactory::getGetMethodName( $propName );
                             while( false !==
                                 ( $content = $subcomp->{$method}( null, true )
@@ -633,26 +807,26 @@ class IcalXMLFactory
                                 );
                             } // end while
                             break;
-                        case Vcalendar::RDATE :
+                        case IcalInterface::RDATE :
                             while( false !==
                                 ( $content = $subcomp->getRdate( null, true )
                                 )) {
                                 $type = self::$date_time;
-                                if( isset( $content[Util::$LCparams][Vcalendar::VALUE] )) {
+                                if( isset( $content[Util::$LCparams][IcalInterface::VALUE] )) {
                                     if( ParameterFactory::isParamsValueSet(
                                         $content,
-                                        Vcalendar::DATE
+                                        IcalInterface::DATE
                                     )) {
                                         $type = self::$date;
                                     }
                                     elseif( ParameterFactory::isParamsValueSet(
                                         $content,
-                                        Vcalendar::PERIOD
+                                        IcalInterface::PERIOD
                                     )) {
                                         $type = self::$period;
                                     }
                                 } // end if
-                                unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                                unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                                 self::addXMLchild(
                                     $properties,
                                     $propName,
@@ -662,12 +836,12 @@ class IcalXMLFactory
                                 );
                             } // end while
                             break;
-                        case Vcalendar::ACTION :      // single occurrence below, if set
-                        case Vcalendar::DESCRIPTION : // fall through
-                        case Vcalendar::SUMMARY :
+                        case IcalInterface::ACTION :      // single occurrence below, if set
+                        case IcalInterface::DESCRIPTION : // fall through
+                        case IcalInterface::SUMMARY :
                             $method = StringFactory::getGetMethodName( $propName );
                             if( false !== ( $content = $subcomp->{$method}( true ))) {
-                                if(( Vcalendar::ACTION != $propName ) ) {
+                                if( IcalInterface::ACTION !== $propName ) {
                                     self::addLanguage(
                                         $content[Util::$LCparams],
                                         $langComp,
@@ -682,9 +856,9 @@ class IcalXMLFactory
                                 );
                             }
                             break;
-                        case Vcalendar::DTSTART :
+                        case IcalInterface::DTSTART :
                             if( false !== ( $content = $subcomp->getDtstart( true ))) {
-                                unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+                                unset( $content[Util::$LCparams][IcalInterface::VALUE] );
                                 self::addXMLchildDateTime(
                                     $properties,
                                     $propName,
@@ -693,7 +867,7 @@ class IcalXMLFactory
                                 );
                             }
                             break;
-                        case Vcalendar::DURATION :
+                        case IcalInterface::DURATION :
                             if( false !== ( $content = $subcomp->getDuration( true ))) {
                                 self::addXMLchildDuration(
                                     $properties,
@@ -703,7 +877,7 @@ class IcalXMLFactory
                                 );
                             }
                             break;
-                        case Vcalendar::REPEAT :
+                        case IcalInterface::REPEAT :
                             if( false !== ( $content = $subcomp->getRepeat( true ))) {
                                 self::addXMLchildInteger(
                                     $properties,
@@ -713,16 +887,8 @@ class IcalXMLFactory
                                 );
                             }
                             break;
-                        case Vcalendar::TRIGGER :
+                        case IcalInterface::TRIGGER :
                             if( false !== ( $content = $subcomp->getTrigger( true ))) {
-                                if( DateIntervalFactory::isDateIntervalArrayInvertSet(
-                                    $content[Util::$LCvalue]
-                                )) {
-                                    $content[Util::$LCvalue] =
-                                        DateIntervalFactory::DateIntervalArr2DateInterval(
-                                            $content[Util::$LCvalue]
-                                        );
-                                }
                                 if( $content[Util::$LCvalue] instanceof DateInterval ) {
                                     self::addXMLchildDuration(
                                         $properties,
@@ -741,8 +907,8 @@ class IcalXMLFactory
                                 }
                             } // end if
                             break;
-                        case Vcalendar::TZOFFSETFROM : // fall through
-                        case Vcalendar::TZOFFSETTO :
+                        case IcalInterface::TZOFFSETFROM : // fall through
+                        case IcalInterface::TZOFFSETTO :
                             $method = StringFactory::getGetMethodName( $propName );
                             if( false !== ( $content = $subcomp->{$method}( true ))) {
                                 self::addXMLchild(
@@ -754,7 +920,7 @@ class IcalXMLFactory
                                 );
                             }
                             break;
-                        case Vcalendar::RRULE :
+                        case IcalInterface::RRULE :
                             // rfc5545 restriction: .. SHOULD NOT occur more than once
                             if( false !== ( $content = $subcomp->getRrule( true ))) {
                                 self::addXMLchildRecur(
@@ -791,20 +957,21 @@ class IcalXMLFactory
     /**
      * Add parameter language if not set
      *
-     * @param array $params
+     * @param string[] $params
      * @param string $langComp
      * @param bool|string $langCal
+     * @return void
      */
-    private static function addLanguage( & $params, string $langComp, $langCal )
+    private static function addLanguage( array & $params, string $langComp, bool | string $langCal ) : void
     {
         switch( true ) {
-            case isset( $params[Vcalendar::LANGUAGE] ) :
+            case isset( $params[IcalInterface::LANGUAGE] ) :
                 break;
             case ( ! empty( $langComp )) :
-                $params[Vcalendar::LANGUAGE] = $langComp;
+                $params[IcalInterface::LANGUAGE] = $langComp;
                 break;
             case ( ! empty( $langCal )) :
-                $params[Vcalendar::LANGUAGE] = $langCal;
+                $params[IcalInterface::LANGUAGE] = $langCal;
                 break;
         } // end switch
     }
@@ -814,7 +981,8 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param array            $content
+     * @param mixed            $content
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -822,12 +990,13 @@ class IcalXMLFactory
     private static function addXMLchildBinaryUri(
         SimpleXMLElement $parent,
         string $name,
-        array $content
-    ) {
-        $type = ( ParameterFactory::isParamsValueSet( $content, Vcalendar::BINARY ))
+        mixed $content
+    ) : void
+    {
+        $type = ( ParameterFactory::isParamsValueSet( $content, IcalInterface::BINARY ))
             ? self::$binary
             : self::$uri;
-        unset( $content[Util::$LCparams][Vcalendar::VALUE] );
+        unset( $content[Util::$LCparams][IcalInterface::VALUE] );
         self::addXMLchild(
             $parent,
             $name,
@@ -842,8 +1011,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -851,18 +1021,21 @@ class IcalXMLFactory
     private static function addXMLchildCalAddress(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$cal_address, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$cal_address, $content, $params );
     }
+
     /**
      * Add XML (rfc6321) date children to a SimpleXMLelement
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -870,10 +1043,11 @@ class IcalXMLFactory
     private static function addXMLchildDate(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$date, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$date, $content, $params );
     }
 
     /**
@@ -881,8 +1055,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -890,10 +1065,11 @@ class IcalXMLFactory
     private static function addXMLchildDateTime(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$date_time, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$date_time, $content, $params );
     }
 
     /**
@@ -901,8 +1077,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -910,13 +1087,14 @@ class IcalXMLFactory
     private static function addXMLchildDuration(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
         self::addXMLchild(
             $parent,
             $name,
-            strtolower( Vcalendar::DURATION ),
+            strtolower( IcalInterface::DURATION ),
             $content,
             $params
         );
@@ -927,8 +1105,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -936,10 +1115,11 @@ class IcalXMLFactory
     private static function addXMLchildInteger(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$integer, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$integer, $content, $params );
     }
 
     /**
@@ -947,8 +1127,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -956,10 +1137,11 @@ class IcalXMLFactory
     private static function addXMLchildRecur(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$recur, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$recur, $content, $params );
     }
 
     /**
@@ -967,8 +1149,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.2 - 2019-06-29
@@ -976,10 +1159,11 @@ class IcalXMLFactory
     private static function addXMLchildText(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
-        self::addXMLchild($parent, $name, self::$text, $content, $params );
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
+        self::addXMLchild( $parent, $name, self::$text, $content, $params );
     }
 
     /**
@@ -987,8 +1171,9 @@ class IcalXMLFactory
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param null|string[]    $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.30.3 - 2021-02-15
@@ -996,9 +1181,10 @@ class IcalXMLFactory
     private static function addXMLchildUri(
         SimpleXMLElement $parent,
         string $name,
-        $content,
-        $params = []
-    ) {
+        mixed $content,
+        ? array $params = []
+    ) : void
+    {
         self::addXMLchild( $parent, $name, self::$uri, htmlentities( $content ), $params );
     }
 
@@ -1008,8 +1194,9 @@ class IcalXMLFactory
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
      * @param string           $type    content type, subelement(-s) name
-     * @param string|array|DateTime|DateInterval  $content new subelement content
-     * @param array            $params  new element 'attributes'
+     * @param mixed            $content new subelement content
+     * @param mixed            $params  new element 'attributes'
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.30 - 2020-12-09
@@ -1018,9 +1205,10 @@ class IcalXMLFactory
         SimpleXMLElement $parent,
         string $name,
         string $type,
-        $content,
-        $params = []
-    ) {
+        mixed $content,
+        mixed $params = []
+    ) : void
+    {
         static $BOOLEAN      = 'boolean';
         static $UNTIL        = 'until';
         static $START        = 'start';
@@ -1029,79 +1217,70 @@ class IcalXMLFactory
         /** create new child node */
         $name  = strtolower( $name );
         $child = $parent->addChild( $name );
-        if(( empty( $content ) && ( Util::$ZERO != $content )) ||
-            ( is_string( $content) &&
-                ( Util::$MINUS != substr( $content, 0, 1 )) &&
-                ( 0 > $content ))
+        if( empty( $content ) && ( Util::$ZERO !== (string) $content )
+            /*
+                ||
+                ( is_string( $content) &&
+                    ( Util::$MINUS !== $content[0] ) &&
+                    ( 0 > $content ))
+            */
         ) { // ??
-            $v = $child->addChild( $type );
+            $child->addChild( $type );
             return;
         }
         $recurDateIsSet = false;
         switch( true ) {
             case empty( $params ) :
                 break;
-            case (( 1 == count( $params )) && isset( $params[Util::$ISLOCALTIME] )) :
+            case (( 1 === count( $params )) && isset( $params[Util::$ISLOCALTIME] )) :
                 break;
-            case ( self::$recur == $type ) :
+            case ( self::$recur === $type ) :
                 $recurDateIsSet = ParameterFactory::isParamsValueSet(
                     [ Util::$LCparams => $params ],
-                    Vcalendar::DATE
+                    IcalInterface::DATE
                 );
-                if(( 1 == count( $params )) && isset( $params[Vcalendar::VALUE ] )) {
+                if(( 1 === count( $params )) && isset( $params[IcalInterface::VALUE ] )) {
                     break;
                 }
-                unset( $params[Vcalendar::VALUE ] );
+                unset( $params[IcalInterface::VALUE ] );
                 // fall through
             default :
                 $parameters = $child->addChild( self::$PARAMETERS );
                 foreach( $params as $param => $parVal ) {
-                    if( Vcalendar::VALUE === $param ) {
-                        if( false !== strpos( $parVal, Util::$COLON )) {
+                    if( IcalInterface::VALUE === $param ) {
+                        if( str_contains( $parVal, Util::$COLON ) ) {
                             $p1   = $parameters->addChild( strtolower( $param ));
-                            $p2   = $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
+                            $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
                             $type = strtolower( StringFactory::before( Util::$COLON, $parVal ));
                         }
-                        elseif( 0 != strcasecmp( $type, $parVal )) {
+                        elseif( 0 !== strcasecmp( $type, $parVal )) {
                             $type = strtolower( $parVal );
                         }
                         continue;
                     }
-                    elseif( Util::$ISLOCALTIME == $param ) {
+                    if( Util::$ISLOCALTIME === $param ) {
                         continue;
                     }
                     $param = strtolower( $param );
                     if( StringFactory::isXprefixed( $param )) {
                         $p1 = $parameters->addChild( $param );
-                        $p2 = $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
+                        $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
                         continue;
                     }
                     $p1 = $parameters->addChild( $param );
-                    switch( $param ) {
-                        case self::$altrep :
-                        case self::$dir :
-                            $ptype = self::$uri;
-                            break;
-                        case self::$delegated_from :
-                        case self::$delegated_to :
-                        case self::$member :
-                        case self::$sent_by :
-                            $ptype = self::$cal_address;
-                            break;
-                        case self::$rsvp :
-                            $ptype = $BOOLEAN;
-                            break;
-                        default :
-                            $ptype = self::$text;
-                            break;
-                    } // end switch
+                    $ptype = match ( $param) {
+                        self::$altrep, self::$dir => self::$uri,
+                        self::$delegated_from, self::$delegated_to, self::$member, self::$sent_by => self::$cal_address,
+                        self::$rsvp => $BOOLEAN,
+                        default => self::$text,
+                    }; // end switch
                     if( is_array( $parVal )) {
                         foreach( $parVal as $pV ) {
-                            $p2 = $p1->addChild( $ptype, htmlspecialchars( $pV ));
+                            $p1->addChild( $ptype, htmlspecialchars( $pV ));
                         }
                     }
                     else {
-                        $p2 = $p1->addChild( $ptype, htmlspecialchars( $parVal ));
+                        $p1->addChild( $ptype, htmlspecialchars( $parVal ));
                     }
                 } // end foreach
                 break;
@@ -1109,19 +1288,19 @@ class IcalXMLFactory
         /** store content */
         switch( $type ) {
             case self::$binary :
-                $v = $child->addChild( $type, $content );
+                $child->addChild( $type, $content );
                 break;
             case $BOOLEAN :
                 break;
             case self::$cal_address :
-                $v = $child->addChild( $type, $content );
+                $child->addChild( $type, $content );
                 break;
             case self::$date :
                 if( $content instanceof DateTime ) {
                     $content = [ $content ];
                 }
                 foreach( $content as $date ) {
-                    $v = $child->addChild(
+                    $child->addChild(
                         $type,
                         DateTimeFactory::dateTime2Str( $date, true )
                     );
@@ -1133,38 +1312,38 @@ class IcalXMLFactory
                 }
                 $isLocalTime = isset( $params[Util::$ISLOCALTIME] );
                 foreach( $content as $dt ) {
-                    $v = $child->addChild(
+                    $child->addChild(
                         $type,
                         DateTimeFactory::dateTime2Str( $dt, false, $isLocalTime )
                     );
                 } // end foreach
                 break;
-            case strtolower( Vcalendar::DURATION ) :
-                $v = $child->addChild(
+            case strtolower( IcalInterface::DURATION ) :
+                $child->addChild(
                     $type,
                     DateIntervalFactory::dateInterval2String( $content, true )
                 );
                 break;
-            case strtolower( Vcalendar::GEO ) :
+            case strtolower( IcalInterface::GEO ) :
                 if( ! empty( $content )) {
-                    $v1 = $child->addChild(
-                        Vcalendar::LATITUDE,
+                    $child->addChild(
+                        IcalInterface::LATITUDE,
                         GeoFactory::geo2str2(
-                            $content[Vcalendar::LATITUDE],
+                            $content[IcalInterface::LATITUDE],
                             GeoFactory::$geoLatFmt
                         )
                     );
-                    $v1 = $child->addChild(
-                        Vcalendar::LONGITUDE,
+                    $child->addChild(
+                        IcalInterface::LONGITUDE,
                         GeoFactory::geo2str2(
-                            $content[Vcalendar::LONGITUDE],
+                            $content[IcalInterface::LONGITUDE],
                             GeoFactory::$geoLongFmt
                         )
                     );
                 }
                 break;
             case self::$integer :
-                $v = $child->addChild( $type, (string) $content );
+                $child->addChild( $type, (string) $content );
                 break;
             case self::$period :
                 if( ! is_array( $content )) {
@@ -1178,10 +1357,10 @@ class IcalXMLFactory
                         false,
                         $isLocalTime
                     );
-                    $v2 = $v1->addChild( $START, $str );
+                    $v1->addChild( $START, $str );
                     if( $period[1] instanceof DateInterval ) {
-                        $v2 = $v1->addChild(
-                            strtolower( Vcalendar::DURATION ),
+                        $v1->addChild(
+                            strtolower( IcalInterface::DURATION ),
                             DateIntervalFactory::dateInterval2String( $period[1] )
                         );
                     }
@@ -1191,7 +1370,7 @@ class IcalXMLFactory
                             false,
                             $isLocalTime
                         );
-                        $v2 = $v1->addChild( $END, $str );
+                        $v1->addChild( $END, $str );
                     }
                 } // end foreach
                 break;
@@ -1200,7 +1379,7 @@ class IcalXMLFactory
                 foreach( $content as $ruleLabel => $ruleValue ) {
                     switch( $ruleLabel ) {
                         case $UNTIL :
-                            $v = $child->addChild(
+                            $child->addChild(
                                 $ruleLabel,
                                 DateTimeFactory::dateTime2Str(
                                     $ruleValue,
@@ -1217,31 +1396,29 @@ class IcalXMLFactory
                         case self::$bymonth :
                         case self::$bysetpos :
                             if( is_array( $ruleValue )) {
-                                foreach( $ruleValue as $vix => $valuePart ) {
-                                    $v = $child->addChild( $ruleLabel, $valuePart );
+                                foreach( $ruleValue as $valuePart ) {
+                                    $child->addChild( $ruleLabel, $valuePart );
                                 }
                             }
                             else {
-                                $v = $child->addChild( $ruleLabel, $ruleValue );
+                                $child->addChild( $ruleLabel, $ruleValue );
                             }
                             break;
                         case self::$byday :
-                            if( isset( $ruleValue[Vcalendar::DAY] )) {
-                                $str  = ( isset( $ruleValue[0] )) ? $ruleValue[0] : null;
-                                $str .= $ruleValue[Vcalendar::DAY];
-                                $p    = $child->addChild( $ruleLabel, $str );
+                            if( isset( $ruleValue[IcalInterface::DAY] )) {
+                                $str  = $ruleValue[0] ?? Util::$SP0;
+                                $str .= $ruleValue[IcalInterface::DAY];
+                                $child->addChild( $ruleLabel, $str );
                             }
                             else {
                                 foreach( $ruleValue as $valuePart ) {
-                                    if( isset( $valuePart[Vcalendar::DAY] )) {
-                                        $str  = ( isset( $valuePart[0] ))
-                                            ? $valuePart[0]
-                                            : null;
-                                        $str .= $valuePart[Vcalendar::DAY];
-                                        $p    = $child->addChild( $ruleLabel, $str );
+                                    if( isset( $valuePart[IcalInterface::DAY] )) {
+                                        $str  = $valuePart[0] ?? Util::$SP0;
+                                        $str .= $valuePart[IcalInterface::DAY];
+                                        $child->addChild( $ruleLabel, $str );
                                     }
                                     else {
-                                        $p = $child->addChild( $ruleLabel, $valuePart );
+                                        $child->addChild( $ruleLabel, $valuePart );
                                     }
                                 } // end foreach
                             }
@@ -1251,29 +1428,29 @@ class IcalXMLFactory
                         case self::$interval :
                         case self::$wkst :
                         default:
-                            $p = $child->addChild( $ruleLabel, $ruleValue );
+                            $child->addChild( $ruleLabel, $ruleValue );
                             break;
                     } // end switch( $ruleLabel )
                 } // end foreach( $content as $ruleLabel => $ruleValue )
                 break;
             case self::$rstatus :
-                $v = $child->addChild(
+                $child->addChild(
                     self::$code,
                     number_format(
-                        (float) $content[Vcalendar::STATCODE],
+                        (float) $content[IcalInterface::STATCODE],
                         2,
                         Util::$DOT,
                         $SP0
                     )
                 );
-                $v = $child->addChild(
+                $child->addChild(
                     self::$description,
-                    htmlspecialchars( $content[Vcalendar::STATDESC] )
+                    htmlspecialchars( $content[IcalInterface::STATDESC] )
                 );
-                if( isset( $content[Vcalendar::EXTDATA] )) {
-                    $v = $child->addChild(
+                if( isset( $content[IcalInterface::EXTDATA] )) {
+                    $child->addChild(
                         self::$data,
-                        htmlspecialchars( $content[Vcalendar::EXTDATA] )
+                        htmlspecialchars( $content[IcalInterface::EXTDATA] )
                     );
                 }
                 break;
@@ -1282,17 +1459,17 @@ class IcalXMLFactory
                     $content = [ $content ];
                 }
                 foreach( $content as $part ) {
-                    $v = $child->addChild( $type, htmlspecialchars( $part ));
+                    $child->addChild( $type, htmlspecialchars( $part ));
                 }
                 break;
             case self::$time :
                 break;
             case self::$uri :
-                $v = $child->addChild( $type, $content );
+                $child->addChild( $type, $content );
                 break;
             case self::$utc_offset :
                 if( DateIntervalFactory::hasPlusMinusPrefix( $content )) {
-                    $str     = substr( $content, 0, 1 );
+                    $str     = $content[0];
                     $content = substr( $content, 1 );
                 }
                 else {
@@ -1303,14 +1480,14 @@ class IcalXMLFactory
                 if( 4 < strlen( $content )) {
                     $str .= Util::$COLON . substr( $content, 4 );
                 }
-                $v = $child->addChild( $type, $str );
+                $child->addChild( $type, $str );
                 break;
-            case self::$unknown :
+            case self::$unknown : // fall through
             default:
                 if( is_array( $content )) {
                     $content = implode( $content );
                 }
-                $v = $child->addChild( self::$unknown, htmlspecialchars( $content ));
+                $child->addChild( self::$unknown, htmlspecialchars( $content ));
                 break;
         } // end switch
     }
@@ -1318,19 +1495,20 @@ class IcalXMLFactory
     /**
      * Parse (rfc6321) XML string into iCalcreator instance
      *
-     * @param  string $xmlStr
-     * @param  array  $iCalcfg  Vcalendar config array (opt)
+     * @param  string        $xmlStr
+     * @param  null|string[] $iCalcfg  Vcalendar config array (opt)
      * @return Vcalendar|bool   false on error
      * @since  2.20.23 - 2017-02-25
      */
-    public static function XML2iCal( string $xmlStr, $iCalcfg = [] )
+    public static function XML2iCal( string $xmlStr, ? array $iCalcfg = [] ) : Vcalendar | bool
     {
         static $CRLF = [ "\r\n", "\n\r", "\n", "\r" ];
-        $xmlStr = str_replace( $CRLF, null, $xmlStr );
+        $xmlStr = str_replace( $CRLF, Util::$SP0, $xmlStr );
         $xml    = self::XMLgetTagContent1( $xmlStr, self::$Vcalendar, $endIx );
         $iCal   = new Vcalendar( $iCalcfg );
-        if( false === self::XMLgetComps( $iCal, $xmlStr ))
+        if( false === self::XMLgetComps( $iCal, $xmlStr )) {
             return false;
+        }
         return $iCal;
     }
 
@@ -1342,7 +1520,7 @@ class IcalXMLFactory
      * @return IcalInterface|bool    false on error
      * @since  2.27.14 - 2019-03-09
      */
-    private static function XMLgetComps( IcalInterface $iCal, string $xml )
+    private static function XMLgetComps( IcalInterface $iCal, string $xml ) : IcalInterface | bool
     {
         static $PROPSTAGempty = '<properties/>';
         static $PROPSTAGstart = '<properties>';
@@ -1350,14 +1528,14 @@ class IcalXMLFactory
         static $COMPSTAGstart = '<components>';
         static $NEW      = 'new';
         static $ALLCOMPS = [
-            Vcalendar::VTIMEZONE,
-            Vcalendar::STANDARD,
-            Vcalendar::DAYLIGHT,
-            Vcalendar::VEVENT,
-            Vcalendar::VTODO,
-            Vcalendar::VJOURNAL,
-            Vcalendar::VFREEBUSY,
-            Vcalendar::VALARM
+            IcalInterface::VTIMEZONE,
+            IcalInterface::STANDARD,
+            IcalInterface::DAYLIGHT,
+            IcalInterface::VEVENT,
+            IcalInterface::VTODO,
+            IcalInterface::VJOURNAL,
+            IcalInterface::VFREEBUSY,
+            IcalInterface::VALARM
         ];
         $len = strlen( $xml );
         $sx  = 0;
@@ -1369,7 +1547,7 @@ class IcalXMLFactory
             ((( $sx + 13 ) < $len ) &&
                 ! StringFactory::startsWith( substr( $xml, $sx ), $PROPSTAGempty ) &&
                 ! StringFactory::startsWith( substr( $xml, $sx ), $COMPSTAGempty ))) {
-            $sx += 1;
+            ++$sx;
         } // end while
         if(( $sx + 11 ) >= $len ) {
             return false;
@@ -1405,9 +1583,11 @@ class IcalXMLFactory
      *
      * @param  IcalInterface $iCalComp iCalcreator calendar/component instance
      * @param  string        $xml
+     * @return void
      * @since  2.30.3 - 2021-02-15
+     * @noinspection UnsupportedStringOffsetOperationsInspection
      */
-    private static function XMLgetProps( IcalInterface $iCalComp, string $xml )
+    private static function XMLgetProps( IcalInterface $iCalComp, string $xml ) : void
     {
         static $VERSIONPRODID   = null;
         static $PARAMENDTAG     = '<parameters/>';
@@ -1415,20 +1595,20 @@ class IcalXMLFactory
         static $DATETAGST       = '<date';
         static $PERIODTAG       = '<period>';
         static $ATTENDEEPARKEYS    = [
-            Vcalendar::DELEGATED_FROM,
-            Vcalendar::DELEGATED_TO,
-            Vcalendar::MEMBER
+            IcalInterface::DELEGATED_FROM,
+            IcalInterface::DELEGATED_TO,
+            IcalInterface::MEMBER
         ];
         if( is_null( $VERSIONPRODID )) {
             $VERSIONPRODID = [
-                Vcalendar::VERSION,
-                Vcalendar::PRODID,
+                IcalInterface::VERSION,
+                IcalInterface::PRODID,
             ];
         }
         while( ! empty( $xml )) {
             $xml2     = self::XMLgetTagContent2( $xml, $propName, $endIx );
             $propName = strtoupper( $propName );
-            if( empty( $xml2 ) && ( Util::$ZERO != $xml2 )) {
+            if( empty( $xml2 ) && ( Util::$ZERO !== $xml2 )) {
                 if( StringFactory::isXprefixed( $propName )) {
                     $iCalComp->setXprop( $propName );
                 }
@@ -1449,7 +1629,7 @@ class IcalXMLFactory
                 while( ! empty( $xml3 )) {
                     $xml4     = self::XMLgetTagContent2( $xml3, $paramKey, $endIx3 );
                     $paramKey = strtoupper( $paramKey );
-                    if( in_array( $paramKey, $ATTENDEEPARKEYS )) {
+                    if( in_array( $paramKey, $ATTENDEEPARKEYS, true ) ) {
                         while( ! empty( $xml4 )) {
                             $paramValue = self::XMLgetTagContent1(
                                 $xml4,
@@ -1486,20 +1666,20 @@ class IcalXMLFactory
                 $xml2 = substr( $xml2, $endIx2 );
             } // end elseif - parameters
             $valueType = Util::$SP0;
-            $value     = ( ! empty( $xml2 ) || ( Util::$ZERO == $xml2 ))
+            $value     = ( ! empty( $xml2 ) || ( Util::$ZERO === $xml2 ))
                 ? self::XMLgetTagContent2( $xml2, $valueType, $endIx3 )
                 : Util::$SP0;
             switch( $propName ) {
-                case Vcalendar::URL : // fall through
-                case Vcalendar::TZURL :
+                case IcalInterface::URL : // fall through
+                case IcalInterface::TZURL :
                     $value = html_entity_decode( $value );
                     break;
-                case Vcalendar::EXDATE :   // multiple single-date(-times) may exist
+                case IcalInterface::EXDATE :   // multiple single-date(-times) may exist
                 // fall through
-                case Vcalendar::RDATE :
-                    if( self::$period != $valueType ) {
-                        if( self::$date == $valueType ) {
-                            $params[Vcalendar::VALUE] = Vcalendar::DATE;
+                case IcalInterface::RDATE :
+                    if( self::$period !== $valueType ) {
+                        if( self::$date === $valueType ) {
+                            $params[IcalInterface::VALUE] = IcalInterface::DATE;
                         }
                         $t = [];
                         while( ! empty( $xml2 ) &&
@@ -1511,9 +1691,9 @@ class IcalXMLFactory
                         break;
                     }
                 // fall through
-                case Vcalendar::FREEBUSY :
-                    if( Vcalendar::RDATE == $propName ) {
-                        $params[Vcalendar::VALUE] = Vcalendar::PERIOD;
+                case IcalInterface::FREEBUSY :
+                    if( IcalInterface::RDATE === $propName ) {
+                        $params[IcalInterface::VALUE] = IcalInterface::PERIOD;
                     }
                     $value = [];
                     while( ! empty( $xml2 ) &&
@@ -1528,44 +1708,44 @@ class IcalXMLFactory
                         $xml2    = substr( $xml2, $endIx4 );
                     } // end while
                     break;
-                case Vcalendar::TZOFFSETTO :
+                case IcalInterface::TZOFFSETTO :
                 // fall through
-                case Vcalendar::TZOFFSETFROM :
-                    $value = str_replace( Util::$COLON, null, $value );
+                case IcalInterface::TZOFFSETFROM :
+                    $value = str_replace( Util::$COLON, Util::$SP0, $value );
                     break;
-                case Vcalendar::GEO :
-                    $tValue                       = [ Vcalendar::LATITUDE => $value ];
-                    $tValue[Vcalendar::LONGITUDE] = self::XMLgetTagContent1(
+                case IcalInterface::GEO :
+                    $tValue = [ IcalInterface::LATITUDE => $value ];
+                    $tValue[IcalInterface::LONGITUDE] = self::XMLgetTagContent1(
                         substr( $xml2, $endIx3 ),
-                        Vcalendar::LONGITUDE,
+                        IcalInterface::LONGITUDE,
                         $endIx3
                     );
                     $value = $tValue;
                     break;
-                case Vcalendar::EXRULE :
+                case IcalInterface::EXRULE :
                 // fall through
-                case Vcalendar::RRULE :
+                case IcalInterface::RRULE :
                     $tValue    = [ $valueType => $value ];
                     $xml2      = substr( $xml2, $endIx3 );
-                    $valueType = false;
+                    $valueType = Util::$SP0;
                     while( ! empty( $xml2 )) {
                         $t = self::XMLgetTagContent2( $xml2, $valueType, $endIx4 );
                         switch( strtoupper( $valueType )) {
-                            case Vcalendar::FREQ :
-                            case Vcalendar::COUNT :
-                            case Vcalendar::UNTIL :
-                            case Vcalendar::INTERVAL :
-                            case Vcalendar::WKST :
+                            case IcalInterface::FREQ :
+                            case IcalInterface::COUNT :
+                            case IcalInterface::UNTIL :
+                            case IcalInterface::INTERVAL :
+                            case IcalInterface::WKST :
                                 $tValue[$valueType] = $t;
                                 break;
-                            case Vcalendar::BYDAY :
-                                if( 2 == strlen( $t )) {
-                                    $tValue[$valueType][] = [ Vcalendar::DAY => $t ];
+                            case IcalInterface::BYDAY :
+                                if( 2 === strlen( $t )) {
+                                    $tValue[$valueType][] = [ IcalInterface::DAY => $t ];
                                 }
                                 else {
                                     $day = substr( $t, -2 );
                                     $key = substr( $t, 0, ( strlen( $t ) - 2 ));
-                                    $tValue[$valueType][] = [ $key, Vcalendar::DAY => $day ];
+                                    $tValue[$valueType][] = [ $key, IcalInterface::DAY => $day ];
                                 }
                                 break;
                             default:
@@ -1575,7 +1755,7 @@ class IcalXMLFactory
                     } // end while
                     $value = $tValue;
                     break;
-                case Vcalendar::REQUEST_STATUS :
+                case IcalInterface::REQUEST_STATUS :
                     $value = [
                         self::$code        => null,
                         self::$description => null,
@@ -1596,19 +1776,19 @@ class IcalXMLFactory
                     switch( $valueType ) {
                         case self::$uri :
                             $value = html_entity_decode( $value );
-                            if( in_array( $propName, [ Vcalendar::ATTACH, Vcalendar::SOURCE ] )) {
+                            if( in_array( $propName, [ IcalInterface::ATTACH, IcalInterface::SOURCE ], true ) ) {
                                 break;
                             }
-                            $params[Vcalendar::VALUE] = Vcalendar::URI;
+                            $params[IcalInterface::VALUE] = IcalInterface::URI;
                             break;
                         case self::$binary :
-                            $params[Vcalendar::VALUE] = Vcalendar::BINARY;
+                            $params[IcalInterface::VALUE] = IcalInterface::BINARY;
                             break;
                         case self::$date :
-                            $params[Vcalendar::VALUE] = Vcalendar::DATE;
+                            $params[IcalInterface::VALUE] = IcalInterface::DATE;
                             break;
                         case self::$date_time :
-                            $params[Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+                            $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
                             break;
                         case self::$text :
                             // fall through
@@ -1617,8 +1797,8 @@ class IcalXMLFactory
                             break;
                         default :
                             if( StringFactory::isXprefixed( $propName ) &&
-                                ( self::$unknown != strtolower( $valueType ))) {
-                                $params[Vcalendar::VALUE] = strtoupper( $valueType );
+                                ( self::$unknown !== strtolower( $valueType ))) {
+                                $params[IcalInterface::VALUE] = strtoupper( $valueType );
                             }
                             break;
                     } // end switch
@@ -1631,19 +1811,19 @@ class IcalXMLFactory
                 case ( StringFactory::isXprefixed( $propName )) :
                     $iCalComp->setXprop( $propName, $value, $params );
                     break;
-                case ( Vcalendar::FREEBUSY == $propName ) :
-                    $fbtype = $params[Vcalendar::FBTYPE] ?? null;
-                    unset( $params[Vcalendar::FBTYPE] );
+                case ( IcalInterface::FREEBUSY === $propName ) :
+                    $fbtype = $params[IcalInterface::FBTYPE] ?? null;
+                    unset( $params[IcalInterface::FBTYPE] );
                     $iCalComp->{$method}( $fbtype, $value, $params );
                     break;
-                case ( Vcalendar::GEO == $propName ) :
+                case ( IcalInterface::GEO === $propName ) :
                     $iCalComp->{$method}(
-                        $value[Vcalendar::LATITUDE],
-                        $value[Vcalendar::LONGITUDE],
+                        $value[IcalInterface::LATITUDE],
+                        $value[IcalInterface::LONGITUDE],
                         $params
                     );
                     break;
-                case ( Vcalendar::REQUEST_STATUS == $propName ) :
+                case ( IcalInterface::REQUEST_STATUS === $propName ) :
                     $iCalComp->{$method}(
                         $value[self::$code],
                         $value[self::$description],
@@ -1666,13 +1846,13 @@ class IcalXMLFactory
     /**
      * Fetch a specific XML tag content
      *
-     * @param string $xml
-     * @param string $tagName
-     * @param int    $endIx
+     * @param string   $xml
+     * @param string   $tagName
+     * @param null|int $endIx
      * @return string
      * @since  2.23.8 - 2017-04-17
      */
-    private static function XMLgetTagContent1( string $xml, string $tagName, & $endIx = 0 ) : string
+    private static function XMLgetTagContent1( string $xml, string $tagName, ? int & $endIx = 0 ) : string
     {
         static $FMT0 = '<%s>';
         static $FMT1 = '<%s />';
@@ -1683,30 +1863,30 @@ class IcalXMLFactory
         $xmlLen  = strlen( $xml );
         $sx1     = 0;
         while( $sx1 < $xmlLen ) {
-            if((( $sx1 + $strLen + 1 ) < $xmlLen ) &&
-                ( sprintf( $FMT0, $tagName ) ==
+            if((( $sx1 + $strLen + 1 ) < $xmlLen ) && // start tag
+                ( sprintf( $FMT0, $tagName ) ===
                     strtolower( substr( $xml, $sx1, ( $strLen + 2 ))))
             ) {
                 break;
             }
-            if((( $sx1 + $strLen + 3 ) < $xmlLen ) &&
-                ( sprintf( $FMT1, $tagName ) ==
+            if((( $sx1 + $strLen + 3 ) < $xmlLen ) && // empty tag1
+                ( sprintf( $FMT1, $tagName ) ===
                     strtolower( substr( $xml, $sx1, ( $strLen + 4 ))))
             ) {
                 $endIx = $strLen + 5;
                 return Util::$SP0; // empty tag
             }
-            if((( $sx1 + $strLen + 2 ) < $xmlLen ) &&
-                ( sprintf( $FMT2, $tagName ) ==
+            if((( $sx1 + $strLen + 2 ) < $xmlLen ) && // empty tag2
+                ( sprintf( $FMT2, $tagName ) ===
                     strtolower( substr( $xml, $sx1, ( $strLen + 3 ))))
             ) {
                 $endIx = $strLen + 4;
                 return Util::$SP0; // empty tag
             }
-            $sx1 += 1;
+            ++$sx1;
         } // end while...
-        if( false === substr( $xml, $sx1, 1 )) {
-            $endIx = ( empty( $sx )) ? 0 : $sx - 1; // ??
+        if( ! isset( $xml[$sx1] )) {
+            $endIx = ( empty( $sx1 )) ? 0 : $sx1 - 1; // ??
             return Util::$SP0;
         }
         $endTag = sprintf( $FMT3, $tagName );
@@ -1715,7 +1895,9 @@ class IcalXMLFactory
             return Util::$SP0;
         }
         $endIx = $pos + $strLen + 3;
-        return substr( $xml, ( $sx1 + $strLen + 2 ), ( $pos - $sx1 - 2 - $strLen ));
+        $start = $sx1 + $strLen + 2;
+        $len   = $pos - $sx1 - 2 - $strLen;
+        return substr( $xml, $start, $len );
     }
 
     /**
@@ -1727,7 +1909,7 @@ class IcalXMLFactory
      * @return string
      * @since  2.23.8 - 2017-04-17
      */
-    private static function XMLgetTagContent2( string $xml, & $tagName, & $endIx ) : string
+    private static function XMLgetTagContent2( string $xml, ? string & $tagName = null, ? int & $endIx = null ) : string
     {
         static $LT          = '<';
         static $CMTSTART    = '<!--';
@@ -1741,18 +1923,18 @@ class IcalXMLFactory
         $endIx  = $xmlLen + 1; // just in case.. .
         $sx1    = 0;
         while( $sx1 < $xmlLen ) {
-            if( $LT == substr( $xml, $sx1, 1 )) {
+            if( $LT === $xml[$sx1] ) {
                 if((( $sx1 + 3 ) < $xmlLen ) &&
                     ( StringFactory::startsWith( substr( $xml, $sx1 ), $CMTSTART ))
                 ) { // skip comment
-                    $sx1 += 1;
+                    ++$sx1;
                 }
                 else {
                     break;
                 } // tagname start here
             }
             else {
-                $sx1 += 1;
+                ++$sx1;
             }
         } // end while...
         $sx2 = $sx1;
@@ -1764,10 +1946,10 @@ class IcalXMLFactory
                 $endIx   = $sx2 + 2;
                 return Util::$SP0;
             }
-            if( $GT == substr( $xml, $sx2, 1 )) { // tagname ends here
+            if( $GT === $xml[$sx2] ) { // tagname ends here
                 break;
             }
-            $sx2 += 1;
+            ++$sx2;
         } // end while...
         $tagName = substr( $xml, ( $sx1 + 1 ), ( $sx2 - $sx1 - 1 ));
         $endIx   = $sx2 + 1;
@@ -1775,7 +1957,7 @@ class IcalXMLFactory
             return Util::$SP0;
         }
         $strLen = strlen( $tagName );
-        if(( $DURATION == $tagName ) &&
+        if(( $DURATION === $tagName ) &&
             ( false !== ( $pos1 = stripos( $xml, $DURATIONTAG, $sx1 + 1 ))) &&
             ( false !== ( $pos2 = stripos( $xml, $DURENDTAG,  $pos1 + 1 ))) &&
             ( false !== ( $pos3 = stripos( $xml, $DURENDTAG,  $pos2 + 1 ))) &&
@@ -1789,4 +1971,3 @@ class IcalXMLFactory
         return substr( $xml, ( $sx1 + $strLen + 2 ), ( $pos - $strLen - 2 ));
     }
 }
-

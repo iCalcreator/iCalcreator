@@ -43,9 +43,9 @@ use function is_numeric;
 trait SEQUENCEtrait
 {
     /**
-     * @var array component property SEQUENCE value
+     * @var null|array component property SEQUENCE value
      */
-    protected $sequence = null;
+    protected ? array $sequence = null;
 
     /**
      * Return formatted output for calendar component property sequence
@@ -60,7 +60,7 @@ trait SEQUENCEtrait
         if(( ! isset( $this->sequence[Util::$LCvalue] ) ||
                 ( empty( $this->sequence[Util::$LCvalue] ) &&
                     ! is_numeric( $this->sequence[Util::$LCvalue] ))) &&
-                ( Util::$ZERO != $this->sequence[Util::$LCvalue] )) {
+                ( 0 !== $this->sequence[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::SEQUENCE )
                 : Util::$SP0;
@@ -68,7 +68,7 @@ trait SEQUENCEtrait
         return StringFactory::createElement(
             self::SEQUENCE,
             ParameterFactory::createParams( $this->sequence[Util::$LCparams] ),
-            $this->sequence[Util::$LCvalue]
+            (string) $this->sequence[Util::$LCvalue]
         );
     }
 
@@ -88,35 +88,38 @@ trait SEQUENCEtrait
      * Get calendar component property sequence
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|int|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getSequence( $inclParam = false )
+    public function getSequence( ? bool $inclParam = false ) : bool | int | string | array
     {
-        if( empty( $this->sequence )) {
+        if( null === $this->sequence ) {
             return false;
         }
-        return ( $inclParam ) ? $this->sequence : $this->sequence[Util::$LCvalue];
+        return ( $inclParam )
+            ? $this->sequence
+            : $this->sequence[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property sequence
      *
-     * @param null|int   $value
-     * @param null|array $params
-     * @return static
+     * @param null|int|string $value
+     * @param null|string[]      $params
+     * @return self
      * @since  2.27.2 - 2019-01-04
      */
-    public function setSequence( $value = null, $params = [] ) : self
+    public function setSequence( mixed $value = null, ? array $params = [] ) : self
     {
-        if(( empty( $value ) && ! is_numeric( $value )) && ( Util::$ZERO != $value )) {
+        if(( $value === null ) || ( $value === Util::$SP0 )) {
             $value = ( isset( $this->sequence[Util::$LCvalue] ) &&
                 ( -1 < $this->sequence[Util::$LCvalue] ))
-                ? $this->sequence[Util::$LCvalue] + 1
-                : Util::$ZERO;
+                ? (int) $this->sequence[Util::$LCvalue] + 1
+                : 0;
         }
         else {
             Util::assertInteger( $value, self::SEQUENCE );
+            $value = (int) $value;
         }
         $this->sequence = [
             Util::$LCvalue  => $value,

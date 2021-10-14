@@ -53,7 +53,7 @@ final class Valarm extends CalendarComponent
     /**
      * @var string
      */
-    protected static $compSgn = 'a';
+    protected static string $compSgn = 'a';
 
     /**
      * Destructor

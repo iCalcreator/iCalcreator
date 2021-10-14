@@ -33,12 +33,12 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcomponent;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_change_key_case;
 
@@ -50,9 +50,9 @@ use function array_change_key_case;
 trait DTSTAMPtrait
 {
     /**
-     * @var array component property DTSTAMP value
+     * @var null|array component property DTSTAMP value
      */
-    protected $dtstamp = null;
+    protected ?array $dtstamp = null;
 
     /**
      * Return formatted output for calendar component property dtstamp
@@ -93,12 +93,12 @@ trait DTSTAMPtrait
      * Return calendar component property dtstamp
      *
      * @param bool   $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.1 2019-06-22
      */
-    public function getDtstamp( $inclParam = false )
+    public function getDtstamp( ? bool $inclParam = false ) : DateTime | bool | string | array
     {
         if( Util::isCompInList( $this->getCompType(), self::$SUBCOMPS )) {
             return false;
@@ -115,14 +115,14 @@ trait DTSTAMPtrait
     /**
      * Set calendar component property dtstamp
      *
-     * @param string|DateTimeInterface  $value
-     * @param array  $params
+     * @param DateTimeInterface|string|null $value
+     * @param string[]|null $params
      * @return Vcomponent
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
      */
-    public function setDtstamp( $value  = null, $params = [] ) : Vcomponent
+    public function setDtstamp( DateTimeInterface | string $value  = null, ? array $params = [] ) : Vcomponent
     {
         if( empty( $value )) {
             $this->dtstamp = [
@@ -131,8 +131,8 @@ trait DTSTAMPtrait
             ];
             return $this;
         }
-        $params = array_change_key_case( $params, CASE_UPPER );
-        $params[Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+        $params = array_change_key_case( $params ?? [], CASE_UPPER );
+        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
         $this->dtstamp = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
         return $this;
     }

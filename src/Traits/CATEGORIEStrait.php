@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait CATEGORIEStrait
 {
     /**
-     * @var array component property CATEGORIES value
+     * @var null|array component property CATEGORIES value
      */
-    protected $categories = null;
+    protected ?array $categories = null;
 
     /**
      * Return formatted output for calendar component property categories
@@ -67,18 +67,18 @@ trait CATEGORIEStrait
     /**
      * Return formatted output for calendar component properties categories/resources
      *
-     * @param string $propName
-     * @param null|array  $pValArr
-     * @param bool|string $lang   bool false on not config lang found
-     * @param bool   $allowEmpty
-     * @param array  $specPkeys
+     * @param string        $propName
+     * @param null|array $pValArr
+     * @param bool|string   $lang   bool false on not config lang found
+     * @param bool          $allowEmpty
+     * @param string[]      $specPkeys
      * @return string
      * @since  2.29.13 - 2019-09-03
      */
     private static function createCatRes(
         string $propName,
-        $pValArr,
-        $lang,
+        ? array $pValArr,
+        bool|string $lang,
         bool $allowEmpty,
         array $specPkeys
     ) : string
@@ -87,7 +87,7 @@ trait CATEGORIEStrait
             return Util::$SP0;
         }
         $output = Util::$SP0;
-        foreach( $pValArr as $cx => $valuePart ) {
+        foreach( $pValArr as $valuePart ) {
             if( empty( $valuePart[Util::$LCvalue] )) {
                 if( $allowEmpty) {
                     $output .= StringFactory::createElement( $propName );
@@ -115,7 +115,7 @@ trait CATEGORIEStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteCategories( $propDelIx = null ) : bool
+    public function deleteCategories( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->categories )) {
             unset( $this->propDelIx[self::CATEGORIES] );
@@ -134,10 +134,10 @@ trait CATEGORIEStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getCategories( $propIx = null, $inclParam = false )
+    public function getCategories( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->categories )) {
             unset( $this->propIx[self::CATEGORIES] );
@@ -155,14 +155,14 @@ trait CATEGORIEStrait
     /**
      * Set calendar component property categories
      *
-     * @param null|mixed   $value
-     * @param null|array   $params
-     * @param null|int     $index
-     * @return static
+     * @param null|string $value
+     * @param null|string[]  $params
+     * @param null|int    $index
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setCategories( $value = null, $params = [], $index = null ) : self
+    public function setCategories( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CATEGORIES );
@@ -173,7 +173,7 @@ trait CATEGORIEStrait
         CalendarComponent::setMval(
             $this->categories,
             (string) $value,
-            $params,
+            ( $params ?? [] ),
             null,
             $index
         );

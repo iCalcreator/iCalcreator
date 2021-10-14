@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait SOURCErfc7986trait
 {
     /**
-     * @var array component property SOURCE value
+     * @var null|array component property SOURCE value
      */
-    protected $source = null;
+    protected ?array $source = null;
 
     /**
      * Return formatted output for calendar component property source
@@ -84,9 +84,9 @@ trait SOURCErfc7986trait
      * Get calendar component property source
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      */
-    public function getSource( $inclParam = false )
+    public function getSource( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->source )) {
             return false;
@@ -97,13 +97,13 @@ trait SOURCErfc7986trait
     /**
      * Set calendar component property source
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since  2.30.2 - 2021-02-04
      */
-    public function setSource( $value = null, $params = [] ) : self
+    public function setSource( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SOURCE );

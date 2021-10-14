@@ -43,15 +43,21 @@ class DateTest extends DtBase
     /**
      * set and restore local timezone from const
      */
-    public static $oldTimeZone = null;
+    public static ?string $oldTimeZone = null;
 
-    public static function setUpBeforeClass()
+    /**
+     * @return void
+     */
+    public static function setUpBeforeClass() : void
     {
         self::$oldTimeZone = date_default_timezone_get();
         date_default_timezone_set( LTZ );
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * @return void
+     */
+    public static function tearDownAfterClass() : void
     {
         date_default_timezone_set( self::$oldTimeZone );
     }
@@ -61,7 +67,7 @@ class DateTest extends DtBase
      *
      * @throws Exception
      */
-    public function DATEProvider()
+    public function DATEProvider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -82,10 +88,10 @@ class DateTest extends DtBase
         $dataArr[] = [ // test set #101 DateTime
             101,
             $dateTime,
-            [ Vcalendar::VALUE => Vcalendar::DATE ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
             [
                 Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ Vcalendar::VALUE => Vcalendar::DATE ]
+                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
             ],
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
@@ -94,10 +100,10 @@ class DateTest extends DtBase
         $dataArr[] = [ // test set #102 DateTime
             102,
             $dateTime,
-            [ Vcalendar::VALUE => Vcalendar::DATE ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
             [
                 Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ Vcalendar::VALUE => Vcalendar::DATE ]
+                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
             ],
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
@@ -109,7 +115,7 @@ class DateTest extends DtBase
             [],
             [
                 Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ Vcalendar::TZID => LTZ ]
+                Util::$LCparams => [ IcalInterface::TZID => LTZ ]
             ],
             $this->getDateTimeAsCreateLongString( $dateTime, LTZ)
         ];
@@ -118,10 +124,10 @@ class DateTest extends DtBase
         $dataArr[] = [ // test set #114 string
             114,
             DATEYmd,
-            [ Vcalendar::VALUE => Vcalendar::DATE ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
             [
                 Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ Vcalendar::VALUE => Vcalendar::DATE ]
+                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
             ],
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
@@ -131,15 +137,15 @@ class DateTest extends DtBase
         $dataArr[] = [ // test set #115 string
             115,
             DATEYmdTHis,
-            [ Vcalendar::VALUE => Vcalendar::DATE ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
             [
                 Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ Vcalendar::VALUE => Vcalendar::DATE ]
+                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
             ],
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
         $dataArr[] = [ // test set #116 string
             116,
             DATEYmdTHis,
@@ -152,20 +158,20 @@ class DateTest extends DtBase
         ];
 
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
         $dataArr[] = [ // test set #117 string
             117,
             DATEYmdTHis . 'Z',
-            [ Vcalendar::VALUE => Vcalendar::DATE ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
             [
                 Util::$LCvalue  => $dateTime,
                 Util::$LCparams =>
-                    [ Vcalendar::VALUE => Vcalendar::DATE ]
+                    [ IcalInterface::VALUE => IcalInterface::DATE ]
             ],
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis, Vcalendar::UTC );
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
         $dataArr[] = [ // test set #118 string
             118,
             DATEYmdTHis . 'Z',
@@ -174,7 +180,7 @@ class DateTest extends DtBase
                 Util::$LCvalue  => $dateTime,
                 Util::$LCparams => []
             ],
-            $this->getDateTimeAsCreateLongString( $dateTime, Vcalendar::UTC )
+            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
         ];
 
         $dateTime  = DateTimeFactory::factory( '20160305' );
@@ -182,10 +188,10 @@ class DateTest extends DtBase
             $dataArr[] = [ // test set #101 DateTime
                 200 + $x,
                 $dateTime->format( 'Ymd' ),
-                [ Vcalendar::VALUE => Vcalendar::DATE ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ],
                 [
                     Util::$LCvalue  => clone $dateTime,
-                    Util::$LCparams => [ Vcalendar::VALUE => Vcalendar::DATE ]
+                    Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
                 ],
                 $this->getDateTimeAsCreateShortString( $dateTime )
             ];
@@ -200,37 +206,37 @@ class DateTest extends DtBase
      *
      * @test
      * @dataProvider DATEProvider
-     * @param int    $case
+     * @param int $case
      * @param mixed  $value
      * @param mixed  $params
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      * @throws InvalidArgumentException
      */
     public function testDATE(
-        $case,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    )
+        int    $case,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
     {
         static $compsProps = [
-            Vcalendar::VEVENT => [
-                Vcalendar::DTSTART,
-                Vcalendar::DTEND,
-                Vcalendar::RECURRENCE_ID,
-                Vcalendar::EXDATE,
-                Vcalendar::RDATE
+            IcalInterface::VEVENT => [
+                IcalInterface::DTSTART,
+                IcalInterface::DTEND,
+                IcalInterface::RECURRENCE_ID,
+                IcalInterface::EXDATE,
+                IcalInterface::RDATE
             ],
-            Vcalendar::VTODO    => [ Vcalendar::DTSTART, Vcalendar::DUE, Vcalendar::RECURRENCE_ID ],
-            Vcalendar::VJOURNAL => [ Vcalendar::DTSTART, Vcalendar::RECURRENCE_ID ],
+            IcalInterface::VTODO    => [ IcalInterface::DTSTART, IcalInterface::DUE, IcalInterface::RECURRENCE_ID ],
+            IcalInterface::VJOURNAL => [ IcalInterface::DTSTART, IcalInterface::RECURRENCE_ID ],
         ];
         static $compsProps2 = [
-            Vcalendar::VEVENT => [
-                Vcalendar::EXDATE,
-                Vcalendar::RDATE
+            IcalInterface::VEVENT => [
+                IcalInterface::EXDATE,
+                IcalInterface::RDATE
             ]
         ];
         $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );

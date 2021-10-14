@@ -1,4 +1,21 @@
-<?php
+<?php /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
@@ -45,15 +62,21 @@ class DateIntervalTest1 extends DtBase
     /**
      * set and restore local timezone from const
      */
-    public static $oldTimeZone = null;
+    public static ?string $oldTimeZone = null;
 
-    public static function setUpBeforeClass()
+    /**
+     * @return void
+     */
+    public static function setUpBeforeClass() : void
     {
         self::$oldTimeZone = date_default_timezone_get();
         date_default_timezone_set( LTZ );
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * @return void
+     */
+    public static function tearDownAfterClass() : void
     {
         date_default_timezone_set( self::$oldTimeZone );
     }
@@ -67,7 +90,7 @@ class DateIntervalTest1 extends DtBase
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
      */
-    public static function DateIntervalArrayGenerator( $inclYearMonth = true)
+    public static function DateIntervalArrayGenerator( bool $inclYearMonth = true) : array
     {
         $base = [
             RecurFactory::$LCYEAR  => array_rand( array_flip( [ 1, 2 ] )),
@@ -88,7 +111,7 @@ class DateIntervalTest1 extends DtBase
                     array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
                 );
             }
-            if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) {
+            if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
                 $random = array_filter( $random );
             }
@@ -164,7 +187,7 @@ class DateIntervalTest1 extends DtBase
         if( $secIsSet ) {
             $result .= $duration[RecurFactory::$LCSEC] . $S;
         }
-        if( DateIntervalFactory::$P == $result ) {
+        if( DateIntervalFactory::$P === $result ) {
             $result = $PT0H0M0S;
         }
         return $result;
@@ -174,11 +197,11 @@ class DateIntervalTest1 extends DtBase
      * DateInterval123ProviderDateInterval sub-provider
      *
      * @param array $input
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval123ProviderDateInterval( array $input, $cnt )
+    public static function DateInterval123ProviderDateInterval( array $input, int $cnt ) : array
     {
         $dateIntervalArray = $input;
         $dateInterval = (array) DateIntervalFactory::factory(
@@ -204,11 +227,11 @@ class DateIntervalTest1 extends DtBase
      * DateInterval123Provider DateIntervalString sub-provider
      *
      * @param array $input
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval123ProviderDateIntervalString( array $input, $cnt )
+    public static function DateInterval123ProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $dateIntervalArray = $input;
         $getValue          = DateIntervalFactory::factory(
@@ -237,7 +260,7 @@ class DateIntervalTest1 extends DtBase
      * @return array
      * @throws Exception
      */
-    public function DateInterval123Provider()
+    public function DateInterval123Provider() : array
     {
         $zeroInput = [
             RecurFactory::$LCHOUR => 0,
@@ -253,7 +276,7 @@ class DateIntervalTest1 extends DtBase
 
         // DateInterval non-zero input
         while( 300 > $cnt ) {
-            $cnt += 1;
+            ++$cnt;
             $dataArr[] = self::DateInterval123ProviderDateInterval( self::DateIntervalArrayGenerator(), $cnt );
         }
 
@@ -263,7 +286,7 @@ class DateIntervalTest1 extends DtBase
 
         // string non-zero input
         while( 300 > $cnt ) {
-            $cnt += 1;
+            ++$cnt;
             $dataArr[] = self::DateInterval123ProviderDateIntervalString( self::DateIntervalArrayGenerator(), $cnt );
         }
 
@@ -277,20 +300,20 @@ class DateIntervalTest1 extends DtBase
      * @dataProvider DateInterval123Provider
      * @param int|string $case
      * @param mixed  $value
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval123( $case, $value, $expectedGet, $expectedString )
+    public function testDateInterval123( int | string $case, mixed $value, array $expectedGet, string $expectedString ) : void
     {
         static $compProp = [
-            Vcalendar::VEVENT    => [ Vcalendar::DURATION ],
-            Vcalendar::VTODO     => [ Vcalendar::DURATION ],
-            Vcalendar::VFREEBUSY => [ Vcalendar::DURATION ],
-            Vcalendar::VALARM    => [ Vcalendar::DURATION, Vcalendar::TRIGGER ],
+            IcalInterface::VEVENT    => [ IcalInterface::DURATION ],
+            IcalInterface::VTODO     => [ IcalInterface::DURATION ],
+            IcalInterface::VFREEBUSY => [ IcalInterface::DURATION ],
+            IcalInterface::VALARM    => [ IcalInterface::DURATION, IcalInterface::TRIGGER ],
         ];
         $c        = new Vcalendar();
-        $propName = Vcalendar::REFRESH_INTERVAL;
+        $propName = IcalInterface::REFRESH_INTERVAL;
         $getMethod    = StringFactory::getGetMethodName( $propName );
         $createMethod = StringFactory::getCreateMethodName( $propName );
         $deleteMethod = StringFactory::getDeleteMethodName( $propName );
@@ -299,7 +322,7 @@ class DateIntervalTest1 extends DtBase
 
         $getValue = $c->{$getMethod}( true );
         $expGet   = $expectedGet;
-        $expGet[Util::$LCparams] += [ Vcalendar::VALUE => Vcalendar::DURATION ];
+        $expGet[Util::$LCparams] += [ IcalInterface::VALUE => IcalInterface::DURATION ];
         $this->assertEquals(
             $expGet,
             $getValue,
@@ -319,7 +342,7 @@ class DateIntervalTest1 extends DtBase
 
         foreach( $compProp as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
-            if( Vcalendar::VALARM == $theComp ) {
+            if( IcalInterface::VALARM === $theComp ) {
                 $comp   = $c->newVevent()->{$newMethod}();
             }
             else {
@@ -359,7 +382,7 @@ class DateIntervalTest1 extends DtBase
                 );
                 $comp->{$setMethod}( $value ); // test ###
             } // end foreach
-            if( Vcalendar::VALARM != $theComp ) {
+            if( IcalInterface::VALARM !== $theComp ) {
                 $comp->setDtstart( '20190101T080000 UTC' );
                 $this->assertGreaterThanOrEqual(
                     '20190101080000',

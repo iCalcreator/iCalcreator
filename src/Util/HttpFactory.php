@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function clearstatcache;
@@ -42,7 +43,6 @@ use function header;
 use function sprintf;
 use function strcasecmp;
 use function strlen;
-use function strpos;
 use function substr;
 use function sys_get_temp_dir;
 use function tempnam;
@@ -59,9 +59,9 @@ class HttpFactory
     /**
      * HTTP headers
      *
-     * @var array $headers
+     * @var string[] $headers
      */
-    private static $headers = [
+    private static array $headers = [
         'Content-Encoding: gzip',
         'Vary: *',
         'Content-Length: %s',
@@ -74,21 +74,21 @@ class HttpFactory
     /**
      * Return created, updated and/or parsed calendar, sending a HTTP redirect header.
      *
-     * @param Vcalendar $calendar
-     * @param bool      $utf8Encode
-     * @param bool      $gzip
-     * @param bool      $cdType true : Content-Disposition: attachment... (default), false : ...inline...
-     * @param string    $fileName
+     * @param Vcalendar    $calendar
+     * @param null|bool    $utf8Encode
+     * @param null|bool    $gzip
+     * @param null|bool    $cdType true : Content-Disposition: attachment... (default), false : ...inline...
+     * @param null|string  $fileName
      * @return bool true on success, false on error
      * @throws Exception
      * @since  2.29.15 - 2020-01-19
      */
     public static function returnCalendar(
         Vcalendar $calendar,
-        $utf8Encode = false,
-        $gzip       = false,
-        $cdType     = true,
-        $fileName   = null
+        ? bool $utf8Encode = false,
+        ? bool $gzip       = false,
+        ? bool $cdType     = true,
+        ? string $fileName = null
     ) : bool
     {
         static $ICR = 'iCr';
@@ -102,25 +102,23 @@ class HttpFactory
         $fsize = null;
         if( $gzip ?? false ) {
             $output = gzencode( $output, 9 );
-            $fsize  = strlen( $output );
+            $fsize  = strlen((string) $output );
             header( self::$headers[0] );
             header( self::$headers[1] );
         }
-        else {
-            if( false !== ( $temp = tempnam( sys_get_temp_dir(), $ICR ))) {
-                if( false !== file_put_contents( $temp, $output )) {
-                    $fsize = @filesize( $temp );
-                }
-                unlink( $temp );
-                clearstatcache();
+        elseif( false !== ( $temp = tempnam( sys_get_temp_dir(), $ICR ))) {
+            if( false !== file_put_contents( $temp, $output )) {
+                $fsize = @filesize( $temp );
             }
+            unlink( $temp );
+            clearstatcache();
         } // end else
         if( ! empty( $fsize )) {
             header( sprintf( self::$headers[2], $fsize ));
         }
         header( self::$headers[3] );
-        $cdType = ( $cdType ?? false ) ? 4 : 5;
-        header( sprintf( self::$headers[$cdType], $fileName ));
+        $cdTix = $cdType ? 4 : 5;
+        header( sprintf( self::$headers[$cdTix], $fileName ));
         header( self::$headers[6] );
         echo $output;
         return true;
@@ -135,26 +133,24 @@ class HttpFactory
     private static function getFakedFilename() : string
     {
         static $DOTICS = '.ics';
-        return date(
-            DateTimeFactory::$YmdHis,
-            intval( microtime( true ))
-            ) . $DOTICS;
+        return date( DateTimeFactory::$YmdHis, (int) microtime( true )) . $DOTICS;
     }
 
     /**
      * Assert URL
      *
      * @param string $url
+     * @return void
      * @throws InvalidArgumentException
      * @since  2.27.3 - 2018-12-28
      */
-    public static function assertUrl( $url )
+    public static function assertUrl( string $url ) : void
     {
         static $UC   = '_';
         static $URN  = 'urn';
         static $HTTP = 'http://';
         static $MSG  = 'URL validity error #%d, \'%s\'';
-        $url2 = ( false !== strpos( $url, $UC ))
+        $url2 = (str_contains( $url, $UC ))
             ? str_replace( $UC, Util::$MINUS, $url )
             : $url;
         $no   = 0;
@@ -167,7 +163,7 @@ class HttpFactory
                 break;
             }
             $no = 1;
-            if( 0 != strcasecmp( $URN, substr( $url, 0, 3 ))) {
+            if( 0 !== strcasecmp( $URN, substr( $url, 0, 3 ))) {
                 $no = 2;
             }
             break;
@@ -180,21 +176,21 @@ class HttpFactory
     /**
      * Set calendar component property uri; URL, TZURL, SOURCE
      *
-     * @param array $valueProp
-     * @param string $value
-     * @param array  $params
+     * @param null|mixed[]   $valueArr
+     * @param null|string    $value
+     * @param null|string[]  $params
      * @return void
      * @throws InvalidArgumentException
      * @since  2.30.3 - 2021-02-14
      */
-    public static function urlSet( & $valueProp, $value = null, $params = [] )
+    public static function urlSet( ? array & $valueArr = [], ? string $value = null, ? array $params = [] ) : void
     {
         if( ! empty( $value )) {
             StringFactory::checkFixUriValue( $value );
             self::assertUrl( $value );
         }
-        ParameterFactory::ifExistRemove( $params, Vcalendar::VALUE, Vcalendar::URI );
-        $valueProp = [
+        ParameterFactory::ifExistRemove( $params, IcalInterface::VALUE, IcalInterface::URI );
+        $valueArr = [
             Util::$LCvalue  => $value,
             Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
         ];

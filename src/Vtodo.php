@@ -52,7 +52,6 @@ final class Vtodo extends VetComponent
         Traits\CONTACTtrait,
         Traits\CREATEDtrait,
         Traits\DESCRIPTIONtrait,
-        Traits\DTSTAMPtrait,
         Traits\DTSTARTtrait,
         Traits\DUEtrait,
         Traits\DURATIONtrait,
@@ -80,7 +79,7 @@ final class Vtodo extends VetComponent
     /**
      * @var string
      */
-    protected static $compSgn = 't';
+    protected static string $compSgn = 't';
 
     /**
      * Destructor

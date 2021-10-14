@@ -33,7 +33,6 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * TZURL property functions
@@ -43,16 +42,16 @@ use InvalidArgumentException;
 trait TZURLtrait
 {
     /**
-     * @var array component property TZURL value
+     * @var null|array component property TZURL value
      */
-    protected $tzurl = null;
+    protected ?array $tzurl = null;
 
     /**
      * Return formatted output for calendar component property tzurl
      *
-     * @return string
+     * @return string|null
      */
-    public function createTzurl()
+    public function createTzurl() : ?string
     {
         if( empty( $this->tzurl )) {
             return null;
@@ -85,10 +84,10 @@ trait TZURLtrait
      * Get calendar component property tzurl
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzurl( $inclParam = false )
+    public function getTzurl( bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzurl )) {
             return false;
@@ -103,13 +102,12 @@ trait TZURLtrait
      * This URI form can be useful within an organization, but is problematic
      * in the Internet.
      *
-     * @param string $value
-     * @param array  $params
-     * @return static
-     * @throws InvalidArgumentException
+     * @param string|null $value
+     * @param array $params
+     * @return self
      * @since  2.30.2 - 2021-02-04
      */
-    public function setTzurl( $value = null, $params = [] ) : self
+    public function setTzurl( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZURL );

@@ -56,7 +56,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.39.1' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40' );
 }
 
 /**
@@ -73,89 +73,89 @@ abstract class IcalBase implements IcalInterface
     /**
      * @var string
      */
-    protected static $INDEX = 'INDEX';
+    protected static string $INDEX = 'INDEX';
 
     /**
-     * @var array  iCal V*-component collection
+     * @var string[]  iCal V*-component collection
      * @usedby IcalBase+Vcalendar+SelectFactory
      */
-    public static $VCOMPS   = [
-        Vcalendar::VEVENT,
-        Vcalendar::VTODO,
-        Vcalendar::VJOURNAL,
-        Vcalendar::VFREEBUSY
+    public static array $VCOMPS   = [
+        IcalInterface::VEVENT,
+        IcalInterface::VTODO,
+        IcalInterface::VJOURNAL,
+        IcalInterface::VFREEBUSY
     ];
 
     /**
-     * @var array  iCal timezone component collection
+     * @var string[]  iCal timezone component collection
      * @usedby DTSTARTtrait+RexdateFactory
      */
-    public static $TZCOMPS  = [
-        Vcalendar::VTIMEZONE,
-        Vcalendar::STANDARD,
-        Vcalendar::DAYLIGHT
+    public static array $TZCOMPS  = [
+        IcalInterface::VTIMEZONE,
+        IcalInterface::STANDARD,
+        IcalInterface::DAYLIGHT
     ];
 
     /**
-     * @var array  iCal component collection
+     * @var string[]  iCal component collection
      */
-    protected static $CALCOMPS = [
-        Vcalendar::VEVENT,
-        Vcalendar::VTODO,
-        Vcalendar::VJOURNAL,
-        Vcalendar::VFREEBUSY,
-        Vcalendar::VALARM,
-        Vcalendar::VTIMEZONE
+    protected static array $CALCOMPS = [
+        IcalInterface::VEVENT,
+        IcalInterface::VTODO,
+        IcalInterface::VJOURNAL,
+        IcalInterface::VFREEBUSY,
+        IcalInterface::VALARM,
+        IcalInterface::VTIMEZONE
     ];
 
     /**
-     * @var array  iCal sub-component collection
+     * @var string[]  iCal sub-component collection
      * @usedby CalendarComponent+IcalBase+DTSTAMPtrait
      */
-    protected static $SUBCOMPS = [
-        Vcalendar::VALARM,
-        Vcalendar::VTIMEZONE,
-        Vcalendar::STANDARD,
-        Vcalendar::DAYLIGHT
+    protected static array $SUBCOMPS = [
+        IcalInterface::VALARM,
+        IcalInterface::VTIMEZONE,
+        IcalInterface::STANDARD,
+        IcalInterface::DAYLIGHT
     ];
 
     /**
-     * @var array  iCal component multiple property sub-collection
+     * @var string[]  iCal component multiple property sub-collection
      * @usedby CalendarComponent + Vcalendar + SelectFactory + SortFactory
      */
-    public static $MPROPS1    = [
-        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT,
-        Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
+    public static array $MPROPS1    = [
+        IcalInterface::ATTENDEE, IcalInterface::CATEGORIES, IcalInterface::CONTACT,
+        IcalInterface::RELATED_TO, IcalInterface::RESOURCES,
     ];
 
     /**
-     * @var array  iCal component multiple property collection
+     * @var string[]  iCal component multiple property collection
      * @since  2.27.20 - 2019-05-20
      * @usedby IcalBase
      */
-    protected static $MPROPS2    = [
-        Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
-        Vcalendar::COMMENT, Vcalendar::CONTACT, Vcalendar::DESCRIPTION,
-        Vcalendar::EXDATE, Vcalendar::FREEBUSY, Vcalendar::RDATE,
-        Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
-        Vcalendar::REQUEST_STATUS, Vcalendar::TZNAME, Vcalendar::X_PROP,
+    protected static array $MPROPS2    = [
+        IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
+        IcalInterface::COMMENT, IcalInterface::CONTACT, IcalInterface::DESCRIPTION,
+        IcalInterface::EXDATE, IcalInterface::FREEBUSY, IcalInterface::RDATE,
+        IcalInterface::RELATED_TO, IcalInterface::RESOURCES,
+        IcalInterface::REQUEST_STATUS, IcalInterface::TZNAME, IcalInterface::X_PROP,
     ];
 
     /**
-     * @var array  iCal component misc. property collection
+     * @var string[]  iCal component misc. property collection
      * @usedby Vcalendar + SelectFactory
      */
-    public static $OTHERPROPS = [
-        Vcalendar::ATTENDEE, Vcalendar::CATEGORIES, Vcalendar::CONTACT, Vcalendar::LOCATION,
-        Vcalendar::ORGANIZER, Vcalendar::PRIORITY, Vcalendar::RELATED_TO, Vcalendar::RESOURCES,
-        Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::UID, Vcalendar::URL,
+    public static array $OTHERPROPS = [
+        IcalInterface::ATTENDEE, IcalInterface::CATEGORIES, IcalInterface::CONTACT, IcalInterface::LOCATION,
+        IcalInterface::ORGANIZER, IcalInterface::PRIORITY, IcalInterface::RELATED_TO, IcalInterface::RESOURCES,
+        IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::UID, IcalInterface::URL,
     ];
 
     /**
-     * @var array  iCal component TEXT properties
+     * @var string[]  iCal component TEXT properties
      * @usedby Vcalendar + CalendarComponent
      */
-    protected static $TEXTPROPS = [
+    protected static array $TEXTPROPS = [
         self::CATEGORIES,
         self::COLOR,
         self::COMMENT,
@@ -167,47 +167,47 @@ abstract class IcalBase implements IcalInterface
     /**
      * @var string
      */
-    protected static $FMTERRPROPFMT = 'Invalid %s input format (%s)';
+    protected static string $FMTERRPROPFMT = 'Invalid %s input format (%s)';
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected static $ALTRPLANGARR  = [ self::ALTREP, self::LANGUAGE ];
+    protected static array $ALTRPLANGARR  = [ self::ALTREP, self::LANGUAGE ];
 
     /**
      * @var array container for sub-components
      */
-    protected $components = [];
+    protected array $components = [];
 
     /**
-     * @var array $unparsed calendar/components in 'raw' text...
+     * @var string[] $unparsed calendar/components in 'raw' text...
      */
-    protected $unparsed = null;
+    protected array $unparsed = [];
 
     /**
      * @var array $config configuration with defaults
      */
-    protected $config = [
+    protected array $config = [
         self::ALLOWEMPTY => true,
     ];
 
     /**
-     * @var string component type
+     * @var string|null component type
      */
-    protected $compType = null;
+    protected ?string $compType;
 
     /**
-     * @var array component index
+     * @var int[] component index
      */
-    protected $compix = [];
+    protected array $compix = [];
 
     /**
-     * @var array get multi property index
+     * @var array<string, int> get multi property index
      */
     protected $propIx = [];
 
     /**
-     * @var array delete multi property index
+     * @var array<string, int> delete multi property index
      */
     protected $propDelIx = [];
 
@@ -232,7 +232,7 @@ abstract class IcalBase implements IcalInterface
                     }
                     unset( $attr_array_value );
                 }
-            }
+            }// end else
         } // end foreach
         $this->compix    = [];
         $this->propIx    = [];
@@ -240,9 +240,9 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
-     * Reset internal counters
+     * Reset all internal counters
      *
-     * @return static
+     * @return self
      * @since  2.27.14 - 2019-03-11
      */
     public function reset() : self
@@ -266,10 +266,10 @@ abstract class IcalBase implements IcalInterface
      * Remove Vcalendar/component config key value
      *
      * @param string $key
-     * @return static
+     * @return self
      * @since  2.27.14 - 2019-02-04
      */
-    public function deleteConfig( $key ) : self
+    public function deleteConfig( string $key ) : self
     {
         $key = strtoupper( $key );
         if( isset( $this->config[$key] )) {
@@ -281,11 +281,11 @@ abstract class IcalBase implements IcalInterface
     /**
      * Return Vcalendar/component config value, false on not found
      *
-     * @param mixed $config
+     * @param null|string $config
      * @return mixed   bool false on not found or empty
      * @since  2.39.1 - 2021-06-26
      */
-    public function getConfig( $config = null )
+    public function getConfig( ? string $config = null ) : mixed
     {
         static $LCORDNO = 'ordno';
         static $LCTYPE  = 'type';
@@ -380,7 +380,7 @@ abstract class IcalBase implements IcalInterface
                     break;
                 case ( empty( $this->{$propName2} )) :
                     break;
-                case ( self::X_PROP == $propName ) :
+                case ( self::X_PROP === $propName ) :
                     foreach( array_keys( $this->{$propName2}) as $propName3 ) {
                         $output[$propName3] = 1;
                     }
@@ -398,14 +398,18 @@ abstract class IcalBase implements IcalInterface
     /**
      * Set Vcalendar/component config
      *
-     * @param mixed  $config
-     * @param mixed $value
-     * @param bool   $softUpdate
-     * @return static
+     * @param string|array $config
+     * @param mixed         $value
+     * @param bool          $softUpdate
+     * @return self
      * @throws InvalidArgumentException
      * @since  2.29.4 - 2019-07-02
      */
-    public function setConfig( $config, $value = null, $softUpdate = false ) : self
+    public function setConfig(
+        string | array $config,
+        mixed $value = null ,
+        ? bool $softUpdate = false
+    ) : self
     {
         static $ERRMSG9 = 'Invalid config value %s';
         $isComponent = ( ! property_exists(
@@ -422,11 +426,11 @@ abstract class IcalBase implements IcalInterface
         $key    = strtoupper( $config );
         $subCfg = null;
         switch( true ) {
-            case ( self::ALLOWEMPTY == $key ) :
+            case ( self::ALLOWEMPTY === $key ) :
                 $this->config[self::ALLOWEMPTY] = $value;
                 $subCfg = [ self::ALLOWEMPTY => $value ];
                 break;
-            case ( self::LANGUAGE == $key ) :
+            case ( self::LANGUAGE === $key ) :
                 // set language for calendar component as defined in [RFC 1766]
                 $value  = trim( $value );
                 if( empty( $this->config[self::LANGUAGE] ) || ! $softUpdate ) { // ??
@@ -434,7 +438,7 @@ abstract class IcalBase implements IcalInterface
                 }
                 $subCfg = [ self::LANGUAGE => $value ];
                 break;
-            case ( self::UNIQUE_ID == $key ) :
+            case ( self::UNIQUE_ID === $key ) :
                 $value  = trim( $value );
                 $this->config[self::UNIQUE_ID] = $value;
                 $subCfg = [ self::UNIQUE_ID => $value ];
@@ -459,10 +463,11 @@ abstract class IcalBase implements IcalInterface
      *
      * @param mixed  $value
      * @param string $propName
+     * @return void
      * @throws InvalidArgumentException
      * @since  2.27.1 - 2018-12-12
      */
-    protected function assertEmptyValue( $value, $propName )
+    protected function assertEmptyValue( mixed $value, string $propName ) : void
     {
         static $ERRMSG = 'Empty %s value not allowed';
         if( empty( $value ) && ! $this->getConfig( self::ALLOWEMPTY )) {
@@ -491,7 +496,7 @@ abstract class IcalBase implements IcalInterface
     {
         return ( empty( $this->components ))
             ? 0
-            : key( array_slice( $this->components, -1, 1, true )) + 1;
+            : (int) key( array_slice( $this->components, -1, 1, true )) + 1;
     }
 
     /**
@@ -501,13 +506,13 @@ abstract class IcalBase implements IcalInterface
      * @param mixed             $arg1      ordno/component type/ component uid
      * @param mixed             $arg2      ordno if arg1 = component type
      * @throws InvalidArgumentException
-     * @return static
+     * @return self
      * @since  2.27.3 - 2018-12-21
      */
     public function setComponent(
         CalendarComponent $component,
-        $arg1 = false,
-        $arg2 = false
+        mixed $arg1 = false,
+        mixed $arg2 = false
     ) : self
     {
         $component->setConfig( $this->getConfig(), false, true );
@@ -536,27 +541,27 @@ abstract class IcalBase implements IcalInterface
             if( empty( $component2 )) {
                 continue;
             }
-            if(( self::$INDEX == $argType ) && ( $index == $cix )) {
+            if(( self::$INDEX === $argType ) && ( $index === $cix )) {
                 // index insert/replace
                 $this->components[$cix] = clone $component;
                 return $this;
             }
-            elseif( $argType == $component2->getCompType()) {
+            if( $argType === $component2->getCompType()) {
                 // component Type index insert/replace
-                if( $index == $cix2sC ) {
+                if( $index === $cix2sC ) {
                     $this->components[$cix] = clone $component;
                     return $this;
                 }
                 $cix2sC++;
             }
             elseif( ! $argType &&
-                ! Util::isCompInList( $component2->getCompType(), self::$SUBCOMPS ) &&
-                ( $arg1 == $component2->getUid())) { // UID insert/replace
+                ( $arg1 === $component2->getUid()) &&
+                ! Util::isCompInList( $component2->getCompType(), self::$SUBCOMPS )) { // UID insert/replace
                 $this->components[$cix] = clone $component;
                 return $this;
             }
         } // end foreach
-        if( self::$INDEX == $argType ) { // arg1=index and not found.. . insert at index .. .
+        if( self::$INDEX === $argType ) { // arg1=index and not found.. . insert at index .. .
             $this->components[$index] = clone $component;
             ksort( $this->components, SORT_NUMERIC );
         }
@@ -570,12 +575,12 @@ abstract class IcalBase implements IcalInterface
      * Delete calendar subcomponent from component container
      *
      * @param mixed    $arg1 ordno / component type / component uid
-     * @param mixed    $arg2 ordno if arg1 = component type
+     * @param bool|mixed $arg2 ordno if arg1 = component type
      * @return bool  true on success, false on not found (last one deleted)
      * @since  2.26.14 - 2019-02-25
      * @todo   Exception mgnt on unknown component
      */
-    public function deleteComponent( $arg1, $arg2 = false ) : bool
+    public function deleteComponent( mixed $arg1, mixed $arg2 = false ) : bool
     {
         if( ! isset( $this->components )) {
             return false;
@@ -590,8 +595,8 @@ abstract class IcalBase implements IcalInterface
                 StringFactory::getInternalPropName( IcalInterface::PRODID )
             )) {
             $cmpArg = ucfirst( strtolower( $arg1 ));
-            if( Util::isCompInList( $cmpArg, IcalBase::$CALCOMPS ) &&
-                ( 0 != strcasecmp( $cmpArg, IcalInterface::VALARM ))) {
+            if( Util::isCompInList( $cmpArg, self::$CALCOMPS ) &&
+                ( 0 !== strcasecmp( $cmpArg, IcalInterface::VALARM ))) {
                 $argType = ucfirst( strtolower( $arg1 ) );
                 $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
                     ? ((int) $arg2 - 1 )
@@ -601,13 +606,13 @@ abstract class IcalBase implements IcalInterface
         $cix2dC = 0;
         $remove = false;
         foreach( $this->components as $cix => $component ) {
-            if(( IcalBase::$INDEX == $argType ) && ( $index == $cix )) {
+            if(( self::$INDEX === $argType ) && ( $index === $cix )) {
                 unset( $this->components[$cix] );
                 $remove = true;
                 break;
             }
-            elseif( $argType == $component->getCompType()) {
-                if( $index == $cix2dC ) {
+            if( $argType === $component->getCompType()) {
+                if( $index === $cix2dC ) {
                     unset( $this->components[$cix] );
                     $argType = strtolower( $argType );
                     if( isset( $this->compix[$argType] )) {
@@ -619,8 +624,8 @@ abstract class IcalBase implements IcalInterface
                 $cix2dC++;
             }
             elseif( ! $argType &&
-                ! Util::isCompInList( $component->getCompType(), IcalBase::$SUBCOMPS ) &&
-                ( $arg1 == $component->getUid())) {
+                ( $arg1 === $component->getUid()) &&
+                ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS )) {
                 unset( $this->components[$cix] );
                 $remove = true;
                 break;
@@ -637,15 +642,16 @@ abstract class IcalBase implements IcalInterface
      * Assert base components
      *
      * @param IcalBase $component
+     * @return void
      * @throws InvalidArgumentException
      * @since  2.27.6 - 2018-12-28
      */
-    protected static function assertBaseComponents( IcalBase $component )
+    protected static function assertBaseComponents( IcalBase $component ) : void
     {
         static $ERRMSG = 'Invalid component type \'%s\'';
         $compType = $component->getCompType();
-        if( ! Util::isCompInList( $compType, self::$VCOMPS ) &&
-             ( self::VTIMEZONE != $compType )) {
+        if(( self::VTIMEZONE !== $compType ) &&
+            ! Util::isCompInList( $compType, self::$VCOMPS )) {
             throw new InvalidArgumentException( sprintf( $ERRMSG, $compType ));
         }
     }
@@ -655,13 +661,15 @@ abstract class IcalBase implements IcalInterface
      *
      * @param IcalBase $comp
      * @param CalendarComponent $subComp
+     * @return void
      * @throws InvalidArgumentException
      * @since  2.27.6 - 2018-12-28
      */
     private static function assertComponents(
         IcalBase $comp,
         CalendarComponent $subComp
-    ) {
+    ) : void
+    {
         static $MSG = 'Unknown component %s';
         $type    = $comp->getCompType();
         $subType = $subComp->getCompType();
@@ -681,12 +689,10 @@ abstract class IcalBase implements IcalInterface
             case self::VEVENT :
                 // fall through
             case self::VTODO :
-                switch( $subType ) {
-                    case self::VALARM :
-                        break 2;
-                    default :
-                        throw new InvalidArgumentException( sprintf( $MSG, $subType ));
+                if( self::VALARM  === $subType ) {
+                    break;
                 }
+                throw new InvalidArgumentException( sprintf( $MSG, $subType ));
             case self::VFREEBUSY :
                 break;
             case self::VJOURNAL :

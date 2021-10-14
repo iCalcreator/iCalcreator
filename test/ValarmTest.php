@@ -46,20 +46,20 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class ValarmTest extends DtBase
 {
-    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-    private static $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    private static array $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
 
     /**
      * valarmTest provider
      */
-    public function valarmTestProvider()
+    public function valarmTestProvider() : array
     {
         $dataArr = [];
 
         // ACTION
         $dataArr[] = [
             11,
-            Vcalendar::ACTION,
+            IcalInterface::ACTION,
             null,
             self::$STCPAR,
             [
@@ -69,10 +69,10 @@ class ValarmTest extends DtBase
             ':'
         ];
 
-        $value = Vcalendar::AUDIO; // "DISPLAY" / "EMAIL
+        $value = IcalInterface::AUDIO; // "DISPLAY" / "EMAIL
         $dataArr[] = [
             12,
-            Vcalendar::ACTION,
+            IcalInterface::ACTION,
             $value,
             self::$STCPAR,
             [
@@ -86,7 +86,7 @@ class ValarmTest extends DtBase
         // TRIGGER
         $dataArr[] = [
             21,
-            Vcalendar::TRIGGER,
+            IcalInterface::TRIGGER,
             null,
             self::$STCPAR,
             [
@@ -99,7 +99,7 @@ class ValarmTest extends DtBase
         $value = 'P1D';
         $dataArr[] = [
             22,
-            Vcalendar::TRIGGER,
+            IcalInterface::TRIGGER,
             $value,
             self::$STCPAR,
             [
@@ -113,7 +113,7 @@ class ValarmTest extends DtBase
         // DURATION
         $dataArr[] = [
             31,
-            Vcalendar::DURATION,
+            IcalInterface::DURATION,
             null,
             self::$STCPAR,
             [
@@ -126,7 +126,7 @@ class ValarmTest extends DtBase
         $value = 'P1D';
         $dataArr[] = [
             32,
-            Vcalendar::DURATION,
+            IcalInterface::DURATION,
             $value,
             self::$STCPAR,
             [
@@ -140,7 +140,7 @@ class ValarmTest extends DtBase
         // REPEAT
         $dataArr[] = [
             41,
-            Vcalendar::REPEAT,
+            IcalInterface::REPEAT,
             null,
             self::$STCPAR,
             [
@@ -153,7 +153,7 @@ class ValarmTest extends DtBase
         $value = 3;
         $dataArr[] = [
             42,
-            Vcalendar::REPEAT,
+            IcalInterface::REPEAT,
             $value,
             self::$STCPAR,
             [
@@ -171,7 +171,7 @@ class ValarmTest extends DtBase
         ];
         $dataArr[] = [
             51,
-            Vcalendar::ATTACH,
+            IcalInterface::ATTACH,
             null,
             self::$STCPAR,
             $getValue,
@@ -186,7 +186,7 @@ class ValarmTest extends DtBase
         ];
         $dataArr[] = [
             52,
-            Vcalendar::ATTACH,
+            IcalInterface::ATTACH,
             $value,
             $params,
             $getValue,
@@ -196,14 +196,14 @@ class ValarmTest extends DtBase
 
         // ATTACH
         $value  = 'ftp://example.com/pub/reports/r-960812.ps';
-        $params = [ Vcalendar::FMTTYPE => 'application/postscript' ] + self::$STCPAR;
+        $params = [ IcalInterface::FMTTYPE => 'application/postscript' ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
         ];
         $dataArr[] = [
             53,
-            Vcalendar::ATTACH,
+            IcalInterface::ATTACH,
             $value,
             $params,
             $getValue,
@@ -214,7 +214,7 @@ class ValarmTest extends DtBase
         // DESCRIPTION
         $dataArr[] = [
             61,
-            Vcalendar::DESCRIPTION,
+            IcalInterface::DESCRIPTION,
             null,
             self::$STCPAR,
             [
@@ -226,26 +226,26 @@ class ValarmTest extends DtBase
 
         $value  = 'Meeting to provide technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
         $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
+                IcalInterface::ALTREP   => 'This is an alternative representation',
+                IcalInterface::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [
             62,
-            Vcalendar::DESCRIPTION,
+            IcalInterface::DESCRIPTION,
             $value,
             $params,
             [
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // SUMMARY
         $dataArr[] = [
             71,
-            Vcalendar::SUMMARY,
+            IcalInterface::SUMMARY,
             null,
             self::$STCPAR,
             [
@@ -257,26 +257,26 @@ class ValarmTest extends DtBase
 
         $value  = 'Department Party';
         $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
+                IcalInterface::ALTREP   => 'This is an alternative representation',
+                IcalInterface::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [
             72,
-            Vcalendar::SUMMARY,
+            IcalInterface::SUMMARY,
             $value,
             $params,
             [
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // ATTENDEE
         $dataArr[] = [
             71,
-            Vcalendar::ATTENDEE,
+            IcalInterface::ATTENDEE,
             null,
             self::$STCPAR,
             [
@@ -298,7 +298,7 @@ class ValarmTest extends DtBase
         $expectedString = substr( $expectedString, 8 );
         $dataArr[] = [
             72,
-            Vcalendar::ATTENDEE,
+            IcalInterface::ATTENDEE,
             $value,
             $params,
             $getValue,
@@ -317,22 +317,23 @@ class ValarmTest extends DtBase
      *
      * @test
      * @dataProvider valarmTestProvider
-     * @param int    $case
+     * @param int $case
      * @param string $propName
      * @param mixed  $value
      * @param mixed  $params
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
     public function valarmTest(
-        $case,
-        $propName,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+        int    $case,
+        string $propName,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
+    {
         $c  = new Vcalendar();
         foreach( [ $c->newVevent(), $c->newVtodo() ] as $comp  ) {
             $a1 = $comp->newValarm();
@@ -343,7 +344,7 @@ class ValarmTest extends DtBase
             $setMethod    = StringFactory::getSetMethodName( $propName );
 
             $a1->{$setMethod}( $value, $params );
-            if( in_array( $propName, [ Vcalendar::ATTACH, Vcalendar::DESCRIPTION, Vcalendar::ATTENDEE ] ) ) {
+            if( in_array( $propName, [ IcalInterface::ATTACH, IcalInterface::DESCRIPTION, IcalInterface::ATTENDEE ], true ) ) {
                 $getValue = $a1->{$getMethod}( null, true );
             }
             else {
@@ -378,10 +379,10 @@ class ValarmTest extends DtBase
 
             $x = 1;
             while( $comp->deleteComponent( $x ) ) {
-                $x += 1;
+                ++$x;
             }
             $this->assertTrue(
-                ( 0 == $comp->countComponents() ),
+                ( 0 === $comp->countComponents() ),
                 $case .  '-5 deleteComponent-error 2, has ' . $comp->countComponents()
             );
             // check components are set
@@ -390,7 +391,7 @@ class ValarmTest extends DtBase
             }
             // check number of components
             $this->assertTrue(
-                ( count( $compArr ) == $comp->countComponents() ),
+                ( count( $compArr ) === $comp->countComponents() ),
                 $case .  '-6 setComponent-error 3, has ' . $comp->countComponents()
             );
         }

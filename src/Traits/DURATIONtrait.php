@@ -30,14 +30,13 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use DateInterval;
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-
-use function is_array;
 
 /**
  * DURATION property functions
@@ -47,16 +46,16 @@ use function is_array;
 trait DURATIONtrait
 {
     /**
-     * @var array component property DURATION value
+     * @var null|array component property DURATION value
      */
-    protected $duration = null;
+    protected ?array $duration = null;
 
     /**
      * Return formatted output for calendar component property duration
      *
      * @return string
      * @throws Exception
-     * @since  2.29.2 - 2019-06-27
+     * @since  2.40 - 2021-10-04
      */
     public function createDuration() : string
     {
@@ -68,23 +67,10 @@ trait DURATIONtrait
                 ? StringFactory::createElement( self::DURATION )
                 : Util::$SP0;
         }
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet( $this->duration[Util::$LCvalue] )) { // fix pre 7.0.5 bug
-            try {
-                $dateInterval = DateIntervalFactory::DateIntervalArr2DateInterval(
-                    $this->duration[Util::$LCvalue]
-                );
-            }
-            catch( Exception $e ) {
-                throw $e;
-            }
-        }
-        else {
-            $dateInterval = $this->duration[Util::$LCvalue];
-        }
         return StringFactory::createElement(
             self::DURATION,
             ParameterFactory::createParams( $this->duration[Util::$LCparams] ),
-            DateIntervalFactory::dateInterval2String( $dateInterval )
+            DateIntervalFactory::dateInterval2String( $this->duration[Util::$LCvalue] )
         );
     }
 
@@ -105,11 +91,11 @@ trait DURATIONtrait
      *
      * @param null|bool   $inclParam
      * @param null|bool   $specform
-     * @return bool|array|DateInterval
+     * @return bool|string|array|DateInterval|DateTime
      * @throws Exception
-     * @since  2.29.2 - 2019-06-29
+     * @since  2.40 - 2021-10-04
      */
-    public function getDuration( $inclParam = false, $specform = false )
+    public function getDuration( ? bool $inclParam = false, ? bool $specform = false ) : DateInterval | DateTime | bool | string | array
     {
         if( empty( $this->duration )) {
             return false;
@@ -117,19 +103,7 @@ trait DURATIONtrait
         if( empty( $this->duration[Util::$LCvalue] )) {
             return ( $inclParam ) ? $this->duration : $this->duration[Util::$LCvalue];
         }
-        if( DateIntervalFactory::isDateIntervalArrayInvertSet( $this->duration[Util::$LCvalue] )) { // fix pre 7.0.5 bug
-            try {
-                $value = DateIntervalFactory::DateIntervalArr2DateInterval(
-                    $this->duration[Util::$LCvalue]
-                );
-            }
-            catch( Exception $e ) {
-                throw $e;
-            }
-        }
-        else {
-            $value = $this->duration[Util::$LCvalue];
-        }
+        $value  = $this->duration[Util::$LCvalue];
         $params = $this->duration[Util::$LCparams];
         if( $specform && ! empty( $this->dtstart )) {
             $dtStart = $this->dtstart;
@@ -148,21 +122,21 @@ trait DURATIONtrait
     /**
      * Set calendar component property duration
      *
-     * @param null|mixed $value
-     * @param null|array $params
-     * @return static
+     * @param mixed $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.29.2 - 2019-06-20
+     * @since  2.40 - 2021-10-04
      * @todo "When the "DURATION" property relates to a
      *        "DTSTART" property that is specified as a DATE value, then the
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
      *        value."
      */
-    public function setDuration( $value  = null, $params = [] ) : self
+    public function setDuration( mixed $value = null , ? array $params = [] ) : self
     {
         switch( true ) {
-            case ( empty( $value ) && ( empty( $params ) || is_array( $params ))) :
+            case empty( $value ) :
                 $this->assertEmptyValue( $value, self::DURATION );
                 $this->duration = [
                     Util::$LCvalue  => Util::$SP0,
@@ -193,7 +167,7 @@ trait DURATIONtrait
                 );
         } // end switch
         $this->duration = [
-            Util::$LCvalue  => (array) $value,  // fix pre 7.0.5 bug
+            Util::$LCvalue  => $value,
             Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
         ];
         return $this;

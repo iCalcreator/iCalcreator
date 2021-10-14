@@ -1,4 +1,5 @@
 <?php
+
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
@@ -28,6 +29,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use DateTimeInterface;
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -45,15 +47,21 @@ class DateIntervalTest3 extends DtBase
     /**
      * set and restore local timezone from const
      */
-    public static $oldTimeZone = null;
+    public static ?string $oldTimeZone = null;
 
-    public static function setUpBeforeClass()
+    /**
+     * @return void
+     */
+    public static function setUpBeforeClass() : void
     {
         self::$oldTimeZone = date_default_timezone_get();
         date_default_timezone_set( LTZ );
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * @return void
+     */
+    public static function tearDownAfterClass() : void
     {
         date_default_timezone_set( self::$oldTimeZone );
     }
@@ -67,7 +75,7 @@ class DateIntervalTest3 extends DtBase
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
      */
-    public static function DateIntervalArrayGenerator( $inclYearMonth = true)
+    public static function DateIntervalArrayGenerator( bool $inclYearMonth = true) : array
     {
         $base = [
             RecurFactory::$LCYEAR  => array_rand( array_flip( [ 1, 2 ] )),
@@ -117,7 +125,7 @@ class DateIntervalTest3 extends DtBase
      * @static
      * @since  2.26.14 - 2019-02-12
      */
-    public static function durationArray2string( array $duration )
+    public static function durationArray2string( array $duration ) : ?string
     {
         static $PT0H0M0S = 'PT0H0M0S';
         static $Y = 'Y';
@@ -174,11 +182,11 @@ class DateIntervalTest3 extends DtBase
      * DateInterval101112Provider DateTime / DateInterval sub-provider, FREEBUSY
      *
      * @param array $input
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval101112ProviderDateInterval( $input, $cnt )
+    public static function DateInterval101112ProviderDateInterval( array $input, int $cnt ) : array
     {
         $cnt += 10000;
         $dateInterval   = (array) DateIntervalFactory::factory(
@@ -190,9 +198,9 @@ class DateIntervalTest3 extends DtBase
                 DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
             )
         );
-        $baseDateTime   = DateTimeFactory::factory( 'now', Vcalendar::UTC );
+        $baseDateTime   = DateTimeFactory::factory( 'now', IcalInterface::UTC );
         $dateTimeString = DateTimeFactory::dateTime2Str( $baseDateTime );
-        $outputString   = ';' . Vcalendar::FBTYPE . '=' . Vcalendar::BUSY . ':' .  $dateTimeString . '/' . $diString;
+        $outputString   = ';' . IcalInterface::FBTYPE . '=' . IcalInterface::BUSY . ':' .  $dateTimeString . '/' . $diString;
         if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
             return [
                 $cnt . 'DateTime/DateInterval',
@@ -202,7 +210,7 @@ class DateIntervalTest3 extends DtBase
                 ],
                 [   // getValue
                     Util::$LCvalue  => [
-                        Vcalendar::FBTYPE => Vcalendar::BUSY,
+                        IcalInterface::FBTYPE => IcalInterface::BUSY,
                         [
                             clone $baseDateTime,
                             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
@@ -222,7 +230,7 @@ class DateIntervalTest3 extends DtBase
                 ],
                 [   // getValue
                     Util::$LCvalue  => [
-                        Vcalendar::FBTYPE => Vcalendar::BUSY,
+                        IcalInterface::FBTYPE => IcalInterface::BUSY,
                         [
                             clone $baseDateTime,
                             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
@@ -239,11 +247,11 @@ class DateIntervalTest3 extends DtBase
      * DateInterval101112Provider DateTime / DateInterval string sub-provider, FREEBUSY
      *
      * @param array $input
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval101112ProviderDateIntervalString( $input, $cnt )
+    public static function DateInterval101112ProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $cnt += 12000;
         $dateInterval   = (array) DateIntervalFactory::factory(
@@ -254,9 +262,9 @@ class DateIntervalTest3 extends DtBase
                 DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
             )
         );
-        $baseDateTime   = DateTimeFactory::factory( 'now', Vcalendar::UTC );
+        $baseDateTime   = DateTimeFactory::factory( 'now', IcalInterface::UTC );
         $dateTimeString = DateTimeFactory::dateTime2Str( $baseDateTime );
-        $outputString   = ';' . Vcalendar::FBTYPE . '=' . Vcalendar::BUSY . ':' .  $dateTimeString . '/' . $diString;
+        $outputString   = ';' . IcalInterface::FBTYPE . '=' . IcalInterface::BUSY . ':' .  $dateTimeString . '/' . $diString;
         if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
             return [
                 $cnt . 'DateTime/diString',
@@ -266,7 +274,7 @@ class DateIntervalTest3 extends DtBase
                 ],
                 [   // getValue
                     Util::$LCvalue  => [
-                        Vcalendar::FBTYPE => Vcalendar::BUSY,
+                        IcalInterface::FBTYPE => IcalInterface::BUSY,
                         [
                             clone $baseDateTime,
                             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -286,7 +294,7 @@ class DateIntervalTest3 extends DtBase
                     ],
                     [   // getValue
                         Util::$LCvalue => [
-                            Vcalendar::FBTYPE => Vcalendar::BUSY,
+                            IcalInterface::FBTYPE => IcalInterface::BUSY,
                             [
                                 clone $baseDateTime,
                                 DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -305,7 +313,7 @@ class DateIntervalTest3 extends DtBase
      * @return array
      * @throws Exception
      */
-    public function DateInterval101112Provider()
+    public function DateInterval101112Provider() : array
     {
 
         $dataArr = [];
@@ -317,7 +325,7 @@ class DateIntervalTest3 extends DtBase
                self::DateIntervalArrayGenerator(),
                $cnt
            );
-            $cnt += 1;
+            ++$cnt;
         }
 
         // (random) dateTime + string input
@@ -327,7 +335,7 @@ class DateIntervalTest3 extends DtBase
                 self::DateIntervalArrayGenerator(),
                 $cnt
             );
-            $cnt += 1;
+            ++$cnt;
         }
 
         return $dataArr;
@@ -338,16 +346,16 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param int    $case
+     * @param string $case
      * @param mixed  $value
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval101112a( $case, $value, $expectedGet, $expectedString )
+    public function dateInterval101112aTest( string $case, mixed $value, array $expectedGet, string $expectedString )
     {
         static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
+            IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
         ];
         $c = new Vcalendar();
         foreach( $compsProps as $theComp => $props ) {
@@ -359,13 +367,22 @@ class DateIntervalTest3 extends DtBase
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
-                $comp->{$setMethod}( Vcalendar::BUSY, $value );
+                $comp->{$setMethod}( IcalInterface::BUSY, $value );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
+                if( isset( $expectedGet[Util::$LCvalue][0][0] ) && // Freebusy
+                    ( $expectedGet[Util::$LCvalue][0][0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                    $act = $getValue[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                }
+                else {
+                    $exp = $expectedGet;
+                    $act = $getValue;
+                }
                 $this->assertEquals(
-                    $expectedGet,
-                    $getValue,
+                    $exp,
+                    $act,
                     "Error in case #{$case}-11, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
                 );
                 $this->assertEquals(
@@ -378,7 +395,7 @@ class DateIntervalTest3 extends DtBase
                     $comp->{$getMethod}(),
                     "(after delete) Error in case #{$case}-13, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
                 );
-                $comp->{$setMethod}( Vcalendar::BUSY, $value );
+                $comp->{$setMethod}( IcalInterface::BUSY, $value );
             }
         }
 
@@ -391,16 +408,16 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param int    $case
+     * @param string $case
      * @param mixed  $value
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval101112b( $case, $value, $expectedGet, $expectedString )
+    public function dateInterval101112bTest( string $case, mixed $value, array $expectedGet, string $expectedString )
     {
         static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
+            IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
         ];
         $c = new Vcalendar();
         foreach( $compsProps as $theComp => $props ) {
@@ -412,13 +429,22 @@ class DateIntervalTest3 extends DtBase
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
-                $comp->{$setMethod}( Vcalendar::BUSY, [ $value ] );
+                $comp->{$setMethod}( IcalInterface::BUSY, [ $value ] );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
+                if( isset( $expectedGet[Util::$LCvalue][0][0] ) && // Freebusy
+                    ( $expectedGet[Util::$LCvalue][0][0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                    $act = $getValue[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                }
+                else {
+                    $exp = $expectedGet;
+                    $act = $getValue;
+                }
                 $this->assertEquals(
-                    $expectedGet,
-                    $getValue,
+                    $exp,
+                    $act,
                     "Error in case #{$case}-21, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
                 );
                 $this->assertEquals(
@@ -431,7 +457,7 @@ class DateIntervalTest3 extends DtBase
                     $comp->{$getMethod}(),
                     "(after delete) Error in case #{$case}-23, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
                 );
-                $comp->{$setMethod}( Vcalendar::BUSY, $value );
+                $comp->{$setMethod}( IcalInterface::BUSY, $value );
             }
         } // end foreach
 
@@ -443,16 +469,16 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param int    $case
+     * @param string $case
      * @param mixed  $value
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval101112c( $case, $value, $expectedGet, $expectedString )
+    public function dateInterval101112cTest( string $case, mixed $value, array $expectedGet, string $expectedString )
     {
         static $compsProps = [
-            Vcalendar::VFREEBUSY => [ Vcalendar::FREEBUSY ],
+            IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
         ];
         $expectedStringOrg = $expectedString;
         $c = new Vcalendar();
@@ -465,11 +491,19 @@ class DateIntervalTest3 extends DtBase
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
-                $comp->{$setMethod}( Vcalendar::BUSY, [ $value, $value ] );
+                $comp->{$setMethod}( IcalInterface::BUSY, [ $value, $value ] );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 $expectedGet[Util::$LCvalue][] = end( $expectedGet[Util::$LCvalue] );
+
+                if( isset( $expectedGet[Util::$LCvalue][0][0] ) && // Freebusy
+                    ( $expectedGet[Util::$LCvalue][0][0] instanceof DateTimeInterface )) {
+                    $expectedGet[Util::$LCvalue][0][0] = $expectedGet[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                    $expectedGet[Util::$LCvalue][1][0] = $expectedGet[Util::$LCvalue][1][0]->format( 'YmddHis' );
+                    $getValue[Util::$LCvalue][0][0]    = $getValue[Util::$LCvalue][0][0]->format( 'YmddHis' );
+                    $getValue[Util::$LCvalue][1][0]    = $getValue[Util::$LCvalue][1][0]->format( 'YmddHis' );
+                }
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
@@ -486,7 +520,7 @@ class DateIntervalTest3 extends DtBase
                     $comp->{$getMethod}(),
                     "(after delete) Error in case #{$case}-33, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
                 );
-                $comp->{$setMethod}( Vcalendar::BUSY, $value );
+                $comp->{$setMethod}( IcalInterface::BUSY, $value );
             }
         } // end foreach
 

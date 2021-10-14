@@ -46,9 +46,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait DUEtrait
 {
     /**
-     * @var array component property DUE value
+     * @var null|array component property DUE value
      */
-    protected $due = null;
+    protected ?array $due = null;
 
     /**
      * Return formatted output for calendar component property due
@@ -100,10 +100,10 @@ trait DUEtrait
      * Return calendar component property due
      *
      * @param null|bool   $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getDue( $inclParam = false )
+    public function getDue( ? bool $inclParam = false ) : DateTime | bool | string | array
     {
         if( empty( $this->due )) {
             return false;
@@ -115,13 +115,13 @@ trait DUEtrait
      * Set calendar component property due
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|array           $params
-     * @return static
+     * @param null|string[]                 $params
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setDue( $value = null, $params = [] ) : self
+    public function setDue( mixed $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DUE );
@@ -131,7 +131,7 @@ trait DUEtrait
             ];
             return $this;
         }
-        $dtstart = $this->getDtstart( true );
+        $dtstart = (array) $this->getDtstart( true );
         if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
             $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
         }

@@ -44,9 +44,9 @@ use function strtoupper;
 trait PRODIDtrait
 {
     /**
-     * @var string calendar property PRODID
+     * @var null|string calendar property PRODID
      */
-    protected $prodid = null;
+    protected ?string $prodid = null;
 
     /**
      * Return formatted output for calendar property prodid
@@ -86,9 +86,10 @@ trait PRODIDtrait
      *  is a globally unique identifier; using some technique such as an FPI
      *  value, as defined in [ISO 9070]."
      *
+     * @return void
      * @since  2.39.1 - 2021-06-26
      */
-    public function makeProdid()
+    public function makeProdid() : void
     {
         static $SERVER_NAME = 'SERVER_NAME';
         static $LOCALHOST   = 'localhost';

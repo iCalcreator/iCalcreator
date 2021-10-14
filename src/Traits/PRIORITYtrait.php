@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait PRIORITYtrait
 {
     /**
-     * @var array component property PRIORITY value
+     * @var null|array component property PRIORITY value
      */
-    protected $priority = null;
+    protected ?array $priority = null;
 
     /**
      * Return formatted output for calendar component property priority
@@ -66,7 +66,7 @@ trait PRIORITYtrait
         return StringFactory::createElement(
             self::PRIORITY,
             ParameterFactory::createParams( $this->priority[Util::$LCparams] ),
-            $this->priority[Util::$LCvalue]
+            (string) $this->priority[Util::$LCvalue]
         );
     }
 
@@ -86,36 +86,42 @@ trait PRIORITYtrait
      * Get calendar component property priority
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|int|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getPriority( $inclParam = false )
+    public function getPriority( ?bool $inclParam = false ) : array | bool | string | int
     {
         if( empty( $this->priority )) {
             return false;
         }
-        return ( $inclParam ) ? $this->priority : $this->priority[Util::$LCvalue];
+        if( null === $this->priority[Util::$LCvalue] ) {
+            $this->priority[Util::$LCvalue] = Util::$SP0;
+        }
+        return ( $inclParam )
+            ? $this->priority
+            : $this->priority[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property priority
      *
-     * @param null|int   $value
-     * @param null|array $params
-     * @return static
+     * @param null|int|string $value
+     * @param null|string[]      $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.2 2019-01-03
      */
-    public function setPriority( $value = null, $params = [] ) : self
+    public function setPriority( mixed $value = null, ? array $params = [] ) : self
     {
-        if( empty( $value ) && ( Util::$ZERO != $value )) {
+        if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::PRIORITY );
-            $value  = Util::$SP0;
+            $value  = null;
             $params = [];
 
         }
         else {
             Util::assertInteger( $value, self::PRIORITY, 0, 9 );
+            $value = (int) $value;
         }
         $this->priority = [
             Util::$LCvalue  => $value,

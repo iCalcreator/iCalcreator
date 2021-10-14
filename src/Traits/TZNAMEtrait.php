@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait TZNAMEtrait
 {
     /**
-     * @var array component property TZNAME value
+     * @var null|array component property TZNAME value
      */
-    protected $tzname = null;
+    protected ?array $tzname = null;
 
     /**
      * Return formatted output for calendar component property tzname
@@ -58,7 +58,7 @@ trait TZNAMEtrait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->tzname as $tzx => $theName ) {
+        foreach( $this->tzname as $theName ) {
             if( ! empty( $theName[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::TZNAME,
@@ -84,7 +84,7 @@ trait TZNAMEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteTzname( $propDelIx = null ) : bool
+    public function deleteTzname( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->tzname )) {
             unset( $this->propDelIx[self::TZNAME] );
@@ -103,10 +103,10 @@ trait TZNAMEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getTzname( $propIx = null, $inclParam = false )
+    public function getTzname( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzname )) {
             unset( $this->propIx[self::TZNAME] );
@@ -125,13 +125,13 @@ trait TZNAMEtrait
      * Set calendar component property tzname
      *
      * @param null|string  $value
-     * @param null|array   $params
+     * @param null|string[] $params
      * @param null|integer $index
-     * @return static
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setTzname( $value = null, $params = [], $index = null ) : self
+    public function setTzname( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZNAME );
@@ -142,7 +142,7 @@ trait TZNAMEtrait
          self::setMval(
             $this->tzname,
             StringFactory::trimTrailNL( $value ),
-            $params,
+             ( $params ?? [] ),
             null,
             $index
         );

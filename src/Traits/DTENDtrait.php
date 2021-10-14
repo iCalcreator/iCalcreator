@@ -46,9 +46,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait DTENDtrait
 {
     /**
-     * @var array component property DTEND value
+     * @var null|array component property DTEND value
      */
-    protected $dtend = null;
+    protected ?array $dtend = null;
 
     /**
      * Return formatted output for calendar component property dtend
@@ -100,10 +100,10 @@ trait DTENDtrait
      * Return calendar component property dtend
      *
      * @param null|bool   $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getDtend( $inclParam = false )
+    public function getDtend( ? bool $inclParam = false ) : DateTime | bool | string | array
     {
         if( empty( $this->dtend )) {
             return false;
@@ -115,13 +115,13 @@ trait DTENDtrait
      * Set calendar component property dtend
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|array           $params
-     * @return static
+     * @param null|string[]                 $params
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setDtend( $value = null, $params = [] ) : self
+    public function setDtend( mixed $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DTEND );
@@ -131,7 +131,7 @@ trait DTENDtrait
             ];
             return $this;
         }
-        $dtstart = $this->getDtstart( true );
+        $dtstart = (array) $this->getDtstart( true );
         if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
             $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
         }

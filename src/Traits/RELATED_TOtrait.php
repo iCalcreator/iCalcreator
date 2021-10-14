@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait RELATED_TOtrait
 {
     /**
-     * @var array component property RELATED_TO value
+     * @var null|array component property RELATED_TO value
      */
-    protected $relatedto = null;
+    protected ?array $relatedto = null;
 
     /**
      * Return formatted output for calendar component property related-to
@@ -58,7 +58,7 @@ trait RELATED_TOtrait
             return Util::$SP0;
         }
         $output = Util::$SP0;
-        foreach( $this->relatedto as $rx => $relation ) {
+        foreach( $this->relatedto as $relation ) {
             if( ! empty( $relation[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::RELATED_TO,
@@ -80,7 +80,7 @@ trait RELATED_TOtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteRelatedto( $propDelIx = null ) : bool
+    public function deleteRelatedto( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->relatedto )) {
             unset( $this->propDelIx[self::RELATED_TO] );
@@ -99,16 +99,16 @@ trait RELATED_TOtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return string|array|bool
      * @since  2.27.1 - 2018-12-12
      */
-    public function getRelatedto( $propIx = null, $inclParam = false )
+    public function getRelatedto( ?int $propIx = null, ?bool $inclParam = false ) : string | array | bool
     {
         if( empty( $this->relatedto )) {
             unset( $this->propIx[self::RELATED_TO] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getPropertyM(
             $this->relatedto,
             self::RELATED_TO,
             $this,
@@ -120,14 +120,14 @@ trait RELATED_TOtrait
     /**
      * Set calendar component property related-to
      *
-     * @param null|string $value
-     * @param null|array  $params
+     * @param mixed $value
+     * @param null|string[]  $params
      * @param null|int    $index
-     * @return static
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setRelatedto( $value = null, $params = [], $index = null ) : self
+    public function setRelatedto( mixed $value = null, mixed $params = [], ? int $index = null ) : self
     {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
@@ -137,6 +137,7 @@ trait RELATED_TOtrait
             $params = [];
 
         }
+        $params = $params ?? [];
         if( ! empty( $params )) {
             ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
         }

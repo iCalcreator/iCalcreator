@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 use function is_numeric;
 
@@ -44,9 +43,9 @@ use function is_numeric;
 trait REPEATtrait
 {
     /**
-     * @var array component property REPEAT value
+     * @var null|array component property REPEAT value
      */
-    protected $repeat = null;
+    protected ?array $repeat = null;
 
     /**
      * Return formatted output for calendar component property repeat
@@ -68,7 +67,7 @@ trait REPEATtrait
         return StringFactory::createElement(
             self::REPEAT,
             ParameterFactory::createParams( $this->repeat[Util::$LCparams] ),
-            $this->repeat[Util::$LCvalue]
+            (string) $this->repeat[Util::$LCvalue]
         );
     }
 
@@ -88,35 +87,40 @@ trait REPEATtrait
      * Get calendar component property repeat
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|int|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getRepeat( $inclParam = false )
+    public function getRepeat( bool $inclParam = false ) : array | bool | int | string
     {
         if( empty( $this->repeat )) {
             return false;
         }
-        return ( $inclParam ) ? $this->repeat : $this->repeat[Util::$LCvalue];
+        if( null === $this->repeat[Util::$LCvalue] ) {
+            $this->repeat[Util::$LCvalue] = Util::$SP0;
+        }
+        return ( $inclParam )
+            ? $this->repeat
+            : $this->repeat[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property repeat
      *
-     * @param string $value
-     * @param array  $params
-     * @return static
-     * @throws InvalidArgumentException
+     * @param null|int|string $value
+     * @param null|string[]      $params
+     * @return self
      * @since 2.27.3 2018-12-22
      */
-    public function setRepeat( $value = null, $params = [] ) : self
+    public function setRepeat( mixed $value = null, ? array $params = [] ) : self
     {
-        if( empty( $value ) && ( Util::$ZERO != $value )) {
+        if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::REPEAT );
-            $value  = Util::$SP0;
+            $value  = null;
             $params = [];
         }
         else {
             Util::assertInteger( $value, self::REPEAT );
+            $value = (int) $value;
         }
         $this->repeat = [
             Util::$LCvalue  => $value,

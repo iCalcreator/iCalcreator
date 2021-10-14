@@ -56,7 +56,7 @@ final class Vtimezone extends CalendarComponent
     /**
      * @var string
      */
-    protected static $compSgn = 'tz';
+    protected static string $compSgn = 'tz';
 
     /**
      * Destructor
@@ -133,7 +133,7 @@ final class Vtimezone extends CalendarComponent
      */
     public function createSubComponent() : string
     {
-        if( self::VTIMEZONE == $this->getCompType()) {
+        if( self::VTIMEZONE === $this->getCompType()) {
             $this->sortVtimezonesSubComponents();
         }
         return parent::createSubComponent();
@@ -145,7 +145,7 @@ final class Vtimezone extends CalendarComponent
      * sort : standard, daylight, in dtstart order
      * @since  2.29.1 - 2019-06-28
      */
-    private function sortVtimezonesSubComponents()
+    private function sortVtimezonesSubComponents() : void
     {
         if( empty( $this->components )) {
             return;
@@ -162,15 +162,15 @@ final class Vtimezone extends CalendarComponent
             else {
                 $key = $key->getTimestamp();
             }
-            if( self::STANDARD == $this->components[$cix]->getCompType()) {
+            if( self::STANDARD === $this->components[$cix]->getCompType()) {
                 while( isset( $stdArr[$key] )) {
-                    $key += 1;
+                    ++$key;
                 }
                 $stdArr[$key] = $this->components[$cix];
             }
-            elseif( self::DAYLIGHT == $this->components[$cix]->getCompType()) {
+            elseif( self::DAYLIGHT === $this->components[$cix]->getCompType()) {
                 while( isset( $dlArr[$key] )) {
-                    $key += 1;
+                    ++$key;
                 }
                 $dlArr[$key] = $this->components[$cix];
             }
@@ -210,7 +210,7 @@ final class Vtimezone extends CalendarComponent
     {
         $ix = ( empty( $this->components ))
             ? 0
-            : key( array_slice( $this->components, -1, 1, true )) + 1;
+            : (int) key( array_slice( $this->components, -1, 1, true )) + 1;
         $this->components[$ix] = new Daylight( $this->getConfig());
         return $this->components[$ix];
     }

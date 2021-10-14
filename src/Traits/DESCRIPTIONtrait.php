@@ -31,12 +31,11 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\CalendarComponent;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-
-use function is_bool;
 
 /**
  * DESCRIPTION property functions
@@ -46,14 +45,14 @@ use function is_bool;
 trait DESCRIPTIONtrait
 {
     /**
-     * @var array component property DESCRIPTION value
+     * @var null|array component property DESCRIPTION value
      */
-    protected $description = null;
+    protected ?array $description = null;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private static $MULTIDESCRCOMPS = [ Vcalendar::VCALENDAR, Vcalendar::VJOURNAL ];
+    private static array $MULTIDESCRCOMPS = [ Vcalendar::VCALENDAR, IcalInterface::VJOURNAL ];
 
     /**
      * Return formatted output for calendar component property description
@@ -68,7 +67,7 @@ trait DESCRIPTIONtrait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->description as $dx => $description ) {
+        foreach( $this->description as $description ) {
             if( ! empty( $description[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::DESCRIPTION,
@@ -94,7 +93,7 @@ trait DESCRIPTIONtrait
      * @return bool
      * @since 2.29.5 2019-07-03
      */
-    public function deleteDescription( $propDelIx = null ) : bool
+    public function deleteDescription( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->description )) {
             unset( $this->propDelIx[self::DESCRIPTION] );
@@ -116,18 +115,18 @@ trait DESCRIPTIONtrait
      *
      * @param null|bool|int  $propIx specific property in case of multiply occurrence
      * @param null|bool      $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since 2.29.5 2019-07-03
      */
-    public function getDescription( $propIx = null, $inclParam = null )
+    public function getDescription( mixed $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->description )) {
             unset( $this->propIx[self::DESCRIPTION] );
             return false;
         }
         if( ! Util::isCompInList( $this->getCompType(), self::$MULTIDESCRCOMPS )) {
-            if( ! is_bool( $inclParam )) {
-                $inclParam = ( true == $propIx ); // note ==
+            if( is_bool( $propIx )) {
+                $inclParam = $propIx;
             }
             $propIx = 1;
         }
@@ -144,13 +143,13 @@ trait DESCRIPTIONtrait
      * Set calendar component property description
      *
      * @param null|string  $value
-     * @param null|array   $params
+     * @param null|string[] $params
      * @param null|integer $index
-     * @return static
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setDescription( $value = null, $params = [], $index = null ) : self
+    public function setDescription( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DESCRIPTION );
@@ -164,7 +163,7 @@ trait DESCRIPTIONtrait
         CalendarComponent::setMval(
             $this->description,
             (string) $value,
-            $params,
+            ( $params ?? [] ),
             null,
             $index
         );

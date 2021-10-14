@@ -46,9 +46,9 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 trait RECURRENCE_IDtrait
 {
     /**
-     * @var array component property RECURRENCE_ID value
+     * @var null|array component property RECURRENCE_ID value
      */
-    protected $recurrenceid = null;
+    protected ?array $recurrenceid = null;
 
     /**
      * Return formatted output for calendar component property recurrence-id
@@ -100,10 +100,10 @@ trait RECURRENCE_IDtrait
      * Return calendar component property recurrence-id
      *
      * @param null|bool   $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @since 2.29.1 2019-06-22
      */
-    public function getRecurrenceid( $inclParam = false )
+    public function getRecurrenceid( ?bool $inclParam = false ) : array | DateTime | string | bool
     {
         if( empty( $this->recurrenceid )) {
             return false;
@@ -117,13 +117,13 @@ trait RECURRENCE_IDtrait
      * Set calendar component property recurrence-id
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|array           $params
-     * @return static
+     * @param null|string[] $params
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setRecurrenceid( $value = null, $params = [] ) : self
+    public function setRecurrenceid( mixed $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RECURRENCE_ID );
@@ -136,7 +136,7 @@ trait RECURRENCE_IDtrait
         $this->recurrenceid = DateTimeFactory::setDate(
             $value,
             ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 DateTimeFactory::$DEFAULTVALUEDATETIME
             )
         );

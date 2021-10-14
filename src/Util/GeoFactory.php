@@ -43,8 +43,8 @@ class GeoFactory
     /**
      * @var string  GEO vars: output format for geo latitude and longitude (before rtrim) etc
      */
-    public static $geoLatFmt  = '%09.6f';
-    public static $geoLongFmt = '%8.6f';
+    public static string $geoLatFmt  = '%09.6f';
+    public static string $geoLongFmt = '%8.6f';
 
     /**
      * Return formatted geo output

@@ -29,7 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -45,9 +45,9 @@ use function strtoupper;
 trait STATUStrait
 {
     /**
-     * @var array component property STATUS value
+     * @var null|array component property STATUS value
      */
-    protected $status = null;
+    protected ?array $status = null;
 
     /**
      * Return formatted output for calendar component property status
@@ -87,10 +87,10 @@ trait STATUStrait
      * Get calendar component property status
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getStatus( $inclParam = false )
+    public function getStatus( bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->status )) {
             return false;
@@ -101,13 +101,13 @@ trait STATUStrait
     /**
      * Set calendar component property status
      *
-     * @param string $value
-     * @param array  $params
-     * @return static
+     * @param null|string  $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setStatus( $value = null, $params = [] ) : self
+    public function setStatus( ? string $value = null, ? array $params = [] ) : self
     {
         static $ALLOWED_VEVENT = [
             self::CONFIRMED,
@@ -132,13 +132,13 @@ trait STATUStrait
                 $value  = Util::$SP0;
                 $params = [];
                 break;
-            case ( Vcalendar::VEVENT == $this->getCompType()) :
+            case ( IcalInterface::VEVENT === $this->getCompType()) :
                 Util::assertInEnumeration( $value, $ALLOWED_VEVENT, self::STATUS );
                 break;
-            case ( Vcalendar::VTODO == $this->getCompType()) :
+            case ( IcalInterface::VTODO === $this->getCompType()) :
                 Util::assertInEnumeration( $value, $ALLOWED_VTODO, self::STATUS );
                 break;
-            case ( Vcalendar::VJOURNAL == $this->getCompType()) :
+            case ( IcalInterface::VJOURNAL === $this->getCompType()) :
                 Util::assertInEnumeration( $value, $ALLOWED_VJOURNAL, self::STATUS );
                 break;
         } // end switch

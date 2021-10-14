@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait CONTACTtrait
 {
     /**
-     * @var array component property CONTACT value
+     * @var null|array component property CONTACT value
      */
-    protected $contact = null;
+    protected ?array $contact = [];
 
     /**
      * Return formatted output for calendar component property contact
@@ -59,7 +59,7 @@ trait CONTACTtrait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->contact as $cx => $contact ) {
+        foreach( $this->contact as $contact ) {
             if( ! empty( $contact[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::CONTACT,
@@ -85,7 +85,7 @@ trait CONTACTtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteContact( $propDelIx = null ) : bool
+    public function deleteContact( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->contact )) {
             unset( $this->propDelIx[self::CONTACT] );
@@ -103,11 +103,11 @@ trait CONTACTtrait
      * Get calendar component property contact
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
-     * @return bool|array
+     * @param null|bool   $inclParam
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getContact( $propIx = null, $inclParam = false )
+    public function getContact( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->contact )) {
             unset( $this->propIx[self::CONTACT] );
@@ -125,14 +125,14 @@ trait CONTACTtrait
     /**
      * Set calendar component property contact
      *
-     * @param string  $value
-     * @param array   $params
-     * @param integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|int      $index
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setContact( $value = null, $params = [], $index = null ) : self
+    public function setContact( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONTACT );
@@ -143,7 +143,7 @@ trait CONTACTtrait
          self::setMval(
             $this->contact,
             StringFactory::trimTrailNL( $value ),
-            $params,
+             ( $params ?? [] ),
             null,
             $index
         );

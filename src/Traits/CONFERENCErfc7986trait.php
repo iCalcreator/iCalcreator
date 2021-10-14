@@ -43,9 +43,9 @@ use function array_change_key_case;
 trait CONFERENCErfc7986trait
 {
     /**
-     * @var array component property CONFERENCE value
+     * @var null|array component property CONFERENCE value
      */
-    protected $conference = null;
+    protected ?array $conference = null;
 
     /**
      * Return formatted output for calendar component property conference
@@ -59,7 +59,7 @@ trait CONFERENCErfc7986trait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->conference as $aix => $conferencePart ) {
+        foreach( $this->conference as $conferencePart ) {
             if( ! empty( $conferencePart[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::CONFERENCE,
@@ -84,7 +84,7 @@ trait CONFERENCErfc7986trait
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      */
-    public function deleteConference( $propDelIx = null ) : bool
+    public function deleteConference( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->conference )) {
             unset( $this->propDelIx[self::CONFERENCE] );
@@ -103,9 +103,9 @@ trait CONFERENCErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      */
-    public function getConference( $propIx = null, $inclParam = false )
+    public function getConference( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->conference )) {
             unset( $this->propIx[self::CONFERENCE] );
@@ -123,15 +123,15 @@ trait CONFERENCErfc7986trait
     /**
      * Set calendar component property conference
      *
-     * @param null|string  $value
-     * @param null|array   $params
-     * @param null|integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|int      $index
+     * @return self
      * @throws InvalidArgumentException
      * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token
      * @todo fix labelparam   - LABEL
      */
-    public function setConference( $value = null, $params = [], $index = null ) : self
+    public function setConference( ? string $value = null, ? array $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONFERENCE );
@@ -139,7 +139,7 @@ trait CONFERENCErfc7986trait
             $params = [];
         }
         else {
-            $params = array_change_key_case(( $params ?? [] ), CASE_UPPER );
+            $params = array_change_key_case( $params ?? [], CASE_UPPER );
             if( ! isset( $params[self::VALUE] ) ) { // required
                 $params[self::VALUE] = self::URI;
             }

@@ -41,9 +41,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait ATTENDEEtrait
 {
     /**
-     * @var array component property ATTENDEE value
+     * @var null|array component property ATTENDEE value
      */
-    protected $attendee = null;
+    protected ?array $attendee = [];
 
     /**
      * Return formatted output for calendar component property attendee
@@ -68,7 +68,7 @@ trait ATTENDEEtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteAttendee( $propDelIx = null ) : bool
+    public function deleteAttendee( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->attendee )) {
             unset( $this->propDelIx[self::ATTENDEE] );
@@ -87,10 +87,10 @@ trait ATTENDEEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getAttendee( $propIx = null, $inclParam = false )
+    public function getAttendee( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->attendee )) {
             unset( $this->propIx[self::ATTENDEE] );
@@ -108,15 +108,15 @@ trait ATTENDEEtrait
     /**
      * Set calendar component property attendee
      *
-     * @param null|string  $value
-     * @param null|array   $params
-     * @param null|integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|integer  $index
+     * @return self
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-17
      * @todo ensure value is prefixed by protocol, mailto: if missing
      */
-    public function setAttendee( $value = null, $params = [], $index = null ) : self
+    public function setAttendee( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTENDEE );
@@ -127,7 +127,7 @@ trait ATTENDEEtrait
         if( ! empty( $value )) {
             CalAddressFactory::assertCalAddress( $value );
         }
-        $params = array_change_key_case( (array) $params, CASE_UPPER );
+        $params = array_change_key_case(( $params ?? [] ), CASE_UPPER );
         CalAddressFactory::sameValueAndEMAILparam( $value, $params );
         $params = CalAddressFactory::inputPrepAttendeeParams(
             $params,

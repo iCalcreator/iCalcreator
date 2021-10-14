@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait ATTACHtrait
 {
     /**
-     * @var array component property ATTACH value
+     * @var null|array component property ATTACH value
      */
-    protected $attach = null;
+    protected ?array $attach = null;
 
     /**
      * Return formatted output for calendar component property attach
@@ -57,7 +57,7 @@ trait ATTACHtrait
             return Util::$SP0;
         }
         $output = Util::$SP0;
-        foreach( $this->attach as $aix => $attachPart ) {
+        foreach( $this->attach as $attachPart ) {
             if( ! empty( $attachPart[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::ATTACH,
@@ -79,7 +79,7 @@ trait ATTACHtrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteAttach( $propDelIx = null ) : bool
+    public function deleteAttach( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->attach )) {
             unset( $this->propDelIx[self::ATTACH] );
@@ -98,10 +98,10 @@ trait ATTACHtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-16
      */
-    public function getAttach( $propIx = null, $inclParam = false )
+    public function getAttach( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->attach )) {
             unset( $this->propIx[self::ATTACH] );
@@ -119,21 +119,22 @@ trait ATTACHtrait
     /**
      * Set calendar component property attach
      *
-     * @param null|string  $value
-     * @param null|array   $params
-     * @param null|integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|integer  $index
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-20
      */
-    public function setAttach( $value = null, $params = [], $index = null ) : self
+    public function setAttach( ? string $value = null, mixed $params = [], ? int $index = null) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTACH );
             $value  = Util::$SP0;
             $params = [];
         }
-         self::setMval( $this->attach, $value, $params, null, $index );
+        $params = $params ?? [];
+        self::setMval( $this->attach, $value, $params, null, $index );
         return $this;
     }
 }

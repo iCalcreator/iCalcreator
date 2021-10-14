@@ -42,9 +42,9 @@ use InvalidArgumentException;
 trait COMMENTtrait
 {
     /**
-     * @var array component property COMMENT value
+     * @var null|array component property COMMENT value
      */
-    protected $comment = null;
+    protected ?array $comment = null;
 
     /**
      * Return formatted output for calendar component property comment
@@ -58,7 +58,7 @@ trait COMMENTtrait
         }
         $output = Util::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->comment as $cx => $commentPart ) {
+        foreach( $this->comment as $commentPart ) {
             if( empty( $commentPart[Util::$LCvalue] )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::COMMENT );
@@ -81,11 +81,11 @@ trait COMMENTtrait
     /**
      * Delete calendar component property comment
      *
-     * @param int   $propDelIx   specific property in case of multiply occurrence
+     * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteComment( $propDelIx = null ) : bool
+    public function deleteComment( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->comment )) {
             unset( $this->propDelIx[self::COMMENT] );
@@ -102,12 +102,12 @@ trait COMMENTtrait
     /**
      * Get calendar component property comment
      *
-     * @param int    $propIx specific property in case of multiply occurrence
-     * @param bool   $inclParam
-     * @return bool|array
+     * @param int|null $propIx specific property in case of multiply occurrence
+     * @param bool $inclParam
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getComment( $propIx = null, $inclParam = false )
+    public function getComment( int $propIx = null, bool $inclParam = false ) : bool | array | string
     {
         if( empty( $this->comment )) {
             unset( $this->propIx[self::COMMENT] );
@@ -125,22 +125,23 @@ trait COMMENTtrait
     /**
      * Set calendar component property comment
      *
-     * @param string  $value
-     * @param array   $params
-     * @param integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|int      $index
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setComment( $value = null, $params = [], $index = null ) : self
+    public function setComment( ? string $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COMMENT );
             $value  = Util::$SP0;
             $params = [];
         }
+        $params = $params ?? [];
         $value = Util::assertString( $value, self::COMMENT );
-         self::setMval( $this->comment, $value, $params, null, $index );
+        self::setMval( $this->comment, $value, $params, null, $index );
         return $this;
     }
 }

@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait ORGANIZERtrait
 {
     /**
-     * @var array component property ORGANIZER value
+     * @var null|array component property ORGANIZER value
      */
-    protected $organizer = null;
+    protected ?array $organizer = null;
 
     /**
      * Return formatted output for calendar component property organizer
@@ -94,10 +94,10 @@ trait ORGANIZERtrait
      * Get calendar component property organizer
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getOrganizer( $inclParam = false )
+    public function getOrganizer( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->organizer )) {
             return false;
@@ -108,14 +108,14 @@ trait ORGANIZERtrait
     /**
      * Set calendar component property organizer
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string  $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since  2.39 - 2021-06-17
      * @todo ensure value is prefixed by protocol, mailto: if missing
       */
-    public function setOrganizer( $value = null, $params = [] ) : self
+    public function setOrganizer( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ORGANIZER );
@@ -126,11 +126,11 @@ trait ORGANIZERtrait
         if( ! empty( $value )) {
             CalAddressFactory::assertCalAddress( $value );
         }
-        $params = array_change_key_case( (array) $params, CASE_UPPER );
+        $params = array_change_key_case( $params ?? [], CASE_UPPER );
         CalAddressFactory::sameValueAndEMAILparam( $value, $params );
         $this->organizer = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         if( isset( $this->organizer[Util::$LCparams][self::EMAIL] )) {
             $this->organizer[Util::$LCparams][self::EMAIL] =

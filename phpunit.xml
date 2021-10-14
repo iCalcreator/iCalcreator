@@ -33,7 +33,6 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="true"
-         syntaxCheck="false"
          bootstrap="autoload.php"
 >
     <testsuites>
@@ -41,26 +40,26 @@
             <file>test/VcalendarTest.php</file>
         </testsuite>
         <testsuite name="Date Tests">
-            <file>test/Exceptions1Test.php</file>
+            <file>test/Exception1Test.php</file>
             <file>test/DateTest.php</file>
-            <file>test/Exceptions6Test.php</file>
+            <file>test/Exception6Test.php</file>
             <file>test/DateTzTest.php</file>
-            <file>test/Exceptions2Test.php</file>
+            <file>test/Exception2Test.php</file>
             <file>test/DateTimeTest.php</file>
             <file>test/DateTimeUTCTest.php</file>
         </testsuite>
         <testsuite name="DateInterval Tests">
-            <file>test/Exceptions3Test.php</file>
+            <file>test/Exception3Test.php</file>
             <file>test/DateIntervalTest1.php</file>
             <file>test/DateIntervalTest2.php</file>
             <file>test/DateIntervalTest3.php</file>
         </testsuite>
         <testsuite name="Integer property Tests">
-            <file>test/Exceptions4Test.php</file>
+            <file>test/Exception4Test.php</file>
             <file>test/IntegerTest.php</file>
         </testsuite>
         <testsuite name="Misc. property Tests">
-            <file>test/Exceptions5Test.php</file>
+            <file>test/Exception5Test.php</file>
             <file>test/MiscTest.php</file>
         </testsuite>
         <testsuite name="Valarm property Tests">
@@ -77,17 +76,20 @@
             <file>test/RecurMonthTest.php</file>
             <file>test/RecurWeekTest.php</file>
             <file>test/RecurDayTest.php</file>
-            <file>test/Exceptions7Test.php</file>
+            <file>test/Exception7Test.php</file>
             <file>test/SelectComponentsTest.php</file>
         </testsuite>
         <testsuite name="vCard Tests">
             <file>test/IcalvCardFactoryTest.php</file>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist
-                addUncoveredFilesFromWhitelist="true"
-                processUncoveredFilesFromWhitelist="true">
+    <coverage
+            includeUncoveredFiles="true"
+            processUncoveredFiles="true"
+            pathCoverage="false"
+            ignoreDeprecatedCodeUnits="false"
+            disableCodeCoverageIgnore="true">
+        <include>
             <file>src/CalendarComponent.php</file>
             <file>src/Daylight.php</file>
             <file>src/DScomponent.php</file>
@@ -176,39 +178,29 @@
             <file>src/Util/Util.php</file>
             <file>src/Util/UtilDateTime.php</file>
             <file>src/Util/VtimezonePopulateFactory.php</file>
-        </whitelist>
-    </filter>
+        </include>
+        <!-- Require the PHP Xdebug (2.7.0 or later) and tokenizer extensions-->
+        <!-- Remove or comment after your own choice-->
+        <!-- Note, all output in report/logging will be saved in 'testDocs' folder -->
+        <report>
+            <!-- clover outputFile="testDocs/clover.xml"/ -->
+            <!-- crap4j outputFile="testDocs/crap4j.xml" threshold="50"/ -->
+            <html outputDirectory="testDocs/PHPUnitCoverage" lowUpperBound="60" highLowerBound="80"/>
+            <php outputFile="testDocs/coverage.php"/>
+            <text outputFile="testDocs/coverage.txt" showUncoveredFiles="false" showOnlySummary="false"/>
+            <!-- xml outputDirectory="testDocs/xml-coverage"/ -->
+        </report>
+    </coverage>
     <logging>
         <!-- Remove or comment after your own choice-->
         <!-- All logs will be saved in 'testDocs' folder -->
 
-        <!-- -->
-        <log type="coverage-html"
-             target="testDocs/PHPUnitCoverage"
-             lowUpperBound="35"
-             highLowerBound="70"/>
-        <!-- -->
-
-        <!--log type="coverage-clover"
-             target="testDocs/coverage.xml"/-->
-        <!--log type="coverage-php"
-             target="testDocs/coverage.serialized"/-->
-        <!--
-        <log type="coverage-text"
-             target="testDocs/PHPUnitReport.txt"
-             showUncoveredFiles="true"/>
-        -->
-        <!--log type="json"
-             target="testDocs/logfile.json"/-->
-        <!--log type="tap"
-             target="testDocs/logfile.tap"/-->
-        <!--log type="junit"
-             target="testDocs/logfile.xml"
-             logIncompleteSkipped="false"/-->
-        <!--log type="testdox-html"
-             target="testDocs/testdox.html"/-->
-        <!--log type="testdox-text"
-             target="testDocs/testdox.txt"/-->
+        <!-- junit outputFile="testDocs/junit.xml"/ -->
+        <!-- teamcity outputFile="testDocs/teamcity.txt"/ -->
+        <!-- testdoxHtml outputFile="testDocs/testdox.html"/ -->
+        <!-- testdoxText outputFile="testDocs/testdox.txt"/ -->
+        <!-- testdoxXml outputFile="testDocs/testdox.xml"/ -->
+        <text outputFile="testDocs/logfile.txt"/>
     </logging>
     <php>
         <!-- define the (YmdTHis) dateTime -->

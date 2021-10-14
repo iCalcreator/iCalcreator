@@ -33,11 +33,11 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_change_key_case;
 
@@ -49,9 +49,9 @@ use function array_change_key_case;
 trait COMPLETEDtrait
 {
     /**
-     * @var array component property COMPLETED value
+     * @var null|array component property COMPLETED value
      */
-    protected $completed = null;
+    protected ?array $completed = null;
 
     /**
      * Return formatted output for calendar component property completed
@@ -94,10 +94,10 @@ trait COMPLETEDtrait
      * Return calendar component property completed
      *
      * @param null|bool  $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getCompleted( $inclParam = false )
+    public function getCompleted( ? bool $inclParam = false ) : DateTime | bool | array | string
     {
         if( empty( $this->completed )) {
             return false;
@@ -109,13 +109,13 @@ trait COMPLETEDtrait
      * Set calendar component property completed
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|array $params
-     * @return static
+     * @param null|string[] $params
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setCompleted( $value = null, $params = [] ) : self
+    public function setCompleted( mixed $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COMPLETED );
@@ -125,8 +125,8 @@ trait COMPLETEDtrait
             ];
             return $this;
         }
-        $params = array_change_key_case( $params, CASE_UPPER );
-        $params[Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+        $params = array_change_key_case( $params ?? [], CASE_UPPER );
+        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
         $this->completed = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
         return $this;
     }

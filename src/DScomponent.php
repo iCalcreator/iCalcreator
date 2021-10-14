@@ -52,7 +52,7 @@ abstract class DScomponent extends CalendarComponent
     /**
      * @var string
      */
-    protected static $compSgn = 'ds';
+    protected static string $compSgn = 'ds';
 
     /**
      * Destructor

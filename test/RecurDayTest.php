@@ -43,8 +43,18 @@ class RecurDayTest extends RecurBaseTest
 {
     /**
      * recurDaily1Test provider
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
-    public function recurDaily1TestProvider() {
+    public function recurDaily1TestProvider() : array
+    {
 
         $dataArr = [];
         $dataSetNo = 0;
@@ -62,7 +72,7 @@ class RecurDayTest extends RecurBaseTest
             while( $x < $count ) {
                 $wDate     = $wDate->modify( $interval . ' days' );
                 $expects[] = $wDate->format( 'Ymd' );
-                $x += 1;
+                ++$x;
             } // end while
             $execTime  = microtime( true ) - $time;
             $dataArr[] = [
@@ -70,9 +80,9 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 (clone $start)->modify( RecurFactory::EXTENDYEAR . ' year' ),
                 [
-                    Vcalendar::FREQ     => Vcalendar::DAILY,
-                    Vcalendar::COUNT    => $count,
-                    Vcalendar::INTERVAL => $interval,
+                    IcalInterface::FREQ     => IcalInterface::DAILY,
+                    IcalInterface::COUNT    => $count,
+                    IcalInterface::INTERVAL => $interval,
                     $DATASET            => $dataSetNo++
                 ],
                 $expects,
@@ -84,8 +94,8 @@ class RecurDayTest extends RecurBaseTest
         // + BYDAY, - BYMONTH, - BYDAYMONTH
         $interval = 1; // NOT 7 !!
         for( $ix = 421; $ix <= 429; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time     = microtime( true );
@@ -96,9 +106,9 @@ class RecurDayTest extends RecurBaseTest
             $x        = 1;
             while( $x < $count ) {
                 $wDate  = $wDate->modify( $interval . ' days' );
-                if( 4 == (int) $wDate->format( 'w' )) { //TH
+                if( 4 === (int) $wDate->format( 'w' )) { //TH
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x += 1;
+                    ++$x;
                 }
             } // end while
             $execTime  = microtime( true ) - $time;
@@ -107,23 +117,23 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 (clone $start)->modify( RecurFactory::EXTENDYEAR . ' year' ),
                 [
-                    Vcalendar::FREQ     => Vcalendar::DAILY,
-                    Vcalendar::COUNT    => $count,
-                    Vcalendar::INTERVAL => $interval,
-                    Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
+                    IcalInterface::FREQ     => IcalInterface::DAILY,
+                    IcalInterface::COUNT    => $count,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
                     $DATASET            => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // + BYDAY, - BYMONTH, - BYDAYMONTH
         $interval = 1; // NOT 7 !!
         for( $ix = 421; $ix <= 429; $ix++ ) { // same as above but two days
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time    = microtime( true );
@@ -134,9 +144,9 @@ class RecurDayTest extends RecurBaseTest
             $x       = 1;
             while( $x < $count ) {
                 $wDate = $wDate->modify( $interval . ' days' );
-                if( in_array((int)  $wDate->format( 'w' ), [ 4, 5 ] )) {
+                if( in_array((int) $wDate->format( 'w' ), [ 4, 5 ] )) {
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x += 1;
+                    ++$x;
                 }
             } // end while
             $execTime  = microtime( true ) - $time;
@@ -145,27 +155,27 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 (clone $start)->modify( RecurFactory::EXTENDYEAR . ' year' ),
                 [
-                    Vcalendar::FREQ      => Vcalendar::DAILY,
-                    Vcalendar::COUNT     => $count,
-                    Vcalendar::INTERVAL  => $interval,
-                    Vcalendar::BYDAY     => [
-                        [ Vcalendar::DAY => Vcalendar::TH ],
-                        [ Vcalendar::DAY => Vcalendar::FR ],
+                    IcalInterface::FREQ      => IcalInterface::DAILY,
+                    IcalInterface::COUNT     => $count,
+                    IcalInterface::INTERVAL  => $interval,
+                    IcalInterface::BYDAY     => [
+                        [ IcalInterface::DAY => IcalInterface::TH ],
+                        [ IcalInterface::DAY => IcalInterface::FR ],
                     ],
                     $DATASET             => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // - BYDAY, + BYMONTH, - BYDAYMONTH
         $interval = 1;
         $byMonth  = [ 2, 4, 6 ];
         for( $ix = 431; $ix <= 439; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time      = microtime( true );
@@ -183,7 +193,7 @@ class RecurDayTest extends RecurBaseTest
                     break;
                 }
                 $currMonth = (int) $wDate->format( 'm' );
-                if( $saveMonth != $currMonth ) {
+                if( $saveMonth !== $currMonth ) {
                     while( ! in_array( $currMonth, $byMonth )) {
                         $wDate     = $wDate->modify( $interval . ' days' );
                         $currMonth = (int) $wDate->format( 'm' );
@@ -191,7 +201,7 @@ class RecurDayTest extends RecurBaseTest
                     $saveMonth = $currMonth;
                 }
                 $expects[] = $wDate->format( 'Ymd' );
-                $x        += 1;
+                ++$x;
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
             $execTime  = microtime( true ) - $time;
@@ -200,24 +210,24 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ     => Vcalendar::DAILY,
-                    Vcalendar::COUNT    => $count,
-                    Vcalendar::INTERVAL => $interval,
-                    Vcalendar::BYMONTH  => $byMonth,
+                    IcalInterface::FREQ     => IcalInterface::DAILY,
+                    IcalInterface::COUNT    => $count,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::BYMONTH  => $byMonth,
                     $DATASET            => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // + BYDAY, + BYMONTH, - BYDAYMONTH
         $interval = 1;
         $byMonth  = [ 2, 4, 6, 8, 10, 12 ];
         for( $ix = 441; $ix <= 449; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time      = microtime( true );
@@ -235,16 +245,16 @@ class RecurDayTest extends RecurBaseTest
                     break;
                 }
                 $currMonth = (int) $wDate->format( 'm' );
-                if( $saveMonth != $currMonth ) {
+                if( $saveMonth !== $currMonth ) {
                     while( ! in_array( $currMonth, $byMonth )) {
                         $wDate     = $wDate->modify( $interval . ' days' );
                         $currMonth = (int) $wDate->format( 'm' );
                     } // end while
                     $saveMonth = $currMonth;
                 }
-                if( 4 == (int) $wDate->format( 'w' )) { //TH
+                if( 4 === (int) $wDate->format( 'w' )) { //TH
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x += 1;
+                    ++$x;
                 }
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
@@ -254,24 +264,24 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ     => Vcalendar::DAILY,
-                    Vcalendar::COUNT    => $count,
-                    Vcalendar::INTERVAL => $interval,
-                    Vcalendar::BYMONTH  => $byMonth,
-                    Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
+                    IcalInterface::FREQ     => IcalInterface::DAILY,
+                    IcalInterface::COUNT    => $count,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::BYMONTH  => $byMonth,
+                    IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
                     $DATASET            => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // - BYDAY, - BYMONTH, + BYDAYMONTH
         $interval = 1;
         for( $ix = 451; $ix <= 459; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time       = microtime( true );
@@ -288,9 +298,9 @@ class RecurDayTest extends RecurBaseTest
                 if( $endYmd < $wDate->format( 'Ymd' )) {
                     break;
                 }
-                if( in_array( $wDate->format( 'd' ), $byMonthDay )) {
+                if( in_array( (int)$wDate->format( 'd' ), $byMonthDay, true ) ) {
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x        += 1;
+                    ++$x;
                 }
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
@@ -300,23 +310,23 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::DAILY,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
+                    IcalInterface::FREQ       => IcalInterface::DAILY,
+                    IcalInterface::COUNT      => $count,
+                    IcalInterface::INTERVAL   => $interval,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
                     $DATASET              => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // + BYDAY, - BYMONTH, + BYDAYMONTH
         $interval = 1;
         for( $ix = 461; $ix <= 469; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time       = microtime( true );
@@ -333,10 +343,10 @@ class RecurDayTest extends RecurBaseTest
                 if( $endYmd < $wDate->format( 'Ymd' )) {
                     break;
                 }
-                if( in_array( $wDate->format( 'd' ), $byMonthDay ) &&
-                    ( 4 == $wDate->format( 'w' ))) { //TH
+                if(( 4 === (int) $wDate->format( 'w' )) &&  // TH
+                    in_array((int) $wDate->format( 'd' ), $byMonthDay, true )) {
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x        += 1;
+                    ++$x;
                 }
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
@@ -346,25 +356,25 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::DAILY,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
-                    Vcalendar::BYDAY      => [ Vcalendar::DAY => Vcalendar::TH ],
+                    IcalInterface::FREQ       => IcalInterface::DAILY,
+                    IcalInterface::COUNT      => $count,
+                    IcalInterface::INTERVAL   => $interval,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
+                    IcalInterface::BYDAY      => [ IcalInterface::DAY => IcalInterface::TH ],
                     $DATASET              => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // - BYDAY, + BYMONTH, + BYDAYMONTH
         $interval = 1;
         $byMonth  = [ 2, 4, 6 ];
         for( $ix = 471; $ix <= 479; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time       = microtime( true );
@@ -381,12 +391,12 @@ class RecurDayTest extends RecurBaseTest
                 if( $endYmd < $wDate->format( 'Ymd' )) {
                     break;
                 }
-                while( ! in_array( $wDate->format( 'm' ), $byMonth )) {
+                while( ! in_array((int)  $wDate->format( 'm' ), $byMonth, true ) ) {
                     $wDate = $wDate->modify( $interval . ' days' );
                 }
-                if( in_array( $wDate->format( 'd' ), $byMonthDay )) {
+                if( in_array((int)  $wDate->format( 'd' ), $byMonthDay, true ) ) {
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x        += 1;
+                    ++$x;
                 }
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
@@ -396,25 +406,25 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::DAILY,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::BYMONTH    => $byMonth,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
+                    IcalInterface::FREQ       => IcalInterface::DAILY,
+                    IcalInterface::COUNT      => $count,
+                    IcalInterface::INTERVAL   => $interval,
+                    IcalInterface::BYMONTH    => $byMonth,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
                     $DATASET              => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         // + BYDAY, + BYMONTH, + BYDAYMONTH
         $interval = 1;
         $byMonth  = [ 2, 4, 6, 8, 10, 12 ];
         for( $ix = 481; $ix <= 489; $ix++ ) {
-            if( 7 == $interval ) {
-                $interval += 1;
+            if( 7 === $interval ) {
+                ++$interval;
                 continue;
             }
             $time       = microtime( true );
@@ -431,13 +441,13 @@ class RecurDayTest extends RecurBaseTest
                 if( $endYmd < $wDate->format( 'Ymd' )) {
                     break;
                 }
-                while( ! in_array( $wDate->format( 'm' ), $byMonth )) {
+                while( ! in_array((int)  $wDate->format( 'm' ), $byMonth, true ) ) {
                     $wDate = $wDate->modify( $interval . ' days' );
                 }
-                if( in_array( $wDate->format( 'd' ), $byMonthDay ) &&
-                  ( 4 == $wDate->format( 'w' ))) { //TH
+                if(( 4 === (int) $wDate->format( 'w' )) && // TH
+                    in_array((int) $wDate->format( 'd' ), $byMonthDay, true )) {
                     $expects[] = $wDate->format( 'Ymd' );
-                    $x        += 1;
+                    ++$x;
                 }
                 $wDate = $wDate->modify( $interval . ' days' );
             } // end while
@@ -447,18 +457,18 @@ class RecurDayTest extends RecurBaseTest
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::DAILY,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::BYMONTH    => $byMonth,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
-                    Vcalendar::BYDAY      => [ Vcalendar::DAY => Vcalendar::TH ],
+                    IcalInterface::FREQ       => IcalInterface::DAILY,
+                    IcalInterface::COUNT      => $count,
+                    IcalInterface::INTERVAL   => $interval,
+                    IcalInterface::BYMONTH    => $byMonth,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
+                    IcalInterface::BYDAY      => [ IcalInterface::DAY => IcalInterface::TH ],
                     $DATASET              => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         } // end for
 
         return $dataArr;
@@ -469,22 +479,23 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily1TestProvider
-     * @param int      $case
+     * @param string $case
      * @param DateTime $start
-     * @param array|DateTime $end
+     * @param DateTime|array $end
      * @param array    $recur
      * @param array    $expects
-     * @param float    $prepTime
+     * @param float $prepTime
      * @throws Exception
      */
     public function recurDaily1Test(
-        $case,
-        DateTime $start,
-        $end,
-        array $recur,
-        array $expects,
-        $prepTime
-    ) {
+        string           $case,
+        DateTime         $start,
+        DateTime | array $end,
+        array            $recur,
+        array            $expects,
+        float            $prepTime
+    ) : void
+    {
         $saveStartDate = clone $start;
 
         $result = $this->recur2dateTest(
@@ -496,15 +507,14 @@ class RecurDayTest extends RecurBaseTest
             $prepTime
         );
 
-        if( ! isset( $recur[Vcalendar::INTERVAL] )) {
-            $recur[Vcalendar::INTERVAL] = 1;
+        if( ! isset( $recur[IcalInterface::INTERVAL] )) {
+            $recur[IcalInterface::INTERVAL] = 1;
         }
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurDaily1( $recur )) {
             echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
-            $this->assertTrue( false );
-            return;
+            $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurDaily1( $recur, $start, clone $start, $end );
@@ -525,8 +535,11 @@ class RecurDayTest extends RecurBaseTest
 
     /**
      * recurDaily11Test provider
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
-    public function recurDaily11TestProvider()
+    public function recurDaily11TestProvider() : array
     {
         $dataArr = [];
         $dataSetNo = 0;
@@ -540,12 +553,12 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 20,
-                Vcalendar::INTERVAL => 1,
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 20,
+                IcalInterface::INTERVAL => 1,
 //              Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYMONTHDAY => range( -1,-14 ),
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::BYMONTHDAY => range( -1,-14 ),
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -563,12 +576,12 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 20,
-                Vcalendar::INTERVAL => 1,
-                Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYMONTHDAY => range( -1,-14 ),
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 20,
+                IcalInterface::INTERVAL => 1,
+                IcalInterface::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
+                IcalInterface::BYMONTHDAY => range( -1,-14 ),
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -587,11 +600,11 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 20,
-                Vcalendar::INTERVAL => 1,
-                Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 20,
+                IcalInterface::INTERVAL => 1,
+                IcalInterface::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -612,29 +625,33 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily11TestProvider
-     * @param int      $case
+     * @param string $case
      * @param DateTime $start
-     * @param array|DateTime $end
+     * @param DateTime|array $end
      * @param array    $recur
      * @param array    $expects
-     * @param float    $prepTime
+     * @param float $prepTime
      * @throws Exception
      */
     public function recurDaily11Test(
-        $case,
-        DateTime $start,
-        $end,
-        array $recur,
-        array $expects,
-        $prepTime
-    ) {
+        string           $case,
+        DateTime         $start,
+        DateTime | array $end,
+        array            $recur,
+        array            $expects,
+        float            $prepTime
+    ) : void
+    {
         $this->recurDaily1Test( $case, $start, $end, $recur, $expects, $prepTime );
     }
 
     /**
      * recurDaily2Test provider
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
-    public function recurDaily2TestProvider()
+    public function recurDaily2TestProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -648,13 +665,13 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 10,
-                Vcalendar::INTERVAL => 1,
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 10,
+                IcalInterface::INTERVAL => 1,
 //              Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYMONTHDAY => range( -1,-14 ),
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
-                Vcalendar::BYSETPOS => -2,
+                IcalInterface::BYMONTHDAY => range( -1,-14 ),
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
+                IcalInterface::BYSETPOS => -2,
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -671,13 +688,13 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 10,
-                Vcalendar::INTERVAL => 1,
-                Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYMONTHDAY => range( -1,-14 ),
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
-                Vcalendar::BYSETPOS => -2,
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 10,
+                IcalInterface::INTERVAL => 1,
+                IcalInterface::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
+                IcalInterface::BYMONTHDAY => range( -1,-14 ),
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
+                IcalInterface::BYSETPOS => -2,
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -696,12 +713,12 @@ class RecurDayTest extends RecurBaseTest
             $start,
             $end,
             [
-                Vcalendar::FREQ     => Vcalendar::DAILY,
-                Vcalendar::COUNT    => 10,
-                Vcalendar::INTERVAL => 1,
-                Vcalendar::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
-                Vcalendar::BYDAY    => [ Vcalendar::DAY => Vcalendar::TH ],
-                Vcalendar::BYSETPOS => [ -3, -2 ],
+                IcalInterface::FREQ     => IcalInterface::DAILY,
+                IcalInterface::COUNT    => 10,
+                IcalInterface::INTERVAL => 1,
+                IcalInterface::BYMONTH  => [ 2, 4, 6, 8, 10, 12 ],
+                IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
+                IcalInterface::BYSETPOS => [ -3, -2 ],
                 $DATASET            => $dataSetNo++,
             ],
             [
@@ -722,33 +739,33 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily2TestProvider
-     * @param int      $case
+     * @param string   $case
      * @param DateTime $start
-     * @param array|DateTime $end
+     * @param DateTime|array $end
      * @param array    $recur
      * @param array    $expects
-     * @param float    $prepTime
+     * @param float $prepTime
      * @throws Exception
      */
     public function recurDaily2Test(
-        $case,
-        DateTime $start,
-        $end,
-        array $recur,
-        array $expects,
-        $prepTime
-    ) {
+        string           $case,
+        DateTime         $start,
+        DateTime | array $end,
+        array            $recur,
+        array            $expects,
+        float            $prepTime
+    ) : void
+    {
         $saveStartDate = clone $start;
 
-        if( ! isset( $recur[Vcalendar::INTERVAL] )) {
-            $recur[Vcalendar::INTERVAL] = 1;
+        if( ! isset( $recur[IcalInterface::INTERVAL] )) {
+            $recur[IcalInterface::INTERVAL] = 1;
         }
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurDaily2( $recur )) {
             echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
-            $this->assertTrue( false );
-            return;
+            $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurDaily2( $recur, $start, clone $start, $end );

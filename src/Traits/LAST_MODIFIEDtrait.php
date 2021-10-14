@@ -33,11 +33,11 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_change_key_case;
 
@@ -49,9 +49,9 @@ use function array_change_key_case;
 trait LAST_MODIFIEDtrait
 {
     /**
-     * @var array component property LAST-MODIFIED value
+     * @var null|array component property LAST-MODIFIED value
      */
-    protected $lastmodified = null;
+    protected ?array $lastmodified = null;
 
     /**
      * Return formatted output for calendar component property last-modified
@@ -89,10 +89,10 @@ trait LAST_MODIFIEDtrait
      * Return calendar component property last-modified
      *
      * @param null|bool   $inclParam
-     * @return bool|DateTime|array
+     * @return bool|string|DateTime|array
      * @since 2.29.9 2019-08-05
      */
-    public function getLastmodified( $inclParam = false )
+    public function getLastmodified( ? bool $inclParam = false ) : DateTime | bool | string | array
     {
         if( empty( $this->lastmodified )) {
             return false;
@@ -106,13 +106,13 @@ trait LAST_MODIFIEDtrait
      * Set calendar component property last-modified
      *
      * @param null|string|DateTimeInterface  $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string[]  $params
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( $value = null, $params = [] ) : self
+    public function setLastmodified( DateTimeInterface | string | null $value = null, ?array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->lastmodified = [
@@ -121,8 +121,8 @@ trait LAST_MODIFIEDtrait
             ];
             return $this;
         }
-        $params = array_change_key_case( $params, CASE_UPPER );
-        $params[Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+        $params = array_change_key_case( $params ?? [], CASE_UPPER );
+        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
         $this->lastmodified = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
         return $this;
     }

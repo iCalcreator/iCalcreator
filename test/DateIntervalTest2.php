@@ -46,15 +46,21 @@ class DateIntervalTest2 extends DtBase
     /**
      * set and restore local timezone from const
      */
-    public static $oldTimeZone = null;
+    public static ?string $oldTimeZone = null;
 
-    public static function setUpBeforeClass()
+    /**
+     * @return void
+     */
+    public static function setUpBeforeClass() : void
     {
         self::$oldTimeZone = date_default_timezone_get();
         date_default_timezone_set( LTZ );
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * @return void
+     */
+    public static function tearDownAfterClass() : void
     {
         date_default_timezone_set( self::$oldTimeZone );
     }
@@ -68,7 +74,7 @@ class DateIntervalTest2 extends DtBase
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
      */
-    public static function DateIntervalArrayGenerator( $inclYearMonth = true )
+    public static function DateIntervalArrayGenerator( bool $inclYearMonth = true ) : array
     {
         $base = [
             RecurFactory::$LCYEAR  => array_rand( array_flip( [ 1, 2 ] )),
@@ -89,7 +95,7 @@ class DateIntervalTest2 extends DtBase
                     array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
                 );
             }
-            if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) {
+            if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
                 $random = array_filter( $random );
             }
@@ -118,7 +124,7 @@ class DateIntervalTest2 extends DtBase
      * @static
      * @since  2.26.14 - 2019-02-12
      */
-    public static function durationArray2string( array $duration )
+    public static function durationArray2string( array $duration ) : string
     {
         static $PT0H0M0S = 'PT0H0M0S';
         static $Y = 'Y';
@@ -165,7 +171,7 @@ class DateIntervalTest2 extends DtBase
         if( $secIsSet ) {
             $result .= $duration[RecurFactory::$LCSEC] . $S;
         }
-        if( DateIntervalFactory::$P == $result ) {
+        if( DateIntervalFactory::$P === $result ) {
             $result = $PT0H0M0S;
         }
         return $result;
@@ -176,30 +182,30 @@ class DateIntervalTest2 extends DtBase
      * DateInterval678ProviderDateInterval sub-provider, TRIGGER
      *
      * @param array $dateIntervalArray
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval678ProviderDateInterval( array $dateIntervalArray, $cnt )
+    public static function DateInterval678ProviderDateInterval( array $dateIntervalArray, int $cnt ) : array
     {
         $dateInterval = (array) DateIntervalFactory::factory(
             self::durationArray2string( $dateIntervalArray )
         );
         $getValue = DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval );
         $params   = [];
-        $s      = array_rand( [Vcalendar::START => 1, Vcalendar::END => 2] );
+        $s      = array_rand( [ IcalInterface::START => 1, IcalInterface::END => 2] );
         $s1     = null;
-        if( Vcalendar::START == $s ) {
+        if( IcalInterface::START === $s ) {
             $s1 = array_rand( [ 1 => 1, 2 => 2 ] );
-            if( 1 == $s1 ) {
-                $params[Vcalendar::RELATED] = Vcalendar::START; // default
+            if( 1 === $s1 ) {
+                $params[IcalInterface::RELATED] = IcalInterface::START; // default
             }
         }
         else {
-            $params[Vcalendar::RELATED] = Vcalendar::END;
+            $params[IcalInterface::RELATED] = IcalInterface::END;
         }
         $b = array_rand( ['before' => 1, 'after' => 2] );
-        if( 'before' == $b ) {
+        if( 'before' === $b ) {
             $diPrefix                   = '-';
             $dateInterval['invert']     = 1;
             $getValue->invert           = 1;
@@ -212,8 +218,8 @@ class DateIntervalTest2 extends DtBase
             Util::$LCvalue  => $getValue,
             Util::$LCparams => $params,
         ];
-        if( isset( $params[Vcalendar::RELATED] ) && ( Vcalendar::START == $params[Vcalendar::RELATED] )) { // remove default
-            unset( $getValue[Util::$LCparams][Vcalendar::RELATED] );
+        if( isset( $params[IcalInterface::RELATED] ) && ( IcalInterface::START === $params[IcalInterface::RELATED] )) { // remove default
+            unset( $getValue[Util::$LCparams][IcalInterface::RELATED] );
         }
         return [
             ( 6000 + $cnt ) . $s . $s1 . $b,
@@ -234,28 +240,28 @@ class DateIntervalTest2 extends DtBase
      * DateInterval678ProviderDateIntervalString sub-provider, TRIGGER
      *
      * @param array $input
-     * @param int   $cnt
+     * @param int $cnt
      * @return array
      * @throws Exception
      */
-    public static function DateInterval678ProviderDateIntervalString( array $input, $cnt )
+    public static function DateInterval678ProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $dateIntervalArray = $input;
         $value  = DateIntervalFactory::factory( self::durationArray2string( $dateIntervalArray ));
         $params = [];
-        $s      = array_rand( [Vcalendar::START => 1, Vcalendar::END => 2] );
+        $s      = array_rand( [ IcalInterface::START => 1, IcalInterface::END => 2] );
         $s1     = null;
-        if( Vcalendar::START == $s ) {
+        if( IcalInterface::START === $s ) {
             $s1 = array_rand( [ 1 => 1, 2 => 2 ] );
-            if( 1 == $s1) {
-                $params[Vcalendar::RELATED] = Vcalendar::START; // default
+            if( 1 === $s1) {
+                $params[IcalInterface::RELATED] = IcalInterface::START; // default
             }
         }
         else {
-            $params[Vcalendar::RELATED] = Vcalendar::END;
+            $params[IcalInterface::RELATED] = IcalInterface::END;
         }
         $b = array_rand( ['before' => 1, 'after' => 2] );
-        if( 'before' == $b) {
+        if( 'before' === $b) {
             $diPrefix      = '-';
             $value->invert = 1;
         }
@@ -267,8 +273,8 @@ class DateIntervalTest2 extends DtBase
             Util::$LCvalue  => $value,
             Util::$LCparams => $params,
         ];
-        if( isset( $params[Vcalendar::RELATED] ) && ( Vcalendar::START == $params[Vcalendar::RELATED] )) { // remove default
-            unset( $getValue[Util::$LCparams][Vcalendar::RELATED] );
+        if( isset( $params[IcalInterface::RELATED] ) && ( IcalInterface::START === $params[IcalInterface::RELATED] )) { // remove default
+            unset( $getValue[Util::$LCparams][IcalInterface::RELATED] );
         }
         return [
             ( 8000 + $cnt ) . $s . $s1 . $b,
@@ -292,7 +298,7 @@ class DateIntervalTest2 extends DtBase
      * @return array
      * @throws Exception
      */
-    public function DateInterval678Provider()
+    public function DateInterval678Provider() : array
     {
         $dataArr = [];
 
@@ -303,7 +309,7 @@ class DateIntervalTest2 extends DtBase
                 self::DateIntervalArrayGenerator(),
                 $cnt
             );
-            $cnt += 1;
+            ++$cnt;
         }
 
         // string input
@@ -313,7 +319,7 @@ class DateIntervalTest2 extends DtBase
                 self::DateIntervalArrayGenerator(),
                 $cnt
             );
-            $cnt += 1;
+            ++$cnt;
         }
 
         return $dataArr;
@@ -326,15 +332,15 @@ class DateIntervalTest2 extends DtBase
      * @dataProvider DateInterval678Provider
      * @param int|string $case
      * @param mixed  $value
-     * @param array  $params
-     * @param array  $expectedGet
+     * @param array $params
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval678( $case, $value, $params, $expectedGet, $expectedString )
+    public function testDateInterval678( int | string $case, mixed $value, array $params, array $expectedGet, string $expectedString ) : void
     {
         static $compProp = [
-            Vcalendar::VALARM  => [ Vcalendar::TRIGGER ],
+            IcalInterface::VALARM  => [ IcalInterface::TRIGGER ],
         ];
         $c = new Vcalendar();
         foreach( $compProp as $theComp => $props ) {
@@ -354,18 +360,27 @@ class DateIntervalTest2 extends DtBase
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
                     "get error in case #{$case}-1, <{$theComp}>->{$getMethod}"
                 );
 
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}()),
                     "create error in case #{$case}-2, <{$theComp}>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertFalse(
                     $comp->{$getMethod}( true ),
                     "get (after delete) error in case #{$case}-3, <{$theComp}>->{$deleteMethod}"

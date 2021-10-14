@@ -44,34 +44,34 @@ class Exception6Test extends TestCase
     /**
      * DateIntervalFactoryTest provider
      */
-    public function DateIntervalFactoryTestProvider()
+    public function DateIntervalFactoryTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             11,
-            Vcalendar::TZOFFSETFROM,
+            IcalInterface::TZOFFSETFROM,
             null,
-            [ Vcalendar::ALLOWEMPTY => false ]
+            [ IcalInterface::ALLOWEMPTY => false ]
         ];
 
         $dataArr[] = [
             11,
-            Vcalendar::TZOFFSETFROM,
+            IcalInterface::TZOFFSETFROM,
             'abc',
             []
         ];
 
         $dataArr[] = [
             21,
-            Vcalendar::TZOFFSETTO,
+            IcalInterface::TZOFFSETTO,
             null,
-            [ Vcalendar::ALLOWEMPTY => false ]
+            [ IcalInterface::ALLOWEMPTY => false ]
         ];
 
         $dataArr[] = [
             21,
-            Vcalendar::TZOFFSETTO,
+            IcalInterface::TZOFFSETTO,
             'abc',
             []
         ];
@@ -84,12 +84,12 @@ class Exception6Test extends TestCase
      *
      * @test
      * @dataProvider DateIntervalFactoryTestProvider
-     * @param int    $case
+     * @param int $case
      * @param string $property
      * @param string|null $value
      * @param array $config
      */
-    public function DateIntervalFactoryTest(  $case, $property, $value  = null, $config = [] )
+    public function DateIntervalFactoryTest( int $case, string $property, string $value  = null, array $config = [] ) : void
     {
         $standard = new Standard( $config );
         $method   = StringFactory::getSetMethodName( $property );

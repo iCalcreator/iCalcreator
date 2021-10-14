@@ -47,7 +47,7 @@ class RegulateTimezoneFactoryTest extends DtBase
     /**
      * TzTest1 provider
      */
-    public function TzTest1Provider()
+    public function TzTest1Provider() : array
     {
         $dataArr = [];
 
@@ -63,7 +63,7 @@ class RegulateTimezoneFactoryTest extends DtBase
         $case = 200;
         $timezoneIdentifiers = DateTimeZone::listIdentifiers();
         foreach( $timezoneIdentifiers as $tix => $timezoneIdentifier ) {
-            if( 0 != ( $tix % 10 )) {
+            if( 0 !== ( $tix % 10 )) {
                 continue;
             }
             $dataArr[] = [
@@ -83,12 +83,12 @@ class RegulateTimezoneFactoryTest extends DtBase
      *
      * @test
      * @dataProvider TzTest1Provider
-     * @param int    $case
+     * @param int $case
      * @param string $otherTimezone
-     * @param int    $hitsAfterProcess
+     * @param int $hitsAfterProcess
      * @throws Exception
      */
-    public function TzTest1( $case, $otherTimezone, $hitsAfterProcess )
+    public function TzTest1( int $case, string $otherTimezone, int $hitsAfterProcess ) : void
     {
         $case += 1000;
         static $CALFMT =
@@ -137,7 +137,7 @@ END:VCALENDAR
         $calendar  = sprintf( $CALFMT, $otherTimezone );
         $calendar2 = RegulateTimezoneFactory::process( $calendar );
 
-        if( 'UTC' == $otherTimezone ) {
+        if( 'UTC' === $otherTimezone ) {
             $hitsAfterProcess = 3;
         }
         $this->assertEquals(
@@ -158,7 +158,7 @@ END:VCALENDAR
      * @test
      * @throws Exception
      */
-    public function TzTest2()
+    public function TzTest2() : void
     {
         $calendar =
 'BEGIN:VCALENDAR
@@ -246,7 +246,7 @@ END:VCALENDAR
         );
     }
 
-    private static $calendar2 =
+    private static string $calendar2 =
         'BEGIN:VCALENDAR
 METHOD:PUBLISH
 PRODID:Microsoft Exchange Server 2010
@@ -268,12 +268,12 @@ END:VCALENDAR
      *
      * @test
      * @dataProvider TzTest1Provider
-     * @param int    $case
+     * @param int $case
      * @param string $otherTimezone
-     * @param int    $hitsAfterProcess
+     * @param int $hitsAfterProcess
      * @throws Exception
      */
-    public function TzTest3( $case, $otherTimezone, $hitsAfterProcess )
+    public function TzTest3( int $case, string $otherTimezone, int $hitsAfterProcess ) : void
     {
         $case += 3000;
         $calendar = sprintf( self::$calendar2, $otherTimezone );
@@ -285,9 +285,7 @@ END:VCALENDAR
             );
         }
         else {
-            $this->assertTrue(
-                ( false !== strpos( $calendar2, $otherTimezone ))
-            );
+            $this->assertTrue( str_contains( $calendar2, $otherTimezone ));
         }
 
         $this->parseCalendarTest(
@@ -302,7 +300,7 @@ END:VCALENDAR
      * @test
      * @throws Exception
      */
-    public function TzTest5()
+    public function TzTest5() : void
     {
         RegulateTimezoneFactory::addMStimezoneToOffset( 'otherTimezone', 12345 );
         $this->assertArrayHasKey(
@@ -330,11 +328,12 @@ END:VCALENDAR
      * Test exception
      *
      * @test
-     * @expectedException InvalidArgumentException
+     *
      * @throws Exception
      */
-    public function TzTest6()
+    public function TzTest6() : void
     {
+        $this->expectException( InvalidArgumentException::class );
         $calendar2 = RegulateTimezoneFactory::process(
             sprintf( self::$calendar2, '̈́Europe/Stockholm' ),
             [ 'otherTimezone' => 'phpTimezone' ]
@@ -345,11 +344,12 @@ END:VCALENDAR
      * Test exception
      *
      * @test
-     * @expectedException InvalidArgumentException
+     *
      * @throws Exception
      */
-    public function TzTest7()
+    public function TzTest7() : void
     {
+        $this->expectException( InvalidArgumentException::class );
         $tzFactory = RegulateTimezoneFactory::factory();
         $this->assertFalse( $tzFactory->isInputiCalSet());
 
@@ -360,11 +360,12 @@ END:VCALENDAR
      * Test exception
      *
      * @test
-     * @expectedException UnexpectedValueException
+     *
      * @throws Exception
      */
-    public function TzTest8()
+    public function TzTest8() : void
     {
+        $this->expectException( UnexpectedValueException::class );
         $calendar2 = RegulateTimezoneFactory::process( 'grodan boll' );
     }
 }

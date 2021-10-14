@@ -43,11 +43,12 @@ abstract class Vcomponent extends CalendarComponent
     /**
      * Constructor for calendar component
      *
-     * @param  array $config
-     * @since  2.27.6 - 2018-12-28
+     * @overrides
+     * @param array|null $config
      * @throws Exception
+     * @since  2.27.6 - 2018-12-28
      */
-    public function __construct( $config = [] )
+    public function __construct( ? array $config = [] )
     {
         parent::__construct( $config );
         $this->setDtstamp();

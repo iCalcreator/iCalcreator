@@ -41,9 +41,9 @@ use InvalidArgumentException;
 trait RESOURCEStrait
 {
     /**
-     * @var array component property RESOURCES value
+     * @var null|array component property RESOURCES value
      */
-    protected $resources = null;
+    protected ?array $resources = null;
 
     /**
      * Return formatted output for calendar component property resources
@@ -69,7 +69,7 @@ trait RESOURCEStrait
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteResources( $propDelIx = null ) : bool
+    public function deleteResources( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->resources )) {
             unset( $this->propDelIx[self::RESOURCES] );
@@ -88,10 +88,10 @@ trait RESOURCEStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getResources( $propIx = null, $inclParam = false )
+    public function getResources( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->resources )) {
             unset( $this->propIx[self::RESOURCES] );
@@ -109,14 +109,14 @@ trait RESOURCEStrait
     /**
      * Set calendar component property resources
      *
-     * @param null|mixed   $value
-     * @param null|array   $params
-     * @param null|integer $index
-     * @return static
+     * @param null|string   $value
+     * @param null|string[] $params
+     * @param null|integer  $index
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setResources( $value = null, $params = [], $index = null ) : self
+    public function setResources( ? string  $value = null, mixed $params = [], ? int $index = null ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RESOURCES );
@@ -125,9 +125,9 @@ trait RESOURCEStrait
         }
         else {
             Util::assertString( $value, self::RESOURCES );
-            $value = StringFactory::trimTrailNL( $value );
+            $value  = StringFactory::trimTrailNL( $value );
         }
-         self::setMval( $this->resources, $value, $params, null, $index );
+        self::setMval( $this->resources, $value, ( $params ?? [] ), null, $index );
         return $this;
     }
 }

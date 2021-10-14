@@ -45,39 +45,39 @@ use PHPUnit\Framework\TestCase;
  */
 class VcalendarTest extends TestCase
 {
-    private static $ERRFMT = "Error %sin case #%s, %s <%s>->%s()";
+    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s()";
 
     /**
      * Testing Vcalendar config
      *
      * @test
      */
-    public function vcalendarTest1()
+    public function vcalendarTest1() : void
     {
         $config = [
-            Vcalendar::ALLOWEMPTY => false,
-            Vcalendar::UNIQUE_ID  => 'kigkonsult.se',
+            IcalInterface::ALLOWEMPTY => false,
+            IcalInterface::UNIQUE_ID  => 'kigkonsult.se',
         ];
         $vcalendar    = new Vcalendar( $config );
 
-        $this->assertEquals( $config[Vcalendar::ALLOWEMPTY], $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
-        $this->assertEquals( $config[Vcalendar::UNIQUE_ID],  $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
+        $this->assertEquals( $config[IcalInterface::ALLOWEMPTY], $vcalendar->getConfig( IcalInterface::ALLOWEMPTY ));
+        $this->assertEquals( $config[IcalInterface::UNIQUE_ID],  $vcalendar->getConfig( IcalInterface::UNIQUE_ID ));
 
         $vcalendar    = new Vcalendar();
 
-        $this->assertEquals( true, $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
-        $this->assertEquals( '', $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
+        $this->assertEquals( true, $vcalendar->getConfig( IcalInterface::ALLOWEMPTY ));
+        $this->assertEquals( '', $vcalendar->getConfig( IcalInterface::UNIQUE_ID ));
 
-        $vcalendar->setConfig( Vcalendar::LANGUAGE, 'EN' );
-        $this->assertEquals( 'EN',                 $vcalendar->getConfig( Vcalendar::LANGUAGE ));
-        $vcalendar->deleteConfig( Vcalendar::LANGUAGE );
-        $this->assertFalse( $vcalendar->getConfig( Vcalendar::LANGUAGE ));
+        $vcalendar->setConfig( IcalInterface::LANGUAGE, 'EN' );
+        $this->assertEquals( 'EN',                 $vcalendar->getConfig( IcalInterface::LANGUAGE ));
+        $vcalendar->deleteConfig( IcalInterface::LANGUAGE );
+        $this->assertFalse( $vcalendar->getConfig( IcalInterface::LANGUAGE ));
 
-        $vcalendar->deleteConfig( Vcalendar::ALLOWEMPTY );
-        $this->assertTrue( $vcalendar->getConfig( Vcalendar::ALLOWEMPTY ));
+        $vcalendar->deleteConfig( IcalInterface::ALLOWEMPTY );
+        $this->assertTrue( $vcalendar->getConfig( IcalInterface::ALLOWEMPTY ));
 
-        $vcalendar->deleteConfig( Vcalendar::UNIQUE_ID );
-        $this->assertEquals( '', $vcalendar->getConfig( Vcalendar::UNIQUE_ID ));
+        $vcalendar->deleteConfig( IcalInterface::UNIQUE_ID );
+        $this->assertEquals( '', $vcalendar->getConfig( IcalInterface::UNIQUE_ID ));
     }
 
     /**
@@ -85,7 +85,7 @@ class VcalendarTest extends TestCase
      *
      * @test
      */
-    public function vcalendarTest2()
+    public function vcalendarTest2() : void
     {
         $vTimezone = new Vtimezone();
         $standard  = $vTimezone->newStandard();
@@ -95,23 +95,23 @@ class VcalendarTest extends TestCase
     /**
      * vcalendarTest10 provider
      */
-    public function vcalendarTest10Provider()
+    public function vcalendarTest10Provider() : array
     {
         $dataArr = [];
 
         $value     = 'GREGORIAN';
         $dataArr[] = [
             1,
-            Vcalendar::CALSCALE,
+            IcalInterface::CALSCALE,
             $value,
             $value,
             ':' . $value
         ];
 
-        $value = Vcalendar::P_BLIC;
+        $value = IcalInterface::P_BLIC;
         $dataArr[] = [
             5,
-            Vcalendar::METHOD,
+            IcalInterface::METHOD,
             $value,
             $value,
             ':' . $value
@@ -129,7 +129,7 @@ class VcalendarTest extends TestCase
         $value = '2.1';
         $dataArr[] = [
             19,
-            Vcalendar::VERSION,
+            IcalInterface::VERSION,
             $value,
             $value,
             ':' . $value
@@ -143,14 +143,14 @@ class VcalendarTest extends TestCase
      *
      * @test
      * @dataProvider vcalendarTest10Provider
-     * @param int    $case
+     * @param int $case
      * @param string $propName
      * @param mixed  $value
-     * @param array  $expectedGet
+     * @param string $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function vcalendarTest10( $case, $propName, $value, $expectedGet, $expectedString )
+    public function vcalendarTest10( int $case, string $propName, mixed $value, string $expectedGet, string $expectedString ) : void
     {
         $vcalendar = Vcalendar::factory();
 
@@ -172,14 +172,14 @@ class VcalendarTest extends TestCase
         );
 
         switch( $propName ) {
-            case Vcalendar::CALSCALE :
+            case IcalInterface::CALSCALE :
                 $vcalendar->{$deleteMethod}();
                 $this->assertNotFalse(
                     $vcalendar->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, 'Vcalendar', $getMethod )
                 );
                 break;
-            case Vcalendar::METHOD :
+            case IcalInterface::METHOD :
                 $vcalendar->{$deleteMethod}();
                 $this->assertFalse(
                     $vcalendar->{$getMethod}(),
@@ -187,7 +187,7 @@ class VcalendarTest extends TestCase
                 );
                 $vcalendar->{$setMethod}( $value );
                 break;
-            case Vcalendar::VERSION :
+            case IcalInterface::VERSION :
                 break;
         }
 
@@ -207,7 +207,7 @@ class VcalendarTest extends TestCase
 
         $vcalendar2 = new Vcalendar();
         $vcalendar2->parse( $calendar1String );
-        if( Vcalendar::VERSION == $propName ) {
+        if( IcalInterface::VERSION === $propName ) {
             $vcalendar2->{$setMethod}( $value );
         }
         $this->assertEquals(
@@ -225,7 +225,7 @@ class VcalendarTest extends TestCase
      * @test
      * @throws Exception
      */
-    public function vcalendarTest20()
+    public function vcalendarTest20() : void
     {
         $vcalendar = new Vcalendar();
 
@@ -236,7 +236,7 @@ class VcalendarTest extends TestCase
         $v2 = $vcalendar->getComponent( 6 );
         $this->assertEquals( $uid,  $v2->getUid());
 
-        $date = DateTimeFactory::factory( 'now', Vcalendar::UTC );
+        $date = DateTimeFactory::factory( 'now', IcalInterface::UTC );
         $v2->setDtstart( $date );
         $vcalendar->setComponent( $v2, 6 );
         $v2 = $vcalendar->getComponent( 6 );
@@ -247,7 +247,7 @@ class VcalendarTest extends TestCase
         $this->assertFalse( $vcalendar->getComponent());
 
         $this->assertTrue(
-            ( 0 == $vcalendar->countComponents()),
+            ( 0 === $vcalendar->countComponents()),
             'deleteComponent-error 1, has ' . $vcalendar->countComponents()
         );
 
@@ -266,7 +266,7 @@ class VcalendarTest extends TestCase
             $vx1->setXprop( 'X-SET_NO', (string) $x );
         }
         $this->assertTrue(
-            ( 30 == $vcalendar->countComponents()),
+            ( 30 === $vcalendar->countComponents()),
             'deleteComponent-error 2, has ' . $vcalendar->countComponents()
         );
 
@@ -275,7 +275,7 @@ class VcalendarTest extends TestCase
         $testArr = [];
 
         $value = $testStr . 1;
-        $testArr[Vcalendar::CATEGORIES] = [ 1, $value ];
+        $testArr[IcalInterface::CATEGORIES] = [ 1, $value ];
         $v     = $vcalendar->getComponent( 1 );
         $v->setCategories( $value );
         $v->setXprop( 'X-VALUE', $value );
@@ -284,7 +284,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $value = $testStr . 2;
-        $testArr[Vcalendar::LOCATION] = [ 2, $value ];
+        $testArr[IcalInterface::LOCATION] = [ 2, $value ];
         $v     = $vcalendar->getComponent( 2 );
         $v->setLocation( $value );
         $v->setComment( 2 ); // remember $x
@@ -293,7 +293,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $value = $testStr . 3;
-        $testArr[Vcalendar::SUMMARY] = [ 3, $value ];
+        $testArr[IcalInterface::SUMMARY] = [ 3, $value ];
         $v     = $vcalendar->getComponent( 3 );
         $v->setSummary( $value );
         $v->setComment( 3 ); // remember $x
@@ -302,7 +302,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $value = $testStr . 4;
-        $testArr[Vcalendar::RESOURCES] = [ 4, $value ];
+        $testArr[IcalInterface::RESOURCES] = [ 4, $value ];
         $v     = $vcalendar->getComponent( 4 );
         $v->setResources( $value );
         $v->setComment( 4 ); // remember $x
@@ -311,7 +311,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
 
-        $testArr[Vcalendar::PRIORITY] = [ 5, 5 ];
+        $testArr[IcalInterface::PRIORITY] = [ 5, 5 ];
         $v = $vcalendar->getComponent( 5 );
         $v->setPriority( 5 );
         $v->setComment( 5 ); // remember $x
@@ -319,17 +319,17 @@ class VcalendarTest extends TestCase
         $v->setXprop( 'X-UPD_NO', 5 );
         $vcalendar->replaceComponent( $v );
 
-        $testArr[Vcalendar::STATUS] = [ 6, Vcalendar::TENTATIVE ];
+        $testArr[IcalInterface::STATUS] = [ 6, IcalInterface::TENTATIVE ];
         $v = $vcalendar->getComponent( 6 );
-        $v->setStatus( Vcalendar::TENTATIVE );
+        $v->setStatus( IcalInterface::TENTATIVE );
         $v->setComment( 6 ); // remember $x
-        $v->setXprop( 'X-VALUE', Vcalendar::TENTATIVE );
+        $v->setXprop( 'X-VALUE', IcalInterface::TENTATIVE );
         $v->setXprop( 'X-UPD_NO', 6 );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 7 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::DTSTART] = [ 7, $dateStr ];
+        $testArr[IcalInterface::DTSTART] = [ 7, $dateStr ];
         $v = $vcalendar->getComponent( 7 );
         $v->setDtstart( $date );
         $v->setComment( 7 ); // remember $x
@@ -337,9 +337,9 @@ class VcalendarTest extends TestCase
         $v->setXprop( 'X-UPD_NO', 7 );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 8 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 8 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::DTSTAMP] = [ 8, $dateStr ];
+        $testArr[IcalInterface::DTSTAMP] = [ 8, $dateStr ];
         $v = $vcalendar->getComponent( 8 );
         $v->setDtstamp( $date );
         $v->setComment( 8 ); // remember $x
@@ -347,36 +347,36 @@ class VcalendarTest extends TestCase
         $v->setXprop( 'X-UPD_NO', 8 );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 9 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 9 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::DTEND] = [ 9, $dateStr ];
+        $testArr[IcalInterface::DTEND] = [ 9, $dateStr ];
         $v = $vcalendar->getComponent( 9 );
         $v->setDtend( $date );
         $v->setComment( 9 ); // remember $x
         $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 10 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 10 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::CREATED] = [ 10, $dateStr ];
+        $testArr[IcalInterface::CREATED] = [ 10, $dateStr ];
         $v = $vcalendar->getComponent( 10 );
         $v->setCreated( $date );
         $v->setComment( 10 ); // remember $x
         $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 11 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 11 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::LAST_MODIFIED] = [ 11, $dateStr ];
+        $testArr[IcalInterface::LAST_MODIFIED] = [ 11, $dateStr ];
         $v = $vcalendar->getComponent( 11 );
         $v->setLastmodified( $date );
         $v->setComment( 11 ); // remember $x
         $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 7 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 7 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::RECURRENCE_ID] = [ 12, $dateStr ];
+        $testArr[IcalInterface::RECURRENCE_ID] = [ 12, $dateStr ];
         $v = $vcalendar->getComponent( 12 );
         $v->setRecurrenceid( $date );
         $v->setComment( 12 ); // remember $x
@@ -384,18 +384,18 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
 
-        $date    = DateTimeFactory::factory( '+' . 13 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 13 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::COMPLETED] = [ 13, $dateStr ]; // Vtodo
+        $testArr[IcalInterface::COMPLETED] = [ 13, $dateStr ]; // Vtodo
         $v = $vcalendar->getComponent( 13 );
         $v->setCompleted( $date );
         $v->setComment( 13 ); // remember $x
         $v->setXprop( 'X-VALUE', $dateStr );
         $vcalendar->replaceComponent( $v );
 
-        $date    = DateTimeFactory::factory( '+' . 14 . ' days', Vcalendar::UTC );
+        $date    = DateTimeFactory::factory( '+' . 14 . ' days', IcalInterface::UTC );
         $dateStr = $date->format( DateTimeFactory::$YmdHis );
-        $testArr[Vcalendar::DUE] = [ 14, $dateStr ]; // Vtodo
+        $testArr[IcalInterface::DUE] = [ 14, $dateStr ]; // Vtodo
         $v = $vcalendar->getComponent( 14 );
         $v->setDue( $date );
         $v->setComment( 14 ); // remember $x
@@ -404,7 +404,7 @@ class VcalendarTest extends TestCase
 
 
         $contact  = 'test.this.contact@exsample.com';
-        $testArr[Vcalendar::CONTACT] = [ 15, $contact ];
+        $testArr[IcalInterface::CONTACT] = [ 15, $contact ];
         $v  = $vcalendar->getComponent( 15 );
         $v->setContact( $contact );
         $v->setComment( 15 ); // remember $x
@@ -412,7 +412,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $attendee = 'MAILTO:test.this.attendee@exsample.com';
-        $testArr[Vcalendar::ATTENDEE] = [ 16, $attendee ];
+        $testArr[IcalInterface::ATTENDEE] = [ 16, $attendee ];
         $v = $vcalendar->getComponent( 16 );
         $v->setAttendee( $attendee );
         $v->setComment( 16 ); // remember $x
@@ -420,7 +420,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $organizer = 'MAILTO:test.this.organizer@exsample.com';
-        $testArr[Vcalendar::ORGANIZER] = [ 17, $organizer ];
+        $testArr[IcalInterface::ORGANIZER] = [ 17, $organizer ];
         $v         = $vcalendar->getComponent( 17 );
         $v->setOrganizer( $organizer );
         $v->setComment( 17 ); // remember $x
@@ -428,7 +428,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $relatedTo = 'test this related-to';
-        $testArr[Vcalendar::RELATED_TO] = [ 18, $relatedTo ];
+        $testArr[IcalInterface::RELATED_TO] = [ 18, $relatedTo ];
         $v         = $vcalendar->getComponent( 18 );
         $v->setRelatedto( $relatedTo );
         $v->setComment( 18 ); // remember $x
@@ -436,7 +436,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $url = 'http://test.this.url@exsample.com';
-        $testArr[Vcalendar::URL] = [ 19, $url ];
+        $testArr[IcalInterface::URL] = [ 19, $url ];
         $v   = $vcalendar->getComponent( 19 );
         $v->setUrl( $url );
         $v->setComment( 19 ); // remember $x
@@ -444,7 +444,7 @@ class VcalendarTest extends TestCase
         $vcalendar->replaceComponent( $v );
 
         $uid = 'test this uid';
-        $testArr[Vcalendar::UID] = [ 20, $uid ];
+        $testArr[IcalInterface::UID] = [ 20, $uid ];
         $v   = $vcalendar->getComponent( 20 );
         $v->setUid( $uid );
         $v->setComment( 20 ); // remember $x
@@ -476,7 +476,7 @@ class VcalendarTest extends TestCase
         } // end foreach
 
         // check fetch on config compsinfo
-        foreach( $vcalendar->getConfig( Vcalendar::COMPSINFO ) as $cix => $compInfo ) {
+        foreach( $vcalendar->getConfig( IcalInterface::COMPSINFO ) as $cix => $compInfo ) {
 
             $v = $vcalendar->getComponent( $compInfo['uid'] ); // note lower case
 
@@ -495,43 +495,43 @@ class VcalendarTest extends TestCase
         }
 
         // check fetch on type and order number
-        $v = $vcalendar->getComponent( Vcalendar::VTODO, 1 );
-        $v = $vcalendar->getComponent( Vcalendar::VTODO, 2 );
-        $this->assertFalse( $vcalendar->getComponent( Vcalendar::VTODO, 3 ) );
+        $v1 = $vcalendar->getComponent( IcalInterface::VTODO, 1 );
+        $v2 = $vcalendar->getComponent( IcalInterface::VTODO, 2 );
+        $this->assertFalse( $vcalendar->getComponent( IcalInterface::VTODO, 3 ) );
 
         // check number of components
         $this->assertTrue(
-            ( 30 == $vcalendar->countComponents() ),
+            ( 30 === $vcalendar->countComponents() ),
             'deleteComponent-error 6, has ' . $vcalendar->countComponents()
         );
 
         for( $x = 18; $x <= 1; $x-- ) {
             $this->assertTrue(
-                $vcalendar->deleteComponent(  Vcalendar::VEVENT, $x ),
+                $vcalendar->deleteComponent(  IcalInterface::VEVENT, $x ),
                 'deleteComponent-error 7 on #' . $x
             );
         }
-        while( $vcalendar->deleteComponent(  Vcalendar::VEVENT, false ) ) {
+        while( $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ) ) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent(  Vcalendar::VEVENT, false ),
+            $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ),
             'deleteComponent-error 8'
         );
         $this->assertTrue(
-            ( 2 == $vcalendar->countComponents() ),
+            ( 2 === $vcalendar->countComponents() ),
             'deleteComponent-error 9, has ' . $vcalendar->countComponents()
         );
 
-        while( $vcalendar->deleteComponent(  Vcalendar::VTODO, false ) ) {
+        while( $vcalendar->deleteComponent(  IcalInterface::VTODO, false ) ) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent(  Vcalendar::VTODO, false ),
+            $vcalendar->deleteComponent(  IcalInterface::VTODO, false ),
             'deleteComponent-error 10'
         );
         $this->assertTrue(
-            ( 0 == $vcalendar->countComponents() ),
+            ( 0 === $vcalendar->countComponents() ),
             'deleteComponent-error 11, has ' . $vcalendar->countComponents()
         );
 
@@ -541,7 +541,7 @@ class VcalendarTest extends TestCase
         }
         $x = 0;
         while( $comp = $vcalendar->getComponent()) {
-            $x += 1;
+            ++$x;
             $this->assertEquals(
                 $x,
                 $comp->getXprop( 'X-SET_NO' )[1],
@@ -550,7 +550,7 @@ class VcalendarTest extends TestCase
         }
         // check number of components
         $this->assertTrue(
-            ( 30 == $vcalendar->countComponents() ),
+            ( 30 === $vcalendar->countComponents() ),
             'deleteComponent-error 13, has ' . $vcalendar->countComponents()
         );
     }

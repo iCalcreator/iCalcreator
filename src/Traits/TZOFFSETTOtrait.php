@@ -30,11 +30,11 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Vcalendar;
 
 use function sprintf;
 
@@ -46,9 +46,9 @@ use function sprintf;
 trait TZOFFSETTOtrait
 {
     /**
-     * @var array component property TZOFFSETTO value
+     * @var null|array component property TZOFFSETTO value
      */
-    protected $tzoffsetto = null;
+    protected ?array $tzoffsetto = null;
 
     /**
      * Return formatted output for calendar component property tzoffsetto
@@ -88,10 +88,10 @@ trait TZOFFSETTOtrait
      * Get calendar component property tzoffsetto
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzoffsetto( $inclParam = false )
+    public function getTzoffsetto( ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzoffsetto )) {
             return false;
@@ -102,13 +102,13 @@ trait TZOFFSETTOtrait
     /**
      * Set calendar component property tzoffsetto
      *
-     * @param null|string $value
-     * @param null|array  $params
-     * @return static
+     * @param null|string  $value
+     * @param null|string[] $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.3 2019-03-14
      */
-    public function setTzoffsetto( $value = null, $params = [] ) : self
+    public function setTzoffsetto( ? string $value = null, ? array $params = [] ) : self
     {
         static $ERR = 'Invalid %s offset value %s';
         if( empty( $value )) {
@@ -118,7 +118,7 @@ trait TZOFFSETTOtrait
         }
         elseif( ! DateTimeZoneFactory::hasOffset( $value )) {
             throw new InvalidArgumentException(
-                sprintf( $ERR, Vcalendar::TZOFFSETTO, $value )
+                sprintf( $ERR, IcalInterface::TZOFFSETTO, $value )
             );
         }
         $this->tzoffsetto = [

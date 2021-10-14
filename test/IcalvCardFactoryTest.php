@@ -28,6 +28,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use Exception;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use PHPUnit\Framework\TestCase;
 use Kigkonsult\Icalcreator\Util\IcalvCardFactory;
@@ -45,10 +46,11 @@ class IcalvCardFactoryTest extends TestCase
 {
     /**
      * IcalvCardFactoryTest provider
-    /**
+     * /**
      * SelectComponentsTest provider
+     * @throws Exception
      */
-    public function IcalvCardFactoryTestProvider()
+    public function IcalvCardTestProvider() : array
     {
         $dataArr = [];
 
@@ -97,12 +99,12 @@ class IcalvCardFactoryTest extends TestCase
      * Testing IcalvCardFactory::iCal2vCards (+iCal2vCard+...)
      *
      * @test
-     * @dataProvider IcalvCardFactoryTestProvider'
-     * @param int       $case
+     * @dataProvider IcalvCardTestProvider'
+     * @param int $case
      * @param Vcalendar $vcalendar
-     * @param string    $version
+     * @param null|string $version
      */
-    public function IcalvCardFactoryTest( $case, Vcalendar $vcalendar, $version )
+    public function IcalvCardTest( int $case, Vcalendar $vcalendar, ? string $version = null ) : void
     {
         static $ERRFMT1 = 'Error in #%d-1, version not found';
         static $ERRFMT2 = 'Error in #%d-2, count BEGIN not match, exp %d got %d';

@@ -33,7 +33,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\IcalInterface;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -46,7 +46,6 @@ use function key;
 use function reset;
 use function sprintf;
 use function str_replace;
-use function strpos;
 use function timezone_name_from_abbr;
 
 /**
@@ -66,8 +65,9 @@ class RegulateTimezoneFactory
      *
      * @param string $msTz
      * @param string $offset   (+/-)HH:mm
+     * @return void
      */
-    public static function addMStimezoneToOffset( $msTz, $offset )
+    public static function addMStimezoneToOffset( string $msTz, string $offset ) : void
     {
         self::$MStimezoneToOffset[$msTz] = $offset;
     }
@@ -78,9 +78,9 @@ class RegulateTimezoneFactory
      * 5 hits on dst (aka daylight saving time)...
      * 5 PHP timezones specified
      *
-     * @var array  MS timezones with corr. UTC offset, 73 items
+     * @var string[]  MS timezones with corr. UTC offset, 73 items
      */
-    public static $MStimezoneToOffset = [
+    public static array $MStimezoneToOffset = [
         'Afghanistan Standard Time'       => '+04:30',
         'Arab Standard Time'              => '+03:00',
         'Arabian Standard Time'           => '+04:00',
@@ -161,18 +161,19 @@ class RegulateTimezoneFactory
      *
      * @param string $otherTz
      * @param string $phpTz
+     * @return void
      * @throws InvalidArgumentException
      */
-    public static function addOtherTzMapToPhpTz( $otherTz, $phpTz )
+    public static function addOtherTzMapToPhpTz( string $otherTz, string $phpTz ) : void
     {
         DateTimeZoneFactory::assertDateTimeZone( $phpTz );
         self::$otherTzToPhpTz[$otherTz] = $phpTz;
     }
 
     /**
-     * @var array  7 MS timezones to PHP timezones
+     * @var string[]  7 MS timezones to PHP timezones
      */
-    public static $otherTzToPhpTz = [
+    public static array $otherTzToPhpTz = [
         'Afghanistan Standard Time'       => 'Asia/Kabul',
         'Fiji Standard Time'              => 'Pacific/Fiji',
         // also in 'UTC+12', below
@@ -191,39 +192,40 @@ class RegulateTimezoneFactory
     ];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $inputiCal = [];
+    private array $inputiCal = [];
 
     /**
      * @var string
      */
-    private $outputiCal = null;
+    private string $outputiCal;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $vtimezoneRows = [];
+    private array $vtimezoneRows = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $otherTzPhpRelations = [];
+    private array $otherTzPhpRelations = [];
 
     /**
      * Class constructor
      *
-     * @param string|array $inputiCal    strict rfc2445 formatted calendar
-     * @param array        $otherTzPhpRelations  [ other => phpTz ]
+     * @param string|string[]   $inputiCal    strict rfc2445 formatted calendar
+     * @param null|string[]     $otherTzPhpRelations  [ other => phpTz ]
      * @throws InvalidArgumentException
      */
-    public function __construct( $inputiCal = null, array $otherTzPhpRelations = [] )
+    public function __construct( mixed $inputiCal = null, ? array $otherTzPhpRelations = [] )
     {
+        $this->outputiCal = Util::$SP0;
         if( ! empty( $inputiCal )) {
             $this->setInputiCal( $inputiCal );
         }
         $this->addOtherTzPhpRelations( self::$otherTzToPhpTz );
-        foreach( $otherTzPhpRelations as $otherTz => $phpTz ) {
+        foreach((array) $otherTzPhpRelations as $otherTz => $phpTz ) {
             $this->addOtherTzPhpRelation( $otherTz, $phpTz );
         }
     }
@@ -231,14 +233,14 @@ class RegulateTimezoneFactory
     /**
      * Class factory method
      *
-     * @param string|array $inputiCal    strict rfc2445 formatted calendar
-     * @param array        $otherTzPhpRelations  [ other => phpTz ]
-     * @return static
+     * @param string|string[] $inputiCal    strict rfc2445 formatted calendar
+     * @param null|string[]   $otherTzPhpRelations  [ other => phpTz ]
+     * @return self
      * @throws InvalidArgumentException
      */
     public static function factory(
-        $inputiCal = null,
-        array $otherTzPhpRelations = []
+        mixed $inputiCal = null,
+        ? array $otherTzPhpRelations = []
     ) : self
     {
         return new self( $inputiCal, $otherTzPhpRelations );
@@ -248,15 +250,15 @@ class RegulateTimezoneFactory
     /**
      * Short static all-in-one method
      *
-     * @param string|array $inputiCal    strict rfc2445 formatted calendar
-     * @param array        $otherTzPhpRelations  [ other => phpTz ]
+     * @param string|string[] $inputiCal    strict rfc2445 formatted calendar
+     * @param null|string[]   $otherTzPhpRelations  [ other => phpTz ]
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
      */
     public static function process(
-        $inputiCal,
-        array $otherTzPhpRelations = []
+        string | array $inputiCal,
+        ? array $otherTzPhpRelations = []
     ) : string
     {
         return self::factory( $inputiCal, $otherTzPhpRelations )
@@ -266,12 +268,12 @@ class RegulateTimezoneFactory
 
 
     /**
-     * @param string|array $inputiCal    strict rfc2445 formatted calendar
-     * @return static
+     * @param null|string|string[] $inputiCal    strict rfc2445 formatted calendar
+     * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function processCalendar( $inputiCal = null ) : self
+    public function processCalendar( null | string | array $inputiCal = null ) : self
     {
         $FMTERR = 'Calendar content required!';
         if( ! empty( $inputiCal )) {
@@ -281,7 +283,7 @@ class RegulateTimezoneFactory
             throw new InvalidArgumentException( $FMTERR );
         }
         $vtSwitch = false;
-        foreach( $this->getInputiCal() as $lix => $row ) {
+        foreach( $this->getInputiCal() as $row ) {
             if( StringFactory::startsWith( $row, self::$BEGINVTIMEZONE )) {
                 $this->setVtimezoneRow( $row );
                 $vtSwitch = true;
@@ -290,7 +292,7 @@ class RegulateTimezoneFactory
             if( StringFactory::startsWith( $row, self::$ENDVTIMEZONE )) {
                 $this->setVtimezoneRow( $row );
                 $this->processVtimezone();
-                $this->setVtimezoneRows();
+                $this->setEmptyVtimezoneRows();
                 $vtSwitch = false;
                 continue;
             }
@@ -304,15 +306,15 @@ class RegulateTimezoneFactory
                 continue;
             }
             /* split property name  and  opt.params and value */
-            list( $propName, $row2 ) = StringFactory::getPropName( $row );
+            [$propName, $row2] = StringFactory::getPropName( $row );
             if( ! Util::isPropInList( $propName, self::$TZIDPROPS )) {
                 $this->setOutputiCalRow( $row );
                 continue;
             }
             /* Now we have only properties with propAttr TZID */
             /* separate attributes from value */
-            list( $value, $propAttr ) = self::splitContent( $row2 );
-            if( ! isset( $propAttr[Vcalendar::TZID] )) {
+            [ $value, $propAttr ] = self::splitContent( $row2 );
+            if( ! isset( $propAttr[IcalInterface::TZID] )) {
                 $this->setOutputiCalRow( $row );
                 continue;
             }
@@ -325,16 +327,18 @@ class RegulateTimezoneFactory
      * Process VTIMEZONE properties
      *
      * NO UTC here !! ??
+     *
+     * @return void
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    private function processVtimezone()
+    private function processVtimezone() : void
     {
         $currTzId      = null;                 // empty if Vtimezone TZID is found else troublesome one
         $currTzIdFound = false;                // true if PHP Vtimezone TZID found
         $stdSwitch     = $dlghtSwitch = false; // process STANDARD/DAYLIGHT or not
         $stdArr        = $dlghtArr = [];       // TZOFFSETTO values (in  STANDARD/DAYLIGHT)
-        foreach( $this->getVtimezoneRows() as $lix => $row ) {
+        foreach( $this->getVtimezoneRows() as $row ) {
             switch( true ) {
                 case ( StringFactory::startsWith( $row, self::$BEGINVTIMEZONE )) :
                     $this->setOutputiCalRow( $row );
@@ -372,8 +376,8 @@ class RegulateTimezoneFactory
                     break; // now we go on with property rows
             } // end switch
             /* split property name  and  opt.params and value */
-            list( $propName, $row2 ) = StringFactory::getPropName( $row );
-            if( Vcalendar::TZOFFSETTO == $propName ) { // save offset if...
+            [ $propName, $row2 ] = StringFactory::getPropName( $row );
+            if( IcalInterface::TZOFFSETTO === $propName ) { // save offset if...
                 if( $stdSwitch ) {
                     $stdArr[] = StringFactory::afterLast( Util::$COLON, $row2 );
                 }
@@ -381,22 +385,22 @@ class RegulateTimezoneFactory
                     $dlghtArr[] = StringFactory::afterLast( Util::$COLON, $row2 );
                 }
             }
-            if( Vcalendar::TZID != $propName ) {  // skip all but Vtimezone TZID
+            if( IcalInterface::TZID !== $propName ) {  // skip all but Vtimezone TZID
                 $this->setOutputiCalRow( $row );
                 continue;
             }
             /* separate attributes from value */
-            list( $value, $propAttr ) = StringFactory::splitContent( $row2 );
+            [ $value, $propAttr ] = StringFactory::splitContent( $row2 );
             $currTzId = $value;
             $valueNew = null;
             switch( true ) {
                 case ( $this->hasOtherTzPHPtzMap( $value )) :
-                    $valueNew = $this->getOtherTzPhpRelations( $value );
+                    $valueNew = (string) $this->getOtherTzPhpRelations( $value );
                     break;
                 case ( isset( self::$MStimezoneToOffset[$value] )) :
                     $msTzOffset = self::$MStimezoneToOffset[$value];
                     if( empty( $msTzOffset )) {
-                        $valueNew = Vcalendar::UTC;
+                        $valueNew = IcalInterface::UTC;
                     }
                     else {
                         $valueNew = self::getTimeZoneNameFromOffset( $msTzOffset, false );
@@ -428,12 +432,12 @@ class RegulateTimezoneFactory
     /**
      * Find currTzId replacement using stdArr+dlghtArr offsets
      *
-     * @param string $currTzId
-     * @param array  $stdArr
-     * @param array  $dlghtArr
+     * @param string   $currTzId
+     * @param mixed[]  $stdArr
+     * @param mixed[]  $dlghtArr
      * @throws RuntimeException
      */
-    private function processCurrTzId( $currTzId, array $stdArr, array $dlghtArr )
+    private function processCurrTzId( string $currTzId, array $stdArr, array $dlghtArr ) : void
     {
         static $ERR = 'Timezone \'%s\' (offset std %s, dlght %s) don\'t match any PHP timezone';
         $stdTzs = $dlghtTzs = [];
@@ -473,25 +477,26 @@ class RegulateTimezoneFactory
     /**
      * Process component properties with propAttr TZID
      *
-     * @param string $propName
-     * @param string $value
-     * @param array  $propAttr
+     * @param string  $propName
+     * @param string  $value
+     * @param mixed[] $propAttr
+     * @return void
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws RuntimeException
      * @todo properties RDATE, EXDATE
      */
-    private function processDtProp( $propName, $value, array $propAttr )
+    private function processDtProp( string $propName, string $value, array $propAttr ) : void
     {
-        $tzId = $propAttr[Vcalendar::TZID];
+        $tzId = $propAttr[IcalInterface::TZID];
         switch( true ) {
             case ( $this->hasOtherTzPHPtzMap( $tzId ) ) :
-                $propAttr[Vcalendar::TZID] = $this->getOtherTzPhpRelations( $tzId );
+                $propAttr[IcalInterface::TZID] = $this->getOtherTzPhpRelations( $tzId );
                 break;
             case ( isset( self::$MStimezoneToOffset[$tzId] ) &&
                 empty( self::$MStimezoneToOffset[$tzId] )) :
-                $this->addOtherTzPhpRelation( $tzId, Vcalendar::UTC, false );
-                $propAttr[Vcalendar::TZID] = Vcalendar::UTC;
+                $this->addOtherTzPhpRelation( $tzId, IcalInterface::UTC, false );
+                $propAttr[IcalInterface::TZID] = IcalInterface::UTC;
                 break;
             default : /* check and (opt) alter timezones */
                 $this->processDatePropsTZIDattribute( $propName, $value, $propAttr );
@@ -504,22 +509,22 @@ class RegulateTimezoneFactory
     /**
      * If in array, alter date-properties attribute TZID fixed. PHP-check (all) timezones, throws exception on error
      *
-     * @param string $propName
-     * @param string $value
-     * @param array  $propAttr
+     * @param string  $propName
+     * @param string  $value
+     * @param mixed[] $propAttr
+     * @return void
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    private function processDatePropsTZIDattribute( $propName, $value, $propAttr )
+    private function processDatePropsTZIDattribute( string $propName, string $value, array $propAttr ) : void
     {
-        $tzId = $tzIdIn = $propAttr[Vcalendar::TZID];
+        $tzId = $tzIdIn = $propAttr[IcalInterface::TZID];
         if( isset( self::$MStimezoneToOffset[$tzIdIn] )) {
             $tzId = self::getTimeZoneNameFromOffset(
-                self::$MStimezoneToOffset[$tzIdIn],
-                true
+                self::$MStimezoneToOffset[$tzIdIn]
             );
             $this->addOtherTzPhpRelation( $tzIdIn, $tzId, false );
-            $propAttr[Vcalendar::TZID] = $tzId;
+            $propAttr[IcalInterface::TZID] = $tzId;
             self::checkTzidForUTC( $value, $propAttr );
         }
         else {
@@ -532,12 +537,12 @@ class RegulateTimezoneFactory
      * Return array( value, propAttr ) from property row
      *
      * @param string $row2
-     * @return array   ( value, propAttr )
+     * @return mixed[]   ( value, propAttr )
      */
     private static function splitContent( string $row2 ) : array
     {
         /* separate attributes from value */
-        list( $value, $propAttr ) = StringFactory::splitContent( $row2 );
+        [ $value, $propAttr ] = StringFactory::splitContent( $row2 );
         /* fix splitContent UTC 'bug' */
         self::fixUTCx( $row2, $value, $propAttr );
         return [ $value, $propAttr ];
@@ -555,7 +560,7 @@ class RegulateTimezoneFactory
      */
     private static function getTimeZoneNameFromOffset(
         string $offset,
-        $throwException = true
+        ? bool $throwException = true
     ) : string
     {
         static $ERR = 'Offset \'%s\' (%+d seconds) don\'t match any PHP timezone';
@@ -587,7 +592,7 @@ class RegulateTimezoneFactory
      * @see https://www.php.net/manual/en/datetimezone.listabbreviations.php#114161
      * @param string $offset
      * @param int    $dst
-     * @return array
+     * @return mixed[]
      * @throws RuntimeException
      */
     private static function getTimezoneListFromOffset( string $offset, int $dst ) : array
@@ -601,11 +606,10 @@ class RegulateTimezoneFactory
         foreach( array_reverse( DateTimeZone::listAbbreviations()) as $tzAbbrList ) {
             foreach( $tzAbbrList as $tzAbbrCity ) {
                 if(((bool) $tzAbbrCity[$DST] !== (bool) $dst ) ||
-                    ( $tzAbbrCity[$OFFSET] != $seconds ) ||
+                    ( $tzAbbrCity[$OFFSET] !== $seconds ) ||
                     empty( $tzAbbrCity[$TIMEZONEID] )) {
                     continue;
                 }
-                $dateTimeOffsetNow = 0;
                 try {
                     $date = new DateTime(
                         DateTimeFactory::$NOW,
@@ -615,13 +619,15 @@ class RegulateTimezoneFactory
                 }
                 catch( Exception $e ) {
                     throw new RuntimeException(
-                        sprintf( $FMTERR, $tzAbbrCity[$TIMEZONEID] )
+                        sprintf( $FMTERR, $tzAbbrCity[$TIMEZONEID] ),
+                        12345,
+                        $e
                     );
                 }
-                if( $seconds == $dateTimeOffsetNow ) {
+                if( $seconds === $dateTimeOffsetNow ) {
                     $tzId = $tzAbbrCity[$TIMEZONEID];
                     if( isset( $output[$tzId] )) {
-                        $output[$tzId] += 1;
+                        ++$output[$tzId];
                     }
                     else {
                         $output[$tzId] = 1;
@@ -635,30 +641,31 @@ class RegulateTimezoneFactory
     /**
      * Suffix value with 'Z'and remove propAttr TZID, IF propAttr TZID = UTC
      *
-     * @param string $value
-     * @param array  $propAttr
+     * @param string  $value
+     * @param mixed[] $propAttr
+     * @return void
      */
-    private static function checkTzidForUTC( & $value, & $propAttr )
+    private static function checkTzidForUTC( string & $value, array & $propAttr ) : void
     {
-        if( ! DateTimeZoneFactory::isUTCtimeZone( $propAttr[Vcalendar::TZID] )) {
+        if( ! DateTimeZoneFactory::isUTCtimeZone( $propAttr[IcalInterface::TZID] )) {
             return;
         }
-        unset( $propAttr[Vcalendar::TZID] );
+        unset( $propAttr[IcalInterface::TZID] );
         $values = explode( Util::$COMMA, $value );
         foreach( array_keys( $values ) as $x ) {
             if( ParameterFactory::isParamsValueSet(
                 [ Util::$LCparams => $propAttr ],
-                Vcalendar::PERIOD
+                IcalInterface::PERIOD
             )) { // RDATE
                 $thePeriods     = explode( Util::$SLASH, $values[$x] );
-                $thePeriods[0] .= Vcalendar::Z;
+                $thePeriods[0] .= IcalInterface::Z;
                 if( ! DateIntervalFactory::isStringAndDuration( $thePeriods[1] )) {
-                    $thePeriods[1] .= Vcalendar::Z;
+                    $thePeriods[1] .= IcalInterface::Z;
                 }
                 $values[$x] = implode( Util::$SLASH, $thePeriods );
             }
             else {
-                $values[$x] .= Vcalendar::Z;
+                $values[$x] .= IcalInterface::Z;
             }
         }
         $value = implode( Util::$COMMA, $values );
@@ -668,25 +675,26 @@ class RegulateTimezoneFactory
      * Fix StringFactory::splitContent UTC* bug for MS list UTC-related timezones
      *
      * Note, here $propAttr[Vcalendar::TZID] exists
-     * @param string $row2
-     * @param string $value
-     * @param array  $propAttr
+     *
+     * @param string  $row2
+     * @param string  $value
+     * @param mixed[] $propAttr
      */
-    private static function fixUTCx( $row2, & $value, & $propAttr )
+    private static function fixUTCx( string $row2, string & $value, array & $propAttr ) : void
     {
         static $UTZx = [ 'UTC-02', 'UTC-11', 'UTC+12' ];
         foreach( $UTZx as $theUTC ) {
-            if( false === strpos( $row2, $theUTC )) {
+            if( !str_contains( $row2, $theUTC ) ) {
                 continue;
             }
-            if( false !== strpos( $propAttr[Vcalendar::TZID], Util::$COLON )) {
-                $propAttr[Vcalendar::TZID] =
+            if( str_contains( $propAttr[IcalInterface::TZID], Util::$COLON ) ) {
+                $propAttr[IcalInterface::TZID] =
                     StringFactory::beforeLast(
                         Util::$COLON,
-                        $propAttr[Vcalendar::TZID]
+                        $propAttr[IcalInterface::TZID]
                     );
             }
-            if( false !== strpos( $value, Util::$COLON )) {
+            if( str_contains( $value, Util::$COLON ) ) {
                 $value = StringFactory::afterLast( Util::$COLON, $row2 );
             }
             break;
@@ -698,7 +706,7 @@ class RegulateTimezoneFactory
      */
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getInputiCal() : array
     {
@@ -714,24 +722,24 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param string|array $inputiCal
-     * @return static
+     * @param string|mixed[] $inputiCal
+     * @return self
      * @throws UnexpectedValueException
      */
-    public function setInputiCal( $inputiCal ) : self
+    public function setInputiCal( string | array $inputiCal ) : self
     {
         /* get rows to parse */
         $rows = StringFactory::conformParseInput( $inputiCal );
         /* concatenate property values spread over several rows */
         $this->inputiCal = StringFactory::concatRows( $rows );
         /* Initiate output */
-        $this->setVtimezoneRows();
+        $this->setEmptyVtimezoneRows();
         return $this;
     }
 
 
     /**
-     * @return array
+     * @return mixed[]
      */
     private function getVtimezoneRows() : array
     {
@@ -740,22 +748,19 @@ class RegulateTimezoneFactory
 
     /**
      * @param string $vtimezoneRow
-     * @return static
+     * @return void
      */
-    private function setVtimezoneRow( $vtimezoneRow ) : self
+    private function setVtimezoneRow( string $vtimezoneRow ) : void
     {
         $this->vtimezoneRows[] = $vtimezoneRow;
-        return $this;
     }
 
     /**
-     * @return static
+     * @return void
      */
-    private function setVtimezoneRows() : self
+    private function setEmptyVtimezoneRows() : void
     {
-        $vtimezoneRows       = [];
-        $this->vtimezoneRows = $vtimezoneRows;
-        return $this;
+        $this->vtimezoneRows = [];
     }
 
 
@@ -772,51 +777,44 @@ class RegulateTimezoneFactory
      *
      * @param string $tzidOld
      * @param string $tzidNew
-     * @return static
+     * @return void
      */
-    private function replaceTzidInOutputiCal( string $tzidOld, string $tzidNew ) : self
+    private function replaceTzidInOutputiCal( string $tzidOld, string $tzidNew ) : void
     {
         $this->outputiCal = str_replace( $tzidOld, $tzidNew, $this->outputiCal );
-        return $this;
     }
 
     /**
      * Append outputiCal from row
      *
      * @param string $row
-     * @return static
+     * @return void
      */
-    private function setOutputiCalRow( string $row ) : self
+    private function setOutputiCalRow( string $row ) : void
     {
         $this->outputiCal .= StringFactory::size75( $row );
-        return $this;
     }
 
     /**
      * Append outputiCal row, built from propName, value, propAttr
      *
-     * @param string $propName
-     * @param string $value
-     * @param array  $propAttr
-     * @return static
+     * @param string  $propName
+     * @param string  $value
+     * @param mixed[] $propAttr
+     * @return void
      */
-    private function setOutputiCalRowElements(
-        string $propName,
-        string $value,
-        array $propAttr
-    ) : self
+    private function setOutputiCalRowElements( string $propName, string $value, array $propAttr ) : void
     {
         $params = ParameterFactory::createParams( $propAttr );
         $this->outputiCal .= StringFactory::createElement( $propName, $params, $value );
-        return $this;
     }
 
 
     /**
-     * @param string $otherTz
-     * @return string|bool|array    bool false on key not found
+     * @param null|string $otherTz
+     * @return string|bool|mixed[]    bool false on key not found
      */
-    public function getOtherTzPhpRelations( string $otherTz = null )
+    public function getOtherTzPhpRelations( ? string $otherTz = null ) : bool | array | string
     {
         if( ! empty( $otherTz )) {
             return $this->hasOtherTzPHPtzMap( $otherTz )
@@ -839,13 +837,14 @@ class RegulateTimezoneFactory
      * @param string $otherTzKey
      * @param string $phpTz
      * @param bool   $doTzAssert
+     * @return self
      * @throws InvalidArgumentException
-     * @return static
+     * @return self
      */
     public function addOtherTzPhpRelation(
         string $otherTzKey,
         string $phpTz,
-        $doTzAssert = true
+        ? bool $doTzAssert = true
     ) : self
     {
         if( $doTzAssert ) {
@@ -856,37 +855,64 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param array $otherTzPhpRelations
-     * @return static
+     * @param mixed[] $otherTzPhpRelations
+     * @return void
      */
-    private function addOtherTzPhpRelations( array $otherTzPhpRelations ) : self
+    private function addOtherTzPhpRelations( array $otherTzPhpRelations ) : void
     {
         $this->otherTzPhpRelations = $otherTzPhpRelations;
-        return $this;
     }
 
 
     /**
-     * @var array  iCal component non-UTC date-property collection
+     * @var string[]  iCal component non-UTC date-property collection
      */
-    private static $TZIDPROPS  = [
-        Vcalendar::DTSTART,
-        Vcalendar::DTEND,
-        Vcalendar::DUE,
-        Vcalendar::RECURRENCE_ID,
-        Vcalendar::EXDATE,
-        Vcalendar::RDATE
+    private static array $TZIDPROPS  = [
+        IcalInterface::DTSTART,
+        IcalInterface::DTEND,
+        IcalInterface::DUE,
+        IcalInterface::RECURRENCE_ID,
+        IcalInterface::EXDATE,
+        IcalInterface::RDATE
     ];
 
     /**
      * @var string
      */
-    private static $BEGIN          = 'BEGIN';
-    private static $BEGINVTIMEZONE = 'BEGIN:VTIMEZONE';
-    private static $BEGINSTANDARD  = 'BEGIN:STANDARD';
-    private static $BEGINDAYLIGHT  = 'BEGIN:DAYLIGHT';
-    private static $END            = 'END';
-    private static $ENDVTIMEZONE   = 'END:VTIMEZONE';
-    private static $ENDSTANDARD    = 'END:STANDARD';
-    private static $ENDDAYLIGHT    = 'END:DAYLIGHT';
+    private static string $BEGIN          = 'BEGIN';
+
+    /**
+     * @var string
+     */
+    private static string $BEGINVTIMEZONE = 'BEGIN:VTIMEZONE';
+
+    /**
+     * @var string
+     */
+    private static string $BEGINSTANDARD  = 'BEGIN:STANDARD';
+
+    /**
+     * @var string
+     */
+    private static string $BEGINDAYLIGHT  = 'BEGIN:DAYLIGHT';
+
+    /**
+     * @var string
+     */
+    private static string $END            = 'END';
+
+    /**
+     * @var string
+     */
+    private static string $ENDVTIMEZONE   = 'END:VTIMEZONE';
+
+    /**
+     * @var string
+     */
+    private static string $ENDSTANDARD    = 'END:STANDARD';
+
+    /**
+     * @var string
+     */
+    private static string $ENDDAYLIGHT    = 'END:DAYLIGHT';
 }

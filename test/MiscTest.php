@@ -50,24 +50,24 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class MiscTest extends DtBase
 {
-    private static $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
-    private static $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
-    private static $EOLCHARS = [ "\r\n ", "\r\n\t", PHP_EOL . " ", PHP_EOL . "\t" ];
+    private static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
+    private static array $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static array $EOLCHARS = [ "\r\n ", "\r\n\t", PHP_EOL . " ", PHP_EOL . "\t" ];
 
     /**
-     * testMisc1 provider
+     * miscTest1 provider
      */
-    public function Misc1Provider()
+    public function misc1Provider() : array
     {
         $dataArr = [];
 
         // TRANSP
-        $value  = Vcalendar::OPAQUE;
+        $value  = IcalInterface::OPAQUE;
         $params = self::$STCPAR;
         $dataArr[] = [
             1011,
             [
-                Vcalendar::TRANSP => [ Vcalendar::VEVENT ]
+                IcalInterface::TRANSP => [ IcalInterface::VEVENT ]
             ],
             $value,
             $params,
@@ -75,20 +75,20 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::TRANSP ) .
+            strtoupper( IcalInterface::TRANSP ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         $value  = 'Meeting to provide technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
         $params = [
-            Vcalendar::ALTREP   => 'This is an alternative representation',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'This is an alternative representation',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             1021,
             [
-                Vcalendar::DESCRIPTION => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
+                IcalInterface::DESCRIPTION => [ IcalInterface::VEVENT, IcalInterface::VTODO ]
             ],
             $value,
             $params,
@@ -96,21 +96,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::DESCRIPTION ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::DESCRIPTION ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // LOCATION
         $value  = 'Conference Room - F123, Bldg. 002';
         $params = [
-            Vcalendar::ALTREP   => 'This is an alternative representation',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'This is an alternative representation',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             1031,
             [
-                Vcalendar::LOCATION => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
+                IcalInterface::LOCATION => [ IcalInterface::VEVENT, IcalInterface::VTODO ]
             ],
             $value,
             $params,
@@ -118,21 +118,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::LOCATION ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::LOCATION ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // SUMMARY
         $value  = 'Department Party';
         $params = [
-            Vcalendar::ALTREP   => 'This is an alternative representation',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'This is an alternative representation',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             1041,
             [
-                Vcalendar::SUMMARY => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::SUMMARY => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -140,20 +140,20 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::SUMMARY ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::SUMMARY ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         $value = '⚽ Major League Soccer on ESPN+';
         $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
+                IcalInterface::ALTREP   => 'This is an alternative representation',
+                IcalInterface::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [ // testing utf8 char
             1042,
             [
-                Vcalendar::SUMMARY => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::SUMMARY => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -161,8 +161,8 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::SUMMARY ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::SUMMARY ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -172,7 +172,7 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1051,
             [
-                Vcalendar::SOURCE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::SOURCE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value,
             $params,
@@ -180,7 +180,7 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::SOURCE ) .
+            strtoupper( IcalInterface::SOURCE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -188,12 +188,12 @@ class MiscTest extends DtBase
         // URL 1
         $value1  = '%3C01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com%3E';
         $value2  = '01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com';
-        $params1 = [  Vcalendar::VALUE => 'URI' ]  + self::$STCPAR;
+        $params1 = [  IcalInterface::VALUE => 'URI' ]  + self::$STCPAR;
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1061,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::URL => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value1,
             $params1,
@@ -201,19 +201,19 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value2,
                 Util::$LCparams => $params2
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( IcalInterface::URL ) .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 2
         $value1  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
         $value2  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
-        $params1 = [  Vcalendar::VALUE => Vcalendar::URI ]  + self::$STCPAR;
+        $params1 = [  IcalInterface::VALUE => IcalInterface::URI ]  + self::$STCPAR;
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1062,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::URL => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value1,
             $params1,
@@ -221,7 +221,7 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value2,
                 Util::$LCparams => $params2
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( IcalInterface::URL ) .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
@@ -229,12 +229,12 @@ class MiscTest extends DtBase
         // URL 4
         $value1  = 'message://https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
         $value2  = 'message://https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
-        $params1 = self::$STCPAR + [  Vcalendar::VALUE => Vcalendar::URI ];
+        $params1 = self::$STCPAR + [  IcalInterface::VALUE => IcalInterface::URI ];
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1064,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::URL => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value1,
             $params1,
@@ -242,19 +242,19 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value2,
                 Util::$LCparams => $params2
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( IcalInterface::URL ) .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 5
         $value1  = 'message://%3C1714214488.13907.1453128266311.JavaMail.tomcat%40web-pdfe-f02%3E?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
         $value2  = 'message://1714214488.13907.1453128266311.JavaMail.tomcat@web-pdfe-f02?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $params1 = self::$STCPAR + [  Vcalendar::VALUE => Vcalendar::URI ];
+        $params1 = self::$STCPAR + [  IcalInterface::VALUE => IcalInterface::URI ];
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1065,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::URL => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value1,
             $params1,
@@ -262,19 +262,19 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value2,
                 Util::$LCparams => $params2
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( IcalInterface::URL ) .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 6
         $value1  = 'message://%3C1714214488.13907.1453128266311.JavaMail.tomcat%40web-pdfe-f02%3E?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
         $value2  = 'message://1714214488.13907.1453128266311.JavaMail.tomcat@web-pdfe-f02?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $params1 = self::$STCPAR + [  strtolower( Vcalendar::VALUE ) => strtolower( Vcalendar::URI ) ];
+        $params1 = self::$STCPAR + [  strtolower( IcalInterface::VALUE ) => strtolower( IcalInterface::URI ) ];
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1066,
             [
-                Vcalendar::URL => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::URL => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value1,
             $params1,
@@ -282,17 +282,17 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value2,
                 Util::$LCparams => $params2
             ],
-            strtoupper( Vcalendar::URL ) .
+            strtoupper( IcalInterface::URL ) .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
         // ORGANIZER
         $value  = 'MAILTO:ildoit1071@example.com';
         $params = [
-                Vcalendar::CN             => 'John Doe',
-                Vcalendar::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
-                Vcalendar::SENT_BY        => 'MAILTO:boss1071@example.com',
-                Vcalendar::LANGUAGE       => 'EN'
+                IcalInterface::CN             => 'John Doe',
+                IcalInterface::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
+                IcalInterface::SENT_BY        => 'MAILTO:boss1071@example.com',
+                IcalInterface::LANGUAGE       => 'EN'
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -301,19 +301,19 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1071,
             [
-                Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ORGANIZER => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
-            $params + [ Vcalendar::EMAIL => 'ildoit1071@example.com' ], // removed, same as value
+            $params + [ IcalInterface::EMAIL => 'ildoit1071@example.com' ], // removed, same as value
             $getValue,
-            strtoupper( Vcalendar::ORGANIZER ) .
+            strtoupper( IcalInterface::ORGANIZER ) .
             ParameterFactory::createParams(
                 $params,
                 [
-                    Vcalendar::CN,
-                    Vcalendar::DIR,
-                    Vcalendar::SENT_BY,
-                    Vcalendar::LANGUAGE
+                    IcalInterface::CN,
+                    IcalInterface::DIR,
+                    IcalInterface::SENT_BY,
+                    IcalInterface::LANGUAGE
                 ]
             ) .
             ':' . $value
@@ -321,14 +321,14 @@ class MiscTest extends DtBase
 
         $value  = 'ildoit1072@example.com';
         $params = [
-                strtolower( Vcalendar::CN )           => 'Jane Doe',
-                strtolower( Vcalendar::SENT_BY )      => 'boss1072@example.com',
-                strtolower( Vcalendar::EMAIL )        => 'MAILTO:another1072@example.com'
+                strtolower( IcalInterface::CN )           => 'Jane Doe',
+                strtolower( IcalInterface::SENT_BY )      => 'boss1072@example.com',
+                strtolower( IcalInterface::EMAIL )        => 'MAILTO:another1072@example.com'
             ] + self::$STCPAR;
         $params2 = [
-                Vcalendar::CN            => 'Jane Doe',
-                Vcalendar::SENT_BY       => 'MAILTO:boss1072@example.com',
-                Vcalendar::EMAIL         => 'another1072@example.com'
+                IcalInterface::CN            => 'Jane Doe',
+                IcalInterface::SENT_BY       => 'MAILTO:boss1072@example.com',
+                IcalInterface::EMAIL         => 'another1072@example.com'
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => 'MAILTO:' . $value,
@@ -337,26 +337,26 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1072,
             [
-                Vcalendar::ORGANIZER => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ORGANIZER => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::ORGANIZER ) .
+            strtoupper( IcalInterface::ORGANIZER ) .
             ParameterFactory::createParams(
                 $params2,
                 [
-                    Vcalendar::CN,
-                    Vcalendar::DIR,
-                    Vcalendar::SENT_BY,
-                    Vcalendar::LANGUAGE
+                    IcalInterface::CN,
+                    IcalInterface::DIR,
+                    IcalInterface::SENT_BY,
+                    IcalInterface::LANGUAGE
                 ]
             ) .
             ':' . 'MAILTO:' . $value
         ];
 
         // CLASS
-        $value  = Vcalendar::CONFIDENTIAL;
+        $value  = IcalInterface::CONFIDENTIAL;
         $params = self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -365,18 +365,18 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1081,
             [
-                Vcalendar::KLASS => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::KLASS => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::KLASS ) .
+            strtoupper( IcalInterface::KLASS ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         // STATUS
-        $value  = Vcalendar::TENTATIVE;
+        $value  = IcalInterface::TENTATIVE;
         $params = self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -385,18 +385,18 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1091,
             [
-                Vcalendar::STATUS => [ Vcalendar::VEVENT ]
+                IcalInterface::STATUS => [ IcalInterface::VEVENT ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::STATUS ) .
+            strtoupper( IcalInterface::STATUS ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         // STATUS
-        $value  = Vcalendar::NEEDS_ACTION;
+        $value  = IcalInterface::NEEDS_ACTION;
         $params = self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -405,18 +405,18 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1092,
             [
-                Vcalendar::STATUS => [ Vcalendar::VTODO ]
+                IcalInterface::STATUS => [ IcalInterface::VTODO ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::STATUS ) .
+            strtoupper( IcalInterface::STATUS ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         // STATUS
-        $value  = Vcalendar::F_NAL;
+        $value  = IcalInterface::F_NAL;
         $params = self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -425,18 +425,18 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1093,
             [
-                Vcalendar::STATUS => [ Vcalendar::VJOURNAL ]
+                IcalInterface::STATUS => [ IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::STATUS ) .
+            strtoupper( IcalInterface::STATUS ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         // GEO
-        $value  = [ Vcalendar::LATITUDE => 10.10, Vcalendar::LONGITUDE => 10.10 ];
+        $value  = [ IcalInterface::LATITUDE => 10.10, IcalInterface::LONGITUDE => 10.10 ];
         $params = self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -445,17 +445,17 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1101,
             [
-                Vcalendar::GEO => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
+                IcalInterface::GEO => [ IcalInterface::VEVENT, IcalInterface::VTODO ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::GEO ) .
+            strtoupper( IcalInterface::GEO ) .
             ParameterFactory::createParams( $params ) .
             ':' .
-            GeoFactory::geo2str2( $getValue[Util::$LCvalue][Vcalendar::LATITUDE], GeoFactory::$geoLatFmt ) .
+            GeoFactory::geo2str2( $getValue[Util::$LCvalue][IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
             Util::$SEMIC .
-            GeoFactory::geo2str2( $getValue[Util::$LCvalue][Vcalendar::LONGITUDE], GeoFactory::$geoLongFmt )
+            GeoFactory::geo2str2( $getValue[Util::$LCvalue][IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
 
         ];
 
@@ -469,12 +469,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             1103,
             [
-                Vcalendar::COLOR => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::COLOR => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::COLOR ) .
+            strtoupper( IcalInterface::COLOR ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -486,37 +486,38 @@ class MiscTest extends DtBase
      * Testing value TEXT (single) properties
      *
      * @test
-     * @dataProvider Misc1Provider
-     * @param int    $case
-     * @param array  $propComps
+     * @dataProvider misc1Provider
+     * @param int $case
+     * @param array $propComps
      * @param mixed  $value
      * @param mixed  $params
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testMisc1(
-        $case,
-        $propComps,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function miscTest1(
+        int    $case,
+        array  $propComps,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
+    {
         $c = new Vcalendar();
         $urlIsSet = false;
         foreach( $propComps as $propName => $theComps ) {
-            if( Vcalendar::SOURCE == $propName ) {
+            if( IcalInterface::SOURCE === $propName ) {
                 $c->setSource( $value, $params );
                 $c->setUrl( $value, $params );
                 continue;
             }
             foreach( $theComps as $theComp ) {
-                if( Vcalendar::COLOR == $propName ) {
+                if( IcalInterface::COLOR === $propName ) {
                     $c->setColor( $value, $params );
                 }
 
-                if( ! $urlIsSet && ( Vcalendar::URL == $propName )) {
+                if( ! $urlIsSet && ( IcalInterface::URL === $propName )) {
                     $c->setUrl( $value, $params );
                     $urlIsSet = true;
                 }
@@ -529,8 +530,8 @@ class MiscTest extends DtBase
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
 
-                if( Vcalendar::GEO == $propName ) {
-                    $comp->{$setMethod}( $value[Vcalendar::LATITUDE], $value[Vcalendar::LONGITUDE], $params );
+                if( IcalInterface::GEO === $propName ) {
+                    $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
                 }
                 else {
                     $comp->{$setMethod}( $value, $params );
@@ -557,8 +558,8 @@ class MiscTest extends DtBase
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
 
-                if( Vcalendar::GEO == $propName ) {
-                    $comp->{$setMethod}( $value[Vcalendar::LATITUDE], $value[Vcalendar::LONGITUDE], $params );
+                if( IcalInterface::GEO === $propName ) {
+                    $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
                 }
                 else {
                     $comp->{$setMethod}( $value, $params );
@@ -570,21 +571,22 @@ class MiscTest extends DtBase
     }
 
     /**
-     * testMisc2 provider
+     * miscTest2 provider
      */
-    public function Misc2Provider() {
+    public function misc2Provider() : array
+    {
 
         $dataArr = [];
 
         // CATEGORIES
         $value  = 'ANNIVERSARY,APPOINTMENT,BUSINESS,EDUCATION,HOLIDAY,MEETING,MISCELLANEOUS,NON-WORKING HOURS,NOT IN OFFICE,PERSONAL,PHONE CALL,SICK DAY,SPECIAL OCCASION,TRAVEL,VACATION';
         $params = [
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             2011,
             [
-                Vcalendar::CATEGORIES  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::CATEGORIES  => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -592,21 +594,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::CATEGORIES ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::CATEGORIES ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // COMMENT
         $value  = 'This is a comment';
         $params = [
-            Vcalendar::ALTREP   => 'This is an alternative representation',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'This is an alternative representation',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             2021,
             [
-                Vcalendar::COMMENT  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::COMMENT  => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value,
             $params,
@@ -614,21 +616,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::COMMENT ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::COMMENT ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // CONTACT
         $value  = 'Jim Dolittle, ABC Industries, +1-919-555-1234';
         $params = [
-            Vcalendar::ALTREP   => 'http://example.com/pdi/jdoe.vcf',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'http://example.com/pdi/jdoe.vcf',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             2031,
             [
-                Vcalendar::CONTACT  => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL, Vcalendar::VFREEBUSY ]
+                IcalInterface::CONTACT  => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
             ],
             $value,
             $params,
@@ -636,21 +638,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::CONTACT ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::CONTACT ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // DESCRIPTION
         $value  = 'Meeting to provide technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
         $params = [
-            Vcalendar::ALTREP   => 'This is an alternative representation',
-            Vcalendar::LANGUAGE => 'EN'
+            IcalInterface::ALTREP   => 'This is an alternative representation',
+            IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
         $dataArr[] = [
             2041,
             [
-                Vcalendar::DESCRIPTION => [ Vcalendar::VJOURNAL ]
+                IcalInterface::DESCRIPTION => [ IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -658,21 +660,21 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::DESCRIPTION ) .
-                ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::DESCRIPTION ) .
+                ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
                 ':' . $value
         ];
 
         // RESOURCES
         $value  = 'EASEL,PROJECTOR,VCR';
         $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
+                IcalInterface::ALTREP   => 'This is an alternative representation',
+                IcalInterface::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $dataArr[] = [
             2051,
             [
-                Vcalendar::RESOURCES => [ Vcalendar::VEVENT, Vcalendar::VTODO ]
+                IcalInterface::RESOURCES => [ IcalInterface::VEVENT, IcalInterface::VTODO ]
             ],
             $value,
             $params,
@@ -680,51 +682,51 @@ class MiscTest extends DtBase
                 Util::$LCvalue  => $value,
                 Util::$LCparams => $params
             ],
-            strtoupper( Vcalendar::RESOURCES ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::RESOURCES ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // ATTENDEE
         $value  = 'MAILTO:ildoit2061@example.com';
         $params = [
-                Vcalendar::CUTYPE         => Vcalendar::GROUP,
-                Vcalendar::MEMBER         => [
+                IcalInterface::CUTYPE         => IcalInterface::GROUP,
+                IcalInterface::MEMBER         => [
                     'MAILTO:DEV-GROUP1@example.com',
                     'MAILTO:DEV-GROUP2@example.com',
                     'MAILTO:DEV-GROUP3@example.com',
                 ],
-                Vcalendar::ROLE           => Vcalendar::OPT_PARTICIPANT,
-                Vcalendar::PARTSTAT       => Vcalendar::TENTATIVE,
-                Vcalendar::RSVP           => Vcalendar::TRUE,
-                Vcalendar::DELEGATED_TO   => [
+                IcalInterface::ROLE           => IcalInterface::OPT_PARTICIPANT,
+                IcalInterface::PARTSTAT       => IcalInterface::TENTATIVE,
+                IcalInterface::RSVP           => IcalInterface::TRUE,
+                IcalInterface::DELEGATED_TO   => [
                     'MAILTO:bob@example.com',
                     'MAILTO:rob@example.com',
                 ],
-                Vcalendar::DELEGATED_FROM => [
+                IcalInterface::DELEGATED_FROM => [
                     'MAILTO:jane@example.com',
                     'MAILTO:mary@example.com',
                 ],
-                Vcalendar::SENT_BY        => 'boss@example.com',          // note missing MAILTO:
-                Vcalendar::EMAIL          => 'MAILTO:hammer@example.com', // MAILTO: woíll be removed
-                Vcalendar::CN             => 'John Doe',
-                Vcalendar::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
-                Vcalendar::LANGUAGE       => 'EN'
+                IcalInterface::SENT_BY        => 'boss@example.com',          // note missing MAILTO:
+                IcalInterface::EMAIL          => 'MAILTO:hammer@example.com', // MAILTO: woíll be removed
+                IcalInterface::CN             => 'John Doe',
+                IcalInterface::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
+                IcalInterface::LANGUAGE       => 'EN'
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
         ];
         $getValue2 = $getValue;
-        $getValue2[Util::$LCparams][Vcalendar::SENT_BY] = 'MAILTO:boss@example.com';
-        $getValue2[Util::$LCparams][Vcalendar::EMAIL]   = 'hammer@example.com';
+        $getValue2[Util::$LCparams][IcalInterface::SENT_BY] = 'MAILTO:boss@example.com';
+        $getValue2[Util::$LCparams][IcalInterface::EMAIL]   = 'hammer@example.com';
         $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue2 ], true ));
         $expectedString = str_replace( Util::$CRLF . ' ' , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
             2061,
             [
-                Vcalendar::ATTENDEE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ATTENDEE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -734,25 +736,25 @@ class MiscTest extends DtBase
 
         $value     = 'MAILTO:ildoit2062@example.com';
         $params    =  [
-                Vcalendar::MEMBER         => '"DEV-GROUP2062@example.com"',
-                Vcalendar::DELEGATED_TO   => '"bob2062@example.com"',
-                Vcalendar::DELEGATED_FROM => '"jane2062@example.com"',
+                IcalInterface::MEMBER         => '"DEV-GROUP2062@example.com"',
+                IcalInterface::DELEGATED_TO   => '"bob2062@example.com"',
+                IcalInterface::DELEGATED_FROM => '"jane2062@example.com"',
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
         ];
         $getValue2 = $getValue;
-        $getValue2[Util::$LCparams][Vcalendar::MEMBER]         = [ 'MAILTO:DEV-GROUP2062@example.com' ];
-        $getValue2[Util::$LCparams][Vcalendar::DELEGATED_TO]   = [ 'MAILTO:bob2062@example.com' ];
-        $getValue2[Util::$LCparams][Vcalendar::DELEGATED_FROM] = [ 'MAILTO:jane2062@example.com' ];
+        $getValue2[Util::$LCparams][IcalInterface::MEMBER]         = [ 'MAILTO:DEV-GROUP2062@example.com' ];
+        $getValue2[Util::$LCparams][IcalInterface::DELEGATED_TO]   = [ 'MAILTO:bob2062@example.com' ];
+        $getValue2[Util::$LCparams][IcalInterface::DELEGATED_FROM] = [ 'MAILTO:jane2062@example.com' ];
         $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue2 ], true ));
         $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
             2062,
             [
-                Vcalendar::ATTENDEE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ATTENDEE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
@@ -772,10 +774,10 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2063,
             [
-                Vcalendar::ATTENDEE => [ Vcalendar::VFREEBUSY ] // , Vcalendar::VFREEBUSY
+                IcalInterface::ATTENDEE => [ IcalInterface::VFREEBUSY ] // , Vcalendar::VFREEBUSY
             ],
             $value,
-            $params + [ Vcalendar::EMAIL => 'ildoit2063-2@example.com' ], // will be skipped
+            $params + [ IcalInterface::EMAIL => 'ildoit2063-2@example.com' ], // will be skipped
             $getValue,
             $expectedString
         ];
@@ -790,12 +792,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2071,
             [
-                Vcalendar::RELATED_TO => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::RELATED_TO => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::RELATED_TO ) .
+            strtoupper( IcalInterface::RELATED_TO ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -810,19 +812,19 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2081,
             [
-                Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ATTACH => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::ATTACH ) .
+            strtoupper( IcalInterface::ATTACH ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
 
         // ATTACH
         $value  = 'ftp://example.com/pub/reports/r-960812.ps';
-        $params = [ Vcalendar::FMTTYPE => 'application/postscript' ] + self::$STCPAR;
+        $params = [ IcalInterface::FMTTYPE => 'application/postscript' ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
@@ -830,12 +832,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2082,
             [
-                Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ATTACH => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::ATTACH ) .
+            strtoupper( IcalInterface::ATTACH ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -843,9 +845,9 @@ class MiscTest extends DtBase
         // ATTACH
         $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
         $params = [
-            Vcalendar::FMTTYPE  => 'image/vnd.microsoft.icon',
-            Vcalendar::ENCODING => Vcalendar::BASE64,
-            Vcalendar::VALUE    => Vcalendar::BINARY,
+            IcalInterface::FMTTYPE  => 'image/vnd.microsoft.icon',
+            IcalInterface::ENCODING => IcalInterface::BASE64,
+            IcalInterface::VALUE    => IcalInterface::BINARY,
         ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -854,12 +856,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2083,
             [
-                Vcalendar::ATTACH => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::ATTACH => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::ATTACH ) .
+            strtoupper( IcalInterface::ATTACH ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -867,7 +869,7 @@ class MiscTest extends DtBase
 
         // IMAGE
         $value  = 'CID:jsmith.part3.960817T083000.xyzMail@example.com';
-        $params = [ Vcalendar::VALUE => Vcalendar::URI ] + self::$STCPAR;
+        $params = [ IcalInterface::VALUE => IcalInterface::URI ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
@@ -875,12 +877,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2091,
             [
-                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::IMAGE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::IMAGE ) .
+            strtoupper( IcalInterface::IMAGE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -888,9 +890,9 @@ class MiscTest extends DtBase
         // IMAGE
         $value  = 'ftp://example.com/pub/reports/r-960812.png';
         $params = [
-            Vcalendar::VALUE   => Vcalendar::URI,
-            Vcalendar::FMTTYPE => 'application/png',
-            Vcalendar::DISPLAY => Vcalendar::BADGE . ',' . Vcalendar::THUMBNAIL
+            IcalInterface::VALUE   => IcalInterface::URI,
+            IcalInterface::FMTTYPE => 'application/png',
+            IcalInterface::DISPLAY => IcalInterface::BADGE . ',' . IcalInterface::THUMBNAIL
         ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -899,12 +901,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2092,
             [
-                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::IMAGE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::IMAGE ) .
+            strtoupper( IcalInterface::IMAGE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -912,10 +914,10 @@ class MiscTest extends DtBase
         // IMAGE
         $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
         $params = [
-                Vcalendar::VALUE    => Vcalendar::BINARY,
-                Vcalendar::FMTTYPE  => 'image/vnd.microsoft.icon',
-                Vcalendar::ENCODING => Vcalendar::BASE64,
-                Vcalendar::DISPLAY  => Vcalendar::BADGE . ',' . Vcalendar::THUMBNAIL
+                IcalInterface::VALUE    => IcalInterface::BINARY,
+                IcalInterface::FMTTYPE  => 'image/vnd.microsoft.icon',
+                IcalInterface::ENCODING => IcalInterface::BASE64,
+                IcalInterface::DISPLAY  => IcalInterface::BADGE . ',' . IcalInterface::THUMBNAIL
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -924,12 +926,12 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2093,
             [
-                Vcalendar::IMAGE => [ Vcalendar::VEVENT, Vcalendar::VTODO, Vcalendar::VJOURNAL ]
+                IcalInterface::IMAGE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::IMAGE ) .
+            strtoupper( IcalInterface::IMAGE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -937,11 +939,11 @@ class MiscTest extends DtBase
 
         // REQUEST_STATUS
         $value  = [
-            Vcalendar::STATCODE => '3.70',
-            Vcalendar::STATDESC => 'Invalid calendar user',
-            Vcalendar::EXTDATA  => 'ATTENDEE:mailto:jsmith@example.com'
+            IcalInterface::STATCODE => '3.70',
+            IcalInterface::STATDESC => 'Invalid calendar user',
+            IcalInterface::EXTDATA  => 'ATTENDEE:mailto:jsmith@example.com'
         ];
-        $params = [ Vcalendar::LANGUAGE => 'EN' ] + self::$STCPAR;
+        $params = [ IcalInterface::LANGUAGE => 'EN' ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
             Util::$LCparams => $params
@@ -949,35 +951,35 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2111,
             [
-                Vcalendar::REQUEST_STATUS => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
-                    Vcalendar::VJOURNAL,
-                    Vcalendar::VFREEBUSY
+                IcalInterface::REQUEST_STATUS => [
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
+                    IcalInterface::VJOURNAL,
+                    IcalInterface::VFREEBUSY
                 ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::REQUEST_STATUS ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::REQUEST_STATUS ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' .
             number_format(
-                (float) $value[Vcalendar::STATCODE],
+                (float) $value[IcalInterface::STATCODE],
                 2,
                 Util::$DOT,
                 null
             ) . ';' .
-            StringFactory::strrep( $value[Vcalendar::STATDESC] ) . ';' .
-            StringFactory::strrep( $value[Vcalendar::EXTDATA] )
+            StringFactory::strrep( $value[IcalInterface::STATDESC] ) . ';' .
+            StringFactory::strrep( $value[IcalInterface::EXTDATA] )
         ];
 
 
         // CONFERENCE
         $value  = 'rtsp://audio.example.com/';
         $params = [
-                Vcalendar::VALUE   => Vcalendar::URI,
-                Vcalendar::FEATURE => Vcalendar::AUDIO
+                IcalInterface::VALUE   => IcalInterface::URI,
+                IcalInterface::FEATURE => IcalInterface::AUDIO
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -986,15 +988,15 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2121,
             [
-                Vcalendar::CONFERENCE => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
+                IcalInterface::CONFERENCE => [
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
                 ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::CONFERENCE ) .
+            strtoupper( IcalInterface::CONFERENCE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -1002,9 +1004,9 @@ class MiscTest extends DtBase
         // CONFERENCE
         $value  = 'https://video-chat.example.com/;group-id=1234';
         $params = [
-                Vcalendar::VALUE    => Vcalendar::URI,
-                Vcalendar::FEATURE  => Vcalendar::AUDIO . ',' . Vcalendar::VIDEO,
-                Vcalendar::LANGUAGE => 'EN',
+                IcalInterface::VALUE    => IcalInterface::URI,
+                IcalInterface::FEATURE  => IcalInterface::AUDIO . ',' . IcalInterface::VIDEO,
+                IcalInterface::LANGUAGE => 'EN',
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -1013,15 +1015,15 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2122,
             [
-                Vcalendar::CONFERENCE => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
+                IcalInterface::CONFERENCE => [
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
                 ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::CONFERENCE ) .
+            strtoupper( IcalInterface::CONFERENCE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -1029,9 +1031,9 @@ class MiscTest extends DtBase
         // CONFERENCE
         $value  = 'https://video-chat.example.com/;group-id=1234';
         $params = [
-                Vcalendar::VALUE   => Vcalendar::URI,
-                Vcalendar::FEATURE => Vcalendar::VIDEO,
-                Vcalendar::LABEL   => "Web video chat, access code=76543"
+                IcalInterface::VALUE   => IcalInterface::URI,
+                IcalInterface::FEATURE => IcalInterface::VIDEO,
+                IcalInterface::LABEL   => "Web video chat, access code=76543"
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -1040,15 +1042,15 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2123,
             [
-                Vcalendar::CONFERENCE => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
+                IcalInterface::CONFERENCE => [
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
                 ]
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::CONFERENCE ) .
+            strtoupper( IcalInterface::CONFERENCE ) .
             ParameterFactory::createParams( $params ) .
             ':' . $value
         ];
@@ -1056,8 +1058,8 @@ class MiscTest extends DtBase
         // NAME
         $value  = 'A calendar name';
         $params = [
-                Vcalendar::ALTREP   => 'This is an alternative representation',
-                Vcalendar::LANGUAGE => 'EN'
+                IcalInterface::ALTREP   => 'This is an alternative representation',
+                IcalInterface::LANGUAGE => 'EN'
             ] + self::$STCPAR;
         $getValue  = [
             Util::$LCvalue  => $value,
@@ -1066,13 +1068,13 @@ class MiscTest extends DtBase
         $dataArr[] = [
             2401,
             [
-                Vcalendar::NAME => []
+                IcalInterface::NAME => []
             ],
             $value,
             $params,
             $getValue,
-            strtoupper( Vcalendar::NAME ) .
-            ParameterFactory::createParams( $params, [ Vcalendar::ALTREP, Vcalendar::LANGUAGE ] ) .
+            strtoupper( IcalInterface::NAME ) .
+            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -1083,33 +1085,34 @@ class MiscTest extends DtBase
      * Testing value TEXT (MULTI) properties
      *
      * @test
-     * @dataProvider Misc2Provider
+     * @dataProvider misc2Provider
      *
-     * @param int    $case
-     * @param array  $propComps
+     * @param int $case
+     * @param array $propComps
      * @param mixed  $value
      * @param mixed  $params
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testMisc2(
-        $case,
-        $propComps,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function miscTest2(
+        int    $case,
+        array  $propComps,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
+    {
         $c = new Vcalendar();
 
         foreach( array_keys( $propComps ) as $propName ) {
             if( in_array( $propName, [
-                Vcalendar::CATEGORIES,
-                Vcalendar::DESCRIPTION,
-                Vcalendar::IMAGE,
-                Vcalendar::NAME
-            ] )) {
+                IcalInterface::CATEGORIES,
+                IcalInterface::DESCRIPTION,
+                IcalInterface::IMAGE,
+                IcalInterface::NAME
+            ], true ) ) {
                 $this->propNameTest(
                     $case . '-1',
                     $c,
@@ -1121,7 +1124,7 @@ class MiscTest extends DtBase
                 );
             }
         } // end foreach
-        if( Vcalendar::NAME == $propName ) {
+        if( IcalInterface::NAME === $propName ) {
             return;
         }
 
@@ -1156,7 +1159,7 @@ class MiscTest extends DtBase
             sprintf( self::$ERRFMT, null, $case . '-26', __FUNCTION__, 'Vcalendar', 'parse, create and compare' )
         );
 
-        if( Vcalendar::DESCRIPTION == $propName ) {
+        if( IcalInterface::DESCRIPTION === $propName ) {
             $c->setName( $value, $params );
             $c->setName( $value, $params );
         }
@@ -1166,23 +1169,24 @@ class MiscTest extends DtBase
     /**
      * Testing calendar/component instance with multi-propName
      *
-     * @param string   $case
-     * @param Vcalendar|CalendarComponent $instance
-     * @param string   $propName
+     * @param string $case
+     * @param CalendarComponent|Vcalendar $instance
+     * @param string $propName
      * @param mixed    $value
      * @param mixed    $params
-     * @param array    $expectedGet
-     * @param string   $expectedString
+     * @param array $expectedGet
+     * @param string $expectedString
      */
     public function propNameTest(
-        $case,
-        $instance,
-        $propName,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+        string                        $case,
+        Vcalendar | CalendarComponent $instance,
+        string                        $propName,
+        mixed                         $value,
+        mixed                         $params,
+        array                         $expectedGet,
+        string                        $expectedString
+    ) : void
+    {
         $getMethod    = StringFactory::getGetMethodName( $propName );
         if( ! method_exists( $instance, $getMethod )) {
             return;
@@ -1191,11 +1195,11 @@ class MiscTest extends DtBase
         $deleteMethod = StringFactory::getDeleteMethodName( $propName );
         $setMethod    = StringFactory::getSetMethodName( $propName );
 
-        if( Vcalendar::REQUEST_STATUS == $propName ) {
+        if( IcalInterface::REQUEST_STATUS === $propName ) {
             $instance->{$setMethod}(
-                $value[Vcalendar::STATCODE],
-                $value[Vcalendar::STATDESC],
-                $value[Vcalendar::EXTDATA],
+                $value[IcalInterface::STATCODE],
+                $value[IcalInterface::STATDESC],
+                $value[IcalInterface::EXTDATA],
                 $params
             );
         }
@@ -1229,17 +1233,17 @@ class MiscTest extends DtBase
             sprintf( self::$ERRFMT, '(after delete) ', $case . '-3b', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
-        if( Vcalendar::REQUEST_STATUS == $propName ) {
+        if( IcalInterface::REQUEST_STATUS === $propName ) {
             $instance->{$setMethod}(
-                $value[Vcalendar::STATCODE],
-                $value[Vcalendar::STATDESC],
-                $value[Vcalendar::EXTDATA],
+                $value[IcalInterface::STATCODE],
+                $value[IcalInterface::STATDESC],
+                $value[IcalInterface::EXTDATA],
                 $params
             );
             $instance->{$setMethod}(
-                $value[Vcalendar::STATCODE],
-                $value[Vcalendar::STATDESC],
-                $value[Vcalendar::EXTDATA],
+                $value[IcalInterface::STATCODE],
+                $value[IcalInterface::STATDESC],
+                $value[IcalInterface::EXTDATA],
                 $params
             );
         }
@@ -1255,17 +1259,17 @@ class MiscTest extends DtBase
             sprintf( self::$ERRFMT, '(after delete) ', $case . '-4', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
-        if( Vcalendar::REQUEST_STATUS == $propName ) {
+        if( IcalInterface::REQUEST_STATUS === $propName ) {
             $instance->{$setMethod}(
-                $value[Vcalendar::STATCODE],
-                $value[Vcalendar::STATDESC],
-                $value[Vcalendar::EXTDATA],
+                $value[IcalInterface::STATCODE],
+                $value[IcalInterface::STATDESC],
+                $value[IcalInterface::EXTDATA],
                 $params
             );
             $instance->{$setMethod}(
-                $value[Vcalendar::STATCODE],
-                $value[Vcalendar::STATDESC],
-                $value[Vcalendar::EXTDATA],
+                $value[IcalInterface::STATCODE],
+                $value[IcalInterface::STATDESC],
+                $value[IcalInterface::EXTDATA],
                 $params
             );
         }
@@ -1278,7 +1282,8 @@ class MiscTest extends DtBase
     /**
      * Testing component X-property
      */
-    public function Misc3Provider() {
+    public function misc3Provider() : array
+    {
 
         $dataArr = [];
 
@@ -1290,10 +1295,10 @@ class MiscTest extends DtBase
             $propName,
             [
                 $propName => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
-                    Vcalendar::VJOURNAL,
-                    Vcalendar::VFREEBUSY,
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
+                    IcalInterface::VJOURNAL,
+                    IcalInterface::VFREEBUSY,
 //                    Vcalendar::VTIMEZONE
                 ]
             ],
@@ -1314,10 +1319,10 @@ class MiscTest extends DtBase
             $propName,
             [
                 $propName => [
-                    Vcalendar::VEVENT,
-                    Vcalendar::VTODO,
-                    Vcalendar::VJOURNAL,
-                    Vcalendar::VFREEBUSY,
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
+                    IcalInterface::VJOURNAL,
+                    IcalInterface::VFREEBUSY,
 //                    Vcalendar::VTIMEZONE // as for now, can't sort Vtimezone...
                 ]
             ],
@@ -1336,29 +1341,29 @@ class MiscTest extends DtBase
      * Testing Vcalendar and component X-property
      *
      * @test
-     * @dataProvider Misc3Provider
-     * @param int    $case
+     * @dataProvider misc3Provider
+     * @param int $case
      * @param string $propName
-     * @param array  $propComps
+     * @param array $propComps
      * @param mixed  $value
      * @param mixed  $params
-     * @param array  $expectedGet
+     * @param array $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testMisc3(
-        $case,
-        $propName,
-        $propComps,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+    public function miscTest3(
+        int    $case,
+        string $propName,
+        array  $propComps,
+        mixed  $value,
+        mixed  $params,
+        array  $expectedGet,
+        string $expectedString
+    ) : void
+    {
         // set two Vcalendar X-properties
         $c = new Vcalendar();
-        for( $x = 1; $x < 2; $x++ ) {
-
+        for( $x = 1; $x < 3; $x++ ) {
             $this->misc3factory(
                 $c,
                 'Vcalendar',
@@ -1369,21 +1374,21 @@ class MiscTest extends DtBase
                 $expectedGet,
                 $expectedString
             );
-        }
+        } // end for
 
         // set single component X-property
-        foreach( $propComps as $propName => $theComps ) {
+        foreach( $propComps as $propName2 => $theComps ) {
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
                 $comp      = $c->{$newMethod}();
 
-                if( in_array($theComp, [ Vcalendar::VEVENT, Vcalendar::VTODO ] )) {
+                if( in_array( $theComp, [ IcalInterface::VEVENT, IcalInterface::VTODO ], true ) ) {
                     $a     = $comp->newValarm();
                     $this->misc3factory(
                         $a,
                         'Valarm',
                         $case . 32,
-                        $propName,
+                        $propName2,
                         $value,
                         $params,
                         $expectedGet,
@@ -1395,7 +1400,7 @@ class MiscTest extends DtBase
                     $comp,
                     $theComp,
                     $case . 33,
-                    $propName,
+                    $propName2,
                     $value,
                     $params,
                     $expectedGet,
@@ -1405,20 +1410,20 @@ class MiscTest extends DtBase
         }
 
         // set two component X-properties and two in Vevent/Vtodo Valarms
-        foreach( $propComps as $propName => $theComps ) {
+        foreach( $propComps as $propName3 => $theComps ) {
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
                 $comp      = $c->{$newMethod}();
-                if( in_array( $theComp, [ Vcalendar::VEVENT, Vcalendar::VTODO ] )) {
+                if( in_array( $theComp, [ IcalInterface::VEVENT, IcalInterface::VTODO ], true ) ) {
                     $a     = $comp->newValarm();
                 }
-                for( $x = 1; $x < 2; $x++ ) {
-                    if( in_array($theComp, [ Vcalendar::VEVENT, Vcalendar::VTODO ] )) {
+                for( $x = 1; $x < 3; $x++ ) {
+                    if( in_array( $theComp, [ IcalInterface::VEVENT, IcalInterface::VTODO ], true ) ) {
                         $this->misc3factory(
                             $a,
                             'Valarm',
                             $case . 34,
-                            $propName . $x,
+                            $propName3 . $x,
                             $value,
                             $params,
                             $expectedGet,
@@ -1430,17 +1435,16 @@ class MiscTest extends DtBase
                         $comp,
                         $theComp,
                         $case . 35,
-                        $propName . $x,
+                        $propName3 . $x,
                         $value,
                         $params,
                         $expectedGet,
                         $expectedString
                     );
-                }
-            }
-        }
+                } // end for
+            } // end foreach
+        } // end foreach
         $c->sort();
-
         $this->parseCalendarTest( $case, $c, $expectedString );
 
     }
@@ -1449,24 +1453,25 @@ class MiscTest extends DtBase
      * Testing component X-property factory
      *
      * @param IcalBase $comp,
-     * @param string   $compName,
-     * @param int      $Number,
-     * @param string   $propName,
-     * @param string   $value,
-     * @param array    $params,
-     * @param array    $expectedGet,
-     * @param string   $expectedString
+     * @param string $compName,
+     * @param int $Number,
+     * @param string $propName,
+     * @param string $value,
+     * @param array $params,
+     * @param array $expectedGet,
+     * @param string $expectedString
      */
     public function misc3factory(
-        $comp,
-        $compName,
-        $Number,
-        $propName,
-        $value,
-        $params,
-        $expectedGet,
-        $expectedString
-    ) {
+        IcalBase $comp,
+        string   $compName,
+        int      $Number,
+        string   $propName,
+        string   $value,
+        array    $params,
+        array    $expectedGet,
+        string   $expectedString
+    ) : void
+    {
         $comp->setXprop( $propName, $value, $params );
 
         $getValue = $comp->getXprop( $propName, null, true );
@@ -1499,10 +1504,11 @@ class MiscTest extends DtBase
      *
      * @test
      */
-    public function geoLocationTest4() {
+    public function geoLocationTest4() : void
+    {
         $compProps = [
-            Vcalendar::VEVENT,
-            Vcalendar::VTODO,
+            IcalInterface::VEVENT,
+            IcalInterface::VTODO,
         ];
         $calendar  = new Vcalendar();
         $location  = 'Conference Room - F123, Bldg. 002';
@@ -1544,12 +1550,15 @@ class MiscTest extends DtBase
             );
         }
     }
+
     /**
      * Testing empty properties
      *
      * @test
+     * @throws Exception
      */
-    public function emptyTest5() {
+    public function emptyTest5() : void
+    {
         $c = Vcalendar::factory()
                       ->setCalscale( 'gregorian' )
                       ->setMethod( 'testing' )
@@ -1568,7 +1577,7 @@ class MiscTest extends DtBase
                       ->setImage()
         ;
 
-        $o = $c->newVevent()
+        $o1 = $c->newVevent()
                ->setClass()
                ->setComment()
                ->setCreated()
@@ -1590,7 +1599,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vevent-empty' );
 
-        $a1 = $o->newValarm()
+        $a1 = $o1->newValarm()
                 ->setAction()
                 ->setAttach()
                 ->setDuration()
@@ -1598,7 +1607,7 @@ class MiscTest extends DtBase
                 ->setTrigger()
                 ->setXprop( 'X-valarm-empty' );
 
-        $a2 = $o->newValarm()
+        $a2 = $o1->newValarm()
                 ->setAction()
                 ->setDescription()
                 ->setDuration()
@@ -1606,7 +1615,7 @@ class MiscTest extends DtBase
                 ->setTrigger()
                 ->setXprop( 'X-valarm-empty' );
 
-        $o = $c->newVevent()
+        $o2 = $c->newVevent()
                ->setConfig( 'language', 'fr' )
                ->setAttendee()
                ->setAttendee()
@@ -1628,7 +1637,7 @@ class MiscTest extends DtBase
                ->setXprop( 'X-ABC-MMSUBJ' )
                ->setXprop( 'X-vevent-empty' );
 
-        $o = $c->newVtodo()
+        $o3 = $c->newVtodo()
                ->setComment()
                ->setCompleted()
                ->setDtstart()
@@ -1642,7 +1651,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vtodo-empty' );
 
-        $o = $c->newVevent()
+        $o4 = $c->newVevent()
                ->setCategories()
                ->setCategories()
                ->setComment()
@@ -1662,7 +1671,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vevent-empty' );
 
-        $o = $c->newVjournal()
+        $o5 = $c->newVjournal()
                ->setComment()
                ->setContact()
                ->setContact()
@@ -1676,7 +1685,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vjournal-empty' );
 
-        $o = $c->newVfreebusy()
+        $o6 = $c->newVfreebusy()
                ->setComment()
                ->setContact()
                ->setDtstart()
@@ -1685,7 +1694,7 @@ class MiscTest extends DtBase
                ->setOrganizer()
                ->setXprop( 'X-vfreebusy-empty' );
 
-        $o = $c->newVtodo()
+        $o7 = $c->newVtodo()
                ->setComment()
                ->setContact()
                ->setDtstart()
@@ -1701,7 +1710,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vtodo-empty' );
 
-        $o = $c->newVjournal()
+        $o8 = $c->newVjournal()
                ->setComment()
                ->setContact()
                ->setContact()
@@ -1714,7 +1723,7 @@ class MiscTest extends DtBase
 
                ->setXprop( 'X-vjournal-empty' );
 
-        $o = $c->newVtodo()
+        $o9 = $c->newVtodo()
                ->setComment()
                ->setContact()
                ->setDtstart()
@@ -1736,7 +1745,8 @@ class MiscTest extends DtBase
     /**
      * parseTest6 provider
      */
-    public function parse6Provider() {
+    public function parse6Provider() : array
+    {
 
         $dataArr = [];
 
@@ -1806,11 +1816,12 @@ class MiscTest extends DtBase
      *
      * @test
      * @dataProvider parse6Provider
-     * @param int    $case
+     * @param int $case
      * @param string $value
      * @throws Exception
      */
-    public function parseTest6( $case, $value ) {
+    public function parseTest6( int $case, string $value ) : void
+    {
         $c = new Vcalendar();
         $c->parse( $value );
 

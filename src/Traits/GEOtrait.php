@@ -34,7 +34,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
-use function floatval;
 use function is_array;
 
 /**
@@ -45,9 +44,9 @@ use function is_array;
 trait GEOtrait
 {
     /**
-     * @var array component property GEO value
+     * @var null|array component property GEO value
      */
-    protected $geo = null;
+    protected ?array $geo = null;
 
     /**
      * Return formatted output for calendar component property geo
@@ -97,10 +96,10 @@ trait GEOtrait
      * Get calendar component property geo
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getGeo( $inclParam = false )
+    public function getGeo( ? bool $inclParam = false ) : bool | string | array
     {
         if( empty( $this->geo )) {
             return false;
@@ -115,7 +114,7 @@ trait GEOtrait
      * @return bool|string
      * @since 2.27.14 2019-02-27
      */
-    public function getGeoLocation()
+    public function getGeoLocation() : bool | string
     {
         if( false === ( $geo = $this->getGeo())) {
             return false;
@@ -130,20 +129,20 @@ trait GEOtrait
     /**
      * Set calendar component property geo
      *
-     * @param null|mixed $latitude
-     * @param null|mixed $longitude
-     * @param null|array $params
-     * @return static
+     * @param null|int|float|string $latitude
+     * @param null|int|float|string $longitude
+     * @param null|string[] $params
+     * @return self
      * @since 2.27.3 2018-12-22
      */
-    public function setGeo( $latitude = null, $longitude = null, $params = [] ) : self
+    public function setGeo( mixed $latitude = null, mixed $longitude = null, ? array $params = [] ) : self
     {
-        if( isset( $latitude ) && isset( $longitude )) {
+        if( isset( $latitude, $longitude ) ) {
             if( ! is_array( $this->geo )) {
                 $this->geo = [];
             }
-            $this->geo[Util::$LCvalue][self::LATITUDE]  = floatval( $latitude );
-            $this->geo[Util::$LCvalue][self::LONGITUDE] = floatval( $longitude );
+            $this->geo[Util::$LCvalue][self::LATITUDE]  = (float) $latitude;
+            $this->geo[Util::$LCvalue][self::LONGITUDE] = (float) $longitude;
             $this->geo[Util::$LCparams]                 =
                 ParameterFactory::setParams( $params ?? [] );
         }

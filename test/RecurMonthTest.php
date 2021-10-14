@@ -43,37 +43,38 @@ class RecurMonthTest extends RecurBaseTest
 {
     /**
      * recurMonthly1Test provider
+     * @throws Exception
      */
-    public function recurMonthly1Provider()
+    public function recurMonthly1aProvider() : array
     {
-        $dataArr   = [];
+        $dataArr = [];
         $dataSetNo = 0;
-        $DATASET   = 'DATASET';
+        $DATASET = 'DATASET';
 
-        $time    = microtime( true );
-        $start   = DateTimeFactory::factory( '20190105T090000', 'Europe/Stockholm' );
-        $wDate   = clone $start;
+        $time = microtime( true );
+        $start = DateTimeFactory::factory( '20190105T090000', 'Europe/Stockholm' );
+        $wDate = clone $start;
         $expects = [];
-        $count   = 10;
-        $x       = 1;
+        $count = 10;
+        $x = 1;
         while( $x < $count ) {
-            $wDate    = $wDate->setDate(
-                 (int) $wDate->format( 'Y' ),
-                ((int) $wDate->format( 'm' ) + 1 ),
-                 (int) $wDate->format( 'd' )
+            $wDate = $wDate->setDate(
+                (int)$wDate->format( 'Y' ),
+                ( (int)$wDate->format( 'm' ) + 1 ),
+                (int)$wDate->format( 'd' )
             );
             $expects[] = $wDate->format( 'Ymd' );
-            $x        += 1;
+            ++$x;
         }
-        $execTime  = microtime( true ) - $time;
+        $execTime = microtime( true ) - $time;
         $dataArr[] = [
             21,
             $start,
             $wDate->modify( RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ  => Vcalendar::MONTHLY,
-                Vcalendar::COUNT => $count,
-                $DATASET         => $dataSetNo++
+                IcalInterface::FREQ => IcalInterface::MONTHLY,
+                IcalInterface::COUNT => $count,
+                $DATASET => $dataSetNo++
             ],
             $expects,
             $execTime
@@ -81,28 +82,28 @@ class RecurMonthTest extends RecurBaseTest
 
 
         $interval = 1;
-        $count    = 10;
+        $count = 10;
         for( $ix = 221; $ix <= 229; $ix++ ) {
-            $time    = microtime( true );
-            $start   = DateTimeFactory::factory( '20190130T0900', 'Europe/Stockholm' );
-            $end     = (clone $start)->modify( RecurFactory::EXTENDYEAR . ' years' );
-            $endYmd  = $end->format( 'Ymd' );
-            $wDate   = clone $start;
+            $time = microtime( true );
+            $start = DateTimeFactory::factory( '20190130T0900', 'Europe/Stockholm' );
+            $end = ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' years' );
+            $endYmd = $end->format( 'Ymd' );
+            $wDate = clone $start;
             $expects = [];
-            $x       = 1;
-            $day     = (int) $wDate->format( 'd' );
-            $month   = (int) $wDate->format( 'm' );
-            $year    = (int) $wDate->format( 'Y' );
+            $x = 1;
+            $day = (int)$wDate->format( 'd' );
+            $month = (int)$wDate->format( 'm' );
+            $year = (int)$wDate->format( 'Y' );
             while( $x < $count ) {
                 $month += $interval;
                 if( 12 < $month ) {
-                    $year  += (int) floor( $month / 12 );
-                    $month  = ( $month % 12 );
-                    if( 0 == $month ) {
+                    $year += (int)floor( $month / 12 );
+                    $month %= 12;
+                    if( 0 === $month ) {
                         $month = 12;
                     }
                 }
-                if( ! checkdate( $month, $day, $year )) {
+                if( ! checkdate( $month, $day, $year ) ) {
                     continue;
                 }
                 $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
@@ -110,134 +111,132 @@ class RecurMonthTest extends RecurBaseTest
                     break;
                 }
                 $expects[] = $Ymd;
-                $x        += 1;
+                ++$x;
             } // end while
-            $execTime  = microtime( true ) - $time;
+            $execTime = microtime( true ) - $time;
             $dataArr[] = [
                 $ix . '-' . $interval,
                 $start,
-                (clone $start)->modify( RecurFactory::EXTENDYEAR . ' years' ),
+                ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' years' ),
                 [
-                    Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                    Vcalendar::INTERVAL => $interval,
-                    Vcalendar::COUNT    => $count,
-                    $DATASET            => $dataSetNo++
+                    IcalInterface::FREQ => IcalInterface::MONTHLY,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::COUNT => $count,
+                    $DATASET => $dataSetNo++
                 ],
                 $expects,
                 $execTime
             ];
-            $interval += 1;
+            ++$interval;
         }
 
         $interval = 1;
-        $byMonth  = [ 1, 5, 12 ];
-        $count    = 9;
+        $byMonth = [ 1, 5, 12 ];
+        $count = 9;
         for( $ix = 231; $ix <= 239; $ix++ ) {
-            $time    = microtime( true );
-            $start   = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
+            $time = microtime( true );
+            $start = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
 //            $end     = (clone $start)->modify( RecurFactory::EXTENDYEAR . ' years' );
-            $end     = (clone $start)->modify( 5 . ' years' );
-            $endYmd  = $end->format( 'Ymd' );
-            $wDate   = clone $start;
+            $end = ( clone $start )->modify( 5 . ' years' );
+            $endYmd = $end->format( 'Ymd' );
+            $wDate = clone $start;
             $expects = [];
-            $x       = 1;
-            $day     = (int) $wDate->format( 'd' );
-            $month   = (int) $wDate->format( 'm' );
-            $year    = (int) $wDate->format( 'Y' );
+            $x = 1;
+            $day = (int)$wDate->format( 'd' );
+            $month = (int)$wDate->format( 'm' );
+            $year = (int)$wDate->format( 'Y' );
             while( $x < $count ) {
                 $month += $interval;
                 if( 12 < $month ) {
-                    $year += (int) floor( $month / 12 );
-                    $month = ( $month % 12 );
-                    if( 0 == $month ) {
+                    $year += (int)floor( $month / 12 );
+                    $month %= 12;
+                    if( 0 === $month ) {
                         $month = 12;
                     }
                 }
-                if( ! checkdate( $month, $day, $year )) {
+                if( ! checkdate( $month, $day, $year ) ) {
                     continue;
                 }
                 $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
                 if( $endYmd < $Ymd ) {
                     break;
                 }
-                if( ! in_array( $month, $byMonth )) {
+                if( ! in_array( $month, $byMonth ) ) {
                     continue;
                 }
                 $expects[] = $Ymd;
-                $x        += 1;
+                ++$x;
             } // end while
-            $execTime  = microtime( true ) - $time;
+            $execTime = microtime( true ) - $time;
             $dataArr[] = [
                 $ix . '-' . $interval,
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                    Vcalendar::INTERVAL => $interval,
-                    Vcalendar::COUNT    => $count,
-                    Vcalendar::BYMONTH  => $byMonth,
-                    $DATASET            => $dataSetNo++
+                    IcalInterface::FREQ => IcalInterface::MONTHLY,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::COUNT => $count,
+                    IcalInterface::BYMONTH => $byMonth,
+                    $DATASET => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
+            ++$interval;
         }
 
-        $interval   = 1;
+        $interval = 1;
         $byMonthDay = [ 1 ];
-        $count      = 20;
-        $switch     = true;
+        $count = 20;
+        $switch = true;
         for( $ix = 241; $ix <= 249; $ix++ ) {
-            $time        = microtime( true );
-            $start       = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
-            $end         = clone $start;
+            $time = microtime( true );
+            $start = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
+            $end = clone $start;
             $end->modify( RecurFactory::EXTENDYEAR . ' years' );
-            $endYmd      = $end->format( 'Ymd' );
-            $wDate       = clone $start;
-            $expects     = [];
-            $x           = 1;
-            $day         = (int) $wDate->format( 'd' );
-            $month       = (int) $wDate->format( 'm' );
-            $year        = (int) $wDate->format( 'Y' );
-            $monthSave   = $month;
-            $lastDayInMonth = (int) $wDate->format( 't' );
-            $tz          = $wDate->getTimezone()->getName();
+            $endYmd = $end->format( 'Ymd' );
+            $wDate = clone $start;
+            $expects = [];
+            $x = 1;
+            $day = (int)$wDate->format( 'd' );
+            $month = (int)$wDate->format( 'm' );
+            $year = (int)$wDate->format( 'Y' );
+            $monthSave = $month;
+            $lastDayInMonth = (int)$wDate->format( 't' );
+            $tz = $wDate->getTimezone()->getName();
             while( $x < $count ) {
-                if( $month != $monthSave ) {
+                if( $month !== $monthSave ) {
                     $month += $interval;
                     if( 12 < $month ) {
-                        $year  += (int) floor( $month / 12 );
-                        $month  = ( $month % 12 );
-                        if( 0 == $month ) {
+                        $year += (int)floor( $month / 12 );
+                        $month %= 12;
+                        if( 0 === $month ) {
                             $month = 12;
                         }
                     }
-                    $monthSave   = $month;
-                    $day         = 1;
-                    $date        = DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz );
-                    $lastDayInMonth = (int) $date->format( 't' );
+                    $monthSave = $month;
+                    $day = 1;
+                    $date = DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz );
+                    $lastDayInMonth = (int)$date->format( 't' );
                 } // end if
-                elseif( $day == $lastDayInMonth ) {
-                    $monthSave = null;
+                elseif( $day === $lastDayInMonth ) {
+                    $monthSave = -1;
                     continue;
                 }
                 else {
-                    $day += 1;
+                    ++$day;
                 }
                 $match = false;
                 foreach( $byMonthDay as $monthDay ) {
                     if( 0 < $monthDay ) {
-                        if( $monthDay == $day ) {
+                        if( $monthDay === $day ) {
                             $match = true;
                             break;
                         }
                     }
-                    else {
-                        if( ( $lastDayInMonth + 1 + $monthDay ) == $day ) {
-                            $match = true;
-                            break;
-                        }
+                    else if( ( $lastDayInMonth + 1 + $monthDay ) === $day ) {
+                        $match = true;
+                        break;
                     }
                 } // end foreach
                 $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
@@ -246,80 +245,80 @@ class RecurMonthTest extends RecurBaseTest
                 }
                 if( $match ) {
                     $expects[] = $Ymd;
-                    $x += 1;
+                    ++$x;
                 }
                 if( $x >= $count ) {
                     break;
                 }
             } // end while
-            $execTime     = microtime( true ) - $time;
-            $dataArr[]    = [
+            $execTime = microtime( true ) - $time;
+            $dataArr[] = [
                 $ix . '-' . $interval,
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
-                    $DATASET              => $dataSetNo++
+                    IcalInterface::FREQ => IcalInterface::MONTHLY,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::COUNT => $count,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
+                    $DATASET => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval    += 2;
+            $interval += 2;
             $byMonthDay[] = $switch ? ( 0 - $interval ) : $interval;
-            $switch       = ! $switch;
+            $switch = ! $switch;
         } // end for
 
-        $interval   = 1;
+        $interval = 1;
         $byMonthDay = [ 1, 3, 5, 7, -5, -3, -1 ];
-        $byMonth    = [ 1, 12 ];
-        $count      = 20;
-        $switch     = true;
+        $byMonth = [ 1, 12 ];
+        $count = 20;
+        $switch = true;
         for( $ix = 251; $ix <= 259; $ix++ ) {
-            $time        = microtime( true );
-            $start       = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
-            $end         = (clone $start)->modify( RecurFactory::EXTENDYEAR . ' years' );
-            $endYmd      = $end->format( 'Ymd' );
-            $wDate       = clone $start;
-            $expects     = [];
-            $x           = 1;
-            $day         = (int) $wDate->format( 'd' );
-            $month       = (int) $wDate->format( 'm' );
-            $year        = (int) $wDate->format( 'Y' );
-            $monthSave   = $month;
-            $lastDayInMonth = (int) $wDate->format( 't' );
-            $tz          = $wDate->getTimezone()->getName();
+            $time = microtime( true );
+            $start = DateTimeFactory::factory( '20190101T0900', 'Europe/Stockholm' );
+            $end = ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' years' );
+            $endYmd = $end->format( 'Ymd' );
+            $wDate = clone $start;
+            $expects = [];
+            $x = 1;
+            $day = (int)$wDate->format( 'd' );
+            $month = (int)$wDate->format( 'm' );
+            $year = (int)$wDate->format( 'Y' );
+            $monthSave = $month;
+            $lastDayInMonth = (int)$wDate->format( 't' );
+            $tz = $wDate->getTimezone()->getName();
             while( $x < $count ) {
-                if( $month != $monthSave ) {
+                if( $month !== $monthSave ) {
                     $month += $interval;
                     if( 12 < $month ) {
-                        $year += (int) floor( $month / 12 );
-                        $month = ( $month % 12 );
-                        if( 0 == $month ) {
+                        $year += (int)floor( $month / 12 );
+                        $month %= 12;
+                        if( 0 === $month ) {
                             $month = 12;
                         }
                     }
-                    if( ! in_array( $month, $byMonth )) {
+                    if( ! in_array( $month, $byMonth, true ) ) {
                         continue;
                     }
-                    $monthSave   = $month;
-                    if( ! empty( $byMonthDay )) {
-                        $day    = 1;
-                        $lastDayInMonth = (int) (
-                            DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz ))
-                            ->format('t' );
+                    $monthSave = $month;
+                    if( ! empty( $byMonthDay ) ) {
+                        $day = 1;
+                        $lastDayInMonth = (int)(
+                        DateTimeFactory::factory( sprintf( '%04d%02d%02d', $year, $month, $day ), $tz ) )
+                            ->format( 't' );
                     }
                 } // end if
-                elseif( $day == $lastDayInMonth ) {
-                    $monthSave = null;
+                elseif( $day === $lastDayInMonth ) {
+                    $monthSave = -1;
                     continue;
                 }
                 else {
-                    $day += 1;
+                    ++$day;
                 }
-                if( ! checkdate( $month, $day, $year )) {
+                if( ! checkdate( $month, $day, $year ) ) {
                     continue;
                 }
                 $Ymd = sprintf( '%04d%02d%02d', $year, $month, $day );
@@ -329,97 +328,95 @@ class RecurMonthTest extends RecurBaseTest
                 $match = false;
                 foreach( $byMonthDay as $monthDay ) {
                     if( 0 < $monthDay ) {
-                        if( $monthDay == $day ) {
+                        if( $monthDay === $day ) {
                             $match = true;
                             break;
                         }
                     }
-                    else {
-                        if( ( $lastDayInMonth + 1 + $monthDay ) == $day ) {
-                            $match = true;
-                            break;
-                        }
+                    else if( ( $lastDayInMonth + 1 + $monthDay ) === $day ) {
+                        $match = true;
+                        break;
                     }
                 } // end foreach
-                if( $match  ) {
+                if( $match ) {
                     $expects[] = $Ymd;
-                    $x += 1;
+                    ++$x;
                 }
             } // end while
-            $execTime     = microtime( true ) - $time;
-            $dataArr[]    = [
+            $execTime = microtime( true ) - $time;
+            $dataArr[] = [
                 $ix,
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                    Vcalendar::INTERVAL   => $interval,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::BYMONTH    => $byMonth,
-                    Vcalendar::BYMONTHDAY => $byMonthDay,
-                    $DATASET              => $dataSetNo++
+                    IcalInterface::FREQ => IcalInterface::MONTHLY,
+                    IcalInterface::INTERVAL => $interval,
+                    IcalInterface::COUNT => $count,
+                    IcalInterface::BYMONTH => $byMonth,
+                    IcalInterface::BYMONTHDAY => $byMonthDay,
+                    $DATASET => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
             ];
-            $interval += 1;
-            $switch    = ! $switch;
+            ++$interval;
+            $switch = ! $switch;
         } // end for
 
         // rfc example 18 (extended) see also #23, above
-        $time    = microtime( true );
-        $start   = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm');
-        $wDate   = clone $start;
+        $time = microtime( true );
+        $start = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm' );
+        $wDate = clone $start;
         $expects = [];
-        $count   = 10;
-        $x       = 1;
-        $saveYm  = $wDate->format( 'Ym' );
-        $wDate   = $wDate->modify( '1 day' );
-        $mDays   = [];
+        $count = 10;
+        $x = 1;
+        $saveYm = $wDate->format( 'Ym' );
+        $wDate = $wDate->modify( '1 day' );
+        $mDays = [];
         while( $x < $count ) {
-            if( $saveYm != $wDate->format( 'Ym' )) {
-                if( ! empty( $mDays )) {
-                    $expects[] =current( array_slice( $mDays, -3, 1 ));
-                    $x    += 1;
+            if( $saveYm !== $wDate->format( 'Ym' ) ) {
+                if( ! empty( $mDays ) ) {
+                    $expects[] = current( array_slice( $mDays, -3, 1 ) );
+                    ++$x;
                     $mDays = [];
                     continue;
                 }
                 $saveYm = $wDate->format( 'Ym' );
             }
             $mDays[] = $wDate->format( 'Ymd' );
-            $wDate   = $wDate->modify( '1 day' );
+            $wDate = $wDate->modify( '1 day' );
         } // end while
         $execTime = microtime( true ) - $time;
         $dataArr[] = [
             '29-18',
             $start,
-            $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
+            $wDate->modify( RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::BYMONTHDAY => -3,
-                $DATASET              => $dataSetNo++
+                IcalInterface::FREQ => IcalInterface::MONTHLY,
+                IcalInterface::COUNT => $count,
+                IcalInterface::BYMONTHDAY => -3,
+                $DATASET => $dataSetNo++
             ],
             $expects,
             $execTime
         ];
 
         // rfc example 19 - 20
-        $dateString   = '1997-09-02 09:00:00';
-        $byMonthDays  = [ 2, 15 ];
+        $dateString = '1997-09-02 09:00:00';
+        $byMonthDays = [ 2, 15 ];
         for( $ix = 19; $ix <= 20; $ix++ ) {
-            $time     = microtime( true );
-            $start    = DateTimeFactory::factory( $dateString, 'America/Los_Angeles' );
+            $time = microtime( true );
+            $start = DateTimeFactory::factory( $dateString, 'America/Los_Angeles' );
             $startYmd = $start->format( 'Ymd' );
-            $end      = ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' year' );
-            $wDate    = clone $start;
-            $expects  = [];
-            $count    = 10;
-            $x        = 1;
-            $year     = (int) $wDate->format( 'Y' );
-            $month    = (int) $wDate->format( 'm' );
+            $end = ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' year' );
+            $wDate = clone $start;
+            $expects = [];
+            $count = 10;
+            $x = 1;
+            $year = (int)$wDate->format( 'Y' );
+            $month = (int)$wDate->format( 'm' );
             while( $x < $count ) {
-                $daysInMonth = (int) $wDate->format( 't' );
+                $daysInMonth = (int)$wDate->format( 't' );
                 foreach( RecurFactory2::getMonthDaysFromByMonthDayList(
                     $daysInMonth, $byMonthDays
                 ) as $monthDay ) {
@@ -436,26 +433,26 @@ class RecurMonthTest extends RecurBaseTest
                         break;
                     }
                     $expects[] = $Ymd;
-                    $x         += 1;
+                    ++$x;
                 } // end foreach
                 $wDate = $wDate->setDate(
                     $year,
                     $month + 1,
                     1
                 );
-                $year  = (int) $wDate->format( 'Y' );
-                $month = (int) $wDate->format( 'm');
+                $year = (int)$wDate->format( 'Y' );
+                $month = (int)$wDate->format( 'm' );
             } // end while
-            $execTime  = microtime( true ) - $time;
+            $execTime = microtime( true ) - $time;
             $dataArr[] = [
                 '29-' . $ix,
                 $start,
                 $end,
                 [
-                    Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                    Vcalendar::COUNT      => $count,
-                    Vcalendar::BYMONTHDAY => $byMonthDays,
-                    $DATASET              => $dataSetNo++
+                    IcalInterface::FREQ => IcalInterface::MONTHLY,
+                    IcalInterface::COUNT => $count,
+                    IcalInterface::BYMONTHDAY => $byMonthDays,
+                    $DATASET => $dataSetNo++
                 ],
                 $expects,
                 $execTime
@@ -466,28 +463,28 @@ class RecurMonthTest extends RecurBaseTest
         } // end for
 
         // rfc example 21
-        $time       = microtime( true );
-        $start      = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm');
-        $wDate      = clone $start;
-        $expects    = [];
-        $count      = 10;
-        $interval   = 18;
-        $byMonthDay = range( 10,15 );
-        $x          = 1;
-        $wDate      = $wDate->modify( '1 day' );
+        $time = microtime( true );
+        $start = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm' );
+        $wDate = clone $start;
+        $expects = [];
+        $count = 10;
+        $interval = 18;
+        $byMonthDay = range( 10, 15 );
+        $x = 1;
+        $wDate = $wDate->modify( '1 day' );
         while( $x < $count ) {
-            if( 10 > $wDate->format( 'd' )) {
-                $wDate     = $wDate->modify( '1 day' );
+            if( 10 > (int)$wDate->format( 'd' ) ) {
+                $wDate = $wDate->modify( '1 day' );
             }
-            elseif( in_array( $wDate->format( 'd' ), $byMonthDay )) {
+            elseif( in_array( (int)$wDate->format( 'd' ), $byMonthDay, true ) ) {
                 $expects[] = $wDate->format( 'Ymd' );
-                $x        += 1;
-                $wDate     = $wDate->modify( '1 day' );
+                ++$x;
+                $wDate = $wDate->modify( '1 day' );
             }
             else {
                 $wDate = $wDate->setDate( // interval=18
-                    (int) $wDate->format( 'Y' ),
-                    ((int) $wDate->format( 'm' ) + 18 ),
+                    (int)$wDate->format( 'Y' ),
+                    ( (int)$wDate->format( 'm' ) + 18 ),
                     10
                 );
             }
@@ -496,46 +493,46 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             '29-21-18',
             $start,
-            (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
+            ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                $DATASET              => $dataSetNo++
+                IcalInterface::FREQ => IcalInterface::MONTHLY,
+                IcalInterface::COUNT => $count,
+                IcalInterface::INTERVAL => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                $DATASET => $dataSetNo++
             ],
             $expects,
             $execTime
         ];
 
         // rfc example 21 BUT only day WE
-        $time       = microtime( true );
-        $start      = DateTimeFactory::factory( '20200801T090000', 'Europe/Stockholm');
-        $wDate      = clone $start;
-        $expects    = [];
-        $count      = 10;
-        $interval   = 2;
-        $byMonthDay = range( 10,15 );
-        $x          = 1;
-        $wDate      = $wDate->modify( '1 day' );
+        $time     = microtime( true );
+        $start    = DateTimeFactory::factory( '20200801T090000', 'Europe/Stockholm' );
+        $wDate    = clone $start;
+        $expects  = [];
+        $count    = 10;
+        $interval = 2;
+        $byMonthDay = range( 10, 15 );
+        $x = 1;
+        $wDate = $wDate->modify( '1 day' );
         while( $x < $count ) {
-            $day = (int) $wDate->format( 'j' );
+            $day = (int)$wDate->format( 'j' );
             if( 10 > $day ) {
                 $wDate = $wDate->modify( '1 day' );
                 continue;
             }
             if( 18 < $day ) {
                 $wDate = $wDate->setDate( // interval=2
-                    (int) $wDate->format( 'Y' ),
-                    ((int) $wDate->format( 'm' ) + $interval ),
+                    (int)$wDate->format( 'Y' ),
+                    ( (int)$wDate->format( 'm' ) + $interval ),
                     10
                 );
                 continue;
             }
-            if( in_array( $day, $byMonthDay ) &&
-                ( 3 == (int) $wDate->format( 'w' ))) {
+            if( in_array( $day, $byMonthDay, true ) &&
+                ( 3 === (int)$wDate->format( 'w' ) ) ) {
                 $expects[] = $wDate->format( 'Ymd' );
-                $x        += 1;
+                ++$x;
             }
             $wDate = $wDate->modify( '1 day' );
         } // end while
@@ -543,18 +540,65 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             '29-21-18B',
             $start,
-            (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
+            ( clone $start )->modify( RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [ 'DAY' => 'WE' ],
-                $DATASET              => $dataSetNo++
+                IcalInterface::FREQ => IcalInterface::MONTHLY,
+                IcalInterface::COUNT => $count,
+                IcalInterface::INTERVAL => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY => [ 'DAY' => 'WE' ],
+                $DATASET => $dataSetNo++
             ],
             $expects,
             $execTime
         ];
+        return $dataArr;
+    }
+
+    /**
+     * Testing recurMonthly1 without BYSETPOS
+     *
+     * @test
+     * @dataProvider recurMonthly1aProvider
+     * @param int|string $case
+     * @param DateTime    $start
+     * @param DateTime    $end
+     * @param array       $recur
+     * @param array       $expects
+     * @param float $prepTime
+     * @throws Exception
+     */
+    public function recurMonthly1aTest(
+        int | string $case,
+        DateTime     $start,
+        DateTime     $end,
+        array        $recur,
+        array        $expects,
+        float        $prepTime
+    ) : void
+    {
+        $this->recurMonthly1XTest(
+            $case,
+            $start,
+            $end,
+            $recur,
+            $expects,
+            $prepTime
+        );
+    }
+
+    /**
+     * recurMonthly1bTest provider
+     * @throws Exception
+     */
+    public function recurMonthly1bProvider() : array
+    {
+        $dataArr   = [];
+        $dataSetNo = 0;
+        $DATASET   = 'DATASET';
+
+        $count    = 10;
+        $interval = 2;
 
         // rfc example 21 BUT only FIRST day WE in extended day period 8-22
         $start      = DateTimeFactory::factory( '20200801T090000', 'Europe/Stockholm');
@@ -567,13 +611,13 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [ 'DAY' => 'WE' ],
-                Vcalendar::BYSETPOS   => 1,
-                $DATASET              => $dataSetNo++
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::COUNT      => $count,
+                IcalInterface::INTERVAL   => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY      => [ 'DAY' => 'WE' ],
+                IcalInterface::BYSETPOS   => 1,
+                $DATASET                  => $dataSetNo++
             ],
             $expects,
             0.0
@@ -590,12 +634,12 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [ 'DAY' => 'WE' ],
-                Vcalendar::BYSETPOS   => -1,
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::COUNT      => $count,
+                IcalInterface::INTERVAL   => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY      => [ 'DAY' => 'WE' ],
+                IcalInterface::BYSETPOS   => -1,
                 $DATASET              => $dataSetNo++
             ],
             $expects,
@@ -613,12 +657,12 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [ 'DAY' => 'WE' ],
-                Vcalendar::BYSETPOS   => 2,
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::COUNT      => $count,
+                IcalInterface::INTERVAL   => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY      => [ 'DAY' => 'WE' ],
+                IcalInterface::BYSETPOS   => 2,
                 $DATASET              => $dataSetNo++
             ],
             $expects,
@@ -636,12 +680,12 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::INTERVAL   => $interval,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [ 'DAY' => 'WE' ],
-                Vcalendar::BYSETPOS   => -2,
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::COUNT      => $count,
+                IcalInterface::INTERVAL   => $interval,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY      => [ 'DAY' => 'WE' ],
+                IcalInterface::BYSETPOS   => -2,
                 $DATASET              => $dataSetNo++
             ],
             $expects,
@@ -660,18 +704,18 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             (clone $start)->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::COUNT      => 24,
-                Vcalendar::BYMONTHDAY => $byMonthDay,
-                Vcalendar::BYDAY      => [
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::COUNT      => 24,
+                IcalInterface::BYMONTHDAY => $byMonthDay,
+                IcalInterface::BYDAY      => [
                     [ 'DAY' => 'MO' ],
                     [ 'DAY' => 'TU' ],
                     [ 'DAY' => 'WE' ],
                     [ 'DAY' => 'TH' ],
                     [ 'DAY' => 'FR' ],
                 ],
-                Vcalendar::BYSETPOS   => [ -1, -5 ],
-                $DATASET              => $dataSetNo++
+                IcalInterface::BYSETPOS   => [ -1, -5 ],
+                $DATASET                  => $dataSetNo++
             ],
             $expects,
             0.0
@@ -680,27 +724,63 @@ class RecurMonthTest extends RecurBaseTest
         return $dataArr;
     }
 
+
     /**
-     * Testing recurMonthly1
+     * Testing recurMonthly1 with BYSETPOS
      *
      * @test
-     * @dataProvider recurMonthly1Provider
-     * @param int|string  $case
+     * @dataProvider recurMonthly1bProvider
+     * @param int|string $case
      * @param DateTime    $start
      * @param DateTime    $end
      * @param array       $recur
      * @param array       $expects
-     * @param float       $prepTime
+     * @param float $prepTime
      * @throws Exception
      */
-    public function recurMonthly1Test(
-        $case,
-        DateTime $start,
-        DateTime $end,
-        array $recur,
-        array $expects,
-        $prepTime
-    ) {
+    public function recurMonthly1bTest(
+        int | string $case,
+        DateTime     $start,
+        DateTime     $end,
+        array        $recur,
+        array        $expects,
+        float        $prepTime
+    ) : void
+    {
+        $this->recurMonthly1XTest(
+            $case,
+            $start,
+            $end,
+            $recur,
+            $expects,
+            $prepTime
+        );
+    }
+    /**
+     * Testing recurMonthly1 with/without BYSETPOS
+     *
+     * @dataProvider recurMonthly1aProvider
+     * @param int|string $case
+     * @param DateTime    $start
+     * @param DateTime    $end
+     * @param array       $recur
+     * @param array       $expects
+     * @param float $prepTime
+     * @throws Exception
+     */
+    public function recurMonthly1XTest(
+        int | string $case,
+        DateTime     $start,
+        DateTime     $end,
+        array        $recur,
+        array        $expects,
+        float        $prepTime
+    ) : void
+    {
+
+        error_log('' ); // test ###
+        error_log( __FUNCTION__ . ' start ' . $case ); // test ###
+
         /*
         if( '29-21-18D' != $case ) {
             $this->assertTrue( true );
@@ -708,9 +788,12 @@ class RecurMonthTest extends RecurBaseTest
         }
         */
         $saveStartDate = clone $start;
+        $strCase       = str_pad( $case, 12 );
 
-        if( in_array( $case, [ '29-21-18C', '29-21-18D', '29-21-18E', '29-21-18F', '31' ] )) {
+        if( in_array( $case, [ '29-21-18C', '29-21-18D', '29-21-18E', '29-21-18F', '31' ], true ) ) {
             $result = array_flip( $expects );
+            echo
+                $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects  ) . PHP_EOL; // test ###
         }
         else {
             $result = $this->recur2dateTest(
@@ -723,29 +806,27 @@ class RecurMonthTest extends RecurBaseTest
             );
         }
 
-        if( ! isset( $recur[Vcalendar::INTERVAL] )) {
-            $recur[Vcalendar::INTERVAL] = 1;
+        if( ! isset( $recur[IcalInterface::INTERVAL] )) {
+            $recur[IcalInterface::INTERVAL] = 1;
         }
-        $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurMonthly1( $recur )) {
             echo $strCase . ' NOT isRecurMonthly1 ' . $recurDisp . PHP_EOL;
-            $this->assertTrue( false );
-            return;
+            $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurMonthly1( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
         echo $strCase . 'mnth smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
             implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
-        echo $recurDisp . PHP_EOL; // test ###
+        echo $recurDisp . ' start ' . $start->format( 'Ymd' ) . ' end ' . $end->format( 'Ymd' ) . PHP_EOL; // test ###
         $this->assertEquals(
             array_keys( $result ),
             array_keys( $resultX ),
             sprintf( self::$ERRFMT, __FUNCTION__, $case . '-21',
                 $saveStartDate->format( 'Ymd' ),
                 $end->format( 'Ymd' ),
-                var_export( $recur, true )
+                $recurDisp
             )
         );
     }
@@ -753,13 +834,13 @@ class RecurMonthTest extends RecurBaseTest
     /**
      * getRecurByDaysInMonthTest provider
      */
-    public function getRecurByDaysInMonthProvider()
+    public function getRecurByDaysInMonthProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             11,
-            [ Vcalendar::DAY => Vcalendar::MO ],
+            [ IcalInterface::DAY => IcalInterface::MO ],
             2020,
             8,
             [ 3, 10, 17, 24, 31 ] // exp
@@ -767,7 +848,7 @@ class RecurMonthTest extends RecurBaseTest
 
         $dataArr[] = [
             21,
-            [ 3, Vcalendar::DAY => Vcalendar::MO ],
+            [ 3, IcalInterface::DAY => IcalInterface::MO ],
             2020,
             8,
             [ 17 ] // exp
@@ -775,7 +856,7 @@ class RecurMonthTest extends RecurBaseTest
 
         $dataArr[] = [
             22,
-            [ -2, Vcalendar::DAY => Vcalendar::MO ],
+            [ -2, IcalInterface::DAY => IcalInterface::MO ],
             2020,
             8,
             [ 24 ] // exp
@@ -783,7 +864,7 @@ class RecurMonthTest extends RecurBaseTest
 
         $dataArr[] = [
             23,
-            [ -2, Vcalendar::DAY => Vcalendar::SA ],
+            [ -2, IcalInterface::DAY => IcalInterface::SA ],
             2020,
             2,
             [ 22 ] // exp
@@ -792,8 +873,8 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             31,
             [
-                [ Vcalendar::DAY => Vcalendar::MO ],
-                [ Vcalendar::DAY => Vcalendar::FR ],
+                [ IcalInterface::DAY => IcalInterface::MO ],
+                [ IcalInterface::DAY => IcalInterface::FR ],
             ],
             2020,
             8,
@@ -803,8 +884,8 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             41,
             [
-                [ 3, Vcalendar::DAY => Vcalendar::MO ],
-                [ -3, Vcalendar::DAY => Vcalendar::FR ],
+                [ 3, IcalInterface::DAY => IcalInterface::MO ],
+                [ -3, IcalInterface::DAY => IcalInterface::FR ],
             ],
             2020,
             8,
@@ -814,11 +895,11 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             42,
             [
-                [ 1, Vcalendar::DAY => Vcalendar::MO ],
-                [ 2, Vcalendar::DAY => Vcalendar::TU ],
-                [ 3, Vcalendar::DAY => Vcalendar::WE ],
-                [ 4, Vcalendar::DAY => Vcalendar::TH ],
-                [ 5, Vcalendar::DAY => Vcalendar::FR ],
+                [ 1, IcalInterface::DAY => IcalInterface::MO ],
+                [ 2, IcalInterface::DAY => IcalInterface::TU ],
+                [ 3, IcalInterface::DAY => IcalInterface::WE ],
+                [ 4, IcalInterface::DAY => IcalInterface::TH ],
+                [ 5, IcalInterface::DAY => IcalInterface::FR ],
             ],
             2020,
             8,
@@ -828,11 +909,11 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             43,
             [
-                [ -1, Vcalendar::DAY => Vcalendar::SU ],
-                [ -2, Vcalendar::DAY => Vcalendar::SA ],
-                [ -3, Vcalendar::DAY => Vcalendar::FR ],
-                [ -4, Vcalendar::DAY => Vcalendar::TH ],
-                [ -5, Vcalendar::DAY => Vcalendar::WE ],
+                [ -1, IcalInterface::DAY => IcalInterface::SU ],
+                [ -2, IcalInterface::DAY => IcalInterface::SA ],
+                [ -3, IcalInterface::DAY => IcalInterface::FR ],
+                [ -4, IcalInterface::DAY => IcalInterface::TH ],
+                [ -5, IcalInterface::DAY => IcalInterface::WE ],
             ],
             2020,
             8,
@@ -842,16 +923,16 @@ class RecurMonthTest extends RecurBaseTest
         $dataArr[] = [
             44,
             [
-                [ 1, Vcalendar::DAY => Vcalendar::MO ],
-                [ 2, Vcalendar::DAY => Vcalendar::TU ],
-                [ 3, Vcalendar::DAY => Vcalendar::WE ],
-                [ 4, Vcalendar::DAY => Vcalendar::TH ],
-                [ 5, Vcalendar::DAY => Vcalendar::FR ],
-                [ -1, Vcalendar::DAY => Vcalendar::SU ],
-                [ -2, Vcalendar::DAY => Vcalendar::SA ],
-                [ -3, Vcalendar::DAY => Vcalendar::FR ],
-                [ -4, Vcalendar::DAY => Vcalendar::TH ],
-                [ -5, Vcalendar::DAY => Vcalendar::WE ],
+                [ 1, IcalInterface::DAY => IcalInterface::MO ],
+                [ 2, IcalInterface::DAY => IcalInterface::TU ],
+                [ 3, IcalInterface::DAY => IcalInterface::WE ],
+                [ 4, IcalInterface::DAY => IcalInterface::TH ],
+                [ 5, IcalInterface::DAY => IcalInterface::FR ],
+                [ -1, IcalInterface::DAY => IcalInterface::SU ],
+                [ -2, IcalInterface::DAY => IcalInterface::SA ],
+                [ -3, IcalInterface::DAY => IcalInterface::FR ],
+                [ -4, IcalInterface::DAY => IcalInterface::TH ],
+                [ -5, IcalInterface::DAY => IcalInterface::WE ],
             ],
             2020,
             8,
@@ -864,8 +945,9 @@ class RecurMonthTest extends RecurBaseTest
     /**
      * @test
      * @dataProvider getRecurByDaysInMonthProvider
+     * @throws Exception
      */
-    public function getRecurByDaysInMonthTest( $case, $recurByDay, $year, $month, $exp )
+    public function getRecurByDaysInMonthTest( $case, $recurByDay, $year, $month, $exp ) : void
     {
         $list = RecurFactory2::getRecurByDaysInMonth( $recurByDay, $year, $month );
 
@@ -879,8 +961,17 @@ class RecurMonthTest extends RecurBaseTest
 
     /**
      * recurMonthly1Test provider
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
-    public function recurMonthly2Provider()
+    public function recurMonthly2Provider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -894,15 +985,15 @@ class RecurMonthTest extends RecurBaseTest
         ];
         $count   = 20;
         $dataArr[] = [
-            26,
+            '26',
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::COUNT     => $count,
-                Vcalendar::BYDAY     => [
-                    [ Vcalendar::DAY => Vcalendar::SA ],
-                    [ Vcalendar::DAY => Vcalendar::SU ]
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::COUNT     => $count,
+                IcalInterface::BYDAY     => [
+                    [ IcalInterface::DAY => IcalInterface::SA ],
+                    [ IcalInterface::DAY => IcalInterface::SU ]
                 ],
                 $DATASET             => $dataSetNo++
             ],
@@ -919,9 +1010,9 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                Vcalendar::COUNT    => $count,
-                Vcalendar::BYDAY    => [ 1, Vcalendar::DAY => Vcalendar::FR ],
+                IcalInterface::FREQ     => IcalInterface::MONTHLY,
+                IcalInterface::COUNT    => $count,
+                IcalInterface::BYDAY    => [ 1, IcalInterface::DAY => IcalInterface::FR ],
                 $DATASET            => $dataSetNo++
             ],
             $expects
@@ -937,12 +1028,12 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::INTERVAL   => 2,
-                Vcalendar::COUNT      => $count,
-                Vcalendar::BYDAY      => [
-                    [  1, Vcalendar::DAY => Vcalendar::FR ],
-                    [ -1, Vcalendar::DAY => Vcalendar::FR ],
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::INTERVAL   => 2,
+                IcalInterface::COUNT      => $count,
+                IcalInterface::BYDAY      => [
+                    [  1, IcalInterface::DAY => IcalInterface::FR ],
+                    [ -1, IcalInterface::DAY => IcalInterface::FR ],
                 ],
                 $DATASET              => $dataSetNo++
             ],
@@ -959,9 +1050,9 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                Vcalendar::COUNT    => $count,
-                Vcalendar::BYDAY    => [ -2, Vcalendar::DAY => Vcalendar::MO ],
+                IcalInterface::FREQ     => IcalInterface::MONTHLY,
+                IcalInterface::COUNT    => $count,
+                IcalInterface::BYDAY    => [ -2, IcalInterface::DAY => IcalInterface::MO ],
                 $DATASET            => $dataSetNo++
             ],
             $expects
@@ -977,16 +1068,16 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ),
             [
-                Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                Vcalendar::COUNT    => $count,
-                Vcalendar::BYDAY    => [
-                    [ Vcalendar::DAY => Vcalendar::MO ],
-                    [ Vcalendar::DAY => Vcalendar::TU ],
-                    [ Vcalendar::DAY => Vcalendar::WE ],
-                    [ Vcalendar::DAY => Vcalendar::TH ],
-                    [ Vcalendar::DAY => Vcalendar::FR ],
+                IcalInterface::FREQ     => IcalInterface::MONTHLY,
+                IcalInterface::COUNT    => $count,
+                IcalInterface::BYDAY    => [
+                    [ IcalInterface::DAY => IcalInterface::MO ],
+                    [ IcalInterface::DAY => IcalInterface::TU ],
+                    [ IcalInterface::DAY => IcalInterface::WE ],
+                    [ IcalInterface::DAY => IcalInterface::TH ],
+                    [ IcalInterface::DAY => IcalInterface::FR ],
                 ],
-                Vcalendar::BYSETPOS => -1,
+                IcalInterface::BYSETPOS => -1,
                 $DATASET            => $dataSetNo++
             ],
             $expects
@@ -1002,16 +1093,16 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ), // end
             [
-                Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                Vcalendar::COUNT    => $count,
-                Vcalendar::BYDAY    => [
-                    [ Vcalendar::DAY => Vcalendar::MO ],
-                    [ Vcalendar::DAY => Vcalendar::TU ],
-                    [ Vcalendar::DAY => Vcalendar::WE ],
-                    [ Vcalendar::DAY => Vcalendar::TH ],
-                    [ Vcalendar::DAY => Vcalendar::FR ],
+                IcalInterface::FREQ     => IcalInterface::MONTHLY,
+                IcalInterface::COUNT    => $count,
+                IcalInterface::BYDAY    => [
+                    [ IcalInterface::DAY => IcalInterface::MO ],
+                    [ IcalInterface::DAY => IcalInterface::TU ],
+                    [ IcalInterface::DAY => IcalInterface::WE ],
+                    [ IcalInterface::DAY => IcalInterface::TH ],
+                    [ IcalInterface::DAY => IcalInterface::FR ],
                 ],
-                Vcalendar::BYSETPOS => [ 3, -3 ],
+                IcalInterface::BYSETPOS => [ 3, -3 ],
                 $DATASET            => $dataSetNo++
             ],
             $expects
@@ -1026,16 +1117,16 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ), // end
             [
-                Vcalendar::FREQ     => Vcalendar::MONTHLY,
-                Vcalendar::COUNT    => 6,
-                Vcalendar::BYDAY    => [
-                    [ Vcalendar::DAY => Vcalendar::MO ],
-                    [ Vcalendar::DAY => Vcalendar::TU ],
-                    [ Vcalendar::DAY => Vcalendar::WE ],
-                    [ Vcalendar::DAY => Vcalendar::TH ],
-                    [ Vcalendar::DAY => Vcalendar::FR ],
+                IcalInterface::FREQ     => IcalInterface::MONTHLY,
+                IcalInterface::COUNT    => 6,
+                IcalInterface::BYDAY    => [
+                    [ IcalInterface::DAY => IcalInterface::MO ],
+                    [ IcalInterface::DAY => IcalInterface::TU ],
+                    [ IcalInterface::DAY => IcalInterface::WE ],
+                    [ IcalInterface::DAY => IcalInterface::TH ],
+                    [ IcalInterface::DAY => IcalInterface::FR ],
                 ],
-                Vcalendar::BYSETPOS => -2,
+                IcalInterface::BYSETPOS => -2,
                 $DATASET            => $dataSetNo++
             ],
             $expects
@@ -1050,14 +1141,14 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  RecurFactory::EXTENDYEAR . ' year' ), // end
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::COUNT     => 6,
-                Vcalendar::BYDAY     => [
-                    [ Vcalendar::DAY => Vcalendar::TU ],
-                    [ Vcalendar::DAY => Vcalendar::WE ],
-                    [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::COUNT     => 6,
+                IcalInterface::BYDAY     => [
+                    [ IcalInterface::DAY => IcalInterface::TU ],
+                    [ IcalInterface::DAY => IcalInterface::WE ],
+                    [ IcalInterface::DAY => IcalInterface::TH ],
                     ],
-                Vcalendar::BYSETPOS  => 3,
+                IcalInterface::BYSETPOS  => 3,
                 $DATASET             => $dataSetNo++
             ],
             $expects
@@ -1071,12 +1162,12 @@ class RecurMonthTest extends RecurBaseTest
             $start,
             $wDate->modify(  10 . ' year' ), // end
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::INTERVAL => 12,
-                Vcalendar::BYDAY     => [
-                    [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::INTERVAL => 12,
+                IcalInterface::BYDAY     => [
+                    [ IcalInterface::DAY => IcalInterface::TH ],
                 ],
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
             [ 20211125,20221124,20231123,20241128,20251127,20261126,20271125,20281123,20291122 ]
@@ -1090,20 +1181,21 @@ class RecurMonthTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurMonthly2Provider
-     * @param int      $case
+     * @param string $case
      * @param DateTime $start
-     * @param array|DateTime $end
+     * @param DateTime|array $end
      * @param array    $recur
      * @param array    $expects
      * @throws Exception
      */
     public function recurMonthly2Test(
-        $case,
-        DateTime $start,
-        $end,
-        array $recur,
-        array $expects
-    ) {
+        string           $case,
+        DateTime         $start,
+        DateTime | array $end,
+        array            $recur,
+        array            $expects
+    ) : void
+    {
         /*
         if( '7266' != $case ) {
             $this->assertTrue( true );  // test ###
@@ -1126,15 +1218,14 @@ class RecurMonthTest extends RecurBaseTest
 
 //      error_log( 'start case ' . $case ); // test ###
 
-        if( ! isset( $recur[Vcalendar::INTERVAL] )) {
-            $recur[Vcalendar::INTERVAL] = 1;
+        if( ! isset( $recur[IcalInterface::INTERVAL] )) {
+            $recur[IcalInterface::INTERVAL] = 1;
         }
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurMonthly2( $recur )) {
             echo $strCase . ' NOT isRecurMonthly2 ' . $recurDisp . PHP_EOL;
-            $this->assertTrue( false );
-            return;
+            $this->fail();
         } // end if
         $time     = microtime( true );
 //      $resultX  = RecurFactory2::recurMonthly2( $recur, $start, clone $start, $end );

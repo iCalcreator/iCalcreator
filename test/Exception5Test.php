@@ -28,6 +28,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use ArgumentCountError;
 use PHPUnit\Framework\TestCase;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Exception;
@@ -41,28 +42,28 @@ use Exception;
  */
 class Exception5Test extends TestCase
 {
-    private static $ERRFMT = "%s error in case #%s, <%s>->%s";
+    private static string $ERRFMT = "%s error in case #%s, <%s>->%s";
 
     /**
      * AllowEmptyTest1 provider
      */
-    public function AllowEmptyTest1Provider()
+    public function AllowEmptyTest1Provider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             11,
             [
-                Vcalendar::VEVENT =>
+                IcalInterface::VEVENT =>
                     [
-                        Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
-                        Vcalendar::KLASS, Vcalendar::COMMENT, Vcalendar::CONTACT,
-                        Vcalendar::DESCRIPTION, Vcalendar::DTEND, Vcalendar::DTSTART,
-                        Vcalendar::DURATION, Vcalendar::EXDATE, Vcalendar::EXRULE,
-                        Vcalendar::GEO, Vcalendar::LOCATION, Vcalendar::ORGANIZER,
-                        Vcalendar::PRIORITY, Vcalendar::RECURRENCE_ID, Vcalendar::RELATED_TO,
-                        Vcalendar::REQUEST_STATUS, Vcalendar::RESOURCES, Vcalendar::RRULE, Vcalendar::RDATE,
-                        Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::TRANSP, Vcalendar::URL,
+                        IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
+                        IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::CONTACT,
+                        IcalInterface::DESCRIPTION, IcalInterface::DTEND, IcalInterface::DTSTART,
+                        IcalInterface::DURATION, IcalInterface::EXDATE, IcalInterface::EXRULE,
+                        IcalInterface::GEO, IcalInterface::LOCATION, IcalInterface::ORGANIZER,
+                        IcalInterface::PRIORITY, IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
+                        IcalInterface::REQUEST_STATUS, IcalInterface::RESOURCES, IcalInterface::RRULE, IcalInterface::RDATE,
+                        IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::TRANSP, IcalInterface::URL,
                     ],
             ]
         ];
@@ -70,15 +71,15 @@ class Exception5Test extends TestCase
         $dataArr[] = [
             12,
             [
-                Vcalendar::VTODO => [
-                    Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
-                    Vcalendar::KLASS, Vcalendar::COMMENT, Vcalendar::COMPLETED, Vcalendar::CONTACT,
-                    Vcalendar::DESCRIPTION, Vcalendar::DTSTART, Vcalendar::DUE,
-                    Vcalendar::DURATION, Vcalendar::EXDATE, Vcalendar::EXRULE,
-                    Vcalendar::GEO, Vcalendar::LOCATION, Vcalendar::ORGANIZER,
-                    Vcalendar::PRIORITY, Vcalendar::RECURRENCE_ID, Vcalendar::RELATED_TO,
-                    Vcalendar::REQUEST_STATUS, Vcalendar::RESOURCES, Vcalendar::RRULE, Vcalendar::RDATE,
-                    Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::URL,
+                IcalInterface::VTODO => [
+                    IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
+                    IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::COMPLETED, IcalInterface::CONTACT,
+                    IcalInterface::DESCRIPTION, IcalInterface::DTSTART, IcalInterface::DUE,
+                    IcalInterface::DURATION, IcalInterface::EXDATE, IcalInterface::EXRULE,
+                    IcalInterface::GEO, IcalInterface::LOCATION, IcalInterface::ORGANIZER,
+                    IcalInterface::PRIORITY, IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
+                    IcalInterface::REQUEST_STATUS, IcalInterface::RESOURCES, IcalInterface::RRULE, IcalInterface::RDATE,
+                    IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::URL,
                 ],
             ],
         ];
@@ -86,15 +87,15 @@ class Exception5Test extends TestCase
         $dataArr[] = [
             13,
             [
-                Vcalendar::VJOURNAL => [
-                    Vcalendar::ATTACH, Vcalendar::ATTENDEE, Vcalendar::CATEGORIES,
-                    Vcalendar::KLASS, Vcalendar::COMMENT, Vcalendar::CONTACT,
-                    Vcalendar::DESCRIPTION, Vcalendar::DTSTART,
-                    Vcalendar::EXDATE, Vcalendar::EXRULE,
-                    Vcalendar::ORGANIZER,
-                    Vcalendar::RECURRENCE_ID, Vcalendar::RELATED_TO,
-                    Vcalendar::REQUEST_STATUS, Vcalendar::RRULE, Vcalendar::RDATE,
-                    Vcalendar::STATUS, Vcalendar::SUMMARY, Vcalendar::URL,
+                IcalInterface::VJOURNAL => [
+                    IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
+                    IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::CONTACT,
+                    IcalInterface::DESCRIPTION, IcalInterface::DTSTART,
+                    IcalInterface::EXDATE, IcalInterface::EXRULE,
+                    IcalInterface::ORGANIZER,
+                    IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
+                    IcalInterface::REQUEST_STATUS, IcalInterface::RRULE, IcalInterface::RDATE,
+                    IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::URL,
                 ],
             ],
         ];
@@ -102,10 +103,10 @@ class Exception5Test extends TestCase
         $dataArr[] = [
             14,
             [
-                Vcalendar::VFREEBUSY => [
-                    Vcalendar::ATTENDEE, Vcalendar::COMMENT, Vcalendar::CONTACT,
-                    Vcalendar::DTEND, Vcalendar::DTSTART, Vcalendar::DURATION,
-                    Vcalendar::FREEBUSY, Vcalendar::REQUEST_STATUS, Vcalendar::URL,
+                IcalInterface::VFREEBUSY => [
+                    IcalInterface::ATTENDEE, IcalInterface::COMMENT, IcalInterface::CONTACT,
+                    IcalInterface::DTEND, IcalInterface::DTSTART, IcalInterface::DURATION,
+                    IcalInterface::FREEBUSY, IcalInterface::REQUEST_STATUS, IcalInterface::URL,
                 ],
             ]
         ];
@@ -113,8 +114,8 @@ class Exception5Test extends TestCase
         $dataArr[] = [
             15,
             [
-                Vcalendar::VTIMEZONE => [
-                    Vcalendar::TZID, Vcalendar::TZURL,
+                IcalInterface::VTIMEZONE => [
+                    IcalInterface::TZID, IcalInterface::TZURL,
                 ],
             ]
         ];
@@ -127,12 +128,12 @@ class Exception5Test extends TestCase
      *
      * @test
      * @dataProvider AllowEmptyTest1Provider
-     * @param int    $case
-     * @param array  $compProps
+     * @param int $case
+     * @param array $compProps
      */
-    public function AllowEmptyTest1( $case, $compProps )
+    public function AllowEmptyTest1( int $case, array $compProps ) : void
     {
-        $calendar = new Vcalendar( [ Vcalendar::ALLOWEMPTY => false ] );
+        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
         foreach( $compProps as $theComp => $propNames ) {
             $newMethod = 'new' . $theComp;
             $comp = $calendar->{$newMethod}();
@@ -155,21 +156,24 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest2()
+    public function AllowEmptyTest2() : void
     {
         $comps = [
-            Vcalendar::VEVENT,
-            Vcalendar::VTODO,
-            Vcalendar::VJOURNAL,
-            Vcalendar::VFREEBUSY,
-            Vcalendar::VTIMEZONE
+            IcalInterface::VEVENT,
+            IcalInterface::VTODO,
+            IcalInterface::VJOURNAL,
+            IcalInterface::VFREEBUSY,
+            IcalInterface::VTIMEZONE
         ];
-        $calendar = new Vcalendar( [ Vcalendar::ALLOWEMPTY => false ] );
+        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
         foreach( $comps as $x => $theComp ) {
             $newMethod = 'new' . $theComp;
             $ok = false;
             try {
                 $calendar->{$newMethod}()->setXprop();
+            }
+            catch( ArgumentCountError $e ) {
+                $ok = true;
             }
             catch( Exception $e ) {
                 $ok = true;
@@ -183,23 +187,23 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest3()
+    public function AllowEmptyTest3() : void
     {
         $compProps = [
-            Vcalendar::VEVENT => [
-                Vcalendar::ACTION, Vcalendar::DESCRIPTION, Vcalendar::TRIGGER, Vcalendar::SUMMARY,
-                Vcalendar::ATTENDEE,
-                Vcalendar::DURATION, Vcalendar::REPEAT,
-                Vcalendar::ATTACH,
+            IcalInterface::VEVENT => [
+                IcalInterface::ACTION, IcalInterface::DESCRIPTION, IcalInterface::TRIGGER, IcalInterface::SUMMARY,
+                IcalInterface::ATTENDEE,
+                IcalInterface::DURATION, IcalInterface::REPEAT,
+                IcalInterface::ATTACH,
             ],
-            Vcalendar::VTODO => [
-                Vcalendar::ACTION, Vcalendar::DESCRIPTION, Vcalendar::TRIGGER, Vcalendar::SUMMARY,
-                Vcalendar::ATTENDEE,
-                Vcalendar::DURATION, Vcalendar::REPEAT,
-                Vcalendar::ATTACH,
+            IcalInterface::VTODO => [
+                IcalInterface::ACTION, IcalInterface::DESCRIPTION, IcalInterface::TRIGGER, IcalInterface::SUMMARY,
+                IcalInterface::ATTENDEE,
+                IcalInterface::DURATION, IcalInterface::REPEAT,
+                IcalInterface::ATTACH,
             ],
         ];
-        $calendar = new Vcalendar( [ Vcalendar::ALLOWEMPTY => false ] );
+        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
         foreach( $compProps as $theComp => $propNames) {
             $newMethod = 'new' . $theComp;
             $comp      = $calendar->{$newMethod}()->newValarm();
@@ -222,18 +226,18 @@ class Exception5Test extends TestCase
      *
      * @test
      */
-    public function AllowEmptyTest4()
+    public function AllowEmptyTest4() : void
     {
         $compProps = [
-            Vcalendar::VEVENT => [
-                Vcalendar::VALARM
+            IcalInterface::VEVENT => [
+                IcalInterface::VALARM
             ],
-            Vcalendar::VTIMEZONE => [
-                Vcalendar::STANDARD,
-                Vcalendar::DAYLIGHT
+            IcalInterface::VTIMEZONE => [
+                IcalInterface::STANDARD,
+                IcalInterface::DAYLIGHT
             ],
         ];
-        $calendar = new Vcalendar( [ Vcalendar::ALLOWEMPTY => false ] );
+        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
         foreach( $compProps as $theComp => $compNames ) {
             $newMethod1 = 'new' . $theComp;
             foreach( $compNames as $x => $subComp ) {
@@ -241,6 +245,9 @@ class Exception5Test extends TestCase
                 $ok = false;
                 try {
                     $calendar->{$newMethod1}()->{$newMethod2}()->setXprop();
+                }
+                catch( ArgumentCountError $e ) {
+                    $ok = true;
                 }
                 catch( Exception $e ) {
                     $ok = true;

@@ -44,9 +44,9 @@ use function is_numeric;
 trait PERCENT_COMPLETEtrait
 {
     /**
-     * @var array component property PERCENT_COMPLETE value
+     * @var null|array component property PERCENT_COMPLETE value
      */
-    protected $percentcomplete = null;
+    protected ?array $percentcomplete = null;
 
     /**
      * Return formatted output for calendar component property percent-complete
@@ -68,7 +68,7 @@ trait PERCENT_COMPLETEtrait
         return StringFactory::createElement(
             self::PERCENT_COMPLETE,
             ParameterFactory::createParams( $this->percentcomplete[Util::$LCparams] ),
-            $this->percentcomplete[Util::$LCvalue]
+            (string) $this->percentcomplete[Util::$LCvalue]
         );
     }
 
@@ -88,13 +88,16 @@ trait PERCENT_COMPLETEtrait
      * Get calendar component property percent-complete
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|int|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getPercentcomplete( $inclParam = false )
+    public function getPercentcomplete( ?bool $inclParam = false ) : array | bool | string | int
     {
         if( empty( $this->percentcomplete )) {
             return false;
+        }
+        if( null === $this->percentcomplete[Util::$LCvalue] ) {
+            $this->percentcomplete[Util::$LCvalue] = Util::$SP0;
         }
         return ( $inclParam )
             ? $this->percentcomplete
@@ -104,21 +107,22 @@ trait PERCENT_COMPLETEtrait
     /**
      * Set calendar component property percent-complete
      *
-     * @param null|int   $value
-     * @param null|array $params
-     * @return static
+     * @param null|int|string  $value  0 accepted
+     * @param null|string[]       $params
+     * @return self
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      */
-    public function setPercentcomplete( $value = null, $params = [] ) : self
+    public function setPercentcomplete( mixed $value = null, ? array $params = [] ) : self
     {
-        if( empty( $value ) && ! is_numeric( $value )) {
+        if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::PERCENT_COMPLETE );
-            $value  = Util::$SP0;
+            $value  = null;
             $params = [];
         }
         else {
             Util::assertInteger( $value, self::PERCENT_COMPLETE, 0, 100 );
+            $value = (int) $value;
         }
         $this->percentcomplete = [
             Util::$LCvalue  => $value,

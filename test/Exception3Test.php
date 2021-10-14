@@ -44,7 +44,7 @@ class Exception3Test extends TestCase
     /**
      * DateIntervalFactoryTest provider
      */
-    public function DateIntervalFactoryTestProvider()
+    public function DateIntervalFactoryTestProvider() : array
     {
         $dataArr = [];
 
@@ -76,13 +76,14 @@ class Exception3Test extends TestCase
      *
      * @test
      * @dataProvider DateIntervalFactoryTestProvider
-     * @param int    $case
+     * @param int $case
      * @param mixed  $value
      */
     public function DateIntervalFactoryTest(
-        $case,
-        $value
-    ) {
+        int   $case,
+        mixed $value
+    ) : void
+    {
         $ok = false;
         try {
             $result = DateIntervalFactory::factory( $value );

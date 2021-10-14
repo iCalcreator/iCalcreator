@@ -28,6 +28,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -43,7 +44,7 @@ class Exception7Test extends TestCase
     /**
      * rruleExceptionsTest provider
      */
-    public function rruleExceptionsTestProvider()
+    public function rruleExceptionsTestProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -53,11 +54,11 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             11,
             [
-                Vcalendar::BYMONTH   => 11,
-                Vcalendar::BYDAY     => [
-                    [ Vcalendar::DAY => Vcalendar::TH ],
+                IcalInterface::BYMONTH   => 11,
+                IcalInterface::BYDAY     => [
+                    [ IcalInterface::DAY => IcalInterface::TH ],
                 ],
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -66,22 +67,22 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             21,
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::BYMONTH   => 11,
-                Vcalendar::BYDAY     => 'EN',
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::BYMONTH   => 11,
+                IcalInterface::BYDAY     => 'EN',
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
         ];
         $dataArr[] = [
             22,
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::BYMONTH   => 11,
-                Vcalendar::BYDAY     => [
-                    [ Vcalendar::DAY => 'EN' ],
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::BYMONTH   => 11,
+                IcalInterface::BYDAY     => [
+                    [ IcalInterface::DAY => 'EN' ],
                 ],
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -92,11 +93,11 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             31,
             [
-                Vcalendar::FREQ      => Vcalendar::WEEKLY,
-                Vcalendar::BYDAY     => [
-                    [ 1, Vcalendar::DAY => Vcalendar::MO ],
+                IcalInterface::FREQ      => IcalInterface::WEEKLY,
+                IcalInterface::BYDAY     => [
+                    [ 1, IcalInterface::DAY => IcalInterface::MO ],
                 ],
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -109,12 +110,12 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             41,
             [
-                Vcalendar::FREQ      => Vcalendar::YEARLY,
-                Vcalendar::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
-                Vcalendar::BYDAY     => [
-                    [ -1, Vcalendar::DAY => Vcalendar::MO ],
+                IcalInterface::FREQ      => IcalInterface::YEARLY,
+                IcalInterface::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::BYDAY     => [
+                    [ -1, IcalInterface::DAY => IcalInterface::MO ],
                 ],
-                Vcalendar::BYSETPOS  => 4,
+                IcalInterface::BYSETPOS  => 4,
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -124,8 +125,8 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             51,
             [
-                Vcalendar::FREQ       => Vcalendar::WEEKLY,
-                Vcalendar::BYMONTHDAY => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::FREQ       => IcalInterface::WEEKLY,
+                IcalInterface::BYMONTHDAY => [ 5, 10, 15, 20, 25 ],
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -135,24 +136,24 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             61,
             [
-                Vcalendar::FREQ       => Vcalendar::DAILY,
-                Vcalendar::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::FREQ       => IcalInterface::DAILY,
+                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
                 $DATASET             => $dataSetNo++
             ],
         ];
         $dataArr[] = [
             62,
             [
-                Vcalendar::FREQ       => Vcalendar::WEEKLY,
-                Vcalendar::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::FREQ       => IcalInterface::WEEKLY,
+                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
                 $DATASET             => $dataSetNo++
             ],
         ];
         $dataArr[] = [
             63,
             [
-                Vcalendar::FREQ       => Vcalendar::MONTHLY,
-                Vcalendar::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::FREQ       => IcalInterface::MONTHLY,
+                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -162,8 +163,8 @@ class Exception7Test extends TestCase
         $dataArr[] = [
             71,
             [
-                Vcalendar::FREQ      => Vcalendar::MONTHLY,
-                Vcalendar::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
+                IcalInterface::FREQ      => IcalInterface::MONTHLY,
+                IcalInterface::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
                 $DATASET             => $dataSetNo++
             ],
         ];
@@ -174,10 +175,12 @@ class Exception7Test extends TestCase
     /**
      * @test
      * @dataProvider rruleExceptionsTestProvider
-     * @param int    $case
-     * @param array  $rrule
+     * @param int $case
+     * @param array $rrule
+     * @throws Exception
+     * @throws Exception
      */
-    public function rruleExceptionsTest(  $case, $rrule )
+    public function rruleExceptionsTest( int $case, array $rrule ) : void
     {
         $calendar = new Vcalendar();
         $ok = false;

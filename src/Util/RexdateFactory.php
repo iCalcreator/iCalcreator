@@ -33,6 +33,7 @@ use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_keys;
@@ -52,22 +53,22 @@ use function var_export;
 class RexdateFactory
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private static $DEFAULTVALUEDATETIME = [
-        Vcalendar::VALUE => Vcalendar::DATE_TIME
+    private static array $DEFAULTVALUEDATETIME = [
+        IcalInterface::VALUE => IcalInterface::DATE_TIME
     ];
 
     /**
      * @var string
      */
-    private static $REXDATEERR = 'Unknown %s value (#%d) : %s';
+    private static string $REXDATEERR = 'Unknown %s value (#%d) : %s';
 
     /**
      * Return formatted output for calendar component property data value type recur
      *
-     * @param array $exdateData
-     * @param bool  $allowEmpty
+     * @param mixed[] $exdateData
+     * @param bool    $allowEmpty
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
@@ -75,21 +76,15 @@ class RexdateFactory
      */
     public static function formatExdate( array $exdateData, bool $allowEmpty ) : string
     {
-        static $SORTER1 = [
-            'Kigkonsult\Icalcreator\Util\SortFactory',
-            'sortExdate1',
-        ];
-        static $SORTER2 = [
-            'Kigkonsult\Icalcreator\Util\SortFactory',
-            'sortExdate2',
-        ];
+        static $SORTER1 = [ SortFactory::class, 'sortExdate1', ];
+        static $SORTER2 = [ SortFactory::class, 'sortExdate2', ];
         $output  = Util::$SP0;
         $exdates = [];
         foreach(( array_keys( $exdateData )) as $ex ) {
             $theExdate = $exdateData[$ex];
             if( empty( $theExdate[Util::$LCvalue] )) {
                 if( $allowEmpty ) {
-                    $output .= StringFactory::createElement( Vcalendar::EXDATE );
+                    $output .= StringFactory::createElement( IcalInterface::EXDATE );
                 }
                 continue;
             }
@@ -105,7 +100,7 @@ class RexdateFactory
             $theExdate   = $exdates[$ex];
             $isValueDate = ParameterFactory::isParamsValueSet(
                 $theExdate,
-                Vcalendar::DATE
+                IcalInterface::DATE
             );
             $isLocalTime = isset( $theExdate[Util::$LCparams][Util::$ISLOCALTIME] );
             $content     = null;
@@ -118,7 +113,7 @@ class RexdateFactory
                 $content .= ( 0 < $eix ) ? Util::$COMMA . $formatted : $formatted;
             } // end foreach
             $output .= StringFactory::createElement(
-                Vcalendar::EXDATE,
+                IcalInterface::EXDATE,
                 ParameterFactory::createParams( $theExdate[Util::$LCparams] ),
                 $content
             );
@@ -130,24 +125,24 @@ class RexdateFactory
      * Return prepared calendar component property exdate input
      *
      * @param string[]|DateTimeInterface[] $exdates
-     * @param array $params
-     * @return array|bool  false on empty
+     * @param null|mixed[]  $params
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public static function prepInputExdate( array $exdates, $params = null )
+    public static function prepInputExdate( array $exdates, ? array $params = [] ) : array
     {
         $output = [
             Util::$LCvalue  => [],
             Util::$LCparams => ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 self::$DEFAULTVALUEDATETIME
             )
         ];
-        $isValueDate = ParameterFactory::isParamsValueSet( $output, Vcalendar::DATE );
+        $isValueDate = ParameterFactory::isParamsValueSet( $output, IcalInterface::DATE );
         $paramTZid   = ParameterFactory::getParamTzid( $output );
-        $forceUTC    = ( Vcalendar::UTC == $paramTZid );
+        $forceUTC    = ( IcalInterface::UTC === $paramTZid );
         $isLocalTime = false;
         if( ! empty( $paramTZid )) {
             if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
@@ -182,7 +177,7 @@ class RexdateFactory
                     throw new InvalidArgumentException(
                         sprintf(
                             self::$REXDATEERR,
-                            Vcalendar::EXDATE,
+                            IcalInterface::EXDATE,
                             $eix,
                             var_export( $theExdate, true )
                         )
@@ -190,24 +185,23 @@ class RexdateFactory
             } // end switch
             $output[Util::$LCvalue][] = $wDate;
         } // end foreach(( array_keys( $exdates...
-        if( 0 >= count( $output[Util::$LCvalue] )) {
-            return false;
+        if( 0 < count( $output[Util::$LCvalue] )) {
+            DateTimeFactory::conformDateTimeParams(
+                $output[Util::$LCparams], $isValueDate, $isLocalTime, $paramTZid
+            );
         }
-        DateTimeFactory::conformDateTimeParams(
-            $output[Util::$LCparams], $isValueDate, $isLocalTime, $paramTZid
-        );
         return $output;
     }
 
     /**
      * Return formatted output for calendar component property rdate
      *
-     * @param array  $rdateData
-     * @param bool   $allowEmpty
-     * @param string $compType
+     * @param mixed[]  $rdateData
+     * @param bool     $allowEmpty
+     * @param string   $compType
      * @return string
      * @throws Exception
-     * @since  2.29.2 - 2019-06-27
+     * @since  2.40 - 2021-10-04
      */
     public static function formatRdate(
         array $rdateData,
@@ -215,14 +209,8 @@ class RexdateFactory
         string $compType
     ) : string
     {
-        static $SORTER1 = [
-            'Kigkonsult\Icalcreator\Util\SortFactory',
-            'sortRdate1',
-        ];
-        static $SORTER2 = [
-            'Kigkonsult\Icalcreator\Util\SortFactory',
-            'sortRdate2',
-        ];
+        static $SORTER1 = [ SortFactory::class, 'sortRdate1' ];
+        static $SORTER2 = [ SortFactory::class, 'sortRdate2' ];
         $utcTime     = Util::isCompInList( $compType, Vcalendar::$TZCOMPS );
         $output      = Util::$SP0;
         $rDates      = [];
@@ -230,12 +218,12 @@ class RexdateFactory
             $theRdate    = $rdateData[$rpix];
             if( empty( $theRdate[Util::$LCvalue] )) {
                 if( $allowEmpty ) {
-                    $output .= StringFactory::createElement( Vcalendar::RDATE );
+                    $output .= StringFactory::createElement( IcalInterface::RDATE );
                 }
                 continue;
             }
             if( $utcTime ) {
-                unset( $theRdate[Util::$LCparams][Vcalendar::TZID] );
+                unset( $theRdate[Util::$LCparams][IcalInterface::TZID] );
             }
             if( 1 < count( $theRdate[Util::$LCvalue] )) {
                 usort( $theRdate[Util::$LCvalue], $SORTER1 );
@@ -249,18 +237,17 @@ class RexdateFactory
             $theRdate    = $rDates[$rpix];
             $isValueDate = ParameterFactory::isParamsValueSet(
                 $theRdate,
-                Vcalendar::DATE
+                IcalInterface::DATE
             );
             $isLocalTime = isset( $theRdate[Util::$LCparams][Util::$ISLOCALTIME] );
             $attributes  = ParameterFactory::createParams( $theRdate[Util::$LCparams] );
             $cnt         = count( $theRdate[Util::$LCvalue] );
-            $content     = null;
+            $content     = Util::$SP0;
             $rno         = 1;
             foreach(( array_keys( $theRdate[Util::$LCvalue] )) as $rix ) {
-                $rdatePart   = $theRdate[Util::$LCvalue][$rix];
-                $contentPart = null;
+                $rdatePart = $theRdate[Util::$LCvalue][$rix];
                 if( is_array( $rdatePart ) &&
-                    ParameterFactory::isParamsValueSet( $theRdate, Vcalendar::PERIOD )) {
+                    ParameterFactory::isParamsValueSet( $theRdate, IcalInterface::PERIOD )) {
                     // PERIOD part 1
                     $contentPart  = DateTimeFactory::dateTime2Str(
                         $rdatePart[0],
@@ -269,18 +256,9 @@ class RexdateFactory
                     );
                     $contentPart .= '/';
                     // PERIOD part 2
-                    if( DateIntervalFactory::isDateIntervalArrayInvertSet( $rdatePart[1] )) { // fix pre 7.0.5 bug
-                        try {
-                            $dateInterval =
-                                DateIntervalFactory::DateIntervalArr2DateInterval(
-                                    $rdatePart[1]
-                                );
-                        }
-                        catch( Exception $e ) {
-                            throw $e;
-                        }
+                    if( $rdatePart[1] instanceof DateInterval ) {
                         $contentPart .= DateIntervalFactory::dateInterval2String(
-                            $dateInterval
+                            $rdatePart[1]
                         );
                     }
                     else { // date-time
@@ -307,7 +285,7 @@ class RexdateFactory
                 $rno++;
             } // end foreach(( array_keys( $theRdate[Util::$LCvalue]...
             $output .= StringFactory::createElement(
-                Vcalendar::RDATE,
+                IcalInterface::RDATE,
                 $attributes,
                 $content
             );
@@ -319,8 +297,8 @@ class RexdateFactory
      * Return value and parameters from parsed row and propAttr
      *
      * @param string $row
-     * @param array $propAttr
-     * @return array
+     * @param mixed[] $propAttr
+     * @return mixed[]
      * @since  2.27.11 - 2019-01-04
      */
     public static function parseRexdate( string $row, array $propAttr ) : array
@@ -331,7 +309,7 @@ class RexdateFactory
         }
         $values = explode( Util::$COMMA, $row );
         foreach( $values as $vix => $value ) {
-            if( false === strpos( $value, $SS )) {
+            if( ! str_contains( $value, $SS ) ) {
                 continue;
             }
             $value2 = explode( $SS, $value );
@@ -345,33 +323,33 @@ class RexdateFactory
     /**
      * Return prepared calendar component property rdate input
      *
-     * @param array  $rDates
-     * @param null|array  $params
-     * @return array
+     * @param mixed[]        $rDates
+     * @param null|string[]  $params
+     * @return mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
      */
-    public static function prepInputRdate( array $rDates, $params = null ) : array
+    public static function prepInputRdate( array $rDates, ? array $params = [] ) : array
     {
         $output = [
             Util::$LCparams => ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 self::$DEFAULTVALUEDATETIME
             )
         ];
         $isValuePeriod = ParameterFactory::isParamsValueSet(
             $output,
-            Vcalendar::PERIOD
+            IcalInterface::PERIOD
         );
         $isValueDate   = ParameterFactory::isParamsValueSet(
             $output,
-            Vcalendar::DATE
+            IcalInterface::DATE
         );
         $isLocalTime   = isset( $params[Util::$ISLOCALTIME] );
         if( $isLocalTime ) {
             $isValuePeriod = $isValueDate = false;
-            $paramTZid = Vcalendar::UTC;
+            $paramTZid = IcalInterface::UTC;
         }
         else {
             $paramTZid = ParameterFactory::getParamTzid( $output );
@@ -385,11 +363,11 @@ class RexdateFactory
                 }
             }
         }
-        $forceUTC = ( Vcalendar::UTC == $paramTZid );
+        $forceUTC = ( IcalInterface::UTC === $paramTZid );
         foreach( $rDates as $rpix => $theRdate ) {
             switch( true ) {
                 case $isValuePeriod : // PERIOD
-                    list( $wDate, $paramTZid ) = self::getPeriod(
+                    [ $wDate, $paramTZid ] = self::getPeriod(
                         $theRdate,
                         $rpix,
                         $isValueDate,
@@ -419,7 +397,7 @@ class RexdateFactory
                     throw new InvalidArgumentException(
                         sprintf(
                             self::$REXDATEERR,
-                            Vcalendar::RDATE, $rpix,
+                            IcalInterface::RDATE, $rpix,
                             var_export( $theRdate, true )
                         )
                     );
@@ -434,34 +412,34 @@ class RexdateFactory
     /**
      * Return managed period (dateTime/dateTime or dateTime/dateInterval)
      *
-     * @param array  $period
-     * @param int    $rpix
-     * @param bool   $isValueDate
-     * @param string $paramTZid
-     * @param bool   $isLocalTime
-     * @return array
+     * @param mixed[] $period
+     * @param int     $rpix
+     * @param bool    $isValueDate
+     * @param string  $paramTZid
+     * @param bool    $isLocalTime
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.40 2021-10-04
      */
     private static function getPeriod(
         array $period,
         int $rpix,
         bool $isValueDate,
-        & $paramTZid,
-        & $isLocalTime
+        string & $paramTZid,
+        bool & $isLocalTime
     ) : array
     {
-        $forceUTC = ( Vcalendar::UTC == $paramTZid );
+        $forceUTC = ( IcalInterface::UTC === $paramTZid );
         $wDate    = [];
         $perX     = -1;
-        foreach( $period as $rix => $rPeriod ) {
-            $perX += 1;
+        foreach( $period as $rPeriod ) {
+            ++$perX;
             if( $rPeriod instanceof DateInterval ) {
-                $wDate[$perX] = (array) $rPeriod; // fix pre 7.0.5 bug
+                $wDate[$perX] = $rPeriod;
                 continue;
             }
-            if( is_array( $rPeriod ) && ( 1 == count( $rPeriod )) &&
+            if( is_array( $rPeriod ) && ( 1 === count( $rPeriod )) &&
                 DateTimeFactory::isStringAndDate( reset( $rPeriod ))) { // text-date
                 $rPeriod = reset( $rPeriod );
             }
@@ -478,18 +456,13 @@ class RexdateFactory
                     }
                     break;
                 case DateIntervalFactory::isStringAndDuration( $rPeriod ) :  // string format duration
-                    if( DateIntervalFactory::$P != $rPeriod[0] ) {
+                    if( DateIntervalFactory::$P !== $rPeriod[0] ) {
                         $rPeriod = substr( $rPeriod, 1 );
                     }
-                    try {
-                        $wDate[$perX] =
-                            (array) DateIntervalFactory::conformDateInterval(
-                                new DateInterval( $rPeriod )
-                            );
-                    }
-                    catch( Exception $e ) {
-                        throw $e;
-                    }
+                    $wDate[$perX] =
+                        DateIntervalFactory::conformDateInterval(
+                            new DateInterval( $rPeriod )
+                        );
                     continue 2;
                 case ( DateTimeFactory::isStringAndDate( $rPeriod )) : // text date ex. 2006-08-03 10:12:18
                     $wDate[$perX] = DateTimeFactory::conformStringDate(
@@ -504,7 +477,7 @@ class RexdateFactory
                     throw new InvalidArgumentException(
                         sprintf(
                             self::$REXDATEERR,
-                            Vcalendar::RDATE,
+                            IcalInterface::RDATE,
                             $rpix,
                             var_export( $rPeriod, true )
                         )

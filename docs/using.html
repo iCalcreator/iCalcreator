@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-<title>iCalcreator 2.39 manual</title>
+<title>iCalcreator 2.40 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2021 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.39">
+<meta name="description" content="using iCalcreator v2.40">
 <style type="text/css">
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -158,9 +158,9 @@ sup {
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.39</p>
+<p class="header">iCalcreator v2.40</p>
 <p>
-iCalcreator v2.39<br>
+iCalcreator v2.40<br>
 Copyright &copy; 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -213,11 +213,14 @@ This document makes previous versions obsolete.
 iCalcreator features create, parse, edit and select <strong>calendar</strong> and <strong>calendar</strong> components.
 </p>
 <p>
-For iCalcreator 2.39 version (and later), <em>PHP</em> version &gt;= 7.0 is required.
-v2.29.25 and later asserts PHP 7+ compability using
+For iCalcreator 2.40 version (and later), <em>PHP</em> version &gt;= 8.0 is required,
+version v2.39 <em>PHP</em>7+.
+
+To assert PHP compability
     <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>
-    and (v2.39+)
-    <a href="https://github.com/phpstan/phpstan" title="PHPStan">PHPStan</a>.
+    and
+    <a href="https://github.com/phpstan/phpstan" title="PHPStan">PHPStan</a>
+are used.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -333,11 +336,14 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.39/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.40/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
-iCalcreator 2.39 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+    For PHP7 use 2.39.
+</p>
+<p>
+iCalcreator 2.40 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -351,25 +357,7 @@ Here are update headlines in this version.
 
 <ul>
 
-    <li>PHP 7 (PHPStan/strict types)<br><br></li>
-
-    <li>iCalBase static methodName methods moved to StringFactory<br>
-    iCalBase Component multi-prop methods moved to CalendarComponent
-        <br><br>
-    </li>
-
-    <li>TRIGGERtrait : setTrigger() bug fix<br><br></li>
-
-    <li>CalAddressFactory::getCalAddresses() arg inclParams removed<br>
-    ATTENDEE/ORGANIZER (CalAddressFactory)
-    <ul>
-        <li>value MAILTO prefix</li>
-        <li>parameter EMAIL etc logic upd</li>
-    </ul>
-    </li>
-    <br><br>
-
-    <li>IcalvCard::iCal2vCards() arg bug</li>
+    <li>PHP 8</li>
 
 </ul>
 
@@ -2847,7 +2835,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.39//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.40//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -8451,7 +8439,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.39
+<tr><td>Version  <td>2.40
 <tr><td class="top">License  <td>
     Subject matter of licence is the software iCalcreator.<br>
     The above copyright, link, package and version notices,<br>

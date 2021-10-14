@@ -46,9 +46,9 @@ use function sprintf;
 trait IMAGErfc7986trait
 {
     /**
-     * @var array component property IMAGE value
+     * @var null|array component property IMAGE value
      */
-    protected $image = null;
+    protected ?array $image = null;
 
     /**
      * Return formatted output for calendar component property image
@@ -61,7 +61,7 @@ trait IMAGErfc7986trait
             return Util::$SP0;
         }
         $output = Util::$SP0;
-        foreach( $this->image as $aix => $imagePart ) {
+        foreach( $this->image as $imagePart ) {
             if( ! empty( $imagePart[Util::$LCvalue] )) {
                 $output .= StringFactory::createElement(
                     self::IMAGE,
@@ -85,7 +85,7 @@ trait IMAGErfc7986trait
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
      */
-    public function deleteImage( $propDelIx = null ) : bool
+    public function deleteImage( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->image )) {
             unset( $this->propDelIx[self::IMAGE] );
@@ -104,9 +104,9 @@ trait IMAGErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      */
-    public function getImage( $propIx = null, $inclParam = false )
+    public function getImage( ?int $propIx =  null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->image )) {
             unset( $this->propIx[self::IMAGE] );
@@ -125,12 +125,12 @@ trait IMAGErfc7986trait
      * Set calendar component property image
      *
      * @param null|string  $value
-     * @param null|array   $params
-     * @param null|integer $index
-     * @return static
+     * @param null|string[] $params
+     * @param null|int     $index
+     * @return self
      * @throws InvalidArgumentException
      */
-    public function setImage( $value = null, $params = [], $index = null ) : self
+    public function setImage( ? string $value = null, ? array $params = [], ? int $index = null ) : self
     {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
         if( empty( $value )) {
@@ -138,7 +138,7 @@ trait IMAGErfc7986trait
             CalendarComponent::setMval( $this->image, Util::$SP0, [], null, $index );
             return $this;
         }
-        $params     = array_change_key_case( $params, CASE_UPPER );
+        $params     = array_change_key_case( $params ?? [], CASE_UPPER );
         switch( true ) {
             case isset( $params[self::ENCODING] ) :
                 $params[self::VALUE] = self::BINARY;

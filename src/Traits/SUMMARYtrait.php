@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * SUMMARY property functions
@@ -42,16 +41,16 @@ use InvalidArgumentException;
 trait SUMMARYtrait
 {
     /**
-     * @var array component property SUMMARY value
+     * @var null|array component property SUMMARY value
      */
-    protected $summary = null;
+    protected ?array $summary = null;
 
     /**
      * Return formatted output for calendar component property summary
      *
-     * @return string
+     * @return string|null
      */
-    public function createSummary()
+    public function createSummary() : ?string
     {
         if( empty( $this->summary )) {
             return null;
@@ -88,10 +87,10 @@ trait SUMMARYtrait
      * Get calendar component property summary
      *
      * @param bool   $inclParam
-     * @return bool|array
+     * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
      */
-    public function getSummary( $inclParam = false )
+    public function getSummary( bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->summary )) {
             return false;
@@ -102,13 +101,12 @@ trait SUMMARYtrait
     /**
      * Set calendar component property summary
      *
-     * @param string $value
-     * @param array  $params
-     * @return static
-     * @throws InvalidArgumentException
+     * @param null|string $value
+     * @param array|null $params
+     * @return self
      * @since 2.29.14 2019-09-03
      */
-    public function setSummary( $value = null, $params = [] ) : self
+    public function setSummary( ? string $value = null, ? array $params = [] ) : self
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SUMMARY );

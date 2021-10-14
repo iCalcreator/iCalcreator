@@ -39,5 +39,5 @@ final class Standard extends DScomponent
     /**
      * @var string
      */
-    protected static $compSgn = 's';
+    protected static string $compSgn = 's';
 }

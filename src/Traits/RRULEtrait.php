@@ -42,9 +42,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait RRULEtrait
 {
     /**
-     * @var array component property RRULE value
+     * @var null|array component property RRULE value
      */
-    protected $rrule = null;
+    protected ?array $rrule = null;
 
     /**
      * Return formatted output for calendar component property rrule
@@ -67,7 +67,7 @@ trait RRULEtrait
     /**
      * Delete calendar component property rrule
      *
-     * @return static
+     * @return self
      * @since 2.29.6 2019-06-23
      */
     public function deleteRrule() : self
@@ -80,10 +80,10 @@ trait RRULEtrait
      * Get calendar component property rrule
      *
      * @param null|bool   $inclParam
-     * @return bool|array
+     * @return bool|string|mixed|array
      * @since 2.29.6 2019-06-23
      */
-    public function getRrule( $inclParam = false )
+    public function getRrule( ?bool $inclParam = false ) : mixed
     {
         if( empty( $this->rrule )) {
             return false;
@@ -95,13 +95,13 @@ trait RRULEtrait
      * Set calendar component property rrule
      *
      * @param null|array   $rruleset
-     * @param null|array   $params
-     * @return static
+     * @param null|string[]   $params
+     * @return self
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setRrule( $rruleset = null, $params = [] ) : self
+    public function setRrule( ? array $rruleset = null, ? array $params = [] ) : self
     {
         if( empty( $rruleset )) {
             $this->assertEmptyValue( $rruleset, self::RRULE );
