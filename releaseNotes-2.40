@@ -129,4 +129,6 @@ v3.39   3.4 release candidate
         IcalvCard::iCal2vCards() arg bug
 
 
-2.40 PHP8
+2.40    PHP8
+
+2.40.1  composer.json bug
