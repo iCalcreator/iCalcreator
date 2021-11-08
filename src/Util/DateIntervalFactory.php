@@ -35,7 +35,6 @@ use Exception;
 use InvalidArgumentException;
 
 use function floor;
-use function is_array;
 use function strlen;
 use function substr;
 use function trim;
@@ -380,17 +379,14 @@ class DateIntervalFactory
     /**
      * Get DateInterval from (DateInterval) array
      *
-     * @param mixed $dateIntervalArr
+     * @param array $dateIntervalArr
      * @return DateInterval
      * @throws Exception  on DateInterval create error
      * @since  2.27.2 - 2018-12-21
      */
-    public static function DateIntervalArr2DateInterval( mixed $dateIntervalArr ) : DateInterval
+    public static function DateIntervalArr2DateInterval( array $dateIntervalArr ) : DateInterval
     {
         static $P0D = 'P0D';
-        if( ! is_array( $dateIntervalArr )) {
-            $dateIntervalArr = [];
-        }
         $dateInterval = new DateInterval( $P0D );
         foreach( $dateIntervalArr as $key => $value ) {
             $dateInterval->{$key} = $value;

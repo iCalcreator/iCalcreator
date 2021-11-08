@@ -102,7 +102,7 @@ trait COMMENTtrait
     /**
      * Get calendar component property comment
      *
-     * @param int|null $propIx specific property in case of multiply occurrence
+     * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
      * @return bool|string|array
      * @since  2.27.1 - 2018-12-12
@@ -128,11 +128,11 @@ trait COMMENTtrait
      * @param null|string   $value
      * @param null|string[] $params
      * @param null|int      $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setComment( ? string $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setComment( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COMMENT );

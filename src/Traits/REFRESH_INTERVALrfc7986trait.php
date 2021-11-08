@@ -90,17 +90,12 @@ trait REFRESH_INTERVALrfc7986trait
      * @param null|bool   $inclParam
      * @return bool|string|array|DateInterval
      * @throws Exception
-     * @since 2.40 2021-10-04
+     * @since 2.43 2021-10-30
      */
     public function getRefreshinterval( ? bool $inclParam = false ) : DateInterval | bool | string | array
     {
         if( empty( $this->refreshinterval )) {
             return false;
-        }
-        if( empty( $this->refreshinterval[Util::$LCvalue] )) {
-            return ( $inclParam )
-                ? $this->refreshinterval
-                : $this->refreshinterval[Util::$LCvalue];
         }
         return ( $inclParam )
             ? $this->refreshinterval
@@ -110,14 +105,17 @@ trait REFRESH_INTERVALrfc7986trait
     /**
      * Set calendar component property refresh_interval
      *
-     * @param null|mixed   $value
+     * @param null|string|DateInterval   $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.40 2021-10-04
      */
-    public function setRefreshinterval( mixed $value = null, ? array $params = [] ) : self
+    public function setRefreshinterval(
+        null|string|DateInterval $value = null,
+        ? array $params = []
+    ) : static
     {
         static $FMTERR = 'Invalid %s value';
         switch( true ) {

@@ -107,11 +107,11 @@ trait PRIORITYtrait
      *
      * @param null|int|string $value
      * @param null|string[]      $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.27.2 2019-01-03
      */
-    public function setPriority( mixed $value = null, ? array $params = [] ) : self
+    public function setPriority( null|int|string $value = null, ? array $params = [] ) : static
     {
         if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::PRIORITY );

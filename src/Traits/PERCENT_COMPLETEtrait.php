@@ -108,12 +108,12 @@ trait PERCENT_COMPLETEtrait
      * Set calendar component property percent-complete
      *
      * @param null|int|string  $value  0 accepted
-     * @param null|string[]       $params
-     * @return self
+     * @param null|string[]    $params
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      */
-    public function setPercentcomplete( mixed $value = null, ? array $params = [] ) : self
+    public function setPercentcomplete( null|int|string $value = null, ? array $params = [] ) : static
     {
         if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::PERCENT_COMPLETE );

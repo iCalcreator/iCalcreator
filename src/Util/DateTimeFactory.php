@@ -176,13 +176,13 @@ class DateTimeFactory
      * @param string|DateTimeInterface  $value
      * @param null|string[]  $params
      * @param null|bool      $forceUTC
-     * @return mixed[]
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
     public static function setDate(
-        mixed $value,
+        string|DateTimeInterface $value,
         ? array $params = [],
         ? bool $forceUTC = false
     ) : array
@@ -356,7 +356,7 @@ class DateTimeFactory
      * Return array [<datePart>, <timezonePart>] from (split) string
      *
      * @param string $string
-     * @return mixed[]    [<datePart>, <timezonePart>]
+     * @return array    [<datePart>, <timezonePart>]
      * @since  2.27.14 - 2019-03-08
      */
     public static function splitIntoDateStrAndTimezone( string $string ) : array

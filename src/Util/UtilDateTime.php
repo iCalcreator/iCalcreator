@@ -55,7 +55,7 @@ class UtilDateTime extends DateTime
     public string $key;
 
     /**
-     * @var mixed[] date[-time] origin
+     * @var array date[-time] origin
      */
     public array $SCbools = [];
 
@@ -181,7 +181,7 @@ class UtilDateTime extends DateTime
      * Return UtilDateTime object instance based on date array and timezone(s)
      *
      * @param DateTime      $date
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @param null|string   $dtstartTz
      * @return self
      * @throws Exception

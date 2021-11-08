@@ -470,8 +470,8 @@ class RecurYearTest extends RecurBaseTest
             $recur[IcalInterface::INTERVAL] = 1;
         }
 
-        error_log('' ); // test ###
-        error_log( __FUNCTION__ . ' start ' . $case ); // test ###
+//      error_log('' ); // test ###
+//      error_log( __FUNCTION__ . ' start ' . $case ); // test ###
 
         $strCase   = str_pad( $case, 12 );
 

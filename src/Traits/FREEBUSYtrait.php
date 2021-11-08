@@ -229,7 +229,7 @@ trait FREEBUSYtrait
      * @param null|string|DateTimeInterface|array $fbValues
      * @param null|string[]   $params
      * @param null|integer $index
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.40 2021-10-04
@@ -237,10 +237,10 @@ trait FREEBUSYtrait
      */
     public function setFreebusy(
         ? string $fbType = null,
-        mixed $fbValues = null,
-        mixed $params = [],
+        null|string|DateTimeInterface|array $fbValues = null,
+        ? array $params = [],
         ? int $index = null
-    ) : self
+    ) : static
     {
         static $ERR2 = 'Unknown (%d) freebusy value (#%d/%d) : \'%s\'';
         if( empty( $fbValues )) {

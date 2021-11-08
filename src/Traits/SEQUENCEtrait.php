@@ -106,10 +106,10 @@ trait SEQUENCEtrait
      *
      * @param null|int|string $value
      * @param null|string[]      $params
-     * @return self
+     * @return static
      * @since  2.27.2 - 2019-01-04
      */
-    public function setSequence( mixed $value = null, ? array $params = [] ) : self
+    public function setSequence( null|int|string $value = null, ? array $params = [] ) : static
     {
         if(( $value === null ) || ( $value === Util::$SP0 )) {
             $value = ( isset( $this->sequence[Util::$LCvalue] ) &&

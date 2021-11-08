@@ -67,10 +67,10 @@ trait EXRULEtrait
     /**
      * Delete calendar component property exrule
      *
-     * @return self
+     * @return static
      * @since 2.29.6 2019-06-23
      */
-    public function deleteExrule() : self
+    public function deleteExrule() : static
     {
         $this->exrule = null;
         return $this;
@@ -80,10 +80,10 @@ trait EXRULEtrait
      * Get calendar component property exrule
      *
      * @param null|bool $inclParam
-     * @return bool|string|mixed|array
+     * @return bool|string|array
      * @since 2.29.6 2019-06-27
      */
-    public function getExrule( ?bool $inclParam = false ) : mixed
+    public function getExrule( ?bool $inclParam = false ) : bool | array | string
     {
         if( empty( $this->exrule )) {
             return false;
@@ -96,12 +96,12 @@ trait EXRULEtrait
      *
      * @param null|array   $exruleset
      * @param null|string[]   $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setExrule( ? array $exruleset = null, ? array $params = [] ) : self
+    public function setExrule( ? array $exruleset = null, ? array $params = [] ) : static
     {
         if( empty( $exruleset )) {
             $this->assertEmptyValue( $exruleset, self::EXRULE );

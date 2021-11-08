@@ -139,27 +139,28 @@ trait REQUEST_STATUStrait
     /**
      * Set calendar component property request-status
      *
-     * @param null|array|float $statCode 1*DIGIT 1*2("." 1*DIGIT)
+     * @param null|int|float|string $statCode 1*DIGIT 1*2("." 1*DIGIT)
      * @param null|string      $text
      * @param null|string      $extData
-     * @param null|string[] $params
+     * @param null|string[]    $params
      * @param null|integer     $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
     public function setRequeststatus(
-        mixed $statCode = null,
+        null|int|float|string $statCode = null,
         ? string $text = null,
         ? string $extData = null,
-        mixed $params = [],
+        ? array $params = [],
         ? int $index = null
-    ) : self
+    ) : static
     {
         static $ERR = 'Invalid %s status code value %s';
         if( empty( $statCode ) || empty( $text )) {
             $this->assertEmptyValue( Util::$SP0, self::REQUEST_STATUS );
-            $statCode = $text = Util::$SP0;
+            $statCode = null;
+            $text     = Util::$SP0;
             $params = [];
         }
         else {
@@ -171,7 +172,7 @@ trait REQUEST_STATUStrait
             Util::assertString( $text, self::REQUEST_STATUS );
         }
         $input = [
-            self::STATCODE => number_format( (float) $statCode, 2, Util::$DOT, null ),
+            self::STATCODE => number_format((float) $statCode, 2, Util::$DOT, null ),
             self::STATDESC => StringFactory::trimTrailNL( $text ),
         ];
         if( ! empty( $extData )) {

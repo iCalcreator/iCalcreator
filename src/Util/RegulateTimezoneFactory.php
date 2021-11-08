@@ -46,6 +46,7 @@ use function key;
 use function reset;
 use function sprintf;
 use function str_replace;
+use function str_starts_with;
 use function timezone_name_from_abbr;
 
 /**
@@ -214,11 +215,11 @@ class RegulateTimezoneFactory
     /**
      * Class constructor
      *
-     * @param string|string[]   $inputiCal    strict rfc2445 formatted calendar
+     * @param null|string|string[]   $inputiCal    strict rfc2445 formatted calendar
      * @param null|string[]     $otherTzPhpRelations  [ other => phpTz ]
      * @throws InvalidArgumentException
      */
-    public function __construct( mixed $inputiCal = null, ? array $otherTzPhpRelations = [] )
+    public function __construct( null|string|array $inputiCal = null, ? array $otherTzPhpRelations = [] )
     {
         $this->outputiCal = Util::$SP0;
         if( ! empty( $inputiCal )) {
@@ -233,13 +234,13 @@ class RegulateTimezoneFactory
     /**
      * Class factory method
      *
-     * @param string|string[] $inputiCal    strict rfc2445 formatted calendar
+     * @param null|string|string[] $inputiCal    strict rfc2445 formatted calendar
      * @param null|string[]   $otherTzPhpRelations  [ other => phpTz ]
      * @return self
      * @throws InvalidArgumentException
      */
     public static function factory(
-        mixed $inputiCal = null,
+        null|string|array $inputiCal = null,
         ? array $otherTzPhpRelations = []
     ) : self
     {
@@ -284,12 +285,12 @@ class RegulateTimezoneFactory
         }
         $vtSwitch = false;
         foreach( $this->getInputiCal() as $row ) {
-            if( StringFactory::startsWith( $row, self::$BEGINVTIMEZONE )) {
+            if( str_starts_with( $row, self::$BEGINVTIMEZONE )) {
                 $this->setVtimezoneRow( $row );
                 $vtSwitch = true;
                 continue;
             }
-            if( StringFactory::startsWith( $row, self::$ENDVTIMEZONE )) {
+            if( str_starts_with( $row, self::$ENDVTIMEZONE )) {
                 $this->setVtimezoneRow( $row );
                 $this->processVtimezone();
                 $this->setEmptyVtimezoneRows();
@@ -300,8 +301,8 @@ class RegulateTimezoneFactory
                 $this->setVtimezoneRow( $row );
                 continue;
             }
-            if( StringFactory::startsWith( $row, self::$BEGIN ) ||
-                StringFactory::startsWith( $row, self::$END )) {
+            if( str_starts_with( $row, self::$BEGIN ) ||
+                str_starts_with( $row, self::$END )) {
                 $this->setOutputiCalRow( $row );
                 continue;
             }
@@ -340,10 +341,10 @@ class RegulateTimezoneFactory
         $stdArr        = $dlghtArr = [];       // TZOFFSETTO values (in  STANDARD/DAYLIGHT)
         foreach( $this->getVtimezoneRows() as $row ) {
             switch( true ) {
-                case ( StringFactory::startsWith( $row, self::$BEGINVTIMEZONE )) :
+                case str_starts_with( $row, self::$BEGINVTIMEZONE ) :
                     $this->setOutputiCalRow( $row );
                     continue 2;
-                case ( StringFactory::startsWith( $row, self::$ENDVTIMEZONE )) :
+                case str_starts_with( $row, self::$ENDVTIMEZONE ) :
                     if( ! empty( $currTzId )) {
                         $this->processCurrTzId( $currTzId, $stdArr, $dlghtArr );
                     }
@@ -353,19 +354,19 @@ class RegulateTimezoneFactory
                     $stdSwitch     = $dlghtSwitch = false; // process STANDARD/DAYLIGHT or not
                     $stdArr        = $dlghtArr = [];       // TZOFFSETTO values (in STANDARD/DAYLIGHT)
                     continue 2;
-                case ( StringFactory::startsWith( $row, self::$BEGINSTANDARD )) :
+                case str_starts_with( $row, self::$BEGINSTANDARD ) :
                     $this->setOutputiCalRow( $row );
                     $stdSwitch = true;
                     continue 2;
-                case ( StringFactory::startsWith( $row, self::$ENDSTANDARD )) :
+                case str_starts_with( $row, self::$ENDSTANDARD ) :
                     $this->setOutputiCalRow( $row );
                     $stdSwitch = false;
                     continue 2;
-                case ( StringFactory::startsWith( $row, self::$BEGINDAYLIGHT )) :
+                case str_starts_with( $row, self::$BEGINDAYLIGHT ) :
                     $this->setOutputiCalRow( $row );
                     $dlghtSwitch = true;
                     continue 2;
-                case ( StringFactory::startsWith( $row, self::$ENDDAYLIGHT )) :
+                case str_starts_with( $row, self::$ENDDAYLIGHT ) :
                     $this->setOutputiCalRow( $row );
                     $dlghtSwitch = false;
                     continue 2;
@@ -433,8 +434,8 @@ class RegulateTimezoneFactory
      * Find currTzId replacement using stdArr+dlghtArr offsets
      *
      * @param string   $currTzId
-     * @param mixed[]  $stdArr
-     * @param mixed[]  $dlghtArr
+     * @param array $stdArr
+     * @param array $dlghtArr
      * @throws RuntimeException
      */
     private function processCurrTzId( string $currTzId, array $stdArr, array $dlghtArr ) : void
@@ -479,7 +480,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param mixed[] $propAttr
+     * @param array $propAttr
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
@@ -511,7 +512,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param mixed[] $propAttr
+     * @param array $propAttr
      * @return void
      * @throws InvalidArgumentException
      * @throws RuntimeException
@@ -537,7 +538,7 @@ class RegulateTimezoneFactory
      * Return array( value, propAttr ) from property row
      *
      * @param string $row2
-     * @return mixed[]   ( value, propAttr )
+     * @return array   ( value, propAttr )
      */
     private static function splitContent( string $row2 ) : array
     {
@@ -592,7 +593,7 @@ class RegulateTimezoneFactory
      * @see https://www.php.net/manual/en/datetimezone.listabbreviations.php#114161
      * @param string $offset
      * @param int    $dst
-     * @return mixed[]
+     * @return array
      * @throws RuntimeException
      */
     private static function getTimezoneListFromOffset( string $offset, int $dst ) : array
@@ -642,7 +643,7 @@ class RegulateTimezoneFactory
      * Suffix value with 'Z'and remove propAttr TZID, IF propAttr TZID = UTC
      *
      * @param string  $value
-     * @param mixed[] $propAttr
+     * @param array $propAttr
      * @return void
      */
     private static function checkTzidForUTC( string & $value, array & $propAttr ) : void
@@ -678,7 +679,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $row2
      * @param string  $value
-     * @param mixed[] $propAttr
+     * @param array $propAttr
      */
     private static function fixUTCx( string $row2, string & $value, array & $propAttr ) : void
     {
@@ -706,7 +707,7 @@ class RegulateTimezoneFactory
      */
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function getInputiCal() : array
     {
@@ -722,7 +723,7 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param string|mixed[] $inputiCal
+     * @param string|array $inputiCal
      * @return self
      * @throws UnexpectedValueException
      */
@@ -739,7 +740,7 @@ class RegulateTimezoneFactory
 
 
     /**
-     * @return mixed[]
+     * @return array
      */
     private function getVtimezoneRows() : array
     {
@@ -800,7 +801,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param mixed[] $propAttr
+     * @param array $propAttr
      * @return void
      */
     private function setOutputiCalRowElements( string $propName, string $value, array $propAttr ) : void
@@ -812,7 +813,7 @@ class RegulateTimezoneFactory
 
     /**
      * @param null|string $otherTz
-     * @return string|bool|mixed[]    bool false on key not found
+     * @return string|bool|array    bool false on key not found
      */
     public function getOtherTzPhpRelations( ? string $otherTz = null ) : bool | array | string
     {
@@ -855,7 +856,7 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param mixed[] $otherTzPhpRelations
+     * @param array $otherTzPhpRelations
      * @return void
      */
     private function addOtherTzPhpRelations( array $otherTzPhpRelations ) : void

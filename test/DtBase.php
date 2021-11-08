@@ -275,12 +275,12 @@ class DtBase extends TestCase
         static $xmlStartChars = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<icalendar xmlns=\"urn:ietf:params:xml:ns:icalendar-2.0\"><!-- kigkonsult.se iCalcreator";
         static $xmlEndChars   = "</icalendar>\n";
 
-        // echo $case . ' ' . __FUNCTION__ . ' ' . $theComp . '::' . $propName . ' start' . PHP_EOL; // test ###
+//      echo $case . ' ' . __FUNCTION__ . ' ' . $theComp . '::' . $propName . ' start' . PHP_EOL; // test ###
 
         $calendarStr1 = $calendar->createCalendar();
 
         if( ! empty( $expectedString )) {
-            $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendarStr1 );
+            $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], Util::$SP0, $calendarStr1 );
             $createString = str_replace( '\,', ',', $createString );
             $this->assertNotFalse(
                 strpos( $createString, $expectedString ),
@@ -324,16 +324,19 @@ class DtBase extends TestCase
                 sprintf( self::$ERRFMT, null, $case . '-34', __FUNCTION__, $theComp, $propName )
                 . PHP_EOL . str_replace( '><', '>' . PHP_EOL . '<', $xml ) . PHP_EOL
             );
-        }
+        } // end if
         else {
             $calendarStr2 = $calendarStr1;
         }
 
+//      echo __FUNCTION__ . ' start #' . $case . ' calendar2 : ' . $calendarStr2 . PHP_EOL; // test ###
+
         $calendar3    = new Vcalendar();
         $calendar3->parse( $calendarStr2 );
+        $calendarStr3 = $calendar3->createCalendar();
         $this->assertEquals(
             $calendarStr1,
-            $calendar3->createCalendar(),
+            $calendarStr3,
             sprintf( self::$ERRFMT, null, $case . '-35', __FUNCTION__, $theComp, $propName )
         );
         ob_start();
@@ -344,11 +347,11 @@ class DtBase extends TestCase
         // testing start -> issue Google Calendar issue - 1 Character is missing in output #93
         $calEnd = 'END:VCALENDAR' . Util::$CRLF;
         $this->assertTrue(
-            StringFactory::endsWith( $calendarStr1, $calEnd ),
+            str_ends_with( $calendarStr1, $calEnd ),
             sprintf( self::$ERRFMT, null, $case . '-36a', __FUNCTION__, $theComp, $propName )
         );
         $this->assertTrue(
-            StringFactory::endsWith( $out3, $calEnd ),
+            str_ends_with( $out3, $calEnd ),
             sprintf( self::$ERRFMT, null, $case . '-36b', __FUNCTION__, $theComp, $propName )
         );
         $this->assertEquals(
@@ -359,7 +362,7 @@ class DtBase extends TestCase
         $needle = 'Content-Length: ';
         $contentLength = 0;
         foreach( $hdrs as $hdr ) {
-            if( StringFactory::startsWith( strtolower( $hdr ), strtolower( $needle ))) {
+            if( str_starts_with( strtolower( $hdr ), strtolower( $needle ))) {
                 $contentLength = trim( StringFactory::after( $needle, $hdr ));
                 break;
             }

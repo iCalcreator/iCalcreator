@@ -110,12 +110,12 @@ trait ORGANIZERtrait
      *
      * @param null|string  $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since  2.39 - 2021-06-17
      * @todo ensure value is prefixed by protocol, mailto: if missing
       */
-    public function setOrganizer( ? string $value = null, ? array $params = [] ) : self
+    public function setOrganizer( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ORGANIZER );

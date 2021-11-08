@@ -127,10 +127,10 @@ trait IMAGErfc7986trait
      * @param null|string  $value
      * @param null|string[] $params
      * @param null|int     $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      */
-    public function setImage( ? string $value = null, ? array $params = [], ? int $index = null ) : self
+    public function setImage( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
         if( empty( $value )) {

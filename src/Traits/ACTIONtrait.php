@@ -85,7 +85,7 @@ trait ACTIONtrait
     /**
      * Get calendar component property action
      *
-     * @param bool|null $inclParam
+     * @param null|bool  $inclParam
      * @return bool|string|array
      * @since  2.27.1 - 2018-12-13
      */
@@ -100,13 +100,13 @@ trait ACTIONtrait
     /**
      * Set calendar component property action
      *
-     * @param string|null $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
+     * @param null|string $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setAction( string $value = null, ? array $params = [] ) : self
+    public function setAction( string $value = null, ? array $params = [] ) : static
     {
         static $STDVALUES = [
             self::AUDIO,

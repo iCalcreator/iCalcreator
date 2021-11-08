@@ -185,36 +185,6 @@ class Exception1Test extends TestCase
             [ IcalInterface::TZID => 'invalid/timezone']
         ];
 
-        $dataArr[] = [
-            18,
-            [ 'timestamp' => 'Papegojan Ragatha' ],
-            []
-        ];
-
-        $dataArr[] = [
-            19,
-            [
-                'timestamp'         => '1',
-                RecurFactory::$LCtz => 'invalid/timezone'
-            ],
-            []
-        ];
-
-        $dataArr[] = [
-            20,
-            [
-                'timestamp'         => '1',
-                RecurFactory::$LCtz => IcalInterface::UTC
-            ],
-            [ IcalInterface::TZID => 'invalid/timezone']
-        ];
-
-        $dataArr[] = [
-            21,
-            [ 'Kalle Stropp'],
-            []
-        ];
-
         return $dataArr;
     }
 

@@ -67,10 +67,10 @@ trait RRULEtrait
     /**
      * Delete calendar component property rrule
      *
-     * @return self
+     * @return static
      * @since 2.29.6 2019-06-23
      */
-    public function deleteRrule() : self
+    public function deleteRrule() : static
     {
         $this->rrule = null;
         return $this;
@@ -80,10 +80,10 @@ trait RRULEtrait
      * Get calendar component property rrule
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed|array
+     * @return bool|string|array
      * @since 2.29.6 2019-06-23
      */
-    public function getRrule( ?bool $inclParam = false ) : mixed
+    public function getRrule( ?bool $inclParam = false ) : bool | array | string
     {
         if( empty( $this->rrule )) {
             return false;
@@ -94,14 +94,14 @@ trait RRULEtrait
     /**
      * Set calendar component property rrule
      *
-     * @param null|array   $rruleset
+     * @param null|array   $rruleset  string[]
      * @param null|string[]   $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.6 2019-06-23
      */
-    public function setRrule( ? array $rruleset = null, ? array $params = [] ) : self
+    public function setRrule( ? array $rruleset = null, ? array $params = [] ) : static
     {
         if( empty( $rruleset )) {
             $this->assertEmptyValue( $rruleset, self::RRULE );

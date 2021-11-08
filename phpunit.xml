@@ -78,6 +78,7 @@
             <file>test/RecurDayTest.php</file>
             <file>test/Exception7Test.php</file>
             <file>test/SelectComponentsTest.php</file>
+            <file>test/SelectComponentsTest2.php</file>
         </testsuite>
         <testsuite name="vCard Tests">
             <file>test/IcalvCardFactoryTest.php</file>

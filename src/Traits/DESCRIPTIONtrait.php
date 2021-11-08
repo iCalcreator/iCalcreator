@@ -118,7 +118,7 @@ trait DESCRIPTIONtrait
      * @return bool|string|array
      * @since 2.29.5 2019-07-03
      */
-    public function getDescription( mixed $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getDescription( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->description )) {
             unset( $this->propIx[self::DESCRIPTION] );
@@ -145,11 +145,11 @@ trait DESCRIPTIONtrait
      * @param null|string  $value
      * @param null|string[] $params
      * @param null|integer $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setDescription( ? string $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setDescription( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DESCRIPTION );

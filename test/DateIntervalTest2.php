@@ -351,7 +351,7 @@ class DateIntervalTest2 extends DtBase
                 $createMethod = StringFactory::getCreateMethodName( $propName );
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
-                /*
+                /* // test ###
                 error_log( __FUNCTION__ . ' #' . $case . ' in ' . // test ###
                     var_export( [ Util::$LCvalue => $value, Util::$LCparams => $params ], true ) // test ###
                 ); // test ###

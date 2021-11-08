@@ -101,11 +101,11 @@ trait URLtrait
      *
      * @param null|string $value
      * @param null|string[]  $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since  2.30.2 - 2021-02-04
      */
-    public function setUrl( ? string $value = null, ? array $params = [] ) : self
+    public function setUrl( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::URL );

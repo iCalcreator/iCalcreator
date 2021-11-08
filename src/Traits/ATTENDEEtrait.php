@@ -111,12 +111,12 @@ trait ATTENDEEtrait
      * @param null|string   $value
      * @param null|string[] $params
      * @param null|integer  $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-17
      * @todo ensure value is prefixed by protocol, mailto: if missing
      */
-    public function setAttendee( ? string $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setAttendee( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTENDEE );

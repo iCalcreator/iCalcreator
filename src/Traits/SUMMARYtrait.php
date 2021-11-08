@@ -48,7 +48,7 @@ trait SUMMARYtrait
     /**
      * Return formatted output for calendar component property summary
      *
-     * @return string|null
+     * @return null|string
      */
     public function createSummary() : ?string
     {
@@ -102,11 +102,11 @@ trait SUMMARYtrait
      * Set calendar component property summary
      *
      * @param null|string $value
-     * @param array|null $params
-     * @return self
+     * @param null|string[] $params
+     * @return static
      * @since 2.29.14 2019-09-03
      */
-    public function setSummary( ? string $value = null, ? array $params = [] ) : self
+    public function setSummary( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SUMMARY );

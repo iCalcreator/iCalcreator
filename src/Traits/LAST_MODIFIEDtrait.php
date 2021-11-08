@@ -107,12 +107,12 @@ trait LAST_MODIFIEDtrait
      *
      * @param null|string|DateTimeInterface  $value
      * @param null|string[]  $params
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( DateTimeInterface | string | null $value = null, ?array $params = [] ) : self
+    public function setLastmodified( DateTimeInterface | string | null $value = null, ?array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->lastmodified = [

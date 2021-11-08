@@ -105,12 +105,12 @@ trait CREATEDtrait
      *
      * @param null|string|DateTimeInterface $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setCreated( mixed $value = null, ? array $params = [] ) : self
+    public function setCreated( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->created = [

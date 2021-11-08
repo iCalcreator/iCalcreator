@@ -108,10 +108,10 @@ trait REPEATtrait
      *
      * @param null|int|string $value
      * @param null|string[]      $params
-     * @return self
+     * @return static
      * @since 2.27.3 2018-12-22
      */
-    public function setRepeat( mixed $value = null, ? array $params = [] ) : self
+    public function setRepeat( null|int|string $value = null, ? array $params = [] ) : static
     {
         if(( $value === null ) || ( $value === Util::$SP0 )) {
             $this->assertEmptyValue( $value, self::REPEAT );

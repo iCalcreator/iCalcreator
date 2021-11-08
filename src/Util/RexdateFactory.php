@@ -67,7 +67,7 @@ class RexdateFactory
     /**
      * Return formatted output for calendar component property data value type recur
      *
-     * @param mixed[] $exdateData
+     * @param array $exdateData
      * @param bool    $allowEmpty
      * @return string
      * @throws Exception
@@ -125,8 +125,8 @@ class RexdateFactory
      * Return prepared calendar component property exdate input
      *
      * @param string[]|DateTimeInterface[] $exdates
-     * @param null|mixed[]  $params
-     * @return mixed[]
+     * @param null|array $params
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
@@ -154,35 +154,29 @@ class RexdateFactory
         }
         foreach(( array_keys( $exdates )) as $eix ) {
             $theExdate = $exdates[$eix];
-            $wDate     = null;
-            switch( true ) {
-                case ( $theExdate instanceof DateTimeInterface ) :
-                    $wDate = DateTimeFactory::conformDateTime(
-                        DateTimeFactory::toDateTime( $theExdate ),
-                        $isValueDate,
-                        $forceUTC,
-                        $paramTZid
-                    );
-                    break;
-                case ( DateTimeFactory::isStringAndDate( $theExdate )) : // ex. 2006-08-03 10:12:18
-                    $wDate = DateTimeFactory::conformStringDate(
-                        $theExdate,
-                        $isValueDate,
-                        $forceUTC,
-                        $isLocalTime,
-                        $paramTZid
-                    );
-                    break;
-                default:
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            self::$REXDATEERR,
-                            IcalInterface::EXDATE,
-                            $eix,
-                            var_export( $theExdate, true )
-                        )
-                    );
-            } // end switch
+            $wDate     = match ( true ) {
+                $theExdate instanceof DateTimeInterface => DateTimeFactory::conformDateTime(
+                    DateTimeFactory::toDateTime( $theExdate ),
+                    $isValueDate,
+                    $forceUTC,
+                    $paramTZid
+                ),
+                DateTimeFactory::isStringAndDate( $theExdate ) => DateTimeFactory::conformStringDate(
+                    $theExdate,
+                    $isValueDate,
+                    $forceUTC,
+                    $isLocalTime,
+                    $paramTZid
+                ),
+                default => throw new InvalidArgumentException(
+                    sprintf(
+                        self::$REXDATEERR,
+                        IcalInterface::EXDATE,
+                        $eix,
+                        var_export( $theExdate, true )
+                    )
+                ),
+            }; // end switch
             $output[Util::$LCvalue][] = $wDate;
         } // end foreach(( array_keys( $exdates...
         if( 0 < count( $output[Util::$LCvalue] )) {
@@ -196,7 +190,7 @@ class RexdateFactory
     /**
      * Return formatted output for calendar component property rdate
      *
-     * @param mixed[]  $rdateData
+     * @param array $rdateData
      * @param bool     $allowEmpty
      * @param string   $compType
      * @return string
@@ -297,8 +291,8 @@ class RexdateFactory
      * Return value and parameters from parsed row and propAttr
      *
      * @param string $row
-     * @param mixed[] $propAttr
-     * @return mixed[]
+     * @param array $propAttr
+     * @return array
      * @since  2.27.11 - 2019-01-04
      */
     public static function parseRexdate( string $row, array $propAttr ) : array
@@ -323,9 +317,9 @@ class RexdateFactory
     /**
      * Return prepared calendar component property rdate input
      *
-     * @param mixed[]        $rDates
-     * @param null|string[]  $params
-     * @return mixed[]
+     * @param string[]|DateTimeInterface[]|string[][]|DateTimeInterface[][]|array $rDates
+     * @param null|string[]                 $params
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
@@ -412,12 +406,12 @@ class RexdateFactory
     /**
      * Return managed period (dateTime/dateTime or dateTime/dateInterval)
      *
-     * @param mixed[] $period
+     * @param array $period
      * @param int     $rpix
      * @param bool    $isValueDate
      * @param string  $paramTZid
      * @param bool    $isLocalTime
-     * @return mixed[]
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.40 2021-10-04

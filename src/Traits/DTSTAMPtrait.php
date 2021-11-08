@@ -34,7 +34,6 @@ use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
-use Kigkonsult\Icalcreator\Vcomponent;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -115,14 +114,14 @@ trait DTSTAMPtrait
     /**
      * Set calendar component property dtstamp
      *
-     * @param DateTimeInterface|string|null $value
-     * @param string[]|null $params
-     * @return Vcomponent
+     * @param null|string|DateTimeInterface $value
+     * @param null|string[] $params
+     * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
      */
-    public function setDtstamp( DateTimeInterface | string $value  = null, ? array $params = [] ) : Vcomponent
+    public function setDtstamp( null|string|DateTimeInterface $value  = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->dtstamp = [

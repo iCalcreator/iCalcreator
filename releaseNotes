@@ -131,4 +131,11 @@ v3.39   3.4 release candidate
 
 2.40    PHP8
 
-2.40.1  composer.json bug
+2.41    removal of ext-debug in cmposer.json
+
+2.42    test RecurMonthTest/RecurYearTest upd
+2.43    PHP8 upd
+2.44    Selectfactory::selectComponents bug
+          flat:false, any:true, split:false
+          DAILY, over night github#95
+          phpunit tests

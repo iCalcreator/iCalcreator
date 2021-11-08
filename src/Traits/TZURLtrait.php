@@ -49,7 +49,7 @@ trait TZURLtrait
     /**
      * Return formatted output for calendar component property tzurl
      *
-     * @return string|null
+     * @return null|string
      */
     public function createTzurl() : ?string
     {
@@ -102,12 +102,12 @@ trait TZURLtrait
      * This URI form can be useful within an organization, but is problematic
      * in the Internet.
      *
-     * @param string|null $value
-     * @param array $params
-     * @return self
+     * @param null|string $value
+     * @param null|string[] $params
+     * @return static
      * @since  2.30.2 - 2021-02-04
      */
-    public function setTzurl( ? string $value = null, ? array $params = [] ) : self
+    public function setTzurl( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZURL );

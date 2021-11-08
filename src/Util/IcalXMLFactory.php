@@ -47,6 +47,7 @@ use function is_array;
 use function number_format;
 use function sprintf;
 use function str_replace;
+use function str_starts_with;
 use function strcasecmp;
 use function stripos;
 use function strlen;
@@ -1541,29 +1542,31 @@ class IcalXMLFactory
         $sx  = 0;
         while(
             ((( $sx + 12 ) < $len ) &&
-                ! StringFactory::startsWith( substr( $xml, $sx ), $PROPSTAGstart ) &&
-                ! StringFactory::startsWith( substr( $xml, $sx ), $COMPSTAGstart )
+                ! str_starts_with( substr( $xml, $sx ), $PROPSTAGstart ) &&
+                ! str_starts_with( substr( $xml, $sx ), $COMPSTAGstart )
                 ) &&
             ((( $sx + 13 ) < $len ) &&
-                ! StringFactory::startsWith( substr( $xml, $sx ), $PROPSTAGempty ) &&
-                ! StringFactory::startsWith( substr( $xml, $sx ), $COMPSTAGempty ))) {
+                ! str_starts_with( substr( $xml, $sx ), $PROPSTAGempty ) &&
+                ! str_starts_with( substr( $xml, $sx ), $COMPSTAGempty ))) {
             ++$sx;
         } // end while
         if(( $sx + 11 ) >= $len ) {
             return false;
         }
-        if( StringFactory::startsWith( $xml, $PROPSTAGempty, $pos )) {
+        if( str_starts_with( $xml, $PROPSTAGempty )) {
+            $pos = strlen( $PROPSTAGempty );
             $xml = substr( $xml, $pos );
         }
-        elseif( StringFactory::startsWith( substr( $xml, $sx ), $PROPSTAGstart )) {
+        elseif( str_starts_with( substr( $xml, $sx ), $PROPSTAGstart )) {
             $xml2 = self::XMLgetTagContent1( $xml, self::$properties, $endIx );
             self::XMLgetProps( $iCal, $xml2 );
             $xml = substr( $xml, $endIx );
         }
-        if( StringFactory::startsWith( $xml, $COMPSTAGempty, $pos )) {
+        if( str_starts_with( $xml, $COMPSTAGempty )) {
+            $pos = strlen( $COMPSTAGempty );
             $xml = substr( $xml, $pos );
         }
-        elseif( StringFactory::startsWith( $xml, $COMPSTAGstart )) {
+        elseif( str_starts_with( $xml, $COMPSTAGstart )) {
             $xml = self::XMLgetTagContent1( $xml, self::$components, $endIx );
         }
         while( ! empty( $xml )) {
@@ -1620,11 +1623,11 @@ class IcalXMLFactory
                 continue;
             }
             $params = [];
-            if( StringFactory::startsWith( $xml2, $PARAMENDTAG, $pos )) {
+            if( str_starts_with( $xml2, $PARAMENDTAG )) {
                 $xml2 = substr( $xml2, 13 );
             }
-            elseif( StringFactory::startsWith( $xml2, $PARAMTAG )) {
-                $xml3 = self::XMLgetTagContent1( $xml2, self::$PARAMETERS, $endIx2 );
+            elseif( str_starts_with( $xml2, $PARAMTAG )) {
+                $xml3   = self::XMLgetTagContent1( $xml2, self::$PARAMETERS, $endIx2 );
                 $endIx3 = 0;
                 while( ! empty( $xml3 )) {
                     $xml4     = self::XMLgetTagContent2( $xml3, $paramKey, $endIx3 );
@@ -1682,8 +1685,7 @@ class IcalXMLFactory
                             $params[IcalInterface::VALUE] = IcalInterface::DATE;
                         }
                         $t = [];
-                        while( ! empty( $xml2 ) &&
-                            ( StringFactory::startsWith( $xml2, $DATETAGST ))) {
+                        while( ! empty( $xml2 ) && str_starts_with( $xml2, $DATETAGST )) {
                             $t[]  = self::XMLgetTagContent2( $xml2, $pType, $endIx4);
                             $xml2 = substr( $xml2, $endIx4 );
                         } // end while
@@ -1696,8 +1698,7 @@ class IcalXMLFactory
                         $params[IcalInterface::VALUE] = IcalInterface::PERIOD;
                     }
                     $value = [];
-                    while( ! empty( $xml2 ) &&
-                        ( StringFactory::startsWith( $xml2, $PERIODTAG ))) {
+                    while( ! empty( $xml2 ) && str_starts_with( $xml2, $PERIODTAG )) {
                         $xml3 = self::XMLgetTagContent1( $xml2, self::$period, $endIx4);
                         $t    = [];
                         while( ! empty( $xml3 )) { // start - end/duration
@@ -1904,8 +1905,8 @@ class IcalXMLFactory
      * Fetch next (unknown) XML tagname AND content
      *
      * @param string $xml
-     * @param string $tagName
-     * @param int    $endIx
+     * @param string|null $tagName
+     * @param int|null $endIx
      * @return string
      * @since  2.23.8 - 2017-04-17
      */
@@ -1925,8 +1926,7 @@ class IcalXMLFactory
         while( $sx1 < $xmlLen ) {
             if( $LT === $xml[$sx1] ) {
                 if((( $sx1 + 3 ) < $xmlLen ) &&
-                    ( StringFactory::startsWith( substr( $xml, $sx1 ), $CMTSTART ))
-                ) { // skip comment
+                    str_starts_with( substr( $xml, $sx1 ), $CMTSTART )) { // skip comment
                     ++$sx1;
                 }
                 else {
@@ -1940,8 +1940,7 @@ class IcalXMLFactory
         $sx2 = $sx1;
         while( $sx2 < $xmlLen ) {
             if((( $sx2 + 1 ) < $xmlLen ) &&
-                ( StringFactory::startsWith( substr( $xml, $sx2 ), $EMPTYTAGEND ))
-            ) { // tag with no content
+                str_starts_with( substr( $xml, $sx2 ), $EMPTYTAGEND )) { // tag with no content
                 $tagName = trim( substr( $xml, ( $sx1 + 1 ), ( $sx2 - $sx1 - 1 )));
                 $endIx   = $sx2 + 2;
                 return Util::$SP0;

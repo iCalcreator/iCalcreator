@@ -113,15 +113,19 @@ trait EXDATEtrait
     /**
      * Set calendar component property exdate
      *
-     * @param null|string|string[]|DateTimeInterface|DateTimeInterface[] $value
+     * @param null|string|array|DateTimeInterface $value
      * @param null|string[] $params
      * @param null|integer $index
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setExdate( mixed $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setExdate(
+        null|string|array|DateTimeInterface $value = null,
+        ? array $params = [],
+        ? int $index = null
+    ) : static
     {
         if( empty( $value ) ||
             ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))

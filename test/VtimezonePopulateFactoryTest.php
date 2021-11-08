@@ -67,7 +67,7 @@ class VtimezonePopulateFactoryTest extends DtBase
     }
 
     /**
-     * Testing VtimezonePopulateFactory::process, UTC
+     * Testing VtimezonePopulateFactory::process, UTC (using Vcalendar::vtimezonePopulate())
      *
      * @test
      * @throws Exception
@@ -80,11 +80,13 @@ class VtimezonePopulateFactoryTest extends DtBase
         $event     = $calendar1->newVevent()->setDtstart( DATEYmdTHis );
         $vtimezone = $calendar1->newVtimezone();
 
-        $calendar2 = VtimezonePopulateFactory::process( $calendar1 );
+        $calendar2 = $calendar1->vtimezonePopulate();
+//      $calendar2 = VtimezonePopulateFactory::process( $calendar1 );
 
         $vtimezone = $calendar2->getComponent( IcalInterface::VTIMEZONE );
 
-        $expTz     = IcalInterface::UTC;
+
+        $expTz     = Vcalendar::UTC;
         $vtTzid    = $vtimezone->getTzid();
         $this->assertEquals(
             $expTz,

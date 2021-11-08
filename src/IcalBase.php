@@ -56,7 +56,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40.1' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.44' );
 }
 
 /**
@@ -204,12 +204,12 @@ abstract class IcalBase implements IcalInterface
     /**
      * @var array<string, int> get multi property index
      */
-    protected $propIx = [];
+    protected array $propIx = [];
 
     /**
      * @var array<string, int> delete multi property index
      */
-    protected $propDelIx = [];
+    protected array $propDelIx = [];
 
     /**
      * __clone method
@@ -242,10 +242,10 @@ abstract class IcalBase implements IcalInterface
     /**
      * Reset all internal counters
      *
-     * @return self
+     * @return static
      * @since  2.27.14 - 2019-03-11
      */
-    public function reset() : self
+    public function reset() : static
     {
         $this->compix = [];
         return $this;
@@ -266,10 +266,10 @@ abstract class IcalBase implements IcalInterface
      * Remove Vcalendar/component config key value
      *
      * @param string $key
-     * @return self
+     * @return static
      * @since  2.27.14 - 2019-02-04
      */
-    public function deleteConfig( string $key ) : self
+    public function deleteConfig( string $key ) : static
     {
         $key = strtoupper( $key );
         if( isset( $this->config[$key] )) {
@@ -398,18 +398,18 @@ abstract class IcalBase implements IcalInterface
     /**
      * Set Vcalendar/component config
      *
-     * @param string|array $config
-     * @param mixed         $value
+     * @param string|array      $config
+     * @param null|bool|string  $value
      * @param bool          $softUpdate
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since  2.29.4 - 2019-07-02
      */
     public function setConfig(
         string | array $config,
-        mixed $value = null ,
+        null|bool|string $value = null ,
         ? bool $softUpdate = false
-    ) : self
+    ) : static
     {
         static $ERRMSG9 = 'Invalid config value %s';
         $isComponent = ( ! property_exists(
@@ -503,17 +503,17 @@ abstract class IcalBase implements IcalInterface
      * Add calendar component as subcomponent to container for subcomponents
      *
      * @param CalendarComponent $component
-     * @param mixed             $arg1      ordno/component type/ component uid
-     * @param mixed             $arg2      ordno if arg1 = component type
+     * @param null|int|string   $arg1      ordno/component type/ component uid
+     * @param null|int          $arg2      ordno if arg1 = component type
      * @throws InvalidArgumentException
-     * @return self
+     * @return static
      * @since  2.27.3 - 2018-12-21
      */
     public function setComponent(
         CalendarComponent $component,
-        mixed $arg1 = false,
-        mixed $arg2 = false
-    ) : self
+        null|int|string $arg1 = null,
+        null|int $arg2 = null
+    ) : static
     {
         $component->setConfig( $this->getConfig(), false, true );
         if( ! Util::isCompInList( $component->getCompType(), self::$SUBCOMPS )) {
@@ -521,7 +521,7 @@ abstract class IcalBase implements IcalInterface
             $component->getUid();
             $component->getDtstamp();
         }
-        if( ! $arg1 ) { // plain insert, last in chain
+        if( null === $arg1 ) { // plain insert, last in chain
             self::assertComponents( $this, $component );
             $this->components[] = clone $component;
             return $this;
@@ -574,13 +574,13 @@ abstract class IcalBase implements IcalInterface
     /**
      * Delete calendar subcomponent from component container
      *
-     * @param mixed    $arg1 ordno / component type / component uid
-     * @param bool|mixed $arg2 ordno if arg1 = component type
+     * @param int|string $arg1 ordno / component type / component uid
+     * @param null|int   $arg2 ordno if arg1 = component type
      * @return bool  true on success, false on not found (last one deleted)
      * @since  2.26.14 - 2019-02-25
      * @todo   Exception mgnt on unknown component
      */
-    public function deleteComponent( mixed $arg1, mixed $arg2 = false ) : bool
+    public function deleteComponent( int|string $arg1, null|int $arg2 = null ) : bool
     {
         if( ! isset( $this->components )) {
             return false;
@@ -599,7 +599,7 @@ abstract class IcalBase implements IcalInterface
                 ( 0 !== strcasecmp( $cmpArg, IcalInterface::VALARM ))) {
                 $argType = ucfirst( strtolower( $arg1 ) );
                 $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
-                    ? ((int) $arg2 - 1 )
+                    ? ( $arg2 - 1 )
                     : 0;
             }
         } // end elseif

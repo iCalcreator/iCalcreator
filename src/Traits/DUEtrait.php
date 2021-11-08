@@ -116,12 +116,12 @@ trait DUEtrait
      *
      * @param null|string|DateTimeInterface $value
      * @param null|string[]                 $params
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setDue( mixed $value = null, ? array $params = [] ) : self
+    public function setDue( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DUE );

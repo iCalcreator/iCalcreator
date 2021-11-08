@@ -126,12 +126,12 @@ trait CONFERENCErfc7986trait
      * @param null|string   $value
      * @param null|string[] $params
      * @param null|int      $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token
      * @todo fix labelparam   - LABEL
      */
-    public function setConference( ? string $value = null, ? array $params = [], ? int $index = null ) : self
+    public function setConference( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONFERENCE );

@@ -99,11 +99,11 @@ trait SOURCErfc7986trait
      *
      * @param null|string   $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since  2.30.2 - 2021-02-04
      */
-    public function setSource( ? string $value = null, ? array $params = [] ) : self
+    public function setSource( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::SOURCE );

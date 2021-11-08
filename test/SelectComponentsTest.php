@@ -26,6 +26,7 @@
  *            You should have received a copy of the GNU Lesser General Public License
  *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
@@ -382,7 +383,6 @@ class SelectComponentsTest extends TestCase
 
     /**
      * SelectComponentsTest provider
-     * @throws Exception
      * @throws Exception
      */
     public function SelectCompTestProvider() : array

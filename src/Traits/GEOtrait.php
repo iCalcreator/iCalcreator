@@ -132,10 +132,14 @@ trait GEOtrait
      * @param null|int|float|string $latitude
      * @param null|int|float|string $longitude
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @since 2.27.3 2018-12-22
      */
-    public function setGeo( mixed $latitude = null, mixed $longitude = null, ? array $params = [] ) : self
+    public function setGeo(
+        null|int|float|string $latitude = null,
+        null|int|float|string $longitude = null,
+        ? array $params = []
+    ) : static
     {
         if( isset( $latitude, $longitude ) ) {
             if( ! is_array( $this->geo )) {

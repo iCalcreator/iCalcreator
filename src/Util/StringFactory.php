@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
+use Exception;
 use Kigkonsult\Icalcreator\IcalInterface;
 use UnexpectedValueException;
 
@@ -43,6 +44,7 @@ use function openssl_random_pseudo_bytes;
 use function ord;
 use function rtrim;
 use function sprintf;
+use function str_contains;
 use function str_ireplace;
 use function str_replace;
 use function strlen;
@@ -118,12 +120,12 @@ class StringFactory
      * Return rows to parse from string or array
      *
      * Used by Vcalendar & RegulateTimezoneFactory
-     * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
+     * @param null|string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return string[]
      * @throws UnexpectedValueException
      * @since  2.29.3 - 2019-08-29
      */
-    public static function conformParseInput( mixed $unParsedText = null ) : array
+    public static function conformParseInput( null|string|array $unParsedText = null ) : array
     {
         static $ERR10 = 'Only %d rows in calendar content :%s';
         $arrParse = false;
@@ -222,7 +224,7 @@ class StringFactory
         static $CRLFexts   = [ "\r\n ", "\r\n\t" ];
         /* fix dummy line separator etc */
         if( empty( $BASEDELIM )) {
-            $BASEDELIM  = self::getRandChars( 16 );
+            $BASEDELIM  = bin2hex( self::getRandChars( 16 ));
             $BASEDELIMs = $BASEDELIM . $BASEDELIM;
             $EMPTYROW   = sprintf( $FMT, $BASEDELIM, Util::$SP0 );
         }
@@ -295,15 +297,19 @@ class StringFactory
      *
      * @param int $cnt
      * @return string
+     * @throws Exception
      * @since  2.27.3 - 2018-12-28
      */
     public static function getRandChars( int $cnt ) : string
     {
         $cnt = (int) floor( $cnt / 2 );
-        $x   = 0;
+        $x       = 0;
+        $cStrong = true;
         do {
             $randChars = bin2hex( openssl_random_pseudo_bytes( $cnt, $cStrong ));
-            ++$x;
+            if( false !== $randChars ) {
+                ++$x;
+            }
         } while(( 3 > $x ) && ( false === $cStrong ));
         return $randChars;
     }
@@ -376,7 +382,7 @@ class StringFactory
                     break; // or here..
                 }
                 $string .= $SP1;
-                $outLen    = 1;
+                $outLen  = 1;
             }
             $str1    = $tmp[$x];
             $byte    = ord( $str1 );
@@ -439,7 +445,7 @@ class StringFactory
      *
      * @param string      $line     property content
      * @param null|string $propName
-     * @return mixed[]            [ line, [*propAttr] ]
+     * @return array            [ line, [*propAttr] ]
      * @todo   fix 2-5 pos port number
      * @since  2.30.3 - 2021-02-14
      */
@@ -750,20 +756,6 @@ class StringFactory
     private static string $SP0 = '';
 
     /**
-     * Return bool true if needle is in haystack
-     *
-     * Case-sensitive search for needle in haystack
-     *
-     * @param string $needle
-     * @param string $haystack
-     * @return bool
-     */
-    public static function isIn( string $needle, string $haystack ) : bool
-    {
-        return str_contains( $haystack, $needle );
-    }
-
-    /**
      * Return substring after first found needle in haystack, '' on not found
      *
      * Case-sensitive search for needle in haystack
@@ -775,7 +767,7 @@ class StringFactory
      */
     public static function after( string $needle, string $haystack ) : string
     {
-        if( ! self::isIn( $needle, $haystack )) {
+        if( ! str_contains( $haystack, $needle )) {
             return self::$SP0;
         }
         $pos = strpos( $haystack, $needle );
@@ -794,7 +786,7 @@ class StringFactory
      */
     public static function afterLast( string $needle, string $haystack ) : string
     {
-        if( ! self::isIn( $needle, $haystack )) {
+        if( ! str_contains( $haystack, $needle )) {
             return self::$SP0;
         }
         $pos = self::strrevpos( $haystack, $needle );
@@ -813,7 +805,7 @@ class StringFactory
      */
     public static function before( string $needle, string $haystack ) : string
     {
-        if( ! self::isIn( $needle, $haystack )) {
+        if( ! str_contains( $haystack, $needle )) {
             return self::$SP0;
         }
         return substr( $haystack, 0, strpos( $haystack, $needle ));
@@ -831,7 +823,7 @@ class StringFactory
      */
     public static function beforeLast( string $needle, string $haystack ) : string
     {
-        if( ! self::isIn( $needle, $haystack )) {
+        if( ! str_contains( $haystack, $needle )) {
             return self::$SP0;
         }
         return substr( $haystack, 0, self::strrevpos( $haystack, $needle ));
@@ -857,18 +849,14 @@ class StringFactory
         string $haystack
     ) : string
     {
-        $exists1 = self::isIn( $needle1, $haystack );
-        $exists2 = self::isIn( $needle2, $haystack );
-        switch( true ) {
-            case ( ! $exists1 && ! $exists2 ) :
-                return self::$SP0;
-            case ( $exists1  && ! $exists2 ) :
-                return self::after( $needle1, $haystack );
-            case ( ! $exists1 && $exists2 ) :
-                return self::before( $needle2, $haystack );
-            default :
-                return self::before( $needle2, self::after( $needle1, $haystack ));
-        } // end switch
+        $exists1 = str_contains( $haystack, $needle1 );
+        $exists2 = str_contains( $haystack, $needle2 );
+        return match ( true ) {
+            ! $exists1 && ! $exists2 => self::$SP0,
+            $exists1 && ! $exists2   => self::after( $needle1, $haystack ),
+            ! $exists1 && $exists2   => self::before( $needle2, $haystack ),
+            default                  => self::before( $needle2, self::after( $needle1, $haystack ) ),
+        }; // end switch
     }
 
     /**
@@ -906,64 +894,6 @@ class StringFactory
         return ( false !== ( $rev_pos = strpos( strrev( $haystack ), strrev( $needle ))))
             ? ( strlen( $haystack ) - $rev_pos - strlen( $needle ))
             : false;
-    }
-
-    /**
-     * Return bool true if haystack starts with needle, false on not found or to large
-     *
-     * Case-sensitive search for needle in haystack
-     *
-     * @param string $haystack
-     * @param string $needle
-     * @param null|int $len       if found contains length of needle
-     * @return bool
-     * @since  2.29.11 - 2019-08-28
-     */
-    public static function startsWith(
-        string $haystack,
-        string $needle,
-        ? int & $len = null
-    ) : bool
-    {
-        $len       = null;
-        $needleLen = strlen( $needle );
-        if( $needleLen > strlen( $haystack )) {
-            return false;
-        }
-        if( str_starts_with( $haystack, $needle )) {
-            $len = $needleLen;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Return bool true if haystack ends with needle, false on not found or to large
-     *
-     * Case-sensitive search for needle in haystack
-     *
-     * @param string $haystack
-     * @param string $needle
-     * @param null|int $len       if found contains length of needle
-     * @return bool
-     * @since  2.29.23 - 2020-07-28
-     */
-    public static function endsWith(
-        string $haystack,
-        string $needle,
-        ? int & $len = null
-    ) : bool
-    {
-        $len       = null;
-        $needleLen = strlen( $needle );
-        if( $needleLen > strlen( $haystack )) {
-            return false;
-        }
-        if( $needle === substr( $haystack, ( 0 - $needleLen ))) {
-            $len = $needleLen;
-            return true;
-        }
-        return false;
     }
 
     /**

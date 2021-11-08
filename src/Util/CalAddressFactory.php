@@ -222,10 +222,9 @@ class CalAddressFactory
         }
         $output = [];
         foreach( $searchProperties as $propName ) {
-            $output = array_merge(
-                $output,
-                self::getCalAdressValuesFromProperty( $calendar, $propName )
-            );
+            foreach( self::getCalAdressValuesFromProperty( $calendar, $propName ) as $calAddress ) {
+                $output[] = $calAddress;
+            }
         } // end foreach
         sort( $output );
         return array_unique( $output );
@@ -282,7 +281,7 @@ class CalAddressFactory
      */
     public static function getCalAdressesAllFromProperty(
         Vcalendar $calendar,
-        mixed $propName = null
+        null|string|array $propName = null
     ) : array
     {
         if( empty( $propName )) {
@@ -574,7 +573,7 @@ class CalAddressFactory
     /**
      * Return formatted output for calendar component property attendee
      *
-     * @param mixed[] $attendeeData
+     * @param array $attendeeData
      * @param bool    $allowEmpty
      * @return string
      * @since  2.29.11 - 2019-08-30
@@ -694,7 +693,7 @@ class CalAddressFactory
      *
      * @param string $row
      * @param string[] $propAttr
-     * @return array<int, array<array<int, string>|string>|string>
+     * @return array
      * @since  2.27.11 - 2019-01-04
      */
     public static function parseAttendee( string $row, array $propAttr ) : array

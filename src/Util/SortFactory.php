@@ -203,8 +203,8 @@ class SortFactory
     /**
      * Sort callback function for exdate
      *
-     * @param mixed[] $a
-     * @param mixed[] $b
+     * @param array $a
+     * @param array $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -221,8 +221,8 @@ class SortFactory
     /**
      * Sort callback function for freebusy and rdate, sort single property
      *
-     * @param mixed[]|DateTime $a
-     * @param mixed[]|DateTime $b
+     * @param array|DateTime $a
+     * @param array|DateTime $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -247,8 +247,8 @@ class SortFactory
     /**
      * Sort callback function for rdate, sort multiple RDATEs in order (after 1st datetime/date/period)
      *
-     * @param mixed[] $a
-     * @param mixed[] $b
+     * @param array $a
+     * @param array $b
      * @return int
      * @since 2.29.11 2019-08-29
      */
@@ -263,7 +263,7 @@ class SortFactory
     /**
      * Return sortValue from RDATE value
      *
-     * @param mixed[]|DateTime $v
+     * @param array|DateTime $v
      * @return string
      * @since 2.29.2 2019-06-23
      */

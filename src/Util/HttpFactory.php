@@ -176,7 +176,7 @@ class HttpFactory
     /**
      * Set calendar component property uri; URL, TZURL, SOURCE
      *
-     * @param null|mixed[]   $valueArr
+     * @param null|array $valueArr
      * @param null|string    $value
      * @param null|string[]  $params
      * @return void

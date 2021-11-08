@@ -215,12 +215,16 @@ trait X_PROPtrait
      * @param string   $xPropName
      * @param null|int|float|string  $value
      * @param null|string[] $params     optional
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      * @todo more value typed asserts ??
      */
-    public function setXprop( string $xPropName, mixed $value = null, ? array $params = [] ) : self
+    public function setXprop(
+        string $xPropName,
+        null|int|float|string $value = null,
+        ? array $params = []
+    ) : static
     {
         static $MSG = 'Invalid X-property name : \'%s\'';
         if( empty( $xPropName ) || ! StringFactory::isXprefixed( $xPropName )) {
@@ -234,12 +238,12 @@ trait X_PROPtrait
             $params = [];
         }
         if( ! isset( $params[self::VALUE] ) ||
-                ( self::TEXT === $params[self::VALUE] )) {
+            ( self::TEXT === $params[self::VALUE] )) {
             $value = Util::assertString( $value, $xPropName );
             $value = StringFactory::trimTrailNL( $value );
         }
         $xprop = [
-            Util::$LCvalue  => $value,
+            Util::$LCvalue  => (string) $value,
             Util::$LCparams => ParameterFactory::setParams( $params ?? [] )
         ];
         if( ! is_array( $this->xprop )) {

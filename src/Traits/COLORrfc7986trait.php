@@ -101,10 +101,10 @@ trait COLORrfc7986trait
      *
      * @param null|string   $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @since 2.29.14 2019-09-03
      */
-    public function setColor( ? string $value = null, ? array $params = [] ) : self
+    public function setColor( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::COLOR );

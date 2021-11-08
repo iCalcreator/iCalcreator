@@ -90,8 +90,8 @@ class VtimezonePopulateFactory
      * @param Vcalendar     $calendar iCalcreator calendar instance
      * @param null|string   $timezone valid timezone acceptable by PHP5 DateTimeZone
      * @param null|string[] $xProp    *[x-propName => x-propValue]
-     * @param DateTimeInterface|int  $start    .. or unix timestamp
-     * @param DateTimeInterface|int  $end      .. or unix timestamp
+     * @param null|int|DateTimeInterface  $start    .. or unix timestamp
+     * @param null|int|DateTimeInterface  $end      .. or unix timestamp
      * @return Vcalendar
      * @throws Exception
      * @throws InvalidArgumentException
@@ -101,8 +101,8 @@ class VtimezonePopulateFactory
         Vcalendar $calendar,
         ? string $timezone = null,
         ? array $xProp = [],
-        mixed $start = null,
-        mixed $end = null
+        null|int|DateTimeInterface $start = null,
+        null|int|DateTimeInterface $end = null
     ) : Vcalendar
     {
         $timezone   = self::getTimezone( $calendar, $timezone, $xProp );
@@ -112,7 +112,7 @@ class VtimezonePopulateFactory
                 self::ensureStartAndEnd( $calendar, $timezone, $start, $end );
             $foundTrans = self::findTransitions( $timezone, $start, $end );
         }
-        while( false !== $calendar->deleteComponent( IcalInterface::VTIMEZONE, false )) {
+        while( false !== $calendar->deleteComponent( IcalInterface::VTIMEZONE )) {
             continue;
         }
         $timezoneComp = $calendar->newVtimezone();
@@ -182,8 +182,8 @@ class VtimezonePopulateFactory
             case ( false !==
                 ( $comp = $calendar->getComponent( IcalInterface::VTIMEZONE ))) :
                 $calendar->reset();
-                if( false !== ( $xProp = $comp->getXprop( IcalInterface::X_LIC_LOCATION ))) {
-                    $timezone = $xProp[1];
+                if( false !== ( $xProp3 = $comp->getXprop( IcalInterface::X_LIC_LOCATION ))) {
+                    $timezone = $xProp3[1];
                     break;
                 }
                 // fall through
@@ -199,8 +199,8 @@ class VtimezonePopulateFactory
      *
      * @param Vcalendar     $calendar
      * @param string        $timezone  valid timezone acceptable by PHP5 DateTimeZone
-     * @param DateTimeInterface|int  $start    .. or unix timestamp
-     * @param DateTimeInterface|int  $end      .. or unix timestamp
+     * @param null|int|DateTimeInterface  $start    .. or unix timestamp
+     * @param null|int|DateTimeInterface  $end      .. or unix timestamp
      * @return int[]
      * @throws  InvalidArgumentException
      * @throws  Exception
@@ -209,8 +209,8 @@ class VtimezonePopulateFactory
     private static function ensureStartAndEnd(
         Vcalendar $calendar,
         string $timezone,
-        mixed $start = null,
-        mixed $end = null
+        null|int|DateTimeInterface $start = null,
+        null|int|DateTimeInterface $end = null
     ) : array
     {
         static $NUMBEROFDAYSBEFORE = 365;
@@ -292,7 +292,7 @@ class VtimezonePopulateFactory
      * @param string $timezone
      * @param int    $start
      * @param int    $end
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.27.15 - 2019-02-23
@@ -381,8 +381,8 @@ class VtimezonePopulateFactory
     /**
      * return bool true if foundTrans matches trans
      *
-     * @param mixed[] $foundTrans
-     * @param mixed[] $trans
+     * @param array $foundTrans
+     * @param array $trans
      * @return bool
      * @since  2.27.15 - 2019-02-23
      */
@@ -400,9 +400,9 @@ class VtimezonePopulateFactory
     /**
      * return (array build 'found'-trans
      *
-     * @param mixed[]|bool $backupTrans
+     * @param array|bool $backupTrans
      * @param string     $timezone
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.27.15 - 2019-02-23

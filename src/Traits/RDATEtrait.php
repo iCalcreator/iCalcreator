@@ -124,15 +124,19 @@ trait RDATEtrait
     /**
      * Set calendar component property rdate
      *
-     * @param null|DateTimeInterface|array   $value
+     * @param null|string|array|DateTimeInterface $value
      * @param null|string[]   $params
      * @param null|integer $index
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.2 2019-06-23
      */
-    public function setRdate( mixed $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setRdate(
+        null|string|array|DateTimeInterface $value = null,
+        ? array $params = [],
+        ? int $index = null
+    ) : static
     {
         if( empty( $value ) ||
             ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))
@@ -166,14 +170,14 @@ trait RDATEtrait
     /**
      * Return Rdates is single input
      *
-     * @param DateTimeInterface|array|string $rDates
+     * @param string|array|DateTimeInterface $rDates
      * @param bool $isPeriod
      * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleRdates( DateTimeInterface | array | string $rDates, bool $isPeriod ) : array
+    private static function checkSingleRdates( string|array|DateTimeInterface $rDates, bool $isPeriod ) : array
     {
         if( $rDates instanceof DateTimeInterface ) {
             return [ DateTimeFactory::toDateTime( $rDates ) ];

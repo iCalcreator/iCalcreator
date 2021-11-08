@@ -44,8 +44,9 @@
     },
     "require": {
         "php": ">=8.0",
-        "ext-simplexml": "*",
+        "ext-xdebug": "*",
         "ext-openssl": "*",
+        "ext-simplexml": "*",
         "ext-zlib": "*"
     },
     "require-dev": {

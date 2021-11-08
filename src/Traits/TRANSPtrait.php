@@ -102,11 +102,11 @@ trait TRANSPtrait
      *
      * @param null|string  $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setTransp( ? string $value = null, ? array $params = [] ) : self
+    public function setTransp( ? string $value = null, ? array $params = [] ) : static
     {
         static $ALLOWED = [
             self::OPAQUE,

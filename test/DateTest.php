@@ -239,6 +239,9 @@ class DateTest extends DtBase
                 IcalInterface::RDATE
             ]
         ];
+
+//      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
+
         $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         $this->theTestMethod1b( $case, $compsProps2, $value, $params, $expectedGet, $expectedString );
     }

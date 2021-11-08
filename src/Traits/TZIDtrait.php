@@ -101,12 +101,12 @@ trait TZIDtrait
      * @since 2.23.12 - 2017-04-22
      * @param null|string   $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
      * @todo assert PHP timezone ?
      */
-    public function setTzid( ? string $value = null, ? array $params = [] ) : self
+    public function setTzid( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::TZID );

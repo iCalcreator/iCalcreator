@@ -126,11 +126,11 @@ trait TRIGGERtrait
      * Get calendar component property trigger
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed|array
+     * @return bool|string|DateTimeInterface|DateInterval|array
      * @throws Exception
      * @since 2.40 2021-10-04
      */
-    public function getTrigger( ?bool $inclParam = false ) : mixed
+    public function getTrigger( ?bool $inclParam = false ) : DateInterval | DateTimeInterface | bool | array | string
     {
         if( empty( $this->trigger )) {
             return false;
@@ -143,9 +143,9 @@ trait TRIGGERtrait
     /**
      * Set calendar component property trigger
      *
-     * @param null|DateTimeInterface|DateInterval|string $value
+     * @param null|string|DateTimeInterface|DateInterval $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.40 2021-10-04
@@ -159,7 +159,10 @@ trait TRIGGERtrait
      *        the "DUE" property or the "DTSTART" and "DURATION " properties
      *        MUST be present in the associated "VTODO" calendar component."
      */
-    public function setTrigger( mixed $value = null, ? array $params = [] ) : self
+    public function setTrigger(
+        null|string|DateTimeInterface|DateInterval $value = null,
+        ? array $params = []
+    ) : static
     {
         if( empty( $value ) && self::isArrayOrEmpty( $params )) {
             $this->assertEmptyValue( Util::$SP0, self::TRIGGER );
@@ -210,11 +213,11 @@ trait TRIGGERtrait
      *
      * @param DateInterval $value
      * @param null|string[]   $params
-     * @return self
+     * @return static
      * @throws Exception
      * @since  2.40 - 2021-10-04
      */
-    private function setTriggerDateIntervalValue( DateInterval $value, ? array $params = [] ) : self
+    private function setTriggerDateIntervalValue( DateInterval $value, ? array $params = [] ) : static
     {
         $dateInterval = DateIntervalFactory::conformDateInterval( $value );
         if( true !== self::isDurationRelatedEnd( $params )) {
@@ -231,11 +234,11 @@ trait TRIGGERtrait
      *
      * @param DateTime $dateTime
      * @param null|string[]   $params
-     * @return self
+     * @return static
      * @throws Exception
      * @since  2.29.2 - 2019-06-28
      */
-    private function setTriggerDateTimeValue( DateTime $dateTime, ? array $params = [] ) : self
+    private function setTriggerDateTimeValue( DateTime $dateTime, ? array $params = [] ) : static
     {
         ParameterFactory::ifExistRemove( $params, self::RELATED ); // n.a. for date-time
         $this->trigger = [
@@ -251,11 +254,11 @@ trait TRIGGERtrait
      *
      * @param string     $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws Exception
      * @since  2.40 - 2021-10-04
      */
-    private function setTriggerStringDurationValue( string $value, ? array $params = [] ) : self
+    private function setTriggerStringDurationValue( string $value, ? array $params = [] ) : static
     {
         $before = ( Util::$MINUS === $value[0] );
         if( DateIntervalFactory::$P !== $value[0] ) {
@@ -280,11 +283,11 @@ trait TRIGGERtrait
      *
      * @param string     $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws Exception
      * @since  2.29.2 - 2019-06-28
      */
-    private function setTriggerStringDateValue( string $value, ? array $params = [] ) : self
+    private function setTriggerStringDateValue( string $value, ? array $params = [] ) : static
     {
         [ $dateStr, $timezonePart ] =
             DateTimeFactory::splitIntoDateStrAndTimezone( $value );

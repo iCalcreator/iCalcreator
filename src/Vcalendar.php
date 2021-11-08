@@ -56,6 +56,7 @@ use function ksort;
 use function method_exists;
 use function property_exists;
 use function rtrim;
+use function str_starts_with;
 use function strcasecmp;
 use function strlen;
 use function stripos;
@@ -298,13 +299,16 @@ final class Vcalendar extends IcalBase
     /**
      * Return clone of calendar component
      *
-     * @param mixed $arg1 ordno/component type/component uid
-     * @param mixed $arg2 ordno if arg1 = component type
-     * @return mixed CalendarComponent|bool (false on error)
+     * @param null|int|string|string[] $arg1 ordno/component type/component uid, array[ *[propertyName => propertyValue] ]
+     * @param null|int        $arg2 ordno if arg1 = component type
+     * @return bool|CalendarComponent  (false on error)
      * @since  2.27.14 - 2019-02-20
      * @todo throw InvalidArgumentException on unknown component
      */
-    public function getComponent( mixed $arg1 = null, mixed $arg2 = null ) : mixed
+    public function getComponent(
+        null|int|string|array $arg1 = null,
+        null|int $arg2 = null
+    ) : bool|CalendarComponent
     {
         $index   = -1;
         $argType = null;
@@ -320,14 +324,14 @@ final class Vcalendar extends IcalBase
                 $index = $this->compix[self::$INDEX];
                 break;
             case is_array( $arg1 ) : // [ *[propertyName => propertyValue] ]
-                $arg2 = implode( Util::$MINUS, array_keys( $arg1 ));
-                if( isset( $this->compix[$arg2] )) {
-                    ++$this->compix[$arg2];
+                $key = implode( Util::$MINUS, array_keys( $arg1 ));
+                if( isset( $this->compix[$key] )) {
+                    ++$this->compix[$key];
                 }
                 else {
-                    $this->compix[$arg2] = 1;
+                    $this->compix[$key] = 1;
                 }
-                $index = $this->compix[$arg2];
+                $index = $this->compix[$key];
                 break;
             case ctype_digit((string) $arg1 ) : // specific component in chain
                 $argType      = self::$INDEX;
@@ -346,7 +350,7 @@ final class Vcalendar extends IcalBase
                     $index = $this->compix[$argType];
                 }
                 elseif( ctype_digit((string) $arg2 )) {
-                    $index = (int) $arg2;
+                    $index = $arg2;
                 }
                 break;
             case is_string( $arg1 ) : // assume UID as 1st argument
@@ -360,7 +364,7 @@ final class Vcalendar extends IcalBase
                     $index = $this->compix[$arg1];
                 }
                 elseif( ctype_digit((string) $arg2 )) {
-                    $index = (int) $arg2;
+                    $index = $arg2;
                 }
                 break;
         } // end switch( true )
@@ -625,16 +629,16 @@ final class Vcalendar extends IcalBase
      * DTSTART MUST be set for every component.
      * No date check.
      *
-     * @param int|array|DateTimeInterface $startY (int) start Year,  default current Year
+     * @param null|int|array|DateTimeInterface $startY (int) start Year,  default current Year
      *                                      ALT. DateTime start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
-     * @param int|DateTimeInterface $startM (int) start Month, default current Month
+     * @param null|int|DateTimeInterface $startM (int) start Month, default current Month
      *                                      ALT. DateTime end date
-     * @param int|null $startD start Day,   default current Day
-     * @param int|null $endY end   Year,  default $startY
-     * @param int|null $endM end   Month, default $startM
-     * @param int|null $endD end   Day,   default $startD
-     * @param mixed $cType calendar component type(-s), default false=all else string/array type(-s)
+     * @param null|int $startD start Day,   default current Day
+     * @param null|int $endY end   Year,  default $startY
+     * @param null|int $endM end   Month, default $startM
+     * @param null|int $endD end   Day,   default $startD
+     * @param null|string|string[] $cType calendar component type(-s), default false=all else string/array type(-s)
      * @param bool $flat false (default) => output : array[Year][Month][Day][]
      *                                       true            => output : array[] (ignores split)
      * @param bool $any true (default) - select component(-s) that occurs within period
@@ -647,13 +651,13 @@ final class Vcalendar extends IcalBase
      * @since  2.29.16 - 2020-01-24
      */
     public function selectComponents(
-        mixed $startY = null,
-        mixed $startM = null,
+        null|int|array|DateTimeInterface $startY = null,
+        null|int|DateTimeInterface $startM = null,
         ? int $startD = null,
         ? int $endY   = null,
         ? int $endM   = null,
         ? int $endD   = null,
-        mixed $cType  = null,
+        null|string|array $cType  = null,
         ? bool $flat   = null,
         ? bool $any    = null,
         ? bool $split  = null
@@ -700,14 +704,14 @@ final class Vcalendar extends IcalBase
     /**
      * Parse iCal text/file into Vcalendar, components, properties and parameters
      *
-     * @param string|array $unParsedText strict rfc2445 formatted, single property string or array of strings
+     * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return self
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @since  2.29.3  2019-08-29
      */
-    public function parse( mixed $unParsedText ) : self
+    public function parse( string|array $unParsedText ) : self
     {
         $rows = StringFactory::conformParseInput( $unParsedText );
         $this->parse2intoComps( $rows );
@@ -744,10 +748,10 @@ final class Vcalendar extends IcalBase
         /* identify components and update unparsed data for components */
         foreach( $rows as $lix => $row ) {
             switch( true ) {
-                case StringFactory::startsWith( $row, $BEGIN_VCALENDAR ) :
+                case str_starts_with( $row, $BEGIN_VCALENDAR ) :
                     $calSync++;
                     break;
-                case StringFactory::startsWith( $row, $END_VCALENDAR ) :
+                case str_starts_with( $row, $END_VCALENDAR ) :
                     --$calSync;
                     if( 0 !== $calSync ) {  /* err 20 */
                         throw new UnexpectedValueException(
@@ -758,23 +762,23 @@ final class Vcalendar extends IcalBase
                 case ( in_array( strtoupper( substr( $row, 0, 6 )), $ENDSARR )) :
                     --$compSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGIN_VEVENT ) :
+                case str_starts_with( $row, $BEGIN_VEVENT ) :
                     $comp      = $this->newVevent();
                     ++$compSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGIN_VFREEBUSY ) :
+                case str_starts_with( $row, $BEGIN_VFREEBUSY ) :
                     $comp      = $this->newVfreebusy();
                     ++$compSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGIN_VJOURNAL ) :
+                case str_starts_with( $row, $BEGIN_VJOURNAL ) :
                     $comp      = $this->newVjournal();
                     ++$compSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGIN_VTODO ) :
+                case str_starts_with( $row, $BEGIN_VTODO ) :
                     $comp      = $this->newVtodo();
                     ++$compSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGIN_VTIMEZONE ) :
+                case str_starts_with( $row, $BEGIN_VTIMEZONE ) :
                     $comp      = $this->newVtimezone();
                     ++$compSync;
                     break;
@@ -825,7 +829,7 @@ final class Vcalendar extends IcalBase
         static $TRIMCHARS = "\x00..\x1F";
         $rows = StringFactory::concatRows( $this->unparsed );
         foreach( $rows as $lix => $row ) {
-            if( StringFactory::startsWith( $row, $BEGIN )) {
+            if( str_starts_with( $row, $BEGIN )) {
                 throw new UnexpectedValueException(
                     sprintf( $ERR, $lix, PHP_EOL . implode( PHP_EOL, $rows ))
                 );
@@ -892,8 +896,8 @@ final class Vcalendar extends IcalBase
      *
      * @param string|null $timezone valid timezone acceptable by PHP5 DateTimeZone
      * @param array|null $xProp *[x-propName => x-propValue]
-     * @param DateTimeInterface|int $start .. or unix timestamp
-     * @param DateTimeInterface|int $end .. or unix timestamp
+     * @param null|int|DateTimeInterface $start .. or unix timestamp
+     * @param null|int|DateTimeInterface $end .. or unix timestamp
      * @return Vcalendar
      * @throws Exception
      * @since  2.29.16 - 2020-01-25
@@ -901,8 +905,8 @@ final class Vcalendar extends IcalBase
     public function vtimezonePopulate(
         ? string $timezone = null,
         ? array $xProp = [],
-        mixed $start = null,
-        mixed $end = null
+        null|int|DateTimeInterface $start = null,
+        null|int|DateTimeInterface $end = null
     ) : self
     {
         return VtimezonePopulateFactory::process(

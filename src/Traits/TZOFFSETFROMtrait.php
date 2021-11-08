@@ -106,11 +106,11 @@ trait TZOFFSETFROMtrait
      *
      * @param null|string   $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2019-03-14
      */
-    public function setTzoffsetfrom( ? string $value = null, ? array $params = [] ) : self
+    public function setTzoffsetfrom( ? string $value = null, ? array $params = [] ) : static
     {
         static $ERR = 'Invalid %s offset value %s';
         if( empty( $value )) {

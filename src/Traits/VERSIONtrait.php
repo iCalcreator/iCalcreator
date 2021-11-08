@@ -73,11 +73,11 @@ trait VERSIONtrait
      * Set (another?) calendar version
      *
      * @param null|string $value
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setVersion( ? string $value = null ) : self
+    public function setVersion( ? string $value = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::VERSION );

@@ -104,7 +104,7 @@ class DateTimeZoneFactory
      * @param DateTimeZone|string $dateTimeZone
      * @param null|int $from
      * @param null|int $to
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-01-22
      */

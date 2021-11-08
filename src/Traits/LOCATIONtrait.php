@@ -103,12 +103,12 @@ trait LOCATIONtrait
     /**
      * Set calendar component property location
      *
-     * @param string|null $value
-     * @param array|null $params
-     * @return self
+     * @param null|string $value
+     * @param null|array  $params
+     * @return static
      * @since 2.29.14 2019-09-03
      */
-    public function setLocation( ? string $value = null, ? array $params = [] ) : self
+    public function setLocation( ? string $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::LOCATION );

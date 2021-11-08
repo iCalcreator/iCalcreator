@@ -118,12 +118,15 @@ trait RECURRENCE_IDtrait
      *
      * @param null|string|DateTimeInterface $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setRecurrenceid( mixed $value = null, ? array $params = [] ) : self
+    public function setRecurrenceid(
+        null|string|DateTimeInterface $value = null,
+        ? array $params = []
+    ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RECURRENCE_ID );

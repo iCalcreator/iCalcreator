@@ -53,6 +53,7 @@ use function sprintf;
 use function strcasecmp;
 use function stripos;
 use function str_contains;
+use function str_starts_with;
 use function strtolower;
 use function strtoupper;
 use function substr;
@@ -205,13 +206,13 @@ abstract class CalendarComponent extends IcalBase
      * Parse data into component properties
      *
      * @param null|string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
-     * @return self
+     * @return static
      * @throws Exception
      * @throws UnexpectedValueException;
      * @since  2.29.3 - 2019-06-20
      * @// todo report invalid properties, Exception.. ??
      */
-    public function parse( mixed $unParsedText = null ) : self
+    public function parse( null|string|array $unParsedText = null ) : static
     {
         $rows = $this->parse1prepInput( $unParsedText );
         $this->parse2intoComps( $rows );
@@ -227,7 +228,7 @@ abstract class CalendarComponent extends IcalBase
      * @return string[]
      * @since  2.29.3 - 2019-06-20
      */
-    private function parse1prepInput( mixed $unParsedText = null ) : array
+    private function parse1prepInput( null|string|array $unParsedText = null ) : array
     {
         switch( true ) {
             case ( ! empty( $unParsedText )) :
@@ -288,9 +289,9 @@ abstract class CalendarComponent extends IcalBase
         $compSync       = $subSync = 0;
         foreach( $rows as $lix => $row ) {
             switch( true ) {
-                case ( StringFactory::startsWith( $row, $ENDALARM ) ||
-                       StringFactory::startsWith( $row, $ENDDAYLIGHT ) ||
-                       StringFactory::startsWith( $row, $ENDSTANDARD )) :
+                case ( str_starts_with( $row, $ENDALARM ) ||
+                       str_starts_with( $row, $ENDDAYLIGHT ) ||
+                       str_starts_with( $row, $ENDSTANDARD )) :
                     if( 1 !== $subSync ) {
                         throw new UnexpectedValueException(
                             self::getErrorMsg( $rows, $lix )
@@ -298,7 +299,7 @@ abstract class CalendarComponent extends IcalBase
                     }
                     --$subSync;
                     break;
-                case StringFactory::startsWith( $row, $END ) :
+                case str_starts_with( $row, $END ) :
                     if( 1 !== $compSync ) { // end:<component>
                         throw new UnexpectedValueException(
                             self::getErrorMsg( $rows, $lix )
@@ -306,19 +307,19 @@ abstract class CalendarComponent extends IcalBase
                     }
                     --$compSync;
                     break 2;  /* skip trailing empty lines.. */
-                case StringFactory::startsWith( $row, $BEGINVALARM ) :
+                case str_starts_with( $row, $BEGINVALARM ) :
                     $comp     = $this->newValarm();
                     ++$subSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGINSTANDARD ) :
+                case str_starts_with( $row, $BEGINSTANDARD ) :
                     $comp     = $this->newStandard();
                     ++$subSync;
                     break;
-                case StringFactory::startsWith( $row, $BEGINDAYLIGHT ) :
+                case str_starts_with( $row, $BEGINDAYLIGHT ) :
                     $comp     = $this->newDaylight();
                     ++$subSync;
                     break;
-                case StringFactory::startsWith( $row, self::$BEGIN ) :
+                case str_starts_with( $row, self::$BEGIN ) :
                     ++$compSync;         // begin:<component>
                     break;
                 default :
@@ -475,13 +476,13 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Return calendar component subcomponent from component container
      *
-     * @param mixed $arg1 ordno/component type/ component uid
-     * @param mixed $arg2 ordno if arg1 = component type
+     * @param null|int|string $arg1 ordno/component type/ component uid
+     * @param null|int $arg2 ordno if arg1 = component type
      * @return mixed CalendarComponent|bool
      * @since  2.26.1 - 2018-11-17
      * @todo throw InvalidArgumentException on unknown component
      */
-    public function getComponent( mixed $arg1 = null, mixed $arg2 = null ) : mixed
+    public function getComponent( null|int|string $arg1 = null, null|int $arg2 = null ) : mixed
     {
         if( empty( $this->components )) {
             return false;
@@ -502,15 +503,11 @@ abstract class CalendarComponent extends IcalBase
             case ( Util::isCompInList( $arg1, self::$SUBCOMPS )) : // class name
                 unset( $this->compix[self::$INDEX] );
                 $argType = strtolower( $arg1 );
-                if( null === $arg2 ) {
-                    $index = $this->compix[$argType] =
+                $index = $arg2 ?? ( $this->compix[$argType] =
                         ( isset( $this->compix[$argType] ))
                             ? $this->compix[$argType] + 1
-                            : 1;
-                }
-                else {
-                    $index = (int) $arg2;
-                }
+                            : 1
+                    );
                 break;
         } // end switch
         --$index;
@@ -546,10 +543,10 @@ abstract class CalendarComponent extends IcalBase
      * Add calendar component as subcomponent to container for subcomponents
      *
      * @param CalendarComponent $component
-     * @return self
+     * @return static
      * @since  1.x.x - 2007-04-24
      */
-    public function addSubComponent( CalendarComponent $component ) : self
+    public function addSubComponent( CalendarComponent $component ) : static
     {
         $this->setComponent( $component );
         return $this;
@@ -583,7 +580,7 @@ abstract class CalendarComponent extends IcalBase
      * Check index and set (an indexed) content in a multiple value array
      *
      * @param null|array    $valueArr
-     * @param null|mixed    $value
+     * @param null|mixed    $value  whatever...
      * @param null|string[] $params
      * @param null|string[] $defaults
      * @param null|int      $index

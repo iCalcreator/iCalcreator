@@ -122,9 +122,9 @@ trait DURATIONtrait
     /**
      * Set calendar component property duration
      *
-     * @param mixed $value
+     * @param null|string|DateInterval $value
      * @param null|string[] $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.40 - 2021-10-04
@@ -133,7 +133,7 @@ trait DURATIONtrait
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
      *        value."
      */
-    public function setDuration( mixed $value = null , ? array $params = [] ) : self
+    public function setDuration( null|string|DateInterval $value = null , ? array $params = [] ) : static
     {
         switch( true ) {
             case empty( $value ) :

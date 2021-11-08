@@ -90,11 +90,11 @@ trait CALSCALEtrait
      * Set calendar property calscale
      *
      * @param null|string $value
-     * @return self
+     * @return static
      * @throws InvalidArgumentException;
      * @since  2.29.14 - 2019-09-03
      */
-    public function setCalscale( ? string $value = null ) : self
+    public function setCalscale( ? string $value = null ) : static
     {
         if( empty( $value )) {
             $value = IcalInterface::GREGORIAN;

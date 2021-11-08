@@ -120,14 +120,14 @@ trait RELATED_TOtrait
     /**
      * Set calendar component property related-to
      *
-     * @param mixed $value
+     * @param null|string    $value
      * @param null|string[]  $params
-     * @param null|int    $index
-     * @return self
+     * @param null|int       $index
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setRelatedto( mixed $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setRelatedto( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
@@ -142,7 +142,7 @@ trait RELATED_TOtrait
             ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
         }
         Util::assertString( $value, self::RELATED_TO );
-         self::setMval(
+        self::setMval(
             $this->relatedto,
             StringFactory::trimTrailNL( $value ),
             $params,

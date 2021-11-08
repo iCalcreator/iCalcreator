@@ -128,11 +128,11 @@ trait CONTACTtrait
      * @param null|string   $value
      * @param null|string[] $params
      * @param null|int      $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setContact( ? string $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setContact( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CONTACT );

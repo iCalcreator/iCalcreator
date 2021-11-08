@@ -55,16 +55,16 @@ class ParameterFactory
     /**
      * Return formatted output for calendar component property parameters
      *
-     * @param null|string[]  $inputParams
-     * @param null|string[]  $ctrKeys
-     * @param bool|string    $lang  bool false if config lang not found
+     * @param null|string[]    $inputParams
+     * @param null|string[]    $ctrKeys
+     * @param null|bool|string $lang  bool false if config lang not found
      * @return string
      * @since  2.29.25 - 2020-09-02
      */
     public static function createParams(
         ? array $inputParams,
         ? array $ctrKeys = [],
-        mixed $lang = null
+        null|bool|string $lang = null
     ) : string
     {
         static $FMTFMTTYPE = ';FMTTYPE=%s%s';
@@ -234,7 +234,7 @@ class ParameterFactory
     /**
      * Return true if property parameter VALUE is set to argument, otherwise false
      *
-     * @param mixed[] $parameterArr
+     * @param array $parameterArr
      * @param string $arg
      * @return bool
      * @since  2.27.14 - 2019-03-01
@@ -254,7 +254,7 @@ class ParameterFactory
     /**
      * Return param[TZID] or empty string
      *
-     * @param mixed[]  $parameterArr
+     * @param array $parameterArr
      * @return string
      * @since  2.27.14 - 2019-02-10
      */
@@ -269,7 +269,7 @@ class ParameterFactory
      * Trim quoted values, default parameters may be set, if missing
      * Non-string values set to string
      *
-     * @param mixed[]  $params
+     * @param array $params
      * @param null|string[] $defaults
      * @return string[]
      * @since  2.29.25 - 2020-08-25

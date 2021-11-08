@@ -122,11 +122,11 @@ trait ATTACHtrait
      * @param null|string   $value
      * @param null|string[] $params
      * @param null|integer  $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-20
      */
-    public function setAttach( ? string $value = null, mixed $params = [], ? int $index = null) : self
+    public function setAttach( ? string $value = null, ? array $params = [], ? int $index = null) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::ATTACH );

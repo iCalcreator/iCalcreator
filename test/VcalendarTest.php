@@ -547,6 +547,7 @@ class VcalendarTest extends TestCase
                 $comp->getXprop( 'X-SET_NO' )[1],
                 'setComponent-error 12, comp . ' . $x . ' is not in order'
             );
+//          if( method_exists( $comp, 'getUid' )) { echo $x . ' - ' . $comp->getUid() . PHP_EOL; } // test ###
         }
         // check number of components
         $this->assertTrue(

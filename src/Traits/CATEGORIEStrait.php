@@ -158,11 +158,11 @@ trait CATEGORIEStrait
      * @param null|string $value
      * @param null|string[]  $params
      * @param null|int    $index
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setCategories( ? string $value = null, mixed $params = [], ? int $index = null ) : self
+    public function setCategories( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::CATEGORIES );

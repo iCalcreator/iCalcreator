@@ -222,7 +222,7 @@ class RecurFactory
      *    the UNTIL rule part MUST always be specified as a date with UTC time.
      *  If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
      * @param string $recurProperty
-     * @param null|mixed[]  $recurData
+     * @param null|array $recurData
      * @param null|bool   $allowEmpty
      * @return string
      * @throws Exception
@@ -331,7 +331,7 @@ class RecurFactory
      * Return (array) parsed rexrule string
      *
      * @param string $row
-     * @return array<string, array|string>
+     * @return array
      * @since 2.27.3 - 2018-12-28
      */
     public static function parseRexrule( string $row ) : array
@@ -375,7 +375,7 @@ class RecurFactory
      * Return array, day rel pos number (opt) and day name abbr
      *
      * @param string $dayValueBase
-     * @return mixed[]
+     * @return array
      * @since  2.27.16 - 2019-03-03
      */
     private static function updateDayNoAndDayName( string $dayValueBase ) : array
@@ -403,9 +403,9 @@ class RecurFactory
      *
      * "The value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
      * "If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param mixed[] $rexrule
+     * @param array $rexrule
      * @param string[] $params    merged with dtstart params
-     * @return mixed[]
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.25 - 2020-09-02
@@ -449,22 +449,16 @@ class RecurFactory
                         $isLocalTime ? IcalInterface::UTC : $paramTZid,
                         true
                     );
-                    if( $isValueDate ) {
-                        ParameterFactory::ifExistRemove(
-                            $params[Util::$LCparams],
-                            IcalInterface::TZID
-                        );
-                    }
-                    else {
+                    if( ! $isValueDate ) {
                         $dateTime = DateTimeFactory::setDateTimeTimeZone(
                             $dateTime,
                             IcalInterface::UTC
                         );
-                        ParameterFactory::ifExistRemove(
-                            $params[Util::$LCparams],
-                            IcalInterface::TZID
-                        );
                     }
+                    ParameterFactory::ifExistRemove(
+                        $params[Util::$LCparams],
+                        IcalInterface::TZID
+                    );
                     $input[$ruleLabel] = $dateTime;
                     break;
                 default :
@@ -491,7 +485,7 @@ class RecurFactory
     }
 
     /**
-     * @param mixed[] $input
+     * @param array $input
      * @return string[]
      * @since  2.29.25 - 2020-09-02
      */
@@ -564,8 +558,8 @@ class RecurFactory
     /**
      * Ensure RRULE BYDAY array and upper case.. .
      *
-     * @param mixed[] $input
-     * @param mixed[] $output
+     * @param array $input
+     * @param array $output
      * @since  2.29.27 - 2020-09-19
      */
     private static function orderRRuleBydayKey( array $input, array & $output ) : void
@@ -638,8 +632,8 @@ class RecurFactory
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param mixed[]        $result      array to update, array([Y-m-d] => bool)
-     * @param mixed[]         $recur       pattern for recurrency (only value part, params ignored)
+     * @param array $result      array to update, array([Y-m-d] => bool)
+     * @param array $recur       pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -664,83 +658,59 @@ class RecurFactory
             : 1;
         switch( true ) {
             case RecurFactory2::isRecurDaily1( $recur ) :
-                $result +=
-                    RecurFactory2::recurDaily1(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurDaily1( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurDaily2( $recur ) :
-                $result +=
-                    RecurFactory2::recurDaily2(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurDaily2( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurMonthly1( $recur ) :
-                $result +=
-                    RecurFactory2::recurMonthly1(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurMonthly1( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurMonthly2( $recur ) :
-                $result +=
-                    RecurFactory2::recurMonthlyYearly3(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurMonthlyYearly3( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurWeekly1( $recur ) :
-                $result +=
-                    RecurFactory2::recurWeekly1(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurWeekly1( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurWeekly2( $recur ) :
-                $result +=
-                    RecurFactory2::recurWeekly2(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurWeekly2( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurYearly1( $recur ) :
-                $result +=
-                    RecurFactory2::recurYearly1(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurYearly1( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             case RecurFactory2::isRecurYearly2( $recur ) :
-                $result +=
-                    RecurFactory2::recurMonthlyYearly3(
-                        $recur,
-                        $wDateIn,
-                        $fcnStartIn,
-                        $fcnEndIn
-                    );
+                foreach( RecurFactory2::recurMonthlyYearly3( $recur, $wDateIn, $fcnStartIn, $fcnEndIn )
+                         as $ymd => $v ) {
+                    $result[$ymd] = $v;
+                }
                 ksort( $result, SORT_NUMERIC );
                 break;
             default :
@@ -759,8 +729,8 @@ class RecurFactory
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param mixed[]         $result      array to update, array([Y-m-d] => bool)
-     * @param mixed[]         $recur       pattern for recurrency (only value part, params ignored)
+     * @param array $result      array to update, array([Y-m-d] => bool)
+     * @param array $recur       pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -1197,13 +1167,13 @@ class RecurFactory
      * Checking BYDAY (etc) hits, recur2date help function
      *
      * @since  2.6.12 - 2011-01-03
-     * @param int|mixed[] $BYvalue
+     * @param int|string|array $BYvalue
      * @param int   $upValue
      * @param int   $downValue
      * @return bool
      */
     private static function recurBYcntcheck(
-        int | array $BYvalue,
+        int | string | array $BYvalue,
         int $upValue,
         int $downValue
     ) : bool
@@ -1220,7 +1190,7 @@ class RecurFactory
      * (re-)Calculate internal index, recur2date help function
      *
      * @param string $freq
-     * @param mixed[]  $date
+     * @param array $date
      * @param int    $wkst
      * @return string
      * @since  2.26 - 2018-11-10
@@ -1247,9 +1217,9 @@ class RecurFactory
     /**
      * Return updated date, array and timpstamp
      *
-     * @param mixed[]      $date    date to step
+     * @param array $date    date to step
      * @param string       $dateYMD date YMD
-     * @param null|mixed[] $step    default array( Util::$LCDAY => 1 )
+     * @param null|array $step    default array( Util::$LCDAY => 1 )
      * @return void
      */
     private static function stepDate( array & $date, string & $dateYMD, ? array $step = null ) : void
@@ -1307,10 +1277,10 @@ class RecurFactory
     /**
      * Return initiated $dayCnts
      *
-     * @param mixed[] $wDate
-     * @param mixed[] $recur
+     * @param array $wDate
+     * @param array $recur
      * @param int     $wkst
-     * @return mixed[]
+     * @return array
      */
     private static function initDayCnts( array $wDate, array $recur, int $wkst ) : array
     {
@@ -1399,7 +1369,7 @@ class RecurFactory
     /**
      * Return a reformatted input date
      *
-     * @param string|mixed[]|DateTime $inputDate
+     * @param string|array|DateTime $inputDate
      * @return int[]
      * @throws Exception
      * @since  2.29.21 - 2020-01-31

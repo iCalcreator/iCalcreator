@@ -36,7 +36,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 
 use function bin2hex;
 use function chr;
-use function openssl_random_pseudo_bytes;
 use function ord;
 use function str_split;
 use function vsprintf;
@@ -88,10 +87,10 @@ trait UIDrfc7986trait
      * Get calendar component property uid
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed|array
+     * @return string|array
      * @since 2.29.5 2019-06-17
      */
-    public function getUid( ?bool $inclParam = false ) : mixed
+    public function getUid( ?bool $inclParam = false ) : array | string
     {
         if( self::isUidEmpty( $this->uid )) {
             $this->uid = self::makeUid();
@@ -121,21 +120,14 @@ trait UIDrfc7986trait
     /**
      * Return an unique id for a calendar/component object instance
      *
-     * @return mixed[]
+     * @return array
      * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
      * @since 2.29.5 2019-06-17
      */
     private static function makeUid() : array
     {
         static $FMT = '%s%s-%s-%s-%s-%s%s%s';
-        static $MAX = 10;
-        $cnt = 0;
-        do {
-            do {
-                $bytes = openssl_random_pseudo_bytes( 16, $cStrong );
-            } while ( false == $bytes );
-            ++$cnt;
-        } while(( $MAX > $cnt ) && ( false === $cStrong ));
+        $bytes    = StringFactory::getRandChars( 32 ); // i.e. 16
         $bytes[6] = chr(ord( $bytes[6] ) & 0x0f | 0x40 ); // set version to 0100
         $bytes[8] = chr(ord( $bytes[8] ) & 0x3f | 0x80 ); // set bits 6-7 to 10
         $uid      = vsprintf( $FMT, str_split( bin2hex( $bytes ), 4 ));
@@ -151,13 +143,13 @@ trait UIDrfc7986trait
      * If empty input, male one
      * @param null|int|string $value
      * @param null|string[]  $params
-     * @return self
+     * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setUid( mixed $value = null, ? array $params = [] ) : self
+    public function setUid( null|int|string $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value ) && ( Util::$ZERO != (string) $value )) {
+        if( empty( $value ) && ( Util::$ZERO !== (string) $value )) {
             $this->uid = self::makeUid();
             return $this;
         } // no allowEmpty check here !!!!
