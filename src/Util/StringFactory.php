@@ -27,7 +27,6 @@
  *
  * This file is a part of iCalcreator.
  */
-
 namespace Kigkonsult\Icalcreator\Util;
 
 use Kigkonsult\Icalcreator\Vcalendar;

@@ -315,8 +315,9 @@ class SelectFactory
                             if( ! empty( $compDuration )) { // DateInterval
                                 $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
                                     ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
+                                $rWdate = $rStart->getClone();
                                 self::setDurationEndTime(
-                                    $rStart,
+                                    $rWdate,
                                     $rEnd,
                                     $cnt,
                                     $occurenceDays,
@@ -324,7 +325,7 @@ class SelectFactory
                                 );
                                 $component2->setXprop(
                                     $propName,
-                                    $rStart->format( $compEnd->dateFormat )
+                                    $rWdate->format( $compEnd->dateFormat )
                                 );
                             } // end if
                             $result[$xY][$xM][$xD][$compUID] = clone $component2;    // copy to output
@@ -467,8 +468,9 @@ class SelectFactory
                                     $component3->deleteXprop( $propName );
                                 }
                                 else {
+                                    $rWdate = $rStart->getClone();
                                     self::setDurationEndTime(
-                                        $rStart,
+                                        $rWdate,
                                         $rEnd,
                                         $cnt,
                                         $occurenceDays,
@@ -476,7 +478,7 @@ class SelectFactory
                                     );
                                     $component3->setXprop(
                                         $propName,
-                                        $rStart->format( $compEnd->dateFormat )
+                                        $rWdate->format( $compEnd->dateFormat )
                                     );
                                 } // end else
                                 $result[$xY][$xM][$xD][$compUID] = clone $component3;     // copy to output
@@ -501,10 +503,9 @@ class SelectFactory
                                 $component2->deleteXprop( $propName );
                             }
                             else {
-                                $rStart->add( $durationInterval );
                                 $component2->setXprop(
                                     $propName,
-                                    $rStart->format( $compEnd->dateFormat )
+                                    $rStart->getClone()->add( $durationInterval )->format( $compEnd->dateFormat )
                                 );
                             }
                             list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
@@ -1025,14 +1026,19 @@ class SelectFactory
         $cnt,
         $occurenceDays,
         array $endHis
-    ) {
+    )
+    {
         static $YMDn = 'Ymd';
         if( $cnt < $occurenceDays ) {
             $rStart->setTime( 23, 59, 59 );
         }
-        elseif(( $rStart->format( $YMDn ) < $rEnd->format( $YMDn )) &&
-            ( 0 == $endHis[0] ) && ( 0 == $endHis[1] ) && ( 0 == $endHis[2] )) {
-            $rStart->setTime( 24, 0, 0 ); // end exactly at midnight
+        elseif( $rStart->format( $YMDn ) < $rEnd->format( $YMDn )) {
+            if( ( 0 === $endHis[0] ) && ( 0 === $endHis[1] ) && ( 0 === $endHis[2] )) {
+                $rStart->setTime( 24, 0 ); // end exactly at midnight  // 24:00:00
+            }
+            else {
+                $rStart->setTime( 23, 59, 59 ); // break at midnight, cont next day  // 23:59:59
+            }
         }
         else {
             $rStart->setTime( $endHis[0], $endHis[1], $endHis[2] );

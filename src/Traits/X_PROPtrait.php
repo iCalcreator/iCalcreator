@@ -116,9 +116,9 @@ trait X_PROPtrait
     {
         $propName = ( $propName ) ? strtoupper( $propName ) : self::X_PROP;
         if( empty( $this->xprop )) {
-            foreach( $this->propDelIx as $propName => $v ) {
-                if( StringFactory::isXprefixed( $propName )) {
-                    unset( $this->propDelIx[$propName] );
+            foreach( $this->propDelIx as $propName2 => $v ) {
+                if( StringFactory::isXprefixed( $propName2 )) {
+                    unset( $this->propDelIx[$propName2] );
                 }
             }
             return false;
@@ -178,9 +178,9 @@ trait X_PROPtrait
     public function getXprop( $propName = null, $propIx = null, $inclParam = false )
     {
         if( empty( $this->xprop )) {
-            foreach( $this->propIx as $propName => $v ) {
-                if( StringFactory::isXprefixed( $propName )) {
-                    unset( $this->propIx[$propName] );
+            foreach( $this->propIx as $propName2 => $v ) {
+                if( StringFactory::isXprefixed( $propName2 )) {
+                    unset( $this->propIx[$propName2] );
                 }
             }
             return false;
@@ -200,9 +200,6 @@ trait X_PROPtrait
                 : 1;
         }
         $this->propIx[$propName] = --$propIx;
-        $class = get_class( $this );
-        $class::recountMvalPropix( $this->xprop, $propIx );
-        $this->propIx[$propName] = $propIx;
         $xpropNo = 0;
         foreach( $this->xprop as $xpropKey => $xpropValue ) {
             if( $propIx == $xpropNo ) {
