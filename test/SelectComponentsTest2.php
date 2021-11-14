@@ -87,14 +87,23 @@ END:VCALENDAR
             new DateTime( '20211025', new DateTimeZone( 'America/Chicago' )),
             [
                 '2021-10-25 21:00:00 America/Chicago', // event start
+                '2021-10-26 00:00:00 America/Chicago',
                 '2021-10-26 21:00:00 America/Chicago',
+                '2021-10-27 00:00:00 America/Chicago',
                 '2021-10-27 21:00:00 America/Chicago',
+                '2021-10-28 00:00:00 America/Chicago',
                 '2021-10-28 21:00:00 America/Chicago',
+                '2021-10-29 00:00:00 America/Chicago',
                 '2021-10-29 21:00:00 America/Chicago',
+                '2021-10-30 00:00:00 America/Chicago',
                 '2021-10-30 21:00:00 America/Chicago',
+                '2021-10-31 00:00:00 America/Chicago',
                 '2021-10-31 21:00:00 America/Chicago',
+                '2021-11-01 00:00:00 America/Chicago',
                 '2021-11-01 21:00:00 America/Chicago',
+                '2021-11-02 00:00:00 America/Chicago',
                 '2021-11-02 21:00:00 America/Chicago',
+                '2021-11-03 00:00:00 America/Chicago',
                 '2021-11-03 21:00:00 America/Chicago', '2021-11-04 00:00:00 America/Chicago' // last event start day1/2
             ]
         ];

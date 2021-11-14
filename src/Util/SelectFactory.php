@@ -125,11 +125,9 @@ class SelectFactory
     {
         static $P1D       = 'P1D';
         static $YMDHIS2   = 'Y-m-d H:i:s';
-        static $PRA       = '%a';
         static $YMDn      = 'Ymd';
         static $HIS       = '%02d%02d%02d';
         static $DAYOFDAYS = 'day %d of %d';
-        static $SORTER    = [ SortFactory::class, 'cmpfcn' ];
         /* check  if empty calendar */
         if( 1 > $calendar->countComponents()) {
             return false;
@@ -266,8 +264,7 @@ class SelectFactory
                     }         // copy original to output (but not anyone with recurrence-id)
                 }
                 elseif( $split ) { // split the original component
-                    $rStart = ( $compStart->format( $YMDHIS2 ) <
-                        $fcnStart->format( $YMDHIS2 ))
+                    $rStart = ( $compStart->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 ))
                         ? $fcnStart->getClone()
                         : $compStart->getClone();
                     $rEnd = ( $compEnd->format( $YMDHIS2 ) > $fcnEnd->format( $YMDHIS2 ))
@@ -301,8 +298,11 @@ class SelectFactory
                         $cnt  = 0;
                         // exclude any recurrence START date, found in exdatelist or recurrIdList
                         // but accept the reccurence-id comp itself
-                        //     count the days (incl start day)
-                        $occurenceDays = 1 + (int) $rStart->diff( $rEnd )->format( $PRA );
+                        //     count the reccurence in days (incl start day)
+                        $occurenceDays = DateTimeFactory::getDayDiff( $rStart, $rEnd );
+                        $propEndName   = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
+                            ? IcalInterface::X_CURRENT_DUE
+                            : IcalInterface::X_CURRENT_DTEND;
                         while( $rStart->format( $YMDn ) <= $rEnd->format( $YMDn )) {
                             ++$cnt;
                             if( 1 < $occurenceDays ) {
@@ -322,19 +322,12 @@ class SelectFactory
                                 IcalInterface::X_CURRENT_DTSTART,
                                 $rStart->format( $compStart->dateFormat )
                             );
-                            [ $xY, $xM, $xD ] = self::getArrayYMDkeys( $rStart );
                             if( ! empty( $compDuration )) { // DateInterval
                                 $rWdate = $rStart->getClone();
                                 self::setDurationEndTime( $rWdate, $rEnd, $cnt, $occurenceDays, $endHis );
-                                $component2->setXprop(
-                                    ( isset( $compEnd->SCbools[self::$DUEEXIST] )
-                                        ? IcalInterface::X_CURRENT_DUE
-                                        : IcalInterface::X_CURRENT_DTEND
-                                    ),
-                                    $rWdate->format( $compEnd->dateFormat )
-                                );
+                                $component2->setXprop( $propEndName, $rWdate->format( $compEnd->dateFormat ));
                             } // end if
-                            $result[$xY][$xM][$xD][$compUID] = clone $component2;    // copy to output
+                            self::nonFlatAppend( clone $component2, $result, $rStart, $compUID ); // copy to output
                             $rStart->add( $INTERVAL_P1D );
                         } // end while(( $rStart->format( 'Ymd' ) < $rEnd->format( 'Ymd' ))
                     } // end if( ! isset( $exdateList[$rStart->key] ))
@@ -348,10 +341,8 @@ class SelectFactory
                         $component2 = clone $component;
                     }
                     if( ! $any || ! isset( $exdateList[$rStart->key] )) {
-                        // exclude any recurrence date, found in exdatelistg1
-
-                        [ $xY, $xM, $xD ] = self::getArrayYMDkeys( $rStart );
-                        $result[$xY][$xM][$xD][$compUID] = clone $component2; // copy to output
+                        // exclude any recurrence date, found in exdatelist
+                        self::nonFlatAppend( clone $component2, $result, $rStart, $compUID ); // copy to output
                     }
                 } // end else
             } // end (dt)start within the period OR occurs within the period
@@ -437,8 +428,8 @@ class SelectFactory
                             $endHis        = $rEnd->getTime();
                             ++$xRecurrence;
                             $cnt           = 0;
-                            // count the days (incl start day)
-                            $occurenceDays = 1 + (int) $rStart->diff( $rEnd )->format( $PRA ); // reccurence in days
+                            // count the reccurence in days (incl start day)
+                            $occurenceDays = DateTimeFactory::getDayDiff( $rStart, $rEnd );
                             while( $rStart->format( $YMDn ) <= $rEnd->format( $YMDn )) {   // iterate.. .
                                 ++$cnt;
                                 if( $rStart->format( $YMDn ) < $fcnStart->format( $YMDn )) { // date before dtstart
@@ -449,7 +440,6 @@ class SelectFactory
                                 if( 2 === $cnt ) {
                                     $rStart->setTime( 0, 0 ); // 0:0:0
                                 }
-                                [ $xY, $xM, $xD ] = self::getArrayYMDkeys( $rStart );
                                 $component3->setXprop( IcalInterface::X_RECURRENCE, $xRecurrence );
                                 if( 1 < $occurenceDays ) {
                                     $component3->setXprop(
@@ -472,7 +462,7 @@ class SelectFactory
                                     self::setDurationEndTime( $rWdate, $rEnd, $cnt, $occurenceDays, $endHis );
                                     $component3->setXprop( $propEndName, $rWdate->format( $compEnd->dateFormat ));
                                 } // end else
-                                $result[$xY][$xM][$xD][$compUID] = clone $component3;     // copy to output
+                                self::nonFlatAppend( clone $component3, $result, $rStart, $compUID ); // copy to output
                                 $rStart->add( $INTERVAL_P1D );
                             } // end while( $rStart->format( 'Ymd' ) <= $rEnd->format( 'Ymd' ))
                             unset( $rStart, $rEnd );
@@ -494,8 +484,7 @@ class SelectFactory
                                     $rStart->getClone()->add( $durationInterval )->format( $compEnd->dateFormat )
                                 );
                             }
-                            [ $xY, $xM, $xD ] = self::getArrayYMDkeys( $rStart );
-                            $result[$xY][$xM][$xD][$compUID] = clone $component2; // copy to output
+                            self::nonFlatAppend( clone $component2, $result, $rStart, $compUID ); // copy to output
                         } // end elseif( $rStart >= $fcnStart )
                     } // end foreach( $recurList as $recurKey => $durationInterval )
                 } // end if( 0 < count( $recurList ))
@@ -505,46 +494,92 @@ class SelectFactory
             return false;
         }
         if( ! $flat ) {
-            foreach( $result as $y => $yList ) {
-                foreach( $yList as $m => $mList ) {
-                    foreach( $mList as $d => $dList ) {
-                        if( empty( $dList )) {
-                            unset( $result[$y][$m][$d] );
-                        }
-                        else {
-                            $result[$y][$m][$d] = array_values( $dList ); // skip tricky UID-index
-                            if( 1 < count( $result[$y][$m][$d] )) {
-                                foreach( $result[$y][$m][$d] as $cix => $d2List ) { // sort
-                                    SortFactory::setSortArgs(
-                                        $result[$y][$m][$d][$cix]
-                                    );
-                                }
-                                usort( $result[$y][$m][$d], $SORTER );
-                            }
-                        }
-                    } // end foreach( $mList as $d => $dList )
-                    if( empty( $result[$y][$m] )) {
-                        unset( $result[$y][$m] );
-                    }
-                    else {
-                        ksort( $result[$y][$m] );
-                    }
-                } // end foreach( $yList as $m => $mList )
-                if( empty( $result[$y] )) {
-                    unset( $result[$y] );
-                }
-                else {
-                    ksort( $result[$y] );
-                }
-            } // end foreach(  $result as $y => $yList )
-            if( empty( $result )) {
-                unset( $result );
-            }
-            else {
-                ksort( $result );
-            }
+            self::ymdSort( $result );
         } // end elseif( !$flat )
         return $result;
+    }
+
+    /**
+     * @param CalendarComponent $component
+     * @param array $result
+     * @param DateTimeInterface $date
+     * @param int $xM
+     * @param int $xD
+     * @param null|string $compUID
+     * @return void
+     */
+    private static function nonFlatAppend(
+        CalendarComponent $component,
+        array & $result,
+        DateTimeInterface $date,
+        ? string $compUID = ''
+    ) : void
+    {
+        static $Y = 'Y';
+        static $M = 'm';
+        static $D = 'd';
+        $xY = (int) $date->format( $Y );
+        $xM = (int) $date->format( $M );
+        $xD = (int) $date->format( $D );
+        if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
+            $result[$xY][$xM][$xD][$compUID] = [];
+        }
+        $result[$xY][$xM][$xD][$compUID][] = $component;
+    }
+
+    /**
+     * @param array $result
+     * @return void
+     */
+    private static function ymdSort( array & $result ) : void
+    {
+        static $SORTER = [ SortFactory::class, 'cmpfcn' ];
+        foreach( $result as $y => $yList ) {
+            foreach( $yList as $m => $mList ) {
+                foreach( $mList as $d => $dList ) {
+                    if( empty( $dList )) {
+                        unset( $result[$y][$m][$d] );
+                    }
+                    else { // skip tricky UID-index
+                        $temp = [];
+                        foreach( $dList as $compVal ) {
+                            if( is_array( $compVal )) {
+                                foreach( $compVal as $comp ) {
+                                    $temp[] = $comp;
+                                }
+                                continue;
+                            }
+                            $temp[] = $compVal;
+                        } // end foreach
+                        $result[$y][$m][$d] = $temp;
+                        if( 1 < count( $result[$y][$m][$d] )) { // sort
+                            foreach( $result[$y][$m][$d] as $comp ) {
+                                SortFactory::setSortArgs( $comp );
+                            }
+                            usort( $result[$y][$m][$d], $SORTER );
+                        }
+                    } // end else
+                } // end foreach( $mList as $d => $dList )
+                if( empty( $result[$y][$m] )) {
+                    unset( $result[$y][$m] );
+                }
+                else {
+                    ksort( $result[$y][$m] );
+                }
+            } // end foreach( $yList as $m => $mList )
+            if( empty( $result[$y] )) {
+                unset( $result[$y] );
+            }
+            else {
+                ksort( $result[$y] );
+            }
+        } // end foreach(  $result as $y => $yList )
+        if( empty( $result )) {
+            unset( $result );
+        }
+        else {
+            ksort( $result );
+        }
     }
 
     /**
@@ -1028,21 +1063,21 @@ class SelectFactory
     /**
      * Get array Y, m, d keys
      *
-     * @param UtilDateTime $icaldateTime
+     * @param UtilDateTime $utilDateTime
      * @return int[]
      * @since 2.26.2 - 2018-11-15
      */
     private static function getArrayYMDkeys(
-        UtilDateTime $icaldateTime
+        UtilDateTime $utilDateTime
     ) : array
     {
         static $Y = 'Y';
         static $M = 'm';
         static $D = 'd';
         return [
-            (int) $icaldateTime->format( $Y ),
-            (int) $icaldateTime->format( $M ),
-            (int) $icaldateTime->format( $D )
+            (int) $utilDateTime->format( $Y ),
+            (int) $utilDateTime->format( $M ),
+            (int) $utilDateTime->format( $D )
         ];
     }
 

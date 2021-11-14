@@ -643,4 +643,20 @@ class DateTimeFactory
                in_array( $dateStr[8], $Tarr ) &&
             ctype_digit( substr( $dateStr, 9, 6 )));
     }
+
+    /**
+     * Return diff in days (incl start day) i.e. event length in days
+     *
+     * @param DateTimeInterface $start
+     * @param DateTimeInterface $end
+     * @return int
+     */
+    public static function getDayDiff( DateTimeInterface $start, DateTimeInterface $end ) : int
+    {
+        static $PRA = '%a';
+        return 1 +
+            (int) (clone $start )->setTime( 0, 0 )
+                ->diff( (clone $end )->setTime( 0, 0 ))
+                ->format( $PRA );
+    }
 }
