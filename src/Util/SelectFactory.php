@@ -58,7 +58,7 @@ use function usort;
  * iCalcreator geo support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.27.17 - 2020-01-25
+ * @since 2.30.7 - 2021-11-12
  */
 class SelectFactory
 {
@@ -95,11 +95,11 @@ class SelectFactory
      * @param bool      $split     true (default) - one component copy every DAY it occurs during the
      *                             period (implies flat=false)
      *                             false          - one occurance of component only in output array
-     * @return mixed  array on success, bool false on select error
+     * @return array|false  array on success, bool false on select error
      * @throws RuntimeException
      * @throws Exception
      * @static
-     * @since  2.29.16 - 2020-01-24
+     * @since  2.30.7.16 - 2021-11-12
      */
     public static function selectComponents(
         Vcalendar $calendar,
@@ -223,7 +223,7 @@ class SelectFactory
             /* prepare */
             $fcnStart = $compStart->getClone();
             $fcnStart->setDate((int) $startY, (int) $startM, (int) $startD );
-            $fcnStart->setTime( 0, 0, 0 );
+            $fcnStart->setTime( 0, 0 );
             $fcnEnd = $compEnd->getClone();
             $fcnEnd->setDate((int) $endY, (int) $endM, (int) $endD );
             $fcnEnd->setTime( 23, 59, 59 );
@@ -300,7 +300,7 @@ class SelectFactory
                                 );
                             }
                             if( 1 < $cnt ) {
-                                $rStart->setTime( 0, 0, 0 );
+                                $rStart->setTime( 0, 0 );
                             }
                             else {
                                 // make sure to exclude start day from the recurrence pattern
@@ -311,7 +311,6 @@ class SelectFactory
                                 Vcalendar::X_CURRENT_DTSTART,
                                 $rStart->format( $compStart->dateFormat )
                             );
-                            list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
                             if( ! empty( $compDuration )) { // DateInterval
                                 $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
                                     ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
@@ -328,7 +327,11 @@ class SelectFactory
                                     $rWdate->format( $compEnd->dateFormat )
                                 );
                             } // end if
-                            $result[$xY][$xM][$xD][$compUID] = clone $component2;    // copy to output
+                            list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
+                            if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
+                                $result[$xY][$xM][$xD][$compUID] = [];
+                            }
+                            $result[$xY][$xM][$xD][$compUID][] = clone $component2;    // copy to output
                             $rStart->add( $INTERVAL_P1D );
                         } // end while(( $rStart->format( 'Ymd' ) < $rEnd->format( 'Ymd' ))
                     } // end if( ! isset( $exdateList[$rStart->key] ))
@@ -346,7 +349,10 @@ class SelectFactory
                     if( ! $any || ! isset( $exdateList[$rStart->key] )) {
                         // exclude any recurrence date, found in exdatelist
                         list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
-                        $result[$xY][$xM][$xD][$compUID] = clone $component2; // copy to output
+                        if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
+                            $result[$xY][$xM][$xD][$compUID] = [];
+                        }
+                        $result[$xY][$xM][$xD][$compUID][] = clone $component2; // copy to output
                     }
                 } // end else
             } // end (dt)start within the period OR occurs within the period
@@ -407,10 +413,9 @@ class SelectFactory
                             foreach( $recurIdList as $k => $v ) {
                                 if( substr( $k, 0, 8 ) == $recurKeyYmd ) {
                                     $rStart            = $recurIdList[$k][0]->getClone();
-                                    $durationInterval2 = ( empty( $recurIdList[$k][2] ))
-                                        ? null : $recurIdList[$k][2];  // DateInterval
+                                    $durationInterval2 = empty( $recurIdList[$k][2] ) ? null : $recurIdList[$k][2];  // DateInterval
                                     $component3        = clone $recurIdList[$k][4];
-                                    $recurFound       = true;
+                                    $recurFound        = true;
                                     break;
                                 }
                             } // end foreach
@@ -437,13 +442,12 @@ class SelectFactory
                                 if( $rStart->format( $YMDn ) <
                                     $fcnStart->format( $YMDn )) { // date before dtstart
                                     $rStart->add( $INTERVAL_P1D ); // cycle rstart to dtstart
-                                    $rStart->setTime( 0, 0, 0 );
+                                    $rStart->setTime( 0, 0 );
                                     continue;
                                 }
                                 elseif( 2 == $cnt ) {
-                                    $rStart->setTime( 0, 0, 0 );
+                                    $rStart->setTime( 0, 0 );
                                 }
-                                list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
                                 $component3->setXprop(
                                     Vcalendar::X_RECURRENCE,
                                     $xRecurrence
@@ -481,7 +485,11 @@ class SelectFactory
                                         $rWdate->format( $compEnd->dateFormat )
                                     );
                                 } // end else
-                                $result[$xY][$xM][$xD][$compUID] = clone $component3;     // copy to output
+                                list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
+                                if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
+                                    $result[$xY][$xM][$xD][$compUID] = [];
+                                }
+                                $result[$xY][$xM][$xD][$compUID][] = clone $component3;     // copy to output
                                 $rStart->add( $INTERVAL_P1D );
                             } // end while( $rStart->format( 'Ymd' ) <= $rEnd->format( 'Ymd' ))
                             unset( $rStart, $rEnd );
@@ -509,7 +517,10 @@ class SelectFactory
                                 );
                             }
                             list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
-                            $result[$xY][$xM][$xD][$compUID] = clone $component2; // copy to output
+                            if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
+                                $result[$xY][$xM][$xD][$compUID] = [];
+                            }
+                            $result[$xY][$xM][$xD][$compUID][] = clone $component2; // copy to output
                         } // end elseif( $rStart >= $fcnStart )
                     } // end foreach( $recurList as $recurKey => $durationInterval )
                 } // end if( 0 < count( $recurList ))
@@ -518,24 +529,32 @@ class SelectFactory
         if( 0 >= count( $result )) {
             return false;
         }
-        elseif( ! $flat ) {
+        if( ! $flat ) {
             foreach( $result as $y => $yList ) {
                 foreach( $yList as $m => $mList ) {
                     foreach( $mList as $d => $dList ) {
                         if( empty( $dList )) {
                             unset( $result[$y][$m][$d] );
                         }
-                        else {
-                            $result[$y][$m][$d] = array_values( $dList ); // skip tricky UID-index
-                            if( 1 < count( $result[$y][$m][$d] )) {
-                                foreach( $result[$y][$m][$d] as $cix => $d2List ) { // sort
-                                    SortFactory::setSortArgs(
-                                        $result[$y][$m][$d][$cix]
-                                    );
+                        else { // skip tricky UID-index
+                            $temp = [];
+                            foreach( $dList as $compVal ) {
+                                if( is_array( $compVal )) {
+                                    foreach( $compVal as $comp ) {
+                                        $temp[] = $comp;
+                                    }
+                                    continue;
+                                }
+                                $temp[] = $compVal;
+                            } // end foreach
+                            $result[$y][$m][$d] = $temp;
+                            if( 1 < count( $result[$y][$m][$d] )) { // sort
+                                foreach( $result[$y][$m][$d] as $comp ) {
+                                    SortFactory::setSortArgs( $comp );
                                 }
                                 usort( $result[$y][$m][$d], $SORTER );
                             }
-                        }
+                        } // end else
                     } // end foreach( $mList as $d => $dList )
                     if( empty( $result[$y][$m] )) {
                         unset( $result[$y][$m] );
@@ -937,9 +956,9 @@ class SelectFactory
         & $split = null
     ) {
         // defaults
-        $flat  = ( is_null( $flat ))  ? false : (bool) $flat;
-        $any   = ( is_null( $any ))   ? true  : (bool) $any;
-        $split = ( is_null( $split )) ? true  : (bool) $split;
+        $flat  = is_null( $flat )  ? false : (bool) $flat;
+        $any   = is_null( $any )   ? true  : (bool) $any;
+        $split = is_null( $split ) ? true  : (bool) $split;
         if(( false === $flat ) && ( false === $any )) {
             // invalid combination
             $split = false;
