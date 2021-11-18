@@ -684,7 +684,7 @@ final class Vcalendar extends IcalBase
     }
 
     /**
-     * Sort iCal compoments
+     * Sort iCal components
      *
      * Ascending sort on properties (if exist) x-current-dtstart, dtstart,
      * x-current-dtend, dtend, x-current-due, due, duration, created, dtstamp, uid if called without arguments,

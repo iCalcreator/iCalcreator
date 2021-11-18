@@ -58,7 +58,7 @@ use function usort;
  * iCalcreator geo support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since 2.30.7 - 2021-11-12
+ * @since 2.30.8 - 2021-11-17
  */
 class SelectFactory
 {
@@ -99,7 +99,7 @@ class SelectFactory
      * @throws RuntimeException
      * @throws Exception
      * @static
-     * @since  2.30.7.16 - 2021-11-12
+     * @since  2.30.8 - 2021-11-17
      */
     public static function selectComponents(
         Vcalendar $calendar,
@@ -259,12 +259,12 @@ class SelectFactory
                     }         // copy original to output (but not anyone with recurrence-id)
                 }
                 elseif( $split ) { // split the original component
-                    $rStart = ( $compStart->format( $YMDHIS2 ) <
-                        $fcnStart->format( $YMDHIS2 ))
+                    $rStart = ( $compStart->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 ))
                         ? $fcnStart->getClone()
                         : $compStart->getClone();
                     $rEnd = ( $compEnd->format( $YMDHIS2 ) > $fcnEnd->format( $YMDHIS2 ))
-                        ? $fcnEnd->getClone()   : $compEnd->getClone();
+                        ? $fcnEnd->getClone()
+                        : $compEnd->getClone();
                     if( ! isset( $exdateList[$rStart->key] )) {      // not excluded in exrule/exdate
                         if( isset( $recurIdList[$rStart->key] )) {  // change start day to new YmdHis/duration
                             $k        = $rStart->key;
@@ -280,17 +280,28 @@ class SelectFactory
                             $endHis     = $rEnd->getTime();
                             $component2 = ( isset( $recurIdList[$k][4] ))
                                 ? clone $recurIdList[$k][4] : clone $component;
-                        }
+                        } // end in recurIdList
                         else {
                             $startHis   = $compStart->getTime();
                             $endHis     = $compEnd->getTime();
                             $component2 = clone $component;
                         }
-                        $cnt  = 0;
+                        $cnt   = 0;
+                        $tDate = clone $compStart;
+                        while( $tDate->format( $YMDHIS2 ) < $fcnStart->format( $YMDHIS2 )) {
+                            $cnt++; // in case fcnStart AFTER cmpStart
+                            $tDate->add( $INTERVAL_P1D );
+                        }
                         // exclude any recurrence START date, found in exdatelist or recurrIdList
                         // but accept the reccurence-id comp itself
                         //     count the days (incl start day)
-                        $occurenceDays = 1 + (int) $rStart->diff( $rEnd )->format( $PRA );
+                        $occurenceDays = 1 +
+                            (int) (clone $compStart )->setTime( 0, 0 )
+                                ->diff( (clone $compEnd )->setTime( 0, 0 ))
+                                ->format( $PRA );
+                        $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
+                            ? Vcalendar::X_CURRENT_DUE
+                            : Vcalendar::X_CURRENT_DTEND;
                         while( $rStart->format( $YMDn ) <= $rEnd->format( $YMDn )) {
                             $cnt += 1;
                             if( 1 < $occurenceDays ) {
@@ -312,20 +323,9 @@ class SelectFactory
                                 $rStart->format( $compStart->dateFormat )
                             );
                             if( ! empty( $compDuration )) { // DateInterval
-                                $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
-                                    ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
                                 $rWdate = $rStart->getClone();
-                                self::setDurationEndTime(
-                                    $rWdate,
-                                    $rEnd,
-                                    $cnt,
-                                    $occurenceDays,
-                                    $endHis
-                                );
-                                $component2->setXprop(
-                                    $propName,
-                                    $rWdate->format( $compEnd->dateFormat )
-                                );
+                                self::setDurationEndTime( $rWdate, $rEnd, $cnt, $occurenceDays, $endHis );
+                                $component2->setXprop( $propName, $rWdate->format( $compEnd->dateFormat ));
                             } // end if
                             list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
                             if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
@@ -436,22 +436,21 @@ class SelectFactory
                             $xRecurrence  += 1;
                             $cnt           = 0;
                             // count the days (incl start day)
-                            $occurenceDays = 1 + (int) $rStart->diff( $rEnd )->format( $PRA );
+                            $occurenceDays = 1 +
+                                (int) (clone $rStart )->setTime( 0, 0 )
+                                    ->diff( (clone $rEnd )->setTime( 0, 0 ))
+                                    ->format( $PRA );
                             while( $rStart->format( $YMDn ) <= $rEnd->format( $YMDn )) {   // iterate.. .
                                 $cnt += 1;
-                                if( $rStart->format( $YMDn ) <
-                                    $fcnStart->format( $YMDn )) { // date before dtstart
+                                if( $rStart->format( $YMDn ) < $fcnStart->format( $YMDn )) { // date before dtstart
                                     $rStart->add( $INTERVAL_P1D ); // cycle rstart to dtstart
                                     $rStart->setTime( 0, 0 );
                                     continue;
                                 }
-                                elseif( 2 == $cnt ) {
+                                if( 2 == $cnt ) {
                                     $rStart->setTime( 0, 0 );
                                 }
-                                $component3->setXprop(
-                                    Vcalendar::X_RECURRENCE,
-                                    $xRecurrence
-                                );
+                                $component3->setXprop( Vcalendar::X_RECURRENCE, $xRecurrence );
                                 if( 1 < $occurenceDays ) {
                                     $component3->setXprop(
                                         Vcalendar::X_OCCURENCE,
@@ -473,17 +472,8 @@ class SelectFactory
                                 }
                                 else {
                                     $rWdate = $rStart->getClone();
-                                    self::setDurationEndTime(
-                                        $rWdate,
-                                        $rEnd,
-                                        $cnt,
-                                        $occurenceDays,
-                                        $endHis
-                                    );
-                                    $component3->setXprop(
-                                        $propName,
-                                        $rWdate->format( $compEnd->dateFormat )
-                                    );
+                                    self::setDurationEndTime( $rWdate, $rEnd, $cnt, $occurenceDays, $endHis );
+                                    $component3->setXprop( $propName, $rWdate->format( $compEnd->dateFormat ));
                                 } // end else
                                 list( $xY, $xM, $xD ) = self::getArrayYMDkeys( $rStart );
                                 if( ! isset( $result[$xY][$xM][$xD][$compUID] )) {
@@ -497,16 +487,14 @@ class SelectFactory
                         elseif( $rStart->format( $YMDn ) >= $fcnStart->format( $YMDn )) {
                             // date within period, flat=false && split=false => one comp every recur startdate
                             $xRecurrence += 1;
-                            $component2->setXprop(
-                                Vcalendar::X_RECURRENCE,
-                                $xRecurrence
-                            );
+                            $component2->setXprop( Vcalendar::X_RECURRENCE, $xRecurrence );
                             $component2->setXprop(
                                 Vcalendar::X_CURRENT_DTSTART,
                                 $rStart->format( $compStart->dateFormat )
                             );
                             $propName = ( isset( $compEnd->SCbools[self::$DUEEXIST] ))
-                                ? Vcalendar::X_CURRENT_DUE : Vcalendar::X_CURRENT_DTEND;
+                                ? Vcalendar::X_CURRENT_DUE
+                                : Vcalendar::X_CURRENT_DTEND;
                             if( empty( $durationInterval )) {
                                 $component2->deleteXprop( $propName );
                             }

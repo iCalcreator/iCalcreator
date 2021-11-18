@@ -800,9 +800,10 @@ class RecurFactory2
         if( $wDateYmd > $endYmd ) {
             return [];
         }
+        $firstYmd  = $wDateYmd;
         $hasBSP    = self::hasSetByPos( $recur );
         $count     = self::getCount( $recur );
-        $result = $byMonthList = $byMonthDayList = $monthDays = $byDayList = $bspList = [];
+        $result    = $monthDays = $byDayList = $bspList = [];
         $hasByMonthDays = $hasByMonth = $hasByDay = false;
         $byMonthList    = self::getRecurByMonth( $recur, $hasByMonth );
         $byMonthDayList = self::getRecurByMonthDay( $recur, $hasByMonthDays );
@@ -812,9 +813,10 @@ class RecurFactory2
                 $recur[Vcalendar::BYDAY] // number(s) for day in week
             );
         }
-        $year      = (int) $wDate->format( self::$UCY );
-        $month     = (int) $wDate->format( self::$LCM );
-        $currMonth = $daysInMonth = null;
+        $year        = (int) $wDate->format( self::$UCY );
+        $month       = (int) $wDate->format( self::$LCM );
+        $recurLimits = [];
+        $currMonth   = -1;
         if( $hasByMonthDays || $hasByDay ) {
             if( $hasByMonthDays ) {
                 $monthDays = self::getMonthDaysFromByMonthDayList(
@@ -833,8 +835,8 @@ class RecurFactory2
         }
         $plusXmonth = $recur[Vcalendar::INTERVAL] . Util::$SP0 . RecurFactory::$LCMONTH;
         $x         = 1;
-        while( $x < $count ) {
-            if( $month != $currMonth ) {
+        while( $x <= $count ) {
+            if( $month !== $currMonth ) {
                 if( $hasByMonthDays && $hasBSP ) { // has BySetPos !!
                     self::bySetPosResultAppend($result, $x, $bspList, $recurLimits );
                     $Ymd = sprintf( RecurFactory::$YMDs, $year, $month, $day );
@@ -847,7 +849,7 @@ class RecurFactory2
                 $year  = (int) $wDate->format( self::$UCY );
                 $month = (int) $wDate->format( self::$LCM );
                 if( ! self::inList( $month, $byMonthList )) {
-                    $currMonth = null;
+                    $currMonth = -1;
                     continue;
                 }
                 $currMonth     = $month;
@@ -863,10 +865,10 @@ class RecurFactory2
                 }
             } // end if( $month != $currMonth )
             else {
-                $day += 1;
+                ++$day;
             }
-            if( ! checkdate((int) $month, (int) $day, (int) $year )) {
-                $currMonth = null;
+            if( ! checkdate( $month, $day, $year )) {
+                $currMonth = -1;
                 continue;
             }
             $Ymd   = sprintf( RecurFactory::$YMDs, $year, $month, $day );
@@ -880,18 +882,18 @@ class RecurFactory2
                     break;
                 case ( $endYmd < $Ymd ) :
                     break 2; // leave while !!
-                case ( $Ymd <= $fcnStartYmd );
+                case ( $Ymd <= $firstYmd ); // accept all but first
                     break;
                 case ( self::inList( $day, $monthDays )) :
                     if( self::inList( $dayNo, $byDayList )) { // empty or hit
+                        ++$x;
                         $result[$Ymd] = true;
-                        $x            += 1;
                         if( $x >= $count ) {
                             break 2;  // leave while !!
                         }
                     } // end if
                     if( ! $hasByMonthDays && ! $hasByDay ) {
-                        $currMonth = null;
+                        $currMonth = -1;
                     }
                     break;
             } // end switch
@@ -937,7 +939,7 @@ class RecurFactory2
         $isYearly    = isset( $recur[Vcalendar::YEARLY] );
         $hasBSP      = self::hasSetByPos( $recur );
         $count       = self::getCount( $recur );
-        $result      = $byMonthList = $byDayList = $bspList = [];
+        $result      = $bspList = [];
         $year        = (int) $wDate->format( self::$UCY );
         $month       = (int) $wDate->format( self::$LCM );
         $hasByMonth  = false;
@@ -958,6 +960,7 @@ class RecurFactory2
             $year,
             $month
         );
+        $recurLimits = [];
         if( $hasBSP ) {
             $recurLimits = [ $count, $recur[Vcalendar::BYSETPOS], $wDateYmd, $endYmd ];
             $wDate->setDate( $year, $month, 1 ); //
@@ -967,25 +970,24 @@ class RecurFactory2
         }
         $currMonth = $month;
         $currYear  = $year;
-        $x         = 1;
+        $x         = ( isset( $recur[Vcalendar::BYDAY] ) &&
+            self::hasRecurByDaysWithRelativeWeekdays( $recur[Vcalendar::BYDAY] )) ? 0 : 1;
         while( $x < $count ) {
-            if( ! checkdate((int) $month, (int) $day, (int) $year )) {
-                $currMonth = null;
-                if( $isYearly && ( 12 == $month )) {
-                    $currYear = null;
+            if( ! checkdate( $month, $day, $year )) {
+                $currMonth    = -1;
+                if( $isYearly && ( 12 === $month )) {
+                    $currYear = -1;
                 }
             }
-            if(( $month != $currMonth ) || ( $isYearly && ( $year != $currYear ))) {
+            if(( $month !== $currMonth ) || ( $isYearly && ( $year !== $currYear ))) {
                 $day       = 1;
-                if( $isYearly && ( $year != $currYear )) {
-                    $wDate->setDate( $year, 1, $day )
-                        ->modify( $modifier );
-                    $year = (int) $wDate->format( self::$UCY );
+                if( $isYearly && ( $year !== $currYear )) {
+                    $wDate->setDate( $year, 1, $day )->modify( $modifier );
+                    $year  = (int) $wDate->format( self::$UCY );
                     $month = 1;
                 }
                 else {
-                    $wDate->setDate( $year, $month, $day )
-                        ->modify( $modifier );
+                    $wDate->setDate( $year, $month, $day )->modify( $modifier );
                     $year  = (int) $wDate->format( self::$UCY );
                     $month = (int) $wDate->format( self::$LCM );
                 }
@@ -998,9 +1000,9 @@ class RecurFactory2
                     $bspList = [];
                 } // end if
                 if( ! self::inList( $month, $byMonthList )) {
-                    $currMonth = null;
-                    if( $isYearly && ( 12 == $month )) {
-                        $currYear = null;
+                    $currMonth = -1;
+                    if( $isYearly && ( 12 === $month )) {
+                        $currYear = -1;
                     }
                     continue;
                 }
@@ -1025,14 +1027,14 @@ class RecurFactory2
                     break;
                 case self::inList( $day, $weekDaysInMonth ) :
                     $result[$Ymd] = true;
-                    $x           += 1;
+                    ++$x;
                     if( $x >= $count ) {
                         break 2;  // leave while !
                     }
                     break;
             } // end switch
             // count day up
-            $day += 1;
+            ++$day;
         } // end while
         return $result;
     }
@@ -1115,62 +1117,62 @@ class RecurFactory2
         if( $wDateYmd > $endYmd ) {
             return [];
         }
-        $result    = $byMonthList = $byWeeknoList = $byMonthDayList = $monthDaysList = [];
+        $startYmd  = ( $wDateYmd > $fcnStartYmd ) ? $wDateYmd : $fcnStartYmd;
+        $result    = [];
         $x         = 1;
         $count     = self::getCount( $recur );
         $hasByMonthDays = $hasByMonth = false;
         $byMonthList    = self::getRecurByMonth( $recur, $hasByMonth );
         $byMonthDayList = self::getRecurByMonthDay( $recur, $hasByMonthDays );
-        $year      = $currYear = (int) $wDate->format( self::$UCY );
+        $currYear  = $year = (int) $wDate->format( self::$UCY );
         $month     = (int) $wDate->format( self::$LCM );
         $day       = (int) $wDate->format( self::$LCJ );
-        $currMonth = $month;
-        if( ! $hasByMonth && ! $hasByMonthDays ) {
-            $currYear  = null;
-            $currMonth = null;
+        $currMonth = $firstMonth = $lastMonth = $month;
+        if( $hasByMonth || $hasByMonthDays ) {
+            $firstMonth = reset( $byMonthList );
+            $lastMonth  = end( $byMonthList );
+        }
+        else {
+            $currMonth  = -1;
+            $currYear   = -1;
         }
         $isLastMonth = false;
         while(( $x < $count ) && ( $endYmd >= $wDate->format( self::$YMD ))) {
-            if( $year != $currYear ) {
+            if( $year !== $currYear ) {
                 $year     += $recur[Vcalendar::INTERVAL];
                 $currYear  = $year;
                 if( $hasByMonth ) {
-                    $month = 1;
-                    $currMonth = null;
+                  $month     = 1;
+                  $currMonth = -1;
                 }
                 $wDate->setDate( $year, $month, $day );
             }  // end if currYear
             if( $hasByMonth && ( $month != $currMonth )) {
                 $continue2 = false;
                 switch( true ) {
-                    case( ! self::inList( $month, $byMonthList )) :
-                        $currMonth = $month = reset( $byMonthList );
+                    case( ! self::inList( $month, $byMonthList )) : // set first month
+                        $currMonth = $month = $firstMonth;
                         break;
-                    case( $isLastMonth ) :
-                        $currMonth = $month = reset( $byMonthList );
+                    case( $isLastMonth ) : // set first month
+                        $currMonth = $month = $firstMonth;
                         break;
-                    case( 1 == count( $byMonthList )) :
-                        $currYear    = null;
+                    case( 1 === count( $byMonthList )) : // step
+                        $currYear    = -1;
                         $isLastMonth = true;
-                        $continue2   = true;
-                        break;
-                    default :
+                        continue 2; // i.e. cont. while
+                    default : // next month in list
                         $nextKey       = array_keys( $byMonthList, $month )[0] + 1;
                         if( isset( $byMonthList[$nextKey] )) {
                             $currMonth = $month = $byMonthList[$nextKey];
                             break;
                         }
-                        $currYear    = null;
+                        $currYear    = -1;
                         $isLastMonth = true;
-                        $continue2   = true;
-                        break;
+                        continue 2; // i.e. cont. while
                 } // end switch
-                if( $continue2 ) {
-                    continue; // i.e. while
-                }
-                $isLastMonth = ( $month == end( $byMonthList ));
+                $isLastMonth = ( $month === $lastMonth );
                 $wDate->setDate( $year, $month, $day );
-            } // end if currMonth
+            } // end if month != currMonth
             $Ymd = $wDate->format( self::$YMD );
             if( $endYmd < $Ymd ) {
                 break; // leave while !!
@@ -1188,24 +1190,24 @@ class RecurFactory2
                         break 2;  // leave while !!
                     }
                     $result[$Ymd] = true;
-                    $x           += 1;
+                    ++$x;
                     if( $x >= $count ) {
                         break 2;
                     }
                 } // end foreach
             } // end if $hasByMonthDays
-            elseif( $Ymd > $fcnStartYmd ) {
+            elseif( $Ymd > $startYmd ) {
                 $result[$Ymd] = true;
-                $x           += 1;
+                ++$x;
             }
             if( $hasByMonth ) {
-                $currMonth = null;
+                $currMonth = -1;
                 if( $isLastMonth ) {
-                    $currYear = null;
+                    $currYear = -1;
                 }
             }
             else {
-                $currYear = null;
+                $currYear = -1;
             }
         } // end while
         return $result;
@@ -1438,10 +1440,9 @@ class RecurFactory2
                     }
                 } // end foreach
                 if( ! empty( $dayN )) {
-                    $result = array_merge(
-                        $result,
-                        self::getMonthDaysFromByDay( $monthDays, $pos, $dayN )
-                    );
+                    foreach(self::getMonthDaysFromByDay( $monthDays, $pos, $dayN ) as $day ) {
+                        $result[] = $day;
+                    }
                 }
                 $dayN = $pos = false;
                 continue;
@@ -1456,10 +1457,9 @@ class RecurFactory2
         } // end foreach
         // single ByDay recur
         if( ! empty( $dayN )) {
-            $result = array_merge(
-                $result,
-                self::getMonthDaysFromByDay( $monthDays, $pos, $dayN )
-            );
+            foreach(self::getMonthDaysFromByDay( $monthDays, $pos, $dayN ) as $day ) {
+                $result[] = $day;
+            }
         }
         sort( $result, SORT_NUMERIC );
         return $result;
