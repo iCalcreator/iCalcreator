@@ -99,8 +99,7 @@ class CalAddressFactory
         else {
             $testAddress = self::removeMailtoPrefix( $calAddress );
         }
-        if( ! filter_var( $testAddress, FILTER_VALIDATE_EMAIL ) &&
-            ! filter_var( $domain, FILTER_VALIDATE_DOMAIN )) {
+        if( ! filter_var( $testAddress, FILTER_VALIDATE_EMAIL )) {
             throw new InvalidArgumentException( sprintf( $ERRMSG, $calAddress ));
         }
     }
