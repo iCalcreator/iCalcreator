@@ -627,7 +627,7 @@ class DateTimeFactory
     }
 
     /*
-     *  Return bool true if dateStr starts with format YYYYmmdd[T/t]HHmmss
+     * Return bool true if dateStr starts with format YYYYmmdd[T/t]HHmmss
      *
      * @param string $dateStr
      * @return bool
@@ -647,16 +647,18 @@ class DateTimeFactory
     /**
      * Return diff in days (incl start day) i.e. event length in days
      *
-     * @param DateTimeInterface $start
-     * @param DateTimeInterface $end
+     * @param UtilDateTime $start
+     * @param UtilDateTime $end
      * @return int
      */
-    public static function getDayDiff( DateTimeInterface $start, DateTimeInterface $end ) : int
+    public static function getDayDiff( UtilDateTime $start, UtilDateTime $end ) : int
     {
         static $PRA = '%a';
         return 1 +
-            (int) (clone $start )->setTime( 0, 0 )
-                ->diff( (clone $end )->setTime( 0, 0 ))
+            (int) $start->getClone()
+                ->setTime( 0, 0 )
+                ->diff( $end->getClone()
+                    ->setTime( 0, 0 ))
                 ->format( $PRA );
     }
 }

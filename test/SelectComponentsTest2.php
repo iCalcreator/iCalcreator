@@ -322,6 +322,33 @@ END:VCALENDAR
         ];
 
         $dataArr[] = [ // rfc 2445-18, test Monthly on the third to the last day of the month, forever BUT here UNTIL 19980228
+            '2103-2445-17',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+COMMENT:Example rfc 2445-17
+Comment:Monthly on the second to last Monday of the month for 6 months:
+Comment:DTSTART;TZID=America/Los_Angeles:19970922T090000
+Comment:RRULE:FREQ=MONTHLY;COUNT=6;BYDAY=-2MO
+Comment:==> (1997 9:00 AM EDT)September 22;October 20
+Comment:    (1997 9:00 AM EST)November 17;December 22
+Comment:    (1998 9:00 AM EST)January 19;February 16
+DTSTART;TZID=America/Los_Angeles:19970922T090000
+RRULE:FREQ=MONTHLY;COUNT=6;BYDAY=-2MO
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19970922090000', new DateTimeZone( 'America/Los_Angeles' )),
+            [
+                '1997-09-22 09:00:00 America/Los_Angeles', // event start
+                '1997-10-20 09:00:00 America/Los_Angeles',
+                '1997-11-17 09:00:00 America/Los_Angeles',
+                '1997-12-22 09:00:00 America/Los_Angeles',
+                '1998-01-19 09:00:00 America/Los_Angeles',
+                '1998-02-16 09:00:00 America/Los_Angeles'
+            ]
+        ];
+
+        $dataArr[] = [ // rfc 2445-18, test Monthly on the third to the last day of the month, forever BUT here UNTIL 19980228
             '2103-2445-18',
             'BEGIN:VCALENDAR
 BEGIN:VEVENT
@@ -495,7 +522,7 @@ END:VCALENDAR
         ];
 
         $dataArr[] = [ // rfc 2445-30, test Every Friday the 13th but COUNT=5
-              // BUG here : got four, exp five.... exDate of startDate NOT taken in acount....
+              // BUG here : got four, exp five.... exDate of startDate NOT taken in COUNT-account....
             '2103-2445-30',
             'BEGIN:VCALENDAR
 BEGIN:VEVENT
@@ -624,10 +651,14 @@ END:VCALENDAR
                              . ' ' . Vcalendar::X_CURRENT_DTEND . $event->getXprop( Vcalendar::X_CURRENT_DTEND )[1]
                         ); // test ###
 */
+                        $this->assertTrue(
+                            isset( $startDates[$count] ),
+                            'case #' . $case . '-1, count ' . $count . ', NOT found in expected, actual ' . $x_current_dtstart
+                        );
                         $this->assertEquals(
                             $startDates[$count],
                             $x_current_dtstart,
-                            'case #' . $case . '-1, count ' . $count . ', got ' . $x_current_dtstart . ', exp ' . $startDates[$count]
+                            'case #' . $case . '-2, count ' . $count . ', got ' . $x_current_dtstart . ', exp ' . $startDates[$count]
                         );
                         ++$count;
                     } // end foreach
@@ -638,7 +669,7 @@ END:VCALENDAR
         $this->assertEquals(
             $expHits,
             $count,
-            'case #' . $case . '-2 got ' . $count . ', exp ' . $expHits
+            'case #' . $case . '-3 got ' . $count . ', exp ' . $expHits
         );
     }
 }

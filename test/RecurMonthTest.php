@@ -995,7 +995,7 @@ class RecurMonthTest extends RecurBaseTest
         // rfc example 14
         $start   = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm');
         $wDate   = clone $start;
-        $expects = [ 20190104, 20190201, 20190301, 20190405, 20190503, 20190607, 20190705, 20190802, 20190906 ];
+        $expects = [ 20190104, 20190201, 20190301, 20190405, 20190503, 20190607, 20190705, 20190802, 20190906, 20191004 ];
         $count   = 10;
         $dataArr[] = [
             '29-14',
@@ -1013,7 +1013,7 @@ class RecurMonthTest extends RecurBaseTest
         // rfc example 16
         $start   = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm');
         $wDate   = clone $start;
-        $expects = [ 20190104, 20190125, 20190301, 20190329, 20190503, 20190531, 20190705, 20190726, 20190906 ];
+        $expects = [ 20190104, 20190125, 20190301, 20190329, 20190503, 20190531, 20190705, 20190726, 20190906, 20190927 ];
         $count   = 10;
         $dataArr[] = [
             '29-16-2',
@@ -1035,7 +1035,7 @@ class RecurMonthTest extends RecurBaseTest
         // rfc example 17
         $start   = DateTimeFactory::factory( '20190101T090000', 'Europe/Stockholm');
         $wDate   = clone $start;
-        $expects = [ 20190121, 20190218, 20190318, 20190422, 20190520 ];
+        $expects = [ 20190121, 20190218, 20190318, 20190422, 20190520, 20190617 ];
         $count   = 6;
         $dataArr[] = [
             '29-17',

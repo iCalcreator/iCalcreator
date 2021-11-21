@@ -55,7 +55,7 @@ use function var_export;
 /**
  * iCalcreator 'newer' recur support class
  *
- * @since  2.27.28 - 2020-09-10
+ * @since  2.40.7 - 2021-11-19
  */
 class RecurFactory2
 {
@@ -950,7 +950,7 @@ class RecurFactory2
      * @param null|string|DateTime $fcnEndIn  end date
      * @return array          array([Ymd] => bool)
      * @throws Exception
-     * @since  2.29.24 - 2020-08-29
+     * @since  2.40.7 - 2021-11-19
      */
     public static function recurMonthlyYearly3(
         array $recur,
@@ -963,9 +963,6 @@ class RecurFactory2
             self::getRecurSimpleBase( $recur, $wDateIn, $fcnStartIn, $fcnEndIn );
         if( $wDateYmd > $endYmd ) {
             return [];
-        }
-        if( $wDateYmd > $fcnStartYmd ) {
-            $fcnStartYmd = $wDateYmd;
         }
         $isYearly    = isset( $recur[IcalInterface::YEARLY] );
         $hasBSP      = self::hasSetByPos( $recur );
@@ -986,11 +983,7 @@ class RecurFactory2
         $modifier = $isYearly
             ? $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCYEAR
             : $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCMONTH;
-        $weekDaysInMonth = self::getRecurByDaysInMonth(
-            $recur[IcalInterface::BYDAY],
-            $year,
-            $month
-        );
+        $weekDaysInMonth = self::getRecurByDaysInMonth( $recur[IcalInterface::BYDAY], $year, $month );
         $recurLimits = [];
         if( $hasBSP ) {
             $recurLimits = [ $count, $recur[IcalInterface::BYSETPOS], $wDateYmd, $endYmd ];
@@ -1001,10 +994,11 @@ class RecurFactory2
         }
         $currMonth = $month;
         $currYear  = $year;
-        $x         = 1;
+        $x         = ( isset( $recur[IcalInterface::BYDAY] ) &&
+            self::hasRecurByDaysWithRelativeWeekdays( $recur[IcalInterface::BYDAY] )) ? 0 : 1;
         while( $x < $count ) {
             if( ! checkdate( $month, $day, $year )) {
-                $currMonth = -1;
+                $currMonth    = -1;
                 if( $isYearly && ( 12 === $month )) {
                     $currYear = -1;
                 }
@@ -1012,14 +1006,12 @@ class RecurFactory2
             if(( $month !== $currMonth ) || ( $isYearly && ( $year !== $currYear ))) {
                 $day       = 1;
                 if( $isYearly && ( $year !== $currYear )) {
-                    $wDate->setDate( $year, 1, $day )
-                        ->modify( $modifier );
-                    $year = (int) $wDate->format( self::$UCY );
+                    $wDate->setDate( $year, 1, $day )->modify( $modifier );
+                    $year  = (int) $wDate->format( self::$UCY );
                     $month = 1;
                 }
                 else {
-                    $wDate->setDate( $year, $month, $day )
-                        ->modify( $modifier );
+                    $wDate->setDate( $year, $month, $day )->modify( $modifier );
                     $year  = (int) $wDate->format( self::$UCY );
                     $month = (int) $wDate->format( self::$LCM );
                 }
@@ -1040,11 +1032,7 @@ class RecurFactory2
                 }
                 $currYear  = $year;
                 $currMonth = $month;
-                $weekDaysInMonth = self::getRecurByDaysInMonth(
-                    $recur[IcalInterface::BYDAY],
-                    $year,
-                    $month
-                );
+                $weekDaysInMonth = self::getRecurByDaysInMonth( $recur[IcalInterface::BYDAY], $year, $month );
             } // end if(( $month !== $currMonth ) || ( $isYearly && ( $year !== $currYear )))
             $Ymd = sprintf( RecurFactory::$YMDs, $year, $month, $day );
             switch( true ) {
