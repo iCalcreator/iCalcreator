@@ -407,7 +407,7 @@ abstract class IcalBase implements IcalInterface
      */
     public function setConfig(
         string | array $config,
-        null|bool|string $value = null ,
+        null|bool|string|array $value = null ,
         ? bool $softUpdate = false
     ) : static
     {
