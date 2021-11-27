@@ -56,7 +56,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40.7' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40.8' );
 }
 
 /**
@@ -64,7 +64,7 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  *
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
- * @since  2.39.1 - 2021-06-26
+ * @since  2.40.8 - 2021-11-26
  */
 abstract class IcalBase implements IcalInterface
 {
@@ -398,24 +398,20 @@ abstract class IcalBase implements IcalInterface
     /**
      * Set Vcalendar/component config
      *
-     * @param string|array      $config
-     * @param null|bool|string  $value
-     * @param bool          $softUpdate
+     * @param string|array           $config
+     * @param null|bool|string|array $value
+     * @param bool                   $softUpdate
      * @return static
      * @throws InvalidArgumentException
-     * @since  2.29.4 - 2019-07-02
+     * @since  2.40.8 - 2021-11-26
      */
     public function setConfig(
         string | array $config,
-        null|bool|string $value = null ,
+        null|bool|string|array $value = null,
         ? bool $softUpdate = false
     ) : static
     {
         static $ERRMSG9 = 'Invalid config value %s';
-        $isComponent = ( ! property_exists(
-            $this,
-            StringFactory::getInternalPropName( self::PRODID )
-        ));
         if( is_array( $config )) {
             $config = array_change_key_case( $config, CASE_UPPER );
             foreach( $config as $cKey => $cValue ) {
@@ -423,6 +419,7 @@ abstract class IcalBase implements IcalInterface
             }
             return $this;
         }
+        $prodIdPropName = StringFactory::getInternalPropName( self::PRODID );
         $key    = strtoupper( $config );
         $subCfg = null;
         switch( true ) {
@@ -443,7 +440,7 @@ abstract class IcalBase implements IcalInterface
                 $this->config[self::UNIQUE_ID] = $value;
                 $subCfg = [ self::UNIQUE_ID => $value ];
                 break;
-            case ( $isComponent ) :
+            case ( ! property_exists( $this, $prodIdPropName )) : // no component
                 break;
             default:  // any invalid config key.. .
                 throw new InvalidArgumentException( sprintf( $ERRMSG9, $config ));
