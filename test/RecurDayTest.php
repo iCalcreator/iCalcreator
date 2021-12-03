@@ -44,19 +44,11 @@ class RecurDayTest extends RecurBaseTest
     /**
      * recurDaily1Test provider
      * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
     public function recurDaily1TestProvider() : array
     {
 
-        $dataArr = [];
+        $dataArr   = [];
         $dataSetNo = 0;
         $DATASET   = 'DATASET';
 
@@ -214,7 +206,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::COUNT    => $count,
                     IcalInterface::INTERVAL => $interval,
                     IcalInterface::BYMONTH  => $byMonth,
-                    $DATASET            => $dataSetNo++
+                    $DATASET                => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
@@ -269,7 +261,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::INTERVAL => $interval,
                     IcalInterface::BYMONTH  => $byMonth,
                     IcalInterface::BYDAY    => [ IcalInterface::DAY => IcalInterface::TH ],
-                    $DATASET            => $dataSetNo++
+                    $DATASET                => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
@@ -314,7 +306,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::COUNT      => $count,
                     IcalInterface::INTERVAL   => $interval,
                     IcalInterface::BYMONTHDAY => $byMonthDay,
-                    $DATASET              => $dataSetNo++
+                    $DATASET                  => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
@@ -361,7 +353,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::INTERVAL   => $interval,
                     IcalInterface::BYMONTHDAY => $byMonthDay,
                     IcalInterface::BYDAY      => [ IcalInterface::DAY => IcalInterface::TH ],
-                    $DATASET              => $dataSetNo++
+                    $DATASET                  => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
@@ -411,7 +403,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::INTERVAL   => $interval,
                     IcalInterface::BYMONTH    => $byMonth,
                     IcalInterface::BYMONTHDAY => $byMonthDay,
-                    $DATASET              => $dataSetNo++
+                    $DATASET                  => $dataSetNo++
                 ],
                 $expects,
                 $execTime,
@@ -463,7 +455,7 @@ class RecurDayTest extends RecurBaseTest
                     IcalInterface::BYMONTH    => $byMonth,
                     IcalInterface::BYMONTHDAY => $byMonthDay,
                     IcalInterface::BYDAY      => [ IcalInterface::DAY => IcalInterface::TH ],
-                    $DATASET              => $dataSetNo++
+                    $DATASET                  => $dataSetNo++
                 ],
                 $expects,
                 $execTime,

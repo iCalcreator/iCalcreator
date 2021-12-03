@@ -56,7 +56,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40.8' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.40.10' );
 }
 
 /**

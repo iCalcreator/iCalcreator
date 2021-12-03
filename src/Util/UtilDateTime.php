@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use Kigkonsult\Icalcreator\IcalInterface;
@@ -45,7 +46,7 @@ use function substr;
 /**
  * iCalcreator DateTime support class
  *
- * @since  2.29.1 - 2019-07-01
+ * @since  2.40.0 - 2021-12-02
  */
 class UtilDateTime extends DateTime
 {
@@ -180,16 +181,16 @@ class UtilDateTime extends DateTime
     /**
      * Return UtilDateTime object instance based on date array and timezone(s)
      *
-     * @param DateTime      $date
+     * @param DateTimeInterface  $date
      * @param null|array $params
      * @param null|string   $dtstartTz
      * @return self
      * @throws Exception
      * @throws RuntimeException
-     * @since  2.29.1 - 2019-07-01
+     * @since  2.40.0 - 2021-12-02
      */
     public static function factory(
-        DateTime $date,
+        DateTimeInterface $date,
         ? array $params = null,
         ? string $dtstartTz = null
     ) : self

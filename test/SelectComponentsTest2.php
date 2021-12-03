@@ -42,7 +42,9 @@ class SelectComponentsTest2 extends TestCase
     {
         $dataArr = [];
 
-        $dataArr[] = [ // test daily, interval 1, count 10
+        // test daily, interval 1, count 10
+        // recurDaily1
+        $dataArr[] = [
             '2100-2445-1',
             'BEGIN:VCALENDAR
 BEGIN:VEVENT
@@ -70,6 +72,8 @@ END:VCALENDAR
             ]
         ];
 
+        // test daily, interval 1, count 10 - over night - neotsn #95
+        // recurDaily1
         $dataArr[] = [ // test daily, interval 1, count 10 - over night - neotsn #95
             '2101',
             'BEGIN:VCALENDAR
@@ -108,7 +112,9 @@ END:VCALENDAR
             ]
         ];
 
-        $dataArr[] = [ // test daily, interval 2, count 10 - same as above but interval 2
+        // test daily, interval 2, count 10 - same as above but interval 2
+        // recurDaily1
+        $dataArr[] = [
             '2102',
             'BEGIN:VCALENDAR
 VERSION:2.0
@@ -137,7 +143,9 @@ END:VCALENDAR
             ]
         ];
 
-        $dataArr[] = [ // rfc 2445-4, test daily, interval 10, count 5
+        // rfc 2445-4, test daily, interval 10, count 5
+        // recurDaily1
+        $dataArr[] = [
             '2103-2445-4',
             'BEGIN:VCALENDAR
 BEGIN:VEVENT
@@ -158,6 +166,58 @@ END:VCALENDAR
                 '1997-09-22 09:00:00 America/Los_Angeles',
                 '1997-10-02 09:00:00 America/Los_Angeles',
                 '1997-10-12 09:00:00 America/Los_Angeles'
+            ]
+        ];
+
+        // rfc 2445-6, test daily, Everyday in January, for 3 years BUT BYSETPOS=10
+        // recurDaily2
+        $dataArr[] = [
+            '2103-2445-6a',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+Comment:Every 10th in January, for 3 years
+Comment:DTSTART;TZID=America/Los_Angeles:19980101T090000
+Comment:RRULE:FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1;BYSETPOS=10
+Comment:==> (1998 9:00 AM EDT)January 21
+Comment:    (1999 9:00 AM EDT)January 21
+Comment:    (2000 9:00 AM EDT)January 21
+DTSTART;TZID=America/Los_Angeles:19980101T090000
+RRULE:FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1;BYSETPOS=10
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19980101090000', new DateTimeZone( 'America/Los_Angeles' )),
+            [
+                '1998-01-01 09:00:00 America/Los_Angeles', // event start
+                '1998-01-10 09:00:00 America/Los_Angeles',
+                '1999-01-10 09:00:00 America/Los_Angeles',
+                '2000-01-10 09:00:00 America/Los_Angeles'
+            ]
+        ];
+
+        // rfc 2445-6, test daily, Everyday in January, for 3 years, same as above BUT BYMONTHDAY=10
+        // recurDaily1
+        $dataArr[] = [
+            '2103-2445-6b',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+Comment:Every 10th in January, for 3 years
+Comment:DTSTART;TZID=America/Los_Angeles:19980101T090000
+Comment:RRULE:FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1;BYMONTHDAY=10
+Comment:==> (1998 9:00 AM EDT)January 21
+Comment:    (1999 9:00 AM EDT)January 21
+Comment:    (2000 9:00 AM EDT)January 21
+DTSTART;TZID=America/Los_Angeles:19980101T090000
+RRULE:FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1;BYMONTHDAY=10
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19980101090000', new DateTimeZone( 'America/Los_Angeles' )),
+            [
+                '1998-01-01 09:00:00 America/Los_Angeles', // event start
+                '1998-01-10 09:00:00 America/Los_Angeles',
+                '1999-01-10 09:00:00 America/Los_Angeles',
+                '2000-01-10 09:00:00 America/Los_Angeles'
             ]
         ];
 
@@ -625,7 +685,8 @@ END:VCALENDAR
         array    $startDates
     ) : void
     {
-//      error_log(__FUNCTION__ . ' start case ' . $case );// test ###
+
+        // echo __FUNCTION__ . ' start case ' . $case .PHP_EOL; // test ###
 
         $vCalender = new Vcalendar();
         $yearHits  = $vCalender->parse( $ics )
@@ -634,23 +695,22 @@ END:VCALENDAR
         $this->assertIsArray( $yearHits );
 
         $count     = 0;
+        $xDtstarts = [];
         foreach( $yearHits as $year => $months ) {
             foreach( $months as $month => $days ) {
                 foreach( $days as $day => $events ) {
                     foreach( $events as $event ) {
                         $x_current_dtstart = $event->getXprop( Vcalendar::X_CURRENT_DTSTART )[1];
-                        if( false !== ( $xRecurrence = $event->getXprop( IcalInterface::X_RECURRENCE ))) {
-                            $xRecurrence = $xRecurrence[1];
-                        }
-                        else {
-                            $xRecurrence = ' ';
-                        }
-/*
+                        /*
+                        $xRecurrence = ( false !== ( $xRecurrence = $event->getXprop( IcalInterface::X_RECURRENCE )))
+                            ? $xRecurrence[1]
+                            : ' ';
                         error_log( '#' . (1 + $count) . ' xRecurrence:' . $xRecurrence . ' ' . $year . '-' . $month . '-' . $day . ' ' .
-                            Vcalendar::X_CURRENT_DTSTART . ':' . $x_current_dtstart
-                             . ' ' . Vcalendar::X_CURRENT_DTEND . $event->getXprop( Vcalendar::X_CURRENT_DTEND )[1]
+                            Vcalendar::X_CURRENT_DTSTART . ':' . $x_current_dtstart . ' ' .
+                            Vcalendar::X_CURRENT_DTEND . $event->getXprop( Vcalendar::X_CURRENT_DTEND )[1]
                         ); // test ###
-*/
+                        */
+                        $xDtstarts[] = $x_current_dtstart;
                         $this->assertTrue(
                             isset( $startDates[$count] ),
                             'case #' . $case . '-1, count ' . $count . ', NOT found in expected, actual ' . $x_current_dtstart
@@ -669,7 +729,7 @@ END:VCALENDAR
         $this->assertEquals(
             $expHits,
             $count,
-            'case #' . $case . '-3 got ' . $count . ', exp ' . $expHits
+            'case #' . $case . '-3 got ' . $count . ', exp ' . $expHits . ' (' . implode( '-', $xDtstarts ) . ')'
         );
     }
 }

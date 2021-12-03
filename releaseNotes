@@ -147,3 +147,7 @@ v3.39   3.4 release candidate
 2.40.7    more DAILY, over night github#95
 
 2.40.8    github#98 setConfig arg
+
+2.40.9    more DAILY, over night github#95
+2.40.10   recur bug, RecurFactory2
+

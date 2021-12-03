@@ -55,7 +55,7 @@ use function var_export;
 /**
  * iCalcreator 'newer' recur support class
  *
- * @since  2.40.7 - 2021-11-19
+ * @since  2.40.10 - 2021-12-03
  */
 class RecurFactory2
 {
@@ -110,7 +110,7 @@ class RecurFactory2
     private static string $COMMA = ',';
 
     /**
-     * @var string[]   troublesome simple recurs keys
+     * @var string[]   troublesome simple recurs keys, all but BYDAY and BYMONTH
      */
     private static array $RECURBYX  = [
         IcalInterface::BYSECOND,
@@ -229,7 +229,7 @@ class RecurFactory2
         if( IcalInterface::DAILY !== $recur[IcalInterface::FREQ ] ) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( in_array( $byX, $ACCEPT, true )) {
                 continue;
             }
@@ -240,22 +240,20 @@ class RecurFactory2
         if( ! isset( $recur[IcalInterface::BYDAY] )) {
             return true;
         }
-        if( empty( self::getRecurByDaysWithNoRelativeWeekdays(
-            $recur[IcalInterface::BYDAY] )
-        )) {
+        if( empty( self::getRecurByDaysWithNoRelativeWeekdays( $recur[IcalInterface::BYDAY] ))) {
             return false;
         }
         return true;
     }
 
     /**
-     *  Return Bool true if it is an simple DAILY recur
+     *  Return Bool true if it is an DAILY recur
      *
      * Recur UNTIL/COUNT/INTERVAL opt (INTERVAL default 1)
      * Recur BYDAYs opt, only fixed weekdays ex. 'TH', not '-1TH'
+     * BYSETPOS, only if one of BYMONTH or BYMONTHDAY exists
      * Recur BYMONTH opt
      * Recur BYMONTHDAY opt
-     * BYSETPOS, only if BYMONTH or BYMONTHDAY exists
      *
      * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
      * is  not  set to MONTHLY or YEARLY."
@@ -296,7 +294,7 @@ class RecurFactory2
         if( isset( $recur[IcalInterface::BYDAY] )) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( isset( $recur[$byX])) {
                 return false;
             }
@@ -331,7 +329,7 @@ class RecurFactory2
         ))) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( isset( $recur[$byX])) {
                 return false;
             }
@@ -366,7 +364,7 @@ class RecurFactory2
             ! isset( $recur[IcalInterface::BYMONTHDAY] )) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( in_array( $byX, $ACCEPT, true )) {
                 continue;
             }
@@ -398,7 +396,7 @@ class RecurFactory2
         if( ! isset( $recur[IcalInterface::BYDAY] )) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( in_array( $byX, $ACCEPT, true )) {
                 continue;
             }
@@ -429,7 +427,7 @@ class RecurFactory2
         if( isset( $recur[IcalInterface::BYDAY] )) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( in_array( $byX, $ACCEPT, true )) {
                 continue;
             }
@@ -461,7 +459,7 @@ class RecurFactory2
         if( ! isset( $recur[IcalInterface::BYDAY], $recur[IcalInterface::BYMONTH] )) {
             return false;
         }
-        foreach( self::$RECURBYX as $byX ) {
+        foreach( self::$RECURBYX as $byX ) { // all but BYDAY and BYMONTH
             if( in_array( $byX, $ACCEPT, true )) {
                 continue;
             }
@@ -527,9 +525,6 @@ class RecurFactory2
      * Recur BYMONTH opt
      * Recur BYMONTHDAY opt
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
-     *
-     * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
-     * is  not  set to MONTHLY or YEARLY."
      *
      * @param array $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn    component start date
@@ -604,15 +599,12 @@ class RecurFactory2
     /**
      * Return array dates based on a DAILY/BYSETPOS recur pattern
      *
-     * Recur INTERVAL required (or set to 1)
+     * Recur UNTIL/COUNT/INTERVAL opt (INTERVAL default 1)
      * Recur BYDAYs opt, only fixed weekdays ex. 'TH', not '-1TH'
+     * BYSETPOS, only if one of BYMONTH or BYMONTHDAY exists
      * Recur BYMONTH opt
      * Recur BYMONTHDAY opt
-     * BYSETPOS, only if BYMONTH or BYMONTHDAY exists
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
-     *
-     * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
-     * is  not  set to MONTHLY or YEARLY."
      *
      * @param array $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn    component start date
@@ -620,7 +612,7 @@ class RecurFactory2
      * @param null|string|DateTime $fcnEndIn   end date
      * @return array          array([Ymd] => bool)
      * @throws Exception
-     * @since  2.27.16 - 2019-03-03
+     * @since  2.40.10 - 2021-12-03
      */
     public static function recurDaily2(
         array $recur,
@@ -629,6 +621,7 @@ class RecurFactory2
         null|string|DateTime $fcnEndIn = null
     ) : array
     {
+        static $TOPREVDAY = '-1 day';
         [ $wDate, $wDateYmd, $fcnStartYmd, $endYmd ] =
             self::getRecurSimpleBase( $recur, $wDateIn, $fcnStartIn, $fcnEndIn );
         if( $wDateYmd > $endYmd ) {
@@ -641,7 +634,7 @@ class RecurFactory2
         unset( $recur[IcalInterface::BYSETPOS] );
         $year        = (int) $wDate->format( self::$UCY );
         $month       = (int) $wDate->format( self::$LCM );
-        $wDate->setDate( $year, $month, 1 );
+        $wDate->setDate( $year, $month, 1 )->modify( $TOPREVDAY );
         $wDateIn2    = clone $wDate;
         $fcnStartIn2 = $wDateIn2->format( self::$YMD );
         $yearEnd     = (int) substr( $endYmd, 0, 4 );
@@ -650,22 +643,29 @@ class RecurFactory2
         $wDate->setDate( $yearEnd, $monthEnd, $dayEnd );
         $fcnEndIn2   = $wDate->setDate( $yearEnd, $monthEnd, (int) $wDate->format( self::$LCT ));
         $result1     = self::recurDaily1( $recur, $wDateIn2, $fcnStartIn2, $fcnEndIn2 );
+        $YmdX        = array_keys( $result1 );
         $recurLimits = [ $count, $bySetPos, $wDateYmd, $endYmd ];
-        $result = $bspList = [];
-        $currMonth = $month;
-        $x         = 1;
-        foreach( array_keys( $result1 ) as $Ymd ) {
-            $month = (int) substr((string) $Ymd, 4, 2 );
-            if( $currMonth !== $month ) {
-                self::bySetPosResultAppend($result, $x, $bspList, $recurLimits );
-                if(( $x >= $count ) || ( $endYmd < $Ymd )) {
-                    break;  // leave foreach !
-                }
-                $bspList   = [];
-                $currMonth = $month;
-            }
+        $bspList = $result = [];
+        $currYm  = reset( $YmdX );
+        $currYm  = (int) substr((string) $currYm  , 0, 6 );
+        $x        = 1;
+        foreach( $YmdX as $Ymd ) {
+            $xYm = (int) substr((string) $Ymd, 0, 6 );
+            if( $currYm !== $xYm ) {
+                if( ! empty( $bspList )) {
+                    self::bySetPosResultAppend( $result, $x, $bspList, $recurLimits );
+                    $bspList = [];
+                    if( ( $x >= $count ) || ( $endYmd < $Ymd ) ) {
+                        break;  // leave foreach !
+                    }
+                } // endif
+                $currYm = $xYm;
+            } // end if
             $bspList[$Ymd] = true;
         } // end foreach
+        if( ! empty( $bspList )) {
+            self::bySetPosResultAppend($result, $x, $bspList, $recurLimits );
+        }
         return $result;
     }
 
