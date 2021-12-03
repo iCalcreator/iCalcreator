@@ -5,7 +5,7 @@
  * copyright (c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * Link      https://kigkonsult.se
  * Package   iCalcreator
- * Version   2.30
+ * Version   2.30.10
  * License   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
  *           this licence notice and the invariant [rfc5545] PRODID result use
@@ -31,6 +31,7 @@
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use Kigkonsult\Icalcreator\Vcalendar;
@@ -47,7 +48,7 @@ use function substr;
  * iCalcreator DateTime support class
  *
  * @author Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @since  2.29.1 - 2019-07-01
+ * @since  2.30.10 - 2021-12-01
  */
 class UtilDateTime extends DateTime
 {
@@ -180,16 +181,16 @@ class UtilDateTime extends DateTime
     /**
      * Return UtilDateTime object instance based on date array and timezone(s)
      *
-     * @param DateTime $date
+     * @param DateTimeInterface $date
      * @param array    $params
      * @param string   $dtstartTz
      * @return static
      * @throws Exception
      * @throws RuntimeException
      * @static
-     * @since  2.29.1 - 2019-07-01
+     * @since  2.30.10 - 2021-12-01
      */
-    public static function factory( DateTime $date, $params = null, $dtstartTz = null )
+    public static function factory( DateTimeInterface $date, $params = null, $dtstartTz = null )
     {
         static $Y_M_D  = 'Y-m-d';
         static $MSG1   = '#%d Can\'t create DateTimeZone from \'%s\'';
