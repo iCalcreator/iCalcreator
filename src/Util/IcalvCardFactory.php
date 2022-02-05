@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -47,7 +47,7 @@ use function ucfirst;
 /**
  * iCalcreator vCard support class
  *
- * @since  2.27.8 - 2019-03-18
+ * @since 2.40.11 2022-01-15
  */
 class IcalvCardFactory
 {
@@ -67,7 +67,7 @@ class IcalvCardFactory
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-18
      */
-    public static function iCal2vCard( string $email, ? string $version ) : string
+    public static function iCal2vCard( string $email, ? string $version = null ) : string
     {
         static $FMTFN      = "FN:%s\r\n";
         static $FMTEMAIL   = "EMAIL:%s\r\n";
@@ -77,7 +77,7 @@ class IcalvCardFactory
         static $FMTREV     = "REV:%s\r\n";
         static $YMDTHISZ   = 'Ymd\THis\Z';
         static $ENDVCARD   = "END:VCARD\r\n";
-        if( empty( $version ) ) {
+        if( empty( $version )) {
             $version = self::$VCARDVERSIONS[2];
         }
         else {
@@ -104,24 +104,27 @@ class IcalvCardFactory
      * Convert ATTENDEEs, CONTACTs and ORGANIZERs (in email format) to vCard 2.1 or 4.0
      *
      * Skips ATTENDEEs, CONTACTs and ORGANIZERs not in email format
+     * Force invoke of Vcalendar::participants2Attendees()
+     *     Participant::calendaraddress, $inclParam=true also from Participant::contacts (both opt)
      *
      * @param Vcalendar   $calendar    iCalcreator Vcalendar instance
      * @param null|string $version     vCard version (default 2.1)
      * @param null|bool   $inclParam
      * @param null|int    $count       on return, count of hits
      * @return string   vCards
-     * @since  2.27.8 - 2019-03-17
+     * @since  2.41.4 - 2022-01-23
      */
     public static function iCal2vCards(
         Vcalendar $calendar,
-        ? string $version = null,
+        ? string $version= null,
         ? bool $inclParam = false,
         ? int & $count = 0
     ) : string
     {
+        $calendar->participants2Attendees( $inclParam );
         $hits   = ( true === $inclParam )
             ? CalAddressFactory::getCalAdressesAllFromProperty( $calendar )
-            : CalAddressFactory::getCalAddresses( $calendar );
+            : CalAddressFactory::getCalAddresses( $calendar ); // not from params, value only
         $output = Util::$SP0;
         $count  = 0;
         foreach( $hits as $email ) {
@@ -166,7 +169,7 @@ class IcalvCardFactory
             case ( ctype_upper( $name ) || ctype_lower( $name )) :
                 $nameParts = [ $name ];
                 break;
-            case (str_contains( $name, Util::$DOT )) :
+            case ( str_contains( $name, Util::$DOT )) :
                 $nameParts = explode( Util::$DOT, $name );
                 foreach( $nameParts as $k => $part ) {
                     $nameParts[$k] = ucfirst( $part );

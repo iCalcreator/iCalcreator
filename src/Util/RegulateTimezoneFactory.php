@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -239,10 +239,7 @@ class RegulateTimezoneFactory
      * @return self
      * @throws InvalidArgumentException
      */
-    public static function factory(
-        null|string|array $inputiCal = null,
-        ? array $otherTzPhpRelations = []
-    ) : self
+    public static function factory( null|string|array $inputiCal = null, ? array $otherTzPhpRelations = [] ) : self
     {
         return new self( $inputiCal, $otherTzPhpRelations );
     }
@@ -257,10 +254,7 @@ class RegulateTimezoneFactory
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public static function process(
-        string | array $inputiCal,
-        ? array $otherTzPhpRelations = []
-    ) : string
+    public static function process( string | array $inputiCal, ? array $otherTzPhpRelations = [] ) : string
     {
         return self::factory( $inputiCal, $otherTzPhpRelations )
                    ->processCalendar()
@@ -434,8 +428,8 @@ class RegulateTimezoneFactory
      * Find currTzId replacement using stdArr+dlghtArr offsets
      *
      * @param string   $currTzId
-     * @param array $stdArr
-     * @param array $dlghtArr
+     * @param mixed[] $stdArr
+     * @param mixed[] $dlghtArr
      * @throws RuntimeException
      */
     private function processCurrTzId( string $currTzId, array $stdArr, array $dlghtArr ) : void
@@ -480,7 +474,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param array $propAttr
+     * @param mixed[] $propAttr
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
@@ -512,7 +506,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param array $propAttr
+     * @param mixed[] $propAttr
      * @return void
      * @throws InvalidArgumentException
      * @throws RuntimeException
@@ -538,7 +532,7 @@ class RegulateTimezoneFactory
      * Return array( value, propAttr ) from property row
      *
      * @param string $row2
-     * @return array   ( value, propAttr )
+     * @return mixed[]  [ value, propAttr ]
      */
     private static function splitContent( string $row2 ) : array
     {
@@ -559,10 +553,7 @@ class RegulateTimezoneFactory
      * @throws RuntimeException    on NOT found
      * @since  2.27.14 - 2019-02-26
      */
-    private static function getTimeZoneNameFromOffset(
-        string $offset,
-        ? bool $throwException = true
-    ) : string
+    private static function getTimeZoneNameFromOffset( string $offset, ? bool $throwException = true ) : string
     {
         static $ERR = 'Offset \'%s\' (%+d seconds) don\'t match any PHP timezone';
         $seconds    = DateTimeZoneFactory::offsetToSeconds( $offset );
@@ -593,7 +584,7 @@ class RegulateTimezoneFactory
      * @see https://www.php.net/manual/en/datetimezone.listabbreviations.php#114161
      * @param string $offset
      * @param int    $dst
-     * @return array
+     * @return mixed[]
      * @throws RuntimeException
      */
     private static function getTimezoneListFromOffset( string $offset, int $dst ) : array
@@ -643,7 +634,7 @@ class RegulateTimezoneFactory
      * Suffix value with 'Z'and remove propAttr TZID, IF propAttr TZID = UTC
      *
      * @param string  $value
-     * @param array $propAttr
+     * @param mixed[] $propAttr
      * @return void
      */
     private static function checkTzidForUTC( string & $value, array & $propAttr ) : void
@@ -679,7 +670,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $row2
      * @param string  $value
-     * @param array $propAttr
+     * @param mixed[] $propAttr
      */
     private static function fixUTCx( string $row2, string & $value, array & $propAttr ) : void
     {
@@ -707,7 +698,7 @@ class RegulateTimezoneFactory
      */
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getInputiCal() : array
     {
@@ -723,7 +714,7 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param string|array $inputiCal
+     * @param string|mixed[] $inputiCal
      * @return self
      * @throws UnexpectedValueException
      */
@@ -740,7 +731,7 @@ class RegulateTimezoneFactory
 
 
     /**
-     * @return array
+     * @return mixed[]
      */
     private function getVtimezoneRows() : array
     {
@@ -801,7 +792,7 @@ class RegulateTimezoneFactory
      *
      * @param string  $propName
      * @param string  $value
-     * @param array $propAttr
+     * @param mixed[] $propAttr
      * @return void
      */
     private function setOutputiCalRowElements( string $propName, string $value, array $propAttr ) : void
@@ -813,7 +804,7 @@ class RegulateTimezoneFactory
 
     /**
      * @param null|string $otherTz
-     * @return string|bool|array    bool false on key not found
+     * @return string|bool|mixed[]    bool false on key not found
      */
     public function getOtherTzPhpRelations( ? string $otherTz = null ) : bool | array | string
     {
@@ -856,7 +847,7 @@ class RegulateTimezoneFactory
     }
 
     /**
-     * @param array $otherTzPhpRelations
+     * @param mixed[] $otherTzPhpRelations
      * @return void
      */
     private function addOtherTzPhpRelations( array $otherTzPhpRelations ) : void

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,18 +37,19 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\VAcomponent;
 
 /**
  * DTEND property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait DTENDtrait
 {
     /**
-     * @var null|array component property DTEND value
+     * @var null|mixed[] component property DTEND value
      */
-    protected ?array $dtend = null;
+    protected ? array $dtend = null;
 
     /**
      * Return formatted output for calendar component property dtend
@@ -100,7 +101,7 @@ trait DTENDtrait
      * Return calendar component property dtend
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
     public function getDtend( ? bool $inclParam = false ) : DateTime | bool | string | array
@@ -108,14 +109,14 @@ trait DTENDtrait
         if( empty( $this->dtend )) {
             return false;
         }
-        return ( $inclParam ) ? $this->dtend : $this->dtend[Util::$LCvalue];
+        return $inclParam ? $this->dtend : $this->dtend[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property dtend
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|string[]                 $params
+     * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -131,6 +132,7 @@ trait DTENDtrait
             ];
             return $this;
         }
+        $params  = array_change_key_case( $params ?? [], CASE_UPPER );
         $dtstart = (array) $this->getDtstart( true );
         if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
             $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
@@ -138,10 +140,13 @@ trait DTENDtrait
         if( isset( $dtstart[Util::$LCparams][Util::$ISLOCALTIME] )) {
             $params[Util::$ISLOCALTIME] = true;
         }
+        if( $this instanceof VAcomponent ) {
+            $params[self::VALUE] = self::DATE_TIME; // rfc7953
+        }
         $this->dtend = DateTimeFactory::setDate(
             $value,
             ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 DateTimeFactory::$DEFAULTVALUEDATETIME
             )
         );

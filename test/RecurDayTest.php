@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,6 +43,8 @@ class RecurDayTest extends RecurBaseTest
 {
     /**
      * recurDaily1Test provider
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurDaily1TestProvider() : array
@@ -471,12 +473,12 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily1TestProvider
-     * @param string $case
+     * @param string   $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
-     * @param float $prepTime
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
+     * @param float    $prepTime
      * @throws Exception
      */
     public function recurDaily1Test(
@@ -527,8 +529,8 @@ class RecurDayTest extends RecurBaseTest
 
     /**
      * recurDaily11Test provider
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurDaily11TestProvider() : array
@@ -617,12 +619,12 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily11TestProvider
-     * @param string $case
-     * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
-     * @param float $prepTime
+     * @param string     $case
+     * @param DateTime   $start
+     * @param DateTime|mixed[] $end
+     * @param mixed[]    $recur
+     * @param mixed[]    $expects
+     * @param float      $prepTime
      * @throws Exception
      */
     public function recurDaily11Test(
@@ -639,8 +641,8 @@ class RecurDayTest extends RecurBaseTest
 
     /**
      * recurDaily2Test provider
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurDaily2TestProvider() : array
@@ -731,12 +733,12 @@ class RecurDayTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurDaily2TestProvider
-     * @param string   $case
-     * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
-     * @param float $prepTime
+     * @param string     $case
+     * @param DateTime   $start
+     * @param DateTime|mixed[] $end
+     * @param mixed[]    $recur
+     * @param mixed[]    $expects
+     * @param float      $prepTime
      * @throws Exception
      */
     public function recurDaily2Test(

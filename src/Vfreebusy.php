@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,21 +37,23 @@ use function strtoupper;
 /**
  * iCalcreator VFREEBUSY component class
  *
- * @since 2.29.9 2019-08-05
+ * @since 2.41.3 2022-01-17
  */
-final class Vfreebusy extends Vcomponent
+final class Vfreebusy extends V2component
 {
-    use Traits\ATTENDEEtrait,
-        Traits\COMMENTtrait,
-        Traits\CONTACTtrait,
-        Traits\DTENDtrait,
-        Traits\DTSTARTtrait,
-        Traits\DURATIONtrait,   // Deprecated in rfc5545
-        Traits\FREEBUSYtrait,
-        Traits\ORGANIZERtrait,
-        Traits\REQUEST_STATUStrait,
-        Traits\UIDrfc7986trait,
-        Traits\URLtrait;
+    use Traits\ATTENDEEtrait;
+    use Traits\Participants2AttendeesTrait;
+    use Traits\COMMENTtrait;
+    use Traits\CONTACTtrait;
+    use Traits\DTENDtrait;
+    use Traits\DTSTARTtrait;
+    use Traits\DURATIONtrait;   // Deprecated in rfc5545
+    use Traits\FREEBUSYtrait;
+    use Traits\ORGANIZERtrait;
+    use Traits\REQUEST_STATUStrait;
+    use Traits\STYLED_DESCRIPTIONrfc9073trait;
+    use Traits\UIDrfc7986trait;
+    use Traits\URLtrait;
 
     /**
      * @var string
@@ -61,7 +63,7 @@ final class Vfreebusy extends Vcomponent
     /**
      * Destructor
      *
-     * @since  2.26 - 2018-11-10
+     * @since 2.41.3 2022-01-17
      */
     public function __destruct()
     {
@@ -90,6 +92,7 @@ final class Vfreebusy extends Vcomponent
             $this->freebusy,
             $this->organizer,
             $this->requeststatus,
+            $this->styleddescription,
             $this->uid,
             $this->url
         );
@@ -100,7 +103,7 @@ final class Vfreebusy extends Vcomponent
      *
      * @return string
      * @throws Exception  (on Duration/Freebusy err)
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.3 2022-01-17
      */
     public function createComponent() : string
     {
@@ -109,6 +112,7 @@ final class Vfreebusy extends Vcomponent
         $component  .= $this->createUid();
         $component  .= $this->createDtstamp();
         $component  .= $this->createAttendee();
+        $component  .= $this->createStyleddescription();
         $component  .= $this->createComment();
         $component  .= $this->createContact();
         $component  .= $this->createDtstart();

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,14 +37,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * EXRULE property functions
  *
- * @since 2.29.6 2019-06-23
+ * @since 2.40.11 2022-01-15
  */
 trait EXRULEtrait
 {
     /**
-     * @var null|array component property EXRULE value
+     * @var null|mixed[] component property EXRULE value
      */
-    protected ?array $exrule = null;
+    protected ? array $exrule = null;
 
     /**
      * Return formatted output for calendar component property exrule
@@ -80,7 +80,7 @@ trait EXRULEtrait
      * Get calendar component property exrule
      *
      * @param null|bool $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since 2.29.6 2019-06-27
      */
     public function getExrule( ?bool $inclParam = false ) : bool | array | string
@@ -88,14 +88,14 @@ trait EXRULEtrait
         if( empty( $this->exrule )) {
             return false;
         }
-        return ( $inclParam ) ? $this->exrule : $this->exrule[Util::$LCvalue];
+        return $inclParam ? $this->exrule : $this->exrule[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property exrule
      *
-     * @param null|array   $exruleset
-     * @param null|string[]   $params
+     * @param null|mixed[]  $exruleset
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
@@ -110,7 +110,7 @@ trait EXRULEtrait
         }
         $this->exrule = RecurFactory::setRexrule(
             $exruleset,
-            array_merge( (array) $params, $this->getDtstartParams())
+            array_merge( $params ?? [], $this->getDtstartParams())
         );
         return $this;
     }

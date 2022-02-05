@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,14 +41,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * RECURRENCE-ID property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait RECURRENCE_IDtrait
 {
     /**
-     * @var null|array component property RECURRENCE_ID value
+     * @var null|mixed[] component property RECURRENCE_ID value
      */
-    protected ?array $recurrenceid = null;
+    protected ? array $recurrenceid = null;
 
     /**
      * Return formatted output for calendar component property recurrence-id
@@ -100,15 +100,15 @@ trait RECURRENCE_IDtrait
      * Return calendar component property recurrence-id
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @since 2.29.1 2019-06-22
      */
-    public function getRecurrenceid( ?bool $inclParam = false ) : array | DateTime | string | bool
+    public function getRecurrenceid( ? bool $inclParam = false ) : array | DateTime | string | bool
     {
         if( empty( $this->recurrenceid )) {
             return false;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->recurrenceid
             : $this->recurrenceid[Util::$LCvalue];
     }
@@ -117,7 +117,7 @@ trait RECURRENCE_IDtrait
      * Set calendar component property recurrence-id
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -138,10 +138,7 @@ trait RECURRENCE_IDtrait
         }
         $this->recurrenceid = DateTimeFactory::setDate(
             $value,
-            ParameterFactory::setParams(
-                $params,
-                DateTimeFactory::$DEFAULTVALUEDATETIME
-            )
+            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
         );
         return $this;
     }

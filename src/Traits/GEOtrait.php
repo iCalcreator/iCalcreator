@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,14 +39,14 @@ use function is_array;
 /**
  * GEO property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait GEOtrait
 {
     /**
-     * @var null|array component property GEO value
+     * @var null|mixed[] component property GEO value
      */
-    protected ?array $geo = null;
+    protected ? array $geo = null;
 
     /**
      * Return formatted output for calendar component property geo
@@ -96,7 +96,7 @@ trait GEOtrait
      * Get calendar component property geo
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
     public function getGeo( ? bool $inclParam = false ) : bool | string | array
@@ -104,7 +104,7 @@ trait GEOtrait
         if( empty( $this->geo )) {
             return false;
         }
-        return ( $inclParam ) ? $this->geo : $this->geo[Util::$LCvalue];
+        return $inclParam ? $this->geo : $this->geo[Util::$LCvalue];
     }
 
     /**
@@ -131,7 +131,7 @@ trait GEOtrait
      *
      * @param null|int|float|string $latitude
      * @param null|int|float|string $longitude
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @since 2.27.3 2018-12-22
      */
@@ -141,14 +141,13 @@ trait GEOtrait
         ? array $params = []
     ) : static
     {
-        if( isset( $latitude, $longitude ) ) {
+        if( isset( $latitude, $longitude )) {
             if( ! is_array( $this->geo )) {
                 $this->geo = [];
             }
             $this->geo[Util::$LCvalue][self::LATITUDE]  = (float) $latitude;
             $this->geo[Util::$LCvalue][self::LONGITUDE] = (float) $longitude;
-            $this->geo[Util::$LCparams]                 =
-                ParameterFactory::setParams( $params ?? [] );
+            $this->geo[Util::$LCparams]                 = ParameterFactory::setParams( $params );
         }
         else {
             $this->assertEmptyValue( $latitude, self::GEO );

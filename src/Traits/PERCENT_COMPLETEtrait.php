@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -44,9 +44,9 @@ use function is_numeric;
 trait PERCENT_COMPLETEtrait
 {
     /**
-     * @var null|array component property PERCENT_COMPLETE value
+     * @var null|mixed[] component property PERCENT_COMPLETE value
      */
-    protected ?array $percentcomplete = null;
+    protected ? array $percentcomplete = null;
 
     /**
      * Return formatted output for calendar component property percent-complete
@@ -88,10 +88,10 @@ trait PERCENT_COMPLETEtrait
      * Get calendar component property percent-complete
      *
      * @param null|bool   $inclParam
-     * @return bool|int|string|array
+     * @return bool|int|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getPercentcomplete( ?bool $inclParam = false ) : array | bool | string | int
+    public function getPercentcomplete( ? bool $inclParam = false ) : array | bool | string | int
     {
         if( empty( $this->percentcomplete )) {
             return false;
@@ -99,7 +99,7 @@ trait PERCENT_COMPLETEtrait
         if( null === $this->percentcomplete[Util::$LCvalue] ) {
             $this->percentcomplete[Util::$LCvalue] = Util::$SP0;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->percentcomplete
             : $this->percentcomplete[Util::$LCvalue];
     }
@@ -108,7 +108,7 @@ trait PERCENT_COMPLETEtrait
      * Set calendar component property percent-complete
      *
      * @param null|int|string  $value  0 accepted
-     * @param null|string[]    $params
+     * @param null|mixed[]     $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
@@ -126,7 +126,7 @@ trait PERCENT_COMPLETEtrait
         }
         $this->percentcomplete = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

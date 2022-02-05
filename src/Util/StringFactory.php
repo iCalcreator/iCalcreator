@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,8 +40,8 @@ use function explode;
 use function floor;
 use function implode;
 use function in_array;
-use function openssl_random_pseudo_bytes;
 use function ord;
+use function random_bytes;
 use function rtrim;
 use function sprintf;
 use function str_contains;
@@ -60,7 +60,7 @@ use function trim;
 /**
  * iCalcreator TEXT support class
  *
- * @since  2.30.3 - 2021-02-14
+ * @since  2.40.11 - 2022-01-15
  */
 class StringFactory
 {
@@ -114,18 +114,18 @@ class StringFactory
     /**
      * @var string
      */
-    private static string $NLCHARS         = '\n';
+    public static string $NLCHARS         = '\n';
 
     /**
      * Return rows to parse from string or array
      *
      * Used by Vcalendar & RegulateTimezoneFactory
-     * @param null|string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
+     * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return string[]
      * @throws UnexpectedValueException
      * @since  2.29.3 - 2019-08-29
      */
-    public static function conformParseInput( null|string|array $unParsedText = null ) : array
+    public static function conformParseInput( string | array $unParsedText ) : array
     {
         static $ERR10 = 'Only %d rows in calendar content :%s';
         $arrParse = false;
@@ -133,7 +133,7 @@ class StringFactory
             $rows     = implode( self::$NLCHARS . Util::$CRLF, $unParsedText );
             $arrParse = true;
         }
-        elseif( is_string( $unParsedText )) { // string
+        else { // string
             $rows = $unParsedText;
         }
         /* fix line folding */
@@ -298,20 +298,12 @@ class StringFactory
      * @param int $cnt
      * @return string
      * @throws Exception
-     * @since  2.27.3 - 2018-12-28
+     * @since  2.40.11 - 2022-01-15
      */
     public static function getRandChars( int $cnt ) : string
     {
         $cnt = (int) floor( $cnt / 2 );
-        $x       = 0;
-        $cStrong = true;
-        do {
-            $randChars = bin2hex( openssl_random_pseudo_bytes( $cnt, $cStrong ));
-            if( false !== $randChars ) {
-                ++$x;
-            }
-        } while(( 3 > $x ) && ( false === $cStrong ));
-        return $randChars;
+        return bin2hex( random_bytes( $cnt ));
     }
 
     /**
@@ -325,6 +317,14 @@ class StringFactory
     {
         static $X_ = 'X-';
         return ( 0 === stripos( $name, $X_ ));
+    }
+
+    public static function hasColonOrSemicOrComma( mixed $value ): bool
+    {
+        return ( is_string( $value ) &&
+            ( str_contains( $value,  Util::$COLON ) ||
+                str_contains( $value, Util::$SEMIC ) ||
+                str_contains( $value, Util::$COMMA )));
     }
 
     /**
@@ -445,7 +445,7 @@ class StringFactory
      *
      * @param string      $line     property content
      * @param null|string $propName
-     * @return array            [ line, [*propAttr] ]
+     * @return mixed[]   [ line, [*propAttr] ]
      * @todo   fix 2-5 pos port number
      * @since  2.30.3 - 2021-02-14
      */
@@ -526,7 +526,7 @@ class StringFactory
      */
     private static function checkSingleParam( string $line ) : bool
     {
-        if( !str_starts_with( $line, Util::$SEMIC ))  {
+        if( ! str_starts_with( $line, Util::$SEMIC ))  {
             return false;
         }
         return (( 1 === substr_count( $line, Util::$SEMIC )) &&
@@ -714,7 +714,7 @@ class StringFactory
     }
 
     /**
-     * Special characters management input
+     * Replace '\\', '\,', '\;' by '\', ',', ';'
      *
      * @param string $string
      * @return string
@@ -843,11 +843,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function between(
-        string $needle1,
-        string $needle2,
-        string $haystack
-    ) : string
+    public static function between( string $needle1, string $needle2, string $haystack ) : string
     {
         $exists1 = str_contains( $haystack, $needle1 );
         $exists2 = str_contains( $haystack, $needle2 );
@@ -870,11 +866,7 @@ class StringFactory
      * @param string $haystack
      * @return string
      */
-    public static function betweenLast(
-        string $needle1,
-        string $needle2,
-        string $haystack
-    ) : string
+    public static function betweenLast( string $needle1, string $needle2, string $haystack ) : string
     {
         return self::afterLast( $needle1, self::beforeLast( $needle2, $haystack ));
     }

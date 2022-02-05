@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,7 @@ namespace Kigkonsult\Icalcreator;
 /**
  * interface IcalInterface
  *
- * @since  2.27.11 - 2019-01-02
+ * @since  2.41.16 - 2022-01-31
  */
 interface IcalInterface
 {
@@ -47,69 +47,99 @@ interface IcalInterface
     public const VJOURNAL         = 'Vjournal';
     public const VFREEBUSY        = 'Vfreebusy';
     public const VALARM           = 'Valarm';
+    /*  rfc9073 component names */
+    public const PARTICIPANT      = 'Participant';
+    public const VLOCATION        = 'Vlocation';
+    public const VRESOURCE        = 'Vresource';
+    /*  rfc7953 component names */
+    public const VAVAILABILITY    = 'Vavailability';
+    public const AVAILABLE        = 'Available';
 
     /**
      * Class constants, iCal component property names
      */
-    public const ACTION           = 'ACTION';
-    public const ATTACH           = 'ATTACH';
-    public const ATTENDEE         = 'ATTENDEE';
-    public const CALSCALE         = 'CALSCALE';
-    public const CATEGORIES       = 'CATEGORIES';
-    public const KLASS            = 'CLASS';        // note CLASS
-    public const COMMENT          = 'COMMENT';
-    public const COMPLETED        = 'COMPLETED';
-    public const CONTACT          = 'CONTACT';
-    public const CREATED          = 'CREATED';
-    public const DESCRIPTION      = 'DESCRIPTION';
-    public const DTEND            = 'DTEND';
-    public const DTSTAMP          = 'DTSTAMP';
-    public const DTSTART          = 'DTSTART';
-    public const DUE              = 'DUE';
-    public const DURATION         = 'DURATION';
-    public const EXDATE           = 'EXDATE';
-    public const EXRULE           = 'EXRULE';
-    public const FREEBUSY         = 'FREEBUSY';
-    public const GEO              = 'GEO';
-    public const GEOLOCATION      = 'GEOLOCATION';
-    public const LAST_MODIFIED    = 'LAST-MODIFIED';
-    public const LOCATION         = 'LOCATION';
-    public const METHOD           = 'METHOD';
-    public const ORGANIZER        = 'ORGANIZER';
-    public const PERCENT_COMPLETE = 'PERCENT-COMPLETE';
-    public const PRIORITY         = 'PRIORITY';
-    public const PRODID           = 'PRODID';
-    public const RECURRENCE_ID    = 'RECURRENCE-ID';
-    public const RELATED_TO       = 'RELATED-TO';
-    public const REPEAT           = 'REPEAT';
-    public const REQUEST_STATUS   = 'REQUEST-STATUS';
-    public const RESOURCES        = 'RESOURCES';
-    public const RDATE            = 'RDATE';
-    public const RRULE            = 'RRULE';
-    public const SEQUENCE         = 'SEQUENCE';
-    public const STATUS           = 'STATUS';
-    public const SUMMARY          = 'SUMMARY';
-    public const TRANSP           = 'TRANSP';
-    public const TRIGGER          = 'TRIGGER';
-    public const TZID             = 'TZID';
-    public const TZNAME           = 'TZNAME';
-    public const TZOFFSETFROM     = 'TZOFFSETFROM';
-    public const TZOFFSETTO       = 'TZOFFSETTO';
-    public const TZURL            = 'TZURL';
-    public const UID              = 'UID';
-    public const URL              = 'URL';
-    public const VERSION          = 'VERSION';
-    public const X_PROP           = 'X-PROP';
+    public const ACTION             = 'ACTION';
+    public const ATTACH             = 'ATTACH';
+    public const ATTENDEE           = 'ATTENDEE';
+    public const CALSCALE           = 'CALSCALE';
+    public const CATEGORIES         = 'CATEGORIES';
+    public const KLASS              = 'CLASS';        // note CLASS
+    public const COMMENT            = 'COMMENT';
+    public const COMPLETED          = 'COMPLETED';
+    public const CONTACT            = 'CONTACT';
+    public const CREATED            = 'CREATED';
+    public const DESCRIPTION        = 'DESCRIPTION';
+    public const DTEND              = 'DTEND';
+    public const DTSTAMP            = 'DTSTAMP';
+    public const DTSTART            = 'DTSTART';
+    public const DUE                = 'DUE';
+    public const DURATION           = 'DURATION';
+    public const EXDATE             = 'EXDATE';
+    public const EXRULE             = 'EXRULE';
+    public const FREEBUSY           = 'FREEBUSY';
+    public const GEO                = 'GEO';
+    public const GEOLOCATION        = 'GEOLOCATION';
+    public const LAST_MODIFIED      = 'LAST-MODIFIED';
+    public const LOCATION           = 'LOCATION';
+    public const METHOD             = 'METHOD';
+    public const ORGANIZER          = 'ORGANIZER';
+    public const PERCENT_COMPLETE   = 'PERCENT-COMPLETE';
+    public const PRIORITY           = 'PRIORITY';
+    public const PRODID             = 'PRODID';
+    public const RECURRENCE_ID      = 'RECURRENCE-ID';
+    public const RELATED_TO         = 'RELATED-TO';
+    public const REPEAT             = 'REPEAT';
+    public const REQUEST_STATUS     = 'REQUEST-STATUS';
+    public const RESOURCES          = 'RESOURCES';
+    public const RDATE              = 'RDATE';
+    public const RRULE              = 'RRULE';
+    public const SEQUENCE           = 'SEQUENCE';
+    public const STATUS             = 'STATUS';
+    public const SUMMARY            = 'SUMMARY';
+    public const TRANSP             = 'TRANSP';
+    public const TRIGGER            = 'TRIGGER';
+    public const TZID               = 'TZID';
+    public const TZID_ALIAS_OF      = 'TZID-ALIAS-OF';
+    public const TZNAME             = 'TZNAME';
+    public const TZOFFSETFROM       = 'TZOFFSETFROM';
+    public const TZOFFSETTO         = 'TZOFFSETTO';
+    public const TZUNTIL            = 'TZUNTIL';
+    public const TZURL              = 'TZURL';
+    public const UID                = 'UID';
+    public const URL                = 'URL';
+    public const VERSION            = 'VERSION';
+    public const X_PROP             = 'X-PROP';
 
     /**
      * Class constants, iCal rfc7986 property names
      */
-    public const COLOR            = 'COLOR';
-    public const CONFERENCE       = 'CONFERENCE';
-    public const IMAGE            = 'IMAGE';
-    public const NAME             = 'NAME';
-    public const REFRESH_INTERVAL = 'REFRESH-INTERVAL';
-    public const SOURCE           = 'SOURCE';
+    public const COLOR              = 'COLOR';
+    public const CONFERENCE         = 'CONFERENCE';
+    public const IMAGE              = 'IMAGE';
+    public const NAME               = 'NAME';
+    public const REFRESH_INTERVAL   = 'REFRESH-INTERVAL';
+    public const SOURCE             = 'SOURCE';
+
+    /**
+     * Class constants, iCal rfc9073 property names
+     */
+    public const CALENDAR_ADDRESS   = 'CALENDAR-ADDRESS';
+    public const LOCATION_TYPE      = 'LOCATION-TYPE';
+    public const PARTICIPANT_TYPE   = 'PARTICIPANT-TYPE';
+    public const RESOURCE_TYPE      = 'RESOURCE-TYPE';
+    public const STYLED_DESCRIPTION = 'STYLED-DESCRIPTION';
+    public const STRUCTURED_DATA    = 'STRUCTURED-DATA';
+
+    /**
+     * Class constants, iCal rfc7953 property names
+     */
+    public const BUSYTYPE         = 'BUSYTYPE';
+
+    /**
+     * Class constants, iCal rfc9074 property names
+     */
+    public const ACKNOWLEDGED     = 'ACKNOWLEDGED';
+    public const PROXIMITY        = 'PROXIMITY';
 
     /**
      * iCal property METHOD types
@@ -132,8 +162,10 @@ interface IcalInterface
      * iCal global component parameter keywords
      */
     public const ALTREP           = 'ALTREP';           // Alternate Text Representation
+    public const DERIVED          = 'DERIVED';          // rfc9073 : DESCRIPTION/STYLED-DESCRIPTION
     public const LANGUAGE         = 'LANGUAGE';         // values defined in [RFC5646]
     public const VALUE            = 'VALUE';
+    public const SCHEMA           = 'SCHEMA';           // rfc9073 : STRUCTURED-DATA
 
     /**
      * iCal component properties VALUE parameter key values
@@ -235,6 +267,12 @@ interface IcalInterface
     public const TH               = 'TH';               // THURSDAY
     public const FR               = 'FR';               // FRIDAY
     public const SA               = 'SA';               // SATURDAY
+    /*  rfc7529 component names RRULE, EXRULE 'RECUR' keywords and values */
+    public const RSCALE           = 'RSCALE';
+    public const SKIP             = 'SKIP';
+    public const OMIT             = 'OMIT';
+    public const BACKWARD         = 'BACKWARD';
+    public const FORWARD          = 'FORWARD';
 
     /**
      * iCal component property ACTION, IMAGE values
@@ -300,6 +338,8 @@ interface IcalInterface
 
     /**
      * iCal component property FREEBUZY parameter key FBTYPE values
+     *
+     * iCal rfc7953 VAVAILABILITY component property BUSYTYPE values, all but 'FREE'
      */
     public const FREE             = 'FREE';
     public const BUSY             = 'BUSY';
@@ -328,6 +368,7 @@ interface IcalInterface
     public const PARENT           = 'PARENT';           // (default)
     public const CHILD            = 'CHILD';
     public const SIBLING          = 'SIBLING';
+    public const SNOOZE           = 'SNOOZE';           // rfc9074 Valarm
 
     /**
      * iCal component property TRIGGER parameter keyword
@@ -345,6 +386,22 @@ interface IcalInterface
      */
     public const LATITUDE         = 'latitude';
     public const LONGITUDE        = 'longitude';
+
+    /**
+     * iCal component rfc9073 property PARTICIPANT-TYPE parts
+     *
+     * CONTACT, defined above
+     */
+    public const ORDER             = 'ORDER';
+    public const ACTIVE            = 'ACTIVE';
+    public const INACTIVE          = 'INACTIVE';
+    public const SPONSOR           = 'SPONSOR';
+    public const BOOKING_CONTACT   = 'BOOKING-CONTACT';
+    public const EMERGENCY_CONTACT = 'EMERGENCY-CONTACT';
+    public const PUBLICITY_CONTACT = 'PUBLICITY-CONTACT';
+    public const PLANNER_CONTACT   = 'PLANNER-CONTACT';
+    public const PERFORMER         = 'PERFORMER';
+    public const SPEAKER           = 'SPEAKER';
 
     /**
      * iCal component property Request-status  parts
@@ -371,6 +428,23 @@ interface IcalInterface
      */
     public const OPAQUE           = 'OPAQUE';           // default
     public const TRANSPARENT      = 'TRANSPARENT';
+
+    /**
+     * iCal Valarm component property PROXIMITY values
+     */
+    public const ARRIVE           = 'ARRIVE';
+    public const DEPART           = 'DEPART';
+    public const CONNECT          = 'CONNECT';
+    public const DISCONNECT       = 'DISCONNECT';
+
+    /**
+     * iCal Vresource component property RESOURCE-TYPE values
+     *
+     * ROOM, defined above               // ATTENDEE/ORGANIZER CUTYPE parameter
+     */
+    public const PROJECTOR        = 'PROJECTOR';
+    public const REMOTE_CONFERENCE_AUDIO = 'REMOTE-CONFERENCE-AUDIO';
+    public const REMOTE_CONFERENCE_VIDEO = 'REMOTE-CONFERENCE-VIDEO';
 
     /**
      * UTC DateTimezones

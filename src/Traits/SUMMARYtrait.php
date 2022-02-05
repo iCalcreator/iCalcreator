@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,29 +36,29 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * SUMMARY property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait SUMMARYtrait
 {
     /**
-     * @var null|array component property SUMMARY value
+     * @var null|mixed[] component property SUMMARY value
      */
-    protected ?array $summary = null;
+    protected ? array $summary = null;
 
     /**
      * Return formatted output for calendar component property summary
      *
-     * @return null|string
+     * @return string
      */
-    public function createSummary() : ?string
+    public function createSummary() : string
     {
         if( empty( $this->summary )) {
-            return null;
+            return Util::$SP0;
         }
         if( empty( $this->summary[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::SUMMARY )
-                : null;
+                : Util::$SP0;
         }
         return StringFactory::createElement(
             self::SUMMARY,
@@ -86,23 +86,23 @@ trait SUMMARYtrait
     /**
      * Get calendar component property summary
      *
-     * @param bool   $inclParam
-     * @return bool|string|array
+     * @param null|bool   $inclParam
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getSummary( bool $inclParam = false ) : array | bool | string
+    public function getSummary( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->summary )) {
             return false;
         }
-        return ( $inclParam ) ? $this->summary : $this->summary[Util::$LCvalue];
+        return $inclParam ? $this->summary : $this->summary[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property summary
      *
-     * @param null|string $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @since 2.29.14 2019-09-03
      */
@@ -116,7 +116,7 @@ trait SUMMARYtrait
         Util::assertString( $value, self::SUMMARY );
         $this->summary = [
             Util::$LCvalue  => (string) $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

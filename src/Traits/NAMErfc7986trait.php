@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -34,18 +34,21 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Vcalendar;
 
 /**
  * NAME property functions
  *
- * @since 2.29.14 2019-09-03
+ * May occur multiply times in Vcalendar but once in Vlocation/Vresource
+ *
+ * @since 2.41.5 2022-01-21
  */
 trait NAMErfc7986trait
 {
     /**
-     * @var null|array component property NAME value
+     * @var null|mixed[] component property NAME value
      */
-    protected ?array $name = null;
+    protected ? array $name = null;
 
     /**
      * Return formatted output for calendar component property name
@@ -85,13 +88,16 @@ trait NAMErfc7986trait
      *
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
-     * @since 2.29.5 2019-06-16
+     * @since 2.41.5 2022-01-21
      */
     public function deleteName( ? int $propDelIx = null ) : bool
     {
         if( empty( $this->name )) {
             unset( $this->propDelIx[self::NAME] );
             return false;
+        }
+        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+            $propDelIx = null;
         }
         return CalendarComponent::deletePropertyM(
             $this->name,
@@ -104,16 +110,22 @@ trait NAMErfc7986trait
     /**
      * Get calendar component property name
      *
-     * @param null|int    $propIx specific property in case of multiply occurrence
+     * @param null|bool|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
-     * @since 2.29.5 2019-06-16
+     * @return bool|string|mixed[]
+     * @since 2.41.5 2022-01-21
      */
-    public function getName( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getName( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->name )) {
             unset( $this->propIx[self::NAME] );
             return false;
+        }
+        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+            if( is_bool( $propIx )) {
+                $inclParam = $propIx;
+            }
+            $propIx = null;
         }
         return CalendarComponent::getPropertyM(
             $this->name,
@@ -127,12 +139,12 @@ trait NAMErfc7986trait
     /**
      * Set calendar component property name
      *
-     * @param null|string  $value
-     * @param null|string[] $params
-     * @param null|integer $index
+     * @param null|string   $value
+     * @param null|mixed[]  $params
+     * @param null|integer  $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.5 2022-01-21
      */
     public function setName( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
@@ -143,6 +155,9 @@ trait NAMErfc7986trait
         }
         else {
             Util::assertString( $value, self::NAME );
+        }
+        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+            $index = 1;
         }
         CalendarComponent::setMval( $this->name, $value, $params, null, $index );
         return $this;

@@ -1,14 +1,11 @@
-<?php /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-
+<?php
 /**
  * iCalcreator, the PHP class package managing iCal (rfc2445/rfc5445) calendar information.
  *
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -73,6 +70,8 @@ class DateTzTest extends DtBase
 
     /**
      * testDATEtz1 provider
+     *
+     * @return mixed[]
      */
     public function DATEtz1Provider() : array
     {
@@ -118,12 +117,12 @@ class DateTzTest extends DtBase
      *
      * @test
      * @dataProvider DATEtz1Provider
-     * @param int $case
-     * @param string $propName
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param string  $propName
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
      */
@@ -168,12 +167,8 @@ class DateTzTest extends DtBase
 
     /**
      * testDATEtz2 provider
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function DATEtz2Provider() : array
@@ -468,12 +463,12 @@ class DateTzTest extends DtBase
      *
      * @test
      * @dataProvider DATEtz2Provider
-     * @param int $case
-     * @param string $propName
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param string  $propName
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDATEtz2(

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,20 +38,22 @@ use function strtoupper;
 /**
  * iCalcreator VTIMEZONE component class
  *
- * @since 2.29.9 2019-08-05
+ * @since 2.41.1 2022-01-15
  */
 final class Vtimezone extends CalendarComponent
 {
-    use Traits\COMMENTtrait,
-        Traits\DTSTARTtrait,
-        Traits\LAST_MODIFIEDtrait,
-        Traits\RDATEtrait,
-        Traits\RRULEtrait,
-        Traits\TZIDtrait,
-        Traits\TZNAMEtrait,
-        Traits\TZOFFSETFROMtrait,
-        Traits\TZOFFSETTOtrait,
-        Traits\TZURLtrait;
+    use Traits\COMMENTtrait;
+    use Traits\DTSTARTtrait;
+    use Traits\LAST_MODIFIEDtrait;
+    use Traits\RDATEtrait;
+    use Traits\RRULEtrait;
+    use Traits\TZIDtrait;
+    use Traits\TZNAMEtrait;
+    use Traits\TZOFFSETFROMtrait;
+    use Traits\TZOFFSETTOtrait;
+    use Traits\TZURLtrait;
+    use Traits\TZUNTILrfc7808trait;
+    use Traits\TZID_ALIAS_OFrfc7808trait;
 
     /**
      * @var string
@@ -61,12 +63,12 @@ final class Vtimezone extends CalendarComponent
     /**
      * Destructor
      *
-     * @since  2.26 - 2018-11-10
+     * @since 2.41.1 2022-01-15
      */
     public function __destruct()
     {
         if( ! empty( $this->components )) {
-            foreach( $this->components as $cix => $component ) {
+            foreach( array_keys( $this->components ) as $cix ) {
                 $this->components[$cix]->__destruct();
             }
         }
@@ -94,7 +96,9 @@ final class Vtimezone extends CalendarComponent
             $this->tzname,
             $this->tzoffsetfrom,
             $this->tzoffsetto,
-            $this->tzurl
+            $this->tzurl,
+            $this->tzuntil,
+            $this->tzidAliasOf
         );
     }
 
@@ -103,13 +107,14 @@ final class Vtimezone extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.1 2022-01-15
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
         $component   = sprintf( self::$FMTBEGIN, $compType );
         $component  .= $this->createTzid();
+        $component  .= $this->createTzidAliasOf();
         $component  .= $this->createLastmodified();
         $component  .= $this->createTzurl();
         $component  .= $this->createDtstart();
@@ -119,6 +124,7 @@ final class Vtimezone extends CalendarComponent
         $component  .= $this->createRdate();
         $component  .= $this->createRrule();
         $component  .= $this->createTzname();
+        $component  .= $this->createTzuntil();
         $component  .= $this->createXprop();
         $component  .= $this->createSubComponent();
         return $component . sprintf( self::$FMTEND, $compType );

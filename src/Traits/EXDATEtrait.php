@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -44,9 +44,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait EXDATEtrait
 {
     /**
-     * @var null|array component property EXDATE value
+     * @var null|mixed[] component property EXDATE value
      */
-    protected ?array $exdate = null;
+    protected ? array $exdate = null;
 
     /**
      * Return formatted output for calendar component property exdate
@@ -92,10 +92,10 @@ trait EXDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|array|bool
+     * @return string|bool|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getExdate( ?int $propIx = null, ?bool $inclParam = false ) : bool | string | array
+    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
     {
         if( empty( $this->exdate )) {
             unset( $this->propIx[self::EXDATE] );
@@ -113,9 +113,9 @@ trait EXDATEtrait
     /**
      * Set calendar component property exdate
      *
-     * @param null|string|array|DateTimeInterface $value
-     * @param null|string[] $params
-     * @param null|integer $index
+     * @param null|string|mixed[]|DateTimeInterface|DateTimeInterface[] $value
+     * @param null|mixed[]  $params
+     * @param null|integer  $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -128,14 +128,13 @@ trait EXDATEtrait
     ) : static
     {
         if( empty( $value ) ||
-            ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))
-        ) {
+            ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))) {
             $this->assertEmptyValue( $value, self::EXDATE );
              self::setMval( $this->exdate, Util::$SP0, [], null, $index );
             return $this;
         }
         $value = self::checkSingleExdates( $value );
-        $input = RexdateFactory::prepInputExdate( $value, ( $params ?? [] ));
+        $input = RexdateFactory::prepInputExdate( $value, $params ?? [] );
         self::setMval(
             $this->exdate,
             $input[Util::$LCvalue],
@@ -150,7 +149,7 @@ trait EXDATEtrait
      * Return $value is single input
      *
      * @param DateTimeInterface|string|DateTimeInterface[]|string[] $value
-     * @return string|array
+     * @return string|mixed[]
      * @since 2.29.16 2020-01-24
      */
     private static function checkSingleExdates( array | DateTimeInterface | string $value ) : string|array

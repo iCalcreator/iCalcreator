@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -69,7 +69,7 @@ class DateIntervalTest2 extends DtBase
      * DateInterval123Provider Generator
      *
      * @param bool $inclYearMonth
-     * @return array
+     * @return mixed[]
      * @throws Exception
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
@@ -90,10 +90,9 @@ class DateIntervalTest2 extends DtBase
             $random = [];
             $cnt = array_rand( array_flip( [ 1, 7 ] ));
             for( $x = 0; $x < $cnt; $x++ ) {
-                $random = array_merge(
-                    $random,
-                    array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
-                );
+                foreach( array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true ) as $k => $v ) {
+                    $random[$k] = $v;
+                }
             }
             if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
@@ -119,7 +118,7 @@ class DateIntervalTest2 extends DtBase
     /**
      * Return an iCal formatted string from (internal array) duration
      *
-     * @param array $duration , array( year, month, day, week, day, hour, min, sec )
+     * @param mixed[] $duration , array( year, month, day, week, day, hour, min, sec )
      * @return string
      * @static
      * @since  2.26.14 - 2019-02-12
@@ -181,9 +180,9 @@ class DateIntervalTest2 extends DtBase
     /**
      * DateInterval678ProviderDateInterval sub-provider, TRIGGER
      *
-     * @param array $dateIntervalArray
+     * @param mixed[] $dateIntervalArray
      * @param int $cnt
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval678ProviderDateInterval( array $dateIntervalArray, int $cnt ) : array
@@ -239,9 +238,9 @@ class DateIntervalTest2 extends DtBase
     /**
      * DateInterval678ProviderDateIntervalString sub-provider, TRIGGER
      *
-     * @param array $input
+     * @param mixed[] $input
      * @param int $cnt
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval678ProviderDateIntervalString( array $input, int $cnt ) : array
@@ -295,7 +294,7 @@ class DateIntervalTest2 extends DtBase
     /**
      * testDateInterval678 provider
      *
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public function DateInterval678Provider() : array
@@ -332,8 +331,8 @@ class DateIntervalTest2 extends DtBase
      * @dataProvider DateInterval678Provider
      * @param int|string $case
      * @param mixed  $value
-     * @param array $params
-     * @param array $expectedGet
+     * @param mixed[] $params
+     * @param mixed[] $expectedGet
      * @param string $expectedString
      * @throws Exception
      */

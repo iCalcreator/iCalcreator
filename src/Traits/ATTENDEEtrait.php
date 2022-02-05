@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,14 +36,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * ATTENDEE property functions
  *
- * @since  2.27.8 - 2019-03-17
+ * @since 2.40.11 2022-01-15
  */
 trait ATTENDEEtrait
 {
     /**
-     * @var null|array component property ATTENDEE value
+     * @var null|mixed[] component property ATTENDEE value
      */
-    protected ?array $attendee = [];
+    protected ? array $attendee = [];
 
     /**
      * Return formatted output for calendar component property attendee
@@ -87,10 +87,10 @@ trait ATTENDEEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getAttendee( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getAttendee( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->attendee )) {
             unset( $this->propIx[self::ATTENDEE] );
@@ -109,12 +109,11 @@ trait ATTENDEEtrait
      * Set calendar component property attendee
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @param null|integer  $index
      * @return static
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-03-17
-     * @todo ensure value is prefixed by protocol, mailto: if missing
      */
     public function setAttendee( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
@@ -127,7 +126,7 @@ trait ATTENDEEtrait
         if( ! empty( $value )) {
             CalAddressFactory::assertCalAddress( $value );
         }
-        $params = array_change_key_case(( $params ?? [] ), CASE_UPPER );
+        $params = array_change_key_case( $params ?? [], CASE_UPPER );
         CalAddressFactory::sameValueAndEMAILparam( $value, $params );
         $params = CalAddressFactory::inputPrepAttendeeParams(
             $params,

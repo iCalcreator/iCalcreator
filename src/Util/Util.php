@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -175,7 +175,7 @@ class Util
             ! array_key_exists( $key, $base )) {
             return false;
         }
-        return ( $value == $base[$key] );
+        return ( $value === $base[$key] );
     }
 
     /**
@@ -214,7 +214,7 @@ class Util
     }
 
     /**
-     * Assert value is string
+     * Assert value is string (i.e. scalar, return string)
      *
      * @param mixed  $value
      * @param string $propName
@@ -227,12 +227,7 @@ class Util
         static $ERR1 = '%s expects string value, got (%s) %s';
         if( ! is_scalar( $value )) {
             throw new InvalidArgumentException(
-                sprintf(
-                    $ERR1,
-                    $propName,
-                    gettype( $value ),
-                    var_export( $value, true )
-                )
+                sprintf( $ERR1, $propName, gettype( $value ), var_export( $value, true ))
             );
         }
         return  (string) $value;
@@ -248,14 +243,10 @@ class Util
      * @throws InvalidArgumentException
      * @since  2.27.2 - 2019-01-04
      */
-    public static function assertInEnumeration(
-        mixed  $value,
-        array  $enumeration,
-        string $propName
-    ) : void
+    public static function assertInEnumeration( mixed  $value, array  $enumeration, string $propName ) : void
     {
         static $ERR = 'Invalid %s value : %s';
-        if( ! in_array( strtoupper( $value ), $enumeration, true ) ) {
+        if( ! in_array( strtoupper( $value ), $enumeration, true )) {
             throw new InvalidArgumentException(
                 sprintf( $ERR, $propName, var_export( $value, true ))
             );

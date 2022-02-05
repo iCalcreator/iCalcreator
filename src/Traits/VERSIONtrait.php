@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -30,7 +30,6 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
-Use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * VERSION property functions
@@ -77,13 +76,12 @@ trait VERSIONtrait
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setVersion( ? string $value = null ) : static
+    public function setVersion( ? string $value = null) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::VERSION );
         }
-        Util::assertString( $value, self::VERSION );
-        $this->version = (string) $value;
+        $this->version = $value;
         return $this;
     }
 }

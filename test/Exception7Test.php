@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,6 +43,8 @@ class Exception7Test extends TestCase
 {
     /**
      * rruleExceptionsTest provider
+     *
+     * @return mixed[]
      */
     public function rruleExceptionsTestProvider() : array
     {
@@ -175,8 +177,8 @@ class Exception7Test extends TestCase
     /**
      * @test
      * @dataProvider rruleExceptionsTestProvider
-     * @param int $case
-     * @param array $rrule
+     * @param int     $case
+     * @param mixed[] $rrule
      * @throws Exception
      * @throws Exception
      */

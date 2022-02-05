@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -43,14 +44,14 @@ use function vsprintf;
 /**
  * UID property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait UIDrfc7986trait
 {
     /**
-     * @var null|array component property UID value
+     * @var null|mixed[] component property UID value
      */
-    protected ?array $uid = null;
+    protected ? array $uid = null;
 
     /**
      * Return formatted output for calendar component property uid
@@ -87,21 +88,21 @@ trait UIDrfc7986trait
      * Get calendar component property uid
      *
      * @param null|bool   $inclParam
-     * @return string|array
+     * @return string|mixed[]
      * @since 2.29.5 2019-06-17
      */
-    public function getUid( ?bool $inclParam = false ) : array | string
+    public function getUid( ? bool $inclParam = false ) : array | string
     {
         if( self::isUidEmpty( $this->uid )) {
             $this->uid = self::makeUid();
         }
-        return ( $inclParam ) ? $this->uid : $this->uid[Util::$LCvalue];
+        return $inclParam ? $this->uid : $this->uid[Util::$LCvalue];
     }
 
     /**
      * Return bool true if uid is empty
      *
-     * @param null|string[]  $array
+     * @param null|mixed[]   $array
      * @return bool
      * @since 2.29.5 2019-06-17
      */
@@ -110,8 +111,7 @@ trait UIDrfc7986trait
         if( empty( $array )) {
             return true;
         }
-        if( empty( $array[Util::$LCvalue] ) &&
-            ( Util::$ZERO !== $array[Util::$LCvalue] )) {
+        if( empty( $array[Util::$LCvalue] ) && ( Util::$ZERO !== $array[Util::$LCvalue] )) {
             return true;
         }
         return false;
@@ -120,9 +120,10 @@ trait UIDrfc7986trait
     /**
      * Return an unique id for a calendar/component object instance
      *
-     * @return array
-     * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
+     * @return mixed[]
+     * @throws Exception
      * @since 2.29.5 2019-06-17
+     * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
      */
     private static function makeUid() : array
     {
@@ -133,7 +134,7 @@ trait UIDrfc7986trait
         $uid      = vsprintf( $FMT, str_split( bin2hex( $bytes ), 4 ));
         return [
             Util::$LCvalue  => $uid,
-            Util::$LCparams => null,
+            Util::$LCparams => [],
         ];
     }
 
@@ -142,7 +143,7 @@ trait UIDrfc7986trait
      *
      * If empty input, male one
      * @param null|int|string $value
-     * @param null|string[]  $params
+     * @param null|mixed[]    $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -156,7 +157,7 @@ trait UIDrfc7986trait
         $value = Util::assertString( $value, self::UID );
         $this->uid = [
             Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

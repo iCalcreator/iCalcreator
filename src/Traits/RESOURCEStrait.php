@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,14 +36,14 @@ use InvalidArgumentException;
 /**
  * RESOURCES property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait RESOURCEStrait
 {
     /**
-     * @var null|array component property RESOURCES value
+     * @var null|mixed[] component property RESOURCES value
      */
-    protected ?array $resources = null;
+    protected ? array $resources = null;
 
     /**
      * Return formatted output for calendar component property resources
@@ -88,10 +88,10 @@ trait RESOURCEStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getResources( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getResources( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->resources )) {
             unset( $this->propIx[self::RESOURCES] );
@@ -110,13 +110,13 @@ trait RESOURCEStrait
      * Set calendar component property resources
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @param null|integer  $index
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setResources( ? string  $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setResources( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::RESOURCES );
@@ -127,7 +127,7 @@ trait RESOURCEStrait
             Util::assertString( $value, self::RESOURCES );
             $value  = StringFactory::trimTrailNL( $value );
         }
-        self::setMval( $this->resources, $value, ( $params ?? [] ), null, $index );
+        self::setMval( $this->resources, $value, $params, null, $index );
         return $this;
     }
 }

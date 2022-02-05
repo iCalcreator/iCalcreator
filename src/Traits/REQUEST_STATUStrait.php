@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -42,12 +42,12 @@ use function var_export;
 /**
  * REQUEST-STATUS property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait REQUEST_STATUStrait
 {
     /**
-     * @var null|array component property REQUEST-STATUS value
+     * @var null|mixed[] component property REQUEST-STATUS value
      */
     protected ?array $requeststatus = null;
 
@@ -118,10 +118,10 @@ trait REQUEST_STATUStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|array|bool
+     * @return string|bool|mixed[]
      * @since 2.29.9 2019-08-05
      */
-    public function getRequeststatus( ?int $propIx = null, ?bool $inclParam = false ) : bool | string | array
+    public function getRequeststatus( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
     {
         if( empty( $this->requeststatus )) {
             unset( $this->propIx[self::REQUEST_STATUS] );
@@ -140,10 +140,10 @@ trait REQUEST_STATUStrait
      * Set calendar component property request-status
      *
      * @param null|int|float|string $statCode 1*DIGIT 1*2("." 1*DIGIT)
-     * @param null|string      $text
-     * @param null|string      $extData
-     * @param null|string[]    $params
-     * @param null|integer     $index
+     * @param null|string    $text
+     * @param null|string    $extData
+     * @param null|mixed[]   $params
+     * @param null|integer   $index
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -179,7 +179,7 @@ trait REQUEST_STATUStrait
             Util::assertString( $extData, self::REQUEST_STATUS );
             $input[self::EXTDATA] = StringFactory::trimTrailNL( $extData );
         }
-        self::setMval( $this->requeststatus, $input, ( $params ?? [] ), null, $index );
+        self::setMval( $this->requeststatus, $input, $params, null, $index );
         return $this;
     }
 }

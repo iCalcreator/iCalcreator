@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,14 +40,14 @@ use function strtoupper;
 /**
  * STATUS property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait STATUStrait
 {
     /**
-     * @var null|array component property STATUS value
+     * @var null|mixed[] component property STATUS value
      */
-    protected ?array $status = null;
+    protected ? array $status = null;
 
     /**
      * Return formatted output for calendar component property status
@@ -86,23 +86,23 @@ trait STATUStrait
     /**
      * Get calendar component property status
      *
-     * @param bool   $inclParam
-     * @return bool|string|array
+     * @param null|bool   $inclParam
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getStatus( bool $inclParam = false ) : array | bool | string
+    public function getStatus( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->status )) {
             return false;
         }
-        return ( $inclParam ) ? $this->status : $this->status[Util::$LCvalue];
+        return $inclParam ? $this->status : $this->status[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property status
      *
-     * @param null|string  $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -144,7 +144,7 @@ trait STATUStrait
         } // end switch
         $this->status = [
             Util::$LCvalue  => $value ,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

@@ -6,7 +6,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -70,7 +70,7 @@ class DateIntervalTest3 extends DtBase
      * DateInterval123Provider Generator
      *
      * @param bool $inclYearMonth
-     * @return array
+     * @return mixed[]
      * @throws Exception
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
@@ -89,14 +89,13 @@ class DateIntervalTest3 extends DtBase
 
         do {
             $random = [];
-            $cnt = array_rand( array_flip( [ 1, 7 ] ));
+            $cnt    = array_rand( array_flip( [ 1, 7 ] ));
             for( $x = 0; $x < $cnt; $x++ ) {
-                $random = array_merge(
-                    $random,
-                    array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
-                );
+                foreach( array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true ) as $k => $v ) {
+                    $random[$k] = $v;
+                }
             }
-            if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) {
+            if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
                 $random = array_filter( $random );
             }
@@ -120,7 +119,7 @@ class DateIntervalTest3 extends DtBase
     /**
      * Return an iCal formatted string from (internal array) duration
      *
-     * @param array $duration , array( year, month, day, week, day, hour, min, sec )
+     * @param mixed[] $duration , array( year, month, day, week, day, hour, min, sec )
      * @return null|string
      * @static
      * @since  2.26.14 - 2019-02-12
@@ -172,7 +171,7 @@ class DateIntervalTest3 extends DtBase
         if( $secIsSet ) {
             $result .= $duration[RecurFactory::$LCSEC] . $S;
         }
-        if( DateIntervalFactory::$P == $result ) {
+        if( DateIntervalFactory::$P === $result ) {
             $result = $PT0H0M0S;
         }
         return $result;
@@ -181,9 +180,9 @@ class DateIntervalTest3 extends DtBase
     /**
      * DateInterval101112Provider DateTime / DateInterval sub-provider, FREEBUSY
      *
-     * @param array $input
+     * @param mixed[] $input
      * @param int $cnt
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval101112ProviderDateInterval( array $input, int $cnt ) : array
@@ -201,7 +200,7 @@ class DateIntervalTest3 extends DtBase
         $baseDateTime   = DateTimeFactory::factory( 'now', IcalInterface::UTC );
         $dateTimeString = DateTimeFactory::dateTime2Str( $baseDateTime );
         $outputString   = ';' . IcalInterface::FBTYPE . '=' . IcalInterface::BUSY . ':' .  $dateTimeString . '/' . $diString;
-        if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
+        if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
             return [
                 $cnt . 'DateTime/DateInterval',
                 [   // input
@@ -221,34 +220,34 @@ class DateIntervalTest3 extends DtBase
                 $outputString,
             ];
         } // end if
-        else { // string
-            return [
-                $cnt . 'DateString/DateInterval',
-                [   // input
-                    DateTimeFactory::dateTime2Str( $baseDateTime ),
-                    $diInput,
-                ],
-                [   // getValue
-                    Util::$LCvalue  => [
-                        IcalInterface::FBTYPE => IcalInterface::BUSY,
-                        [
-                            clone $baseDateTime,
-                            DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
-                        ],
+
+        // string
+        return [
+            $cnt . 'DateString/DateInterval',
+            [   // input
+                DateTimeFactory::dateTime2Str( $baseDateTime ),
+                $diInput,
+            ],
+            [   // getValue
+                Util::$LCvalue  => [
+                    IcalInterface::FBTYPE => IcalInterface::BUSY,
+                    [
+                        clone $baseDateTime,
+                        DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
                     ],
-                    Util::$LCparams => [],
                 ],
-                $outputString,
-            ];
-        } // end else
+                Util::$LCparams => [],
+            ],
+            $outputString,
+        ]; // end else
     }
 
     /**
      * DateInterval101112Provider DateTime / DateInterval string sub-provider, FREEBUSY
      *
-     * @param array $input
-     * @param int $cnt
-     * @return array
+     * @param mixed[] $input
+     * @param int     $cnt
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval101112ProviderDateIntervalString( array $input, int $cnt ) : array
@@ -265,7 +264,7 @@ class DateIntervalTest3 extends DtBase
         $baseDateTime   = DateTimeFactory::factory( 'now', IcalInterface::UTC );
         $dateTimeString = DateTimeFactory::dateTime2Str( $baseDateTime );
         $outputString   = ';' . IcalInterface::FBTYPE . '=' . IcalInterface::BUSY . ':' .  $dateTimeString . '/' . $diString;
-        if( 1 == array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
+        if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) { // DateTime
             return [
                 $cnt . 'DateTime/diString',
                 [   // input
@@ -285,32 +284,32 @@ class DateIntervalTest3 extends DtBase
                 $outputString
             ];
         } // end if
-        else { // string
-                return [
-                    $cnt . 'DateString/diString',
-                    [   // input
-                        $dateTimeString,
-                        $diString
-                    ],
-                    [   // getValue
-                        Util::$LCvalue => [
-                            IcalInterface::FBTYPE => IcalInterface::BUSY,
-                            [
-                                clone $baseDateTime,
-                                DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
-                            ]
-                        ],
-                        Util::$LCparams => []
-                    ],
-                    $outputString
-                ];
-        } // end else
+
+        // string
+        return [
+            $cnt . 'DateString/diString',
+            [   // input
+                $dateTimeString,
+                $diString
+            ],
+            [   // getValue
+                Util::$LCvalue => [
+                    IcalInterface::FBTYPE => IcalInterface::BUSY,
+                    [
+                        clone $baseDateTime,
+                        DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
+                    ]
+                ],
+                Util::$LCparams => []
+            ],
+            $outputString
+        ]; // end else
     }
 
     /**
      * testDateInterval101112 provider, FREEBUSY
      *
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public function DateInterval101112Provider() : array
@@ -346,13 +345,13 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param string $case
-     * @param mixed  $value
-     * @param array $expectedGet
+     * @param string  $case
+     * @param mixed   $value
+     * @param mixed[] $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function dateInterval101112aTest( string $case, mixed $value, array $expectedGet, string $expectedString )
+    public function dateInterval101112aTest( string $case, mixed $value, array $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
             IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
@@ -408,13 +407,13 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param string $case
-     * @param mixed  $value
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param string  $case
+     * @param mixed   $value
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
-    public function dateInterval101112bTest( string $case, mixed $value, array $expectedGet, string $expectedString )
+    public function dateInterval101112bTest( string $case, mixed $value, array $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
             IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
@@ -469,13 +468,13 @@ class DateIntervalTest3 extends DtBase
      *
      * @test
      * @dataProvider DateInterval101112Provider
-     * @param string $case
-     * @param mixed  $value
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param string  $case
+     * @param mixed   $value
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
-    public function dateInterval101112cTest( string $case, mixed $value, array $expectedGet, string $expectedString )
+    public function dateInterval101112cTest( string $case, mixed $value, array $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
             IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],

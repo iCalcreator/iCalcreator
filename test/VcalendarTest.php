@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,12 +39,15 @@ use PHPUnit\Framework\TestCase;
  *    METHOD
  *    VERSION
  *    PRODID (implicit)
- *    Not X-property, tested in MiscTest
+ *    Not X-property, tested in PropEmptyTest
  *
  * @since  2.39.1 - 2021-06-26
  */
 class VcalendarTest extends TestCase
 {
+    /**
+     * @var string
+     */
     private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s()";
 
     /**
@@ -89,7 +92,7 @@ class VcalendarTest extends TestCase
     {
         $vTimezone = new Vtimezone();
         $standard  = $vTimezone->newStandard();
-        $this->assertTrue( $standard instanceof Standard );
+        $this->assertInstanceOf( Standard::class, $standard );
     }
 
     /**
@@ -246,9 +249,8 @@ class VcalendarTest extends TestCase
         $this->assertFalse( $vcalendar->getComponent( 6 ));
         $this->assertFalse( $vcalendar->getComponent());
 
-        $this->assertTrue(
-            ( 0 === $vcalendar->countComponents()),
-            'deleteComponent-error 1, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            0, $vcalendar->countComponents(), 'deleteComponent-error 1, has ' . $vcalendar->countComponents()
         );
 
 
@@ -265,9 +267,8 @@ class VcalendarTest extends TestCase
             $vx1   = $vcalendar->newVevent();
             $vx1->setXprop( 'X-SET_NO', (string) $x );
         }
-        $this->assertTrue(
-            ( 30 === $vcalendar->countComponents()),
-            'deleteComponent-error 2, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            30, $vcalendar->countComponents(), 'deleteComponent-error 2, has ' . $vcalendar->countComponents()
         );
 
         $testStr = 'Testing this #';
@@ -500,9 +501,8 @@ class VcalendarTest extends TestCase
         $this->assertFalse( $vcalendar->getComponent( IcalInterface::VTODO, 3 ) );
 
         // check number of components
-        $this->assertTrue(
-            ( 30 === $vcalendar->countComponents() ),
-            'deleteComponent-error 6, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            30, $vcalendar->countComponents(), 'deleteComponent-error 6, has ' . $vcalendar->countComponents()
         );
 
         for( $x = 18; $x <= 1; $x-- ) {
@@ -518,9 +518,8 @@ class VcalendarTest extends TestCase
             $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ),
             'deleteComponent-error 8'
         );
-        $this->assertTrue(
-            ( 2 === $vcalendar->countComponents() ),
-            'deleteComponent-error 9, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            2, $vcalendar->countComponents(), 'deleteComponent-error 9, has ' . $vcalendar->countComponents()
         );
 
         while( $vcalendar->deleteComponent(  IcalInterface::VTODO, false ) ) {
@@ -530,9 +529,8 @@ class VcalendarTest extends TestCase
             $vcalendar->deleteComponent(  IcalInterface::VTODO, false ),
             'deleteComponent-error 10'
         );
-        $this->assertTrue(
-            ( 0 === $vcalendar->countComponents() ),
-            'deleteComponent-error 11, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            0, $vcalendar->countComponents(), 'deleteComponent-error 11, has ' . $vcalendar->countComponents()
         );
 
         // check components are set in order
@@ -550,9 +548,8 @@ class VcalendarTest extends TestCase
 //          if( method_exists( $comp, 'getUid' )) { echo $x . ' - ' . $comp->getUid() . PHP_EOL; } // test ###
         }
         // check number of components
-        $this->assertTrue(
-            ( 30 === $vcalendar->countComponents() ),
-            'deleteComponent-error 13, has ' . $vcalendar->countComponents()
+        $this->assertSame(
+            30, $vcalendar->countComponents(), 'deleteComponent-error 13, has ' . $vcalendar->countComponents()
         );
     }
 }

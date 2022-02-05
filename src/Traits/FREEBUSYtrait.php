@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -53,14 +53,14 @@ use Kigkonsult\Icalcreator\Util\SortFactory;
  * FREEBUSY property functions
  *
  * @throws InvalidArgumentException
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait FREEBUSYtrait
 {
     /**
-     * @var null|array component property FREEBUSY value
+     * @var null|mixed[] component property FREEBUSY value
      */
-    protected ?array $freebusy = null;
+    protected ? array $freebusy = null;
 
     /**
      * @var string[] FREEBUSY param keywords
@@ -166,11 +166,11 @@ trait FREEBUSYtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|array|bool
+     * @return string|bool|mixed[]
      * @throws Exception
      * @since 2.40 2021-10-04
      */
-    public function getFreebusy( ?int $propIx = null, ?bool $inclParam = false ) : bool | string | array
+    public function getFreebusy( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
     {
         if( empty( $this->freebusy )) {
             unset( $this->propIx[self::FREEBUSY] );
@@ -192,9 +192,9 @@ trait FREEBUSYtrait
     /**
      * Return type, value and parameters from parsed row and propAttr
      *
-     * @param string $row
-     * @param array  $propAttr
-     * @return array
+     * @param string  $row
+     * @param mixed[] $propAttr
+     * @return mixed[]
      * @since  2.27.11 - 2019-01-04
      */
     protected static function parseFreebusy( string $row, array $propAttr ) : array
@@ -225,10 +225,10 @@ trait FREEBUSYtrait
     /**
      * Set calendar component property freebusy
      *
-     * @param null|string  $fbType
-     * @param null|string|DateTimeInterface|array $fbValues
-     * @param null|string[]   $params
-     * @param null|integer $index
+     * @param null|string   $fbType
+     * @param null|string|DateTimeInterface|mixed[] $fbValues
+     * @param null|mixed[]  $params
+     * @param null|integer  $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -302,18 +302,18 @@ trait FREEBUSYtrait
             } // end foreach
             $input[] = $freebusyPeriod;
         }
-        self::setMval( $this->freebusy, $input, ( $params ?? [] ), null, $index );
+        self::setMval( $this->freebusy, $input, $params, null, $index );
         return $this;
     }
 
     /**
      * Check for single values and , if so, put into array
      *
-     * @param array|string $fbValues
-     * @return array
+     * @param string|mixed[] $fbValues
+     * @return string|mixed[]
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleValues( array | string $fbValues ) : array
+    private static function checkSingleValues( string | array $fbValues ) : array|string
     {
         if( ! is_array( $fbValues )) {
             return $fbValues;

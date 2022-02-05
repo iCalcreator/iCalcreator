@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,9 +43,9 @@ use function array_change_key_case;
 trait CONFERENCErfc7986trait
 {
     /**
-     * @var null|array component property CONFERENCE value
+     * @var null|mixed[] component property CONFERENCE value
      */
-    protected ?array $conference = null;
+    protected ? array $conference = null;
 
     /**
      * Return formatted output for calendar component property conference
@@ -103,9 +103,9 @@ trait CONFERENCErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      */
-    public function getConference( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getConference( ? int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->conference )) {
             unset( $this->propIx[self::CONFERENCE] );
@@ -124,12 +124,12 @@ trait CONFERENCErfc7986trait
      * Set calendar component property conference
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
-     * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token
-     * @todo fix labelparam   - LABEL
+     * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token ??
+     * @todo fix labelparam   - LABEL ??
      */
     public function setConference( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {

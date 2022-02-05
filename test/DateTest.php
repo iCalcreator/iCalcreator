@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -65,6 +65,7 @@ class DateTest extends DtBase
     /**
      * testDATE provider
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function DATEProvider() : array
@@ -206,11 +207,11 @@ class DateTest extends DtBase
      *
      * @test
      * @dataProvider DATEProvider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      * @throws InvalidArgumentException
      */
@@ -230,14 +231,13 @@ class DateTest extends DtBase
                 IcalInterface::EXDATE,
                 IcalInterface::RDATE
             ],
-            IcalInterface::VTODO    => [ IcalInterface::DTSTART, IcalInterface::DUE, IcalInterface::RECURRENCE_ID ],
-            IcalInterface::VJOURNAL => [ IcalInterface::DTSTART, IcalInterface::RECURRENCE_ID ],
+            IcalInterface::VTODO         => [ IcalInterface::DTSTART, IcalInterface::DUE, IcalInterface::RECURRENCE_ID ],
+            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTART, IcalInterface::RECURRENCE_ID ],
+//          IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTART, IcalInterface::DTEND ], datetime required
         ];
         static $compsProps2 = [
-            IcalInterface::VEVENT => [
-                IcalInterface::EXDATE,
-                IcalInterface::RDATE
-            ]
+            IcalInterface::VEVENT        => [ IcalInterface::EXDATE, IcalInterface::RDATE ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
         ];
 
 //      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###

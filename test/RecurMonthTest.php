@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,6 +43,8 @@ class RecurMonthTest extends RecurBaseTest
 {
     /**
      * recurMonthly1Test provider
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurMonthly1aProvider() : array
@@ -560,12 +562,12 @@ class RecurMonthTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurMonthly1aProvider
-     * @param int|string $case
+     * @param int|string  $case
      * @param DateTime    $start
      * @param DateTime    $end
-     * @param array       $recur
-     * @param array       $expects
-     * @param float $prepTime
+     * @param mixed[]     $recur
+     * @param mixed[]     $expects
+     * @param float       $prepTime
      * @throws Exception
      */
     public function recurMonthly1aTest(
@@ -589,6 +591,8 @@ class RecurMonthTest extends RecurBaseTest
 
     /**
      * recurMonthly1bTest provider
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurMonthly1bProvider() : array
@@ -730,12 +734,12 @@ class RecurMonthTest extends RecurBaseTest
      *
      * @test
      * @dataProvider recurMonthly1bProvider
-     * @param int|string $case
+     * @param int|string  $case
      * @param DateTime    $start
      * @param DateTime    $end
-     * @param array       $recur
-     * @param array       $expects
-     * @param float $prepTime
+     * @param mixed[]     $recur
+     * @param mixed[]     $expects
+     * @param float       $prepTime
      * @throws Exception
      */
     public function recurMonthly1bTest(
@@ -763,8 +767,8 @@ class RecurMonthTest extends RecurBaseTest
      * @param int|string $case
      * @param DateTime    $start
      * @param DateTime    $end
-     * @param array       $recur
-     * @param array       $expects
+     * @param mixed[]     $recur
+     * @param mixed[]     $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -833,6 +837,8 @@ class RecurMonthTest extends RecurBaseTest
 
     /**
      * getRecurByDaysInMonthTest provider
+     *
+     * @return mixed[]
      */
     public function getRecurByDaysInMonthProvider() : array
     {
@@ -945,9 +951,14 @@ class RecurMonthTest extends RecurBaseTest
     /**
      * @test
      * @dataProvider getRecurByDaysInMonthProvider
+     * @param int|string $case
+     * @param mixed[] $recurByDay
+     * @param int $year
+     * @param int $month
+     * @param mixed[] $exp
      * @throws Exception
      */
-    public function getRecurByDaysInMonthTest( $case, $recurByDay, $year, $month, $exp ) : void
+    public function getRecurByDaysInMonthTest( int | string $case, array $recurByDay, int $year, int $month, array $exp ) : void
     {
         $list = RecurFactory2::getRecurByDaysInMonth( $recurByDay, $year, $month );
 
@@ -961,6 +972,8 @@ class RecurMonthTest extends RecurBaseTest
 
     /**
      * recurMonthly1Test provider
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurMonthly2Provider() : array

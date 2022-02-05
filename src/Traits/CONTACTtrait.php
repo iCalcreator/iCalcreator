@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,14 +38,14 @@ use InvalidArgumentException;
  * CONTACT property functions
  *
  * @throws InvalidArgumentException
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait CONTACTtrait
 {
     /**
-     * @var null|array component property CONTACT value
+     * @var null|mixed[] component property CONTACT value
      */
-    protected ?array $contact = [];
+    protected ? array $contact = [];
 
     /**
      * Return formatted output for calendar component property contact
@@ -104,10 +104,10 @@ trait CONTACTtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getContact( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getContact( ? int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->contact )) {
             unset( $this->propIx[self::CONTACT] );
@@ -126,7 +126,7 @@ trait CONTACTtrait
      * Set calendar component property contact
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
@@ -143,7 +143,7 @@ trait CONTACTtrait
          self::setMval(
             $this->contact,
             StringFactory::trimTrailNL( $value ),
-             ( $params ?? [] ),
+             $params,
             null,
             $index
         );

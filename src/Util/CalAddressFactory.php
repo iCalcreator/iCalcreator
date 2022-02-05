@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -49,7 +49,7 @@ use function trim;
 /**
  * iCalcreator attendee support class
  *
- * @since 2.39 2021-06-19
+ * @since 2022-01-31 2.41.15
  */
 class CalAddressFactory
 {
@@ -59,10 +59,13 @@ class CalAddressFactory
     private static array $CALADDRESSPROPERTIES = [
         IcalInterface::ATTENDEE,
         IcalInterface::CONTACT,
-        IcalInterface::ORGANIZER
+        IcalInterface::ORGANIZER,
+        IcalInterface::PARTICIPANT
     ];
 
     /**
+     * Attendee parameters with cal-address
+     *
      * @var string[]
      */
     private static array $ParamArrayKeys = [
@@ -270,7 +273,7 @@ class CalAddressFactory
     }
 
     /**
-     * Return value and parameters cal-addresses from Vcalendar property
+     * Return value and parameters cal-addresses from Vcalendar properties
      *
      * From one of ATTENDEEs and ORGANIZERs, name part from CONTACTs
      *
@@ -281,13 +284,13 @@ class CalAddressFactory
      */
     public static function getCalAdressesAllFromProperty(
         Vcalendar $calendar,
-        null|string|array $propName = null
+        null | string | array $propName = null
     ) : array
     {
         if( empty( $propName )) {
             $propName = self::$CALADDRESSPROPERTIES;
         }
-        $calendar->reset();
+        $calendar->resetCompCounter();
         $output = [];
         while( $comp = $calendar->getComponent()) {
             foreach((array) $propName as $pName ) {
@@ -295,21 +298,29 @@ class CalAddressFactory
                 if( ! method_exists( $comp, $method ) ) {
                     continue;
                 }
-                $output = match( $pName ) {
-                    IcalInterface::ATTENDEE => array_merge(
-                        $output,
-                        self:: getCalAdressesAllFromAttendee( $comp )
-                    ),
-                    IcalInterface::ORGANIZER => array_merge(
-                        $output,
-                        self::getCalAdressesAllFromOrganizer( $comp )
-                    ),
-                    // IcalInterface::CONTACT
-                    default => array_merge(
-                        $output,
-                        self::getCalAdressesAllFromContact( $comp )
-                    ),
-                }; // end switch
+                switch( $pName ) {
+                    case IcalInterface::ATTENDEE :
+                        foreach( self::getCalAdressesAllFromAttendee( $comp ) as $email ) {
+                            if( ! in_array( $email, $output, true )) {
+                                $output[] = $email;
+                            }
+                        }
+                        break;
+                    case IcalInterface::ORGANIZER :
+                        foreach( self::getCalAdressesAllFromOrganizer( $comp ) as $email ) {
+                            if( ! in_array( $email, $output, true )) {
+                                $output[] = $email;
+                            }
+                        }
+                        break;
+                    default :
+                        foreach( self::getCalAdressesAllFromContact( $comp ) as $email ) {
+                            if( ! in_array( $email, $output, true )) {
+                                $output[] = $email;
+                            }
+                        }
+                        break;
+                } // end switch
             } // end foreach
         } // end while
         sort( $output );
@@ -377,7 +388,7 @@ class CalAddressFactory
         }
         $output = [];
         $value  = self::removeMailtoPrefix( $propValue[Util::$LCvalue] );
-        if( ! in_array( $value, $output, true ) ) {
+        if( ! in_array( $value, $output, true )) {
             $output[] = $value;
         }
         foreach( [ IcalInterface::EMAIL, IcalInterface::SENT_BY ] as $key ) {
@@ -475,10 +486,11 @@ class CalAddressFactory
                 continue;
             }
             $params2[$pLabel] = match( $pLabel ) {
-                IcalInterface::MEMBER, IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM => self::prepInputMDtDf((array) $pValue ),
-                IcalInterface::EMAIL => self::prepEmail( $pValue ),
+                IcalInterface::MEMBER, IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM
+                                       => self::prepInputMDtDf((array) $pValue ),
+                IcalInterface::EMAIL   => self::prepEmail( $pValue ),
                 IcalInterface::SENT_BY => self::prepSentBy( $pValue ),
-                default => trim( $pValue, StringFactory::$QQ ),
+                default                => trim( $pValue, StringFactory::$QQ ),
             }; // end match( $pLabel.. .
         } // end foreach( $params as $pLabel => $optParamValue )
         // end if( is_array($params ))
@@ -573,10 +585,10 @@ class CalAddressFactory
     /**
      * Return formatted output for calendar component property attendee
      *
-     * @param array $attendeeData
+     * @param mixed[] $attendeeData
      * @param bool    $allowEmpty
      * @return string
-     * @since  2.29.11 - 2019-08-30
+     * @since  2022-01-31 2.41.15
      */
     public static function outputFormatAttendee(
         array $attendeeData,
@@ -621,13 +633,11 @@ class CalAddressFactory
                     continue;
                 }
                 foreach( $pValue as $pLabel2 => $pValue2 ) { // fix (opt) quotes
-                    if( is_array( $pValue2 ) ||
-                        in_array( $pLabel2, self::$ParamArrayKeys, true ) ) {
+                    if( is_array( $pValue2 ) || in_array( $pLabel2, self::$ParamArrayKeys, true )) {
                         continue;
                     } // all but DELEGATED-FROM, DELEGATED-TO, MEMBER
-                    if((str_contains( $pValue2, Util::$COLON )) ||
-                       (str_contains( $pValue2, Util::$SEMIC )) ||
-                       (str_contains( $pValue2, Util::$COMMA ))) {
+                    $pValue[$pLabel2] = ParameterFactory::circumflexQuoteInvoke( $pValue2 );
+                    if( StringFactory::hasColonOrSemicOrComma( $pValue2 )) {
                         $pValue[$pLabel2] = self::getQuotedItem( $pValue2 );
                     }
                 } // end foreach
@@ -662,8 +672,11 @@ class CalAddressFactory
                     }
                 } // end foreach
                 if( isset( $pValue[IcalInterface::DIR] )) {
-                    $delim       = (!str_contains( $pValue[IcalInterface::DIR], StringFactory::$QQ )) ? StringFactory::$QQ : null;
-                    $attributes .= sprintf( $FMTDIREQ, IcalInterface::DIR, $delim, $pValue[IcalInterface::DIR], $delim );
+                    $delim       = ( ! str_contains( $pValue[IcalInterface::DIR], StringFactory::$QQ ))
+                        ? StringFactory::$QQ
+                        : null;
+                    $attributes .=
+                        sprintf( $FMTDIREQ, IcalInterface::DIR, $delim, $pValue[IcalInterface::DIR], $delim );
                 }
                 foreach( $KEYGRP4 as $key ) { // CN, LANGUAGE
                     if( isset( $pValue[$key] )) {
@@ -689,14 +702,13 @@ class CalAddressFactory
     }
 
     /**
-     * Return value and parameters from parsed row and propAttr
+     * Split multiple Attendees MEMBER/DELEGATED-TO/DELEGATED-FROM into array, if found
      *
-     * @param string $row
-     * @param string[] $propAttr
-     * @return array
+     * @param mixed[] $propAttr
+     * @return mixed[]
      * @since  2.27.11 - 2019-01-04
      */
-    public static function parseAttendee( string $row, array $propAttr ) : array
+    public static function splitMultiParams( array $propAttr ) : array
     {
         foreach( $propAttr as $pix => $attr ) {
             if( ! in_array( strtoupper( $pix ), self::$ParamArrayKeys, true ) ) {
@@ -707,6 +719,6 @@ class CalAddressFactory
                 $propAttr[$pix] = $attr2;
             }
         }
-        return [ $row, $propAttr ];
+        return $propAttr;
     }
 }

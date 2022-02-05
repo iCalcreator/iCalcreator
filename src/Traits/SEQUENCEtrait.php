@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,12 +38,12 @@ use function is_numeric;
 /**
  * SEQUENCE property functions
  *
- * @since  2.27.3 - 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait SEQUENCEtrait
 {
     /**
-     * @var null|array component property SEQUENCE value
+     * @var null|mixed[] component property SEQUENCE value
      */
     protected ? array $sequence = null;
 
@@ -88,7 +88,7 @@ trait SEQUENCEtrait
      * Get calendar component property sequence
      *
      * @param null|bool   $inclParam
-     * @return bool|int|string|array
+     * @return bool|int|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
     public function getSequence( ? bool $inclParam = false ) : bool | int | string | array
@@ -96,7 +96,7 @@ trait SEQUENCEtrait
         if( null === $this->sequence ) {
             return false;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->sequence
             : $this->sequence[Util::$LCvalue];
     }
@@ -105,7 +105,7 @@ trait SEQUENCEtrait
      * Set calendar component property sequence
      *
      * @param null|int|string $value
-     * @param null|string[]      $params
+     * @param null|mixed[]    $params
      * @return static
      * @since  2.27.2 - 2019-01-04
      */
@@ -123,7 +123,7 @@ trait SEQUENCEtrait
         }
         $this->sequence = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -45,9 +45,9 @@ use Kigkonsult\Icalcreator\Util\Util;
 trait REFRESH_INTERVALrfc7986trait
 {
     /**
-     * @var null|array component property REFRESH_INTERVAL value
+     * @var null|mixed[] component property REFRESH_INTERVAL value
      */
-    protected ?array $refreshinterval = null;
+    protected ? array $refreshinterval = null;
 
     /**
      * Return formatted output for calendar component property refresh_interval
@@ -88,7 +88,7 @@ trait REFRESH_INTERVALrfc7986trait
      * Get calendar component property refresh_interval
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array|DateInterval
+     * @return bool|string|DateInterval|mixed[]
      * @throws Exception
      * @since 2.43 2021-10-30
      */
@@ -97,7 +97,7 @@ trait REFRESH_INTERVALrfc7986trait
         if( empty( $this->refreshinterval )) {
             return false;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->refreshinterval
             : $this->refreshinterval[Util::$LCvalue];
     }
@@ -106,16 +106,13 @@ trait REFRESH_INTERVALrfc7986trait
      * Set calendar component property refresh_interval
      *
      * @param null|string|DateInterval   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.40 2021-10-04
      */
-    public function setRefreshinterval(
-        null|string|DateInterval $value = null,
-        ? array $params = []
-    ) : static
+    public function setRefreshinterval( null|string|DateInterval $value = null, ? array $params = [] ) : static
     {
         static $FMTERR = 'Invalid %s value';
         switch( true ) {

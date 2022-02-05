@@ -5,7 +5,7 @@
  This file is a part of iCalcreator.
 
  author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  link      https://kigkonsult.se
  license   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
@@ -33,7 +33,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="true"
-         bootstrap="autoload.php"
+         bootstrap="test/autoload.php"
 >
     <testsuites>
         <testsuite name="Vcalendar Tests">
@@ -60,7 +60,11 @@
         </testsuite>
         <testsuite name="Misc. property Tests">
             <file>test/Exception5Test.php</file>
-            <file>test/MiscTest.php</file>
+            <file>test/Prop1TextSingleTest.php</file>
+            <file>test/Prop2TextMultiTest.php</file>
+            <file>test/PropXTest.php</file>
+            <file>test/PropEmptyTest.php</file>
+            <file>test/ParseTest.php</file>
         </testsuite>
         <testsuite name="Valarm property Tests">
             <file>test/ValarmTest.php</file>
@@ -91,24 +95,33 @@
             ignoreDeprecatedCodeUnits="false"
             disableCodeCoverageIgnore="true">
         <include>
+            <file>src/Available.php</file>
             <file>src/CalendarComponent.php</file>
             <file>src/Daylight.php</file>
             <file>src/DScomponent.php</file>
             <file>src/IcalBase.php</file>
             <file>src/IcalInterface.php</file>
+            <file>src/Participant.php</file>
             <file>src/Standard.php</file>
+            <file>src/V2component.php</file>
+            <file>src/V3component.php</file>
+            <file>src/VAcomponent.php</file>
             <file>src/Valarm.php</file>
+            <file>src/Vavailability.php</file>
             <file>src/Vcalendar.php</file>
             <file>src/Vcomponent.php</file>
-            <file>src/VetComponent.php</file>
             <file>src/Vevent.php</file>
             <file>src/Vfreebusy.php</file>
             <file>src/Vjournal.php</file>
+            <file>src/Vlocation.php</file>
+            <file>src/Vresource.php</file>
             <file>src/Vtimezone.php</file>
             <file>src/Vtodo.php</file>
+            <file>src/Traits/ACKNOWLEDGEDrfc9074trait.php</file>
             <file>src/Traits/ACTIONtrait.php</file>
             <file>src/Traits/ATTACHtrait.php</file>
             <file>src/Traits/ATTENDEEtrait.php</file>
+            <file>src/Traits/CALENDAR_ADDRESSrfc9073trait.php</file>
             <file>src/Traits/CALSCALEtrait.php</file>
             <file>src/Traits/CATEGORIEStrait.php</file>
             <file>src/Traits/CLASStrait.php</file>
@@ -127,34 +140,42 @@
             <file>src/Traits/EXDATEtrait.php</file>
             <file>src/Traits/EXRULEtrait.php</file>
             <file>src/Traits/FREEBUSYtrait.php</file>
-            <file>src/Traits/IMAGErfc7986trait.php</file>
             <file>src/Traits/GEOtrait.php</file>
+            <file>src/Traits/IMAGErfc7986trait.php</file>
             <file>src/Traits/LAST_MODIFIEDtrait.php</file>
             <file>src/Traits/LOCATIONtrait.php</file>
+            <file>src/Traits/LOCATIONTYPErfc9073trait.php</file>
             <file>src/Traits/METHODtrait.php</file>
             <file>src/Traits/NAMErfc7986trait.php</file>
             <file>src/Traits/ORGANIZERtrait.php</file>
+            <file>src/Traits/Participants2AttendeesTrait.php</file>
             <file>src/Traits/PERCENT_COMPLETEtrait.php</file>
             <file>src/Traits/PRIORITYtrait.php</file>
             <file>src/Traits/PRODIDtrait.php</file>
+            <file>src/Traits/PROXIMITYrfc9074trait.php</file>
             <file>src/Traits/RDATEtrait.php</file>
-            <file>src/Traits/REFRESH_INTERVALrfc7986trait.php</file>
             <file>src/Traits/RECURRENCE_IDtrait.php</file>
+            <file>src/Traits/REFRESH_INTERVALrfc7986trait.php</file>
             <file>src/Traits/RELATED_TOtrait.php</file>
             <file>src/Traits/REPEATtrait.php</file>
             <file>src/Traits/REQUEST_STATUStrait.php</file>
+            <file>src/Traits/RESOURCE_TYPErfc9073trait.php</file>
             <file>src/Traits/RESOURCEStrait.php</file>
             <file>src/Traits/RRULEtrait.php</file>
-            <file>src/Traits/SOURCErfc7986trait.php</file>
             <file>src/Traits/SEQUENCEtrait.php</file>
+            <file>src/Traits/SOURCErfc7986trait.php</file>
             <file>src/Traits/STATUStrait.php</file>
+            <file>src/Traits/STRUCTURED_DATArfc9073trait.php</file>
+            <file>src/Traits/STYLED_DESCRIPTIONrfc9073trait.php</file>
             <file>src/Traits/SUMMARYtrait.php</file>
             <file>src/Traits/TRANSPtrait.php</file>
             <file>src/Traits/TRIGGERtrait.php</file>
+            <file>src/Traits/TZID_ALIAS_OFrfc7808.php</file>
             <file>src/Traits/TZIDtrait.php</file>
             <file>src/Traits/TZNAMEtrait.php</file>
             <file>src/Traits/TZOFFSETFROMtrait.php</file>
             <file>src/Traits/TZOFFSETTOtrait.php</file>
+            <file>src/Traits/TZUNTILrfc7808.php</file>
             <file>src/Traits/TZURLtrait.php</file>
             <file>src/Traits/UIDrfc7986trait.php</file>
             <file>src/Traits/URLtrait.php</file>

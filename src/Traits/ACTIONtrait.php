@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,12 +39,12 @@ use function strtoupper;
 /**
  * ACTION property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait ACTIONtrait
 {
     /**
-     * @var null|array component property ACTION value
+     * @var null|mixed[] component property ACTION value
      */
     protected ?array $action = null;
 
@@ -86,27 +86,27 @@ trait ACTIONtrait
      * Get calendar component property action
      *
      * @param null|bool  $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getAction( ?bool $inclParam = false ) : array | bool | string
+    public function getAction( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->action )) {
             return false;
         }
-        return ( $inclParam ) ? $this->action : $this->action[Util::$LCvalue];
+        return $inclParam ? $this->action : $this->action[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property action
      *
-     * @param null|string $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
-     * @param null|string[] $params
+     * @param null|string   $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setAction( string $value = null, ? array $params = [] ) : static
+    public function setAction( ? string $value = null, ? array $params = [] ) : static
     {
         static $STDVALUES = [
             self::AUDIO,
@@ -125,7 +125,7 @@ trait ACTIONtrait
         Util::assertString( $value, self::ACTION );
         $this->action = [
             Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL((string) $value )),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

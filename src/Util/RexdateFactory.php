@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -67,7 +67,7 @@ class RexdateFactory
     /**
      * Return formatted output for calendar component property data value type recur
      *
-     * @param array $exdateData
+     * @param mixed[] $exdateData
      * @param bool    $allowEmpty
      * @return string
      * @throws Exception
@@ -125,8 +125,8 @@ class RexdateFactory
      * Return prepared calendar component property exdate input
      *
      * @param string[]|DateTimeInterface[] $exdates
-     * @param null|array $params
-     * @return array
+     * @param null|mixed[] $params
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
@@ -190,18 +190,14 @@ class RexdateFactory
     /**
      * Return formatted output for calendar component property rdate
      *
-     * @param array $rdateData
+     * @param mixed[]  $rdateData
      * @param bool     $allowEmpty
      * @param string   $compType
      * @return string
      * @throws Exception
      * @since  2.40 - 2021-10-04
      */
-    public static function formatRdate(
-        array $rdateData,
-        bool $allowEmpty,
-        string $compType
-    ) : string
+    public static function formatRdate( array $rdateData, bool $allowEmpty, string $compType ) : string
     {
         static $SORTER1 = [ SortFactory::class, 'sortRdate1' ];
         static $SORTER2 = [ SortFactory::class, 'sortRdate2' ];
@@ -290,9 +286,9 @@ class RexdateFactory
     /**
      * Return value and parameters from parsed row and propAttr
      *
-     * @param string $row
-     * @param array $propAttr
-     * @return array
+     * @param string  $row
+     * @param mixed[] $propAttr
+     * @return mixed[]
      * @since  2.27.11 - 2019-01-04
      */
     public static function parseRexdate( string $row, array $propAttr ) : array
@@ -317,9 +313,9 @@ class RexdateFactory
     /**
      * Return prepared calendar component property rdate input
      *
-     * @param string[]|DateTimeInterface[]|string[][]|DateTimeInterface[][]|array $rDates
-     * @param null|string[]                 $params
-     * @return array
+     * @param string[]|DateTimeInterface[]|string[][]|DateTimeInterface[][]|mixed[] $rDates
+     * @param null|string[] $params
+     * @return mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
@@ -328,7 +324,7 @@ class RexdateFactory
     {
         $output = [
             Util::$LCparams => ParameterFactory::setParams(
-                $params,
+                $params ?? [],
                 self::$DEFAULTVALUEDATETIME
             )
         ];
@@ -406,12 +402,12 @@ class RexdateFactory
     /**
      * Return managed period (dateTime/dateTime or dateTime/dateInterval)
      *
-     * @param array $period
+     * @param mixed[] $period
      * @param int     $rpix
      * @param bool    $isValueDate
      * @param string  $paramTZid
      * @param bool    $isLocalTime
-     * @return array
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.40 2021-10-04

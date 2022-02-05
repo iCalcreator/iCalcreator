@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,50 +31,54 @@ namespace Kigkonsult\Icalcreator;
 
 use Exception;
 
+use function array_keys;
 use function sprintf;
 use function strtoupper;
 
 /**
  * iCalcreator VTODO component class
  *
- * @since  2.29.9 - 2019-08-05
+ * @since 2.41.3 2022-01-17
  */
-final class Vtodo extends VetComponent
+final class Vtodo extends V3component
 {
-    use Traits\ATTACHtrait,
-        Traits\ATTENDEEtrait,
-        Traits\CATEGORIEStrait,
-        Traits\CLASStrait,
-        Traits\COLORrfc7986trait,
-        Traits\COMMENTtrait,
-        Traits\COMPLETEDtrait,
-        Traits\CONFERENCErfc7986trait,
-        Traits\CONTACTtrait,
-        Traits\CREATEDtrait,
-        Traits\DESCRIPTIONtrait,
-        Traits\DTSTARTtrait,
-        Traits\DUEtrait,
-        Traits\DURATIONtrait,
-        Traits\EXDATEtrait,
-        Traits\EXRULEtrait,
-        Traits\GEOtrait,
-        Traits\IMAGErfc7986trait,
-        Traits\LAST_MODIFIEDtrait,
-        Traits\LOCATIONtrait,
-        Traits\ORGANIZERtrait,
-        Traits\PERCENT_COMPLETEtrait,
-        Traits\PRIORITYtrait,
-        Traits\RDATEtrait,
-        Traits\RECURRENCE_IDtrait,
-        Traits\RELATED_TOtrait,
-        Traits\REQUEST_STATUStrait,
-        Traits\RESOURCEStrait,
-        Traits\RRULEtrait,
-        Traits\SEQUENCEtrait,
-        Traits\STATUStrait,
-        Traits\SUMMARYtrait,
-        Traits\UIDrfc7986trait,
-        Traits\URLtrait;
+    use Traits\ATTACHtrait;
+    use Traits\ATTENDEEtrait;
+    use Traits\Participants2AttendeesTrait;
+    use Traits\CATEGORIEStrait;
+    use Traits\CLASStrait;
+    use Traits\COLORrfc7986trait;
+    use Traits\COMMENTtrait;
+    use Traits\COMPLETEDtrait;
+    use Traits\CONFERENCErfc7986trait;
+    use Traits\CONTACTtrait;
+    use Traits\CREATEDtrait;
+    use Traits\DESCRIPTIONtrait;
+    use Traits\DTSTARTtrait;
+    use Traits\DUEtrait;
+    use Traits\DURATIONtrait;
+    use Traits\EXDATEtrait;
+    use Traits\EXRULEtrait;
+    use Traits\GEOtrait;
+    use Traits\IMAGErfc7986trait;
+    use Traits\LAST_MODIFIEDtrait;
+    use Traits\LOCATIONtrait;
+    use Traits\ORGANIZERtrait;
+    use Traits\PERCENT_COMPLETEtrait;
+    use Traits\PRIORITYtrait;
+    use Traits\RDATEtrait;
+    use Traits\RECURRENCE_IDtrait;
+    use Traits\RELATED_TOtrait;
+    use Traits\REQUEST_STATUStrait;
+    use Traits\RESOURCEStrait;
+    use Traits\RRULEtrait;
+    use Traits\SEQUENCEtrait;
+    use Traits\STATUStrait;
+    use Traits\STRUCTURED_DATArfc9073trait;
+    use Traits\STYLED_DESCRIPTIONrfc9073trait;
+    use Traits\SUMMARYtrait;
+    use Traits\UIDrfc7986trait;
+    use Traits\URLtrait;
 
     /**
      * @var string
@@ -84,12 +88,12 @@ final class Vtodo extends VetComponent
     /**
      * Destructor
      *
-     * @since  2.29.9 - 2019-08-05
+     * @since 2.41.3 2022-01-17
      */
     public function __destruct()
     {
         if( ! empty( $this->components )) {
-            foreach( $this->components as $cix => $component ) {
+            foreach( array_keys( $this->components ) as $cix ) {
                 $this->components[$cix]->__destruct();
             }
         }
@@ -140,6 +144,8 @@ final class Vtodo extends VetComponent
             $this->rrule,
             $this->sequence,
             $this->status,
+            $this->structureddata,
+            $this->styleddescription,
             $this->summary,
             $this->uid,
             $this->url
@@ -151,7 +157,7 @@ final class Vtodo extends VetComponent
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since  2.29.9 - 2019-08-05
+     * @since 2.41.3 2022-01-17
      */
     public function createComponent() : string
     {
@@ -170,6 +176,8 @@ final class Vtodo extends VetComponent
         $component  .= $this->createContact();
         $component  .= $this->createCreated();
         $component  .= $this->createDescription();
+        $component  .= $this->createStyleddescription();
+        $component  .= $this->createStructureddata();
         $component  .= $this->createDtstart();
         $component  .= $this->createDue();
         $component  .= $this->createDuration();

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,7 +43,7 @@ class RecurYearTest extends RecurBaseTest
     /**
      * recurYearlyTest111x provider
      *
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public function recurYearlyTest111xProvider() : array
@@ -95,9 +95,9 @@ class RecurYearTest extends RecurBaseTest
      * @dataProvider recurYearlyTest111xProvider
      * @param string $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -116,7 +116,7 @@ class RecurYearTest extends RecurBaseTest
     /**
      * recurYearlyTest23 provider
      *
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public function recurYearlyTest23Provider() : array
@@ -183,7 +183,7 @@ class RecurYearTest extends RecurBaseTest
                         break;
                     }
                     if( $startYmd < $wDate->format( 'Ymd' )) {
-                        if( in_array((int) $wDate->format( 'm' ), $mRange ) ) {
+                        if( in_array( (int)$wDate->format( 'm' ), $mRange, true ) ) {
                             $expects[] = $wDate->format( 'Ymd' );
                             ++$x;
                         }
@@ -229,9 +229,9 @@ class RecurYearTest extends RecurBaseTest
      * @dataProvider recurYearlyTest23Provider
      * @param string $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -250,6 +250,7 @@ class RecurYearTest extends RecurBaseTest
     /**
      * recurYearlyTest23e provider, rfc example 23 -Extended, both byMonth and byMonthDay
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurYearlyTest23eProvider() : array
@@ -369,9 +370,9 @@ class RecurYearTest extends RecurBaseTest
      * @dataProvider recurYearlyTest23eProvider
      * @param string $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -390,6 +391,7 @@ class RecurYearTest extends RecurBaseTest
     /**
      * recurYearlyTest23l provider, rfc example 23 changed date and limited by INTERVAL 2 and byMonthDay [ -20, -10 ]
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurYearlyTest23lProvider() : array
@@ -426,9 +428,9 @@ class RecurYearTest extends RecurBaseTest
      * @dataProvider recurYearlyTest23lProvider
      * @param string $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -449,9 +451,9 @@ class RecurYearTest extends RecurBaseTest
      *
      * @param string $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @param float $prepTime
      * @throws Exception
      */
@@ -521,6 +523,7 @@ class RecurYearTest extends RecurBaseTest
     /**
      * recurYearlyTest2X provider
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function recurYearlyTest2XProvider() : array
@@ -579,9 +582,9 @@ class RecurYearTest extends RecurBaseTest
      * @dataProvider recurYearlyTest2XProvider
      * @param string   $case
      * @param DateTime $start
-     * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
+     * @param DateTime|mixed[] $end
+     * @param mixed[]  $recur
+     * @param mixed[]  $expects
      * @throws Exception
      */
     public function recurYearly2XTest(

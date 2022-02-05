@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,14 +37,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * RRULE property functions
  *
- * @since 2.29.6 2019-06-23
+ * @since 2.40.11 2022-01-15
  */
 trait RRULEtrait
 {
     /**
-     * @var null|array component property RRULE value
+     * @var null|mixed[] component property RRULE value
      */
-    protected ?array $rrule = null;
+    protected ? array $rrule = null;
 
     /**
      * Return formatted output for calendar component property rrule
@@ -80,22 +80,22 @@ trait RRULEtrait
      * Get calendar component property rrule
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since 2.29.6 2019-06-23
      */
-    public function getRrule( ?bool $inclParam = false ) : bool | array | string
+    public function getRrule( ? bool $inclParam = false ) : bool | array | string
     {
         if( empty( $this->rrule )) {
             return false;
         }
-        return ( $inclParam ) ? $this->rrule : $this->rrule[Util::$LCvalue];
+        return $inclParam ? $this->rrule : $this->rrule[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property rrule
      *
-     * @param null|array   $rruleset  string[]
-     * @param null|string[]   $params
+     * @param null|mixed[]  $rruleset  string[]
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
@@ -110,7 +110,7 @@ trait RRULEtrait
         }
         $this->rrule = RecurFactory::setRexrule(
             $rruleset,
-            array_merge( (array) $params, $this->getDtstartParams())
+            array_merge( $params ?? [], $this->getDtstartParams())
         );
         return $this;
     }

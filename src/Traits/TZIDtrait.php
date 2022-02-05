@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,14 +37,14 @@ use InvalidArgumentException;
 /**
  * TZID property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait TZIDtrait
 {
     /**
-     * @var null|array component property TZID value
+     * @var null|mixed[] component property TZID value
      */
-    protected ?array $tzid = null;
+    protected ? array $tzid = null;
 
     /**
      * Return formatted output for calendar component property tzid
@@ -84,15 +84,15 @@ trait TZIDtrait
      * Get calendar component property tzid
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzid( ?bool $inclParam = false ) : array | bool | string
+    public function getTzid( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzid )) {
             return false;
         }
-        return ( $inclParam ) ? $this->tzid : $this->tzid[Util::$LCvalue];
+        return $inclParam ? $this->tzid : $this->tzid[Util::$LCvalue];
     }
 
     /**
@@ -100,7 +100,7 @@ trait TZIDtrait
      *
      * @since 2.23.12 - 2017-04-22
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2018-12-22
@@ -115,7 +115,7 @@ trait TZIDtrait
         }
         $this->tzid = [
             Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

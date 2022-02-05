@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -65,27 +65,36 @@ class DateTimeTest extends DtBase
         date_default_timezone_set( self::$oldTimeZone );
     }
 
+    /**
+     * @var mixed[][]
+     */
     private static array $propsCompsProps = [
         IcalInterface::DTSTART => [
-            IcalInterface::VEVENT   => [ IcalInterface::DTSTART ],
-            IcalInterface::VTODO    => [ IcalInterface::DTSTART ],
-            IcalInterface::VJOURNAL => [ IcalInterface::DTSTART ]
+            IcalInterface::VEVENT        => [ IcalInterface::DTSTART ],
+            IcalInterface::VTODO         => [ IcalInterface::DTSTART ],
+            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTART ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DTSTART ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTART ]
         ],
         IcalInterface::DTEND => [
-            IcalInterface::VEVENT => [ IcalInterface::DTEND ]
+            IcalInterface::VEVENT        => [ IcalInterface::DTEND ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DTEND ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DTEND ]
         ],
         IcalInterface::DUE => [
-            IcalInterface::VTODO => [ IcalInterface::DUE ],
+            IcalInterface::VTODO     => [ IcalInterface::DUE ],
         ],
         IcalInterface::RECURRENCE_ID => [
-            IcalInterface::VEVENT => [ IcalInterface::RECURRENCE_ID ],
-            IcalInterface::VTODO  => [ IcalInterface::RECURRENCE_ID ],
+            IcalInterface::VEVENT    => [ IcalInterface::RECURRENCE_ID ],
+            IcalInterface::VTODO     => [ IcalInterface::RECURRENCE_ID ],
         ],
         IcalInterface::EXDATE => [
-            IcalInterface::VEVENT => [ IcalInterface::EXDATE ],
+            IcalInterface::VEVENT    => [ IcalInterface::EXDATE ],
+            IcalInterface::AVAILABLE => [ IcalInterface::EXDATE ],
         ],
         IcalInterface::RDATE => [
-            IcalInterface::VEVENT => [ IcalInterface::RDATE ],
+            IcalInterface::VEVENT    => [ IcalInterface::RDATE ],
+            IcalInterface::AVAILABLE => [ IcalInterface::RDATE ],
         ],
     ];
 
@@ -93,11 +102,17 @@ class DateTimeTest extends DtBase
         IcalInterface::VEVENT => [
             IcalInterface::EXDATE,
             IcalInterface::RDATE
+        ],
+        IcalInterface::AVAILABLE => [
+            IcalInterface::EXDATE,
+            IcalInterface::RDATE
         ]
     ];
 
     /**
      * testDateTime1 provider
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function DateTime1Provider() : array
@@ -292,11 +307,11 @@ class DateTimeTest extends DtBase
      * @test
      * @dataProvider DateTime1Provider
      *
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime1(
@@ -340,6 +355,7 @@ class DateTimeTest extends DtBase
     /**
      * testDateTime7 provider
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function DateTime7Provider() : array
@@ -639,11 +655,11 @@ class DateTimeTest extends DtBase
      *
      * @test
      * @dataProvider DateTime7Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime7(
@@ -684,6 +700,7 @@ class DateTimeTest extends DtBase
     /**
      * testDateTime8 provider
      *
+     * @return mixed[]
      * @throws Exception
      */
     public function DateTime8Provider() : array
@@ -966,11 +983,11 @@ class DateTimeTest extends DtBase
      *
      * @test
      * @dataProvider DateTime8Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime8(

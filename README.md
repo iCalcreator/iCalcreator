@@ -2,10 +2,35 @@
 
 is the PHP class package managing
 
-> iCal (rfc2445, rfc5545, rfc6321, rfc7986) calendar information
+> iCal calendar information
+- [rfc2445]
+  - Internet Calendaring and Scheduling Core Object Specification (iCalendar)
+ 
+- [rfc5545]
+  - Internet Calendaring and Scheduling Core Object Specification (iCalendar)
+
+
+- [rfc5870] 
+  - A Uniform Resource Identifier for Geographic Locations ('geo' URI)
+- [rfc6321]
+  - xCal: The XML Format for iCalendar
+- [rfc6868]
+  - Parameter Value Encoding in iCalendar and vCard
+- [rfc7529]
+  - Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)
+- [rfc7808]
+  - Time Zone Data Distribution Service
+- [rfc7953]
+  - Calendar Availability
+- [rfc7986]
+  - New Properties for iCalendar
+- [rfc9073]
+  - Event Publishing Extensions to iCalendar
+- [rfc9074]
+  - VALARM Extensions for iCalendar
 
 operating on calendar and
-calendar events, reports, todos and journaling data.
+calendar events, reports, todos, journaling, participants, locations, resources, availability and timezone data.
 
 ~~~~~~~~
 
@@ -26,7 +51,9 @@ Please review
 
 ###### Builds
 
-c2.40 - *(master)* stable PHP8
+v2.41.16 - v2.42 pre-release
+
+v2.40 - stable PHP8
 
 v2.39 - PHP7 (tag)
 
@@ -34,13 +61,13 @@ Assert PHP compability using [PHPCompatibility] and [PHPStan].
 
 ###### Support
 
-For support use [github.com iCalcreator]. Non-emergence support issues are, unless sponsored, fixed in due time.
+For support use [github.com/iCalcreator]. Non-emergence support issues are, unless sponsored, fixed in due time.
 
 
 ###### Sponsorship
 
-Donation using <a href="https://paypal.me/kigkonsult" rel="nofollow">paypal.me/kigkonsult</a> are appreciated.
-For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
+Donation using [paypal.me/kigkonsult] are appreciated.
+For invoice, please e-mail</a>.
 
 ###### Installation
 
@@ -68,6 +95,18 @@ For PHP7 use 2.39.
 iCalcreator is licensed under the LGPLv3 License.
 
 [demo]:docs/demoUsage.md
-[github.com iCalcreator]:https://github.com/iCalcreator/iCalcreator/issues
+[github.com/iCalcreator]:https://github.com/iCalcreator/iCalcreator/issues
+[paypal.me/kigkonsult]:https://paypal.me/kigkonsult
 [PHPCompatibility]:https://github.com/PHPCompatibility/PHPCompatibility
 [PHPStan]:https://github.com/phpstan/phpstan
+[rfc2445]:https://www.rfc-editor.org/info/rfc2445
+[rfc5545]:https://www.rfc-editor.org/info/rfc5545
+[rfc5870]:https://www.rfc-editor.org/info/rfc5870
+[rfc6321]:https://www.rfc-editor.org/info/rfc6321
+[rfc6868]:https://www.rfc-editor.org/info/rfc6868
+[rfc7529]:https://www.rfc-editor.org/info/rfc7529
+[rfc7808]:https://www.rfc-editor.org/info/rfc7808
+[rfc7953]:https://www.rfc-editor.org/info/rfc7953
+[rfc7986]:https://www.rfc-editor.org/info/rfc7986
+[rfc9073]:https://www.rfc-editor.org/info/rfc9073
+[rfc9074]:https://www.rfc-editor.org/info/rfc9074

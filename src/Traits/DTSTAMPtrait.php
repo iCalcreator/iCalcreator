@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -44,14 +44,14 @@ use function array_change_key_case;
 /**
  * DTSTAMP property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait DTSTAMPtrait
 {
     /**
-     * @var null|array component property DTSTAMP value
+     * @var null|mixed[] component property DTSTAMP value
      */
-    protected ?array $dtstamp = null;
+    protected ? array $dtstamp = null;
 
     /**
      * Return formatted output for calendar component property dtstamp
@@ -92,36 +92,33 @@ trait DTSTAMPtrait
      * Return calendar component property dtstamp
      *
      * @param bool   $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.1 2019-06-22
      */
     public function getDtstamp( ? bool $inclParam = false ) : DateTime | bool | string | array
     {
-        if( Util::isCompInList( $this->getCompType(), self::$SUBCOMPS )) {
-            return false;
-        }
         if( empty( $this->dtstamp )) {
             $this->dtstamp = [
                 Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
                 Util::$LCparams => [],
             ];
         }
-        return ( $inclParam ) ? $this->dtstamp : $this->dtstamp[Util::$LCvalue];
+        return $inclParam ? $this->dtstamp : $this->dtstamp[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property dtstamp
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.29.16 2020-01-24
      */
-    public function setDtstamp( null|string|DateTimeInterface $value  = null, ? array $params = [] ) : static
+    public function setDtstamp( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->dtstamp = [
@@ -130,7 +127,7 @@ trait DTSTAMPtrait
             ];
             return $this;
         }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
+        $params        = array_change_key_case( $params ?? [], CASE_UPPER );
         $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
         $this->dtstamp = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
         return $this;

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -52,7 +52,7 @@ use function var_export;
  * iCalcreator DateTime support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since  2.29.21 - 2020-01-31
+ * @since 2.40.11 2022-01-15
  */
 class DateTimeFactory
 {
@@ -86,9 +86,9 @@ class DateTimeFactory
      * @return DateTime
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.29.21 - 2020-01-31
+     * @since  2.40.11 - 2022-01-27
      */
-    public static function factory( ? string $dateTimeString, ? string $timeZoneString = null ) : DateTime
+    public static function factory( ? string $dateTimeString = null, ? string $timeZoneString = null ) : DateTime
     {
         static $AT      = '@';
         $dateTimeString = $dateTimeString ?? 'now';
@@ -147,7 +147,8 @@ class DateTimeFactory
             throw new InvalidArgumentException(
                 sprintf( self::$ERR1, $dateTimeString ),
                 $e->getCode(),
-                $e );
+                $e
+            );
         }
         return $dateTime;
     }
@@ -174,9 +175,9 @@ class DateTimeFactory
      * Return internal date (format) with parameters based on input date
      *
      * @param string|DateTimeInterface  $value
-     * @param null|string[]  $params
-     * @param null|bool      $forceUTC
-     * @return array
+     * @param null|mixed[]  $params
+     * @param null|bool     $forceUTC
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
@@ -187,7 +188,7 @@ class DateTimeFactory
         ? bool $forceUTC = false
     ) : array
     {
-        $output      = [ Util::$LCparams => $params ];
+        $output      = [ Util::$LCparams => ParameterFactory::setParams( $params ) ];
         $isValueDate = ParameterFactory::isParamsValueSet( $output, IcalInterface::DATE );
         $paramTZid   = ParameterFactory::getParamTzid( $output );
         $isLocalTime = isset( $params[Util::$ISLOCALTIME] );
@@ -259,9 +260,9 @@ class DateTimeFactory
     ) : DateTime
     {
         $dateTime = match (true) {
-            !$isValueDate && $forceUTC => self::setDateTimeTimeZone( $input, IcalInterface::UTC ),
-            !$forceUTC && !empty( $paramTZid ) => self::setDateTimeTimeZone( $input, $paramTZid ),
-            self::dateTimeHasOffset( $input ) => self::setDateTimeTimeZone(
+            ! $isValueDate && $forceUTC          => self::setDateTimeTimeZone( $input, IcalInterface::UTC ),
+            ! $forceUTC && ! empty( $paramTZid ) => self::setDateTimeTimeZone( $input, $paramTZid ),
+            self::dateTimeHasOffset( $input )    => self::setDateTimeTimeZone(
                 $input,
                 $input->getTimezone()->getName()
             ),
@@ -355,8 +356,8 @@ class DateTimeFactory
     /**
      * Return array [<datePart>, <timezonePart>] from (split) string
      *
-     * @param string $string
-     * @return array    [<datePart>, <timezonePart>]
+     * @param string    $string
+     * @return mixed[]  [<datePart>, <timezonePart>]
      * @since  2.27.14 - 2019-03-08
      */
     public static function splitIntoDateStrAndTimezone( string $string ) : array
@@ -545,7 +546,7 @@ class DateTimeFactory
         ? string $tz
     ) : DateTime
     {
-        $tz      = trim( $tz );
+        $tz      = trim((string) $tz );
         switch( true ) {
             case ( empty( $tz )) :
                 break;

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
 class SelectComponentsTest2 extends TestCase
 {
     /**
-     * @return array
+     * @return mixed[]
      */
     public function SelectComponentsTest21Provider() : array
     {
@@ -665,6 +665,74 @@ END:VCALENDAR
             ]
         ];
 
+        $dataArr[] = [ // rfc7529 Non-Gregorian Recurrence Rules in the Internet Calendaring and
+            // Scheduling Core Object Specification (iCalendar)
+            '3101-ROC',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+COMMENT:Example rfc7529
+COMMENT:Monthly on the third to the last day of the month, until 199802281500Z:
+COMMENT:DTSTART;TZID=Asia/Shanghai:19970928T090000
+COMMENT:RRULE:RSCALE=ROC;FREQ=MONTHLY;BYMONTHDAY=-3
+DTSTART;TZID=Asia/Shanghai:19970928T090000
+RRULE:RSCALE=ROC;FREQ=MONTHLY;UNTIL=199802281500Z;BYMONTHDAY=-3
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19970928090000', new DateTimeZone( 'America/Los_Angeles' )),
+            []
+        ];
+
+        $dataArr[] = [ // rfc7529 Non-Gregorian Recurrence Rules in the Internet Calendaring and
+            // Scheduling Core Object Specification (iCalendar)
+            '3101-GREGORIAN',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+COMMENT:Example rfc7529
+COMMENT:Monthly on the third to the last day of the month, until 199802281500Z:
+COMMENT:DTSTART;TZID=Asia/Shanghai:19970928T090000
+COMMENT:RRULE:RSCALE=GREGORIAN;FREQ=MONTHLY;BYMONTHDAY=-3
+DTSTART;TZID=Asia/Shanghai:19970928T090000
+RRULE:RSCALE=GREGORIAN;FREQ=MONTHLY;UNTIL=199802281500Z;BYMONTHDAY=-3
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19970928090000', new DateTimeZone( 'America/Los_Angeles' )),
+            [
+                '1997-09-28 09:00:00 Asia/Shanghai',
+                '1997-10-29 09:00:00 Asia/Shanghai',
+                '1997-11-28 09:00:00 Asia/Shanghai',
+                '1997-12-29 09:00:00 Asia/Shanghai',
+                '1998-01-29 09:00:00 Asia/Shanghai',
+                '1998-02-26 09:00:00 Asia/Shanghai'
+            ]
+        ];
+
+        $dataArr[] = [ // rfc7529 Non-Gregorian Recurrence Rules in the Internet Calendaring and
+            // Scheduling Core Object Specification (iCalendar)
+            '3101-gregory',
+            'BEGIN:VCALENDAR
+BEGIN:VEVENT
+COMMENT:Example rfc7529
+COMMENT:Monthly on the third to the last day of the month, until 199802281500Z:
+COMMENT:DTSTART;TZID=Asia/Shanghai:19970928T090000
+COMMENT:RRULE:RSCALE=gregory;FREQ=monthly;BYMONTHDAY=-3
+DTSTART;TZID=Asia/Shanghai:19970928T090000
+RRULE:RSCALE=gregory;FREQ=monthly;UNTIL=199802281500Z;BYMONTHDAY=-3
+END:VEVENT
+END:VCALENDAR
+',
+            new DateTime( '19970928090000', new DateTimeZone( 'America/Los_Angeles' )),
+            [
+                '1997-09-28 09:00:00 Asia/Shanghai',
+                '1997-10-29 09:00:00 Asia/Shanghai',
+                '1997-11-28 09:00:00 Asia/Shanghai',
+                '1997-12-29 09:00:00 Asia/Shanghai',
+                '1998-01-29 09:00:00 Asia/Shanghai',
+                '1998-02-26 09:00:00 Asia/Shanghai'
+            ]
+        ];
+
         return $dataArr;
     }
 
@@ -675,7 +743,7 @@ END:VCALENDAR
      * @param string   $case
      * @param string   $ics
      * @param dateTime $startDate
-     * @param array    $startDates
+     * @param mixed[]  $startDates
      * @return void
      */
     public function SelectComponentsTest21(
@@ -692,7 +760,14 @@ END:VCALENDAR
         $yearHits  = $vCalender->parse( $ics )
             ->selectComponents( $startDate, (clone $startDate )->modify( '10 year' )); // startDate/endDate
 
-        $this->assertIsArray( $yearHits );
+        if( empty( $startDates )) {
+            $this->assertFalse( $yearHits ); // rfc7529 and NOT accepted RSCALE
+            return;
+        }
+        $this->assertIsArray(
+            $yearHits,
+            'case ' . $case . ', expects array got ' . var_export( $yearHits, true )
+        );
 
         $count     = 0;
         $xDtstarts = [];

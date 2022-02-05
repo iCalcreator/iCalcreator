@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,13 +41,13 @@ use function strtoupper;
  */
 abstract class DScomponent extends CalendarComponent
 {
-    use Traits\COMMENTtrait,
-        Traits\DTSTARTtrait,
-        Traits\RDATEtrait,
-        Traits\RRULEtrait,
-        Traits\TZNAMEtrait,
-        Traits\TZOFFSETFROMtrait,
-        Traits\TZOFFSETTOtrait;
+    use Traits\COMMENTtrait;
+    use Traits\DTSTARTtrait;
+    use Traits\RDATEtrait;
+    use Traits\RRULEtrait;
+    use Traits\TZNAMEtrait;
+    use Traits\TZOFFSETFROMtrait;
+    use Traits\TZOFFSETTOtrait;
 
     /**
      * @var string

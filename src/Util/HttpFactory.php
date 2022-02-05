@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -52,7 +52,7 @@ use function utf8_encode;
 /**
  * iCalcreator http support class
  *
- * @since  2.30.3 - 2021-02-14
+ * @since 2.40.11 2022-01-15
  */
 class HttpFactory
 {
@@ -95,7 +95,7 @@ class HttpFactory
         if( empty( $fileName ) ) {
             $fileName = self::getFakedFilename();
         }
-        $output   = $calendar->createCalendar();
+        $output     = $calendar->createCalendar();
         if( $utf8Encode ?? false ) {
             $output = utf8_encode( $output );
         }
@@ -176,9 +176,9 @@ class HttpFactory
     /**
      * Set calendar component property uri; URL, TZURL, SOURCE
      *
-     * @param null|array $valueArr
-     * @param null|string    $value
-     * @param null|string[]  $params
+     * @param null|mixed[]  $valueArr
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return void
      * @throws InvalidArgumentException
      * @since  2.30.3 - 2021-02-14
@@ -192,7 +192,7 @@ class HttpFactory
         ParameterFactory::ifExistRemove( $params, IcalInterface::VALUE, IcalInterface::URI );
         $valueArr = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
     }
 }

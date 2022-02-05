@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -35,17 +35,21 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use InvalidArgumentException;
 
+use function stripos;
+use function strtolower;
+use function substr;
+
 /**
  * URL property functions
  *
- * @since  2.30.2 - 2021-02-04
+ * @since 2.41.12 2022-01-27
  */
 trait URLtrait
 {
     /**
-     * @var null|array component property URL value
+     * @var null|mixed[] component property URL value
      */
-    protected ?array $url = null;
+    protected ? array $url = null;
 
     /**
      * Return formatted output for calendar component property url
@@ -85,25 +89,33 @@ trait URLtrait
      * Get calendar component property url
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getUrl( ?bool $inclParam = false ) : array | bool | string
+    public function getUrl( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->url )) {
             return false;
         }
-        return ( $inclParam ) ? $this->url : $this->url[Util::$LCvalue];
+        return $inclParam ? $this->url : $this->url[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property url
      *
-     * @param null|string $value
-     * @param null|string[]  $params
+     * 2.41.12
+     * rfc5870 Uniform Resource Identifier for Geographic Locations ('geo' URI)
+     *   rfc9073 (7.2. Location) defines VLOCATION with a GEO property
+     *   rfc9074 (8.  Alarm Proximity Trigger) add VLOCATION(s) to VALARM
+     *   with an URL 'geo' URI [RFC5870] property
+     *  As for now, accept 'global' URL with 'geo' URI "as is"
+     *  Ex. 'URL:geo:40.443,-79.945;u=10'
+     *
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since  2.30.2 - 2021-02-04
+     * @since  2.41.12 - 2022-01-27
      */
     public function setUrl( ? string $value = null, ? array $params = [] ) : static
     {
@@ -115,7 +127,16 @@ trait URLtrait
             ];
             return $this;
         }
-        HttpFactory::urlSet( $this->url, $value, $params );
+        if( 0 === stripos( $value, self::GEO )) {
+            $value     = strtolower( self::GEO ) . substr( $value, 3 );
+            $this->url = [
+                Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
+                Util::$LCparams => ParameterFactory::setParams( $params ),
+            ];
+        }
+        else {
+            HttpFactory::urlSet( $this->url, $value, $params );
+        }
         return $this;
     }
 }

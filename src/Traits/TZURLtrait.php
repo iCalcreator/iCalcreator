@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,29 +37,29 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * TZURL property functions
  *
- * @since  2.30.2 - 2021-02-04
+ * @since 2.40.11 2022-01-15
  */
 trait TZURLtrait
 {
     /**
-     * @var null|array component property TZURL value
+     * @var null|mixed[] component property TZURL value
      */
-    protected ?array $tzurl = null;
+    protected ? array $tzurl = null;
 
     /**
      * Return formatted output for calendar component property tzurl
      *
-     * @return null|string
+     * @return string
      */
-    public function createTzurl() : ?string
+    public function createTzurl() : string
     {
         if( empty( $this->tzurl )) {
-            return null;
+            return Util::$SP0;
         }
         if( empty( $this->tzurl[Util::$LCvalue] )) {
             return $this->getConfig( self::ALLOWEMPTY )
                 ? StringFactory::createElement( self::TZURL )
-                : null;
+                : Util::$SP0;
         }
         return StringFactory::createElement(
             self::TZURL,
@@ -83,16 +83,16 @@ trait TZURLtrait
     /**
      * Get calendar component property tzurl
      *
-     * @param bool   $inclParam
-     * @return bool|string|array
+     * @param null|bool   $inclParam
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzurl( bool $inclParam = false ) : array | bool | string
+    public function getTzurl( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzurl )) {
             return false;
         }
-        return ( $inclParam ) ? $this->tzurl : $this->tzurl[Util::$LCvalue];
+        return $inclParam ? $this->tzurl : $this->tzurl[Util::$LCvalue];
     }
 
     /**
@@ -102,8 +102,8 @@ trait TZURLtrait
      * This URI form can be useful within an organization, but is problematic
      * in the Internet.
      *
-     * @param null|string $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @since  2.30.2 - 2021-02-04
      */

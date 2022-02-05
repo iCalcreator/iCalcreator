@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,14 +38,14 @@ use InvalidArgumentException;
 /**
  * SOURCE property functions
  *
- * @since  2.30.2 - 2021-02-04
+ * @since 2.40.11 2022-01-15
  */
 trait SOURCErfc7986trait
 {
     /**
-     * @var null|array component property SOURCE value
+     * @var null|mixed[] component property SOURCE value
      */
-    protected ?array $source = null;
+    protected ? array $source = null;
 
     /**
      * Return formatted output for calendar component property source
@@ -84,21 +84,21 @@ trait SOURCErfc7986trait
      * Get calendar component property source
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      */
-    public function getSource( ?bool $inclParam = false ) : array | bool | string
+    public function getSource( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->source )) {
             return false;
         }
-        return ( $inclParam ) ? $this->source : $this->source[Util::$LCvalue];
+        return $inclParam ? $this->source : $this->source[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property source
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since  2.30.2 - 2021-02-04

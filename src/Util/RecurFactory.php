@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -34,6 +34,7 @@ use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Vcalendar;
 use LogicException;
 
 use function array_change_key_case;
@@ -65,7 +66,7 @@ use function var_export;
 /**
  * iCalcreator recur support class
  *
- * @since  2.29.27 - 2020-09-19
+ * @since  2.41.16 - 2022-01-31
  */
 class RecurFactory
 {
@@ -221,13 +222,13 @@ class RecurFactory
      *  In the case of the "STANDARD" and "DAYLIGHT" sub-components
      *    the UNTIL rule part MUST always be specified as a date with UTC time.
      *  If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param string $recurProperty
-     * @param null|array $recurData
-     * @param null|bool   $allowEmpty
+     * @param string        $recurProperty
+     * @param null|mixed[]  $recurData
+     * @param null|bool     $allowEmpty
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.6 2019-06-23
+     * @since 2.41.16 - 2022-01-31
      * @todo above
      */
     public static function formatRecur(
@@ -236,6 +237,7 @@ class RecurFactory
         ? bool $allowEmpty = true
     ) : string
     {
+        static $FMTRSCALEEQ      = 'RSCALE=%s';
         static $FMTFREQEQ        = 'FREQ=%s';
         static $FMTDEFAULTEQ     = ';%s=%s';
         static $FMTOTHEREQ       = ';%s=';
@@ -267,7 +269,13 @@ class RecurFactory
         foreach( $recurData[Util::$LCvalue] as $ruleLabel => $ruleValue ) {
             $ruleLabel = strtoupper( $ruleLabel );
             switch( $ruleLabel ) {
+                case IcalInterface::RSCALE :
+                    $content1 .= sprintf( $FMTRSCALEEQ, $ruleValue );
+                    break;
                 case IcalInterface::FREQ :
+                    if( ! empty( $content1 )) {
+                        $content1 .= Util::$SEMIC;
+                    }
                     $content1 .= sprintf( $FMTFREQEQ, $ruleValue );
                     break;
                 case IcalInterface::UNTIL :
@@ -331,7 +339,7 @@ class RecurFactory
      * Return (array) parsed rexrule string
      *
      * @param string $row
-     * @return array
+     * @return mixed[]
      * @since 2.27.3 - 2018-12-28
      */
     public static function parseRexrule( string $row ) : array
@@ -375,7 +383,7 @@ class RecurFactory
      * Return array, day rel pos number (opt) and day name abbr
      *
      * @param string $dayValueBase
-     * @return array
+     * @return mixed[]
      * @since  2.27.16 - 2019-03-03
      */
     private static function updateDayNoAndDayName( string $dayValueBase ) : array
@@ -403,9 +411,9 @@ class RecurFactory
      *
      * "The value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
      * "If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param array $rexrule
-     * @param string[] $params    merged with dtstart params
-     * @return array
+     * @param mixed[] $rexrule
+     * @param mixed[] $params    merged with dtstart params
+     * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since  2.29.25 - 2020-09-02
@@ -485,9 +493,9 @@ class RecurFactory
     }
 
     /**
-     * @param array $input
-     * @return string[]
-     * @since  2.29.25 - 2020-09-02
+     * @param mixed[] $input
+     * @return mixed[]
+     * @since  2.41.16 - 2022-01-31
      */
     private static function orderRRuleKeys( array $input ) : array
     {
@@ -520,6 +528,12 @@ class RecurFactory
         ];
         /* set recurrence rule specification in rfc2445 order */
         $output = [];
+        if( isset( $input[IcalInterface::RSCALE] )) { // rfc7529 - first
+            $output[IcalInterface::RSCALE] = strtoupper( $input[IcalInterface::RSCALE] );
+        }
+        if( isset( $input[IcalInterface::FREQ] )) {
+            $input[IcalInterface::FREQ] = strtoupper( $input[IcalInterface::FREQ] );
+        }
         foreach( $RKEYS1 as $rKey1 ) {
             if( isset( $input[$rKey1] )) {
                 $output[$rKey1] = $input[$rKey1];
@@ -552,14 +566,18 @@ class RecurFactory
                 $output[$rKey3] = array_unique( $output[$rKey3] );
             }
         } // end foreach
+        if( isset( $input[IcalInterface::SKIP] )) { // rfc7529 - last
+            $output[IcalInterface::SKIP] = strtoupper( $input[IcalInterface::SKIP] );
+        }
         return $output;
     }
 
     /**
      * Ensure RRULE BYDAY array and upper case.. .
      *
-     * @param array $input
-     * @param array $output
+     * @param mixed[] $input
+     * @param mixed[] $output
+     * @return void
      * @since  2.29.27 - 2020-09-19
      */
     private static function orderRRuleBydayKey( array $input, array & $output ) : void
@@ -613,8 +631,7 @@ class RecurFactory
                         break;
                     case ( is_string( $BYDAYv2 ) && ctype_alpha( $BYDAYv2 )) :
                         // day abbr without key, set key
-                        $output[IcalInterface::BYDAY][$BYDAYx][IcalInterface::DAY] =
-                            strtoupper( $BYDAYv2 );
+                        $output[IcalInterface::BYDAY][$BYDAYx][IcalInterface::DAY] = strtoupper( $BYDAYv2 );
                         break;
                     default :
                         // rel pos day number. force key from 0 (1++ results in error)
@@ -628,12 +645,49 @@ class RecurFactory
     }
 
     /**
+     * Return UID[] where RRULE(/EXRULE) RECUR RSCALE exists and is NOT GREGORIAN (or similar)
+     *
+     * Return UID[] contains UID to skip, rfc7529 6. Compatibility, option 2
+     * For all (rfc7529) calendar systems, see
+     *   (http://www.unicode.org/repos/cldr/tags/latest/common/bcp47/calendar.xml, redirected to)
+     *   https://github.com/unicode-org/cldr/blob/latest/common/bcp47/calendar.xml
+     *
+     * @param Vcalendar  $calendar
+     * @param string[]   $compTypes  component types to accept
+     * @return array
+     * @since 2.41.16 - 2022-02-01
+     */
+    public static function rruleRscaleCheck( Vcalendar $calendar, array $compTypes ) : array
+    {
+        static $ACCEPTED   = [ 'GREGORY', IcalInterface::GREGORIAN, 'ISO8601' ];
+        static $RRULEPROPS = [ IcalInterface::EXRULE, IcalInterface::RRULE ];
+        $foundUids = [];
+        $calendar->resetCompCounter();
+        while( $component = $calendar->getComponent()) {
+            if( ! Util::isCompInList( $component->getCompType(), $compTypes )) {
+                continue;
+            }
+            foreach( $RRULEPROPS as $rruleProp ) {
+                $getMethod = StringFactory::getGetMethodName( $rruleProp );
+                if( false === ( $prop = $component->{$getMethod}( true ))) {
+                    continue;
+                }
+                if( isset( $prop[Util::$LCvalue][IcalInterface::RSCALE] ) &&
+                    ! in_array( $prop[Util::$LCvalue][IcalInterface::RSCALE], $ACCEPTED )) { // no third arg
+                    $foundUids[] = $component->getUID();
+                }
+            } // end foreach
+        } // end while
+        return $foundUids;
+    }
+
+    /**
      * Update array $result with dates based on a recur pattern
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param array $result      array to update, array([Y-m-d] => bool)
-     * @param array $recur       pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $result      array to update, array([Y-m-d] => bool)
+     * @param mixed[] $recur       pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -729,8 +783,8 @@ class RecurFactory
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param array $result      array to update, array([Y-m-d] => bool)
-     * @param array $recur       pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $result              array to update, array([Y-m-d] => bool)
+     * @param mixed[] $recur               pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -893,10 +947,8 @@ class RecurFactory
             }
             else {
                 self::stepDate( $fcnEnd, $fcnEndYMD, $step );
-            } // make sure to \count whole last period
+            } // make sure to count whole last period
             $bysetPosWold = self::getWeekNumber(
-                0,
-                0,
                 $wkst,
                 $wDate[self::$LCMONTH],
                 $wDate[self::$LCDAY],
@@ -1103,8 +1155,6 @@ class RecurFactory
                 }
                 elseif( $recurFreqIsWeekly ) {
                     $weekNo = self::getWeekNumber(
-                        0,
-                        0,
                         $wkst,
                         $wDate[self::$LCMONTH],
                         $wDate[self::$LCDAY],
@@ -1167,7 +1217,7 @@ class RecurFactory
      * Checking BYDAY (etc) hits, recur2date help function
      *
      * @since  2.6.12 - 2011-01-03
-     * @param int|string|array $BYvalue
+     * @param int|string|mixed[] $BYvalue
      * @param int   $upValue
      * @param int   $downValue
      * @return bool
@@ -1179,19 +1229,19 @@ class RecurFactory
     ) : bool
     {
         if( is_array( $BYvalue ) &&
-            ( in_array( $upValue, $BYvalue ) || in_array( $downValue, $BYvalue ))
+            ( in_array( $upValue, $BYvalue ) || in_array( $downValue, $BYvalue )) // no third arg tue
         ) {
             return true;
         }
-        return (( $BYvalue == $upValue ) || ( $BYvalue == $downValue ));
+        return (( $BYvalue == $upValue ) || ( $BYvalue == $downValue ));  // no third arg tue
     }
 
     /**
      * (re-)Calculate internal index, recur2date help function
      *
-     * @param string $freq
-     * @param array $date
-     * @param int    $wkst
+     * @param string  $freq
+     * @param mixed[] $date
+     * @param int     $wkst
      * @return string
      * @since  2.26 - 2018-11-10
      */
@@ -1202,8 +1252,10 @@ class RecurFactory
             IcalInterface::YEARLY  => $date[self::$LCYEAR],
             IcalInterface::MONTHLY => $date[self::$LCYEAR] . Util::$MINUS . $date[self::$LCMONTH],
             IcalInterface::WEEKLY  => self::getWeekNumber(
-                0, 0, $wkst,
-                $date[self::$LCMONTH], $date[self::$LCDAY], $date[self::$LCYEAR]
+                $wkst,
+                $date[self::$LCMONTH],
+                $date[self::$LCDAY],
+                $date[self::$LCYEAR]
             ),
             default => $date[self::$LCYEAR] .
                 Util::$MINUS .
@@ -1217,9 +1269,9 @@ class RecurFactory
     /**
      * Return updated date, array and timpstamp
      *
-     * @param array $date    date to step
-     * @param string       $dateYMD date YMD
-     * @param null|array $step    default array( Util::$LCDAY => 1 )
+     * @param mixed[]     $date     date to step
+     * @param string      $dateYMD  date YMD
+     * @param null|array  $step     default array( Util::$LCDAY => 1 )
      * @return void
      */
     private static function stepDate( array & $date, string & $dateYMD, ? array $step = null ) : void
@@ -1277,8 +1329,8 @@ class RecurFactory
     /**
      * Return initiated $dayCnts
      *
-     * @param array $wDate
-     * @param array $recur
+     * @param mixed[] $wDate
+     * @param mixed[] $recur
      * @param int     $wkst
      * @return array
      */
@@ -1304,7 +1356,7 @@ class RecurFactory
                     $dayCnts[$m][$d][self::$YEARCNT_UP] = $yearDays;
                 }
                 if( isset( $recur[IcalInterface::BYDAY] )) {
-                    $day = self::getDayInWeek( 0, 0, 0, $m, $d, $wDate[self::$LCYEAR] );
+                    $day = self::getDayInWeek( $m, $d, $wDate[self::$LCYEAR] );
                     $dayCnts[$m][$d][IcalInterface::DAY] = $day;
                     $weekDayCnt[$day]++;
                     $dayCnts[$m][$d][self::$MONTHDAYNO_UP] = $weekDayCnt[$day];
@@ -1314,7 +1366,7 @@ class RecurFactory
                 if( isset( $recur[IcalInterface::BYWEEKNO] ) ||
                     ( $recur[IcalInterface::FREQ] === IcalInterface::WEEKLY )) {
                     $dayCnts[$m][$d][self::$WEEKNO_UP] =
-                        self::getWeekNumber(0,0, $wkst, $m, $d, $wDate[self::$LCYEAR] );
+                        self::getWeekNumber($wkst, $m, $d, $wDate[self::$LCYEAR] );
                 }
             } // end for( $d   = 1; $d <= $daysInMonth; $d++ )
         } // end for( $m = 1; $m <= 12; $m++ )
@@ -1369,7 +1421,7 @@ class RecurFactory
     /**
      * Return a reformatted input date
      *
-     * @param string|array|DateTime $inputDate
+     * @param string|mixed[]|DateTime $inputDate
      * @return int[]
      * @throws Exception
      * @since  2.29.21 - 2020-01-31
@@ -1402,8 +1454,6 @@ class RecurFactory
     /**
      * Return week number
      *
-     * @param int $hour
-     * @param int $min
      * @param int $sec
      * @param int $month
      * @param int $day
@@ -1411,8 +1461,6 @@ class RecurFactory
      * @return int
      */
     private static function getWeekNumber(
-        int $hour,
-        int $min,
         int $sec,
         int $month,
         int $day,
@@ -1420,7 +1468,7 @@ class RecurFactory
     ) : int
     {
         static $UCW  = 'W'; // week number
-        return (int) date( $UCW, (int) mktime( $hour, $min, $sec, $month, $day, $year ));
+        return (int) date( $UCW, (int) mktime( 0, 0, $sec, $month, $day, $year ));
     }
 
     /**
@@ -1450,18 +1498,12 @@ class RecurFactory
     /**
      * Return (string) 2-pos day in week
      *
-     * @param int $hour
-     * @param int $min
-     * @param int $sec
      * @param int $month
      * @param int $day
      * @param int $year
      * @return string
      */
     private static function getDayInWeek(
-        int $hour,
-        int $min,
-        int $sec,
         int $month,
         int $day,
         int $year
@@ -1470,7 +1512,7 @@ class RecurFactory
         static $LCW  = 'w'; // day of week number
         $dayNo = (int) date(
             $LCW,
-            (int) mktime( $hour, $min, $sec, $month, $day, $year )
+            (int) mktime( 0, 0, 0, $month, $day, $year )
         );
         return self::$DAYNAMES[$dayNo];
     }

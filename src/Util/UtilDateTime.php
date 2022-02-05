@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -56,7 +56,7 @@ class UtilDateTime extends DateTime
     public string $key;
 
     /**
-     * @var array date[-time] origin
+     * @var mixed[] date[-time] origin
      */
     public array $SCbools = [];
 
@@ -73,7 +73,7 @@ class UtilDateTime extends DateTime
      * @throws Exception
      * @since  2.27.8 - 2019-01-12
      */
-    public function __construct( ? string $time = null , ? DateTimeZone $timezone = null )
+    public function __construct( ? string $time = null, ? DateTimeZone $timezone = null )
     {
         parent::__construct(( $time ?? DateTimeFactory::$NOW ), $timezone );
         $this->dateFormat = DateTimeFactory::$YMDHISe;
@@ -158,8 +158,7 @@ class UtilDateTime extends DateTime
      */
     public function getTimezoneName() : string
     {
-        $tz = $this->getTimezone();
-        return $tz->getName();
+        return $this->getTimezone()->getName();
     }
 
     /**
@@ -181,9 +180,9 @@ class UtilDateTime extends DateTime
     /**
      * Return UtilDateTime object instance based on date array and timezone(s)
      *
-     * @param DateTimeInterface  $date
-     * @param null|array $params
-     * @param null|string   $dtstartTz
+     * @param DateTimeInterface $date
+     * @param null|mixed[]      $params
+     * @param null|string       $dtstartTz
      * @return self
      * @throws Exception
      * @throws RuntimeException
@@ -191,7 +190,7 @@ class UtilDateTime extends DateTime
      */
     public static function factory(
         DateTimeInterface $date,
-        ? array $params = null,
+        ? array $params = [],
         ? string $dtstartTz = null
     ) : self
     {
@@ -229,10 +228,7 @@ class UtilDateTime extends DateTime
                 );
             }
         } // end if
-        if( ParameterFactory::isParamsValueSet(
-            [ Util::$LCparams => $params ],
-            IcalInterface::DATE )
-        ) {
+        if( ParameterFactory::isParamsValueSet( [ Util::$LCparams => $params ], IcalInterface::DATE )) {
             $iCaldateTime->dateFormat = $Y_M_D;
             $iCaldateTime->key        = $iCaldateTime->format( DateTimeFactory::$Ymd );
         }

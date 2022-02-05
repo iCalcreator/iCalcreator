@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,14 +41,14 @@ use function sprintf;
 /**
  * IMAGE property functions
  *
- * @since 2.29.21 2019-06-17
+ * @since 2.40.11 2022-01-15
  */
 trait IMAGErfc7986trait
 {
     /**
-     * @var null|array component property IMAGE value
+     * @var null|mixed[] component property IMAGE value
      */
-    protected ?array $image = null;
+    protected ? array $image = null;
 
     /**
      * Return formatted output for calendar component property image
@@ -104,9 +104,9 @@ trait IMAGErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      */
-    public function getImage( ?int $propIx =  null, ?bool $inclParam = false ) : array | bool | string
+    public function getImage( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->image )) {
             unset( $this->propIx[self::IMAGE] );
@@ -124,9 +124,9 @@ trait IMAGErfc7986trait
     /**
      * Set calendar component property image
      *
-     * @param null|string  $value
-     * @param null|string[] $params
-     * @param null|int     $index
+     * @param null|string   $value
+     * @param null|mixed[]  $params
+     * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
      */

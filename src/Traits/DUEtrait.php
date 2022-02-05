@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,14 +41,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * DUE property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait DUEtrait
 {
     /**
-     * @var null|array component property DUE value
+     * @var null|mixed[] component property DUE value
      */
-    protected ?array $due = null;
+    protected ? array $due = null;
 
     /**
      * Return formatted output for calendar component property due
@@ -100,7 +100,7 @@ trait DUEtrait
      * Return calendar component property due
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
     public function getDue( ? bool $inclParam = false ) : DateTime | bool | string | array
@@ -108,14 +108,14 @@ trait DUEtrait
         if( empty( $this->due )) {
             return false;
         }
-        return ( $inclParam ) ? $this->due : $this->due[Util::$LCvalue];
+        return $inclParam ? $this->due : $this->due[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property due
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|string[]                 $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -141,7 +141,7 @@ trait DUEtrait
         $this->due = DateTimeFactory::setDate(
             $value,
             ParameterFactory::setParams(
-                ( $params ?? [] ),
+                $params,
                 DateTimeFactory::$DEFAULTVALUEDATETIME
             )
         );

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,14 +38,14 @@ use InvalidArgumentException;
 /**
  * CATEGORIES property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait CATEGORIEStrait
 {
     /**
-     * @var null|array component property CATEGORIES value
+     * @var null|mixed[] component property CATEGORIES value
      */
-    protected ?array $categories = null;
+    protected ? array $categories = null;
 
     /**
      * Return formatted output for calendar component property categories
@@ -68,7 +68,7 @@ trait CATEGORIEStrait
      * Return formatted output for calendar component properties categories/resources
      *
      * @param string        $propName
-     * @param null|array $pValArr
+     * @param null|mixed[]  $pValArr
      * @param bool|string   $lang   bool false on not config lang found
      * @param bool          $allowEmpty
      * @param string[]      $specPkeys
@@ -134,10 +134,10 @@ trait CATEGORIEStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getCategories( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getCategories( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->categories )) {
             unset( $this->propIx[self::CATEGORIES] );
@@ -155,9 +155,9 @@ trait CATEGORIEStrait
     /**
      * Set calendar component property categories
      *
-     * @param null|string $value
-     * @param null|string[]  $params
-     * @param null|int    $index
+     * @param null|string   $value
+     * @param null|mixed[]  $params
+     * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -173,7 +173,7 @@ trait CATEGORIEStrait
         CalendarComponent::setMval(
             $this->categories,
             (string) $value,
-            ( $params ?? [] ),
+            $params,
             null,
             $index
         );

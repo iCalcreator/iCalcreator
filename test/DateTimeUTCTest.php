@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * class DateTest, testing DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
  *
- * @since  2.29.16 - 2020-01-24
+ * @since  2.41.4 - 2022-01-18
  */
 class DateTimeUTCTest extends DtBase
 {
@@ -71,12 +71,12 @@ class DateTimeUTCTest extends DtBase
     /**
      * The recur DATETIME test method , EXRULE + RRULE
      *
-     * @param int $case
-     * @param array  $compsProps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed[] $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
      */
@@ -92,7 +92,12 @@ class DateTimeUTCTest extends DtBase
         $calendar1 = new Vcalendar();
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
-            $comp      = $calendar1->{$newMethod}();
+            if( IcalInterface::AVAILABLE ===  $theComp ) {
+                $comp = $calendar1->newVavailability()->{$newMethod}();
+            }
+            else {
+                $comp = $calendar1->{$newMethod}();
+            }
             $comp->setDtstart( $value, $params );
 
             foreach( $props as $x2 => $propName ) {
@@ -155,12 +160,12 @@ class DateTimeUTCTest extends DtBase
     /**
      * The FREEBUSY DATETIME/DATETIME test method
      *
-     * @param int $case
-     * @param array  $compsProps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed[] $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function theFreebusyTestMethodDate(
@@ -217,12 +222,12 @@ class DateTimeUTCTest extends DtBase
     /**
      * The FREEBUSY DATETIME/DATEINTERVAL test method
      *
-     * @param int $case
-     * @param array  $compsProps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed[] $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function theFreebusyTestMethodDateInterval(
@@ -279,12 +284,12 @@ class DateTimeUTCTest extends DtBase
     /**
      * The TRIGGER DATETIME test method
      *
-     * @param int $case
-     * @param array  $compsProps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed[] $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function theTriggerTestMethod(
@@ -342,12 +347,12 @@ class DateTimeUTCTest extends DtBase
     /**
      * The TRIGGER DATETIME args test method
      *
-     * @param int $case
-     * @param array  $compsProps
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed[] $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function theTriggerTestMethod2(
@@ -418,17 +423,8 @@ class DateTimeUTCTest extends DtBase
 
     /**
      * testDateTime11 provider
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function DateTime11Provider() : array
@@ -601,21 +597,24 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime11Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime11( int $case, mixed $value, mixed $params, array $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT    => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VTODO     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
-            IcalInterface::VJOURNAL  => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VFREEBUSY => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
-            IcalInterface::VTIMEZONE => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::VEVENT        => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VTODO         => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
+            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VFREEBUSY     => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
+            IcalInterface::VTIMEZONE     => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::PARTICIPANT   => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
         ];
         $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -625,19 +624,20 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime11Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testRecurDateTime11( int $case, mixed $value, mixed $params, array $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT   => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VTODO    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VJOURNAL => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VEVENT    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VTODO     => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VJOURNAL  => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::AVAILABLE => [ IcalInterface::RRULE ],
         ];
         $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -647,11 +647,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime11Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testFreebusyDateTime11(
@@ -678,11 +678,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime11Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testTriggerDateTime11(
@@ -702,21 +702,8 @@ class DateTimeUTCTest extends DtBase
 
     /**
      * testDateTime17 provider
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function DateTime17Provider() : array
@@ -940,11 +927,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime17Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime17(
@@ -956,11 +943,14 @@ class DateTimeUTCTest extends DtBase
     ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT    => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VTODO     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
-            IcalInterface::VJOURNAL  => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VFREEBUSY => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
-            IcalInterface::VTIMEZONE => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::VEVENT        => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VTODO         => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
+            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VFREEBUSY     => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
+            IcalInterface::VTIMEZONE     => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::PARTICIPANT   => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
         ];
         $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -970,11 +960,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime17Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testRecurDateTime17(
@@ -986,9 +976,10 @@ class DateTimeUTCTest extends DtBase
     ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT   => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VTODO    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VJOURNAL => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VEVENT    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VTODO     => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VJOURNAL  => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::AVAILABLE => [ IcalInterface::RRULE ],
         ];
         $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -1062,21 +1053,6 @@ class DateTimeUTCTest extends DtBase
 
     /**
      * testDateTime18 provider
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      * @throws Exception
      */
     public function DateTime18Provider() : array
@@ -1300,11 +1276,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime18Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateTime18(
@@ -1316,11 +1292,14 @@ class DateTimeUTCTest extends DtBase
     ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT    => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VTODO     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
-            IcalInterface::VJOURNAL  => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
-            IcalInterface::VFREEBUSY => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
-            IcalInterface::VTIMEZONE => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::VEVENT        => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VTODO         => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
+            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VFREEBUSY     => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
+            IcalInterface::VTIMEZONE     => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::PARTICIPANT   => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
         ];
         $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -1330,11 +1309,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime18Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testRecurDateTime18(
@@ -1346,9 +1325,10 @@ class DateTimeUTCTest extends DtBase
     ) : void
     {
         static $compsProps = [
-            IcalInterface::VEVENT   => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VTODO    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
-            IcalInterface::VJOURNAL => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VEVENT    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VTODO     => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::VJOURNAL  => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
+            IcalInterface::AVAILABLE => [ IcalInterface::RRULE ],
         ];
         $this->theRecurTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
     }
@@ -1358,11 +1338,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime18Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testFreebusyDateTime18(
@@ -1394,11 +1374,11 @@ class DateTimeUTCTest extends DtBase
      *
      * @test
      * @dataProvider DateTime18Provider
-     * @param int $case
-     * @param mixed  $value
-     * @param mixed  $params
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testTriggerDateTime18(

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,14 +37,14 @@ use InvalidArgumentException;
 /**
  * RELATED-TO property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.41.2 2022-01-16
  */
 trait RELATED_TOtrait
 {
     /**
-     * @var null|array component property RELATED_TO value
+     * @var null|mixed[] component property RELATED_TO value
      */
-    protected ?array $relatedto = null;
+    protected ? array $relatedto = null;
 
     /**
      * Return formatted output for calendar component property related-to
@@ -99,10 +99,10 @@ trait RELATED_TOtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|array|bool
+     * @return string|bool|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getRelatedto( ?int $propIx = null, ?bool $inclParam = false ) : string | array | bool
+    public function getRelatedto( ? int $propIx = null, ? bool $inclParam = false ) : string | array | bool
     {
         if( empty( $this->relatedto )) {
             unset( $this->propIx[self::RELATED_TO] );
@@ -121,11 +121,11 @@ trait RELATED_TOtrait
      * Set calendar component property related-to
      *
      * @param null|string    $value
-     * @param null|string[]  $params
+     * @param null|mixed[]   $params
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.2 2022-01-16
      */
     public function setRelatedto( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
@@ -137,8 +137,7 @@ trait RELATED_TOtrait
             $params = [];
 
         }
-        $params = $params ?? [];
-        if( ! empty( $params )) {
+        if( ! empty( $params ) && ( $this->getCompType() !== self::VALARM )) {
             ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
         }
         Util::assertString( $value, self::RELATED_TO );

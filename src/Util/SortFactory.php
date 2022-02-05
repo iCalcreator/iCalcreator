@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,6 +36,7 @@ use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_slice;
 use function ctype_digit;
+use function in_array;
 use function is_null;
 use function key;
 use function method_exists;
@@ -98,48 +99,71 @@ class SortFactory
      *
      * @param CalendarComponent $c valendar component
      * @param null|string       $sortArg
-     * @since 2.29.17 2020-01-25
+     * @since 2.41.13 2022-02-01
      */
     public static function setSortArgs( CalendarComponent $c, ? string $sortArg = null ) : void
     {
         static $INITARR = [ '0', '0', '0', '0' ];
-        $c->srtk  = $INITARR;
+        static $GETRECURRIDMETHOD = null;
+        static $GETSEQMETHOD      = null;
+        $c->srtk        = $INITARR;
         $compType = $c->getCompType();
         if( IcalInterface::VTIMEZONE === $compType ) {
             $c->srtk[0] = $c->cno; // set order
             return;
         }
-        if( ! is_null( $sortArg )) {
-            if( Util::isPropInList( $sortArg, Vcalendar::$MPROPS1 )) { // all string
-                $propValues = [];
-                $c->getProperties( $sortArg, $propValues );
-                if( ! empty( $propValues )) {
-                    $c->srtk[0] = key( array_slice( $propValues, 0, 1, true ));
-                }
-                if( IcalInterface::RELATED_TO === $sortArg ) {
-                    $c->srtk[0] = $c->getUid();
-                }
-            } // end if( Util::isPropInList( $sortArg, Util::$MPROPS1 ))
-            else {
-                $method = StringFactory::getGetMethodName( $sortArg );
-                if( method_exists( $c, $method ) && ( false !== ( $d = $c->{$method}()))) {
-                    $c->srtk[0] = ( $d instanceof DateTime ) ? $d->getTimestamp() : $d;
-                    if( IcalInterface::UID === $sortArg ) {
-                        if(( IcalInterface::VFREEBUSY !== $compType  ) &&
-                            ( false !== ( $d = $c->getRecurrenceid()))) {
-                            $c->srtk[1] = $d->getTimestamp();
-                            if( false === ( $c->srtk[2] = $c->getSequence())) {
-                                $c->srtk[2] = 0; // missing sequence equals sequence:0 in comb. with recurr.-id
-                            }
-                        }
-                        else {
-                            $c->srtk[1] = $c->srtk[2] = PHP_INT_MAX;
-                        }
-                    } // end if( Vcalendar::UID == $sortArg )
-                } // end if
-            } // end elseif( false !== ( $d = $c->getProperty( $sortArg )))
+        if( is_null( $sortArg )) {
+            self::setSortDefaultArgs( $c );
             return;
-        } // end elseif( $sortArg )
+        }
+        if( Util::isPropInList( $sortArg, Vcalendar::$MPROPS1 )) { // all string
+            $propValues = [];
+            $c->getProperties( $sortArg, $propValues );
+            if( ! empty( $propValues )) {
+                $c->srtk[0] = key( array_slice( $propValues, 0, 1, true ));
+            }
+            if( IcalInterface::RELATED_TO === $sortArg ) {
+                $c->srtk[0] = $c->getUid();
+            }
+            return;
+        } // end if( Util::isPropInList( $sortArg, Util::$MPROPS1 ))
+        $method = StringFactory::getGetMethodName( $sortArg );
+        if( method_exists( $c, $method ) && ( false !== ( $d = $c->{$method}()))) {
+            $c->srtk[0] = ( $d instanceof DateTime ) ? $d->getTimestamp() : $d;
+            if( IcalInterface::UID === $sortArg ) {
+                if( null === $GETRECURRIDMETHOD ) {
+                    $GETRECURRIDMETHOD = StringFactory::getGetMethodName( IcalInterface::RECURRENCE_ID );
+                    $GETSEQMETHOD      = StringFactory::getGetMethodName( IcalInterface::SEQUENCE );
+                }
+                if( method_exists( $c, $GETRECURRIDMETHOD ) && ( false !== ( $d = $c->getRecurrenceid()))) {
+                    $c->srtk[1] = $d->getTimestamp();
+                    if( method_exists( $c, $GETSEQMETHOD ) && ( false === ( $c->srtk[2] = $c->getSequence()))) {
+                        $c->srtk[2] = 0; // missing sequence equals sequence:0 in comb. with recurr.-id
+                    }
+                }
+                else {
+                    $c->srtk[1] = $c->srtk[2] = PHP_INT_MAX;
+                }
+            } // end if( Vcalendar::UID == $sortArg )
+        } // end if
+    }
+
+    /**
+     * Set default (date-related/uid) sort arguments/parameters in component
+     *
+     * @param CalendarComponent $c valendar component
+     * @since 2.41.9 2022-01-30
+     */
+    private static function setSortDefaultArgs( CalendarComponent $c ) : void
+    {
+        static $DTENDCOMPS = [ IcalInterface::VEVENT, IcalInterface::VFREEBUSY, IcalInterface::VAVAILABILITY ];
+        static $DURCOMPS   = [
+            IcalInterface::VAVAILABILITY,
+            IcalInterface::VEVENT,
+            IcalInterface::VFREEBUSY,
+            IcalInterface::VTODO
+        ];
+        $compType = $c->getCompType();
         switch( true ) { // sortkey 0 : dtstart
             case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTSTART ))) :
                 $c->srtk[0] = $d[1];
@@ -152,9 +176,7 @@ class SortFactory
             case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTEND ))) :
                 $c->srtk[1] = $d[1];
                 break;
-            case ((( IcalInterface::VEVENT === $compType ) ||
-                   ( IcalInterface::VFREEBUSY === $compType  )) &&
-                ( false !== ( $d = $c->getDtend()))) :
+            case( in_array( $compType, $DTENDCOMPS, true ) ) && ( false !== ( $d = $c->getDtend())) :
                 $c->srtk[1] = $d->getTimestamp();
                 break;
             case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DUE ))) :
@@ -163,9 +185,7 @@ class SortFactory
             case (( IcalInterface::VTODO === $compType  ) && ( false !== ( $d = $c->getDue()))) :
                 $c->srtk[1] = $d->getTimestamp();
                 break;
-            case ((( IcalInterface::VEVENT === $compType  ) ||
-                    ( IcalInterface::VTODO === $compType )) &&
-                ( false !== ( $d = $c->getDuration( null, true )))) :
+            case ( in_array( $compType, $DURCOMPS, true ) && ( false !== ( $d = $c->getDuration( null, true )))) :
                 $c->srtk[1] = $d->getTimestamp();
                 break;
         } // end switch
@@ -203,8 +223,8 @@ class SortFactory
     /**
      * Sort callback function for exdate
      *
-     * @param array $a
-     * @param array $b
+     * @param mixed[] $a
+     * @param mixed[] $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -221,8 +241,8 @@ class SortFactory
     /**
      * Sort callback function for freebusy and rdate, sort single property
      *
-     * @param array|DateTime $a
-     * @param array|DateTime $b
+     * @param mixed[]|DateTime $a
+     * @param mixed[]|DateTime $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -247,8 +267,8 @@ class SortFactory
     /**
      * Sort callback function for rdate, sort multiple RDATEs in order (after 1st datetime/date/period)
      *
-     * @param array $a
-     * @param array $b
+     * @param mixed[] $a
+     * @param mixed[] $b
      * @return int
      * @since 2.29.11 2019-08-29
      */
@@ -263,7 +283,7 @@ class SortFactory
     /**
      * Return sortValue from RDATE value
      *
-     * @param array|DateTime $v
+     * @param mixed[]|DateTime $v
      * @return string
      * @since 2.29.2 2019-06-23
      */

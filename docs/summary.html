@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.40 summary</title>
+    <title>iCalcreator 2.40.16 summary</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
-    <meta name="copyright"   content="2007-2021 Kjell-Inge Gustafsson, kigkonsult">
+    <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="using iCalcreator v2.40">
+    <meta name="description" content="iCalcreator v2.40.16 summary">
     <style type="text/css">
         * {
             FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -143,9 +143,9 @@
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.40</p>
+<p class="header">iCalcreator v2.40.16</p>
 <p>
-    iCalcreator v2.40<br>
+    iCalcreator v2.40.16<br>
     Copyright &copy; 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
     <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -156,10 +156,16 @@
 <p>
     This document describes usage of iCalcreator, the <em>PHP</em> software implementation of standards
     <a href="https://tools.ietf.org/html/rfc5545" title="Download rfc5545" target="_blank">rfc5545</a>/
-    <a href="https://tools.ietf.org/html/rfc5546" title="Download rfc5546" target="_blank">rfc5546</a>
-    <a href="https://tools.ietf.org/html/rfc6321" title="Download rfc6321" target="_blank">rfc6321</a>
-    <a href="https://tools.ietf.org/html/rfc7986" title="Download rfc7986" target="_blank">rfc7986</a>
-    to manage calendar information.
+    <a href="https://tools.ietf.org/html/rfc5546" title="Download rfc5546" target="_blank">rfc5546</a>/
+    <a href="https://tools.ietf.org/html/rfc5870" title="Download rfc5870" target="_blank">rfc5870</a>/
+    <a href="https://tools.ietf.org/html/rfc6321" title="Download rfc6321" target="_blank">rfc6321</a>/
+    <a href="https://tools.ietf.org/html/rfc6868" title="Download rfc6868" target="_blank">rfc6868</a>/
+    <a href="https://tools.ietf.org/html/rfc7529" title="Download rfc7529" target="_blank">rfc7529</a>/
+    <a href="https://tools.ietf.org/html/rfc7808" title="Download rfc7808" target="_blank">rfc7808</a>/
+    <a href="https://tools.ietf.org/html/rfc7986" title="Download rfc7986" target="_blank">rfc7986</a>/
+    <a href="https://tools.ietf.org/html/rfc9073" title="Download rfc9073" target="_blank">rfc9073</a>/
+    <a href="https://tools.ietf.org/html/rfc9074" title="Download rfc9074" target="_blank"> rfc9074</a>
+    and other IETF rfc documents to manage calendar information.
     The fc5545/rfc5546 obsoletes rfc2445/rfc2446.
 </p>
 <p>
@@ -207,16 +213,19 @@
 </p>
 
 <h4>iCal</h4>
+<h4>iCal</h4>
 <p>
-    A short iCal description is found at <a href="http://en.wikipedia.org/wiki/ICalendar#Core_object" title="iCalendar From Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
+    A short iCal description is found at <a href="https://en.wikipedia.org/wiki/ICalendar" title="iCalendar From Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
     If You are not familiar with iCal, read this first!
 </p>
+<a id="IETF_rfc"></a>
 <p>
     The <strong>iCalendar</strong> format, <strong>iCal</strong>, are described in
 </p>
 <dl>
     <dt><a href="https://tools.ietf.org/html/rfc5545" title="Download rfc5545" target="_blank">rfc5545</a></dt>
     <dd>&quot;Internet Calendaring and Scheduling Core Object Specification (<strong>iCalendar</strong>)&quot;</dd>
+
     <dt><a href="https://tools.ietf.org/html/rfc5546" title="Download rfc5546" target="_blank">rfc5546</a></dt>
     <dd>&quot;iCalendar Transport-Independent Interoperability Protocol (iTIP)&quot;<br>Scheduling Events, BusyTime, To-dos and Journal Entries
         <p class="quotes">. ..allows for the capture and exchange of information normally stored
@@ -224,22 +233,52 @@
         and
         <p class="quotes">. ..is an exchange format between applications or systems.</p>
     </dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc5870" title="Download rfc5870" target="_blank">rfc5870</a></dt>
+    <dd>A Uniform Resource Identifier for Geographic Locations ('geo' URI)</dd>
+
     <dt><a href="https://tools.ietf.org/html/rfc6321" title="Download rfc6321" target="_blank">rfc6321</a></dt>
     <dd>xCal: The XML Format for iCalendar</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc6868" title="Download rfc6868" target="_blank">rfc6868</a></dt>
+    <dd>Parameter Value Encoding in iCalendar and vCard</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc7529" title="Download rfc7529" target="_blank">rfc7529</a></dt>
+    <dd>Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc7808" title="Download rfc7808" target="_blank">rfc7808</a></dt>
+    <dd>Time Zone Data Distribution Service</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc7953" title="Download rfc7953" target="_blank">rfc7953</a></dt>
+    <dd>Calendar Availability</dd>
+
     <dt><a href="https://tools.ietf.org/html/rfc7986" title="Download rfc7986" target="_blank">rfc7986</a></dt>
-    <dd>New Properties for iCalendar,</dd>
-    <dd>may NOT be supported by all calendaring software</dd>
+    <dd>New Properties for iCalendar</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc9073" title="Download rfc9073" target="_blank">rfc9073</a></dt>
+    <dd>Event Publishing Extensions to iCalendar</dd>
+
+    <dt><a href="https://tools.ietf.org/html/rfc9074" title="Download rfc9074" target="_blank"> rfc9074</a></dt>
+    <dd>VALARM Extensions for iCalendar</dd>
+
 </dl>
+
 <p>
-<a href="https://tools.ietf.org/html/rfc5545" title="Download RFC5545 in text format" target="_blank">rfc5545</a> and
-<a href="https://tools.ietf.org/html/rfc5546" title="Download RFC5546 in text format" target="_blank">rfc5546</a>
-obsoletes, respectively,
-<a href="https://tools.ietf.org/html/rfc2445" title="Download RFC2445 in text format" target="_blank">rfc2445</a> and
-<a href="https://tools.ietf.org/html/rfc2446" title="Download RFC2446 in text format" target="_blank">rfc2446</a>.
+    <a href="https://tools.ietf.org/html/rfc5545" title="Download rfc5545" target="_blank">rfc5545</a> and
+    <a href="https://tools.ietf.org/html/rfc5546" title="Download rfc5546" target="_blank">rfc5546</a>
+    obsoletes, respectively,
+    <a href="https://tools.ietf.org/html/rfc2445" title="Download rfc2445" target="_blank">rfc2445</a> and
+    <a href="https://tools.ietf.org/html/rfc2446" title="Download rfc2446" target="_blank">rfc2446</a>.
 </p>
 
 <p>
-    A short xCal description is found at <a href="http://en.wikipedia.org/wiki/XCal" title="xCal on Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
+    For <a href="https://www.ietf.org/" target="_blank">IETF</a> rfc documents, copyright and licence,
+    see the &quot;Copyright Notice&quot; content part in top of each IETF rfc document.
+</p>
+
+<p>
+    A short xCal description is found at
+    <a href="https://en.wikipedia.org/wiki/XCal" title="xCal on Wikipedia, the free encyclopedia" target="_blank">Wikipedia</a>.
 </p>
 
 <h4>Support</h4>
@@ -277,7 +316,7 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.40/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.40.16/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
@@ -285,7 +324,7 @@ complete manual and review and explore iCalcreator usage.
 </p>
 
 <p>
-iCalcreator 2.40 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.40.16 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -714,14 +753,20 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
 <br>
 
 
-<a name="Copyright_and_Licence"></a>
+<a id="Copyright_and_Licence"></a>
 <h2>COPYRIGHT AND LICENSE</h2>
+<p>
+    In this document may exist quotes and/or extracts from
+    <a href="https://www.ietf.org/" target="_blank">IETF</a> <a href="#IETF_rfc">rfc</a> documents,
+    for copyright and licence, see the &quot;Copyright Notice&quot; content part
+    in top of each IETF <a href="#IETF_rfc">rfc</a> document.
+</p>
 
 <table>
-    <tr><td>Copyright<td>(c) 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+    <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.40
+    <tr><td>Version  <td>2.40.16
     <tr><td class="top">License  <td>
         Subject matter of licence is the software iCalcreator.<br>
         The above copyright, link, package and version notices,<br>

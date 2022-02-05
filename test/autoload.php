@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -26,26 +26,46 @@
  *            You should have received a copy of the GNU Lesser General Public License
  *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
-declare( strict_types = 1 );
-namespace Kigkonsult\Icalcreator;
+/**
+ * test/autoload.php
+ *
+ * iCalcreator package test autoloader
+ *
+ * @since  2.41.19 - 2022-01-26
+ */
 
 /**
- * iCalcreator VEVENT/VTODO component base class
- *
- * @since  2.29.24 - 2019-07-02
+ * load iCalcreator src and support classes and Traits
  */
-abstract class VetComponent extends Vcomponent
-{
-    /**
-     * Return Valarm object instance
-     *
-     * @return Valarm
-     * @since  2.27.2 - 2018-12-21
-     */
-    public function newValarm() : Valarm
-    {
-        $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Valarm( $this->getConfig());
-        return $this->components[$ix];
+spl_autoload_register(
+    function( $class ) {
+        static $BS      = '\\';
+        static $PHP     = '.php';
+        static $PREFIX  = 'Kigkonsult\\Icalcreator\\';
+        static $SRC     = 'src';
+        static $SRCDIR  = null;
+        static $TEST    = 'test';
+        static $TESTDIR = null;
+        if( 0 !== strncmp( $PREFIX, $class, 23 )) {
+            return false;
+        }
+        $class = substr( $class, 23 );
+        if( str_contains( $class, $BS ) ) {
+            $class = str_replace( $BS, DIRECTORY_SEPARATOR, $class );
+        }
+        if( is_null( $SRCDIR )) {
+            $SRCDIR  = dirname( __DIR__ ) . DIRECTORY_SEPARATOR . $SRC . DIRECTORY_SEPARATOR;
+            $TESTDIR = dirname(__DIR__ ) . DIRECTORY_SEPARATOR . $TEST . DIRECTORY_SEPARATOR;
+        }
+        $file = $SRCDIR . $class . $PHP;
+        if( file_exists( $file )) {
+            include $file;
+        }
+        else {
+            $file = $TESTDIR . $class . $PHP;
+            if( file_exists( $file )) {
+                include $file;
+            }
+        }
     }
-}
+);

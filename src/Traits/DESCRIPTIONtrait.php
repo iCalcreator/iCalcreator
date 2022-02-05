@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,14 +40,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * DESCRIPTION property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait DESCRIPTIONtrait
 {
     /**
-     * @var null|array component property DESCRIPTION value
+     * @var null|mixed[] component property DESCRIPTION value
      */
-    protected ?array $description = null;
+    protected ? array $description = null;
 
     /**
      * @var string[]
@@ -100,7 +100,7 @@ trait DESCRIPTIONtrait
             return false;
         }
         if( ! Util::isCompInList( $this->getCompType(), self::$MULTIDESCRCOMPS )) {
-            $propDelIx = 1;
+            $propDelIx = null;
         }
         return CalendarComponent::deletePropertyM(
             $this->description,
@@ -115,7 +115,7 @@ trait DESCRIPTIONtrait
      *
      * @param null|bool|int  $propIx specific property in case of multiply occurrence
      * @param null|bool      $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since 2.29.5 2019-07-03
      */
     public function getDescription( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
@@ -128,7 +128,7 @@ trait DESCRIPTIONtrait
             if( is_bool( $propIx )) {
                 $inclParam = $propIx;
             }
-            $propIx = 1;
+            $propIx = null;
         }
         return  CalendarComponent::getPropertyM(
             $this->description,
@@ -142,28 +142,30 @@ trait DESCRIPTIONtrait
     /**
      * Set calendar component property description
      *
-     * @param null|string  $value
-     * @param null|string[] $params
-     * @param null|integer $index
+     * @param null|string   $value
+     * @param null|mixed[]  $params
+     * @param null|integer  $index
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      */
-    public function setDescription( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setDescription( ? string $value = null, ? array $params = [], ? int $index = null) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::DESCRIPTION );
             $value  = Util::$SP0;
             $params = [];
         }
+        else{
+            Util::assertString( $value, self::DESCRIPTION );
+        }
         if( ! Util::isCompInList( $this->getCompType(), self::$MULTIDESCRCOMPS )) {
             $index = 1;
         }
-        Util::assertString( $value, self::DESCRIPTION );
         CalendarComponent::setMval(
             $this->description,
             (string) $value,
-            ( $params ?? [] ),
+            $params,
             null,
             $index
         );

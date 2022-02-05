@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -45,14 +45,14 @@ use function reset;
 /**
  * RDATE property functions
  *
- * @since 2.29.2 2019-06-23
+ * @since 2.40.11 2022-01-15
  */
 trait RDATEtrait
 {
     /**
-     * @var null|array component property RDATE value
+     * @var null|mixed[] component property RDATE value
      */
-    protected ?array $rdate = null;
+    protected ? array $rdate = null;
 
     /**
      * Return formatted output for calendar component property rdate
@@ -98,11 +98,11 @@ trait RDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|array|bool
+     * @return string|bool|mixed[]
      * @throws Exception
      * @since 2.40 2021-10-04
      */
-    public function getRdate( ?int $propIx = null, ?bool $inclParam = false ) : array | string | bool
+    public function getRdate( ? int $propIx = null, ? bool $inclParam = false ) : array | string | bool
     {
         if( empty( $this->rdate )) {
             unset( $this->propIx[self::RDATE] );
@@ -124,9 +124,9 @@ trait RDATEtrait
     /**
      * Set calendar component property rdate
      *
-     * @param null|string|array|DateTimeInterface $value
-     * @param null|string[]   $params
-     * @param null|integer $index
+     * @param null|string|mixed[]|DateTimeInterface $value
+     * @param null|mixed[]  $params
+     * @param null|integer  $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
@@ -139,8 +139,7 @@ trait RDATEtrait
     ) : static
     {
         if( empty( $value ) ||
-            ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))
-        ) {
+            ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))) {
             $this->assertEmptyValue( $value, self::RDATE );
             self::setMval( $this->rdate, Util::$SP0, [], null, $index );
             return $this;
@@ -170,14 +169,14 @@ trait RDATEtrait
     /**
      * Return Rdates is single input
      *
-     * @param string|array|DateTimeInterface $rDates
+     * @param string|mixed[]|DateTimeInterface $rDates
      * @param bool $isPeriod
-     * @return array
+     * @return string|mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    private static function checkSingleRdates( string|array|DateTimeInterface $rDates, bool $isPeriod ) : array
+    private static function checkSingleRdates( string|array|DateTimeInterface $rDates, bool $isPeriod ) : string|array
     {
         if( $rDates instanceof DateTimeInterface ) {
             return [ DateTimeFactory::toDateTime( $rDates ) ];

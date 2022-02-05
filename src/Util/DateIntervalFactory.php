@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,7 +43,7 @@ use function trim;
  * iCalcreator DateInterval utility/support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since  2.29.20 - 2020-01-31
+ * @since 2.40.11 2022-01-15
  */
 class DateIntervalFactory
 {
@@ -243,8 +243,7 @@ class DateIntervalFactory
             ( 0 === ( $dateIntervalArr[self::$d] % 7 ))) {
             $result .= (int) floor( $dateIntervalArr[self::$d] / 7 ) .
                 self::$W;
-            return (( $showOptSign ?? false ) &&
-                ( 0 < $dateIntervalArr[self::$invert] ))
+            return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
                 ? Util::$MINUS . $result : $result;
         }
         if( 0 < $dateIntervalArr[self::$y] ) {
@@ -379,7 +378,7 @@ class DateIntervalFactory
     /**
      * Get DateInterval from (DateInterval) array
      *
-     * @param array $dateIntervalArr
+     * @param mixed[] $dateIntervalArr
      * @return DateInterval
      * @throws Exception  on DateInterval create error
      * @since  2.27.2 - 2018-12-21

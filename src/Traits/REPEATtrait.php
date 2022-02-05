@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,14 +38,14 @@ use function is_numeric;
 /**
  * REPEAT property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait REPEATtrait
 {
     /**
-     * @var null|array component property REPEAT value
+     * @var null|mixed[] component property REPEAT value
      */
-    protected ?array $repeat = null;
+    protected ? array $repeat = null;
 
     /**
      * Return formatted output for calendar component property repeat
@@ -86,11 +86,11 @@ trait REPEATtrait
     /**
      * Get calendar component property repeat
      *
-     * @param bool   $inclParam
-     * @return bool|int|string|array
+     * @param null|bool   $inclParam
+     * @return bool|int|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getRepeat( bool $inclParam = false ) : array | bool | int | string
+    public function getRepeat( ? bool $inclParam = false ) : array | bool | int | string
     {
         if( empty( $this->repeat )) {
             return false;
@@ -98,7 +98,7 @@ trait REPEATtrait
         if( null === $this->repeat[Util::$LCvalue] ) {
             $this->repeat[Util::$LCvalue] = Util::$SP0;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->repeat
             : $this->repeat[Util::$LCvalue];
     }
@@ -107,7 +107,7 @@ trait REPEATtrait
      * Set calendar component property repeat
      *
      * @param null|int|string $value
-     * @param null|string[]      $params
+     * @param null|mixed[]    $params
      * @return static
      * @since 2.27.3 2018-12-22
      */
@@ -124,7 +124,7 @@ trait REPEATtrait
         }
         $this->repeat = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

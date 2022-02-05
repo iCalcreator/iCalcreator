@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,12 +37,12 @@ use InvalidArgumentException;
 /**
  * PRIORITY property functions
  *
- * @since 2.27.2 2019-01-03
+ * @since 2.27.3 2018-12-22
  */
 trait PRIORITYtrait
 {
     /**
-     * @var null|array component property PRIORITY value
+     * @var null|mixed[] component property PRIORITY value
      */
     protected ?array $priority = null;
 
@@ -86,10 +86,10 @@ trait PRIORITYtrait
      * Get calendar component property priority
      *
      * @param null|bool   $inclParam
-     * @return bool|int|string|array
+     * @return bool|int|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getPriority( ?bool $inclParam = false ) : array | bool | string | int
+    public function getPriority( ? bool $inclParam = false ) : array | bool | string | int
     {
         if( empty( $this->priority )) {
             return false;
@@ -97,7 +97,7 @@ trait PRIORITYtrait
         if( null === $this->priority[Util::$LCvalue] ) {
             $this->priority[Util::$LCvalue] = Util::$SP0;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->priority
             : $this->priority[Util::$LCvalue];
     }
@@ -106,7 +106,7 @@ trait PRIORITYtrait
      * Set calendar component property priority
      *
      * @param null|int|string $value
-     * @param null|string[]      $params
+     * @param null|mixed[]    $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.27.2 2019-01-03
@@ -125,7 +125,7 @@ trait PRIORITYtrait
         }
         $this->priority = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,14 +41,14 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * DURATION property functions
  *
- * @since  2.27.3 - 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait DURATIONtrait
 {
     /**
-     * @var null|array component property DURATION value
+     * @var null|mixed[] component property DURATION value
      */
-    protected ?array $duration = null;
+    protected ? array $duration = null;
 
     /**
      * Return formatted output for calendar component property duration
@@ -91,17 +91,20 @@ trait DURATIONtrait
      *
      * @param null|bool   $inclParam
      * @param null|bool   $specform
-     * @return bool|string|array|DateInterval|DateTime
+     * @return bool|string|DateInterval|DateTime|mixed[]
      * @throws Exception
      * @since  2.40 - 2021-10-04
      */
-    public function getDuration( ? bool $inclParam = false, ? bool $specform = false ) : DateInterval | DateTime | bool | string | array
+    public function getDuration(
+        ? bool $inclParam = false,
+        ? bool $specform = false
+    ) : DateInterval | DateTime | bool | string | array
     {
         if( empty( $this->duration )) {
             return false;
         }
         if( empty( $this->duration[Util::$LCvalue] )) {
-            return ( $inclParam ) ? $this->duration : $this->duration[Util::$LCvalue];
+            return $inclParam ? $this->duration : $this->duration[Util::$LCvalue];
         }
         $value  = $this->duration[Util::$LCvalue];
         $params = $this->duration[Util::$LCparams];
@@ -114,7 +117,7 @@ trait DURATIONtrait
                 $params = array_merge( $params, $dtStart[Util::$LCparams] );
             }
         }
-        return ( $inclParam )
+        return $inclParam
             ? [ Util::$LCvalue  => $value, Util::$LCparams => (array) $params, ]
             : $value;
     }
@@ -123,7 +126,7 @@ trait DURATIONtrait
      * Set calendar component property duration
      *
      * @param null|string|DateInterval $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
@@ -133,7 +136,7 @@ trait DURATIONtrait
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
      *        value."
      */
-    public function setDuration( null|string|DateInterval $value = null , ? array $params = [] ) : static
+    public function setDuration( null|string|DateInterval $value = null, ? array $params = [] ) : static
     {
         switch( true ) {
             case empty( $value ) :
@@ -168,7 +171,7 @@ trait DURATIONtrait
         } // end switch
         $this->duration = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

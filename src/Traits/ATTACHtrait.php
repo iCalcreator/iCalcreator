@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,12 +37,12 @@ use InvalidArgumentException;
 /**
  * ATTACH property functions
  *
- * @since 2.27.3 2018-12-20
+ * @since 2.40.11 2022-01-15
  */
 trait ATTACHtrait
 {
     /**
-     * @var null|array component property ATTACH value
+     * @var null|mixed[] component property ATTACH value
      */
     protected ?array $attach = null;
 
@@ -98,10 +98,10 @@ trait ATTACHtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-16
      */
-    public function getAttach( int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getAttach( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->attach )) {
             unset( $this->propIx[self::ATTACH] );
@@ -120,7 +120,7 @@ trait ATTACHtrait
      * Set calendar component property attach
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @param null|integer  $index
      * @return static
      * @throws InvalidArgumentException

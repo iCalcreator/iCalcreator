@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,12 +39,12 @@ use function strtoupper;
 /**
  * CLASS property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait CLASStrait
 {
     /**
-     * @var null|array component property CLASS value
+     * @var null|mixed[] component property CLASS value
      */
     protected ?array $class = null;
 
@@ -91,15 +91,15 @@ trait CLASStrait
      * Get calendar component property class
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getClass( ?bool $inclParam = false ) : array | bool | string
+    public function getClass( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->{self::$KLASS} )) {
             return false;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->{self::$KLASS}
             : $this->{self::$KLASS}[Util::$LCvalue];
     }
@@ -108,7 +108,7 @@ trait CLASStrait
      * Set calendar component property class
      *
      * @param null|string   $value  "PUBLIC" / "PRIVATE" / "CONFIDENTIAL" / iana-token / x-name
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -131,7 +131,7 @@ trait CLASStrait
         Util::assertString( $value, self::KLASS );
         $this->{self::$KLASS} = [
             Util::$LCvalue  => strtoupper( StringFactory::trimTrailNL((string) $value )),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

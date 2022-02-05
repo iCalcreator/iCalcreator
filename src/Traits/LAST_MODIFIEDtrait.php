@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -44,14 +44,14 @@ use function array_change_key_case;
 /**
  * LAST-MODIFIED property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait LAST_MODIFIEDtrait
 {
     /**
-     * @var null|array component property LAST-MODIFIED value
+     * @var null|mixed[] component property LAST-MODIFIED value
      */
-    protected ?array $lastmodified = null;
+    protected ? array $lastmodified = null;
 
     /**
      * Return formatted output for calendar component property last-modified
@@ -89,7 +89,7 @@ trait LAST_MODIFIEDtrait
      * Return calendar component property last-modified
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @since 2.29.9 2019-08-05
      */
     public function getLastmodified( ? bool $inclParam = false ) : DateTime | bool | string | array
@@ -97,7 +97,7 @@ trait LAST_MODIFIEDtrait
         if( empty( $this->lastmodified )) {
             return false;
         }
-        return ( $inclParam )
+        return $inclParam
             ? $this->lastmodified
             : $this->lastmodified[Util::$LCvalue];
     }
@@ -106,13 +106,13 @@ trait LAST_MODIFIEDtrait
      * Set calendar component property last-modified
      *
      * @param null|string|DateTimeInterface  $value
-     * @param null|string[]  $params
+     * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( DateTimeInterface | string | null $value = null, ?array $params = [] ) : static
+    public function setLastmodified( DateTimeInterface | string | null $value = null, ? array $params = [] ) : static
     {
         if( empty( $value )) {
             $this->lastmodified = [

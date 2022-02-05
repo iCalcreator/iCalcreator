@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -28,11 +28,12 @@
  */
 namespace Kigkonsult\Icalcreator\Util;
 
+use DateTime;
+use Exception;
+use InvalidArgumentException;
 use Kigkonsult\Icalcreator\DtBase;
 use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcalendar;
-use InvalidArgumentException;
-use Exception;
 
 /**
  * class VtimezonePopulateFactoryTest
@@ -41,11 +42,20 @@ use Exception;
  */
 class VtimezonePopulateFactoryTest extends DtBase
 {
+    /**
+     * @var string
+     */
     private static string $ERRFMT = "%s Error in case #%s, %s, exp %s, got %s";
+
+    /**
+     * @var array|string[]
+     */
     private static array $STCPAR = [ 'X-Y-Z' => 'VaLuE' ];
 
     /**
      * set and restore local timezone from const
+     *
+     * @var string|null
      */
     public static ?string $oldTimeZone = null;
 
@@ -78,13 +88,12 @@ class VtimezonePopulateFactoryTest extends DtBase
         $calendar1 = new Vcalendar();
 
         $event     = $calendar1->newVevent()->setDtstart( DATEYmdTHis );
-        $vtimezone = $calendar1->newVtimezone();
+        $vtimezone = $calendar1->newVtimezone(); // will force removal in vtimezonePopulate
 
         $calendar2 = $calendar1->vtimezonePopulate();
 //      $calendar2 = VtimezonePopulateFactory::process( $calendar1 );
 
         $vtimezone = $calendar2->getComponent( IcalInterface::VTIMEZONE );
-
 
         $expTz     = Vcalendar::UTC;
         $vtTzid    = $vtimezone->getTzid();
@@ -131,13 +140,8 @@ class VtimezonePopulateFactoryTest extends DtBase
 
     /**
      * processTest3 provider
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function processTest3Provider() : array
@@ -257,18 +261,17 @@ class VtimezonePopulateFactoryTest extends DtBase
     }
 
     /**
-     * Testing VtimezonePopulateFactory::process
+     * Testing VtimezonePopulateFactory::process, new TZUNTIL (and include TZID_ALIAS_OF)
      *
      * @test
      * @dataProvider processTest3Provider
      * @param int $case
      * @param mixed $xParamTz
      * @param mixed $mParamTz
-     * @param int $from
-     * @param int $to
-     * @param array $dtstarts
+     * @param int|null $from
+     * @param int|null $to
+     * @param mixed[] $dtstarts
      * @throws Exception
-     * @throws InvalidArgumentException;
      */
     public function processTest3( int $case, mixed $xParamTz, mixed $mParamTz, null|int $from, null|int $to, array $dtstarts ) : void
     {
@@ -286,7 +289,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             $e = $calendar1->newVevent()->setDtstart( $dtstartValue );
         }
 
-        $c2 = VtimezonePopulateFactory::process(
+        $c2 = VtimezonePopulateFactory::process( // with TZUNTIL set!!
             $calendar1,
             $mParamTz ?: null,
             $params,
@@ -304,13 +307,34 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf( self::$ERRFMT, __FUNCTION__, $case . '-1', IcalInterface::TZID, $expTz, $vtTzid )
         );
 
+        // test get/set of TZID-ALIAS-OF in Vtimezone (with TZID value)
+        $vtimezone->setTzidAliasOf( $vtTzid . 1 );
+        $vtimezone->setTzidAliasOf( $vtTzid . 2 );
+        foreach( [ 1, 2 ] as $x ) {
+            $this->assertEquals(
+                $vtTzid . $x,
+                $vtimezone->getTzidAliasOf(),
+                sprintf( self::$ERRFMT, __FUNCTION__, $case . '-2-' . $x, IcalInterface::TZID_ALIAS_OF, $expTz, $vtTzid )
+            );
+        }
+
+        $calendar1->replaceComponent( $vtimezone ); // assure TZID_ALIAS_OF is set in calendars Vtimezone
+
+        // test isset TZUNTIL
+        $tzUntil = $vtimezone->getTzuntil();
+        $this->assertInstanceOf(
+            DateTime::class,
+            $tzUntil,
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-3', IcalInterface::TZUNTIL, $expTz, $vtTzid )
+        );
+
         $standard = $vtimezone->getComponent( IcalInterface::STANDARD );
         $this->assertNotFalse(
             $standard,
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-2',
+                $case . '-4',
                 IcalInterface::STANDARD,
                 IcalInterface::STANDARD,
                 'false'
@@ -324,7 +348,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-3',
+                $case . '-5',
                 IcalInterface::STANDARD . '::' . IcalInterface::TZOFFSETFROM,
                 '+0200',
                 $getValue
@@ -338,7 +362,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-4',
+                $case . '-6',
                 IcalInterface::STANDARD . '::' . IcalInterface::TZOFFSETTO,
                 '+0100',
                 $getValue
@@ -354,7 +378,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-5',
+                $case . '-7',
                 IcalInterface::STANDARD . '::' . IcalInterface::RDATE,
                 '20xx-10-xx-03-00-00',
                 var_export( $getValue, true )
@@ -367,7 +391,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-6',
+                $case . '-8',
                 IcalInterface::DAYLIGHT,
                 IcalInterface::DAYLIGHT,
                 'false'
@@ -381,7 +405,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-7',
+                $case . '-9',
                 IcalInterface::DAYLIGHT . '::' . IcalInterface::TZOFFSETFROM,
                 '+0100',
                 $getValue
@@ -395,7 +419,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-8',
+                $case . '-10',
                 IcalInterface::DAYLIGHT . '::' . IcalInterface::TZOFFSETTO,
                 '+0200',
                 $getValue
@@ -411,21 +435,23 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-9',
+                $case . '-11',
                 IcalInterface::DAYLIGHT . '::' . IcalInterface::RDATE,
                 '20xx-03-xx-02-00-00',
                 var_export( $getValue, true )
             )
         );
 
-        $this->parseCalendarTest( 1, $calendar1 );
+        $this->parseCalendarTest( $case, $calendar1, IcalInterface::TZUNTIL ); // force xml+parse
         $calendar1Str = $calendar1->createCalendar();
 
         // fetch all components
+        $vtimezone->resetCompCounter();  // REQUIRED
         $compArr = [];
         while( $comp = $vtimezone->getComponent()) {
             $compArr[] = $comp;
         }
+
         $x = 1;
         while( $vtimezone->deleteComponent( $x )) {
             ++$x;
@@ -433,9 +459,9 @@ class VtimezonePopulateFactoryTest extends DtBase
         $this->assertSame(
             0,
             $vtimezone->countComponents(),
-            'deleteComponent-error ' . $case . '-10, has ' . $vtimezone->countComponents()
+            'deleteComponent-error ' . $case . '-12, has ' . $vtimezone->countComponents()
         );
-        // check components are set
+        // set components again
         foreach( $compArr as $comp ) {
             $vtimezone->setComponent( $comp );
         }
@@ -443,17 +469,115 @@ class VtimezonePopulateFactoryTest extends DtBase
         $this->assertSame(
             count( $compArr ),
             $vtimezone->countComponents(),
-            'setComponent-error ' . $case . '-11, has ' . $vtimezone->countComponents()
+            'setComponent-error ' . $case . '-13, has ' . $vtimezone->countComponents()
         );
 
         $vtimezone2 = $calendar1->getComponent( IcalInterface::VTIMEZONE, 1 );
+        // check number of components
+        $this->assertSame(
+            count( $compArr ),
+            $vtimezone2->countComponents(),
+            'setComponent-error ' . $case . '-14, has ' . $vtimezone2->countComponents()
+        );
 
         $calendar1->replaceComponent( $vtimezone2 );
 
         $this->assertEquals(
             $calendar1Str,
             $calendar1->createCalendar(),
-            'calendar compare error ' . $case . '-12'
+            'calendar compare error ' . $case . '-15'
         );
+
+//      if( 1 === $case ) { echo $calendar1Str . PHP_EOL;  } // test ###
+    }
+
+    /**
+     * Testing VtimezonePopulateFactory::process, multiple timezones as timezone arg, test twice
+     *
+     * @test
+     * @throws Exception
+     */
+    public function processTest4() : void
+    {
+        $timezone1 = 'Europe/Stockholm';
+        $timezone2 = 'America/New_York';
+        $timezone3 = 'Europe/Moscow';
+        $timezone4 = 'America/Los_Angeles';
+
+        $vCalendar = new Vcalendar();
+
+        // set two timezones into calendar 
+        $vCalendar = VtimezonePopulateFactory::process(
+            $vCalendar,
+            [ $timezone1, $timezone2 ]
+        );
+
+        // check first 
+        $this->assertNotFalse(
+            $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 1 ),
+            __METHOD__ . ' 11 Vtimezone not found'
+        );
+        $this->assertNotFalse(
+            $tzId = $vTimezone->getTzId(),
+            __METHOD__ . ' 12 TZID not found'
+        );
+        $this->assertSame(
+            $timezone1,
+            $tzId,
+            __METHOD__ . ' 13 expected ' . $timezone1 . ' got ' . $tzId
+        );
+
+        // check second 
+        $this->assertNotFalse(
+            $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 2 ),
+            __METHOD__ . ' 21 Vtimezone not found'
+        );
+        $this->assertNotFalse(
+            $tzId = $vTimezone->getTzId(),
+            __METHOD__ . ' 22 TZID not found'
+        );
+        $this->assertSame(
+            $timezone2,
+            $tzId,
+            __METHOD__ . ' 23 expected ' . $timezone1 . ' got ' . $tzId
+        );
+
+        // set two other timezones into calendar
+        $vCalendar = VtimezonePopulateFactory::process(
+            $vCalendar,
+            [ $timezone3, $timezone4 ]
+        );
+
+        // check first 
+        $this->assertNotFalse(
+            $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 1 ),
+            __METHOD__ . ' 31 Vtimezone not found'
+        );
+        $this->assertNotFalse(
+            $tzId = $vTimezone->getTzId(),
+            __METHOD__ . ' 32 TZID not found'
+        );
+        $this->assertSame(
+            $timezone3,
+            $tzId,
+            __METHOD__ . ' 33 expected ' . $timezone3 . ' got ' . $tzId
+        );
+
+        // check second 
+        $this->assertNotFalse(
+            $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 2 ),
+            __METHOD__ . ' 41 Vtimezone not found'
+        );
+        $this->assertNotFalse(
+            $tzId = $vTimezone->getTzId(),
+            __METHOD__ . ' 42 TZID not found'
+        );
+        $this->assertSame(
+            $timezone4,
+            $tzId,
+            __METHOD__ . ' 43 expected ' . $timezone4 . ' got ' . $tzId
+        );
+
+//      echo $vCalendar->createCalendar() . PHP_EOL; // test ###
     }
 }

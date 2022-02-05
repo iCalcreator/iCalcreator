@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -126,7 +126,7 @@ class RecurFactory2
     /**
      * Asserts recur
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return void
      * @throws LogicException
      * @since  2.27.26 - 2020-09-10
@@ -219,7 +219,7 @@ class RecurFactory2
      * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
      * is  not  set to MONTHLY or YEARLY."
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -258,7 +258,7 @@ class RecurFactory2
      * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
      * is  not  set to MONTHLY or YEARLY."
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.24 - 2020-08-27
      */
@@ -282,7 +282,7 @@ class RecurFactory2
      * Recur UNTIL/COUNT/INTERVAL opt (INTERVAL default 1)
      * Recur BYMONTH opt.
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -312,7 +312,7 @@ class RecurFactory2
      * "The BYDAY rule part MUST NOT be specified with a numeric value when the FREQ rule part
      * is  not  set to MONTHLY or YEARLY."
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -346,7 +346,7 @@ class RecurFactory2
      * Recur BYMONTHDAY opt
      * Recur BYSETPOS if BYMONTHDAY exists
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -383,7 +383,7 @@ class RecurFactory2
      * Recur BYMONTH opt
      * Recur BYSETPOS opt
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -414,7 +414,7 @@ class RecurFactory2
      * Recur BYMONTH opt
      * Recur BYMONTHDAY opt
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.27.22 - 2020-08-18
      */
@@ -446,7 +446,7 @@ class RecurFactory2
      * Recur BYDAY required
      * Recur BYSETPOS opt
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      * @since  2.29.24 - 2020-08-29
      */
@@ -475,11 +475,11 @@ class RecurFactory2
      *
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @param string|DateTime $wDateIn
      * @param string|DateTime $fcnStartIn
      * @param null|string|DateTime $fcnEndIn
-     * @return array
+     * @return mixed[]
      * @throws Exception
      * @since  2.29.2 - 2019-03-03
      */
@@ -526,11 +526,11 @@ class RecurFactory2
      * Recur BYMONTHDAY opt
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
-     * @param string|DateTime $wDateIn    component start date
-     * @param string|DateTime $fcnStartIn start date
+     * @param mixed[]              $recur    pattern for recurrency (only value part, params ignored)
+     * @param string|DateTime      $wDateIn    component start date
+     * @param string|DateTime      $fcnStartIn start date
      * @param null|string|DateTime $fcnEndIn   end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]  array([Ymd] => bool)
      * @throws Exception
      * @since  2.27.16 - 2019-03-03
      */
@@ -606,11 +606,11 @@ class RecurFactory2
      * Recur BYMONTHDAY opt
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[]         $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn    component start date
      * @param string|DateTime $fcnStartIn start date
      * @param null|string|DateTime $fcnEndIn   end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]   array([Ymd] => bool)
      * @throws Exception
      * @since  2.40.10 - 2021-12-03
      */
@@ -676,11 +676,11 @@ class RecurFactory2
      * Recur BYMONTH opt.
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array                $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[]              $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime      $wDateIn    component start date
      * @param string|DateTime      $fcnStartIn start date
      * @param null|string|DateTime $fcnEndIn   end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]     array([Ymd] => bool)
      * @throws Exception
      * @since  2.27.16 - 2019-03-03
      */
@@ -727,11 +727,11 @@ class RecurFactory2
      * Recur BYMONTH opt.
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn         component start date
      * @param string|DateTime $fcnStartIn     start date
      * @param null|string|DateTime $fcnEndIn  end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]   array([Ymd] => bool)
      * @throws Exception
      * @since  2.27.28 - 2029-09-10
      */
@@ -805,11 +805,11 @@ class RecurFactory2
      * Recur BYSETPOS if BYMONTHDAY exists
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn    component start date, string / Datetime
      * @param string|DateTime $fcnStartIn start date, string / Datetime
      * @param null|string|DateTime $fcnEndIn   end date, string / Datetime
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]  array([Ymd] => bool)
      * @throws Exception
      * @since  2.29.24 - 2020-08-29
      */
@@ -944,11 +944,11 @@ class RecurFactory2
      * "The numeric value in a BYDAY rule part with the FREQ rule part set to YEARLY corresponds
      *    to an offset within the month when the BYMONTH rule part is present"
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn        component start date
      * @param string|DateTime $fcnStartIn     start date
      * @param null|string|DateTime $fcnEndIn  end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]  array([Ymd] => bool)
      * @throws Exception
      * @since  2.40.7 - 2021-11-19
      */
@@ -1062,10 +1062,10 @@ class RecurFactory2
     /**
      * Append result from bspList in conjunction with x/count, bySetPos, start/endYmd
      *
-     * @param array $result
+     * @param mixed[] $result
      * @param int     $x
-     * @param array $bspList
-     * @param array $recurLimits  [ count, bySetPos, wDateYmd, endYmd ]
+     * @param mixed[] $bspList
+     * @param mixed[] $recurLimits  [ count, bySetPos, wDateYmd, endYmd ]
      * @return void
      */
     private static function bySetPosResultAppend(
@@ -1119,11 +1119,11 @@ class RecurFactory2
      * Recur BYMONTHDAY opt
      * If missing endDate/UNTIL, stopDate is set to (const) EXTENDYEAR year from startdate (emergency break)
      *
-     * @param array $recur    pattern for recurrency (only value part, params ignored)
+     * @param mixed[] $recur    pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn        component start date
      * @param string|DateTime $fcnStartIn     start date
      * @param null|string|DateTime $fcnEndIn  end date
-     * @return array          array([Ymd] => bool)
+     * @return mixed[]  array([Ymd] => bool)
      * @throws Exception
      * @since  2.29.21 - 2020-01-31
      */
@@ -1237,7 +1237,7 @@ class RecurFactory2
     /**
      * Return count occurrences (if found) or PHP_INT_MAX
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return int
      */
     private static function getCount( array $recur ) : int
@@ -1266,7 +1266,7 @@ class RecurFactory2
     /**
      * Return bool true if recur setByPos exists, assure array
      *
-     * @param array $recur
+     * @param mixed[] $recur
      * @return bool
      */
     private static function hasSetByPos( array & $recur ) : bool
@@ -1285,7 +1285,7 @@ class RecurFactory2
    /**
      * Return array, recur BYMONTH (sorted month numbers)
      *
-     * @param array $recur
+     * @param mixed[]    $recur
      * @param null|bool  $hasByMonth
      * @return int[]
      * @since  2.29.11 - 2019-08-30
@@ -1307,8 +1307,8 @@ class RecurFactory2
     /**
      * Return array BYMONTHDAY i.e. sorted day numbers in month
      *
-     * @param array $recur
-     * @param null|bool  $hasByMonthDays
+     * @param mixed[]   $recur
+     * @param null|bool $hasByMonthDays
      * @return int[]
      * @since  2.29.11 - 2019-08-30
      */
@@ -1335,10 +1335,7 @@ class RecurFactory2
      * @return int[]
      * @since  2.27.16 - 2019-03-06
      */
-    public static function getMonthDaysFromByMonthDayList(
-        int $daysInMonth,
-        array $byMonthDayList
-    ) : array
+    public static function getMonthDaysFromByMonthDayList( int $daysInMonth, array $byMonthDayList ) : array
     {
         $list = [];
         foreach( $byMonthDayList as $byMonthDay ) {
@@ -1354,13 +1351,11 @@ class RecurFactory2
     /**
      * Return recur BYDAYs but the relative part of weekday(s) skipped ( ex '-1TH' to 'TH')
      *
-     * @param array $recurByDay
-     * @return array
+     * @param mixed[] $recurByDay
+     * @return mixed[]
      * @since  2.27.16 - 2019-03-03
      */
-    private static function getRecurByDaysWithNoRelativeWeekdays(
-        array $recurByDay
-    ) : array
+    private static function getRecurByDaysWithNoRelativeWeekdays( array $recurByDay ) : array
     {
         $dayArr = array_flip( RecurFactory::$DAYNAMES );
         $list   = [];
@@ -1382,13 +1377,11 @@ class RecurFactory2
     /**
      * Return bool true if recur BYDAYs has relative weekday(s) ( ex '-1 TH' )
      *
-     * @param array $recurByDay
+     * @param mixed[] $recurByDay
      * @return bool
      * @since  2.27.16 - 2019-03-03
      */
-     private static function hasRecurByDaysWithRelativeWeekdays(
-         array $recurByDay
-     ) : bool
+     private static function hasRecurByDaysWithRelativeWeekdays( array $recurByDay ) : bool
      {
          if( empty( $recurByDay )) {
              return false;
@@ -1417,18 +1410,14 @@ class RecurFactory2
     /**
      * Return recur BYDAYs for spec. year/month, also '-1MO'-type BYDAYs
      *
-     * @param array $recurByDay
-     * @param int $year
-     * @param int $month
+     * @param mixed[]  $recurByDay
+     * @param int      $year
+     * @param int      $month
      * @return int[]
      * @throws Exception
      * @since  2.27.16 - 2019-03-03
      */
-    public static function getRecurByDaysInMonth(
-        array $recurByDay,
-        int $year,
-        int $month
-    ) : array
+    public static function getRecurByDaysInMonth( array $recurByDay, int $year, int $month ) : array
     {
         static $wFmt1 = '%d-%02d-%02d';
         static $wFmt2 = '+1 day';
@@ -1496,7 +1485,7 @@ class RecurFactory2
     /**
      * Return (array) dayNo hits, found in monthDays
      *
-     * @param array $monthDays with element dayN, posFromStart, posFromEnd
+     * @param mixed[]  $monthDays with element dayN, posFromStart, posFromEnd
      * @param bool|int $pos
      * @param string   $dayN      weekday name abbr
      * @return int[]              dayNo hits in month
@@ -1547,7 +1536,7 @@ class RecurFactory2
     /**
      *  Return int[], opt sorted asc
      *
-     * @param array $input
+     * @param mixed[]   $input
      * @param null|bool $sort
      * @return void
      */

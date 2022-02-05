@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -43,9 +43,9 @@ use InvalidArgumentException;
 trait ORGANIZERtrait
 {
     /**
-     * @var null|array component property ORGANIZER value
+     * @var null|mixed[] component property ORGANIZER value
      */
-    protected ?array $organizer = null;
+    protected ? array $organizer = null;
 
     /**
      * Return formatted output for calendar component property organizer
@@ -94,26 +94,25 @@ trait ORGANIZERtrait
      * Get calendar component property organizer
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
-    public function getOrganizer( ?bool $inclParam = false ) : array | bool | string
+    public function getOrganizer( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->organizer )) {
             return false;
         }
-        return ( $inclParam ) ? $this->organizer : $this->organizer[Util::$LCvalue];
+        return $inclParam ? $this->organizer : $this->organizer[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property organizer
      *
-     * @param null|string  $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since  2.39 - 2021-06-17
-     * @todo ensure value is prefixed by protocol, mailto: if missing
       */
     public function setOrganizer( ? string $value = null, ? array $params = [] ) : static
     {

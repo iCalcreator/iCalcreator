@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,9 +41,19 @@ use Exception;
  */
 abstract class RecurBaseTest extends TestCase
 {
+    /**
+     * @var string
+     */
     protected static string $ERRFMT = "%s error in case #%s, start %s, end %s, recur:%s";
 
+    /**
+     * @var float
+     */
     protected static float $totExpectTime = 0.0;
+
+    /**
+     * @var float
+     */
     protected static float $totResultTime = 0.0;
 
     /**
@@ -59,13 +69,13 @@ abstract class RecurBaseTest extends TestCase
     /**
      * Testing recur2date
      *
-     * @param int|string $case
-     * @param DateTime $start
+     * @param int|string     $case
+     * @param DateTime       $start
      * @param DateTime|array $end
-     * @param array    $recur
-     * @param array    $expects
-     * @param float $prepTime
-     * @return array
+     * @param mixed[]        $recur
+     * @param mixed[]        $expects
+     * @param float          $prepTime
+     * @return mixed[]
      * @throws Exception
      */
     public function recur2dateTest(

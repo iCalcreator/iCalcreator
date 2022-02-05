@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,12 +41,12 @@ use function sprintf;
 /**
  * TZOFFSETTO property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait TZOFFSETTOtrait
 {
     /**
-     * @var null|array component property TZOFFSETTO value
+     * @var null|mixed[] component property TZOFFSETTO value
      */
     protected ?array $tzoffsetto = null;
 
@@ -88,22 +88,22 @@ trait TZOFFSETTOtrait
      * Get calendar component property tzoffsetto
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTzoffsetto( ?bool $inclParam = false ) : array | bool | string
+    public function getTzoffsetto( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->tzoffsetto )) {
             return false;
         }
-        return ( $inclParam ) ? $this->tzoffsetto : $this->tzoffsetto[Util::$LCvalue];
+        return $inclParam ? $this->tzoffsetto : $this->tzoffsetto[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property tzoffsetto
      *
-     * @param null|string  $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.27.3 2019-03-14
@@ -123,7 +123,7 @@ trait TZOFFSETTOtrait
         }
         $this->tzoffsetto = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

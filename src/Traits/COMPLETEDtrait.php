@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -44,14 +44,14 @@ use function array_change_key_case;
 /**
  * COMPLETED property functions
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.40.11 2022-01-15
  */
 trait COMPLETEDtrait
 {
     /**
-     * @var null|array component property COMPLETED value
+     * @var null|mixed[] component property COMPLETED value
      */
-    protected ?array $completed = null;
+    protected ? array $completed = null;
 
     /**
      * Return formatted output for calendar component property completed
@@ -94,7 +94,7 @@ trait COMPLETEDtrait
      * Return calendar component property completed
      *
      * @param null|bool  $inclParam
-     * @return bool|string|DateTime|array
+     * @return bool|string|DateTime|mixed[]
      * @since  2.27.1 - 2018-12-12
      */
     public function getCompleted( ? bool $inclParam = false ) : DateTime | bool | array | string
@@ -102,14 +102,14 @@ trait COMPLETEDtrait
         if( empty( $this->completed )) {
             return false;
         }
-        return ( $inclParam ) ? $this->completed : $this->completed[Util::$LCvalue];
+        return $inclParam ? $this->completed : $this->completed[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property completed
      *
      * @param null|string|DateTimeInterface $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,14 +36,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * LOCATION property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.41.4 2022-01-20
  */
 trait LOCATIONtrait
 {
     /**
-     * @var null|array component property LOCATION value
+     * @var null|mixed[] component property LOCATION value
      */
-    protected ?array $location = null;
+    protected ? array $location = null;
 
     /**
      * Return formatted output for calendar component property location
@@ -55,71 +55,99 @@ trait LOCATIONtrait
         if( empty( $this->location )) {
             return Util::$SP0;
         }
-        if( empty( $this->location[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::LOCATION )
-                : Util::$SP0;
+        $output = Util::$SP0;
+        $lang   = $this->getConfig( self::LANGUAGE );
+        foreach( $this->location as $locationPart ) {
+            if( empty( $locationPart[Util::$LCvalue] ) ) {
+                $output .= $this->getConfig( self::ALLOWEMPTY )
+                    ? StringFactory::createElement( self::LOCATION )
+                    : Util::$SP0;
+                continue;
+            }
+            $output .= StringFactory::createElement(
+                self::LOCATION,
+                ParameterFactory::createParams( $locationPart[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
+                StringFactory::strrep( $locationPart[Util::$LCvalue] )
+            ); // end foreach
         }
-        return StringFactory::createElement(
-            self::LOCATION,
-            ParameterFactory::createParams(
-                $this->location[Util::$LCparams],
-                self::$ALTRPLANGARR,
-                $this->getConfig( self::LANGUAGE )
-            ),
-            StringFactory::strrep( $this->location[Util::$LCvalue] )
-        );
+        return $output;
     }
 
     /**
      * Delete calendar component property location
      *
+     * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
-     * @since  2.27.1 - 2018-12-15
+     * @since 2.41.4 2022-01-20
      */
-    public function deleteLocation() : bool
+    public function deleteLocation( ? int $propDelIx = null ) : bool
     {
         $this->location = null;
-        return true;
+        if( empty( $this->location )) {
+            unset( $this->propDelIx[self::LOCATION] );
+            return false;
+        }
+        if( self::PARTICIPANT !== $this->getCompType()) {
+            $propDelIx = null;
+        }
+        return  self::deletePropertyM(
+            $this->location,
+            self::LOCATION,
+            $this,
+            $propDelIx
+        );
     }
 
     /**
      * Get calendar component property location
      *
-     * @param null|bool   $inclParam
-     * @return bool|string|array
-     * @since  2.27.1 - 2018-12-12
+     * @param null|bool|int   $propIx specific property in case of multiply occurrence
+     * @param null|bool  $inclParam
+     * @return bool|string|mixed[]
+     * @since 2.41.4 2022-01-20
      */
-    public function getLocation( ? bool $inclParam = false ) : array | bool | string
+    public function getLocation( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->location )) {
+            unset( $this->propIx[self::LOCATION] );
             return false;
         }
-        return ( $inclParam )
-            ? $this->location
-            : $this->location[Util::$LCvalue];
+        if( self::PARTICIPANT !== $this->getCompType()) {
+            if( is_bool( $propIx )) {
+                $inclParam = $propIx;
+            }
+            $propIx = null;
+        }
+        return self::getPropertyM(
+            $this->location,
+            self::LOCATION,
+            $this,
+            $propIx,
+            $inclParam
+        );
     }
 
     /**
      * Set calendar component property location
      *
-     * @param null|string $value
-     * @param null|array  $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
+     * @param null|int      $index  if NOT comp PARTICIPANT : 1
      * @return static
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.4 2022-01-18
      */
-    public function setLocation( ? string $value = null, ? array $params = [] ) : static
+    public function setLocation( ? string $value = null, ? array $params = [], ? int $index = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::LOCATION );
             $value  = Util::$SP0;
             $params = [];
         }
+        if( self::PARTICIPANT !== $this->getCompType()) {
+            $index = 1;
+        }
         Util::assertString( $value, self::LOCATION );
-        $this->location = [
-            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
-        ];
+        self::setMval( $this->location, $value, $params, null, $index );
         return $this;
     }
 }

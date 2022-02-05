@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,15 +36,15 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * COLOR property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  * @see https://www.w3.org/TR/css-color-3/#svg-color
  */
 trait COLORrfc7986trait
 {
     /**
-     * @var null|array component property COLOR value
+     * @var null|mixed[] component property COLOR value
      */
-    protected ?array $color = null;
+    protected ? array $color = null;
 
     /**
      * Return formatted output for calendar (component property color
@@ -85,22 +85,22 @@ trait COLORrfc7986trait
      * Get calendar component property color
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since 2.29.5 2019-06-16
      */
-    public function getColor( ?bool $inclParam = false ) : array | bool | string
+    public function getColor( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->color )) {
             return false;
         }
-        return ( $inclParam ) ? $this->color : $this->color[Util::$LCvalue];
+        return $inclParam ? $this->color : $this->color[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property color
      *
      * @param null|string   $value
-     * @param null|string[] $params
+     * @param null|mixed[]  $params
      * @return static
      * @since 2.29.14 2019-09-03
      */
@@ -116,7 +116,7 @@ trait COLORrfc7986trait
         }
         $this->color = [
             Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

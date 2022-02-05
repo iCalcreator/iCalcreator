@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,35 +37,38 @@ use function strtoupper;
 /**
  * iCalcreator VJOURNAL component class
  *
- * @since  2.29.9 - 2019-08-05
+ * @since 2.41.3 2022-01-17
  */
-final class Vjournal extends Vcomponent
+final class Vjournal extends V2component
 {
-    use Traits\ATTACHtrait,
-        Traits\ATTENDEEtrait,
-        Traits\CATEGORIEStrait,
-        Traits\CLASStrait,
-        Traits\COLORrfc7986trait,
-        Traits\COMMENTtrait,
-        Traits\CONTACTtrait,
-        Traits\CREATEDtrait,
-        Traits\DESCRIPTIONtrait,
-        Traits\DTSTARTtrait,
-        Traits\EXDATEtrait,
-        Traits\EXRULEtrait,
-        Traits\IMAGErfc7986trait,
-        Traits\LAST_MODIFIEDtrait,
-        Traits\ORGANIZERtrait,
-        Traits\RDATEtrait,
-        Traits\RECURRENCE_IDtrait,
-        Traits\RELATED_TOtrait,
-        Traits\REQUEST_STATUStrait,
-        Traits\RRULEtrait,
-        Traits\SEQUENCEtrait,
-        Traits\STATUStrait,
-        Traits\SUMMARYtrait,
-        Traits\UIDrfc7986trait,
-        Traits\URLtrait;
+    use Traits\ATTACHtrait;
+    use Traits\ATTENDEEtrait;
+    use Traits\Participants2AttendeesTrait;
+    use Traits\CATEGORIEStrait;
+    use Traits\CLASStrait;
+    use Traits\COLORrfc7986trait;
+    use Traits\COMMENTtrait;
+    use Traits\CONTACTtrait;
+    use Traits\CREATEDtrait;
+    use Traits\DESCRIPTIONtrait;
+    use Traits\DTSTARTtrait;
+    use Traits\EXDATEtrait;
+    use Traits\EXRULEtrait;
+    use Traits\IMAGErfc7986trait;
+    use Traits\LAST_MODIFIEDtrait;
+    use Traits\ORGANIZERtrait;
+    use Traits\RDATEtrait;
+    use Traits\RECURRENCE_IDtrait;
+    use Traits\RELATED_TOtrait;
+    use Traits\REQUEST_STATUStrait;
+    use Traits\RRULEtrait;
+    use Traits\SEQUENCEtrait;
+    use Traits\STATUStrait;
+    use Traits\STRUCTURED_DATArfc9073trait;
+    use Traits\STYLED_DESCRIPTIONrfc9073trait;
+    use Traits\SUMMARYtrait;
+    use Traits\UIDrfc7986trait;
+    use Traits\URLtrait;
 
     /**
      * @var string
@@ -75,7 +78,7 @@ final class Vjournal extends Vcomponent
     /**
      * Destructor
      *
-     * @since  2.29.9 - 2019-08-05
+     * @since 2.41.3 2022-01-17
      */
     public function __destruct()
     {
@@ -117,6 +120,8 @@ final class Vjournal extends Vcomponent
             $this->rrule,
             $this->sequence,
             $this->status,
+            $this->structureddata,
+            $this->styleddescription,
             $this->summary,
             $this->uid,
             $this->url
@@ -128,7 +133,7 @@ final class Vjournal extends Vcomponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since  2.29.9 - 2019-08-05
+     * @since 2.41.3 2022-01-17
      */
     public function createComponent() : string
     {
@@ -145,6 +150,8 @@ final class Vjournal extends Vcomponent
         $component  .= $this->createContact();
         $component  .= $this->createCreated();
         $component  .= $this->createDescription();
+        $component  .= $this->createStyleddescription();
+        $component  .= $this->createStructureddata();
         $component  .= $this->createDtstart();
         $component  .= $this->createExdate();
         $component  .= $this->createExrule();

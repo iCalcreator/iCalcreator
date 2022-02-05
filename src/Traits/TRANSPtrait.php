@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -39,14 +39,14 @@ use function strtoupper;
 /**
  * TRANSP property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.40.11 2022-01-15
  */
 trait TRANSPtrait
 {
     /**
-     * @var null|array component property TRANSP value
+     * @var null|mixed[] component property TRANSP value
      */
-    protected ?array $transp = null;
+    protected ? array $transp = null;
 
     /**
      * Return formatted output for calendar component property transp
@@ -86,22 +86,22 @@ trait TRANSPtrait
      * Get calendar component property transp
      *
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-13
      */
-    public function getTransp( ?bool $inclParam = false ) : array | bool | string
+    public function getTransp( ? bool $inclParam = false ) : array | bool | string
     {
         if( empty( $this->transp )) {
             return false;
         }
-        return ( $inclParam ) ? $this->transp : $this->transp[Util::$LCvalue];
+        return $inclParam ? $this->transp : $this->transp[Util::$LCvalue];
     }
 
     /**
      * Set calendar component property transp
      *
-     * @param null|string  $value
-     * @param null|string[] $params
+     * @param null|string   $value
+     * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
@@ -123,7 +123,7 @@ trait TRANSPtrait
         }
         $this->transp = [
             Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] ),
+            Util::$LCparams => ParameterFactory::setParams( $params ),
         ];
         return $this;
     }

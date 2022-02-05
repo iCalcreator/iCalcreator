@@ -151,3 +151,44 @@ v3.39   3.4 release candidate
 2.40.9    more DAILY, over night github#95
 2.40.10   recur bug, RecurFactory2
 
+
+2.40.11   more PHP8 updates, StringFactory::getRandChars() upd
+
+2.41.1    rfc7808 new Vtimezone properties TZID-ALIAS-OF/TZUNTIL
+2.41.2    rfc9074 new Valarm properties: UID, RELATED-TO, ACKNOWLEDGED, PROXIMITY
+2.41.3    rfc9073 new properties,
+              for Vevent, Vtodo, Vjournal : STRUCTURED-DATA
+              for Vevent, Vtodo, Vjournal, Valarm : STYLED_DESCRIPTION
+2.41.4    rfc9073 new component PARTICIPANT
+              with new properties CALENDAR-ADDRESS/PARTICIPANT-TYPE
+              new Vcalendar/component method participants2Attendees()
+2.41.5    rfc9073 new subComponent VLOCATION
+              with new property LOCATION-TYPE
+2.41.6    method(s) Vcalendar/caledarComponent::getComponent() moved to IcalBase
+2.41.7    rfc9073 new subComponent VRESOURCE
+              with new property RESOURCE-TYPE
+          restructure of abstract classes
+2.41.8   (new) signtures of newValarm, newParticipant, newVlocation, newVresource methods
+2.41.9    rfc7953 new component VAVAILABILITY
+              with new property BUSYTYPE
+          rfc7953 new component AVAILABLE
+          NO support for AVAILABLE in Vcalendar::selectComponents()
+2.41.10   upd VtimezonePopulateFactory::process(), accept multiple timeszones
+          arg timezone as string|string[]
+2.41.11   rfc9074 new Valarm sub-component VLOCATION
+2.41.14   rfc 6868 Parameter Value Encoding in iCalendar and vCard TEST
+2.41.12   rfc5870 Uniform Resource Identifier for Geographic Locations ('geo' URI)
+          rfc9073 (7.2. Location) defines VLOCATION with a GEO property
+          rfc9074 (8.  Alarm Proximity Trigger) add VLOCATION(s) to VALARM
+              with a URL 'geo' URI [RFC5870] property
+          As for now, accept
+            VLOCATION with properties URL (with 'geo' URI) and GEO (without)
+            any Vcalendar component with URL and with 'geo' URI
+            any ?? or only VLOCATION URL
+2.41.13   Icalbase::$OTHERPROPS renamed to $SELSORTPROPS
+2.41.14   DateTimeFactory::setDate() will also use ParameterFactory::setParams()
+2.41.15   rfc6868 Parameter Value Encoding in iCalendar and vCard
+2.41.16   rfc7529 Non-Gregorian Recurrence Rules in the Internet Calendaring and
+                  Scheduling Core Object Specification (iCalendar)
+          new RRULE elements RSCALE, SKIP accepted
+          For Vcalendar::selectComponents(), if RRULE RSCALE set only GREGORIAN accepted

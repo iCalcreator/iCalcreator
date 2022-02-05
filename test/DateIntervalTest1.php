@@ -1,19 +1,4 @@
-<?php /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-/** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+<?php
 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
 
 /**
@@ -22,7 +7,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -85,7 +70,7 @@ class DateIntervalTest1 extends DtBase
      * DateInterval123Provider Generator
      *
      * @param bool $inclYearMonth
-     * @return array
+     * @return mixed[]
      * @throws Exception
      * @static
      * @todo replace with DateInterval properties, remove durationArray2string()
@@ -106,10 +91,9 @@ class DateIntervalTest1 extends DtBase
             $random = [];
             $cnt = array_rand( array_flip( [ 1, 7 ] ));
             for( $x = 0; $x < $cnt; $x++ ) {
-                $random = array_merge(
-                    $random,
-                    array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true )
-                );
+                foreach( array_slice( $base, array_rand( array_flip( [ 1, 7 ] )), 1, true ) as $k => $v ) {
+                    $random[$k] = $v;
+                }
             }
             if( 1 === array_rand( [ 1 => 1, 2 => 2 ] )) {
                 unset( $random[RecurFactory::$LCWEEK] );
@@ -135,7 +119,7 @@ class DateIntervalTest1 extends DtBase
     /**
      * Return an iCal formatted string from (internal array) duration
      *
-     * @param array $duration , array( year, month, day, week, day, hour, min, sec )
+     * @param mixed[] $duration , array( year, month, day, week, day, hour, min, sec )
      * @return string
      * @static
      * @since  2.26.14 - 2019-02-12
@@ -196,9 +180,9 @@ class DateIntervalTest1 extends DtBase
     /**
      * DateInterval123ProviderDateInterval sub-provider
      *
-     * @param array $input
-     * @param int $cnt
-     * @return array
+     * @param mixed[] $input
+     * @param int     $cnt
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval123ProviderDateInterval( array $input, int $cnt ) : array
@@ -226,9 +210,9 @@ class DateIntervalTest1 extends DtBase
     /**
      * DateInterval123Provider DateIntervalString sub-provider
      *
-     * @param array $input
-     * @param int $cnt
-     * @return array
+     * @param mixed[] $input
+     * @param int     $cnt
+     * @return mixed[]
      * @throws Exception
      */
     public static function DateInterval123ProviderDateIntervalString( array $input, int $cnt ) : array
@@ -257,7 +241,7 @@ class DateIntervalTest1 extends DtBase
     /**
      * testDateInterval123 provider
      *
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     public function DateInterval123Provider() : array
@@ -299,18 +283,20 @@ class DateIntervalTest1 extends DtBase
      * @test
      * @dataProvider DateInterval123Provider
      * @param int|string $case
-     * @param mixed  $value
-     * @param array $expectedGet
-     * @param string $expectedString
+     * @param mixed   $value
+     * @param mixed[] $expectedGet
+     * @param string  $expectedString
      * @throws Exception
      */
     public function testDateInterval123( int | string $case, mixed $value, array $expectedGet, string $expectedString ) : void
     {
         static $compProp = [
-            IcalInterface::VEVENT    => [ IcalInterface::DURATION ],
-            IcalInterface::VTODO     => [ IcalInterface::DURATION ],
-            IcalInterface::VFREEBUSY => [ IcalInterface::DURATION ],
-            IcalInterface::VALARM    => [ IcalInterface::DURATION, IcalInterface::TRIGGER ],
+            IcalInterface::VEVENT        => [ IcalInterface::DURATION ],
+            IcalInterface::VTODO         => [ IcalInterface::DURATION ],
+            IcalInterface::VFREEBUSY     => [ IcalInterface::DURATION ],
+            IcalInterface::VALARM        => [ IcalInterface::DURATION, IcalInterface::TRIGGER ],
+            IcalInterface::AVAILABLE     => [ IcalInterface::DURATION ],
+            IcalInterface::VAVAILABILITY => [ IcalInterface::DURATION ]
         ];
         $c        = new Vcalendar();
         $propName = IcalInterface::REFRESH_INTERVAL;
@@ -342,11 +328,16 @@ class DateIntervalTest1 extends DtBase
 
         foreach( $compProp as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
-            if( IcalInterface::VALARM === $theComp ) {
-                $comp   = $c->newVevent()->{$newMethod}();
-            }
-            else {
-                $comp   = $c->{$newMethod}();
+            switch( true ) {
+                case ( IcalInterface::AVAILABLE === $theComp ) :
+                    $comp   = $c->newVavailability()->{$newMethod}();
+                    break;
+                case ( IcalInterface::VALARM === $theComp ) :
+                    $comp   = $c->newVevent()->{$newMethod}();
+                    break;
+                default :
+                    $comp   = $c->{$newMethod}();
+                    break;
             }
             foreach( $props as $propName ) {
                 $getMethod    = StringFactory::getGetMethodName( $propName );

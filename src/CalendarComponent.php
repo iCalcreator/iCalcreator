@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,17 +40,14 @@ use UnexpectedValueException;
 
 use function array_keys;
 use function count;
-use function ctype_digit;
-use function end;
 use function explode;
 use function get_class;
 use function implode;
+use function in_array;
 use function is_array;
 use function ksort;
 use function method_exists;
 use function property_exists;
-use function sprintf;
-use function strcasecmp;
 use function stripos;
 use function str_contains;
 use function str_starts_with;
@@ -63,12 +60,12 @@ use function ucfirst;
 /**
  *  Parent class for calendar components
  *
- * @since  2.30.3 - 2021-02-15
+ * @since 2.41.1 2022-01-15
  */
 abstract class CalendarComponent extends IcalBase
 {
     /**
-     * @var array  component sort params
+     * @var mixed[]  component sort params
      */
     public array $srtk = [];
 
@@ -95,7 +92,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Constructor for calendar component
      *
-     * @param null|array $config
+     * @param null|mixed[] $config
      * @since  2.27.14 - 2019-07-03
      */
     public function __construct( ? array $config = [] )
@@ -116,7 +113,7 @@ abstract class CalendarComponent extends IcalBase
      * and for each, number of occurrence (values)
      *
      * @param string $propName
-     * @param array $output incremented result array
+     * @param mixed[] $output incremented result array
      * @return void
      * @since  2.29.17 - 2020-01-25
      */
@@ -273,54 +270,67 @@ abstract class CalendarComponent extends IcalBase
      *
      * @param string[] $rows
      * @return void
-     * @since  2.29.3 - 2019-08-26
+     * @since  2.41.11 - 2022-01-27
      */
     private function parse2intoComps( array $rows ) : void
     {
-        static $ENDALARM        = 'END:VALARM';
-        static $ENDDAYLIGHT     = 'END:DAYLIGHT';
-        static $ENDSTANDARD     = 'END:STANDARD';
-        static $END             = 'END:';
-        static $BEGINVALARM     = 'BEGIN:VALARM';
-        static $BEGINSTANDARD   = 'BEGIN:STANDARD';
-        static $BEGINDAYLIGHT   = 'BEGIN:DAYLIGHT';
+        static $END_ALARM         = 'END:VALARM';
+        static $END_PARTICIPANT   = 'END:PARTICIPANT';
+        static $ENDSARR           = [ 'END:AV', 'END:DA', 'END:ST', 'END:VL', 'END:VR' ];
+        static $END               = 'END:';
+        static $BEGIN             = 'BEGIN:';
+        static $BEGIN_AVAILABLE   = 'BEGIN:AVAILABLE';
+        static $BEGIN_DAYLIGHT    = 'BEGIN:DAYLIGHT';
+        static $BEGIN_PARTICIPANT = 'BEGIN:PARTICIPANT';
+        static $BEGIN_STANDARD    = 'BEGIN:STANDARD';
+        static $BEGIN_VALARM      = 'BEGIN:VALARM';
+        static $BEGIN_VLOCATION   = 'BEGIN:VLOCATION';
+        static $BEGIN_VRESOURCE   = 'BEGIN:VRESOURCE';
         $this->unparsed = [];
-        $comp           = $this;
-        $compSync       = $subSync = 0;
+        $comp     = $this;
+        $compType = strtoupper( $this->getCompType());
+        $beginTag = $BEGIN . $compType;
+        $endTag   = $END . $compType;
+        $isParticipantCurrent = $isValarmCurrent = false;
         foreach( $rows as $lix => $row ) {
             switch( true ) {
-                case ( str_starts_with( $row, $ENDALARM ) ||
-                       str_starts_with( $row, $ENDDAYLIGHT ) ||
-                       str_starts_with( $row, $ENDSTANDARD )) :
-                    if( 1 !== $subSync ) {
-                        throw new UnexpectedValueException(
-                            self::getErrorMsg( $rows, $lix )
-                        );
-                    }
-                    --$subSync;
+                case str_starts_with( $row, $beginTag ) :  // begin:<thisComponent>
                     break;
-                case str_starts_with( $row, $END ) :
-                    if( 1 !== $compSync ) { // end:<component>
-                        throw new UnexpectedValueException(
-                            self::getErrorMsg( $rows, $lix )
-                        );
-                    }
-                    --$compSync;
-                    break 2;  /* skip trailing empty lines.. */
-                case str_starts_with( $row, $BEGINVALARM ) :
+                case str_starts_with( $row, $endTag ) : // end:<thisComponent>
+                    break 2;  // skip opt trailing empty lines..
+                case $isParticipantCurrent && str_starts_with( $row, $END_PARTICIPANT ) :
+                    $isParticipantCurrent = false;
+                    break;
+                case $isValarmCurrent && str_starts_with( $row, $END_ALARM ) :
+                    $isValarmCurrent = false;
+                    break;
+                case ( $isParticipantCurrent || $isValarmCurrent ) :
+                    $comp->unparsed[] = $row;
+                    break;
+                case ( in_array( strtoupper( substr( $row, 0, 6 )), $ENDSARR, true )) :
+                    break;
+                case str_starts_with( $row, $BEGIN_AVAILABLE ) :
+                    $comp     = $this->newAvailable();
+                    break;
+                case str_starts_with( $row, $BEGIN_VALARM ) :
                     $comp     = $this->newValarm();
-                    ++$subSync;
+                    $isValarmCurrent = true;
                     break;
-                case str_starts_with( $row, $BEGINSTANDARD ) :
-                    $comp     = $this->newStandard();
-                    ++$subSync;
-                    break;
-                case str_starts_with( $row, $BEGINDAYLIGHT ) :
+                case str_starts_with( $row, $BEGIN_DAYLIGHT ) :
                     $comp     = $this->newDaylight();
-                    ++$subSync;
                     break;
-                case str_starts_with( $row, self::$BEGIN ) :
-                    ++$compSync;         // begin:<component>
+                case str_starts_with( $row, $BEGIN_PARTICIPANT ) :
+                    $comp     = $this->newParticipant();
+                    $isParticipantCurrent = true;
+                    break;
+                case str_starts_with( $row, $BEGIN_STANDARD ) :
+                    $comp     = $this->newStandard();
+                    break;
+                case str_starts_with( $row, $BEGIN_VLOCATION ) :
+                    $comp     = $this->newVlocation();
+                    break;
+                case str_starts_with( $row, $BEGIN_VRESOURCE ) :
+                    $comp     = $this->newVresource();
                     break;
                 default :
                     $comp->unparsed[] = $row;
@@ -333,7 +343,7 @@ abstract class CalendarComponent extends IcalBase
      * Parse this properties
      *
      * @return void
-     * @since  2.30.3 - 2021-02-15
+     * @since 2.41.9 2022-01-22
      * @todo report invalid properties ??
      */
     private function parse3thisProperties() : void
@@ -346,11 +356,7 @@ abstract class CalendarComponent extends IcalBase
             [ $propName, $row ] = StringFactory::getPropName( $row );
             if( StringFactory::isXprefixed( $propName )) {
                 [ $value, $propAttr ] = StringFactory::splitContent( $row );
-                $this->setXprop(
-                    $propName,
-                    StringFactory::strunrep( $value ),
-                    $propAttr
-                );
+                $this->setXprop( $propName, StringFactory::strunrep( $value ), $propAttr );
                 continue;
             }
             if( ! property_exists( $this, StringFactory::getInternalPropName( $propName ))) {
@@ -359,28 +365,27 @@ abstract class CalendarComponent extends IcalBase
             /* separate attributes from value */
             [ $value, $propAttr ] = StringFactory::splitContent( $row, $propName );
             if( ! Util::isPropInList( $propName, self::$TEXTPROPS ) &&
-                ( ! StringFactory::isXprefixed( $propName )) &&
-                ( self::$NLCHARS === strtolower( substr( $value, -2 )))) {
+                ( ! StringFactory::isXprefixed( $propName ))) {
                 $value = StringFactory::trimTrailNL( $value );
             }
             /* call set<Propname>(.. . */
             $method = StringFactory::getSetMethodName( $propName );
             switch( strtoupper( $propName )) {
                 case self::ATTENDEE :
-                    [ $value, $propAttr ] =
-                        CalAddressFactory::parseAttendee( $value, $propAttr );
-                    $this->{$method}( $value, $propAttr );
+                    $this->{$method}( $value, CalAddressFactory::splitMultiParams( $propAttr ));
                     break;
-                case self::CATEGORIES :   // fall through
-                case self::RESOURCES :    // fall through
-                case self::COLOR :        // fall through
+                case self::CATEGORIES :   // fall through // i.e. self::$TEXTPROPS above
                 case self::COMMENT :      // fall through
                 case self::CONTACT :      // fall through
                 case self::DESCRIPTION :  // fall through
                 case self::LOCATION :     // fall through
+                case self::PROXIMITY :    // fall through
+                case self::RESOURCES :    // fall through
+                case self::STRUCTURED_DATA :    // dito
+                case self::STYLED_DESCRIPTION : // dito
                 case self::SUMMARY :
                     if( empty( $value )) {
-                        $propAttr = null;
+                        $propAttr = [];
                     }
                     $this->{$method}( StringFactory::strunrep( $value ), $propAttr );
                     break;
@@ -423,13 +428,16 @@ abstract class CalendarComponent extends IcalBase
                     $recur  = RecurFactory::parseRexrule( $value );
                     $this->{$method}( $recur, $propAttr );
                     break;
-                case self::ACTION :     // fall through
-                case self::STATUS :     // fall through
-                case self::TRANSP :     // fall through
-                case self::UID :        // fall through
-                case self::TZID :       // fall through
-                case self::RELATED_TO : // fall through
-                case self::TZNAME :
+                case self::ACTION :         // fall through
+                case self::BUSYTYPE :       // dito
+                case self::KLASS :          // fall through
+                case self::RELATED_TO :     // fall through
+                case self::STATUS :         // fall through
+                case self::TRANSP :         // fall through
+                case self::TZID :           // fall through
+                case self::TZID_ALIAS_OF :  // fall through
+                case self::TZNAME :         // fall through
+                case self::UID :
                     $value = StringFactory::strunrep( $value );
                 // fall through
                 default:
@@ -457,86 +465,6 @@ abstract class CalendarComponent extends IcalBase
                 $this->components[$ckey]->parse();
             }
         } // end foreach
-    }
-
-    /**
-     * Return error message
-     *
-     * @param string[] $rows
-     * @param int $lix
-     * @return string
-     * @since  2.26.3 - 2018-12-28
-     */
-    private static function getErrorMsg( array $rows, int $lix ) : string
-    {
-        static $ERR = 'Calendar component content not in sync (row %d)%s%s';
-        return sprintf( $ERR, $lix, PHP_EOL, implode( PHP_EOL, $rows ));
-    }
-
-    /**
-     * Return calendar component subcomponent from component container
-     *
-     * @param null|int|string $arg1 ordno/component type/ component uid
-     * @param null|int $arg2 ordno if arg1 = component type
-     * @return mixed CalendarComponent|bool
-     * @since  2.26.1 - 2018-11-17
-     * @todo throw InvalidArgumentException on unknown component
-     */
-    public function getComponent( null|int|string $arg1 = null, null|int $arg2 = null ) : mixed
-    {
-        if( empty( $this->components )) {
-            return false;
-        }
-        $index = $argType = null;
-        switch( true ) {
-            case ( null === $arg1 ) :
-                $argType = self::$INDEX;
-                $this->compix[self::$INDEX] = ( isset( $this->compix[self::$INDEX] ))
-                    ? $this->compix[self::$INDEX] + 1 : 1;
-                $index   = $this->compix[self::$INDEX];
-                break;
-            case ( ctype_digit((string) $arg1 )) :
-                $argType = self::$INDEX;
-                $index   = (int) $arg1;
-                $this->compix = [];
-                break;
-            case ( Util::isCompInList( $arg1, self::$SUBCOMPS )) : // class name
-                unset( $this->compix[self::$INDEX] );
-                $argType = strtolower( $arg1 );
-                $index = $arg2 ?? ( $this->compix[$argType] =
-                        ( isset( $this->compix[$argType] ))
-                            ? $this->compix[$argType] + 1
-                            : 1
-                    );
-                break;
-        } // end switch
-        --$index;
-        $ckeys = array_keys( $this->components );
-        if( ! empty( $index ) && ( $index > end( $ckeys ))) {
-            return false;
-        }
-        $cix2gC = 0;
-        foreach( $ckeys as $cix ) {
-            if( empty( $this->components[$cix] )) {
-                continue;
-            }
-            if(( self::$INDEX === $argType ) && ( $index === $cix )) {
-                return clone $this->components[$cix];
-            }
-            if( 0 === strcasecmp(
-                $this->components[$cix]->getCompType(),
-                    (string) $argType
-                )
-            ) {
-                if( $index === $cix2gC ) {
-                    return clone $this->components[$cix];
-                }
-                $cix2gC++;
-            }
-        } // end foreach
-        /* not found.. . */
-        $this->compix = [];
-        return false;
     }
 
     /**
@@ -577,54 +505,6 @@ abstract class CalendarComponent extends IcalBase
      */
 
     /**
-     * Check index and set (an indexed) content in a multiple value array
-     *
-     * @param null|array    $valueArr
-     * @param null|mixed    $value  whatever...
-     * @param null|string[] $params
-     * @param null|string[] $defaults
-     * @param null|int      $index
-     * @return void
-     * @since  2.22.23 - 2017-04-08
-     */
-    public static function setMval(
-        ? array & $valueArr = [],
-        mixed $value = null,
-        ? array $params = [],
-        ? array $defaults = [],
-        ? int $index = null
-    ) : void
-    {
-        if( empty( $valueArr )) {
-            $valueArr = [];
-        }
-        $params2 = ParameterFactory::setParams(
-            $params,
-            $defaults
-        );
-        if( null === $index ) { // i.e. next
-            $valueArr[] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params2,
-            ];
-            return;
-        }
-        --$index;
-        if( isset( $valueArr[$index] )) { // replace
-            $valueArr[$index] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params2,
-            ];
-            return;
-        }
-        $valueArr[$index] = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params2,
-        ];
-        ksort( $valueArr ); // order
-    }
-
-    /**
      * Recount property propIx, used at consecutive getProperty calls
      *
      * @param string[] $propArr   component (multi-)property
@@ -647,7 +527,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Return propName index
      *
-     * @param array $indexArr
+     * @param mixed[] $indexArr
      * @param string $propName
      * @param int|null $index
      * @return int
@@ -670,12 +550,12 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Get calendar component multpProp property
      *
-     * @param array $multiProp component (multi-)property
+     * @param mixed[]  $multiProp component (multi-)property
      * @param string   $propName
      * @param IcalBase $instance
      * @param null|int $propIx    specific property in case of multiply occurrence
      * @param bool     $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.1 - 2018-12-15
      */
     public static function getPropertyM(
@@ -708,7 +588,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Delete calendar component multiProp property[ix]
      *
-     * @param array $multiProp component (multi-)property
+     * @param mixed[]   $multiProp component (multi-)property
      * @param string    $propName
      * @param IcalBase  $instance
      * @param null|int  $propDelIx specific property in case of multiply occurrence
@@ -739,5 +619,50 @@ abstract class CalendarComponent extends IcalBase
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check index and set (an indexed) content in a multiple value array
+     *
+     * @param null|mixed[]  $valueArr
+     * @param null|mixed    $value  whatever...
+     * @param null|mixed[]  $params
+     * @param null|string[] $defaults
+     * @param null|int      $index
+     * @return void
+     * @since  2.22.23 - 2017-04-08
+     */
+    public static function setMval(
+        ? array & $valueArr = [],
+        mixed $value = null,
+        ? array $params = [],
+        ? array $defaults = [],
+        ? int $index = null
+    ) : void
+    {
+        if( empty( $valueArr )) {
+            $valueArr = [];
+        }
+        $params2 = ParameterFactory::setParams( $params, $defaults );
+        if( null === $index ) { // i.e. next
+            $valueArr[] = [
+                Util::$LCvalue  => $value,
+                Util::$LCparams => $params2,
+            ];
+            return;
+        }
+        --$index;
+        if( isset( $valueArr[$index] )) { // replace
+            $valueArr[$index] = [
+                Util::$LCvalue  => $value,
+                Util::$LCparams => $params2,
+            ];
+            return;
+        }
+        $valueArr[$index] = [
+            Util::$LCvalue  => $value,
+            Util::$LCparams => $params2,
+        ];
+        ksort( $valueArr ); // order
     }
 }

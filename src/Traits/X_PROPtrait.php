@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2021 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -45,14 +45,14 @@ use function strtoupper;
 /**
  * X-property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.40.11 2022-01-15
  */
 trait X_PROPtrait
 {
     /**
-     * @var null|array component property X-property value
+     * @var null|mixed[] component property X-property value
      */
-    protected ?array $xprop = null;
+    protected ? array $xprop = null;
 
     /**
      * Return formatted output for calendar/component property x-prop
@@ -168,10 +168,14 @@ trait X_PROPtrait
      * @param null|string $propName
      * @param null|int    $propIx    specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|array
+     * @return bool|string|mixed[]
      * @since  2.27.11 - 2019-01-02
      */
-    public function getXprop( ? string $propName = null, ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
+    public function getXprop(
+        ? string $propName = null,
+        ? int $propIx = null,
+        ? bool $inclParam = false
+    ) : bool | string | array
     {
         if( empty( $this->xprop )) {
             foreach( $this->propIx as $propName2 => $v ) {
@@ -186,7 +190,7 @@ trait X_PROPtrait
             if( ! isset( $this->xprop[$propName] )) {
                 return false;
             }
-            return ( $inclParam )
+            return $inclParam
                 ? [ $propName, $this->xprop[$propName], ]
                 : [ $propName, $this->xprop[$propName][Util::$LCvalue], ];
         }
@@ -200,7 +204,7 @@ trait X_PROPtrait
         $xpropNo = 0;
         foreach( $this->xprop as $xpropKey => $xpropValue ) {
             if( $propIx === $xpropNo ) {
-                return ( $inclParam )
+                return $inclParam
                     ? [ $xpropKey, $this->xprop[$xpropKey], ]
                     : [ $xpropKey, $this->xprop[$xpropKey][Util::$LCvalue], ];
             }
@@ -212,19 +216,15 @@ trait X_PROPtrait
     /**
      * Set calendar property x-prop
      *
-     * @param string   $xPropName
+     * @param string        $xPropName
      * @param null|int|float|string  $value
-     * @param null|string[] $params     optional
+     * @param null|mixed[]  $params     optional
      * @return static
      * @throws InvalidArgumentException
      * @since 2.29.14 2019-09-03
      * @todo more value typed asserts ??
      */
-    public function setXprop(
-        string $xPropName,
-        null|int|float|string $value = null,
-        ? array $params = []
-    ) : static
+    public function setXprop( string $xPropName, null|int|float|string $value = null, ? array $params = [] ) : static
     {
         static $MSG = 'Invalid X-property name : \'%s\'';
         if( empty( $xPropName ) || ! StringFactory::isXprefixed( $xPropName )) {
@@ -244,7 +244,7 @@ trait X_PROPtrait
         }
         $xprop = [
             Util::$LCvalue  => (string) $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ?? [] )
+            Util::$LCparams => ParameterFactory::setParams( $params )
         ];
         if( ! is_array( $this->xprop )) {
             $this->xprop = [];
