@@ -814,17 +814,11 @@ class Prop2TextMultiTest extends DtBase
         foreach( $propComps as $propName => $theComps ) {
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
-                switch( true ) {
-                    case ( IcalInterface::AVAILABLE === $theComp ) :
-                        $comp = $c->newVavailability()->{$newMethod}();
-                        break;
-                    case ( IcalInterface::PARTICIPANT === $theComp ) :
-                        $comp = $c->newVevent()->{$newMethod}();
-                        break;
-                    default :
-                        $comp = $c->{$newMethod}();
-                        break;
-                }
+                $comp = match ( true ) {
+                    IcalInterface::AVAILABLE === $theComp   => $c->newVavailability()->{$newMethod}(),
+                    IcalInterface::PARTICIPANT === $theComp => $c->newVevent()->{$newMethod}(),
+                    default                                 => $c->{$newMethod}(),
+                };
                 $this->propNameTest(
                     $case . '-2',
                     $comp,
@@ -970,5 +964,144 @@ class Prop2TextMultiTest extends DtBase
             $instance->{$setMethod}( $value, $params );
             $instance->{$setMethod}( $value, $params );
         }
+    }
+
+    /**
+     * Testing value TEXT (MULTI) properties multi read
+     *
+     * @test
+     */
+    public function textMultiTest3() : void
+    {
+        $calendar = Vcalendar::factory();
+        for( $x = 1; $x <= 5; ++$x ) {
+            $calendar->setDescription( 'Description ' . $x );
+            $calendar->setXprop( 'x-' . $x, $x );
+        }
+
+        $cnt1 = 0;
+        while( false !== $calendar->getDescription()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $calendar->getDescription()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt2,
+            '#1a multi Vcalendar::getDescripton() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#1b double multi Vcalendar::getDescripton() session counts do not match'
+        );
+
+        $cnt1 = 0;
+        while( false !== $calendar->getXprop()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $calendar->getXprop()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt1,
+            '#2a multi Vcalendar::getXprop() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#2b double multi Vcalendar::getXprop() session counts do not match'
+        );
+
+        $event = $calendar->newVevent();
+        for( $x = 1; $x <= 5; ++$x ) {
+            $event->setComment( 'Comment ' . $x );
+            $event->setXprop( 'x-' . $x, $x );
+        }
+
+        $cnt1 = 0;
+        while( false !== $event->getComment()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $event->getComment()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt1,
+            '#3a multi Vevent::getComment() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#3b double multi Vevent::getComment() session counts do not match'
+        );
+
+        $cnt1 = 0;
+        while( false !== $event->getXprop()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $event->getXprop()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt1,
+            '#4a multi Vevent::getXprop() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#4b double multi Vevent::getXprop() session counts do not match'
+        );
+
+        $alarm = $event->newValarm();
+        for( $x = 1; $x <= 5; ++$x ) {
+            $alarm->setAttach( 'https://test' . $x . 'info/doloribus-fuga-optio-enim-doloremque-consectetur.html');
+            $alarm->setXprop( 'x-' . $x, $x );
+        }
+        $cnt1 = 0;
+        while( false !== $alarm->getAttach()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $alarm->getAttach()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt1,
+            '#5a multi Valarm::getAttach() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#5b double multi Valarm::getAttach() session counts do not match'
+        );
+
+        $cnt1 = 0;
+        while( false !== $alarm->getXprop()) {
+            ++$cnt1;
+        }
+        $cnt2 = 0;
+        while( false !== $alarm->getXprop()) {
+            ++$cnt2;
+        }
+        $this->assertSame(
+            5,
+            $cnt1,
+            '#6a multi Valarm::getXprop() counts is NOT 5'
+        );
+        $this->assertSame(
+            $cnt1,
+            $cnt2,
+            '#6b double multi Valarm::getXprop() session counts do not match'
+        );
     }
 }

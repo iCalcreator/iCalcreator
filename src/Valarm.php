@@ -31,14 +31,13 @@ namespace Kigkonsult\Icalcreator;
 
 use Exception;
 
-use Kigkonsult\Icalcreator\Traits\DURATIONtrait;
 use function sprintf;
 use function strtoupper;
 
 /**
  * iCalcreator VALARM component class
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.29 2022-02-24
  */
 final class Valarm extends CalendarComponent
 {
@@ -100,49 +99,36 @@ final class Valarm extends CalendarComponent
 
     /**
      * Return Vlocation object instance
-     *
-     * @param null|string $locationtype  property LOCATION-TYPE value
-     * @param null|string[] $params      dito params
-     * @return Vlocation
-     * @since  2.41.11 - 2022-01-26
      */
-    public function newVlocation( ? string $locationtype = null, ? array $params = [] ) : Vlocation
-    {
-        $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vlocation( $this->getConfig());
-        $this->components[$ix]->getUid();
-        if( null !== $locationtype ) {
-            $this->components[$ix]->setLocationtype( $locationtype, $params );
-        }
-        return $this->components[$ix];
-    }
+    use Traits\NewVlocationTrait;
 
     /**
      * Return formatted output for calendar component VALARM object instance
      *
      * @return string
      * @throws Exception  (on Duration/Trigger err)
-     * @since 2.41.3 2022-01-17
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createRelatedto();
-        $component  .= $this->createAction();
-        $component  .= $this->createAttach();
-        $component  .= $this->createAttendee();
-        $component  .= $this->createDescription();
-        $component  .= $this->createStyleddescription();
-        $component  .= $this->createProximity();
-        $component  .= $this->createDuration();
-        $component  .= $this->createRepeat();
-        $component  .= $this->createSummary();
-        $component  .= $this->createTrigger();
-        $component  .= $this->createAcknowledged();
-        $component  .= $this->createXprop();
-        $component  .= $this->createSubComponent();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createRelatedto().
+            $this->createAction() .
+            $this->createAttach() .
+            $this->createAttendee() .
+            $this->createDescription() .
+            $this->createStyleddescription() .
+            $this->createProximity() .
+            $this->createDuration() .
+            $this->createRepeat() .
+            $this->createSummary() .
+            $this->createTrigger() .
+            $this->createAcknowledged() .
+            $this->createXprop() .
+            $this->createSubComponent() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

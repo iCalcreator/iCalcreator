@@ -74,18 +74,12 @@ class DtBase extends TestCase
 
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
-            switch( true ) {
-                case ( IcalInterface::PARTICIPANT === $theComp ) :
-                    $comp   = $c->newVevent()->{$newMethod}()
-                        ->setDtstamp( $value, $params );
-                    break;
-                case ( IcalInterface::AVAILABLE === $theComp ) :
-                    $comp   = $c->newVavailability()->{$newMethod}();
-                    break;
-                default :
-                    $comp = $c->{$newMethod}();
-                    break;
-            }
+            $comp = match ( true ) {
+                IcalInterface::PARTICIPANT === $theComp => $c->newVevent()->{$newMethod}()
+                    ->setDtstamp( $value, $params ),
+                IcalInterface::AVAILABLE === $theComp   => $c->newVavailability()->{$newMethod}(),
+                default                                 => $c->{$newMethod}(),
+            };
             foreach( $props as $propName ) {
                 $getMethod    = StringFactory::getGetMethodName( $propName );
                 $createMethod = StringFactory::getCreateMethodName( $propName );

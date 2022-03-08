@@ -45,7 +45,7 @@ use function strtoupper;
 /**
  * X-property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since  2.41.30 - 2022-03-04
  */
 trait X_PROPtrait
 {
@@ -169,7 +169,7 @@ trait X_PROPtrait
      * @param null|int    $propIx    specific property in case of multiply occurrence
      * @param null|bool   $inclParam
      * @return bool|string|mixed[]
-     * @since  2.27.11 - 2019-01-02
+     * @since  2.41.30 - 2022-03-04
      */
     public function getXprop(
         ? string $propName = null,
@@ -210,6 +210,7 @@ trait X_PROPtrait
             }
             $xpropNo++;
         } // end foreach
+        unset( $this->propIx[$propName] );
         return false; // not found ??
     }
 

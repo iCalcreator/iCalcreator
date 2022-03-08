@@ -42,7 +42,7 @@ use Kigkonsult\Icalcreator\VAcomponent;
 /**
  * DTEND property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.28 2022-02-20
  */
 trait DTENDtrait
 {
@@ -120,7 +120,7 @@ trait DTENDtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.28 2022-02-20
      */
     public function setDtend( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
     {
@@ -148,7 +148,8 @@ trait DTENDtrait
             ParameterFactory::setParams(
                 $params,
                 DateTimeFactory::$DEFAULTVALUEDATETIME
-            )
+            ),
+            ( self::VFREEBUSY === $this->getCompType()) // $forceUTC
         );
         if( ! empty( $dtstart ) && ( Util::issetAndNotEmpty( $dtstart, Util::$LCvalue ))) {
             DateTimeFactory::assertDatesAreInSequence(

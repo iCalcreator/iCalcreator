@@ -87,11 +87,10 @@ class VtimezonePopulateFactoryTest extends DtBase
     {
         $calendar1 = new Vcalendar();
 
-        $event     = $calendar1->newVevent()->setDtstart( DATEYmdTHis );
-        $vtimezone = $calendar1->newVtimezone(); // will force removal in vtimezonePopulate
+        $event     = $calendar1->newVevent( DATEYmdTHis );
+        $vtimezone = $calendar1->newVtimezone(); // will below force removal in vtimezonePopulate
 
         $calendar2 = $calendar1->vtimezonePopulate();
-//      $calendar2 = VtimezonePopulateFactory::process( $calendar1 );
 
         $vtimezone = $calendar2->getComponent( IcalInterface::VTIMEZONE );
 
@@ -286,7 +285,8 @@ class VtimezonePopulateFactoryTest extends DtBase
         }
 
         foreach( $dtstarts as $dtstartValue ) {
-            $e = $calendar1->newVevent()->setDtstart( $dtstartValue );
+//          $e = $calendar1->newVevent( $dtstartValue );
+            $vav = $calendar1->newVavailability( $dtstartValue );
         }
 
         $c2 = VtimezonePopulateFactory::process( // with TZUNTIL set!!

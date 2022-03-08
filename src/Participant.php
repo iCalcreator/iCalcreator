@@ -37,7 +37,7 @@ use function strtoupper;
 /**
  * iCalcreator PARTICIPANT component class
  *
- * @since 2.41.4 2022-01-18
+ * @since 2.41.29 2022-02-24
  */
 final class Participant extends Vcomponent
 {
@@ -133,39 +133,40 @@ final class Participant extends Vcomponent
      *
      * @return string
      * @throws Exception
-     * @since 2.41.4 2022-01-18
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createParticipanttype();
-        $component  .= $this->createCalendaraddress();
-        $component  .= $this->createContact();
-        $component  .= $this->createLocation();
-        $component  .= $this->createCreated();
-        $component  .= $this->createSummary();
-        $component  .= $this->createDescription();
-        $component  .= $this->createStyleddescription();
-        $component  .= $this->createStructureddata();
-        $component  .= $this->createGeo();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createPriority();
-        $component  .= $this->createSequence();
-        $component  .= $this->createStatus();
-        $component  .= $this->createUrl();
-        $component  .= $this->createAttach();
-        $component  .= $this->createCategories();
-        $component  .= $this->createComment();
-        $component  .= $this->createRequeststatus();
-        $component  .= $this->createRelatedto();
-        $component  .= $this->createResources();
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createParticipanttype() .
+            $this->createCalendaraddress() .
+            $this->createContact() .
+            $this->createLocation() .
+            $this->createCreated() .
+            $this->createSummary() .
+            $this->createDescription() .
+            $this->createStyleddescription() .
+            $this->createStructureddata() .
+            $this->createGeo() .
+            $this->createLastmodified() .
+            $this->createPriority() .
+            $this->createSequence() .
+            $this->createStatus() .
+            $this->createUrl() .
+            $this->createAttach() .
+            $this->createCategories() .
+            $this->createComment() .
+            $this->createRequeststatus() .
+            $this->createRelatedto() .
+            $this->createResources() .
 //      strucloc
 //      strucres
-        $component  .= $this->createXprop();
-        $component  .= $this->createSubComponent();
-        return $component . sprintf( self::$FMTEND, $compType );
+            $this->createXprop() .
+            $this->createSubComponent() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

@@ -608,7 +608,7 @@ class Prop1TextSingleTest extends DtBase
         string $expectedString
     ) : void
     {
-        $c = new Vcalendar();
+        $c        = new Vcalendar();
         $urlIsSet = false;
         foreach( $propComps as $propName => $theComps ) {
             if( IcalInterface::SOURCE === $propName ) {
@@ -648,31 +648,56 @@ class Prop1TextSingleTest extends DtBase
                 if( IcalInterface::GEO === $propName ) {
                     $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
                 }
+
+                elseif(( IcalInterface::LOCATION === $propName ) &&
+                    in_array( $theComp, [ IcalInterface::VEVENT, IcalInterface::VTODO ], true ) ) {
+                    $vlocation = $comp->newVlocation()->setName( $value );
+                    $comp->vlocationNames2Location();
+                    $location  = $comp->getLocation( true );
+                    $this->assertEquals(
+                        $value,
+                        $location[Util::$LCvalue],
+                        sprintf( self::$ERRFMT, null, $case . '-1a1', __FUNCTION__, $theComp, $getMethod )
+                    );
+                    $this->assertTrue(
+                        isset( $location[Util::$LCparams][Vcalendar::X_VLOCATIONID] ),
+                        sprintf( self::$ERRFMT, null, $case . '-1a2', __FUNCTION__, $theComp, $getMethod )
+                    );
+                    $comp->deleteLocation();
+                    // while( false !== $comp->deleteLocation()) {
+                    //    continue;
+                    // };
+                    $comp->setLocation( $value, $params );  // overwrite
+                } // end elseif
                 else {
                     $comp->{$setMethod}( $value, $params );
                 }
                 if( IcalInterface::CALENDAR_ADDRESS === $propName ) {
                     $vevent->participants2Attendees();
-                    $attendee = $vevent->getAttendee();
+                    $attendee = $vevent->getAttendee( null, true );
                     $this->assertEquals(
                         $value,
-                        $attendee,
-                        sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
+                        $attendee[Util::$LCvalue],
+                        sprintf( self::$ERRFMT, null, $case . '-1b1', __FUNCTION__, $theComp, $getMethod )
+                    );
+                    $this->assertTrue(
+                        isset( $attendee[Util::$LCparams][Vcalendar::X_PARTICIPANTID] ),
+                        sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 elseif( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
                     $vevent->newParticipant()->{$newMethod}()->{$setMethod}( $value, $params );
                 }
 
-
                 $getValue = $comp->{$getMethod}( true );
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $getMethod ) .
+                        ', got : ' . var_export( $getValue, true ) . ', exp : ' . var_export( $expectedGet, true )
                 );
 
-                $createString   = str_replace( self::$EOLCHARS , null, $comp->{$createMethod}() );
+                $createString   = str_replace( self::$EOLCHARS , null, $comp->{$createMethod}());
                 $createString   = str_replace( '\,', ',', $createString );
                 $this->assertEquals(
                     $expectedString,

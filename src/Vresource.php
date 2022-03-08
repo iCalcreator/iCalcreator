@@ -37,7 +37,7 @@ use function strtoupper;
 /**
  * iCalcreator Vlocation component class
  *
- * @since 2.41.7 2022-01-20
+ * @since 2.41.29 2022-02-24
  */
 final class Vresource extends CalendarComponent
 {
@@ -93,19 +93,20 @@ final class Vresource extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Duration/Trigger err)
-     * @since 2.41.7 2022-01-20
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDescription();
-        $component  .= $this->createGeo();
-        $component  .= $this->createName();
-        $component  .= $this->createResourcetype();
-        $component  .= $this->createStructureddata();
-        $component  .= $this->createXprop();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDescription() .
+            $this->createGeo() .
+            $this->createName() .
+            $this->createResourcetype() .
+            $this->createStructureddata() .
+            $this->createXprop() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

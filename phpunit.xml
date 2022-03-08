@@ -38,6 +38,7 @@
     <testsuites>
         <testsuite name="Vcalendar Tests">
             <file>test/VcalendarTest.php</file>
+            <file>test/FactoryCompTest.php</file>
         </testsuite>
         <testsuite name="Date Tests">
             <file>test/Exception1Test.php</file>
@@ -147,6 +148,7 @@
             <file>src/Traits/LOCATIONTYPErfc9073trait.php</file>
             <file>src/Traits/METHODtrait.php</file>
             <file>src/Traits/NAMErfc7986trait.php</file>
+            <file>src/Traits/NewVlocationTrait.php</file>
             <file>src/Traits/ORGANIZERtrait.php</file>
             <file>src/Traits/Participants2AttendeesTrait.php</file>
             <file>src/Traits/PERCENT_COMPLETEtrait.php</file>

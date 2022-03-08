@@ -72,13 +72,16 @@ class SelectComponentsTest extends TestCase
                 "Europe/Stockholm"
             );
 
-        // create a new event
-        $event1 = $vcalendar->newVevent()
+        // create a new event with dtstart, dtend and summary
+        $event1 = $vcalendar->newVevent(
+            new DateTime( '20190421T090000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190421T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            null.
+            'Scheduled meeting with six occurrences'
+        )
             ->setTransp( IcalInterface::OPAQUE )
             ->setClass( IcalInterface::P_BLIC )
             ->setSequence( 1 )
-            // describe the event
-            ->setSummary( 'Scheduled meeting with six occurrences' )
             ->setDescription(
                 'Agenda for the the meeting...',
                 [ IcalInterface::ALTREP => 'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
@@ -86,19 +89,6 @@ class SelectComponentsTest extends TestCase
             ->setComment( 'It\'s going to be fun..' )
             ->setLocation( 'Kafé Ekorren Stockholm' )
             ->setGeo( '59.32206', '18.12485' )
-            // set the time
-            ->setDtstart(
-                new DateTime(
-                    '20190421T090000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
-            ->setDtend(
-                new DateTime(
-                    '20190421T100000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
             // with recurrence rule
             ->setRrule(
                 [
@@ -179,14 +169,17 @@ class SelectComponentsTest extends TestCase
             );
 
         // add an alarm for the event
-        $alarm = $event1->newValarm()
-            ->setAction( IcalInterface::DISPLAY )
-            ->setDescription( $event1->getDescription() )
-            // fire off the alarm one day before
-            ->setTrigger( '-P1D' );
+        // fire off the alarm one day before
+        $alarm = $event1->newValarm(IcalInterface::DISPLAY, '-P1D' )
+            ->setDescription( $event1->getDescription());
 
         // alter day and time for one event in recurrence set
-        $event2 = $vcalendar->newVevent()
+        // the altered day and time with duration
+        $event2 = $vcalendar->newVevent(
+            new DateTime( '20190504T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            null,
+            'PT2H'
+        )
             ->setTransp( IcalInterface::OPAQUE )
             ->setClass( IcalInterface::P_BLIC )
             // reference to one event in recurrence set
@@ -200,14 +193,6 @@ class SelectComponentsTest extends TestCase
                 [ IcalInterface::ALTREP => 'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
             )
             ->setComment( 'Now we are working hard for two hours' )
-            // the altered day and time with duration
-            ->setDtstart(
-                new DateTime(
-                    '20190504T100000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
-            ->setDuration( 'PT2H' )
             // add alarm (i.e. same as event1)
             ->setComponent( $event1->getComponent( IcalInterface::VALARM ) );
 
@@ -245,11 +230,15 @@ class SelectComponentsTest extends TestCase
             );
 
         // create a new todo
-        $todo1 = $vcalendar->newVtodo()
+        $todo1 = $vcalendar->newVtodo(
+            new DateTime( '20190421T090000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190421T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            null,
+            'Scheduled meeting with six occurrences'
+        )
             ->setClass( IcalInterface::P_BLIC )
             ->setSequence( 1 )
             // describe the event
-            ->setSummary( 'Scheduled meeting with six occurrences' )
             ->setDescription(
                 'Agenda for the the meeting...',
                 [ IcalInterface::ALTREP => 'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
@@ -257,19 +246,6 @@ class SelectComponentsTest extends TestCase
             ->setComment( 'It\'s going to be fun..' )
             ->setLocation( 'Kafé Ekorren Stockholm' )
             ->setGeo( '59.32206', '18.12485' )
-            // set the time
-            ->setDtstart(
-                new DateTime(
-                    '20190421T090000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
-            ->setDue(
-                new DateTime(
-                    '20190421T100000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
             // with recurrence rule
             ->setRrule(
                 [
@@ -344,14 +320,17 @@ class SelectComponentsTest extends TestCase
                 ]
             );
         // add an alarm for the todo
-        $alarm = $todo1->newValarm()
-            ->setAction( IcalInterface::DISPLAY )
-            ->setDescription( $todo1->getDescription() )
-            // fire off the alarm one day before
-            ->setTrigger( '-P1D' );
+        // fire off the alarm one day before
+        $alarm = $todo1->newValarm( IcalInterface::DISPLAY, '-P1D' )
+            ->setDescription( $todo1->getDescription());
 
         // alter day and time for one todo in recurrence set
-        $event2 = $vcalendar->newVtodo()
+        // the altered day and time with duration
+        $event2 = $vcalendar->newVtodo(
+            new DateTime( '20190504T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            null,
+            'PT2H'
+        )
             ->setClass( IcalInterface::P_BLIC )
             // reference to one event in recurrence set
             ->setUid( $todo1->getUid() )
@@ -364,14 +343,6 @@ class SelectComponentsTest extends TestCase
                 [ IcalInterface::ALTREP => 'CID:<FFFF__=0ABBE548DFE235B58f9e8a93d@coffeebean.com>' ]
             )
             ->setComment( 'Now we are working hard for two hours' )
-            // the altered day and time with duration
-            ->setDtstart(
-                new DateTime(
-                    '20190504T100000',
-                    new DateTimeZone( 'Europe/Stockholm' )
-                )
-            )
-            ->setDuration( 'PT2H' )
             // add alarm (i.e. same as event1)
             ->setComponent( $todo1->getComponent( IcalInterface::VALARM ) );
 

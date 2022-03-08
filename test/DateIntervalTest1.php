@@ -328,17 +328,11 @@ class DateIntervalTest1 extends DtBase
 
         foreach( $compProp as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
-            switch( true ) {
-                case ( IcalInterface::AVAILABLE === $theComp ) :
-                    $comp   = $c->newVavailability()->{$newMethod}();
-                    break;
-                case ( IcalInterface::VALARM === $theComp ) :
-                    $comp   = $c->newVevent()->{$newMethod}();
-                    break;
-                default :
-                    $comp   = $c->{$newMethod}();
-                    break;
-            }
+            $comp = match ( true ) {
+                IcalInterface::AVAILABLE === $theComp => $c->newVavailability()->{$newMethod}(),
+                IcalInterface::VALARM === $theComp    => $c->newVevent()->{$newMethod}(),
+                default                               => $c->{$newMethod}(),
+            };
             foreach( $props as $propName ) {
                 $getMethod    = StringFactory::getGetMethodName( $propName );
                 $createMethod = StringFactory::getCreateMethodName( $propName );

@@ -38,7 +38,7 @@ use function strtoupper;
 /**
  * iCalcreator VTIMEZONE component class
  *
- * @since 2.41.1 2022-01-15
+ * @since 2.41.29 2022-02-24
  */
 final class Vtimezone extends CalendarComponent
 {
@@ -107,27 +107,28 @@ final class Vtimezone extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since 2.41.1 2022-01-15
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createTzid();
-        $component  .= $this->createTzidAliasOf();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createTzurl();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createTzoffsetfrom();
-        $component  .= $this->createTzoffsetto();
-        $component  .= $this->createComment();
-        $component  .= $this->createRdate();
-        $component  .= $this->createRrule();
-        $component  .= $this->createTzname();
-        $component  .= $this->createTzuntil();
-        $component  .= $this->createXprop();
-        $component  .= $this->createSubComponent();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createTzid() .
+            $this->createTzidAliasOf() .
+            $this->createLastmodified() .
+            $this->createTzurl() .
+            $this->createDtstart() .
+            $this->createTzoffsetfrom() .
+            $this->createTzoffsetto() .
+            $this->createComment() .
+            $this->createRdate() .
+            $this->createRrule() .
+            $this->createTzname() .
+            $this->createTzuntil() .
+            $this->createXprop() .
+            $this->createSubComponent() .
+            sprintf( self::$FMTEND, $compType );
     }
 
     /**

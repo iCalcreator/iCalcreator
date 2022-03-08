@@ -37,7 +37,7 @@
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.16' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.30' );
 
 /**
  * load iCalcreator src and support classes and Traits

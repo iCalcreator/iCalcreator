@@ -35,13 +35,15 @@ use Exception;
 use InvalidArgumentException;
 
 use function array_keys;
+use function sprintf;
+use function strtoupper;
 
 /**
  * iCalcreator rfc7953 VAVAILABILITY component class
  *
- * @since 2.41.9 2022-01-22
+ * @since 2.41.29 2022-02-24
  */
-class Vavailability extends VAcomponent
+final class Vavailability extends VAcomponent
 {
     // the following are OPTIONAL but MUST NOT occur more than once (and NOT declared in VAcomponent)
     use Traits\BUSYTYPErfc7953trait;
@@ -128,7 +130,7 @@ class Vavailability extends VAcomponent
         if( null !== $dtend ) {
             $this->components[$ix]->setDtend( $dtend );
         }
-        if( null !== $duration ) {
+        elseif( null !== $duration ) {
             $this->components[$ix]->setDuration( $duration );
         }
         return $this->components[$ix];
@@ -139,32 +141,34 @@ class Vavailability extends VAcomponent
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createBusytype();
-        $component  .= $this->createCategories();
-        $component  .= $this->createClass();
-        $component  .= $this->createCreated();
-        $component  .= $this->createSummary();
-        $component  .= $this->createDescription();
-        $component  .= $this->createComment();
-        $component  .= $this->createContact();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createDtend();
-        $component  .= $this->createDuration();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createLocation();
-        $component  .= $this->createOrganizer();
-        $component  .= $this->createPriority();
-        $component  .= $this->createSequence();
-        $component  .= $this->createUrl();
-        $component  .= $this->createXprop();
-        $component  .= $this->createSubComponent();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createBusytype() .
+            $this->createCategories() .
+            $this->createClass() .
+            $this->createCreated() .
+            $this->createSummary() .
+            $this->createDescription() .
+            $this->createComment() .
+            $this->createContact() .
+            $this->createDtstart() .
+            $this->createDtend() .
+            $this->createDuration() .
+            $this->createLastmodified() .
+            $this->createLocation() .
+            $this->createOrganizer() .
+            $this->createPriority() .
+            $this->createSequence() .
+            $this->createUrl() .
+            $this->createXprop() .
+            $this->createSubComponent() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

@@ -3,34 +3,23 @@
 is the PHP class package managing
 
 > iCal calendar information
-- [rfc2445]
-  - Internet Calendaring and Scheduling Core Object Specification (iCalendar)
- 
-- [rfc5545]
-  - Internet Calendaring and Scheduling Core Object Specification (iCalendar)
 
-
-- [rfc5870] 
-  - A Uniform Resource Identifier for Geographic Locations ('geo' URI)
-- [rfc6321]
-  - xCal: The XML Format for iCalendar
-- [rfc6868]
-  - Parameter Value Encoding in iCalendar and vCard
-- [rfc7529]
-  - Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)
-- [rfc7808]
-  - Time Zone Data Distribution Service
-- [rfc7953]
-  - Calendar Availability
-- [rfc7986]
-  - New Properties for iCalendar
-- [rfc9073]
-  - Event Publishing Extensions to iCalendar
-- [rfc9074]
-  - VALARM Extensions for iCalendar
+| |supporting|
+|---|---|
+|[rfc2445]|Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
+|[rfc5545]|Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
+|[rfc5870]|A Uniform Resource Identifier for Geographic Locations ('geo' URI)|
+|[rfc6321]|xCal: The XML Format for iCalendar|
+|[rfc6868]|Parameter Value Encoding in iCalendar and vCard|
+|[rfc7529]|Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
+|[rfc7808]|Time Zone Data Distribution Service|
+|[rfc7953]|Calendar Availability|
+|[rfc7986]|New Properties for iCalendar|
+|[rfc9073]|Event Publishing Extensions to iCalendar|
+|[rfc9074]|VALARM Extensions for iCalendar|
 
 operating on calendar and
-calendar events, reports, todos, journaling, participants, locations, resources, availability and timezone data.
+calendar event, todo, journal, freebusy, participant, location, resource, availability and timezone data.
 
 ~~~~~~~~
 
@@ -51,11 +40,11 @@ Please review
 
 ###### Builds
 
-v2.41.16 - v2.42 pre-release
+v2.41.30 - v2.42 pre-release
 
 v2.40 - stable PHP8
 
-v2.39 - PHP7 (tag)
+v2.39 - PHP7
 
 Assert PHP compability using [PHPCompatibility] and [PHPStan].
 
@@ -88,7 +77,6 @@ In your composer.json:
     }
 }
 ```
-For PHP7 use 2.39.
 
 ###### License
 

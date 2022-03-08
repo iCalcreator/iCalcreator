@@ -37,12 +37,13 @@ use function strtoupper;
 /**
  * iCalcreator VFREEBUSY component class
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.29 2022-02-24
  */
 final class Vfreebusy extends V2component
 {
     use Traits\ATTENDEEtrait;
     use Traits\Participants2AttendeesTrait;
+    use Traits\SubCompsGetTrait;
     use Traits\COMMENTtrait;
     use Traits\CONTACTtrait;
     use Traits\DTENDtrait;
@@ -103,26 +104,27 @@ final class Vfreebusy extends V2component
      *
      * @return string
      * @throws Exception  (on Duration/Freebusy err)
-     * @since 2.41.3 2022-01-17
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createAttendee();
-        $component  .= $this->createStyleddescription();
-        $component  .= $this->createComment();
-        $component  .= $this->createContact();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createDtend();
-        $component  .= $this->createDuration();
-        $component  .= $this->createFreebusy();
-        $component  .= $this->createOrganizer();
-        $component  .= $this->createRequeststatus();
-        $component  .= $this->createUrl();
-        $component  .= $this->createXprop();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createAttendee() .
+            $this->createStyleddescription() .
+            $this->createComment() .
+            $this->createContact() .
+            $this->createDtstart() .
+            $this->createDtend() .
+            $this->createDuration() .
+            $this->createFreebusy() .
+            $this->createOrganizer() .
+            $this->createRequeststatus() .
+            $this->createUrl() .
+            $this->createXprop() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

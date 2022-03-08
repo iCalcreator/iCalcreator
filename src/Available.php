@@ -37,7 +37,7 @@ use function strtoupper;
 /**
  * iCalcreator rfc7953 Available component class
  *
- * @since 2.41.9 2022-01-22
+ * @since 2.41.29 2022-02-24
  */
 final class Available extends VAcomponent
 {
@@ -62,11 +62,6 @@ final class Available extends VAcomponent
      */
     public function __destruct()
     {
-        if( ! empty( $this->components )) {
-            foreach( $this->components as $cix => $component ) {
-                $this->components[$cix]->__destruct();
-            }
-        }
         unset(
             $this->compType,
             $this->xprop,
@@ -107,31 +102,32 @@ final class Available extends VAcomponent
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since 2.41.3 2022-01-17
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createCategories();
-        $component  .= $this->createComment();
-        $component  .= $this->createContact();
-        $component  .= $this->createCreated();
-        $component  .= $this->createDescription();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createDtend();
-        $component  .= $this->createDuration();
-        $component  .= $this->createExdate();
-        $component  .= $this->createRrule();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createLocation();
-        $component  .= $this->createRdate();
-        $component  .= $this->createRrule();
-        $component  .= $this->createRecurrenceid();
-        $component  .= $this->createSummary();
-        $component  .= $this->createXprop();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createCategories() .
+            $this->createComment() .
+            $this->createContact() .
+            $this->createCreated() .
+            $this->createDescription() .
+            $this->createDtstart() .
+            $this->createDtend() .
+            $this->createDuration() .
+            $this->createExdate() .
+            $this->createRrule() .
+            $this->createLastmodified() .
+            $this->createLocation() .
+            $this->createRdate() .
+            $this->createRrule() .
+            $this->createRecurrenceid() .
+            $this->createSummary() .
+            $this->createXprop() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

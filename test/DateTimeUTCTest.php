@@ -460,7 +460,7 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
+        $dateTime  = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
         $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, IcalInterface::UTC );
         $dataArr[] = [
             11013,
@@ -473,7 +473,7 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
-        $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
+        $dateTime  = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
         $dateTime2 = DateTimeFactory::setDateTimeTimeZone( clone $dateTime, IcalInterface::UTC );
         $dataArr[] = [
             11014,
@@ -588,7 +588,6 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
-
         return $dataArr;
     }
 
@@ -666,10 +665,10 @@ class DateTimeUTCTest extends DtBase
             IcalInterface::VFREEBUSY => [ IcalInterface::FREEBUSY ],
         ];
         $this->theFreebusyTestMethodDate(
-            $case, $compsProps, $value, $params, $expectedGet, $expectedString
+            $case, $compsProps, clone $value, $params, $expectedGet, $expectedString
         );
         $this->theFreebusyTestMethodDateInterval(
-            $case, $compsProps, $value, $params, $expectedGet, $expectedString
+            $case, $compsProps, clone $value, $params, $expectedGet, $expectedString
         );
     }
 

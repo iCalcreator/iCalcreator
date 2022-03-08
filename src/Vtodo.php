@@ -38,13 +38,12 @@ use function strtoupper;
 /**
  * iCalcreator VTODO component class
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.29 2022-02-24
  */
 final class Vtodo extends V3component
 {
     use Traits\ATTACHtrait;
     use Traits\ATTENDEEtrait;
-    use Traits\Participants2AttendeesTrait;
     use Traits\CATEGORIEStrait;
     use Traits\CLASStrait;
     use Traits\COLORrfc7986trait;
@@ -157,51 +156,52 @@ final class Vtodo extends V3component
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since 2.41.3 2022-01-17
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createAttach();
-        $component  .= $this->createAttendee();
-        $component  .= $this->createCategories();
-        $component  .= $this->createClass();
-        $component  .= $this->createColor();
-        $component  .= $this->createComment();
-        $component  .= $this->createConference();
-        $component  .= $this->createCompleted();
-        $component  .= $this->createContact();
-        $component  .= $this->createCreated();
-        $component  .= $this->createDescription();
-        $component  .= $this->createStyleddescription();
-        $component  .= $this->createStructureddata();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createDue();
-        $component  .= $this->createDuration();
-        $component  .= $this->createExdate();
-        $component  .= $this->createExrule();
-        $component  .= $this->createImage();
-        $component  .= $this->createGeo();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createLocation();
-        $component  .= $this->createOrganizer();
-        $component  .= $this->createPercentcomplete();
-        $component  .= $this->createPriority();
-        $component  .= $this->createRdate();
-        $component  .= $this->createRelatedto();
-        $component  .= $this->createRequeststatus();
-        $component  .= $this->createRecurrenceid();
-        $component  .= $this->createResources();
-        $component  .= $this->createRrule();
-        $component  .= $this->createSequence();
-        $component  .= $this->createStatus();
-        $component  .= $this->createSummary();
-        $component  .= $this->createUrl();
-        $component  .= $this->createXprop();
-        $component  .= $this->createSubComponent();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createAttach() .
+            $this->createAttendee() .
+            $this->createCategories() .
+            $this->createClass() .
+            $this->createColor() .
+            $this->createComment() .
+            $this->createConference() .
+            $this->createCompleted() .
+            $this->createContact() .
+            $this->createCreated() .
+            $this->createDescription() .
+            $this->createStyleddescription() .
+            $this->createStructureddata() .
+            $this->createDtstart() .
+            $this->createDue() .
+            $this->createDuration() .
+            $this->createExdate() .
+            $this->createExrule() .
+            $this->createImage() .
+            $this->createGeo() .
+            $this->createLastmodified() .
+            $this->createLocation() .
+            $this->createOrganizer() .
+            $this->createPercentcomplete() .
+            $this->createPriority() .
+            $this->createRdate() .
+            $this->createRelatedto() .
+            $this->createRequeststatus() .
+            $this->createRecurrenceid() .
+            $this->createResources() .
+            $this->createRrule() .
+            $this->createSequence() .
+            $this->createStatus() .
+            $this->createSummary() .
+            $this->createUrl() .
+            $this->createXprop() .
+            $this->createSubComponent() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

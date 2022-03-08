@@ -110,7 +110,7 @@ trait GEOtrait
     /**
      * Get ISO6709 "Standard representation of geographic point location by coordinates"
      *
-     * Combining the LOCATION and GEO property values (only if GEO is set)
+     * Combining the (first) LOCATION and GEO property values (only if GEO is set)
      * @return bool|string
      * @since 2.27.14 2019-02-27
      */

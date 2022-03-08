@@ -27,53 +27,27 @@
  *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
 declare( strict_types = 1 );
-namespace Kigkonsult\Icalcreator;
+namespace Kigkonsult\Icalcreator\Traits;
 
-use Exception;
+use Kigkonsult\Icalcreator\Vlocation;
 
-/**
- * iCalcreator Vcomponents base class
- *
- * @since  2.27.6 - 2018-12-28
- */
-abstract class Vcomponent extends CalendarComponent
+trait NewVlocationTrait
 {
-    use Traits\DTSTAMPtrait;
-
-    /**
-     * Constructor for calendar component
-     *
-     * @overrides
-     * @param null|mixed[] $config
-     * @throws Exception
-     * @since  2.27.6 - 2018-12-28
-     */
-    public function __construct( ? array $config = [] )
-    {
-        parent::__construct( $config );
-        $this->setDtstamp();
-    }
-
     /**
      * Return Vlocation object instance
-     */
-    use Traits\NewVlocationTrait;
-
-    /**
-     * Return Vresource object instance
      *
-     * @param null|string $resourceType  property RESOURCE-TYPE value
+     * @param null|string $locationType  property LOCATION-TYPE value
      * @param null|string $name          property NAME value
-     * @return Vresource
-     * @since  2.41.21 - 2022-02-18
+     * @return Vlocation
+     * @since  2.41.18 - 2022-02-18
      */
-    public function newVresource( ? string $resourceType = null, ? string $name = null ) : Vresource
+    public function newVlocation( ? string $locationType = null, ? string $name = null ) : Vlocation
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vresource( $this->getConfig());
+        $this->components[$ix] = new Vlocation( $this->getConfig());
         $this->components[$ix]->getUid();
-        if( null !== $resourceType ) {
-            $this->components[$ix]->setResourcetype( $resourceType );
+        if( null !== $locationType ) {
+            $this->components[$ix]->setLocationtype( $locationType );
         }
         if( null !== $name ) {
             $this->components[$ix]->setName( $name );

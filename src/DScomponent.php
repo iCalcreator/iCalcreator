@@ -37,7 +37,7 @@ use function strtoupper;
 /**
  * iCalcreator (Vtimezone) Daylight/Standard base component class
  *
- * @since  2.29.11 - 2019-08-30
+ * @since 2.41.29 2022-02-24
  */
 abstract class DScomponent extends CalendarComponent
 {
@@ -90,20 +90,21 @@ abstract class DScomponent extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since  2.29.11 - 2019-08-30
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createTzname();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createTzoffsetfrom();
-        $component  .= $this->createTzoffsetto();
-        $component  .= $this->createRdate();
-        $component  .= $this->createRrule();
-        $component  .= $this->createComment();
-        $component  .= $this->createXprop();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createTzname() .
+            $this->createDtstart() .
+            $this->createTzoffsetfrom() .
+            $this->createTzoffsetto() .
+            $this->createRdate() .
+            $this->createRrule() .
+            $this->createComment() .
+            $this->createXprop() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

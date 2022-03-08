@@ -654,7 +654,7 @@ class RecurFactory
      *
      * @param Vcalendar  $calendar
      * @param string[]   $compTypes  component types to accept
-     * @return array
+     * @return string[]
      * @since 2.41.16 - 2022-02-01
      */
     public static function rruleRscaleCheck( Vcalendar $calendar, array $compTypes ) : array
@@ -1269,9 +1269,9 @@ class RecurFactory
     /**
      * Return updated date, array and timpstamp
      *
-     * @param mixed[]     $date     date to step
-     * @param string      $dateYMD  date YMD
-     * @param null|array  $step     default array( Util::$LCDAY => 1 )
+     * @param mixed[]      $date     date to step
+     * @param string       $dateYMD  date YMD
+     * @param null|mixed[] $step     default array( Util::$LCDAY => 1 )
      * @return void
      */
     private static function stepDate( array & $date, string & $dateYMD, ? array $step = null ) : void
@@ -1332,7 +1332,7 @@ class RecurFactory
      * @param mixed[] $wDate
      * @param mixed[] $recur
      * @param int     $wkst
-     * @return array
+     * @return mixed[]
      */
     private static function initDayCnts( array $wDate, array $recur, int $wkst ) : array
     {

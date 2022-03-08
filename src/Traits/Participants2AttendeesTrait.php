@@ -31,8 +31,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Vcalendar;
 
-use function array_flip;
-use function array_keys;
 use function in_array;
 
 trait Participants2AttendeesTrait
@@ -40,47 +38,27 @@ trait Participants2AttendeesTrait
     /**
      * Set subComponent Participants (calendaraddress) as Attendees, skip if set
      *
+     * Participant UID set as X-param x-participantid
+     * Used in V3component (Vevent, Vtodo ), VFreebusy, Vjournal
+     *
      * @return static
-     * @since 2.41.4 - 2022-02-05
+     * @since 2.41.17 - 2022-02-18
      */
     public function participants2Attendees() : static
     {
         if( ! in_array( $this->getCompType(), Vcalendar::$VCOMBS )) {
             return $this;
         }
-        $participants = [];
-        $pix = 0;
-        foreach( array_keys( $this->components ) as $cix ) {
-            if( self::PARTICIPANT !== $this->components[$cix]->getCompType()) {
-                continue;
-            }
-            if(( false !== ( $attendee = $this->components[$cix]->getCalendaraddress())) &&
-                ! empty( $attendee ) && ! isset( $participants[$attendee] )) {
-                $participants[$attendee] = $pix++;
-            }
-        } // end foreach
-        if( empty( $participants )) {
-            return $this;
-        }
-
-        foreach( $participants as $p => $n ) {
-            $this->setXprop( 'x-1-' . $n, $p ); // test ###
-        }
-
-        if( ! empty( $this->attendee )) {
-            while( false !== ( $attendee = $this->getAttendee())) {
-                if( ! empty( $attendee ) && isset( $participants[$attendee] )) {
-                    unset( $participants[$attendee] ); // skip if exist
-                }
-            } // end while
-        } // end if
-        ksort( $participants );
+        [ $participants, $lcArr ] = $this->getSubCompsDetailType(
+            self::PARTICIPANT,
+            self::CALENDAR_ADDRESS,
+            self::X_PARTICIPANTID,
+            self::PARTICIPANT_TYPE,
+            self::X_PARTICIPANT_TYPE
+        );
         if( ! empty( $participants )) {
-            foreach( array_flip( $participants ) as $participant ) {
-                    $this->setXprop( 'x-2', $participant ); // test ###
-                $this->setAttendee( $participant );
-            }
-        } // end if
+            $this->comPropUpdFromSub( self::ATTENDEE, true, $participants, $lcArr );
+        }
         return $this;
     }
 }

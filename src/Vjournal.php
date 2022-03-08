@@ -37,13 +37,14 @@ use function strtoupper;
 /**
  * iCalcreator VJOURNAL component class
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.29 2022-02-24
  */
 final class Vjournal extends V2component
 {
     use Traits\ATTACHtrait;
     use Traits\ATTENDEEtrait;
     use Traits\Participants2AttendeesTrait;
+    use Traits\SubCompsGetTrait;
     use Traits\CATEGORIEStrait;
     use Traits\CLASStrait;
     use Traits\COLORrfc7986trait;
@@ -133,41 +134,42 @@ final class Vjournal extends V2component
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since 2.41.3 2022-01-17
+     * @since 2.41.29 2022-02-24
      */
     public function createComponent() : string
     {
         $compType    = strtoupper( $this->getCompType());
-        $component   = sprintf( self::$FMTBEGIN, $compType );
-        $component  .= $this->createUid();
-        $component  .= $this->createDtstamp();
-        $component  .= $this->createAttach();
-        $component  .= $this->createAttendee();
-        $component  .= $this->createCategories();
-        $component  .= $this->createClass();
-        $component  .= $this->createColor();
-        $component  .= $this->createComment();
-        $component  .= $this->createContact();
-        $component  .= $this->createCreated();
-        $component  .= $this->createDescription();
-        $component  .= $this->createStyleddescription();
-        $component  .= $this->createStructureddata();
-        $component  .= $this->createDtstart();
-        $component  .= $this->createExdate();
-        $component  .= $this->createExrule();
-        $component  .= $this->createImage();
-        $component  .= $this->createLastmodified();
-        $component  .= $this->createOrganizer();
-        $component  .= $this->createRdate();
-        $component  .= $this->createRequeststatus();
-        $component  .= $this->createRecurrenceid();
-        $component  .= $this->createRelatedto();
-        $component  .= $this->createRrule();
-        $component  .= $this->createSequence();
-        $component  .= $this->createStatus();
-        $component  .= $this->createSummary();
-        $component  .= $this->createUrl();
-        $component  .= $this->createXprop();
-        return $component . sprintf( self::$FMTEND, $compType );
+        return
+            sprintf( self::$FMTBEGIN, $compType ) .
+            $this->createUid() .
+            $this->createDtstamp() .
+            $this->createAttach() .
+            $this->createAttendee() .
+            $this->createCategories() .
+            $this->createClass() .
+            $this->createColor() .
+            $this->createComment() .
+            $this->createContact() .
+            $this->createCreated() .
+            $this->createDescription() .
+            $this->createStyleddescription() .
+            $this->createStructureddata() .
+            $this->createDtstart() .
+            $this->createExdate() .
+            $this->createExrule() .
+            $this->createImage() .
+            $this->createLastmodified() .
+            $this->createOrganizer() .
+            $this->createRdate() .
+            $this->createRequeststatus() .
+            $this->createRecurrenceid() .
+            $this->createRelatedto() .
+            $this->createRrule() .
+            $this->createSequence() .
+            $this->createStatus() .
+            $this->createSummary() .
+            $this->createUrl() .
+            $this->createXprop() .
+            sprintf( self::$FMTEND, $compType );
     }
 }

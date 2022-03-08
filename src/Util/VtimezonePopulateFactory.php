@@ -156,8 +156,7 @@ class VtimezonePopulateFactory
                 self::ensureStartAndEnd( $calendar, $timezone, $start, $end );
             $foundTrans = self::findTransitions( $timezone, $start, $end );
         }
-        $timezoneComp = $calendar->newVtimezone();
-        $timezoneComp->setTzid( $timezone );
+        $timezoneComp = $calendar->newVtimezone( $timezone );
         if( ! empty( $xProp )) {
             foreach( $xProp as $xPropName => $xPropValue ) {
                 if( StringFactory::isXprefixed( $xPropName )) {

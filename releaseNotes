@@ -168,7 +168,7 @@ v3.39   3.4 release candidate
 2.41.7    rfc9073 new subComponent VRESOURCE
               with new property RESOURCE-TYPE
           restructure of abstract classes
-2.41.8   (new) signtures of newValarm, newParticipant, newVlocation, newVresource methods
+2.41.8   (new) signatures of newValarm, newParticipant, newVlocation, newVresource methods
 2.41.9    rfc7953 new component VAVAILABILITY
               with new property BUSYTYPE
           rfc7953 new component AVAILABLE
@@ -192,3 +192,22 @@ v3.39   3.4 release candidate
                   Scheduling Core Object Specification (iCalendar)
           new RRULE elements RSCALE, SKIP accepted
           For Vcalendar::selectComponents(), if RRULE RSCALE set only GREGORIAN accepted
+
+
+2.41.17   Vcalendar/component method participants2Attendees() upd (Participant uid+type as x-params)
+2.41.18   using.html doc upd
+2.41.19   Vcalendar/Vevent/Vtodo method vlocationNames2Locations()() upd (Vlocation uid+type as x-params)
+          upd args component::newVLocation( [ type [, name ]] )
+2.41.20   upd multi Decription
+2.41.21   Vcalendar/Vevent/Vtodo method vresourceNames2Resources() upd (Vresource uid+type as x-params)
+          upd args component::newVresource( [ type [, name ]] )
+2.41.22   upd args Vcalendar::newVavailability( [ busytype [, start [, end [, duration ]]]] )
+2.41.23   upd args Vcalendar::newVtimezone( [ tzid ] )
+2.41.24   upd args Vcalendar::newVevent( [ dtstart [, dtend [, duration [, summary ]]]] )
+2.41.25   upd signatures of newValarm, accepts DateTimeInterface
+2.41.26   upd args Vcalendar::newVtodo( [ dtstart [, due [, duration [, summary ]]]] )
+2.41.27   upd args Vcalendar::newVJournal( [ dtstart [, summary ]] )
+2.41.28   upd args Vcalendar::newVfreebusy( [ dtstart [, dtend [, duration ]]] )
+          bug component::setDtend()
+2.41.29   upd createCalendar/Component methods
+2.41.30   getXprop() multi sessions use bug

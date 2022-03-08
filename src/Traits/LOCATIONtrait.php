@@ -116,7 +116,8 @@ trait LOCATIONtrait
             if( is_bool( $propIx )) {
                 $inclParam = $propIx;
             }
-            $propIx = null;
+//          $propIx = null;
+            $propIx = 1;
         }
         return self::getPropertyM(
             $this->location,
@@ -146,7 +147,6 @@ trait LOCATIONtrait
         if( self::PARTICIPANT !== $this->getCompType()) {
             $index = 1;
         }
-        Util::assertString( $value, self::LOCATION );
         self::setMval( $this->location, $value, $params, null, $index );
         return $this;
     }

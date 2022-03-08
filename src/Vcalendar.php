@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use Exception;
@@ -64,7 +65,7 @@ use function usort;
 /**
  * Vcalendar class
  *
- * @since  2.39.1 - 2021-06-26
+ * @since 2.41.29 2022-02-24
  */
 final class Vcalendar extends IcalBase
 {
@@ -282,100 +283,187 @@ final class Vcalendar extends IcalBase
     /**
      * Return Vevent object instance
      *
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend   one of dtend or duration
+     * @param null|string|DateInterval $duration
+     * @param null|string $summary
      * @return Vevent
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.27.14 - 2018-02-19
+     * @since  2.41.24 - 2022-02-19
      */
-    public function newVevent() : Vevent
+    public function newVevent(
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+        null|string|DateInterval $duration = null,
+        ? string $summary = null
+    ) : Vevent
     {
-        $comp = new Vevent( $this->getConfig());
-        $comp->getDtstamp();
-        $comp->getUid();
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = $comp;
-        return $comp;
+        $this->components[$ix] = new Vevent( $this->getConfig());
+        $this->components[$ix]->getDtstamp();
+        $this->components[$ix]->getUid();
+        if( null !== $dtstart ) {
+            $this->components[$ix]->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $this->components[$ix]->setDtend( $dtend );
+        }
+        elseif( null !== $duration ) {
+            $this->components[$ix]->setDuration( $duration );
+        }
+        if( null !== $summary ) {
+            $this->components[$ix]->setSummary( $summary );
+        }
+        return $this->components[$ix];
     }
 
     /**
      * Return Vtodo object instance
      *
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $due   one of due or duration
+     * @param null|string|DateInterval $duration
+     * @param null|string $summary
      * @return Vtodo
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.27.14 - 2018-02-19
+     * @since  2.41.26 - 2022-02-19
      */
-    public function newVtodo() : Vtodo
+    public function newVtodo(
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $due = null,
+        null|string|DateInterval $duration = null,
+        ? string $summary = null
+    ) : Vtodo
     {
-        $comp = new Vtodo( $this->getConfig());
-        $comp->getDtstamp();
-        $comp->getUid();
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = $comp;
-        return $comp;
+        $this->components[$ix] = new Vtodo( $this->getConfig());
+        $this->components[$ix]->getDtstamp();
+        $this->components[$ix]->getUid();
+        if( null !== $dtstart ) {
+            $this->components[$ix]->setDtstart( $dtstart );
+        }
+        if( null !== $due ) {
+            $this->components[$ix]->setDue( $due );
+        }
+        elseif( null !== $duration ) {
+            $this->components[$ix]->setDuration( $duration );
+        }
+        if( null !== $summary ) {
+            $this->components[$ix]->setSummary( $summary );
+        }
+        return $this->components[$ix];
     }
 
     /**
      * Return Vjournal object instance
      *
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string $summary
      * @return Vjournal
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.27.14 - 2018-02-19
+     * @since  2.41.27 - 2022-02-19
      */
-    public function newVjournal() : Vjournal
+    public function newVjournal(
+        null|string|DateTimeInterface $dtstart = null,
+        ? string $summary = null
+    ) : Vjournal
     {
-        $comp = new Vjournal( $this->getConfig());
-        $comp->getDtstamp();
-        $comp->getUid();
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = $comp;
-        return $comp;
+        $this->components[$ix] = new Vjournal( $this->getConfig());
+        $this->components[$ix]->getDtstamp();
+        $this->components[$ix]->getUid();
+        if( null !== $dtstart ) {
+            $this->components[$ix]->setDtstart( $dtstart );
+        }
+        if( null !== $summary ) {
+            $this->components[$ix]->setSummary( $summary );
+        }
+        return $this->components[$ix];
     }
 
     /**
      * Return Vfreebusy object instance
      *
+     * @param null|string $attendee
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend
      * @return Vfreebusy
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.27.14 - 2018-02-19
+     * @since  2.41.28 - 2022-02-20
      */
-    public function newVfreebusy() : Vfreebusy
+    public function newVfreebusy(
+        ? string $attendee = null,
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+    ) : Vfreebusy
     {
-        $comp = new Vfreebusy( $this->getConfig());
-        $comp->getDtstamp();
-        $comp->getUid();
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = $comp;
-        return $comp;
+        $this->components[$ix] = new Vfreebusy( $this->getConfig());
+        $this->components[$ix]->getDtstamp();
+        $this->components[$ix]->getUid();
+        if( null !== $attendee ) {
+            $this->components[$ix]->setAttendee( $attendee );
+        }
+        if( null !== $dtstart ) {
+            $this->components[$ix]->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $this->components[$ix]->setDtend( $dtend );
+        }
+        return $this->components[$ix];
     }
 
     /**
      * Return Vavailability object instance
      *
+     * @param null|string $busyType
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend
+     * @param null|string|DateInterval $duration
      * @return Vavailability
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.9 - 2022-01-22
+     * @since  2.41.22 - 2022-02-19
      */
-    public function newVavailability() : Vavailability
+    public function newVavailability(
+        ? string $busyType = null,
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+        null|string|DateInterval $duration = null
+    ) : Vavailability
     {
         $comp = new Vavailability( $this->getConfig());
         $comp->getDtstamp();
         $comp->getUid();
         $ix   = $this->getNextComponentIndex();
         $this->components[$ix] = $comp;
+        if( null !== $busyType ) {
+            $this->components[$ix]->setBusytype( $busyType );
+        }
+        if( null !== $dtstart ) {
+            $this->components[$ix]->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $this->components[$ix]->setDtend( $dtend );
+        }
+        elseif( null !== $duration ) {
+            $this->components[$ix]->setDuration( $duration );
+        }
         return $comp;
     }
 
     /**
      * Return Vtimezone object instance
      *
+     * @param null|string $tzid
      * @return Vtimezone
-     * @since  2.29.8 - 2019-07-03
+     * @since  2.41.23 - 2022-02-19
      */
-    public function newVtimezone() : Vtimezone
+    public function newVtimezone( ? string $tzid = null) : Vtimezone
     {
         $vTimezones = $others = [];
         foreach( array_keys( $this->components ) as $cix ) {
@@ -387,6 +475,9 @@ final class Vcalendar extends IcalBase
         } // end foreach
         $vtix              = count( $vTimezones );
         $vTimezones[$vtix] = new Vtimezone( $this->getConfig());
+        if( null !== $tzid ) {
+            $vTimezones[$vtix]->setTzid( $tzid );
+        }
         $this->components  = [];
         foreach( array_keys( $vTimezones ) as $cix ) {
             $this->components[] = $vTimezones[$cix];
@@ -736,13 +827,53 @@ final class Vcalendar extends IcalBase
      * Set subComponent Participants (calendaraddress) as Attendees, skip if set
      *
      * @return self
-     * @since 2.41.4 - 2019-03-17
+     * @since 2.41.4 - 2022-02-16
      */
     public function participants2Attendees() : self
     {
         foreach( array_keys( $this->components ) as $cix ) {
-            if( in_array( $this->components[$cix]->getCompType(), self::$VCOMBS, true ) ) {
+            if( in_array( $this->components[$cix]->getCompType(), self::$VCOMBS, true )) {
                 $this->components[$cix]->participants2Attendees();
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Set Vevent/Vtodo subComponent Vlocation names as Locations, skip if set
+     *
+     * Vlocation UID set as Location X-param x-vlocationid
+     * All Vlocation name parameters are set if not exist.
+     * Vlocation LOCATION_TYPE set as Location X-param x-location-type
+     *
+     * @return self
+     * @since 2.41.19 - 2022-02-18
+     */
+    public function vlocationNames2Location() : self
+    {
+        foreach( array_keys( $this->components ) as $cix ) {
+            if( in_array( $this->components[$cix]->getCompType(), [ self::VEVENT, self::VTODO ] , true )) {
+                $this->components[$cix]->vlocationNames2Location();
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Set Vevent/Vtodo subComponent Vresource names as Resource, skip if set
+     *
+     * Vresource UID set as Resurce X-param x-participantid
+     * Other Vresource name parameters are set if ot exist.
+     * Vresource RESOURCE_TYPE set as Location X-param x-resource-type
+     *
+     * @return static
+     * @since 2.41.21 - 2022-02-18
+     */
+    public function vresourceNames2Resources() : self
+    {
+        foreach( array_keys( $this->components ) as $cix ) {
+            if( in_array( $this->components[$cix]->getCompType(), [ self::VEVENT, self::VTODO ] , true )) {
+                $this->components[$cix]->vresourceNames2Resources();
             }
         }
         return $this;
@@ -753,28 +884,29 @@ final class Vcalendar extends IcalBase
      *
      * @return string
      * @throws Exception
-     * @since  2.29.05 - 2019-07-02
+     * @since 2.41.29 2022-02-24
      */
     public function createCalendar() : string
     {
         static $BEGIN_VCALENDAR = "BEGIN:VCALENDAR";
         static $END_VCALENDAR   = "END:VCALENDAR";
-        $calendar  = $BEGIN_VCALENDAR . Util::$CRLF;
-        $calendar .= $this->createVersion();
-        $calendar .= $this->createProdid();
-        $calendar .= $this->createCalscale();
-        $calendar .= $this->createMethod();
-        $calendar .= $this->createLastmodified();
-        $calendar .= $this->createUid();
-        $calendar .= $this->createUrl();
-        $calendar .= $this->createRefreshinterval();
-        $calendar .= $this->createSource();
-        $calendar .= $this->createColor();
-        $calendar .= $this->createName();
-        $calendar .= $this->createDescription();
-        $calendar .= $this->createCategories();
-        $calendar .= $this->createImage();
-        $calendar .= $this->createXprop();
+        $calendar  =
+            $BEGIN_VCALENDAR . Util::$CRLF .
+            $this->createVersion() .
+            $this->createProdid() .
+            $this->createCalscale() .
+            $this->createMethod() .
+            $this->createLastmodified() .
+            $this->createUid() .
+            $this->createUrl() .
+            $this->createRefreshinterval() .
+            $this->createSource() .
+            $this->createColor() .
+            $this->createName() .
+            $this->createDescription() .
+            $this->createCategories() .
+            $this->createImage() .
+            $this->createXprop();
         $config    = $this->getConfig();
         $this->resetCompCounter();
         foreach( array_keys( $this->components ) as $cix ) {
