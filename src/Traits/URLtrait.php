@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -42,14 +43,14 @@ use function substr;
 /**
  * URL property functions
  *
- * @since 2.41.12 2022-01-27
+ * @since 2.41.36 2022-04-03
  */
 trait URLtrait
 {
     /**
-     * @var null|mixed[] component property URL value
+     * @var null|Pc component property URL value
      */
-    protected ? array $url = null;
+    protected ? Pc $url = null;
 
     /**
      * Return formatted output for calendar component property url
@@ -59,17 +60,15 @@ trait URLtrait
     public function createUrl() : string
     {
         if( empty( $this->url )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->url[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::URL )
-                : Util::$SP0;
+        if( empty( $this->url->value )) {
+            return $this->createSinglePropEmpty( self::URL );
         }
         return StringFactory::createElement(
             self::URL,
-            ParameterFactory::createParams( $this->url[Util::$LCparams] ),
-            $this->url[Util::$LCvalue]
+            ParameterFactory::createParams( $this->url->params ),
+            $this->url->value
         );
     }
 
@@ -89,15 +88,26 @@ trait URLtrait
      * Get calendar component property url
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getUrl( ? bool $inclParam = false ) : array | bool | string
+    public function getUrl( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->url )) {
             return false;
         }
-        return $inclParam ? $this->url : $this->url[Util::$LCvalue];
+        return $inclParam ? clone $this->url : $this->url->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isUrlSet() : bool
+    {
+        return ! empty( $this->url->value );
     }
 
     /**
@@ -111,31 +121,29 @@ trait URLtrait
      *  As for now, accept 'global' URL with 'geo' URI "as is"
      *  Ex. 'URL:geo:40.443,-79.945;u=10'
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since  2.41.12 - 2022-01-27
+     * @since 2.41.36 2022-04-03
      */
-    public function setUrl( ? string $value = null, ? array $params = [] ) : static
+    public function setUrl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::URL );
-            $this->url = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => [],
-            ];
-            return $this;
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::URL );
+            $this->url = Pc::factory( self::$SP0 );
         }
-        if( 0 === stripos( $value, self::GEO )) {
-            $value     = strtolower( self::GEO ) . substr( $value, 3 );
-            $this->url = [
-                Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-                Util::$LCparams => ParameterFactory::setParams( $params ),
-            ];
+        elseif( 0 === stripos( $value->value, self::GEO )) {
+            $value->value = strtolower( self::GEO ) . substr( $value->value, 3 );
+            $this->url = $value->setValue( StringFactory::trimTrailNL( $value->value ))
+                ->removeParam(self::VALUE );
         }
         else {
-            HttpFactory::urlSet( $this->url, $value, $params );
+            Util::assertString( $value->value, self::URL );
+            HttpFactory::urlSet( $this->url, $value );
         }
         return $this;
     }

@@ -209,5 +209,26 @@ v3.39   3.4 release candidate
 2.41.27   upd args Vcalendar::newVJournal( [ dtstart [, summary ]] )
 2.41.28   upd args Vcalendar::newVfreebusy( [ dtstart [, dtend [, duration ]]] )
           bug component::setDtend()
-2.41.29   upd createCalendar/Component methods
-2.41.30   getXprop() multi sessions use bug
+2.41.29   upd createCalendar/createComponent methods
+2.41.30   Vcalendar/Component::getXprop() consecutive invokes bug
+
+
+2.41.31   Parsetest upd
+2.41.32   doc upd GEO/NAME component occurence
+          CONTACT/DESCRIPTION/LOCATION/NAME property get-methods and
+          IcalXMLFactory::compProps2Xml() logic
+2.41.33   Vcalendar::setComponents() bug, insert Vtimezone(s) first (not last)
+2.41.34   upd participants2Attendees() : Participant-type to (ATTENDEE) parameter ROLE
+
+2.41.35   new Component::is<property>set() methods
+
+2.41.36   All property contents are now (class) Pc, an ArrayObject extend class
+          get<property> methods return property->value or Pc (dep. arg inclParam)
+          For get<property> return: $return::{'value'} (params) <=> $return->value (params)
+          Pc has also getter/setter methods etc
+          rewrite Vcalendar/Component::set<property> methods
+          Vcalendar/Component::set<property> methods accepts Pc as first arg
+
+2.41.37   <component>::createAttendee() param format bug
+2.41.38   Altered Freebusy::getFreebusy() output, fbBusyType now in params
+2.41.39   Multi-properties help methods moved to trait

@@ -35,6 +35,7 @@ use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
 
+use Kigkonsult\Icalcreator\Pc;
 use function ctype_digit;
 use function date_default_timezone_get;
 use function in_array;
@@ -172,48 +173,41 @@ class DateTimeFactory
     }
 
     /**
-     * Return internal date (format) with parameters based on input date
+     * Return Pc with internal date (format) with parameters based on input date
      *
-     * @param string|DateTimeInterface  $value
-     * @param null|mixed[]  $params
+     * @param Pc  $value
      * @param null|bool     $forceUTC
-     * @return mixed[]
+     * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.36 2022-04-03
      */
-    public static function setDate(
-        string|DateTimeInterface $value,
-        ? array $params = [],
-        ? bool $forceUTC = false
-    ) : array
+    public static function setDate( Pc $value, ? bool $forceUTC = false ) : Pc
     {
-        $output      = [ Util::$LCparams => ParameterFactory::setParams( $params ) ];
-        $isValueDate = ParameterFactory::isParamsValueSet( $output, IcalInterface::DATE );
-        $paramTZid   = ParameterFactory::getParamTzid( $output );
-        $isLocalTime = isset( $params[Util::$ISLOCALTIME] );
+        $isValueDate = $value->hasParamValue( IcalInterface::DATE );
+        $paramTZid   = $value->getParams( IcalInterface::TZID ) ?? Util::$SP0;
+        $isLocalTime = $value->hasParamKey( Util::$ISLOCALTIME );
         if( ! empty( $paramTZid )) {
             if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
-                $paramTZid =
-                    DateTimeZoneFactory::getTimeZoneNameFromOffset( $paramTZid );
+                $paramTZid = DateTimeZoneFactory::getTimeZoneNameFromOffset( $paramTZid );
             }
             else {
                 DateTimeZoneFactory::assertDateTimeZone( $paramTZid );
             }
         } // end if
         switch( true ) {
-            case ( $value instanceof DateTimeInterface ) :
+            case ( $value->value instanceof DateTimeInterface ) :
                 $dateTime = self::conformDateTime(
-                    self::toDateTime( $value ),
+                    self::toDateTime( $value->value ),
                     $isValueDate,
                     $forceUTC,
                     $paramTZid
                 );
                 break;
-            case ( self::isStringAndDate( $value )) :
+            case ( self::isStringAndDate( $value->value )) :
                 // string ex. "2006-08-03 10:12:18 [[[+/-]1234[56]] / timezone]"
                 $dateTime = self::conformStringDate(
-                    $value,
+                    $value->value,
                     $isValueDate,
                     $forceUTC,
                     $isLocalTime,
@@ -227,29 +221,30 @@ class DateTimeFactory
                 throw new InvalidArgumentException(
                     sprintf(
                         self::$ERR4,
-                        var_export( $value, true ),
-                        var_export( $params, true )
+                        var_export( $value->value, true ),
+                        var_export( $value->params, true )
                     )
                 );
         } // end switch
-        $output[Util::$LCvalue] = $dateTime;
+        $value->setValue( $dateTime );
         self::conformDateTimeParams(
-            $output[Util::$LCparams],
+            $value,
             $isValueDate,
             $isLocalTime,
             ( $forceUTC ? IcalInterface::UTC : $paramTZid )
         );
-        return $output;
+        return $value;
     }
 
     /**
      * Return conformed DateTime
      *
      * @param DateTime $input
-     * @param bool     $isValueDate
-     * @param bool     $forceUTC
-     * @param string   $paramTZid
+     * @param bool $isValueDate
+     * @param bool $forceUTC
+     * @param string $paramTZid
      * @return DateTime
+     * @throws Exception
      * @since  2.29.1 - 2019-06-26
      */
     public static function conformDateTime(
@@ -315,40 +310,35 @@ class DateTimeFactory
     /**
      * Conform date parameters
      *
-     * @param string[]  $params
+     * @param Pc        $pc
      * @param bool      $isValueDate
      * @param bool      $isLocalTime
      * @param null|string $paramTZid
      * @return void
-     * @since  2.29.1 - 2019-06-27
+     * @since  2.41.36 - 2022-04-03
      */
     public static function conformDateTimeParams(
-        array & $params,
-        bool $isValueDate,
-        bool $isLocalTime,
+        Pc       $pc,
+        bool     $isValueDate,
+        bool     $isLocalTime,
         ? string $paramTZid
     ) : void
     {
-        ParameterFactory::ifExistRemove( // remove default
-            $params,
-            IcalInterface::VALUE,
-            IcalInterface::DATE_TIME
-        );
+        $pc->removeParam(IcalInterface::VALUE,IcalInterface::DATE_TIME );
         switch( true ) {
             case ( $isValueDate ) :
-                ParameterFactory::ifExistRemove( $params, IcalInterface::TZID );
-                ParameterFactory::ifExistRemove( $params, Util::$ISLOCALTIME );
+                $pc->removeParam(IcalInterface::TZID );
+                $pc->removeParam( Util::$ISLOCALTIME );
                 break;
             case ( $isLocalTime ) :
-                ParameterFactory::ifExistRemove( $params, IcalInterface::TZID );
-                $params[Util::$ISLOCALTIME] = true;
+                $pc->removeParam( IcalInterface::TZID );
+                $pc->addParam( Util::$ISLOCALTIME, true );
                 break;
-            case ( ! empty( $paramTZid ) &&
-                ! DateTimeZoneFactory::isUTCtimeZone( $paramTZid )) :
-                $params[IcalInterface::TZID] = $paramTZid;
+            case ( ! empty( $paramTZid ) && ! DateTimeZoneFactory::isUTCtimeZone( $paramTZid )) :
+                $pc->addParam( IcalInterface::TZID, $paramTZid );
                 break;
             default :
-                ParameterFactory::ifExistRemove( $params, IcalInterface::TZID );
+                $pc->removeParam( IcalInterface::TZID );
                 break;
         } // end switch
     }
@@ -424,7 +414,7 @@ class DateTimeFactory
     public static function getDateTimeWithTimezoneFromString(
         string $dateStr,
         ? string $timezonePart,
-        ? string $paramTZid,
+        ? string $paramTZid = null,
         ? bool $forceUTC = false
     ) : DateTime
     {
@@ -566,7 +556,7 @@ class DateTimeFactory
         return $dateTime;
     }
 
-    /*
+    /**
      * Return DateTime modified from (ext) timezone
      *
      * @param DateTimeInterface $dateTime
@@ -623,8 +613,7 @@ class DateTimeFactory
             return false;
         }
         $string = trim( $string );
-        return (( 8 <= strlen( $string )) &&
-            ( false !== strtotime ( $string )));
+        return (( 8 <= strlen( $string )) && ( false !== strtotime ( $string )));
     }
 
     /*

@@ -123,6 +123,7 @@ class StringFactory
      * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return string[]
      * @throws UnexpectedValueException
+     * @throws Exception
      * @since  2.29.3 - 2019-08-29
      */
     public static function conformParseInput( string | array $unParsedText ) : array
@@ -212,6 +213,7 @@ class StringFactory
      *
      * @param string $text
      * @return string[]
+     * @throws Exception
      * @since  2.29.9 - 2019-03-30
      */
     public static function convEolChar( string & $text ) : array
@@ -446,7 +448,6 @@ class StringFactory
      * @param string      $line     property content
      * @param null|string $propName
      * @return mixed[]   [ line, [*propAttr] ]
-     * @todo   fix 2-5 pos port number
      * @since  2.30.3 - 2021-02-14
      */
     public static function splitContent( string $line, ? string $propName = null ) : array
@@ -731,19 +732,19 @@ class StringFactory
     }
 
     /**
-     * Return string with trimmed trailing \n
+     * Return string with trimmed trailing \n (PHP_EOL)
      *
      * @param string $value
      * @return string
-     * @since  2.29.14 - 2019-09-03
+     * @since  2.41.36 - 2022-04-11
      */
     public static function trimTrailNL( string $value ) : string
     {
         static $NL = '\n';
-        if( $NL === strtolower( substr( $value, -2 ))) {
+        if( ! empty( $value ) && ( $NL === strtolower( substr( $value, -2 )))) {
             $value = substr( $value, 0, ( strlen( $value ) - 2 ));
         }
-        return $value;
+        return rtrim( $value, PHP_EOL );
     }
 
     /**
@@ -922,19 +923,6 @@ class StringFactory
     }
 
     /**
-     * Return name for property set-method
-     *
-     * @param string $propName
-     * @return string
-     * @since  2.27.1 - 2018-12-16
-     */
-    public static function getSetMethodName( string $propName ) : string
-    {
-        static $FMT = 'set%s';
-        return self::getMethodName( $FMT, $propName );
-    }
-
-    /**
      * Return name for property delete-method
      *
      * @param string $propName
@@ -944,6 +932,32 @@ class StringFactory
     public static function getCreateMethodName( string $propName ) : string
     {
         static $FMT = 'create%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property delete-method
+     *
+     * @param string $propName
+     * @return string
+     * @since  2.27.1 - 2018-12-12
+     */
+    public static function getDeleteMethodName( string $propName ) : string
+    {
+        static $FMT = 'delete%s';
+        return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Return name for property get-method
+     *
+     * @param string $propName
+     * @return string
+     * @since 2.41.35 2022-03-28
+     */
+    public static function getIsMethodSetName( string $propName ) : string
+    {
+        static $FMT = 'is%sSet';
         return self::getMethodName( $FMT, $propName );
     }
 
@@ -961,15 +975,15 @@ class StringFactory
     }
 
     /**
-     * Return name for property delete-method
+     * Return name for property set-method
      *
      * @param string $propName
      * @return string
-     * @since  2.27.1 - 2018-12-12
+     * @since  2.27.1 - 2018-12-16
      */
-    public static function getDeleteMethodName( string $propName ) : string
+    public static function getSetMethodName( string $propName ) : string
     {
-        static $FMT = 'delete%s';
+        static $FMT = 'set%s';
         return self::getMethodName( $FMT, $propName );
     }
 }

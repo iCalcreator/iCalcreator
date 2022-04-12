@@ -29,20 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * RELATED-TO property functions
  *
- * @since 2.41.2 2022-01-16
+ * @since 2.41.36 2022-04-09
  */
 trait RELATED_TOtrait
 {
     /**
-     * @var null|mixed[] component property RELATED_TO value
+     * @var null|Pc[] component property RELATED_TO value
      */
     protected ? array $relatedto = null;
 
@@ -50,20 +51,20 @@ trait RELATED_TOtrait
      * Return formatted output for calendar component property related-to
      *
      * @return string
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.36 2022-04-03
      */
     public function createRelatedto() : string
     {
         if( empty( $this->relatedto )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         foreach( $this->relatedto as $relation ) {
-            if( ! empty( $relation[Util::$LCvalue] )) {
+            if( ! empty( $relation->value )) {
                 $output .= StringFactory::createElement(
                     self::RELATED_TO,
-                    ParameterFactory::createParams( $relation[Util::$LCparams] ),
-                    StringFactory::strrep( $relation[Util::$LCvalue] )
+                    ParameterFactory::createParams( $relation->params ),
+                    StringFactory::strrep( $relation->value )
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
@@ -86,7 +87,7 @@ trait RELATED_TOtrait
             unset( $this->propDelIx[self::RELATED_TO] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->relatedto,
             self::RELATED_TO,
             $this,
@@ -99,16 +100,16 @@ trait RELATED_TOtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|bool|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getRelatedto( ? int $propIx = null, ? bool $inclParam = false ) : string | array | bool
+    public function getRelatedto( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->relatedto )) {
             unset( $this->propIx[self::RELATED_TO] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->relatedto,
             self::RELATED_TO,
             $this,
@@ -118,36 +119,47 @@ trait RELATED_TOtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isRelatedtoSet() : bool
+    {
+        return self::isMvalSet( $this->relatedto );
+    }
+
+    /**
      * Set calendar component property related-to
      *
-     * @param null|string    $value
-     * @param null|mixed[]   $params
+     * @param null|string|Pc $value
+     * @param null|int|mixed[]   $params
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.2 2022-01-16
+     * @since 2.41.36 2022-04-09
      */
-    public function setRelatedto( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setRelatedto(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
         static $RELTYPE = 'RELTYPE';
         static $PARENT  = 'PARENT';
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::RELATED_TO );
-            $value  = Util::$SP0;
-            $params = [];
-
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::RELATED_TO );
+            $value->setEmpty();
         }
-        if( ! empty( $params ) && ( $this->getCompType() !== self::VALARM )) {
-            ParameterFactory::ifExistRemove( $params, $RELTYPE, $PARENT ); // remove default
+        else {
+            $value->value =StringFactory::trimTrailNL( $value->value );
         }
-        Util::assertString( $value, self::RELATED_TO );
-        self::setMval(
-            $this->relatedto,
-            StringFactory::trimTrailNL( $value ),
-            $params,
-            null,
-            $index
-        );
+        if( $this->getCompType() !== self::VALARM ) {
+            Util::assertString( $value->value, self::RELATED_TO );
+            $value->removeParam( $RELTYPE, $PARENT ); // remove default
+        }
+        self::setMval( $this->relatedto, $value, $index );
         return $this;
     }
 }

@@ -33,25 +33,22 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-
-use function array_change_key_case;
 
 /**
  * TZUNTIL property functions
  *
- * @since 2.41.1 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait TZUNTILrfc7808trait
 {
     /**
-     * @var null|mixed[] component property TZUNTIL value
+     * @var null|Pc component property TZUNTIL value
      */
-    protected ?array $tzuntil = null;
+    protected ? Pc $tzuntil = null;
 
     /**
      * Return formatted output for calendar component property TZUNTIL
@@ -59,17 +56,20 @@ trait TZUNTILrfc7808trait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.1 2022-01-15
+     * @since 2.41.36 2022-04-03
      */
     public function createTzuntil() : string
     {
         if( empty( $this->tzuntil )) {
-            return Util::$SP0;
+            return self::$SP0;
+        }
+        if( empty( $this->action->value )) {
+            return $this->createSinglePropEmpty( self::TZUNTIL );
         }
         return StringFactory::createElement(
             self::TZUNTIL,
-            ParameterFactory::createParams( $this->tzuntil[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->tzuntil[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->tzuntil->params ),
+            DateTimeFactory::dateTime2Str( $this->tzuntil->value )
         );
     }
 
@@ -89,41 +89,50 @@ trait TZUNTILrfc7808trait
      * Return calendar component property TZUNTIL
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|mixed[]
-     * @since 2.41.1 2022-01-15
+     * @return bool|string|DateTime|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTzuntil( ? bool $inclParam = false ) : DateTime | bool | string | array
+    public function getTzuntil( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->tzuntil )) {
             return false;
         }
-        return $inclParam
-            ? $this->tzuntil
-            : $this->tzuntil[Util::$LCvalue];
+        return $inclParam ? clone $this->tzuntil : $this->tzuntil->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isTzuntilSet() : bool
+    {
+        return ! empty( $this->tzuntil->value );
     }
 
     /**
      * Set calendar component property last-modified
      *
-     * @param null|string|DateTimeInterface  $value
+     * @param null|string|Pc|DateTimeInterface  $value
      * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.1 2022-01-15
+     * @since 2.41.36 2022-04-03
      */
-    public function setTzuntil( DateTimeInterface | string | null $value = null, ? array $params = [] ) : static
+    public function setTzuntil(
+        null | string | Pc | DateTimeInterface $value = null,
+        ? array $params = []
+    ) : static
     {
-        if( empty( $value )) {
-            $this->tzuntil = [
-                Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
-                Util::$LCparams => [],
-            ];
-            return $this;
-        }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
-        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
-        $this->tzuntil = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $value->addParamValue( self::DATE_TIME ); // req
+        $this->tzuntil = empty( $value->value )
+            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
+            : DateTimeFactory::setDate( $value, true ); // $forceUTC
         return $this;
     }
 }

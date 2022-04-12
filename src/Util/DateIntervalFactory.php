@@ -196,7 +196,6 @@ class DateIntervalFactory
      * @param string  $value
      * @return string
      * @since  2.16.7 - 2018-11-26
-     * @todo remove -> $isMinus  = ( 0 > $value );  $tz = abs((int) $value );
      */
     public static function removePlusMinusPrefix( string $value ) : string
     {

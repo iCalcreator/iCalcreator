@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -38,14 +39,14 @@ use function is_numeric;
 /**
  * REPEAT property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait REPEATtrait
 {
     /**
-     * @var null|mixed[] component property REPEAT value
+     * @var null|Pc component property REPEAT value
      */
-    protected ? array $repeat = null;
+    protected ? Pc $repeat = null;
 
     /**
      * Return formatted output for calendar component property repeat
@@ -55,19 +56,16 @@ trait REPEATtrait
     public function createRepeat() : string
     {
         if( empty( $this->repeat )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( ! isset( $this->repeat[Util::$LCvalue] ) ||
-            ( empty( $this->repeat[Util::$LCvalue] ) &&
-                ! is_numeric( $this->repeat[Util::$LCvalue] ))) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::REPEAT )
-                : Util::$SP0;
+        if( ! isset( $this->repeat->value ) ||
+            ( empty( $this->repeat->value ) && ! is_numeric( $this->repeat->value ))) {
+            return $this->createSinglePropEmpty( self::REPEAT );
         }
         return StringFactory::createElement(
             self::REPEAT,
-            ParameterFactory::createParams( $this->repeat[Util::$LCparams] ),
-            (string) $this->repeat[Util::$LCvalue]
+            ParameterFactory::createParams( $this->repeat->params ),
+            (string) $this->repeat->value
         );
     }
 
@@ -87,45 +85,53 @@ trait REPEATtrait
      * Get calendar component property repeat
      *
      * @param null|bool   $inclParam
-     * @return bool|int|string|mixed[]
-     * @since  2.27.1 - 2018-12-13
+     * @return bool|int|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getRepeat( ? bool $inclParam = false ) : array | bool | int | string
+    public function getRepeat( ? bool $inclParam = false ) : bool | int | string | Pc
     {
         if( empty( $this->repeat )) {
             return false;
         }
-        if( null === $this->repeat[Util::$LCvalue] ) {
-            $this->repeat[Util::$LCvalue] = Util::$SP0;
+        if( ! $this->repeat->isset()) {
+            $this->repeat->value = self::$SP0;
         }
-        return $inclParam
-            ? $this->repeat
-            : $this->repeat[Util::$LCvalue];
+        return $inclParam ? clone $this->repeat : $this->repeat->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isRepeatSet() : bool
+    {
+        return ! empty( $this->repeat->value );
     }
 
     /**
      * Set calendar component property repeat
      *
-     * @param null|int|string $value
+     * @param null|int|string|Pc $value
      * @param null|mixed[]    $params
      * @return static
-     * @since 2.27.3 2018-12-22
+     * @since 2.41.36 2022-04-03
      */
-    public function setRepeat( null|int|string $value = null, ? array $params = [] ) : static
+    public function setRepeat( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if(( $value === null ) || ( $value === Util::$SP0 )) {
-            $this->assertEmptyValue( $value, self::REPEAT );
-            $value  = null;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
+            $this->assertEmptyValue( $value->value, self::REPEAT );
+            $value->setEmpty();
         }
         else {
-            Util::assertInteger( $value, self::REPEAT );
-            $value = (int) $value;
+            Util::assertInteger( $value->value, self::REPEAT );
+            $value->value = (int) $value->value;
         }
-        $this->repeat = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->repeat = $value;
         return $this;
     }
 }

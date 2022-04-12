@@ -71,10 +71,10 @@ class PropXTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -95,10 +95,10 @@ class PropXTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -115,7 +115,7 @@ class PropXTest extends DtBase
      * @param mixed[] $propComps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -125,7 +125,7 @@ class PropXTest extends DtBase
         array  $propComps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -226,7 +226,7 @@ class PropXTest extends DtBase
      * @param string   $propName,
      * @param string   $value,
      * @param mixed[]  $params,
-     * @param mixed[]  $expectedGet,
+     * @param Pc       $expectedGet,
      * @param string   $expectedString
      */
     public function misc3factory(
@@ -236,11 +236,18 @@ class PropXTest extends DtBase
         string   $propName,
         string   $value,
         array    $params,
-        array    $expectedGet,
+        Pc       $expectedGet,
         string   $expectedString
     ) : void
     {
-        $comp->setXprop( $propName, $value, $params );
+        static $pcInput = false;
+        if( $pcInput ) {
+            $comp->setXprop( $propName, Pc::factory( $value, $params ));
+        }
+        else {
+            $comp->setXprop( $propName, $value, $params );
+        }
+        $pcInput = ! $pcInput;
 
         $getValue = $comp->getXprop( $propName, null, true );
         $this->assertEquals(

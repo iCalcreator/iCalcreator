@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.30 manual</title>
+    <title>iCalcreator 2.41.39 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.30">
+<meta name="description" content="using iCalcreator v2.41.39">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.30</p>
+<p class="header">iCalcreator v2.41.39</p>
 <p>
-iCalcreator v2.41.30<br>
+iCalcreator v2.41.39<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -369,12 +369,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.30/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.39/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.30</dt>
+    <dt>v2.41.39</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +383,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.30 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.39 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -417,7 +417,7 @@ Here are update headlines in this version.
     <li>rfc9073 new subComponent VRESOURCE with new property RESOURCE-TYPE<br>
         restructure of abstract classes</li>
 
-    <li>(new) signtures of newAlarm, newParticipant, newVlocation, newVresource methods</li>
+    <li>(new) signature of newAlarm, newParticipant, newVlocation, newVresource methods</li>
 
     <li>rfc7953 new component VAVAILABILITY with new property BUSYTYPE</li>
 
@@ -443,8 +443,38 @@ Here are update headlines in this version.
         bug component::setDtend()<br>
         upd createCalendar/Component methods<br>
         using.html doc upd<br>
-        Vcalendar/Component::getXprop() multi sessions use bug
+        Vcalendar/Component::getXprop() consecutive invokes bug
     </li>
+
+    <li>
+        Parsetest upd<br>
+        doc upd GEO/NAME component occurence<br>
+        CONTACT/DESCRIPTION/LOCATION/NAME property get-methods and IcalXMLFactory::compProps2Xml() logic<br>
+        Vcalendar::setComponents() bug, insert Vtimezone(s) first (not last)<br>
+        upd participants2Attendees() : Participant-type to (ATTENDEE) parameter ROLE
+        <br><br>
+    </li>
+    <li>
+        <b>new</b>, Component::is&lt;Property&gt;Set() methods
+        <br><br>
+    </li>
+
+    <li>
+        <b>upd</b>, all property value/params contents are now (class) Pc, an ArrayObject extend class<br>
+        Vcalendar/Component::get&lt;Property&gt;() methods return property->value or Pc (dep. on arg inclParam)<br>
+        For arg inclParam=true return usage: $return[&quot;value&quot;] &lt;=&gt; $return->value (dito params)<br>
+        Pc has also getter/setter-methods etc<br>
+        rewrite of Vcalendar/Component::set&lt;property&gt; methods<br>
+        Vcalendar/Component::set&lt;property&gt;() methods accepts Pc as first arg
+        <br><br>
+    </li>
+
+    <li>
+        Component::createAttendee() param format bug<br>
+        Changed Freebusy::getFreebusy() output, fbBusyType now in params<br>
+        Multi-properties help methods moved to trait
+    </li>
+
 </ul>
 
 
@@ -495,10 +525,10 @@ Also setting &quot;X-WR-TIMEZONE&quot; (below) is to recommend.
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
-          -&gt;setXprop(  Vcalendar::X_WR_CALNAME, &quot;Calendar Sample&quot; )
-          -&gt;setXprop(  Vcalendar::X_WR_CALDESC, &quot;Calendar Description&quot;  )
-          -&gt;setXProp(  Vcalendar::X_WR_RELCALID, &quot;3E26604A-50F4-4449-8B3E-E4F4932D05B5&quot; )
-          -&gt;setXprop(  Vcalendar::X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
+    -&gt;setXprop( Vcalendar::X_WR_CALNAME, &quot;Calendar Sample&quot; )
+    -&gt;setXprop( Vcalendar::X_WR_CALDESC, &quot;Calendar Description&quot;  )
+    -&gt;setXProp( Vcalendar::X_WR_RELCALID, &quot;3E26604A-50F4-4449-8B3E-E4F4932D05B5&quot; )
+    -&gt;setXprop( Vcalendar::X_WR_TIMEZONE, &quot;Europe/Stockholm&quot; );
 
 </p>
 
@@ -592,70 +622,71 @@ $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
 <br>
 <a href="#Calendar_component_object_property_function_list">3.2 Component property methods</a><br>
 <a href="#date_restraints">3.2.1 Date restraints</a><br>
-<a href="#componentParse">3.2.2 Parse</a><br>
+<a href="#propValueParam">3.2.2 Property value/params</a><br>
+<a href="#componentParse">3.2.3 Parse</a><br>
 <dl>
     <dt>Properties in ascending name order</dt>
-    <dd><a href="#ACKNOWLEDGED">3.2.3 ACKNOWLEDGED</a>
-    <dd><a href="#ACTION">3.2.4 ACTION</a>
-    <dd><a href="#ATTACH">3.2.5 ATTACH</a>
-    <dd><a href="#ATTENDEE">3.2.6 ATTENDEE</a>
-    <dd><a href="#BUSYTYPE">3.2.7 BUSYTYPE</a>
-    <dd><a href="#CALENDAR-ADDRESS">3.2.8 CALENDAR-ADDRESS</a>
-    <dd><a href="#CATEGORIES">3.2.9 CATEGORIES</a>
-    <dd><a href="#CLASS">3.2.10 CLASS</a>
-    <dd><a href="#COLOR">3.2.11 COLOR</a>
-    <dd><a href="#COMMENT">3.2.12 COMMENT</a>
-    <dd><a href="#COMPLETED">3.2.13 COMPLETED</a>
-    <dd><a href="#CONFERENCE">3.2.14 CONFERENCE</a>
-    <dd><a href="#CONTACT">3.2.15 CONTACT</a>
-    <dd><a href="#CREATED">3.2.16 CREATED</a>
-    <dd><a href="#DESCRIPTION">3.2.17 DESCRIPTION</a>
-    <dd><a href="#DTEND">3.2.18 DTEND</a>
-    <dd><a href="#DTSTAMP">3.2.19 DTSTAMP</a>
-    <dd><a href="#DTSTART">3.2.20 DTSTART</a>
-    <dd><a href="#DUE">3.2.21 DUE</a>
+    <dd><a href="#ACKNOWLEDGED">3.2.4 ACKNOWLEDGED</a>
+    <dd><a href="#ACTION">3.2.5 ACTION</a>
+    <dd><a href="#ATTACH">3.2.6 ATTACH</a>
+    <dd><a href="#ATTENDEE">3.2.7 ATTENDEE</a>
+    <dd><a href="#BUSYTYPE">3.2.8 BUSYTYPE</a>
+    <dd><a href="#CALENDAR-ADDRESS">3.2.9 CALENDAR-ADDRESS</a>
+    <dd><a href="#CATEGORIES">3.2.10 CATEGORIES</a>
+    <dd><a href="#CLASS">3.2.11 CLASS</a>
+    <dd><a href="#COLOR">3.2.12 COLOR</a>
+    <dd><a href="#COMMENT">3.2.13 COMMENT</a>
+    <dd><a href="#COMPLETED">3.2.14 COMPLETED</a>
+    <dd><a href="#CONFERENCE">3.2.15 CONFERENCE</a>
+    <dd><a href="#CONTACT">3.2.16 CONTACT</a>
+    <dd><a href="#CREATED">3.2.17 CREATED</a>
+    <dd><a href="#DESCRIPTION">3.2.18 DESCRIPTION</a>
+    <dd><a href="#DTEND">3.2.19 DTEND</a>
+    <dd><a href="#DTSTAMP">3.2.20 DTSTAMP</a>
+    <dd><a href="#DTSTART">3.2.21 DTSTART</a>
+    <dd><a href="#DUE">3.2.22 DUE</a>
     <dd><a href="#DURATION">3.2.22 DURATION</a>
-    <dd><a href="#EXDATE">3.2.23 EXDATE</a>
-    <dd><a href="#EXRULE">3.2.24 EXRULE</a>
-    <dd><a href="#FREEBUSY_PROP">3.2.25 FREEBUSY</a>
-    <dd><a href="#GEO">3.2.26 GEO</a>
-    <dd><a href="#IMAGE">3.2.27 IMAGE</a>
-    <dd><a href="#LAST-MODIFIED">3.2.28 LAST-MODIFIED</a>
-    <dd><a href="#LOCATION">3.2.29 LOCATION</a>
-    <dd><a href="#LOCATION-TYPE">3.2.30 LOCATION-TYPE</a>
-    <dd><a href="#NAME">3.2.31 NAME</a>
-    <dd><a href="#ORGANIZER">3.2.32 ORGANIZER</a>
-    <dd><a href="#PARTICIPANT-TYPE">3.2.33 PARTICIPANT-TYPE</a>
-    <dd><a href="#PERCENT-COMPLETE">3.2.34 PERCENT-COMPLETE</a>
-    <dd><a href="#PRIORITY">3.2.35 PRIORITY</a>
-    <dd><a href="#PROXIMITY">3.2.36 PROXIMITY</a>
-    <dd><a href="#RDATE">3.2.37 RDATE</a>
-    <dd><a href="#RECURRENCE-ID">3.2.38 RECURRENCE-ID</a>
-    <dd><a href="#REFRESH-INTERVAL">3.2.39 REFRESH-INTERVAL</a>
-    <dd><a href="#RELATED-TO">3.2.40 RELATED-TO</a>
-    <dd><a href="#REPEAT">3.2.41 REPEAT</a>
-    <dd><a href="#REQUEST-STATUS">3.2.42 REQUEST-STATUS</a>
-    <dd><a href="#RESOURCE-TYPE">3.2.43 RESOURCE-TYPE</a>
-    <dd><a href="#RESOURCES">3.2.44 RESOURCES</a>
-    <dd><a href="#RRULE">3.2.45 RRULE</a>
-    <dd><a href="#SEQUENCE">3.2.46 SEQUENCE</a>
-    <dd><a href="#SOURCE">3.2.47 SOURCE</a>
-    <dd><a href="#STATUS">3.2.48 STATUS</a>
-    <dd><a href="#STRUCTURED-DATA">3.2.49 STRUCTURED-DATA</a>
-    <dd><a href="#STYLED-DESCRIPTION">3.2.50 STYLED-DESCRIPTION</a>
-    <dd><a href="#SUMMARY">3.2.51 SUMMARY</a>
-    <dd><a href="#TRANSP">3.2.52 TRANSP</a>
-    <dd><a href="#TRIGGER">3.2.53 TRIGGER</a>
-    <dd><a href="#TZID">3.2.54 TZID</a>
-    <dd><a href="#TZID-ALIAS-OF">3.2.55 TZID-ALIAS-OF</a>
-    <dd><a href="#TZNAME">3.2.56 TZNAME</a>
-    <dd><a href="#TZOFFSETFROM">3.2.57 TZOFFSETFROM</a>
-    <dd><a href="#TZOFFSETTO">3.2.58 TZOFFSETTO</a>
-    <dd><a href="#TZUNTIL">3.2.59 TZUNTIL</a>
-    <dd><a href="#TZURL">3.2.60 TZURL</a>
-    <dd><a href="#UID">3.2.61 UID</a>
-    <dd><a href="#URL">3.2.62 URL</a>
-    <dd><a href="#X-PROPERTY">3.2.63 X-PROPERTY</a>
+    <dd><a href="#EXDATE">3.2.24 EXDATE</a>
+    <dd><a href="#EXRULE">3.2.25 EXRULE</a>
+    <dd><a href="#FREEBUSY_PROP">3.2.26 FREEBUSY</a>
+    <dd><a href="#GEO">3.2.27 GEO</a>
+    <dd><a href="#IMAGE">3.2.28 IMAGE</a>
+    <dd><a href="#LAST-MODIFIED">3.2.29 LAST-MODIFIED</a>
+    <dd><a href="#LOCATION">3.2.30 LOCATION</a>
+    <dd><a href="#LOCATION-TYPE">3.2.31 LOCATION-TYPE</a>
+    <dd><a href="#NAME">3.2.32 NAME</a>
+    <dd><a href="#ORGANIZER">3.2.33 ORGANIZER</a>
+    <dd><a href="#PARTICIPANT-TYPE">3.2.34 PARTICIPANT-TYPE</a>
+    <dd><a href="#PERCENT-COMPLETE">3.2.35 PERCENT-COMPLETE</a>
+    <dd><a href="#PRIORITY">3.2.36 PRIORITY</a>
+    <dd><a href="#PROXIMITY">3.2.37 PROXIMITY</a>
+    <dd><a href="#RDATE">3.2.38 RDATE</a>
+    <dd><a href="#RECURRENCE-ID">3.2.39 RECURRENCE-ID</a>
+    <dd><a href="#REFRESH-INTERVAL">3.2.40 REFRESH-INTERVAL</a>
+    <dd><a href="#RELATED-TO">3.2.41 RELATED-TO</a>
+    <dd><a href="#REPEAT">3.2.42 REPEAT</a>
+    <dd><a href="#REQUEST-STATUS">3.2.43 REQUEST-STATUS</a>
+    <dd><a href="#RESOURCE-TYPE">3.2.42 RESOURCE-TYPE</a>
+    <dd><a href="#RESOURCES">3.2.45 RESOURCES</a>
+    <dd><a href="#RRULE">3.2.46 RRULE</a>
+    <dd><a href="#SEQUENCE">3.2.47 SEQUENCE</a>
+    <dd><a href="#SOURCE">3.2.48 SOURCE</a>
+    <dd><a href="#STATUS">3.2.49 STATUS</a>
+    <dd><a href="#STRUCTURED-DATA">3.2.50 STRUCTURED-DATA</a>
+    <dd><a href="#STYLED-DESCRIPTION">3.2.51 STYLED-DESCRIPTION</a>
+    <dd><a href="#SUMMARY">3.2.52 SUMMARY</a>
+    <dd><a href="#TRANSP">3.2.53 TRANSP</a>
+    <dd><a href="#TRIGGER">3.2.54 TRIGGER</a>
+    <dd><a href="#TZID">3.2.55 TZID</a>
+    <dd><a href="#TZID-ALIAS-OF">3.2.56 TZID-ALIAS-OF</a>
+    <dd><a href="#TZNAME">3.2.57 TZNAME</a>
+    <dd><a href="#TZOFFSETFROM">3.2.58 TZOFFSETFROM</a>
+    <dd><a href="#TZOFFSETTO">3.2.59 TZOFFSETTO</a>
+    <dd><a href="#TZUNTIL">3.2.60 TZUNTIL</a>
+    <dd><a href="#TZURL">3.2.61 TZURL</a>
+    <dd><a href="#UID">3.2.62 UID</a>
+    <dd><a href="#URL">3.2.63 URL</a>
+    <dd><a href="#X-PROPERTY">3.2.64 X-PROPERTY</a>
 </dl>
 <a href="#iCalcreator_component_configuration_methods">3.3 iCalcreator Component configuration methods</a><br>
 <a href="#Language_PROP">3.3.1 Language</a><br>
@@ -1573,7 +1604,6 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 $vcalendar = Vcalendar::factory( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] )
     -&gt;setMethod( "PUBLIC" );
 
-
 </p>
 
 <br>
@@ -1664,7 +1694,7 @@ $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quo
 
 .. .
 $vtodo     = $vcalendar-&gt;newVtodo( $dtStart )
-    .. .
+.. .
 
 </p>
 
@@ -1764,11 +1794,11 @@ dtend    = property <a href="#DTEND">DTEND</a>   string|DateTimeInterface value
 <p class="label">Example</p>
 <p class="example">use Kigkonsult\Icalcreator\Vcalendar;
 
-    $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
-    .. .
-    $vtodo     = $vcalendar-&gt;newVfreebusy( $attendee, $dtStart, $dtend )
-    .. .
+.. .
+$vtodo     = $vcalendar-&gt;newVfreebusy( $attendee, $dtStart, $dtend )
+.. .
 
 </p>
 
@@ -2570,6 +2600,7 @@ $vtodo = $vcalendar-&gt;getComponent( Vcalendar::VTODO );
 while( $vtodo-&gt;deleteComponent( Vcalendar::VALARM)) {
     continue;
 }
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
@@ -2923,9 +2954,9 @@ foreach( $events_arr as $year =&gt; $year_arr ) {
         foreach( $month_arr as $day =&gt; $day_arr ) {
             foreach( $day_arr as $event ) {
                 $currddate   = $event-&gt;getDtstart();
-        <span class="comment">// if member of a recurrence set, returns
-       // array(&quot; x-current-dtstart&quot;,
-       // &lt;(string) date(&quot;Y-m-d&nbsp;[H:i:s][timezone/UTC&nbsp;offset]&quot;)&gt;)</span>
+     <span class="comment">// if member of a recurrence set
+       // X-prop &quot; x-current-dtstart&quot; returns
+       // &lt;(string) date(&quot;Y-m-d&nbsp;[H:i:s][timezone/UTC&nbsp;offset]&quot;)&gt;</span>
                 $startDate   = $event-&gt;getDtstart(;
                 $summary     = $event-&gt;getSummary();
                 $description = $event-&gt;getDescription();
@@ -3168,7 +3199,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.30//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.39//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -3214,6 +3245,7 @@ Generate and return (string) <strong>calendar</strong>.
 <p class="label">Example</p>
 <p class="example">
 $str = $vcalendar-&gt;createCalendar();
+
 echo $str;
 
 </p>
@@ -3443,8 +3475,10 @@ $uniqueId = $vcalendar-&gt;getConfig( Vcalendar::UNIQUE_ID );
 $config = $vcalendar-&gt;getConfig();
  .. .
 </p>
-<p class="comment">Output= array( string key =&gt; mixed value
-           *[, string key =&gt; mixed value] )</p>
+<p class="comment">Output= [
+    *( string key =&gt; mixed value )
+]
+</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_configuration_methods">[up]</a>
 
@@ -3544,18 +3578,19 @@ There is a convenient config key constant available: Vcalendar::ALLOWEMPTY.
 Get information about the Vcalendar instance components. Returns array with basic information
 about all components (in array format) within the Vcalendar instance.
 </p>
-<p class="comment">Output   = array ( *compinfo )
-compinfo = array ( &quot;ordno&quot; =&gt; int ordno,
+<p class="comment">Output   = [ *compinfo ]
+compinfo = [
+    &quot;ordno&quot; =&gt; int ordno,
                    // <span class="commsnt">order number (1st=1, 2nd=2..)</span>
-                 , &quot;type&quot;  =&gt; string type
+    &quot;type&quot;  =&gt; string type,
                    // <span class="comment">component type (vevent, vtodo</span>
-                 , &quot;uid&quot;   =&gt; string uid
+    &quot;uid&quot;   =&gt; string uid,
                    // <span class="comment">component <a href="#UID">UID</a> (not for <a href="#VALARM">ALARM</a> / <a href="#VTIMEZONE">TIMEZONE</a>)</span>
-                 , &quot;props&quot; =&gt;
-                     array( *[ propertyName =&gt; Property count ])
+    &quot;props&quot; =&gt;, [ *( propertyName =&gt; Property count ) ],
                    // <span class="comment">for every set property</span>
-                 , &quot;sub&quot;   =&gt; array( *compinfo ))
+    &quot;sub&quot;   =&gt; [ *compinfo  ] )
                    // <span class="comment">if subcomponents exists, an array for each subcomponent</span></p>
+]
 <p>
 There is a convenient config key constant available: Vcalendar::COMPSINFO.
 </p>
@@ -3681,14 +3716,151 @@ Other string formats, acceptable by <em>PHP</em> strtotime function, may work.
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
+<a id="propValueParam"></a><h3>3.2.2 Property value/params</h3>
+<p>
+    From 2.41.36 all (but
+    <a href="#VCALENDAR">VCALENDAR</a>
+    <a href="#CALSCALE">CALSCALE</a>,
+    <a href="#METHOD">METHOD</a> and
+    <a href="#VERSION">VERSION</a>) 
+    properties value and parameters
+    are stored in a (class) Pc instance,
+    changed from a PHP type array to an somewhat restricted ArrayObject extend class, Pc.
+</p>
+<p>
+    The <span class="format"> component::get&lt;Property&gt;( true )</span> method output
+    is an cloned Pc instance with property contents.<br>
+    For properties where multiple occurences are allowed (ex <a href="#COMMENT">COMMENT</a>),<br>
+    format is <span class="format"> component::get&lt;Property&gt;( propOrderNo/null, true );</span><br>
+    The current property contents will not be affected of any output Pc instance changes.<br>
+    Parameter (&quot;params&quot;) keys always in uppercase,
+</p>
+<p>An pre-2.41.36 get-example, still works in post-2.41.36.</p>
+<p class="example">
+.. .
+$output = $event->getSummary( true );
+$value  = $output[&quot;value&quot;];
+$params = $output[&quot;params&quot;];
+.. .
+</p>
+<p>
+    All property set-methods (but <a href="#VCALENDAR">VCALENDARs</a>, above) accepts
+    Pc class instance as first (and only) argument.
+</p>
+<p>An post-2.41.36 get/set-example, get-methods works as in example above.</p>
+<p class="example">
+.. .
+$output = $event->getSummary( true );
+$value  = $output->value;
+$params = $output->params;
+.. .
+$event->setSummary( Pc::factory( $value, $params ));
+.. .
 
-<a id="componentParse"></a><h3>3.2.2 Parse</h3>
+</p>
+<p>Pc class methods :</p>
+
+<dl>
+    <dt><span class="format">Pc::factory( [ value [, params ]] )</span></dt>
+    <dd>Pc class factory method, static</dd>
+    <dd><span class="comment">value = mixed </span></dd>
+    <dd><span class="comment">params = array </span></dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">Pc::getAsArray()</span></dt>
+    <dd>(Pc::getArrayCopy() alias)</dd>
+    <dd>return property (key/value) assoc array</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">Pc::isset()</span></dt>
+    <dd>Return bool true if property value property is set, i.e not null</dd>
+
+    <dt><span class="format">Pc::getValue()</span></dt>
+    <dd>Return property value, false if not set</dd>
+
+    <dt><span class="format">Pc::setEmpty()</span></dt>
+    <dd>Set (reset) to &quot;empty&quot; state (property value &quot;&quot; params [] )</dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">Pc::setValue( [ value ] )</span></dt>
+    <dd><span class="comment">value = mixed </span></dd>
+    <dd>Set property value</dd>
+    <dd>Return class instance</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">Pc::getParamKeys()</span></dt>
+    <dd>Return array, property parameter keys (in uppercase)</dd>
+
+    <dt><span class="format">Pc::getParams( [ pKey ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase </span></dd>
+    <dd>Return all property parameters (key/value) assoc array or single parameter key value, null if not key exists</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">Pc::hasParamKey( [ pKey [, pValue ] ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase </span></dd>
+    <dd><span class="comment">pValue = string </span></dd>
+    <dd>Return bool true if property params has key, opt with spec. value</dd>
+
+    <dt><span class="format">Pc::hasXparamKey( [ pKey [, pValue ] ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase, x-prefixed if missing </span></dd>
+    <dd><span class="comment">pValue = string </span></dd>
+    <dd>Return bool true if property params has X-key, opt with spec. value</dd>
+
+    <dt><span class="format">Pc::hasParamValue( [ pValue ] )</span></dt>
+    <dd><span class="comment">pValue = string, set to uppercase </span></dd>
+    <dd>Return bool true if property params has &quot;VALUE&quot; key with spec. value</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">Pc::removeParam( [ pKey [, pValue ] ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase </span></dd>
+    <dd><span class="comment">pValue = string </span></dd>
+    <dd>Remove property parameter key, opt only with spec. value</dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">removeXparam( pKey )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase, x-prefixed if missing </span></dd>
+    <dd>Remove property parameter X-key</dd>
+    <dd>Return class instance</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">addParam( pKey, pValue [, overwrite = true ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase </span></dd>
+    <dd><span class="comment">pValue = string </span></dd>
+    <dd><span class="comment">overwrite = bool, default true </span></dd>
+    <dd>Set property parameter key/value, default overwrite</dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">addParamValue( pValue [, overwrite = true ] ] )</span></dt>
+    <dd><span class="comment">pValue = string, set to uppercase </span></dd>
+    <dd><span class="comment">overwrite = bool, default true </span></dd>
+    <dd>Set contents for property parameter key &quot;VALUE&quot;, default overwrite</dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">addXparam( pKey, pValue [, overwrite = true ] )</span></dt>
+    <dd><span class="comment">pKey = string, set to uppercase, x-prefixed if missing </span></dd>
+    <dd><span class="comment">pValue = string </span></dd>
+    <dd><span class="comment">overwrite = bool, default true </span></dd>
+    <dd>Set property parameter X-key/value, default overwrite</dd>
+    <dd>Return class instance</dd>
+
+    <dt><span class="format">setParams( params [, overwrite = true ] ] )</span></dt>
+    <dd><span class="comment">params = array </span></dd>
+    <dd><span class="comment">overwrite = bool, default true </span></dd>
+    <dd>Set property parameter X-key/value array, default overwrite (keys set to uppercase )</dd>
+    <dd>Return class instance</dd>
+
+</dl>
+
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
+
+
+<a id="componentParse"></a><h3>3.2.3 Parse</h3>
 <p>
 Parse iCal component property text from a string or an array.
 Each string/array row must be strict RFC5545 formatted, i.e. begin with a property name.
 </p>
 <p>
-Uou can also parse complete <a href="#VALARM">ALARM</a>s, all properties included, in array format and
+You can also parse complete <a href="#VALARM">ALARM</a>s, all properties included, in array format and
 first array row as &quot;BEGIN:VALARM&quot;, last as &quot;END:VALARM&quot;
 as well as <a href="#VTIMEZONE">TIMEZONE</a> and standard/daylight subcomponents.
 Empty lines in a text property must be replaced by &quot;\n&quot;.
@@ -3710,7 +3882,7 @@ Except for the <a href="#X-PROPERTY">X-properties</a>, non-standard properties a
                (array)  [RFC5545] formatted properties,
                property name <b>must</b> start string / rows(-s)
     // <span class="comment">For a property array MUST all, but first row, be prefixed by space.</span></p>
-<p class="label">example</p>
+<p class="label">Example</p>
 <p class="example">
 $e = $vcalendar-&gt;newVevent();
 $e-&gt;parse( &quot;DTSTAMP:19970324T1200Z&quot; );
@@ -3728,31 +3900,35 @@ $e-&gt;parse( &quot;CATEGORIES:MEETING,PROJECT&quot; );
 $e-&gt;parse( &quot;CLASS:PUBLIC&quot; );
 $e-&gt;parse( &quot;SUMMARY:Calendaring Interoperability Planning Meeting&quot; );
 $e-&gt;parse( &quot;STATUS:DRAFT&quot; );
-$e-&gt;parse( &quot;DESCRIPTION:Project xyz Review Meeting Minutes\\n &quot;
-         . &quot;Agenda\\n &quot;
-         . &quot;1. Review of project version 1.0 requirements.\\n &quot;
-         . &quot;2. Definition of project processes.\\n &quot;
-         . &quot;3. Review of project schedule.\\n &quot;
-         . &quot;Participants: John Smith, Jane Doe, Jim Dandy\\n &quot;
-         . &quot;- It was decided that the requirements need to be signed off by \\n &quot;
-         . &quot;product marketing.\\n &quot;
-         . &quot;- Project processes were accepted.\\n &quot;
-         . &quot;- Project schedule needs to account for scheduled holidays and employee\\n &quot;
-         . &quot; vacation time. Check with HR for specific dates.\\n &quot;
-         . &quot;- New schedule will be distributed by Friday.\\n &quot;
-         . &quot;- Next weeks meeting is cancelled. No meeting until 3/23.&quot; );
+$e-&gt;parse(
+    &quot;DESCRIPTION:Project xyz Review Meeting Minutes\\n &quot; .
+    &quot;Agenda\\n &quot; .
+    &quot;1. Review of project version 1.0 requirements.\\n &quot; .
+    &quot;2. Definition of project processes.\\n &quot; .
+    &quot;3. Review of project schedule.\\n &quot; .
+    &quot;Participants: John Smith, Jane Doe, Jim Dandy\\n &quot; .
+    &quot;- It was decided that the requirements need to be signed off by \\n &quot; .
+    &quot;product marketing.\\n &quot; .
+    &quot;- Project processes were accepted.\\n &quot; .
+    &quot;- Project schedule needs to account for scheduled holidays and employee\\n &quot; .
+    &quot; vacation time. Check with HR for specific dates.\\n &quot; .
+    &quot;- New schedule will be distributed by Friday.\\n &quot; .
+    &quot;- Next weeks meeting is cancelled. No meeting until 3/23.&quot;
+);
 $e-&gt;parse( &quot;LOCATION:LDB Lobby&quot; );
 $e-&gt;parse( &quot;ATTACH;FMTTYPE=application/postscript:ftp://xyz.com/pub/conf/bkgrnd.ps&quot; );
-$e-&gt;parse( [
-    &quot;BEGIN:VALARM&quot;,
-    &quot;ACTION:AUDIO&quot;,
-    &quot;TRIGGER;VALUE=DATE-TIME:19970224T070000Z&quot;,
-    &quot;ATTACH;FMTTYPE=audio/basic:https://host.com/pub/audio-files/ssbanner.aud&quot;,
-    &quot;REPEAT:4&quot;,
-    &quot;DURATION:PT1H&quot;,
-    &quot;X-alarm:non-standard ALARM property&quot;,
-    &quot;END:VALARM&quot;
-]);
+$e-&gt;parse(
+    [
+        &quot;BEGIN:VALARM&quot;,
+        &quot;ACTION:AUDIO&quot;,
+        &quot;TRIGGER;VALUE=DATE-TIME:19970224T070000Z&quot;,
+        &quot;ATTACH;FMTTYPE=audio/basic:https://host.com/pub/audio-files/ssbanner.aud&quot;,
+        &quot;REPEAT:4&quot;,
+        &quot;DURATION:PT1H&quot;,
+        &quot;X-alarm:non-standard ALARM property&quot;,
+        &quot;END:VALARM&quot;
+    ]
+);
 $e-&gt;parse( &quot;X-xomment:non-standard property will be displayed, comma escaped&quot;);
 
 </p>
@@ -3760,7 +3936,7 @@ $e-&gt;parse( &quot;X-xomment:non-standard property will be displayed, comma esc
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="ACKNOWLEDGED"></a><h3>3.2.3 ACKNOWLEDGED</h3>
+<a id="ACKNOWLEDGED"></a><h3>3.2.4 ACKNOWLEDGED</h3>
 <p class="quotes">
     ACKNOWLEDGED specifies the UTC date and time at which the corresponding alarm was last sent or acknowledged
 </p>
@@ -3786,7 +3962,7 @@ $e-&gt;parse( &quot;X-xomment:non-standard property will be displayed, comma esc
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="ACTION"></a><h3>3.2.4 ACTION</h3>
+<a id="ACTION"></a><h3>3.2.5 ACTION</h3>
 <p class="quotes">
 This property defines the action to be invoked when an <a href="#VALARM">VALARM</a> is triggered,
 <br> &quot;AUDIO&quot; / &quot;DISPLAY&quot; / &quot;EMAIL&quot; / &quot;PROCEDURE&quot;.
@@ -3825,12 +4001,24 @@ $valarm-&gt;deleteAction();
 <p class="format">calendarComponent::getAction()</p>
 <p class="comment">output = actionValue<sup>1</sup>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getAction( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; actionValue<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; actionValue<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup> )
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $action = $valarm-&gt;getAction();
+
+<h5>is ACTION set</h5>
+<p>Return bool true if ACTION is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isActionSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $valarm-&gt;isActionSet();
 
 </p>
 <h5>Set ACTION</h5>
@@ -3856,7 +4044,7 @@ $valarm-&gt;setAction( &quot;DISPLAY&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="ATTACH"></a><h3>3.2.5 ATTACH</h3>
+<a id="ATTACH"></a><h3>3.2.6 ATTACH</h3>
 <p class="quotes">
     The property provides the capability to associate a document object with a <strong>calendar</strong> component.
     The property is<br>
@@ -3935,10 +4123,14 @@ while( $valarm-&gt;deleteAttach()) {
 <p class="format">calendarComponent::getAttach()</p>
 <p class="comment">output = attachValue<sup>1</sup></p>
 <p class="label">Format 2</p>
-<p class="format">calendarComponent::getAttach( propOrderNo/null , true )</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="format">calendarComponent::getAttach( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value,
-<p class="comment">output = array( &quot;value&quot;  =&gt; attachValue<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; attachValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getAttach( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -3947,7 +4139,16 @@ while( $valarm-&gt;deleteAttach()) {
 <p class="example">
 $attach = $valarm-&gt;getAttach();
 
+<h5>is ATTACH set</h5>
+<p>Return bool true if ATTACH is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isAttachSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isAttachSet();
+
 </p>
+
 <h5>Set ATTACH</h5>
 <p>
 Set property value. Parameters will be ordered as prescribed in [RFC5545].
@@ -3980,7 +4181,7 @@ $vevent-&gt;setAttach(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="ATTENDEE"></a><h3>3.2.6 ATTENDEE</h3>
+<a id="ATTENDEE"></a><h3>3.2.7 ATTENDEE</h3>
 <p class="quotes">
     The property defines an "Attendee" within a <strong>calendar</strong> component and is OPTIONAL
     and MAY occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
@@ -4007,8 +4208,8 @@ $vevent-&gt;setAttach(
         <a href="#PARTICIPANT">PARTICIPANT</a> (sub-)components
         and the <a href="#CALENDAR-ADDRESS">CALENDAR-ADDRESS</a> property value
         with X-parameters : ATTENDEE default values, see setAttendee() below, and PARTICIPANT
-        <a href="#UID">UID</a> and <a href="#PARTICIPANT-TYPE">PARTICIPANT-TYPE</a>.
-        <br>An option is to set ATTENDEE and <a href="#PARTICIPANT">PARTICIPANT</a> in pairs.
+        <a href="#UID">UID</a> and <a href="#PARTICIPANT-TYPE">PARTICIPANT-TYPE</a>.<br>
+        Another option is to set ATTENDEE and <a href="#PARTICIPANT">PARTICIPANT</a> in pairs.
     </dd>
 </dl>
 <p>This value type for ATTENDEE is URI, a <strong>calendar</strong> user address.</p>
@@ -4086,10 +4287,14 @@ while( $valarm-&gt;deleteAttendee()) {
 <p class="format">calendarComponent::getAttendee()</p>
 <p class="comment">output = attendeeValue<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getAttendee( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; attendeeValue<sup>1</sup>
-              , &quot;params&quot; =&gt; array( params<sup>2</sup> ))</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; attendeeValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getAttendee( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -4098,7 +4303,16 @@ while( $valarm-&gt;deleteAttendee()) {
 <p class="example">
 $attendee = $valarm-&gt;getAttendee();
 
+<h5>is ATTENDEE set</h5>
+<p>Return bool true if ATTENDEE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isAttendeeSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isAttendeeSet();
+
 </p>
+
 <h5>Set ATTENDEE</h5>
 <p>
 Set property value. If exist, default parameter values are removed after input (params<sup>2</sup>).
@@ -4256,7 +4470,7 @@ $vevent-&gt;setAttendee(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="BUSYTYPE"></a><h3>3.2.7 BUSYTYPE</h3>
+<a id="BUSYTYPE"></a><h3>3.2.8 BUSYTYPE</h3>
 <p class="quotes">BUSYTYPE specifies the default busy time type</p>
 <p>As described in</p>
 <dl>
@@ -4293,7 +4507,7 @@ $vevent-&gt;setAttendee(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CALENDAR-ADDRESS"></a><h3>3.2.8 CALENDAR-ADDRESS</h3>
+<a id="CALENDAR-ADDRESS"></a><h3>3.2.9 CALENDAR-ADDRESS</h3>
 <p class="quotes">
     This property specifies the calendar address for a <a href="#PARTICIPANT">PARTICIANT</a>.
 </p>
@@ -4317,7 +4531,7 @@ $vevent-&gt;setAttendee(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CATEGORIES"></a><h3>3.2.9 CATEGORIES</h3>
+<a id="CATEGORIES"></a><h3>3.2.10 CATEGORIES</h3>
 <p class="quotes">
     This property defines the categories for a <strong>calendar</strong> component and is OPTIONAL
     and MAY occur more than once in
@@ -4371,7 +4585,8 @@ $str = $component-&gt;createCategories();
 <h5>Delete CATEGORIES</h5>
 <p>Remove CATEGORIES from component.</p>
 <p class="label">Format</p>
-<p class="format">calendarComponent::deleteCategories()</p>
+<p class="format">calendarComponent::deleteCategories( [ propOrderNo ] )</p>
+<p class="comment">propOrderNo = (int) order number // <span class="comment">1=1st, 2=2nd etc</span></p>
 <p class="label">Example 1</p>
 <p>Delete (single/first) CATEGORIES property</p>
 <p class="example">
@@ -4381,7 +4596,7 @@ $vevent-&gt;deleteCategories();
 <p class="label">Example 2</p>
 <p>Delete CATEGORIES property no 2.</p>
 <p class="example">
-$vevent-&gt;deleteCategories();
+$vevent-&gt;deleteCategories( 2 );
 
 </p>
 <p class="label">Example 3</p>
@@ -4397,10 +4612,14 @@ while( $vevent-&gt;deleteCategories()) {
 <p class="format">calendarComponent::getCategories()</p>
 <p class="comment">output = categoryValue<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getCategories( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; categories<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; categories<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getCategories( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -4410,6 +4629,17 @@ while( $vevent-&gt;deleteCategories()) {
 $categories = $valarm-&gt;getCategories();
 
 </p>
+
+<h5>is CATEGORIES set</h5>
+<p>Return bool true if CATEGORIES is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isCategoriesSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isCategoriesSet();
+
+</p>
+
 <h5>Set CATEGORIES</h5>
 <p>Set property value.</p>
 <p>
@@ -4441,7 +4671,7 @@ $vevent-&gt;setCategories( &quot;project_x&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CLASS"></a><h3>3.2.10 CLASS</h3>
+<a id="CLASS"></a><h3>3.2.11 CLASS</h3>
 <p class="quotes">
 This property defines the access classification for a <strong>calendar</strong> component and is OPTIONAL
 and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a> and <a href="#VJOURNAL">VJOURNAL</a> components.
@@ -4484,6 +4714,7 @@ $str = $component-&gt;createClass();
 $vjournal-&gt;deleteClass();
 
 </p>
+
 <h5>Get CLASS</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -4491,13 +4722,27 @@ $vjournal-&gt;deleteClass();
 <p class="comment">output = classValue<sup>1</sup></p>
 <p class="label">Format 2</p>
 <p class="format">calendarComponent::getClass( true )</p>
-<p class="comment">output = array &quot;value&quot;   =&gt; classValue<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; classValue<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $class = $valarm-&gt;getClass();
 
 </p>
+
+<h5>is CLASS set</h5>
+<p>Return bool true if CLASS is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isClassSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isClassSet();
+
+</p>
+
 <h5>Set CLASS</h5>
 <p>Set property value.</p>
 <p>
@@ -4524,7 +4769,7 @@ $vevent-&gt;setClass( Vcalendar::CONFIDENTIAL );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="COLOR"></a><h3>3.2.11 COLOR</h3>
+<a id="COLOR"></a><h3>3.2.12 COLOR</h3>
 <p class="quotes">
     This property specifies a color used for displaying the
     <a href="#VCALENDAR">VCALENDAR</a>
@@ -4567,19 +4812,36 @@ $str = $component-&gt;createColor();
 $vevent-&gt;deleteColor();
 
 </p>
+
 <h5>Get COLOR</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getColor( )</p>
 <p class="comment">output = color<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getColor( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; color<sup>1</sup>, &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; color<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $transp = $vtodo-&gt;getColor();
 
 </p>
+
+<h5>is COLOR set</h5>
+<p>Return bool true if COLOR is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isColorSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isColorSet();
+
+</p>
+
 <h5>Set COLOR</h5>
 <p>Set property value.</p>
 <p>
@@ -4599,7 +4861,7 @@ $vevent-&gt;setColor( &quot;Blue&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="COMMENT"></a><h3>3.2.12 COMMENT</h3>
+<a id="COMMENT"></a><h3>3.2.13 COMMENT</h3>
 <p class="quotes">
 This property specifies non-processing information intended to provide a comment to the <strong>calendar</strong> user
 and is OPTIONAL and MAY occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
@@ -4672,10 +4934,14 @@ while( $vevent-&gt;deleteComment()) {
 <p class="format">calendarComponent::getComment()</p>
 <p class="comment">output = commentValue<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getComment( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; commentValue<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; commentValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getComment( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -4685,6 +4951,17 @@ while( $vevent-&gt;deleteComment()) {
 $comment = $vevent-&gt;getComment();
 
 </p>
+
+<h5>is COMMENT set</h5>
+<p>Return bool true if COMMENT is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isCommentSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isCommentSet();
+
+</p>
+
 <h5>Set COMMENT</h5>
 <p>Set property value.</p>
 <p>
@@ -4714,7 +4991,7 @@ $vevent-&gt;setComment( &quot;this is a comment&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="COMPLETED"></a><h3>3.2.13 COMPLETED</h3>
+<a id="COMPLETED"></a><h3>3.2.14 COMPLETED</h3>
 <p class="quotes">
 This property defines the date and time that a <a href="#VTODO">VTODO</a> was actually completed and is OPTIONAL and MUST NOT occur more than once.
 </p>
@@ -4727,7 +5004,7 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::COMPLETED is availa
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CONFERENCE"></a><h3>3.2.14 CONFERENCE</h3>
+<a id="CONFERENCE"></a><h3>3.2.15 CONFERENCE</h3>
 <p class="quotes">
     CONFERENCE specifies information for accessing a conferencing system for attendees of a meeting or task.
 </p>
@@ -4779,13 +5056,29 @@ $vevent-&gt;deleteConference();
 <p class="format">calendarComponent::getConference()</p>
 <p class="comment">output = url<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getConference( true )</p>
-<p class="comment">output = array &quot;value&quot; =&gt; conference<sup>1</sup>, &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; conference<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $conference = $vevent-&gt;getConference();
 
 </p>
+
+<h5>is CONFERENCE set</h5>
+<p>Return bool true if CONFERENCE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isConferenceSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isConferenceSet();
+
+</p>
+
 <h5>Set CONFERENCE</h5>
 <p>Set property value.</p>
 <p>
@@ -4820,12 +5113,12 @@ $conference = $vevent-&gt;getConference();
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CONTACT"></a><h3>3.2.15 CONTACT</h3>
+<a id="CONTACT"></a><h3>3.2.16 CONTACT</h3>
 <p class="quotes">
 The property is used to represent textual contact information or alternately a reference to textual contact information
  associated with the <strong>calendar</strong> component. The property is OPTIONAL and MUST NOT occur more than once in
- a VFREEBUSY or MAY occur more than once  in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a> and
- <a href="#VJOURNAL">VJOURNAL</a> components.
+ a <a href="#VFREEBUSY">VFREEBUSY</a> or MAY occur more than once  in <a href="#VEVENT">VEVENT</a>,
+    <a href="#VTODO">VTODO</a> and <a href="#VJOURNAL">VJOURNAL</a> components.
 </p>
 <p>Note, as described in</p>
 <dl>
@@ -4868,8 +5161,9 @@ $str = $component-&gt;createContact();
 </p>
 <h5>Delete CONTACT</h5>
 <p>Remove CONTACT from component.</p>
+<p>For CONTACT in <a href="#VFREEBUSY">VFREEBUSY</a> (may only occur once), skip the &quot;propOrderNo&quot; argument.</p>
 <p class="label">Format</p>
-<p class="format">calendarComponent::deleteContact()</p>
+<p class="format">calendarComponent::deleteContact( [ propOrderNo ] )</p>
 <p class="label">Example 1</p>
 <p>Delete (single/first) CONTACT property<p>
 <p class="example">
@@ -4890,15 +5184,20 @@ while( $vevent-&gt;deleteContact()) {
 }
 </p>
 <h5>Get CONTACT</h5>
+<p>For CONTACT in <a href="#VFREEBUSY">VFREEBUSY</a> (may only occur once), skip the &quot;propOrderNo&quot; argument.</p>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getContact()</p>
 <p class="comment">output = contactValue<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getContact( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; contactValue<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; contactValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getContact( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -4908,6 +5207,17 @@ while( $vevent-&gt;deleteContact()) {
 $contact = $vevent-&gt;getContact();
 
 </p>
+
+<h5>is CONTACT set</h5>
+<p>Return bool true if CONTACT is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isContactSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isContactSet();
+
+</p>
+
 <h5>Set CONTACT</h5>
 <p>Set property value.</p>
 <p>
@@ -4917,14 +5227,15 @@ The method returns the class instance (static).
 The method throws InvalidArgumentException on empty value and config ALLOWEMPTY is set to false (default true).
 </p>
 <p>Parameters will be ordered as prescribed in [RFC5545].</p>
+<p>For CONTACT in <a href="#VFREEBUSY">VFREEBUSY</a> (may only occur once), skip the &quot;propOrderNo&quot; argument.</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setContact( contactValue [, params [, propOrderNo ]] )</p>
 <p class="comment">contactValue<sup>1</sup> = (string) Value type TEXT
-params<sup>2</sup>       = array(
-                    Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;],
-                    Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;]
-                    *(xparams )
-                )
+params<sup>2</sup>       = [
+    Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;],
+    Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;],
+    *(xparams )
+]
 xparams       = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
 propOrderNo   = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>         = as defined in [RFC5546]</p>
@@ -4937,7 +5248,7 @@ $c-&gt;setContact( &quot;tel 012-34 56 789&quot; )
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="CREATED"></a><h3>3.2.16 CREATED</h3>
+<a id="CREATED"></a><h3>3.2.17 CREATED</h3>
 <p class="quotes">
     This property specifies the date and time that the <strong>calendar</strong> information was created by
     the <strong>calendar</strong> user agent in the <strong>calendar</strong> store.
@@ -4993,14 +5304,29 @@ $vevent-&gt;deleteCreated();
 <p class="format">calendarComponent::getCreated()</p>
 <p class="comment">output = createdDate<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getCreated( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; createdDate<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; createdDate<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $created = $vevent-&gt;getCreated();
 
 </p>
+
+<h5>is CREATED set</h5>
+<p>Return bool true if CREATED is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isCreatedSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isCreatedSet();
+
+</p>
+
 <h5>Set CREATED</h5>
 <p>
 Set property value. Input date is always a <a href="#DATE_WITH_UTC_TIME">UTC</a> timezone DATE-TIME or,
@@ -5043,7 +5369,7 @@ catch( Exception $e ) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DESCRIPTION"></a><h3>3.2.17 DESCRIPTION</h3>
+<a id="DESCRIPTION"></a><h3>3.2.18 DESCRIPTION</h3>
 <p class="quotes">
     This property provides a more complete textual description of the <strong>calendar</strong> component,
     than that provided by the <a href="#SUMMARY">SUMMARY</a> property (, analogous to a mail BODY).
@@ -5113,13 +5439,13 @@ $vevent-&gt;deleteDescription();
 
 </p>
 <p class="label">Example 2</p>
-<p>Delete DESCRIPTION property no 2.</p>
+<p>Delete DESCRIPTION property no 2, <a href="#VCALENDAR">VCALENDAR</a>/<a href="#VJOURNAL">VJOURNAL</a> only.</p>
 <p class="example">
 $vjournal-&gt;deleteDescription( 2 );
 
 </p>
 <p class="label">Example 3</p>
-<p>Deleting all DESCRIPTION properties.</p>
+<p>Deleting all DESCRIPTION properties. <a href="#VCALENDAR">VCALENDAR</a>/<a href="#VJOURNAL">VJOURNAL</a> only.</p>
 <p class="example">
 while( $vjournal-&gt;deleteDescription()) {
     continue;
@@ -5128,17 +5454,38 @@ while( $vjournal-&gt;deleteDescription()) {
 <h5>Get DESCRIPTION</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
+<p>get (single) DESCRIPTION property, for <a href="#VCALENDAR">VCALENDAR</a>/<a href="#VJOURNAL">VJOURNAL</a>, first/next</p>
 <p class="format">calendarComponent::getDescription()</p>
 <p class="comment">output = descriptionValue<sup>1</sup></p>
+
+
 <p class="label">Format 2</p>
-<p class="format">calendarComponent::getDescription( null , true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; descriptionValue<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="format">calendarComponent::getDescription( propOrderNo/null ,true )</p>
+<p class="comment">
+propOrderNo = (int) order number // <span class="comment">1=1st, 2=2nd etc, <a href="#VCALENDAR">VCALENDAR</a>/<a href="#VJOURNAL">VJOURNAL</a> only</span>
+</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; descriptionValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $description = $vevent-&gt;getDescription();
 
 </p>
+
+<h5>is DESCRIPTION set</h5>
+<p>Return bool true if DESCRIPTION is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isDescriptionSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isDescriptionSet();
+
+</p>
+
 <h5>Set DESCRIPTION</h5>
 <p>Set property value.</p>
 <p>
@@ -5157,7 +5504,7 @@ params<sup>2</sup>           = array(
                         *(xparams )
                     )
 xparams           = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-propOrderNo       = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
+propOrderNo       = (int) order number       // <span class="comment">1=1st, 2=2nd etc, <a href="#VCALENDAR">VCALENDAR</a>/<a href="#VJOURNAL">VJOURNAL</a> only</span>
 lang<sup>*</sup>             = as defined in [RFC5546]</p>
 <p class="label">Example</p>
 <p class="example">
@@ -5168,7 +5515,7 @@ $vevent-&gt;setDescription( &quot;This is a description&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DTEND"></a><h3>3.2.18 DTEND</h3>
+<a id="DTEND"></a><h3>3.2.19 DTEND</h3>
 <p class="quotes">
     This property specifies the date and time that a <strong>calendar</strong> component ends.
     The property is OPTIONAL and MUST NOT occur more than once in
@@ -5239,14 +5586,29 @@ $vevent-&gt;deleteDtend();
 <p class="format">calendarComponent::getDtend()</p>
 <p class="comment">output = dtendDate<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getDtend( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; dtendDate<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; dtendDate<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $dtend = $vevent-&gt;getDtend();
 
 </p>
+
+<h5>is DTEND set</h5>
+<p>Return bool true if DTEND is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isDtendSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isDtendSet();
+
+</p>
+
 <a id="tzidparam"><h5>Set DTEND</h5></a>
 <p>
 Set property value. If DATE value type is expected, &quot;VALUE&quot; = &quot;DATE&quot; <b>must</b> be set
@@ -5288,6 +5650,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <p class="label">Example 2</p>
 <p>End of an all-day event.<p>
@@ -5302,6 +5665,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <p class="label">Example 3</p>
 <p>Will output: DTEND;TZID=Europe/Stockholm:20060811T093000</p>
@@ -5313,12 +5677,13 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DTSTAMP"></a><h3>3.2.19 DTSTAMP</h3>
+<a id="DTSTAMP"></a><h3>3.2.20 DTSTAMP</h3>
 <p class="quotes">
     The property indicates the date/time the Vcalendar instance was created and is OPTIONAL and
     MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
@@ -5362,7 +5727,7 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::DTSTAMP is availabl
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DTSTART"></a><h3>3.2.20 DTSTART</h3>
+<a id="DTSTART"></a><h3>3.2.21 DTSTART</h3>
 <p class="quotes">
     This property specifies when the <strong>calendar</strong> component begins.
     The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>,
@@ -5408,7 +5773,7 @@ To ease up usage, constants<br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DUE"></a><h3>3.2.21 DUE</h3>
+<a id="DUE"></a><h3>3.2.22 DUE</h3>
 <p class="quotes">
 This property defines the date and time when a <a href="#VTODO">VTODO</a> is expected to be completed
 and is OPTIONAL and MUST NOT occur more than once and only if DURATION NOT occurs.
@@ -5433,7 +5798,7 @@ To ease up usage, constants<br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="DURATION"></a><h3>3.2.22 DURATION</h3>
+<a id="DURATION"></a><h3>3.2.23 DURATION</h3>
 <p class="quotes">
     The property specifies a positive duration of time.
 </p>
@@ -5494,9 +5859,13 @@ $valarm-&gt;deleteDuration();
 <p class="format">calendarComponent::getDuration()</p>
 <p class="comment">output = duration<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getDuration( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; duration<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; duration<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $duration = $vtodo-&gt;getDuration();
@@ -5508,6 +5877,17 @@ If (1st) argument is true and a 2nd is used and set to true, returned output is 
  output format (like <a href="#DTEND">DTEND</a> / <a href="#DUE">DUE</a>), based on
 <a href="#DTSTART">DTSTART</a> value with the added DURATION value (incl. opt. timezone).
 </p>
+
+<h5>is DURATION set</h5>
+<p>Return bool true if DURATION is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isDurationSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isDurationSet();
+
+</p>
+
 <h5>Set DURATION</h5>
 <p>Set property value.</p>
 <p>
@@ -5541,6 +5921,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <p class="label">Example 2</p>
 <p>Four hours duration.</p>
@@ -5551,12 +5932,13 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="EXDATE"></a><h3>3.2.23 EXDATE</h3>
+<a id="EXDATE"></a><h3>3.2.24 EXDATE</h3>
 <p class="quotes">
     This property defines the list of date/time exceptions for a recurring <strong>calendar</strong> component
     and is OPTIONAL and MAY occur more than once in <a href="#VEVENT">VEVENT</a>,
@@ -5620,15 +6002,30 @@ while( $vjournal-&gt;deleteExdate()) {
 <p class="format">calendarComponent::getExdate()<p>
 <p class="comment">output = exdates<sup>1</sup> (with date<sup>1</sup>)</p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getExdate( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; exdates<sup>1</sup> (with date<sup>1</sup>)
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; exdates<sup>1</sup> (with date<sup>1</sup>),
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $exdate = $vtodo-&gt;getExdate();
 
 </p>
+
+<h5>is EXDATE set</h5>
+<p>Return bool true if EXDATE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isExdateSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isExdateSet();
+
+</p>
+
 <h5>Set EXDATE</h5>
 <p>Set property value.</p>
 <p>The value type for EXDATE should match the <a href="#DTSTART">DTSTART</a> value type.</p>
@@ -5690,7 +6087,7 @@ catch( Exception $e ) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="EXRULE"></a><h3>3.2.24 EXRULE</h3>
+<a id="EXRULE"></a><h3>3.2.25 EXRULE</h3>
 <p class="quotes">
 This property defines a rule or repeating pattern for an exception to a recurrence set and is OPTIONAL
 and MAY occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>, <a href="#VJOURNAL">VJOURNAL</a> components.
@@ -5704,7 +6101,7 @@ Uses the methods and formats as <a href="#RRULE">RRULE</a>.
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="FREEBUSY_PROP"></a><h3>3.2.25 FREEBUSY</h3>
+<a id="FREEBUSY_PROP"></a><h3>3.2.26 FREEBUSY</h3>
 <p class="quotes">
 The property defines one or more free or busy time intervals in a <a href="#VFREEBUSY">VFREEBUSY</a>
 <strong>calendar</strong> component.
@@ -5751,28 +6148,42 @@ $vfreebusy-&gt;deleteFreebusy( 2 );
 while( $vfreebusy-&gt;deleteFreebusy()) {
     continue;
 }
+
 </p>
 <h5>Get FREEBUSY</h5>
-<p>If set, returns property value, otherwise bool false.</p>
+<p>If set, returns property value, otherwise bool false. Note, NO freebusytype!</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getFreebusy()</p>
 <p class="comment">
-output  = array( &quot;fbtype&quot; =&gt; freebusytype<sup>1</sup> , periods )
-periods = periods<sup>2</sup> with startdate/enddate<sup>2</sup> below
+output  = (array) periods<sup>2</sup> with (array) startdate, enddate/duration<sup>2</sup> below
 </p>
-<p class="label">Format 3</p>
+<p class="label">Format 2</p>
+<p>If set, returns property value and params, otherwise bool false. Freebusytype in params.</p>
 <p class="format">calendarComponent::getFreebusy( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
 <p class="comment">
-output  = array( &quot;value&quot; =&gt; array(&quot;fbtype&quot; =&gt; freebusytype<sup>1</sup> ,periods)
-               , &quot;params&quot; =&gt; xparams<sup>3</sup> )
-periods = periods<sup>2</sup> with startdate/enddate<sup>2</sup> below
+output  = [
+    &quot;value&quot;  =&gt; array( periods),
+    &quot;params&quot; =&gt; [ &quot;FBTYPE&quot; =&gt; freebusytype, *xparams<sup>3</sup> ]
+]
+periods = (array) periods<sup>2</sup> with (array) startdate, enddate/duration<sup>2</sup> below
 </p>
 <p class="label">Example</p>
 <p class="example">
 $freebusy = $vfreebusy-&gt;getFreebusy();
 
 </p>
+
+<h5>is FREEBUSY set</h5>
+<p>Return bool true if FREEBUSY is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isFreebusySet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vfreebusy-&gt;isFreebusySet();
+
+</p>
+
 <h5>Set FREEBUSY</h5>
 <p>
 Set property value. FREEBUSY date is always a <a href="#DATE_WITH_UTC_TIME">UTC</a> timezone DATE-TIME
@@ -5791,15 +6202,14 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
     Exception on DateTime/DateInterval error.
 </p>
 <p class="label">Format</p>
-<p class="format">calendarComponent::setFreebusy( freebusytype,fbperiods [,xparams [,propOrderNo ]] )</p>
-<p class="comment">freebusytype<sup>1</sup>     = one of Vcalendar::FREE
+<p class="format">calendarComponent::setFreebusy( freebusytype, periods<sup>2</sup> [,xparams [,propOrderNo ]] )</p>
+<p class="comment">freebusytype     = one of Vcalendar::FREE
                          / Vcalendar::BUSY <b>Default</b>
                          / Vcalendar::BUSY-UNAVAILABLE
                          / Vcalendar::BUSY-TENTATIVE
                          / x-name
-fbperiods         = (array) ( periods<sup>2</sup> )&nbsp;
-periods<sup>2</sup>          = (array) ( startdate, enddate/duration ) /
-                    (array) ( *[, (array) ( startdate, enddate/duration )] )
+periods<sup>2</sup>          = (array) ( period [, period... ] )
+period            = (array) ( startdate, enddate/duration )
 
 startdate/enddate = (object) DateTimeInterface instance, will be set to UTC if not UTC timezone
 startdate/enddate = (string) datetime string<sup>*</sup>
@@ -5825,83 +6235,86 @@ propOrderNo       = (int) order number                              // <span cla
     &quot;Internet Calendaring and Scheduling Core Object Specification (iCalendar)&quot;.
     The recommended way :
 </p>
+<p class="label">Example 1</p>
+<p>Single FREEBUSY entries</p>
 <p class="example">
-    try {
-        $freebusy-&gt;setFreebusy(
-            Vcalendar::FREE,
-            [
-                new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; ),
-                new DateTime( &quot;2002-02-02 02:02:02 UTC&quot; )
-            [
-        )
-        $freebusy-&gt;setFreebusy(
-            Vcalendar::FREE,
-            [
-                new DateTime( &quot;2003-03-03 03:03:03 UTC&quot; ),
-                new DateInterval( &quot;P5DT5H5M5S&quot; )
-            ],
-        )
-        $freebusy-&gt;setFreebusy(
-            Vcalendar::FREE,
-            [
-                &quot;4 April 2005 4:4:4 UTC&quot;,
-                &quot;P2D&quot;
-            ]
-        )
-        -&gt;setFreebusy(
+try {
+    $freebusy1->setFreebusy(
+        Vcalendar::FREE,
+        [
+            new DateTime( "2001-01-01 01:01:01 UTC" ),
+            new DateTime( "2002-02-02 02:02:02 UTC" )
+        ]
+    );
+    $freebusy1->setFreebusy(
+        Vcalendar::FREE,
+        [
+            new DateTime( "2003-03-03 03:03:03 UTC" ),
+            new DateInterval( "P5DT5H5M5S" )
+        ],
+    );
+    $freebusy1->setFreebusy(
+        Vcalendar::FREE,
+        [
+            "4 April 2005 4:4:4 UTC",
+            "P2D"
+        ]
+    )
+        ->setFreebusy(
             Vcalendar::BUSY,
             [
-                new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; ),
-                new DateTime( &quot;2002-02-02 02:02:02 UTC&quot; )
+                new DateTime( "2001-01-01 01:01:01 UTC" ),
+                new DateTime( "2002-02-02 02:02:02 UTC" )
             ],
         )
-        -&gt;setFreebusy(
+        ->setFreebusy(
             Vcalendar::BUSY,
             [
-                new DateTime( &quot;2003-03-03 03:03:03 UTC&quot; ),
-                &quot;P2D&quot;
+                new DateTime( "2003-03-03 03:03:03 UTC" ),
+                "P2D"
             ],
         )
-        -&gt;setFreebusy(
+        ->setFreebusy(
             Vcalendar::BUSY,
             [
-                &quot;4 April 2005 4:4:4 UTC&quot;,
-                new DateInterval( &quot;PT5H&quot; )
+                "4 April 2005 4:4:4 UTC",
+                new DateInterval( "PT5H" )
             ],
         )
-        -&gt;setFreebusy(
+        ->setFreebusy(
             Vcalendar::BUSY,
             [
-                new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; ),
-                new DateTime( &quot;2003-03-03 03:03:03 UTC&quot; )
+                new DateTime( "2001-01-01 01:01:01 UTC" ),
+                new DateTime( "2003-03-03 03:03:03 UTC" )
             ]
         );
     }
     catch( Exception $e ) {
-    die( $e-&gt;getMessage());
+        die( $e->getMessage());
     }
+
 </p>
-<p class="label">Example 1</p>
-Works, but...
+<p class="label">Example 2</p>
+<p>FREEBUSY entries as <i>list</i> of entries</p>
 <p class="example">
-    try {
-        $freebusy-&gt;setFreebusy(
-            Vcalendar::FREE,
+try {
+    $freebusy2-&gt;setFreebusy(
+        Vcalendar::FREE,
+        [
             [
-                [
-                    new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; ),
-                    new DateTime( &quot;2002-02-02 02:02:02 UTC&quot; )
-                ],
-                [
-                    new DateTime( &quot;2003-03-03 03:03:03 UTC&quot; ),
-                    new DateInterval( &quot;P5DT5H5M5S&quot; )
-                ],
-                [
-                    &quot;4 April 2005 4:4:4 UTC&quot;,
-                    &quot;P2D&quot;
-                ]
+                new DateTime( &quot;2001-01-01 01:01:01 UTC&quot; ),
+                new DateTime( &quot;2002-02-02 02:02:02 UTC&quot; )
+            ],
+            [
+                new DateTime( &quot;2003-03-03 03:03:03 UTC&quot; ),
+                new DateInterval( &quot;P5DT5H5M5S&quot; )
+            ],
+            [
+                &quot;4 April 2005 4:4:4 UTC&quot;,
+                &quot;P2D&quot;
             ]
-        )
+        ]
+    )
         -&gt;setFreebusy(
             Vcalendar::BUSY,
             [
@@ -5923,16 +6336,17 @@ Works, but...
                 ]
             ]
         );
-    }
-    catch( Exception $e ) {
-        die( $e-&gt;getMessage());
-    }
+}
+catch( Exception $e ) {
+    die( $e-&gt;getMessage());
+}
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="GEO"></a><h3>3.2.26 GEO</h3>
+<a id="GEO"></a><h3>3.2.27 GEO</h3>
 <p class="quotes">
 This property specifies information related to the global position for the activity specified by
     <a href="#VEVENT">VEVENT</a> and <a href="#VTODO">VTODO</a> components
@@ -5945,7 +6359,7 @@ This property specifies information related to the global position for the activ
         &quot;Event Publishing Extensions to iCalendar&quot;
     </dt>
     <dd>
-        GEO may occur more than once in
+        GEO may occur once in
         <a href="#PARTICIPANT">PARTICIPANT</a>,
         <a href="#VRESOURCE">VRESOURCE</a>and
         <a href="#VLOCATION">VLOCATION</a>
@@ -5997,14 +6411,28 @@ $vevent-&gt;deleteGeo();
               , &quot;longitude&quot; =&gt; &lt;longitude&gt;))</p>
 <p class="label">Format 2</p>
 <p class="format">calendarComponent::getGeo( true )</p>
-<p class="comment">output = array( &quot;value&quot; =&gt; array ( &quot;latitude&quot;  =&gt; &lt;latitude&gt;
-                                 , &quot;longitude&quot; =&gt; &lt;longitude&gt;))
-              , &quot;params&quot; =&gt; xparams<sup>1</sup> )</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="comment">output = [
+    &quot;value&quot; =&gt; array ( &quot;latitude&quot;  =&gt; &lt;latitude&gt;, &quot;longitude&quot; =&gt; &lt;longitude&gt; ),
+    &quot;params&quot; =&gt; xparams<sup>1</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $geo = $vevent-&gt;getGeo();
 
 </p>
+
+<h5>is GEO set</h5>
+<p>Return bool true if GEO is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isGeoSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isGeoSet();
+
+</p>
+
 <h5>Set GEO</h5>
 <p>Set property value.</p>
 <p>
@@ -6028,7 +6456,7 @@ $vevent-&gt;setGeo( 11.23456, -23.45678 );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="IMAGE"></a><h3>3.2.27 IMAGE</h3>
+<a id="IMAGE"></a><h3>3.2.28 IMAGE</h3>
 <p class="quotes">
 <p>IMAGE specifies an image associated with the calendar or a calendar component.</p>
 <p>Note, as described in</p>
@@ -6093,6 +6521,7 @@ Deleting all IMAGE properties.
 while( $vevent-&gt;deleteImage()) {
     continue;
 }
+
 </p>
 <h5>Get IMAGE</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
@@ -6100,9 +6529,14 @@ while( $vevent-&gt;deleteImage()) {
 <p class="format">calendarComponent::getImage()</p>
 <p class="comment">output = imageValue<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getImage( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value,
-<p class="comment">output = array( &quot;value&quot; =&gt; imageValue<sup>1</sup>, &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; imageValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getImage( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value order number</p>
@@ -6112,6 +6546,17 @@ while( $vevent-&gt;deleteImage()) {
 $image = $valarm-&gt;getImage();
 
 </p>
+
+<h5>is IMAGE set</h5>
+<p>Return bool true if IMAGE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isImageSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isImageSet();
+
+</p>
+
 <h5>Set IMAGE</h5>
 <p>
     Set property value. Parameters will be ordered as prescribed in [RFC7986].
@@ -6126,18 +6571,18 @@ $image = $valarm-&gt;getImage();
 <p class="format">calendarComponent::setImage( imageValue<sup>1</sup> [, params [, propOrderNo ]] )</p>
 <p class="comment">imageValue<sup>1</sup> = (string) URI / inline binary encoded content
     params<sup>2</sup> 1   = [            // value is URI
-    Vcalendar::VALUE =&gt; Vcalendar::URI ], imageParams
+        Vcalendar::VALUE =&gt; Vcalendar::URI ], imageParams
     ]
     params<sup>2</sup> 2   = [            // value is binary
-    Vcalendar::ENCODING =&gt; Vcalendar::BASE64,
-    Vcalendar::VALUE    =&gt; Vcalendar::BINARY,
-    imageParams
+        Vcalendar::ENCODING =&gt; Vcalendar::BASE64,
+        Vcalendar::VALUE    =&gt; Vcalendar::BINARY,
+        imageParams
     ]
     imageParams = [
-    Vcalendar::FMTTYPE  =&gt; contentType,
-    Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
-    Vcalendar::DISPLAY  =&gt; displayVal,
-    xparams
+        Vcalendar::FMTTYPE  =&gt; contentType,
+        Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
+        Vcalendar::DISPLAY  =&gt; displayVal,
+        xparams
     ]
     contentType = (string) The parameter value MUST be the TEXT for either an IANA
     registered content type or a non-standard content type.
@@ -6158,13 +6603,14 @@ $vevent-&gt;setImage(
     &quot;ftp://domain.com/pub/docs/agenda.doc&quot;,
     [ Vcalendar::FMTTYPE =&gt; &quot;application/binary&quot; ]
 );
+
 </p>
 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="LAST-MODIFIED"></a><h3>3.2.28 LAST-MODIFIED</h3>
+<a id="LAST-MODIFIED"></a><h3>3.2.29 LAST-MODIFIED</h3>
 <p class="quotes">
 The property specifies the date and time that the information associated with the <strong>calendar</strong>
 component was last revised in the <strong>calendar</strong> store.
@@ -6209,7 +6655,7 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::LAST_MODIFIED is av
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="LOCATION"></a><h3>3.2.29 LOCATION</h3>
+<a id="LOCATION"></a><h3>3.2.30 LOCATION</h3>
 <p class="quotes">
 The property defines the intended venue for the activity defined by a <strong>calendar</strong> component.
 The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>
@@ -6241,8 +6687,8 @@ The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">
         <a href="#VLOCATION">VLOCATION</a> (sub-)component
         and the <a href="#NAME">NAME</a> property value
         with X-parameters for <a href="#VLOCATION">VLOCATION</a> properties
-        <a href="#UID">UID</a> and <a href="#LOCATION-TYPE">LOCATION-TYPE</a>.
-        <br>An option is to set LOCATION and <a href="#VLOCATION">VLOCATION</a> in pairs.
+        <a href="#UID">UID</a> and <a href="#LOCATION-TYPE">LOCATION-TYPE</a>.<br>
+        Another option is to set LOCATION and <a href="#VLOCATION">VLOCATION</a> in pairs.
     </dd>
 </dl>
 <p>The value type for LOCATION is TEXT.</p>
@@ -6270,6 +6716,10 @@ $str = $component-&gt;createLocation();
 </p>
 <h5>Delete LOCATION</h5>
 <p>Remove LOCATION from component.</p>
+<p>
+    For LOCATION in <a href="#PARTICIPANT">PARTICIPANT</a> (may occur more than once),
+    review <a href="#CATEGORIES">CATEGORIES</a> delete-method with &quot;propOrderNo&quot; argument.
+</p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::deleteLocation()</p>
 <p class="label">Example</p>
@@ -6279,20 +6729,43 @@ $vevent-&gt;deleteLocation();
 </p>
 <h5>Get LOCATION</h5>
 <p>If set, returns property value, otherwise bool false.</p>
+<p>
+    For LOCATION in <a href="#PARTICIPANT">PARTICIPANT</a> (may occur more than once),
+    review <a href="#CATEGORIES">CATEGORIES</a> get-method with &quot;propOrderNo&quot; argument.
+</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getLocation()</p>
 <p class="comment">output = location<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getLocation( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; location<sup>1</sup>
-              , &quot;params&quot; =&gt; param<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; location<sup>1</sup>,
+    &quot;params&quot; =&gt; param<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $location = $vevent-&gt;getLocation();
 
 </p>
+
+<h5>is LOCATION set</h5>
+<p>Return bool true if LOCATION is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isLocationSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isLocationSet();
+
+</p>
+
 <h5>Set LOCATION</h5>
 <p>Set property value.</p>
+<p>
+    For LOCATION in <a href="#PARTICIPANT">PARTICIPANT</a> (may occur more than once),
+    review <a href="#CATEGORIES">CATEGORIES</a> set-method with &quot;propOrderNo&quot; argument.
+</p>
 <p>
 The method returns the class instance (static).
 </p>
@@ -6301,14 +6774,17 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 </p>
 <p>Parameters will be ordered as prescribed in [RFC5545].</p>
 <p class="label">Format</p>
-<p class="format">calendarComponent::setLocation( location [, param] )</p>
+<p class="format">calendarComponent::setLocation( location [, param [, propOrderNo]] )</p>
 <p class="comment">location<sup>1</sup> = (string) Value type TEXT
-params<sup>2</sup>   = (array) (
-                  [  Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;]
-                  [, Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;]
-                 *[, xparams ] )
-xparams   = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-lang<sup>*</sup>     = as defined in [RFC5546]</p>
+params<sup>2</sup>     = (array) (
+            [  Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;]
+            [, Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;]
+           *[, xparams ]
+)
+xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
+lang<sup>*</sup>       = as defined in [RFC5546]
+propOrderNo = (int) order number             // <span class="comment">opt, 1=1st, 2=2nd etc, <a href="#PARTICIPANT">PARTICIPANT</a> only</span>
+</p>
 <p class="label">Example</p>
 <p class="example">
 $vevent-&gt;setLocation( &quot;Buckingham Palace&quot; );
@@ -6318,7 +6794,7 @@ $vevent-&gt;setLocation( &quot;Buckingham Palace&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="LOCATION-TYPE"></a><h3>3.2.30 LOCATION-TYPE</h3>
+<a id="LOCATION-TYPE"></a><h3>3.2.31 LOCATION-TYPE</h3>
 <p class="quotes">LOCATION-TYPE specifies the type(s) of a location</p>
 <p>As described in</p>
 <dl>
@@ -6348,7 +6824,7 @@ $vevent-&gt;setLocation( &quot;Buckingham Palace&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="NAME"></a><h3>3.2.31 NAME</h3>
+<a id="NAME"></a><h3>3.2.32 NAME</h3>
 <p class="quotes">
     NAME specifies the name of the calendar.
 </p>
@@ -6359,14 +6835,14 @@ $vevent-&gt;setLocation( &quot;Buckingham Palace&quot; );
         &quot;iCalendar Property Extensions&quot;
     </dt>
     <dd>
-        NAME may occur once in <a href="#VCALENDAR">VCALENDAR</a> and may NOT be supported by all calendaring software.
+        NAME may occur more than once in <a href="#VCALENDAR">VCALENDAR</a> and may NOT be supported by all calendaring software.
     </dd>
     <dt>
         <a href="https://tools.ietf.org/html/rfc9073" title="Download rfc9073" target="_blank">rfc9073</a>
         &quot;Event Publishing Extensions to iCalendar&quot;
     </dt>
     <dd>
-        NAME may occur more than once in <a href="#VLOCATION">VLOCATION</a> and <a href="#VRESOURCE">VRESOURCE</a>
+        NAME may occur once in <a href="#VLOCATION">VLOCATION</a> and <a href="#VRESOURCE">VRESOURCE</a>
         and may NOT be supported by all calendaring software.
     </dd>
 </dl>
@@ -6389,40 +6865,52 @@ $str = $calendar-&gt;createName();
 </p>
 <h5>Delete NAME</h5>
 <p>Remove NAME from calendar.</p>
+<p>
+    For NAME in <a href="#VCALENDAR">VCALENDAR</a> (may occur more than once),
+    review <a href="#CATEGORIES">CATEGORIES</a> delete-method with &quot;propOrderNo&quot; argument.
+</p>
 <p class="label">Format</p>
 <p class="format">Vcalendar::deleteName()</p>
-<p class="label">Example 1</p>
+<p class="label">Example</p>
 <p>Delete (single/first) NAME property.</p>
 <p class="example">
 $calendar-&gt;deleteName();
 
 </p>
-<p class="label">Example 2</p>
-<p>Delete NAME property no 2.</p>
-<p class="example">
-$calendar-&gt;deletename( 2 );
 
-</p>
-<p class="label">Example 3</p>
-<p>Deleting all NAME properties.</p>
-<p class="example">
-while( $calendar-&gt;deleteName()) {
-    continue;
-}
-</p>
 <h5>Get NAME</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
+<p>
+    For NAME in <a href="#VCALENDAR">VCALENDAR</a> (may occur more than once),
+    review <a href="#CATEGORIES">CATEGORIES</a> get-method with &quot;propOrderNo&quot; argument.
+</p>
 <p class="label">Format 1</p>
 <p class="format">Vcalendar::getName()</p>
 <p class="comment">output = nameValue<sup>1</sup></p>
 <p class="label">Format 2</p>
-<p class="format">Vcalendar::getName( null , true )</p>
-<p class="comment">output = array( &quot;value&quot; =&gt; nameValue<sup>1</sup>, &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="format">Vcalendar::getName( true )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; nameValue<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $name = $calendar-&gt;getName();
 
 </p>
+
+<h5>is NAME set</h5>
+<p>Return bool true if NAME is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isNameSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vcalendar-&gt;isNameSet();
+
+</p>
+
 <h5>Set NAME</h5>
 <p>Set property value.</p>
 <p>
@@ -6433,16 +6921,17 @@ $name = $calendar-&gt;getName();
 </p>
 <p>Parameters will be ordered as prescribed in [RFC7986].
 <p class="label">Format</p>
-<p class="format">Vcalendar::setDescription( nameValue [, params [, propOrderNo ]] )</p>
-<p class="comment">nameValue<sup>1</sup> = (string) Value type TEXT
-    params<sup>2</sup>     = [
-                    Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
-                    Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;
-                  ],
-                  *xparams
-    xparams     = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
-    propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
-    lang<sup>*</sup>       = as defined in [RFC5546]</p>
+<p class="format">Vcalendar::setName( nameValue [, params [, propOrderNo ]] )</p>
+<p class="comment">nameValue<sup>1</sup>   = (string) Value type TEXT
+params<sup>2</sup>      = [
+    Vcalendar::ALTREP   =&gt; (string) &quot;&lt;an alternate text representation, URI&gt;&quot;,
+    Vcalendar::LANGUAGE =&gt; (string) &quot;lang<sup>*</sup>&quot;
+],
+    *xparams
+lang<sup>*</sup>        = as defined in [RFC5546]
+xparams      = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
+propOrderNo  = (int) order number             // <span class="comment">opt, 1=1st, 2=2nd etc, <a href="#VCALENDAR">VCALENDAR</a> only</span>
+</p>
 <p class="label">Example</p>
 <p class="example">
 $calendar-&gt;setName( &quot;This is a name&quot; );
@@ -6452,7 +6941,7 @@ $calendar-&gt;setName( &quot;This is a name&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="ORGANIZER"></a><h3>3.2.32 ORGANIZER</h3>
+<a id="ORGANIZER"></a><h3>3.2.33 ORGANIZER</h3>
 <p class="quotes">
 The property defines the organizer for a <strong>calendar</strong> component and is OPTIONAL
 and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>,
@@ -6505,18 +6994,33 @@ $vevent-&gt;deleteOrganizer();
 <p class="format">calendarComponent::getOrganizer()</p>
 <p class="comment">output = organizer<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getOrganizer( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; organizer<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; organizer<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $organizer = $vevent-&gt;getOrganizer();
 
 </p>
+
+<h5>is ORGANIZER set</h5>
+<p>Return bool true if ORGANIZER is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isOrganizerSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isOrganizerSet();
+
+</p>
+
 <h5>Set ORGANIZER</h5>
 <p>Set property value.
 Property value must be prefixed by protocol
-    (&quot;ftp://&quot;, &quot;http://&quot;, &quot;mailto:&quot;, &quot;file://&quot; etc,
+    (&quot;ftp://&quot;, &quot;https://&quot;, &quot;mailto:&quot;, &quot;file://&quot; etc,
     ref. <a href="https://tools.ietf.org/html/rfc1738" title="Download 1738" target="_blank">rfc1738</a>),
     &quot;mailto:&quot; is prefixed if missing.
 Also DIR parameter must be prefixed by protocol.
@@ -6563,7 +7067,7 @@ $vevent-&gt;setOrganizer(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="PARTICIPANT-TYPE"></a><h3>3.2.33 PARTICIPANT-TYPE</h3>
+<a id="PARTICIPANT-TYPE"></a><h3>3.2.34 PARTICIPANT-TYPE</h3>
 <p class="quotes">PARTICIPANT-TYPE specifies the type of participant.</p>
 <p>As described in</p>
 <dl>
@@ -6600,7 +7104,7 @@ $vevent-&gt;setOrganizer(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="PERCENT-COMPLETE"></a><h3>3.2.34 PERCENT-COMPLETE</h3>
+<a id="PERCENT-COMPLETE"></a><h3>3.2.35 PERCENT-COMPLETE</h3>
 <p class="quotes">
 This property is used by an assignee or delegatee of a <a href="#VTODO">VTODO</a> to
 convey the percent completion of a <a href="#VTODO">VTODO</a> to the Organizer and is
@@ -6639,14 +7143,29 @@ $vtodo-&gt;deletePercentcomplete()
 <p class="format">calendarComponent::getPercentcomplete()</p>
 <p class="comment">output = percent<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getPercentcomplete( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; percent<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; percent<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $percent = $vtodo-&gt;getPercentcomplete();
 
 </p>
+
+<h5>is PERCENT-COMPLETE set</h5>
+<p>Return bool true if PERCENT-COMPLETE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isPercentcompleteSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vtodo-&gt;isPercentcompleteSet();
+
+</p>
+
 <h5>Set PERCENT-COMPLETE</h5>
 <p>Set property value.</p>
 <p>
@@ -6669,7 +7188,7 @@ $vtodo-&gt;setPercentcomplete( 90 );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="PRIORITY"></a><h3>3.2.35 PRIORITY</h3>
+<a id="PRIORITY"></a><h3>3.2.36 PRIORITY</h3>
 <p class="quotes">
 The property defines the relative priority for a <strong>calendar</strong> component and is OPTIONAL
 and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a> and <a href="#VTODO">VTODO</a> components.
@@ -6729,14 +7248,29 @@ $vevent-&gt;deletePriority();
 <p class="format">calendarComponent::getPriority()</p>
 <p class="comment">output = priority<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getPriority( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; priority<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; priority<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $priority = $vevent-&gt;getPriority();
 
 </p>
+
+<h5>is PRIORITY set</h5>
+<p>Return bool true if PRIORITY is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isPrioritySet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isPrioritySet();
+
+</p>
+
 <h5>Set PRIORITY</h5>
 <p>Set property value.</p>
 <p>
@@ -6760,7 +7294,7 @@ $vevent-&gt;setPriority( 3 );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="PROXIMITY"></a><h3>3.2.36 PROXIMITY</h3>
+<a id="PROXIMITY"></a><h3>3.2.37 PROXIMITY</h3>
 <p class="quotes">PROXIMITY indicates that a location-based trigger is applied to an <a href="#VALARM">VALARM</a></p>
 <p>As described in</p>
 <dl>
@@ -6794,7 +7328,7 @@ $vevent-&gt;setPriority( 3 );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RDATE"></a><h3>3.2.37 RDATE</h3>
+<a id="RDATE"></a><h3>3.2.38 RDATE</h3>
 <p class="quotes">
 This property defines the list of date/times for a recurrence set and is OPTIONAL and MAY occur
 more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>, <a href="#VJOURNAL">VJOURNAL</a>,
@@ -6849,13 +7383,16 @@ $vtodo-&gt;deleteRdate();
 <p class="label">Example 2</p>
 <p>Delete RDATE property no 2.</p>
 <p class="example">
-$vjournal-&gt;deleteRdate( 2 );</p>
+$vjournal-&gt;deleteRdate( 2 );
+
+</p>
 <p class="label">Example 3</p>
 <p>Delete all RDATE properties.</p>
 <p class="example">
 while( $vjournal-&gt;deleteRdate()) {
     continue;
 }
+
 </p>
 <h5>Get RDATE</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -6863,10 +7400,14 @@ while( $vjournal-&gt;deleteRdate()) {
 <p class="format">calendarComponent::getRdate()</p>
 <p class="comment">output = dates<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getRdate( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; dates<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; dates<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getRdate( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -6876,6 +7417,17 @@ while( $vjournal-&gt;deleteRdate()) {
 $rdates = $vevent-&gt;getRdate();
 
 </p>
+
+<h5>is RDATE set</h5>
+<p>Return bool true if RDATE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isRdateSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isRdateSet();
+
+</p>
+
 <h5>Set RDATE</h5>
 <p>Set property value.</p>
 <p>The value type for RDATE should match the <a href="#DTSTART">DTSTART</a> value type.</p>
@@ -7022,12 +7574,13 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RECURRENCE-ID"></a><h3>3.2.38 RECURRENCE-ID</h3>
+<a id="RECURRENCE-ID"></a><h3>3.2.39 RECURRENCE-ID</h3>
 <p class="quotes">
 This property is used in conjunction with the <a href="#UID">UID</a> and <a href="#SEQUENCE">SEQUENCE</a>
 property to identify a specific instance of a recurring <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>
@@ -7067,7 +7620,7 @@ To ease up usage, constants<br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="REFRESH-INTERVAL"></a><h3>3.2.39 REFRESH-INTERVAL</h3>
+<a id="REFRESH-INTERVAL"></a><h3>3.2.40 REFRESH-INTERVAL</h3>
 <p class="quotes">
     REFRESH-INTERVAL specifies a suggested minimum interval for
     polling for changes of the calendar data from the original source
@@ -7090,14 +7643,14 @@ To ease up usage, constants<br>
     To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::REFRESH_INTERVAL is available.
 </p>
 <p>
-    For methods and usage, see <a href="#DURATION">3.2.22 DURATION</a> but applied on a Vcalendar instance.
+    For methods and usage, see <a href="#DURATION">3.2.23 DURATION</a> but applied on a Vcalendar instance.
 </p>
 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RELATED-TO"></a><h3>3.2.40 RELATED-TO</h3>
+<a id="RELATED-TO"></a><h3>3.2.41 RELATED-TO</h3>
 <p class="quotes">
     The property is used to represent a relationship or reference
     between one <strong>calendar</strong> component and another
@@ -7151,7 +7704,9 @@ $str = $component-&gt;createRelatedTo();
 <p class="label">Example 1</p>
 <p>Delete /single/first) RELATED-TO property</p>
 <p class="example">
-$vtodo-&gt;deleteRelatedto()</p>
+$vtodo-&gt;deleteRelatedto()
+
+</p>
 <p class="label">Example 2</p>
 <p>Delete RELATED-TO property no 2.</p>
 <p class="example">
@@ -7164,6 +7719,7 @@ $vtodo-&gt;deleteRelatedto()</p>
 while( $vjournal-&gt;deleteRelatedto()) {
     continue;
 }
+
 </p>
 <h5>Get RELATED-TO</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -7171,10 +7727,14 @@ while( $vjournal-&gt;deleteRelatedto()) {
 <p class="format">calendarComponent::getRelatedto()</p>
 <p class="comment">output = relid<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getRelatedto( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; relid<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; relid<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getRelatedto(propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -7184,6 +7744,17 @@ while( $vjournal-&gt;deleteRelatedto()) {
 $relatedId = $vtodo-&gt;getRelatedto();
 
 </p>
+
+<h5>is RELATED-TO set</h5>
+<p>Return bool true if RELATED-TO is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isRelatedtoSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isRelatedtoSet();
+
+</p>
+
 <h5>Set RELATED-TO</h5>
 <p>
 The method throws InvalidArgumentException on empty value and config ALLOWEMPTY is set to false (default true).
@@ -7213,7 +7784,7 @@ $vtodo-&gt;setRelatedto( &quot;19960401-080045-4000F192713@host.com&quot; );
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
-<a id="REPEAT"></a><h3>3.2.41 REPEAT</h3>
+<a id="REPEAT"></a><h3>3.2.42 REPEAT</h3>
 <p class="quotes">
     This property defines the number of time the <a href="#VALARM">ALARM</a> should be repeated,
     after the initial trigger.
@@ -7248,14 +7819,29 @@ $valarm-&gt;deleteRepeat();
 <p class="format">calendarComponent::getRepeat()</p>
 <p class="comment">output = repeatTimes<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getRepeat( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; repeatTimes<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; repeatTimes<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $repeat = $valarm-&gt;getRepeat();
 
 </p>
+
+<h5>is REPEAT set</h5>
+<p>Return bool true if REPEAT is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isRepeatSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $valarm-&gt;isRepeatSet();
+
+</p>
+
 <h5>Set REPEAT</h5>
 <p>Set property value.</p>
 <p>
@@ -7279,7 +7865,7 @@ $valarm-&gt;setRepeat( 2 );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="REQUEST-STATUS"></a><h3>3.2.42 REQUEST-STATUS</h3>
+<a id="REQUEST-STATUS"></a><h3>3.2.43 REQUEST-STATUS</h3>
 <p class="quotes">
 This property defines the status code returned for a scheduling request and is OPTIONAL and
 MAY occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>, <a href="#VJOURNAL">VJOURNAL</a>
@@ -7343,29 +7929,32 @@ $vjournal-&gt;deleteRequeststatus( 2 );
 while( $vjournal-&gt;deleteRequeststatus()) {
     continue;
 }
+
 </p>
 <h5>Get REQUEST-STATUS</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::getRequeststatus()</p>
-<p class="comment">output = array(
+<p class="comment">output = [
     Vcalendar::STATCODE =&gt; statcode<sup>1</sup>,
-  , Vcalendar::STATDESC =&gt; statdesc<sup>2</sup>
-[ , Vcalendar::EXTDATA  =&gt; extdata<sup>3</sup> ]
-)
+    Vcalendar::STATDESC =&gt; statdesc<sup>2</sup>,
+    Vcalendar::EXTDATA  =&gt; extdata<sup>3</sup> // opt
+]
 </p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getRequeststatus( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
 <p class="comment">output =
-    array(
+    [
         &quot;value&quot;    =&gt;
-            array( Vcalendar::STATDESC =&gt; statcode<sup>1</sup>,
-                   Vcalendar::STATDESC =&gt; errtext<sup>2</sup>,
-                 [ Vcalendar::EXTDATA  =&gt; extdata<sup>3</sup> ]
+            [
+                Vcalendar::STATDESC =&gt; statcode<sup>1</sup>,
+                Vcalendar::STATDESC =&gt; errtext<sup>2</sup>,
+                Vcalendar::EXTDATA  =&gt; extdata<sup>3</sup> // opt
             ),
         &quot;params&quot; =&gt; params<sup>4</sup>
-    )
+    ]
 </p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getRequeststatus( propOrderNo )</p>
@@ -7376,6 +7965,17 @@ while( $vjournal-&gt;deleteRequeststatus()) {
 $requestStatus = $vtodo-&gt;getRequeststatus();
 
 </p>
+
+<h5>is REQUEST-STATUS set</h5>
+<p>Return bool true if REQUEST-STATUS is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isRequeststatusSet()</p>
+<p class="label">Example</p>
+<p class="example">
+    $isPropSet = $vevent-&gt;isRequeststatusSet();
+
+</p>
+
 <h5>Set REQUEST-STATUS</h5>
 <p>Set property value.</p>
 <p>
@@ -7414,7 +8014,7 @@ $vfreebusy-&gt;setRequeststatus(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RESOURCE-TYPE"></a><h3>3.2.43 RESOURCE-TYPE</h3>
+<a id="RESOURCE-TYPE"></a><h3>3.2.42 RESOURCE-TYPE</h3>
 <p class="quotes">RESOURCE-TYPE specifies the type of resource</p>
 <p>As described in</p>
 <dl>
@@ -7444,7 +8044,7 @@ $vfreebusy-&gt;setRequeststatus(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RESOURCES"></a><h3>3.2.44 RESOURCES</h3>
+<a id="RESOURCES"></a><h3>3.2.45 RESOURCES</h3>
 <p class="quotes">
 This property defines the equipment or resources anticipated for an activity specified by a
     <strong>calendar</strong> entity and is OPTIONAL and MAY occur more than once in
@@ -7468,8 +8068,8 @@ This property defines the equipment or resources anticipated for an activity spe
         <a href="#VRESOURCE">VRESOURCE</a> (sub-)components
         and the <a href="#NAME">NAME</a> property value
         with X-parameters for <a href="#VRESOURCE">VRESOURCE</a> properties
-        <a href="#UID">UID</a> and <a href="#RESOURCE-TYPE">RESOURCE-TYPE</a>.
-        <br>An option is to set RESOURCE and <a href="#VRESOURCE">VRESOURCE</a> in pairs.
+        <a href="#UID">UID</a> and <a href="#RESOURCE-TYPE">RESOURCE-TYPE</a>.<br>
+        Another option is to set RESOURCES and <a href="#VRESOURCE">VRESOURCE</a> in pairs.
     </dd>
 </dl>
 <p>The value type for RESOURCES is TEXT.</p>
@@ -7512,6 +8112,7 @@ $vevent-&gt;deleteResources( 2 );
 while( $vevent-&gt;deleteResources()) {
     continue;
 }
+
 </p>
 <h5>Get RESOURCES</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -7519,10 +8120,14 @@ while( $vevent-&gt;deleteResources()) {
 <p class="format">calendarComponent::getResources()</p>
 <p class="comment">output = resources<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getResources( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; resources<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; resources<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getResources( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -7532,6 +8137,17 @@ while( $vevent-&gt;deleteResources()) {
 $resources = $vtodo-&gt;getResources();
 
 </p>
+
+<h5>is RESOURCES set</h5>
+<p>Return bool true if RESOURCES is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isResourcesSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isResourcesSet();
+
+</p>
+
 <h5>Set RESOURCES</h5>
 <p>Set property value.</p>
 <p>
@@ -7566,7 +8182,7 @@ $vevent-&gt;setResources( &quot;COMPUTER PROJECTOR&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RRULE"></a><h3>3.2.45 RRULE</h3>
+<a id="RRULE"></a><h3>3.2.46 RRULE</h3>
 <p class="quotes">
     This property defines a rule or repeating pattern
     for recurring <a href="#VEVENT">EVENTs</a>, <a href="#VTODO">TODOs</a>,
@@ -7651,6 +8267,7 @@ $vevent-&gt;deleteRrule( 2 );
 while( $vevent-&gt;deleteRrule()) {
     continue;
 }
+
 </p>
 <h5>Get RRULE</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -7658,14 +8275,29 @@ while( $vevent-&gt;deleteRrule()) {
 <p class="format">calendarComponent::getRrule()</p>
 <p class="comment">output = recur<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getRrule( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; recur<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; recur<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $rrules = $vtodo-&gt;getRrule();
 
 </p>
+
+<h5>is RRULE set</h5>
+<p>Return bool true if RRULE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isRruleSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isRruleSet();
+
+</p>
+
 <h5>Set RRULE</h5>
 <p>
     Set property single value, &quot;RECUR&quot;, multiple values not allowed.
@@ -7835,7 +8467,7 @@ $vtodo-&gt;setRrule(
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
-<a id="SEQUENCE"></a><h3>3.2.46 SEQUENCE</h3>
+<a id="SEQUENCE"></a><h3>3.2.47 SEQUENCE</h3>
 <p class="quotes">
     This property defines the revision sequence number of the <strong>calendar</strong> component
     within a sequence of revisions.
@@ -7909,14 +8541,29 @@ $vtodo-&gt;deleteSequence();
 <p class="format">calendarComponent::getSequence()</p>
 <p class="comment">output = sequence<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getSequence( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; sequence<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; sequence<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $sequence = $vtodo-&gt;getSequence();
 
 </p>
+
+<h5>is SEQUENCE set</h5>
+<p>Return bool true if SEQUENCE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isSequenceSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isSequenceSet();
+
+</p>
+
 <h5>Set SEQUENCE</h5>
 <p>Set property value.</p>
 <p>
@@ -7930,22 +8577,21 @@ xparams<sup>2</sup>  = (array) ( *[ (string) key =&gt; (string) value ] ) // <sp
 </p>
 <p class="label">Example 1</p>
 <p class="example">
-$vevent-&gt;setSequence( 2 );
-                     <span class="comment">// set sequence number to 2</span>
+$vevent-&gt;setSequence( 2 ); <span class="comment">// set sequence number to 2</span>
 
 </p>
 <p class="label">Example 2</p>
 <p class="example">
 $vevent-&gt;setSequence();
-                     <span class="comment">// force sequence number to be set to 0
-                            // or, if sequence exists, incremented by 1</span>
+    <span class="comment">// force sequence number to be set to 0
+      // or, if sequence exists, incremented by 1</span>
 
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="SOURCE"></a><h3>3.2.47 SOURCE</h3>
+<a id="SOURCE"></a><h3>3.2.48 SOURCE</h3>
 <p class="quotes">SOURCE identifies a URI where calendar data can be refreshed from</p>
 <p>Note, as described in</p>
 <dl>
@@ -7987,13 +8633,29 @@ $calendar-&gt;deleteSource();
 <p class="format">Vcalendar::getSource()</p>
 <p class="comment">output = url<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">Vcalendar::getSource( true )</p>
-<p class="comment">output = array &quot;value&quot; =&gt; source<sup>1</sup>, &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; source<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $url = $calendar-&gt;getSource();
 
 </p>
+
+<h5>is SOURCE set</h5>
+<p>Return bool true if SOURCE is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isSourceSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vcalendar-&gt;isSourceSet();
+
+</p>
+
 <h5>Set SOURCE</h5>
 <p>Set property value.</p>
 <p>
@@ -8020,7 +8682,7 @@ catch( InvalidArgumentException $e ) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="STATUS"></a><h3>3.2.48 STATUS</h3>
+<a id="STATUS"></a><h3>3.2.49 STATUS</h3>
 <p class="quotes">
 This property defines the overall status or confirmation for the <strong>calendar</strong> component.
 The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>, <a href="#VTODO">VTODO</a>
@@ -8076,14 +8738,29 @@ $vtodo-&gt;deleteStatus();
 <p class="format">calendarComponent::getStatus()</p>
 <p class="comment">output = status<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getStatus( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; status<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; status<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $status = $vtodo-&gt;getStatus();
 
 </p>
+
+<h5>is STATUS set</h5>
+<p>Return bool true if STATUS is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isStatusSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isStatusSet();
+
+</p>
+
 <h5>Set STATUS</h5>
 <p>Set property value.</p>
 <p>
@@ -8117,7 +8794,7 @@ $vevent-&gt;setStatus( &quot;COMPLETED&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="STRUCTURED-DATA"></a><h3>3.2.49 STRUCTURED-DATA</h3>
+<a id="STRUCTURED-DATA"></a><h3>3.2.50 STRUCTURED-DATA</h3>
 <p class="quotes">
     STRUCTURED-DATA specifies ancillary data associated with the calendar component
 </p>
@@ -8180,6 +8857,7 @@ Deleting all STRUCTURED-DATA properties.
 while( $vevent-&gt;deleteStructureddata()) {
     continue;
 }
+
 </p>
 <h5>Get STRUCTURED-DATA</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
@@ -8187,10 +8865,14 @@ while( $vevent-&gt;deleteStructureddata()) {
 <p class="format">calendarComponent::getStructureddata()</p>
 <p class="comment">output = structureddataValue</p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getStructureddata( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value,
-<p class="comment">output = array( &quot;value&quot;  =&gt; structureddataValue
-    , &quot;params&quot; =&gt; params )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; structureddataValue,
+    &quot;params&quot; =&gt; params
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getStructureddata( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -8200,6 +8882,17 @@ while( $vevent-&gt;deleteStructureddata()) {
 $structureddata = $vevent-&gt;getStructureddata();
 
 </p>
+
+<h5>is STRUCTURED-DATA set</h5>
+<p>Return bool true if STRUCTURED-DATA is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isStructureddataSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isStructureddataSet();
+
+</p>
+
 <h5>Set STRUCTURED-DATA</h5>
 <p>
     Set property value.
@@ -8231,13 +8924,14 @@ $vevent-&gt;setStructureddata(
     &quot;https://dir.example.com/vcard/aviolinist.vcf&quot;,
     [ Vcalendar::VALUE =&gt; Vcalendar::URI ]
 );
+
 </p>
 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="STYLED-DESCRIPTION"></a><h3>3.2.50 STYLED-DESCRIPTION</h3>
+<a id="STYLED-DESCRIPTION"></a><h3>3.2.51 STYLED-DESCRIPTION</h3>
 <p class="quotes">
     STYLED-DESCRIPTION provides for one or more rich-text
     descriptions to replace that provided by the "DESCRIPTION"
@@ -8302,6 +8996,7 @@ Deleting all STYLED-DESCRIPTION properties.
 while( $vevent-&gt;deleteStyleddescription()) {
     continue;
 }
+
 </p>
 <h5>Get STYLED-DESCRIPTION</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
@@ -8309,12 +9004,13 @@ while( $vevent-&gt;deleteStyleddescription()) {
 <p class="format">calendarComponent::getStyleddescription()</p>
 <p class="comment">output = styleddescriptionValue</p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getStyleddescription( propOrderNo/null , true )</p>
 <p class="comment">propOrderNo = (int) specific property value,
-<p class="comment">output = array(
+<p class="comment">output = [
     &quot;value&quot;  =&gt; styleddescriptionValue,
     &quot;params&quot; =&gt; params
-)
+]
 </p>
 <p class="label">Format 3</p>
 <p class="format">calendarComponent::getStyleddescription( propOrderNo )</p>
@@ -8325,6 +9021,17 @@ while( $vevent-&gt;deleteStyleddescription()) {
 $structureddata = $vevent-&gt;getStyleddescription();
 
 </p>
+
+<h5>is STYLED-DESCRIPTION set</h5>
+<p>Return bool true if STYLED-DESCRIPTION is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isStyleddescriptionSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isStyleddescriptionSet();
+
+</p>
+
 <h5>Set STYLED-DESCRIPTION</h5>
 <p>
     Set property value.
@@ -8359,19 +9066,21 @@ $vevent-&gt;setStyleddescription(
     &quot;&lt;html&gt;...&lt;/html&gt;&quot;,
     [ Vcalendar::FMTTYPE =&gt; &quot;text/html;&quot; ]
 );
+
 </p>
 <p class="example">
 $vevent-&gt;setStyleddescription(
     &quot;https://example.org/desc001.html&quot;,
     [ Vcalendar::VALUE =&gt; Vcalendar::URI ]
 );
+
 </p>
 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="SUMMARY"></a><h3>3.2.51 SUMMARY</h3>
+<a id="SUMMARY"></a><h3>3.2.52 SUMMARY</h3>
 <p class="quotes">
 This property defines a short (&quot;one line&quot;) summary or subject for the <strong>calendar</strong> component.
 (In &quot;[RFC5545], Recommended Practices&quot;, up to 255 characters) (, analogous to a mail SUBJECT).
@@ -8431,14 +9140,29 @@ $vevent-&gt;deleteSummar();
 <p class="format">calendarComponent::getSummary()</p>
 <p class="comment">output = summary<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getSummary( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; summary<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; summary<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $summary = $vtodo-&gt;getSummary();
 
 </p>
+
+<h5>is SUMMARY set</h5>
+<p>Return bool true if SUMMARY is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isSummarySet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isSummarySet();
+
+</p>
+
 <h5>Set SUMMARY</h5>
 <p>Set property value.</p>
 <p>
@@ -8464,7 +9188,7 @@ $vevent-&gt;setSummary( &quot;This is a summary&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TRANSP"></a><h3>3.2.52 TRANSP</h3>
+<a id="TRANSP"></a><h3>3.2.53 TRANSP</h3>
 <p class="quotes">
 This property defines whether an <a href="#VEVENT">EVENT</a> is transparent or not to busy time searches and is OPTIONAL and MUST NOT occur more than once.
 </p>
@@ -8499,14 +9223,29 @@ $vevent-&gt;deleteTransp();
 <p class="format">calendarComponent::getTransp( )</p>
 <p class="comment">output = transp<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getTransp( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; transp<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; transp<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $transp = $vtodo-&gt;getTransp();
 
 </p>
+
+<h5>is TRANSP set</h5>
+<p>Return bool true if TRANSP is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTranspSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isTranspSet();
+
+</p>
+
 <h5>Set TRANSP</h5>
 <p>Set property value.</p>
 <p>
@@ -8526,7 +9265,7 @@ $vevent-&gt;setTransp( &quot;TRANSPARENT&quot; );
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TRIGGER"></a><h3>3.2.53 TRIGGER</h3>
+<a id="TRIGGER"></a><h3>3.2.54 TRIGGER</h3>
 <p class="quotes">
 This property specifies when an <a href="#VALARM">ALARM</a> will trigger and is REQUIRED and MUST NOT occur more than once.
 </p>
@@ -8585,14 +9324,29 @@ $valarm-&gt;deleteTrigger();
 <p class="format">valarm::getTrigger()</p>
 <p class="comment">output = duration<sup>1</sup>/date<sup>3</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">valarm::getTrigger( true )</p>
-<p class="comment">output   = array( &quot;value&quot;  =&gt; duration<sup>1</sup>/date<sup>3</sup> )
-                , &quot;params&quot; =&gt; params<sup>4</sup> )
+<p class="comment">output   = [
+    &quot;value&quot;  =&gt; duration<sup>1</sup>/date<sup>3</sup> ),
+    &quot;params&quot; =&gt; params<sup>4</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $trigger = $valarm-&gt;getTrigger();
 
 </p>
+
+<h5>is TRIGGER set</h5>
+<p>Return bool true if TRIGGER is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTriggerSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $valarm-&gt;isTriggerSet();
+
+</p>
+
 <h5>Set TRIGGER</h5>
 <p>Set property value.</p>
 <p>
@@ -8639,6 +9393,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 2</p>
@@ -8652,6 +9407,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 3</p>
@@ -8666,6 +9422,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 4</p>
@@ -8677,6 +9434,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 5</p>
@@ -8690,6 +9448,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 6</p>
@@ -8703,6 +9462,7 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <p class="label">Example 7</p>
@@ -8716,13 +9476,14 @@ try {
 catch( Exception $e ) {
     die( $e-&gt;getMessage());
 }
+
 </p>
 
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZID"></a><h3>3.2.54 TZID</h3>
+<a id="TZID"></a><h3>3.2.55 TZID</h3>
 <p class="quotes">
 This property specifies the text value that uniquely identifies the <a href="#VTIMEZONE">VTIMEZONE</a>
 <strong>calendar</strong> component and is REQUIRED, but MUST NOT occur more than once.
@@ -8755,14 +9516,29 @@ $vtimezone-&gt;deleteTzid();
 <p class="format">vtimezone::getTzid()</p>
 <p class="comment">output = tzid<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">vtimezone::getTzid( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; tzid<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; tzid<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $tzid = $vtimezone-&gt;getTzid();
 
 </p>
+
+<h5>is TZID set</h5>
+<p>Return bool true if TZID is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTzidSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vtimezone-&gt;isTzidSet();
+
+</p>
+
 <h5>Set TZID</h5>
 <p>Set property value.</p>
 <p>
@@ -8786,7 +9562,7 @@ $vtimezone = $vcalendar-&gt;newVtimezone()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZID-ALIAS-OF"></a><h3>3.2.55 TZID-ALIAS-OF</h3>
+<a id="TZID-ALIAS-OF"></a><h3>3.2.56 TZID-ALIAS-OF</h3>
 <p class="quotes">
     This property specifies a time zone identifier for which the main time zone identifier is an alias.
 </p>
@@ -8812,7 +9588,7 @@ $vtimezone = $vcalendar-&gt;newVtimezone()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZNAME"></a><h3>3.2.56 TZNAME</h3>
+<a id="TZNAME"></a><h3>3.2.57 TZNAME</h3>
 <p class="quotes">
 This property specifies the customary designation for a <a href="#VTIMEZONE">STANDARD</a> or <a href="#VTIMEZONE">DAYLIGHT</a> description
 and is OPTIONAL and MAY occur more than once.
@@ -8855,6 +9631,7 @@ $vtimezonestd-&gt;deleteTzname( 2 );
 while( $vtimezonestd-&gt;deleteTzname()) {
     continue;
 }
+
 </p>
 <h5>Get TZNAME</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -8862,10 +9639,14 @@ while( $vtimezonestd-&gt;deleteTzname()) {
 <p class="format">vtimezone::getTzname()</p>
 <p class="comment">output = tzname<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">vtimezone::getTzname( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; tzname<sup>1</sup>
-              , &quot;params&quot; =&gt; params<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; tzname<sup>1</sup>,
+    &quot;params&quot; =&gt; params<sup>2</sup>
+]
+</p>
 <p class="label">Format 3</p>
 <p class="format">vtimezone::getTzname( propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -8875,6 +9656,17 @@ while( $vtimezonestd-&gt;deleteTzname()) {
 $tzname = $timezonestandard-&gt;getTzname();
 
 </p>
+
+<h5>is TZNAME set</h5>
+<p>Return bool true if TZNAME is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTznameSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $daylight-&gt;isTznameSet();
+
+</p>
+
 <h5>Set TZNAME</h5>
 <p>Set property value.</p>
 <p>
@@ -8907,7 +9699,7 @@ $daylight  = $vtimezone-&gt;newDaylight()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZOFFSETFROM"></a><h3>3.2.57 TZOFFSETFROM</h3>
+<a id="TZOFFSETFROM"></a><h3>3.2.58 TZOFFSETFROM</h3>
 <p class="quotes">
 This property specifies the offset which is in use prior to this <a href="#VTIMEZONE">TIMEZONE</a> observance.
 The property is REQUIRED, but MUST NOT occur more than once in <a href="#VTIMEZONE">STANDARD</a> and <a href="#VTIMEZONE">DAYLIGHT</a> components.
@@ -8940,14 +9732,29 @@ $vtimezonestd-&gt;deleteTzoffsetfrom();
 <p class="format">vtimezone::getTzoffsetfrom()</p>
 <p class="comment">output = tzoffsetfrom<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">vtimezone::getTzoffsetfrom( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; tzoffsetfrom<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; tzoffsetfrom<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $tzoffsetfrom = $tzstandard-&gt;getTzoffsetfrom();
 
 </p>
+
+<h5>is TZOFFSETFROM set</h5>
+<p>Return bool true if TZOFFSETFROM is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTzoffsetfromSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $daylight-&gt;isTzoffsetfromSet();
+
+</p>
+
 <h5>Set TZOFFSETFROM</h5>
 <p>Set property value.</p>
 <p>
@@ -8977,7 +9784,7 @@ $standard  = $vtimezone-&gt;newStandard()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZOFFSETTO"></a><h3>3.2.58 TZOFFSETTO</h3>
+<a id="TZOFFSETTO"></a><h3>3.2.59 TZOFFSETTO</h3>
 <p class="quotes">
 This property specifies the offset which is in use in this <a href="#VTIMEZONE">TIMEZONE</a> observance.
 The property is REQUIRED, but MUST NOT occur more than once in <a href="#VTIMEZONE">STANDARD</a> and <a href="#VTIMEZONE">DAYLIGHT</a> components.
@@ -9010,14 +9817,29 @@ $daylight-&gt;deleteTzoffsetto();
 <p class="format">vtimezone::getTzoffsetto()</p>
 <p class="comment">output = tzoffsetto<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">vtimezone::getTzoffsetto( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; tzoffsetto<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; tzoffsetto<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $tzoffsetto = $tztandard-&gt;getTzoffsetto();
 
 </p>
+
+<h5>is TZOFFSETTO set</h5>
+<p>Return bool true if TZOFFSETTO is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTzoffsettoSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $daylight-&gt;isTzoffsettoSet();
+
+</p>
+
 <h5>Set TZOFFSETTO</h5>
 <p>Set property value.</p>
 <p>
@@ -9048,7 +9870,7 @@ $daylight  = $vtimezone-&gt;newDaylight()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZUNTIL"></a><h3>3.2.59 TZUNTIL</h3>
+<a id="TZUNTIL"></a><h3>3.2.60 TZUNTIL</h3>
 <p class="quotes">
     This property specifies an upper bound for the validity period of data
     within a <a href="#VTIMEZONE">VTIMEZONE</a> component.
@@ -9075,7 +9897,7 @@ $daylight  = $vtimezone-&gt;newDaylight()
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="TZURL"></a><h3>3.2.60 TZURL</h3>
+<a id="TZURL"></a><h3>3.2.61 TZURL</h3>
 <p class="quotes">
     The TZURL provides a means for a <a href="#VTIMEZONE">VTIMEZONE</a> component to point to
     a network location that can be used to retrieve an up-to-date version of itself. The property
@@ -9109,14 +9931,29 @@ $vtimezone-&gt;deleteTzurl();
 <p class="format">vtimezone::getTzurl()</p>
 <p class="comment">output = tzurl<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">vtimezone::getTzurl( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; tzurl<sup>1</sup>
-    , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; tzurl<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $tzurl = $timezonestandard-&gt;getTzurl();
 
 </p>
+
+<h5>is TZURL set</h5>
+<p>Return bool true if TZURL is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isTzurlSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vtimezone-&gt;isTzurlSet();
+
+</p>
+
 <h5>Set TZURL</h5>
 <p>Set property value.</p>
 <p>
@@ -9156,7 +9993,7 @@ catch( InvalidArgumentException $e ) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="UID"></a><h3>3.2.61 UID</h3>
+<a id="UID"></a><h3>3.2.62 UID</h3>
 <p class="quotes">
 The persistent, globally <b>U</b>nique <b>ID</b>entifier for the <strong>calendar</strong> / component.
 The property (is OPTIONAL and) MUST NOT occur more than once in
@@ -9195,7 +10032,8 @@ The property (is OPTIONAL and) MUST NOT occur more than once in
 
 </dl>
 <p>
-    UID is a hex-encoded random Universally Unique Identifier (UUID) value as defined in Sections 4.4 and 4.5 of
+    UID is (auto set to) a hex-encoded random Universally Unique Identifier (UUID) value
+    as defined in Sections 4.4 and 4.5 of
     <a href="https://tools.ietf.org/html/rfc4122" title="Download rfc4122" target="_blank">rfc4122</a>.
 </p>
 <p class="label">Example</p>
@@ -9238,19 +10076,34 @@ $vevent-&gt;deleteUid();
 <p class="format">calendarComponent::getUid()</p>
 <p class="comment">output = uid<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getUid( true )</p>
-<p class="comment">output = array( &quot;value&quot;  =&gt; uid<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; uid<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $uid = $vevent-&gt;getUid();
 
 </p>
+
+<h5>is UID set</h5>
+<p>Return bool true.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isUidSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isUidSet();
+
+</p>
+
 <h5>Set UID</h5>
 <p>Insert property value, overrides any previously set or auto-created UID.</p>
 <p>
 Do <b>NOT</b> use an integer UID or only a component name as UID (ex. &quot;vevent&quot;),
-this may cause malfunction in Vcalendar method <a href="#setComponent">setComponent</a> with index or UID argument.
+this may cause malfunction in ex. Vcalendar method <a href="#setComponent">setComponent</a> with index or UID argument.
 </p>
 <p>
 The method throws InvalidArgumentException on empty (non-zero) value.
@@ -9266,19 +10119,21 @@ $vevent-&gt;setUid( &quot;20070803T194810CEST-0123U3PXiX@kigkonsult.se&quot; );
 
 </p>
 <p>
-BUT, due to poorly created iCal formatted information, a numeric UID is accepted in the setUid() and <a href="#parse_merge">parse()</a> methods.
-Do check for component digit UIDs and remove it (will force a (auto) UID recreation) or (re-)set it manually.
+    BUT, due to poorly created iCal formatted information, a numeric UID is accepted in the setUid() and
+    <a href="#parse_merge">parse()</a> methods.
+    Do check for component digit UIDs and remove it (will force a (auto) UID recreation) or (re-)set it manually.
 </p>
 <p class="example">
 if( ctype_digit( $vevent-&gt;getUid())) {
     $vevent-&gt;deleteUid();
 }
+
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="URL"></a><h3>3.2.62 URL</h3>
+<a id="URL"></a><h3>3.2.63 URL</h3>
 <p class="quotes">
 This property defines a Uniform Resource Locator (URL) associated with the <strong>iCalendar</strong> object.
 The property is OPTIONAL and MUST NOT occur more than once in <a href="#VEVENT">VEVENT</a>,
@@ -9349,14 +10204,29 @@ $vevent-&gt;deleteUrl();
 <p class="format">calendarComponent::getUrl()</p>
 <p class="comment">output = url<sup>1</sup></p>
 <p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">calendarComponent::getUrl( true )</p>
-<p class="comment">output = array &quot;value&quot;   =&gt; url<sup>1</sup>
-              , &quot;params&quot; =&gt; xparams<sup>2</sup> )</p>
+<p class="comment">output = [
+    &quot;value&quot;  =&gt; url<sup>1</sup>,
+    &quot;params&quot; =&gt; xparams<sup>2</sup>
+]
+</p>
 <p class="label">Example</p>
 <p class="example">
 $url = $vevent-&gt;getUrl();
 
 </p>
+
+<h5>is URL set</h5>
+<p>Return bool true if URL is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isUrlSet()</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isUrlSet();
+
+</p>
+
 <h5>Set URL</h5>
 <p>Set property value.</p>
 <p>
@@ -9385,7 +10255,7 @@ catch( InvalidArgumentException $e ) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="X-PROPERTY"></a><h3>3.2.63 X-PROPERTY</h3>
+<a id="X-PROPERTY"></a><h3>3.2.64 X-PROPERTY</h3>
 <p class="quotes">
     A <a href="#VCALENDAR">VCALENDAR</a>/component, non-standard property with a TEXT value
     and a name with an &quot;<b>X-</b>&quot; prefix.
@@ -9439,6 +10309,7 @@ $vevent-&gt;deleteXprop( &quot;X-PROPERTY&quot; );
 while( $vevent-&gt;deleteXprop()) {
     continue;
 }
+
 </p>
 <h5>Get X-property</h5>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -9447,8 +10318,10 @@ while( $vevent-&gt;deleteXprop()) {
 Get specific x-propery value.
 </p>
 <p class="format">Component::getXprop( &quot;&lt;X-PROPERTY-NANE&gt;&quot; )</p>
-<p class="comment">output = array( propertyName<sup>1</sup>
-              , value<sup>2</sup> )</p>
+<p class="comment">output = [
+    propertyName<sup>1</sup>,
+    value<sup>2</sup> )
+</p>
 <p class="label">Format 2</p>
 <p>
 Get (next) x-property value.
@@ -9457,11 +10330,17 @@ Get (next) x-property value.
 <p class="comment">output = array( propertyName<sup>1</sup>
               , value<sup>2</sup> )</p>
 <p class="label">Format 3</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
 <p class="format">Component::getXprop( null, propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
-<p class="comment">output = array( propertyName<sup>1</sup>
-              , array ( &quot;value&quot;  =&gt; value<sup>2</sup> )
-                      , &quot;params&quot; =&gt; params<sup>3</sup>))</p>
+<p class="comment">output = [
+    propertyName<sup>1</sup>,
+    [
+        &quot;value&quot;  =&gt; value<sup>2</sup> ),
+        &quot;params&quot; =&gt; params<sup>3</sup>
+    ]
+]
+</p>
 <p class="label">Format 4</p>
 <p class="format">Component::getXprop( null, propOrderNo )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
@@ -9473,10 +10352,12 @@ Get (next) x-property value.
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 $vcalendar-&gt;parse( $iCalContent );
-if( false !== ( $d = $vcalendar-&gt;getXprop( Vcalendar::X_WR_TIMEZONE ))) {
+if( $vcalendar-&gt;isXpropSet( Vcalendar::X_WR_TIMEZONE )) {
+    $d = $vcalendar-&gt;getXprop( Vcalendar::X_WR_TIMEZONE );
     echo $d[1];
     <span class="comment">// $d = array( &quot;X-WR-TIMEZONE&quot;, value<sup>2</sup> )</span>
-}
+} // end if
+
 </p>
 
 <p class="label">Example 2</p>
@@ -9486,8 +10367,10 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 $vcalendar-&gt;parse( $iCalContent );
 while( $xprop = $vcalendar-&gt;getXprop )) {
-    <span class="comment">// $xprop = array( propertyName<sup>1</sup>, value<sup>2</sup> )</span>
+    <span class="comment">// $xprop = [ propertyName<sup>1</sup>, value<sup>2</sup> ]</span>
     .. .
+} // end while
+
 </p>
 
 
@@ -9498,9 +10381,9 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 $vcalendar-&gt;parse( $iCalContent );
 if( $xprop = $vcalendar-&gt;getXprop( &quot;X-ABC-MMSUBJ&quot; )) {
-    <span class="comment">// $xprop = array( &quot;X-ABC-MMSUBJ&quot;, value<sup>2</sup> )</span>
+    <span class="comment">// $xprop = [ &quot;X-ABC-MMSUBJ&quot;, value<sup>2</sup> ]</span>
      .. .
-}
+} // end if
 </p>
 
 <p class="label">Example 4</p>
@@ -9510,14 +10393,30 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
 $vcalendar-&gt;parse( $iCalContent );
 while( $xprop = $vcalendar-&gt;getXprop( null, null, true )) {
-       /*
-    <span class="comment"> $xprop = [ propertyName<sup>1</sup>,
-                   [
-                     &quot;value&quot;  =&gt; value<sup>2</sup>,
-                     &quot;params&quot; =&gt; params<sup>3</sup>
-                   ]</span>
-       */
+/*
+    <span class="comment"> $xprop = [
+               propertyName<sup>1</sup>,
+               [
+                   &quot;value&quot;  =&gt; value<sup>2</sup>,
+                   &quot;params&quot; =&gt; params<sup>3</sup>
+               ]
+        ]</span>
+*/
+} // end while
+
 </p>
+
+<h5>is X-property set</h5>
+<p>Return bool true if X-property (key)  is set (i.e. non-empty).</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::isXpropSet( [key] )</p>
+<p class="comment">key = (string) X-property name</p>
+<p class="label">Example</p>
+<p class="example">
+$isPropSet = $vevent-&gt;isXpropSet();
+
+</p>
+
 <h5>Set X-property</h5>
 <p>Insert property name and value. If an x-prop with the same name already exists, it will be replaced.</p>
 <p>
@@ -9532,7 +10431,7 @@ xparam        = (string) key =&gt; (string) value // <span class="comment">key p
 lang<sup>*</sup>         = as defined in [RFC5546]</p>
 <p class="label">Example</p>
 <p class="example">
-$component-&gt;setXprop(&quot;X-ABC-MMSUBJ&quot;,&quot;https://load.noise.org/mysubj.wav&quot;);
+$component-&gt;setXprop( &quot;X-ABC-MMSUBJ&quot;, &quot;https://load.noise.org/mysubj.wav&quot; );
 
 </p>
 <br>
@@ -9960,7 +10859,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.30
+<tr><td>Version  <td>2.41.39
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

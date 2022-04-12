@@ -40,13 +40,13 @@ Please review
 
 ###### Builds
 
-v2.41.30 - v2.42 pre-release
+v2.41.39 - v2.42 pre-release
 
 v2.40 - stable PHP8
 
 v2.39 - PHP7
 
-Assert PHP compability using [PHPCompatibility] and [PHPStan].
+Asserting PHP compability using [PHPCompatibility] and [PHPStan].
 
 ###### Support
 

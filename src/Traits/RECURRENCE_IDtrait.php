@@ -33,6 +33,7 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -41,14 +42,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * RECURRENCE-ID property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait RECURRENCE_IDtrait
 {
     /**
-     * @var null|mixed[] component property RECURRENCE_ID value
+     * @var null|Pc component property RECURRENCE_ID value
      */
-    protected ? array $recurrenceid = null;
+    protected ? Pc $recurrenceid = null;
 
     /**
      * Return formatted output for calendar component property recurrence-id
@@ -56,30 +57,23 @@ trait RECURRENCE_IDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.1 2019-06-24
+     * @since 2.41.36 2022-04-03
      */
     public function createRecurrenceid() : string
     {
         if( empty( $this->recurrenceid )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->recurrenceid[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::RECURRENCE_ID )
-                : Util::$SP0;
+        if( empty( $this->recurrenceid->value )) {
+            return $this->createSinglePropEmpty( self::RECURRENCE_ID );
         }
-        $isDATE      = ParameterFactory::isParamsValueSet(
-            $this->recurrenceid,
-            self::DATE
-        );
-        $isLocalTime = isset( $this->recurrenceid[Util::$LCparams][Util::$ISLOCALTIME] );
         return StringFactory::createElement(
             self::RECURRENCE_ID,
-            ParameterFactory::createParams( $this->recurrenceid[Util::$LCparams] ),
+            ParameterFactory::createParams( $this->recurrenceid->params ),
             DateTimeFactory::dateTime2Str(
-                $this->recurrenceid[Util::$LCvalue],
-                $isDATE,
-                $isLocalTime
+                $this->recurrenceid->value,
+                $this->recurrenceid->hasParamValue( self::DATE ),
+                $this->recurrenceid->hasParamKey( Util::$ISLOCALTIME )
             )
         );
     }
@@ -100,46 +94,54 @@ trait RECURRENCE_IDtrait
      * Return calendar component property recurrence-id
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|mixed[]
-     * @since 2.29.1 2019-06-22
+     * @return bool|string|DateTime|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getRecurrenceid( ? bool $inclParam = false ) : array | DateTime | string | bool
+    public function getRecurrenceid( ? bool $inclParam = false ) : bool | string | DateTime | Pc
     {
         if( empty( $this->recurrenceid )) {
             return false;
         }
-        return $inclParam
-            ? $this->recurrenceid
-            : $this->recurrenceid[Util::$LCvalue];
+        return $inclParam ? clone $this->recurrenceid : $this->recurrenceid->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isRecurrenceidSet() : bool
+    {
+        return ! empty( $this->recurrenceid->value );
     }
 
     /**
      * Set calendar component property recurrence-id
      *
-     * @param null|string|DateTimeInterface $value
+     * @param null|string|Pc|DateTimeInterface $value
      * @param null|mixed[]  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.36 2022-04-03
      */
     public function setRecurrenceid(
-        null|string|DateTimeInterface $value = null,
+        null|string|DateTimeInterface|Pc $value = null,
         ? array $params = []
     ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::RECURRENCE_ID );
-            $this->recurrenceid = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => [],
-            ];
-            return $this;
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::RECURRENCE_ID );
+            $this->recurrenceid = $value->setEmpty();
         }
-        $this->recurrenceid = DateTimeFactory::setDate(
-            $value,
-            ParameterFactory::setParams( $params, DateTimeFactory::$DEFAULTVALUEDATETIME )
-        );
+        else {
+            $value->addParamValue( self::DATE_TIME, false ); // default
+            $this->recurrenceid = DateTimeFactory::setDate( $value );
+        }
         return $this;
     }
 }

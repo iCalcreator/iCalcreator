@@ -33,13 +33,10 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-
-use function array_change_key_case;
 
 /**
  * LAST-MODIFIED property functions
@@ -49,9 +46,9 @@ use function array_change_key_case;
 trait LAST_MODIFIEDtrait
 {
     /**
-     * @var null|mixed[] component property LAST-MODIFIED value
+     * @var null|Pc component property LAST-MODIFIED value
      */
-    protected ? array $lastmodified = null;
+    protected ? Pc $lastmodified = null;
 
     /**
      * Return formatted output for calendar component property last-modified
@@ -64,12 +61,12 @@ trait LAST_MODIFIEDtrait
     public function createLastmodified() : string
     {
         if( empty( $this->lastmodified )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
         return StringFactory::createElement(
             self::LAST_MODIFIED,
-            ParameterFactory::createParams( $this->lastmodified[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->lastmodified[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->lastmodified->params ),
+            DateTimeFactory::dateTime2Str( $this->lastmodified->value )
         );
     }
 
@@ -89,41 +86,51 @@ trait LAST_MODIFIEDtrait
      * Return calendar component property last-modified
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|mixed[]
+     * @return bool|string|DateTime|Pc
      * @since 2.29.9 2019-08-05
      */
-    public function getLastmodified( ? bool $inclParam = false ) : DateTime | bool | string | array
+    public function getLastmodified( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->lastmodified )) {
             return false;
         }
-        return $inclParam
-            ? $this->lastmodified
-            : $this->lastmodified[Util::$LCvalue];
+        return $inclParam ? clone $this->lastmodified : $this->lastmodified->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isLastmodifiedSet() : bool
+    {
+        return ! empty( $this->lastmodified->value );
     }
 
     /**
      * Set calendar component property last-modified
      *
-     * @param null|string|DateTimeInterface  $value
+     * @param null|string|Pc|DateTimeInterface  $value
      * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.29.16 2020-01-24
      */
-    public function setLastmodified( DateTimeInterface | string | null $value = null, ? array $params = [] ) : static
+    public function setLastmodified(
+        null | string | Pc | DateTimeInterface $value = null,
+        ? array $params = []
+    ) : static
     {
-        if( empty( $value )) {
-            $this->lastmodified = [
-                Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
-                Util::$LCparams => [],
-            ];
-            return $this;
-        }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
-        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
-        $this->lastmodified = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, $params );
+        $value->addParamValue(self::DATE_TIME ); // req
+        $this->lastmodified = empty( $value->value )
+            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
+                ->removeParam( self::VALUE )
+            : DateTimeFactory::setDate( $value, true );
         return $this;
     }
 }

@@ -34,6 +34,7 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Traits\MvalTrait;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\SelectFactory;
@@ -102,6 +103,7 @@ final class Vcalendar extends IcalBase
      * Constructor for calendar object
      *
      * @param null|mixed[] $config
+     * @throws Exception
      * @since  2.39.1 - 2021-06-26
      */
     public function __construct( ? array $config = [] )
@@ -939,4 +941,9 @@ final class Vcalendar extends IcalBase
     {
         return HttpFactory::returnCalendar( $this, $utf8Encode, $gzip, $cdType, $fileName );
     }
+
+    /**
+     * Component multi-property help methods
+     */
+    use MvalTrait;
 }

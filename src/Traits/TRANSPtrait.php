@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -39,14 +40,14 @@ use function strtoupper;
 /**
  * TRANSP property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait TRANSPtrait
 {
     /**
-     * @var null|mixed[] component property TRANSP value
+     * @var null|Pc component property TRANSP value
      */
-    protected ? array $transp = null;
+    protected ? Pc $transp = null;
 
     /**
      * Return formatted output for calendar component property transp
@@ -56,17 +57,15 @@ trait TRANSPtrait
     public function createTransp() : string
     {
         if( empty( $this->transp )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->transp[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::TRANSP )
-                : Util::$SP0;
+        if( empty( $this->transp->value )) {
+            return $this->createSinglePropEmpty( self::TRANSP );
         }
         return StringFactory::createElement(
             self::TRANSP,
-            ParameterFactory::createParams( $this->transp[Util::$LCparams] ),
-            $this->transp[Util::$LCvalue]
+            ParameterFactory::createParams( $this->transp->params ),
+            $this->transp->value
         );
     }
 
@@ -86,45 +85,56 @@ trait TRANSPtrait
      * Get calendar component property transp
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-13
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTransp( ? bool $inclParam = false ) : array | bool | string
+    public function getTransp( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->transp )) {
             return false;
         }
-        return $inclParam ? $this->transp : $this->transp[Util::$LCvalue];
+        return $inclParam ? clone $this->transp : $this->transp->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isTranspSet() : bool
+    {
+        return ! empty( $this->transp->value );
     }
 
     /**
      * Set calendar component property transp
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-03
      */
-    public function setTransp( ? string $value = null, ? array $params = [] ) : static
+    public function setTransp( null|string|Pc $value = null, ? array $params = [] ) : static
     {
         static $ALLOWED = [
             self::OPAQUE,
             self::TRANSPARENT
         ];
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::TRANSP );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TRANSP );
+            $value->setEmpty();
         }
         else {
-            $value = strtoupper( StringFactory::trimTrailNL( $value ));
-            Util::assertInEnumeration( $value, $ALLOWED, self::TRANSP );
+            Util::assertString( $value->value, self::TRANSP );
+            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
+            Util::assertInEnumeration( $value->value, $ALLOWED, self::TRANSP );
         }
-        $this->transp = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->transp = $value;
         return $this;
     }
 }

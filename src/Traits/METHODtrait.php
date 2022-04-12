@@ -43,7 +43,7 @@ trait METHODtrait
     /**
      * @var null|string calendar property METHOD
      */
-    protected ?string $method = null;
+    protected ? string $method = null;
 
     /**
      * Return formatted output for calendar property method
@@ -53,7 +53,7 @@ trait METHODtrait
     public function createMethod() : string
     {
         return ( empty( $this->method ))
-            ? Util::$SP0
+            ? self::$SP0
             : sprintf( self::$FMTICAL, self::METHOD, $this->method );
     }
 
@@ -84,17 +84,28 @@ trait METHODtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isMethodSet() : bool
+    {
+        return ! empty( $this->method );
+    }
+
+    /**
      * Set calendar property method
      *
      * @param null|string $value
      * @return static
      * @since  2.29.14 - 2019-09-03
      */
-    public function setMethod( ? string $value = null ) : static
+    public function setMethod( null|string $value = null ) : static
     {
         if( empty( $value )) {
             $this->assertEmptyValue( $value, self::METHOD );
-            $value = Util::$SP0;
+            $value = self::$SP0;
         }
         Util::assertString( $value, self::METHOD );
         $this->method = (string) $value;

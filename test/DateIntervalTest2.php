@@ -213,19 +213,16 @@ class DateIntervalTest2 extends DtBase
             $diPrefix                   = null;
         }
         $params['X-KEY'] = 'X-Value';
-        $getValue = [
-            Util::$LCvalue  => $getValue,
-            Util::$LCparams => $params,
-        ];
+        $getValue = Pc::factory( $getValue, $params );
         if( isset( $params[IcalInterface::RELATED] ) && ( IcalInterface::START === $params[IcalInterface::RELATED] )) { // remove default
-            unset( $getValue[Util::$LCparams][IcalInterface::RELATED] );
+            $getValue->removeParam( IcalInterface::RELATED );
         }
         return [
             ( 6000 + $cnt ) . $s . $s1 . $b,
             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
             $params,
             $getValue,
-            ParameterFactory::createParams( $getValue[Util::$LCparams] ) .
+            ParameterFactory::createParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -268,19 +265,16 @@ class DateIntervalTest2 extends DtBase
             $diPrefix    = null;
         }
         $params['X-KEY'] = 'X-Value';
-        $getValue = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params,
-        ];
+        $getValue = Pc::factory( $value, $params );
         if( isset( $params[IcalInterface::RELATED] ) && ( IcalInterface::START === $params[IcalInterface::RELATED] )) { // remove default
-            unset( $getValue[Util::$LCparams][IcalInterface::RELATED] );
+            $getValue->removeParam( IcalInterface::RELATED );
         }
         return [
             ( 8000 + $cnt ) . $s . $s1 . $b,
             $diPrefix . self::durationArray2string( $dateIntervalArray ),
             $params,
             $getValue,
-            ParameterFactory::createParams( $getValue[Util::$LCparams] ) .
+            ParameterFactory::createParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::factory(
@@ -332,16 +326,17 @@ class DateIntervalTest2 extends DtBase
      * @param int|string $case
      * @param mixed  $value
      * @param mixed[] $params
-     * @param mixed[] $expectedGet
+     * @param pc      $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval678( int | string $case, mixed $value, array $params, array $expectedGet, string $expectedString ) : void
+    public function testDateInterval678( int | string $case, mixed $value, array $params, pc $expectedGet, string $expectedString ) : void
     {
         static $compProp = [
             IcalInterface::VALARM  => [ IcalInterface::TRIGGER ],
         ];
-        $c = new Vcalendar();
+        $c       = new Vcalendar();
+        $pcInput = false;
         foreach( $compProp as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp   = $c->newVevent()->{$newMethod}();
@@ -355,7 +350,13 @@ class DateIntervalTest2 extends DtBase
                     var_export( [ Util::$LCvalue => $value, Util::$LCparams => $params ], true ) // test ###
                 ); // test ###
                 */
-                $comp->{$setMethod}( $value, $params );
+                if( $pcInput ) {
+                    $comp->{$setMethod}( Pc::factory( $value, $params ));
+                }
+                else {
+                    $comp->{$setMethod}( $value, $params );
+                }
+                $pcInput = ! $pcInput;
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
@@ -369,16 +370,12 @@ class DateIntervalTest2 extends DtBase
                 );
 
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}()),
                     "create error in case #{$case}-2, <{$theComp}>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertFalse(
                     $comp->{$getMethod}( true ),

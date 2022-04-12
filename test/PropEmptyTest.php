@@ -55,8 +55,7 @@ class PropEmptyTest extends DtBase
                       ->setName()
                       ->setDescription()
                       ->setCategories()
-                      ->setImage()
-        ;
+                      ->setImage();
 
         $o1 = $c->newVevent()
                ->setClass()

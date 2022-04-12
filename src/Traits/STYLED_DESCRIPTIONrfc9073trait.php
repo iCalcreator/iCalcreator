@@ -29,20 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * STYLED-DESCRIPTION property functions
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.36 2022-04-09
  */
 trait STYLED_DESCRIPTIONrfc9073trait
 {
     /**
-     * @var null|mixed[] component property styleddescription value
+     * @var null|Pc[] component property styleddescription value
      */
     protected ? array $styleddescription = null;
 
@@ -54,18 +55,18 @@ trait STYLED_DESCRIPTIONrfc9073trait
     public function createStyleddescription() : string
     {
         if( empty( $this->styleddescription )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output  = Util::$SP0;
+        $output  = self::$SP0;
         $txtLang = $this->getConfig( self::LANGUAGE );
         foreach( $this->styleddescription as $part ) {
-            if( empty( $part[Util::$LCvalue] )) {
+            if( empty( $part->value )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::STYLED_DESCRIPTION );
                 }
                 continue;
             }
-            if( self::TEXT === $part[Util::$LCparams][self::VALUE] ) {
+            if( $part->hasParamValue( self::TEXT )) {
                 $ctrKeys = self::$ALTRPLANGARR;
                 $lang    = $txtLang;
             }
@@ -75,8 +76,8 @@ trait STYLED_DESCRIPTIONrfc9073trait
             }
             $output .= StringFactory::createElement(
                 self::STYLED_DESCRIPTION,
-                ParameterFactory::createParams( $part[Util::$LCparams], $ctrKeys, $lang ),
-                StringFactory::strrep( $part[Util::$LCvalue] )
+                ParameterFactory::createParams( $part->params, $ctrKeys, $lang ),
+                StringFactory::strrep( $part->value )
             );
         } // end foreach
         return $output;
@@ -94,7 +95,7 @@ trait STYLED_DESCRIPTIONrfc9073trait
             unset( $this->propDelIx[self::STYLED_DESCRIPTION] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->styleddescription,
             self::STYLED_DESCRIPTION,
             $this,
@@ -107,21 +108,32 @@ trait STYLED_DESCRIPTIONrfc9073trait
      *
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getStyleddescription( int $propIx = null, bool $inclParam = false ) : bool | array | string
+    public function getStyleddescription( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->styleddescription )) {
             unset( $this->propIx[self::STYLED_DESCRIPTION] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->styleddescription,
             self::STYLED_DESCRIPTION,
             $this,
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isStyleddescriptionSet() : bool
+    {
+        return self::isMvalSet( $this->styleddescription );
     }
 
     /**
@@ -135,33 +147,35 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * Additionally, if there is one or more "STYLED-DESCRIPTION" property,
      * then the "DESCRIPTION" property should either be absent or have the parameter DERIVED=TRUE.
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params   VALUE TEXT/URI
-     * @param null|int      $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params   VALUE TEXT/URI
+     * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setStyleddescription( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setStyleddescription(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::STYLED_DESCRIPTION );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::STYLED_DESCRIPTION );
+            $value->setEmpty();
         }
         else {
-            $params = array_change_key_case( $params ?? [], CASE_UPPER );
-            if( ! isset( $params[self::VALUE] )) {
-                $params[self::VALUE] = self::TEXT; // must have one
+            $value->value  = Util::assertString( $value->value, self::STYLED_DESCRIPTION );
+            $value->addParamValue( self::TEXT, false ); // must have one
+            if( ! $value->hasParamKey( self::VALUE, self::TEXT )) { // text may have but URI not...
+                $value->removeParam( self::ALTREP );
+                $value->removeParam( self::LANGUAGE );
             }
-            if( self::TEXT !== $params[self::VALUE] ) { // text may have but URI not
-                unset( $params[self::ALTREP], $params[self::LANGUAGE] );
-            }
-            if( ! isset( $params[self::DERIVED] )) {
-                $params[self::DERIVED] = self::FALSE; // default
+            if( ! $value->hasParamKey( self::DERIVED )) {
+                $value->addParam( self::DERIVED, self::FALSE ); // default
             }
         }
-        $value  = Util::assertString( $value, self::STYLED_DESCRIPTION );
-        self::setMval( $this->styleddescription, $value, $params, [], $index );
+        self::setMval( $this->styleddescription, $value, $index );
         return $this;
     }
 }

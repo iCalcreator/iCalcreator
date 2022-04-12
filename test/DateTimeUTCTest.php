@@ -75,7 +75,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed[] $compsProps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
@@ -85,11 +85,12 @@ class DateTimeUTCTest extends DtBase
         array  $compsProps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
         $calendar1 = new Vcalendar();
+        $pcInput   = false;
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             if( IcalInterface::AVAILABLE ===  $theComp ) {
@@ -101,9 +102,9 @@ class DateTimeUTCTest extends DtBase
             $comp->setDtstart( $value, $params );
 
             foreach( $props as $x2 => $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $createMethod = StringFactory::getCreateMethodName( $propName );
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
 
                 $recurSet = [
@@ -121,13 +122,19 @@ class DateTimeUTCTest extends DtBase
                     IcalInterface::BYSETPOS   => [ 1, 2, 3, 4, 5 ],
                     IcalInterface::WKST       => IcalInterface::SU
                 ];
-                $comp->{$setMethod}( $recurSet );
+                if( $pcInput ) {
+                    $comp->{$setMethod}( Pc::factory( $recurSet ));
+                }
+                else {
+                    $comp->{$setMethod}( $recurSet );
+                }
+                $pcInput = ! $pcInput;
 
                 $getValue = $comp->{$getMethod}( true );
 
                 $this->assertEquals(
-                    $expectedGet[Util::$LCvalue],
-                    $getValue[Util::$LCvalue][IcalInterface::UNTIL],
+                    $expectedGet->value,
+                    $getValue->value[IcalInterface::UNTIL],
                     sprintf( self::$ERRFMT, null, $case . "-r{$x2}-1", __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
@@ -164,7 +171,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed[] $compsProps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -173,11 +180,12 @@ class DateTimeUTCTest extends DtBase
         array  $compsProps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
         $calendar1 = new Vcalendar();
+        $pcInput   = false;
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp      = $calendar1->{$newMethod}();
@@ -190,9 +198,10 @@ class DateTimeUTCTest extends DtBase
                 $comp->{$setMethod}( IcalInterface::BUSY, [$value, $value] );
 
                 $getValue = $comp->{$getMethod}( null, true );
+
                 $this->assertEquals(
-                    $expectedGet[Util::$LCvalue],
-                    $getValue[Util::$LCvalue][0][0],
+                    $expectedGet->value,
+                    $getValue->value[0][0] ?? '',
                     sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
@@ -205,7 +214,18 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( IcalInterface::BUSY, [$value, $value] );
+                if( $pcInput ) {
+                    $comp->{$setMethod}(
+                        Pc::factory(
+                            [ $value, $value ],
+                            [ IcalInterface::FBTYPE => IcalInterface::BUSY ]
+                        )
+                    );
+                }
+                else {
+                    $comp->{$setMethod}( IcalInterface::BUSY, [ $value, $value ] );
+                }
+                $pcInput = ! $pcInput;
             }
         }
         $calendar1Str = $calendar1->createCalendar();
@@ -226,7 +246,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed[] $compsProps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -235,11 +255,12 @@ class DateTimeUTCTest extends DtBase
         array  $compsProps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
         $calendar1 = new Vcalendar();
+        $pcInput   = false;
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp      = $calendar1->{$newMethod}();
@@ -253,8 +274,8 @@ class DateTimeUTCTest extends DtBase
 
                 $getValue = $comp->{$getMethod}( null, true );
                 $this->assertEquals(
-                    $expectedGet[Util::$LCvalue],
-                    $getValue[Util::$LCvalue][0][0],
+                    $expectedGet->value,
+                    $getValue->value[0][0],
                     sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
@@ -267,7 +288,18 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( IcalInterface::BUSY, [$value, $value] );
+                if( $pcInput ) {
+                    $comp->{$setMethod}(
+                        Pc::factory(
+                            [ $value, $value ],
+                            [ IcalInterface::FBTYPE => IcalInterface::BUSY ]
+                        )
+                    );
+                }
+                else {
+                    $comp->{$setMethod}( IcalInterface::BUSY, [ $value, $value ] );
+                }
+                $pcInput = ! $pcInput;
             }
         }
         $calendar1Str = $calendar1->createCalendar();
@@ -288,7 +320,7 @@ class DateTimeUTCTest extends DtBase
      * @param mixed[] $compsProps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -297,12 +329,13 @@ class DateTimeUTCTest extends DtBase
         array  $compsProps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
         $calendar1 = new Vcalendar();
         $e         = $calendar1->newVevent();
+        $pcInput   = false;
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp      = $e->{$newMethod}();
@@ -316,8 +349,8 @@ class DateTimeUTCTest extends DtBase
 
                 $getValue = $comp->{$getMethod}( true );
                 $this->assertEquals(
-                    $expectedGet[Util::$LCvalue],
-                    $getValue[Util::$LCvalue],
+                    $expectedGet->value,
+                    $getValue->value,
                     sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
@@ -330,84 +363,15 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case . '-3', __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( $value, [ IcalInterface::VALUE => IcalInterface::DATE_TIME] );
-            }
-        } // end foreach
-        $calendar1Str = $calendar1->createCalendar();
-        $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1Str );
-        $createString = str_replace( '\,', ',', $createString );
-        $this->assertNotFalse(
-            strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-5', __FUNCTION__, 'Vcalendar', 'createComponent' )
-        );
-
-        $this->parseCalendarTest( $case, $calendar1, $expectedString );
-    }
-
-    /**
-     * The TRIGGER DATETIME args test method
-     *
-     * @param int     $case
-     * @param mixed[] $compsProps
-     * @param mixed   $value
-     * @param mixed   $params
-     * @param mixed[] $expectedGet
-     * @param string  $expectedString
-     * @throws Exception
-     */
-    public function theTriggerTestMethod2(
-        int    $case,
-        array  $compsProps,
-        mixed  $value,
-        mixed  $params,
-        array  $expectedGet,
-        string $expectedString
-    ) : void
-    {
-        static $keys = [];
-        if( empty( $keys )) {
-            $keys = [
-                RecurFactory::$LCYEAR, RecurFactory::$LCMONTH, RecurFactory::$LCDAY,
-                RecurFactory::$LCHOUR, RecurFactory::$LCMIN,   RecurFactory::$LCSEC
-            ];
-        }
-        $calendar1 = new Vcalendar();
-        $e         = $calendar1->newVevent();
-        foreach( $compsProps as $theComp => $props ) {
-            $newMethod = 'new' . $theComp;
-            $comp      = $e->{$newMethod}();
-            foreach( $props as $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
-                // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
-                foreach( $keys as $key ) {
-                    ${$key} = $value[$key] ?? null;
+                if( $pcInput ) {
+                    $comp->{$setMethod}(
+                        Pc::factory( $value, [ IcalInterface::VALUE => IcalInterface::DATE_TIME ] )
+                    );
                 }
-                $comp->{$setMethod}( ${RecurFactory::$LCYEAR}, ${RecurFactory::$LCMONTH}, ${RecurFactory::$LCDAY},
-                                     ${RecurFactory::$LCHOUR}, ${RecurFactory::$LCMIN}, ${RecurFactory::$LCSEC},
-                                     [ IcalInterface::VALUE => IcalInterface::DATE_TIME] );
-
-                $getValue = $comp->{$getMethod}( true );
-                $this->assertEquals(
-                    $expectedGet[Util::$LCvalue],
-                    $getValue[Util::$LCvalue],
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
-                );
-                $this->assertEquals(
-                    strtoupper( $propName ) . ';VALUE=DATE-TIME' . $expectedString,
-                    trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $createMethod )
-                );
-                $comp->{$deleteMethod}();
-                $this->assertFalse(
-                    $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
-                );
-                $comp->{$setMethod}( ${RecurFactory::$LCYEAR}, ${RecurFactory::$LCMONTH}, ${RecurFactory::$LCDAY},
-                                     ${RecurFactory::$LCHOUR}, ${RecurFactory::$LCMIN}, ${RecurFactory::$LCSEC},
-                                     [ IcalInterface::VALUE => IcalInterface::DATE_TIME] );
+                else {
+                    $comp->{$setMethod}( $value, [ IcalInterface::VALUE => IcalInterface::DATE_TIME ] );
+                }
+                $pcInput = ! $pcInput;
             } // end foreach
         } // end foreach
         $calendar1Str = $calendar1->createCalendar();
@@ -415,7 +379,7 @@ class DateTimeUTCTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Vcalendar', 'createComponent' )
+            sprintf( self::$ERRFMT, null, $case . '-5', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -439,10 +403,10 @@ class DateTimeUTCTest extends DtBase
             11008,
             $dateTime,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -453,10 +417,10 @@ class DateTimeUTCTest extends DtBase
             11012,
             $dateTime,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -466,10 +430,10 @@ class DateTimeUTCTest extends DtBase
             11013,
             $dateTime,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -479,10 +443,10 @@ class DateTimeUTCTest extends DtBase
             11014,
             $dateTime,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -492,10 +456,10 @@ class DateTimeUTCTest extends DtBase
             11015,
             $dateTime2,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -504,10 +468,10 @@ class DateTimeUTCTest extends DtBase
             11019,
             $dateTime2,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -516,10 +480,10 @@ class DateTimeUTCTest extends DtBase
             11020,
             $dateTime2,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -528,10 +492,10 @@ class DateTimeUTCTest extends DtBase
             11021,
             $dateTime2,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -542,10 +506,10 @@ class DateTimeUTCTest extends DtBase
             11022,
             $dateTime,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -555,10 +519,10 @@ class DateTimeUTCTest extends DtBase
             11026,
             $dateTime,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -568,10 +532,10 @@ class DateTimeUTCTest extends DtBase
             11027,
             $dateTime,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -581,10 +545,10 @@ class DateTimeUTCTest extends DtBase
             11028,
             $dateTime,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -599,11 +563,11 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDateTime11( int $case, mixed $value, mixed $params, array $expectedGet, string $expectedString ) : void
+    public function testDateTime11( int $case, mixed $value, mixed $params, Pc $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
             IcalInterface::VEVENT        => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
@@ -626,11 +590,11 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testRecurDateTime11( int $case, mixed $value, mixed $params, array $expectedGet, string $expectedString ) : void
+    public function testRecurDateTime11( int $case, mixed $value, mixed $params, Pc $expectedGet, string $expectedString ) : void
     {
         static $compsProps = [
             IcalInterface::VEVENT    => [ IcalInterface::EXRULE, IcalInterface::RRULE ],
@@ -649,7 +613,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -657,7 +621,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -680,7 +644,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -688,7 +652,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -717,10 +681,10 @@ class DateTimeUTCTest extends DtBase
             17001,
             $dateTime,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -730,10 +694,10 @@ class DateTimeUTCTest extends DtBase
             17005,
             $dateTime,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -743,10 +707,10 @@ class DateTimeUTCTest extends DtBase
             17006,
             $dateTime,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -756,10 +720,10 @@ class DateTimeUTCTest extends DtBase
             17007,
             $dateTime,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -770,10 +734,10 @@ class DateTimeUTCTest extends DtBase
             17008,
             $dateTime . ' ' . LTZ,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -783,10 +747,10 @@ class DateTimeUTCTest extends DtBase
             17012,
             $dateTime . ' ' . LTZ,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -796,10 +760,10 @@ class DateTimeUTCTest extends DtBase
             17013,
             $dateTime . ' ' . LTZ,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -809,10 +773,10 @@ class DateTimeUTCTest extends DtBase
             17014,
             $dateTime . ' ' . LTZ,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -822,10 +786,10 @@ class DateTimeUTCTest extends DtBase
             17015,
             $dateTime . ' ' . IcalInterface::UTC,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -834,10 +798,10 @@ class DateTimeUTCTest extends DtBase
             17019,
             $dateTime . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -846,10 +810,10 @@ class DateTimeUTCTest extends DtBase
             17020,
             $dateTime . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -858,10 +822,10 @@ class DateTimeUTCTest extends DtBase
             17021,
             $dateTime . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -872,10 +836,10 @@ class DateTimeUTCTest extends DtBase
             17022,
             $dateTime . OFFSET,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -885,10 +849,10 @@ class DateTimeUTCTest extends DtBase
             17026,
             $dateTime . OFFSET,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -898,10 +862,10 @@ class DateTimeUTCTest extends DtBase
             17027,
             $dateTime . OFFSET,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -911,10 +875,10 @@ class DateTimeUTCTest extends DtBase
             17028,
             $dateTime . OFFSET,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -929,7 +893,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -937,7 +901,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -962,7 +926,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -970,7 +934,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -991,7 +955,7 @@ class DateTimeUTCTest extends DtBase
      * @param int $case
      * @param mixed  $value
      * @param mixed  $params
-     * @param array $expectedGet
+     * @param Pc     $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
@@ -999,7 +963,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -1027,7 +991,7 @@ class DateTimeUTCTest extends DtBase
      * @param int $case
      * @param mixed  $value
      * @param mixed  $params
-     * @param array $expectedGet
+     * @param Pc     $expectedGet
      * @param string $expectedString
      * @throws Exception
      */
@@ -1035,7 +999,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -1067,10 +1031,10 @@ class DateTimeUTCTest extends DtBase
             18001,
             $dateTime,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1080,10 +1044,10 @@ class DateTimeUTCTest extends DtBase
             18005,
             $dateTime,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1092,10 +1056,10 @@ class DateTimeUTCTest extends DtBase
             18006,
             $dateTime,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1105,10 +1069,10 @@ class DateTimeUTCTest extends DtBase
             18007,
             $dateTime,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1119,10 +1083,10 @@ class DateTimeUTCTest extends DtBase
             18008,
             DATEYmd . ' ' . LTZ,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1132,10 +1096,10 @@ class DateTimeUTCTest extends DtBase
             18012,
             DATEYmd . ' ' . LTZ,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1145,10 +1109,10 @@ class DateTimeUTCTest extends DtBase
             18013,
             DATEYmd . ' ' . LTZ,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1158,10 +1122,10 @@ class DateTimeUTCTest extends DtBase
             18014,
             DATEYmd . ' ' . LTZ,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1171,10 +1135,10 @@ class DateTimeUTCTest extends DtBase
             18015,
             DATEYmd . ' ' . IcalInterface::UTC,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1183,10 +1147,10 @@ class DateTimeUTCTest extends DtBase
             18019,
             DATEYmd . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1195,10 +1159,10 @@ class DateTimeUTCTest extends DtBase
             18020,
             DATEYmd . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1207,10 +1171,10 @@ class DateTimeUTCTest extends DtBase
             18021,
             DATEYmd . ' ' . IcalInterface::UTC,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1221,10 +1185,10 @@ class DateTimeUTCTest extends DtBase
             18022,
             DATEYmd . OFFSET,
             [],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1234,10 +1198,10 @@ class DateTimeUTCTest extends DtBase
             18026,
             DATEYmd . OFFSET,
             [ IcalInterface::TZID => TZ2 ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1247,10 +1211,10 @@ class DateTimeUTCTest extends DtBase
             18027,
             DATEYmd . OFFSET,
             [ IcalInterface::TZID => IcalInterface::UTC ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1260,10 +1224,10 @@ class DateTimeUTCTest extends DtBase
             18028,
             DATEYmd . OFFSET,
             [ IcalInterface::TZID => OFFSET ],
-            [
-                Util::$LCvalue  => $dateTime2,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
@@ -1278,7 +1242,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -1286,7 +1250,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -1311,7 +1275,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -1319,7 +1283,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -1340,7 +1304,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -1348,7 +1312,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
@@ -1376,7 +1340,7 @@ class DateTimeUTCTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -1384,7 +1348,7 @@ class DateTimeUTCTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {

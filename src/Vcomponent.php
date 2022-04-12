@@ -62,9 +62,10 @@ abstract class Vcomponent extends CalendarComponent
     /**
      * Return Vresource object instance
      *
-     * @param null|string $resourceType  property RESOURCE-TYPE value
-     * @param null|string $name          property NAME value
+     * @param null|string $resourceType property RESOURCE-TYPE value
+     * @param null|string $name property NAME value
      * @return Vresource
+     * @throws Exception
      * @since  2.41.21 - 2022-02-18
      */
     public function newVresource( ? string $resourceType = null, ? string $name = null ) : Vresource

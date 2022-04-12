@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Util;
 use Kigkonsult\Icalcreator\IcalInterface;
 
 use function array_change_key_case;
-use function array_filter;
 use function ctype_digit;
 use function in_array;
 use function is_array;
@@ -40,7 +39,6 @@ use function is_bool;
 use function is_string;
 use function ksort;
 use function sprintf;
-use function strcasecmp;
 use function strtoupper;
 use function trim;
 
@@ -84,7 +82,6 @@ class ParameterFactory
             IcalInterface::LABEL
         ];
 
-        $inputParams = $inputParams ?: [];
         if( isset( $inputParams[Util::$ISLOCALTIME ] )) {
             unset( $inputParams[Util::$ISLOCALTIME ] );
         }
@@ -98,18 +95,18 @@ class ParameterFactory
         [ $params, $xparams ] = self::quoteParams( $inputParams );
         foreach( $xparams as $paramKey => $paramValue ) {
             $attr2 .= Util::$SEMIC;
-            $attr2 .= ( ctype_digit((string) $paramKey ))
+            $attr2 .= ( ctype_digit((string) $paramKey )) // ??
                 ? $paramValue
                 : sprintf( $FMTKEQV, $paramKey, $paramValue );
         }
         if( isset( $params[IcalInterface::FMTTYPE] ) && // as defined in Section 4.2 of RFC4288
-            ! in_array( IcalInterface::FMTTYPE, $ctrKeys, true ) ) {
+            ! in_array( IcalInterface::FMTTYPE, $ctrKeys, true )) { // ATTACH/IMAGE
             $attr1 .= sprintf( $FMTFMTTYPE, $params[IcalInterface::FMTTYPE], $attr2 );
             $attr2 = Util::$SP0;
             unset( $params[IcalInterface::FMTTYPE] );
         }
         if( isset( $params[IcalInterface::ENCODING] ) &&
-            ! in_array( IcalInterface::ENCODING, $ctrKeys, true ) ) {
+            ! in_array( IcalInterface::ENCODING, $ctrKeys, true )) {
             if( ! empty( $attr2 )) {
                 $attr1 .= $attr2;
                 $attr2 = Util::$SP0;
@@ -118,7 +115,7 @@ class ParameterFactory
             unset( $params[IcalInterface::ENCODING] );
         }
         foreach( $KEYGRP1 as $key ) { // VALUE, TZID, RANGE, RELTYPE
-            if( isset( $params[$key] ) && ! in_array( $key, $ctrKeys, true ) ) {
+            if( isset( $params[$key] ) && ! in_array( $key, $ctrKeys, true )) {
                 $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
                 unset( $params[$key] );
             }
@@ -129,7 +126,7 @@ class ParameterFactory
             unset( $params[IcalInterface::CN] );
         }
         foreach( $KEYGRP2 as $key ) { // DIR, ALTREP
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true ) ) {
+            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
                 $delim  = str_contains( $params[$key], StringFactory::$QQ )
                     ? Util::$SP0
                     : StringFactory::$QQ;
@@ -138,7 +135,7 @@ class ParameterFactory
             }
         } // end foreach
         foreach( $KEYGRP3 as $key ) { // SENT_BY, DISPLAY, FEATURE, LABEL
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true ) ) {
+            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
                 $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
                 unset( $params[$key] );
             }
@@ -152,14 +149,14 @@ class ParameterFactory
         }
         if( isset( $params[IcalInterface::DERIVED] )) {
             if( IcalInterface::FALSE === $params[IcalInterface::DERIVED] ) {
-                unset( $params[IcalInterface::DERIVED] ); // skip default FALSE-DERIVED
+                unset( $params[IcalInterface::DERIVED] ); // skip default FALSE for DERIVED
             }
             elseif( IcalInterface::TRUE !== $params[IcalInterface::DERIVED] ) {
                 $params[IcalInterface::DERIVED] = ((bool) $params[IcalInterface::DERIVED] )
                     ? IcalInterface::TRUE
                     : IcalInterface::FALSE;
             }
-        }
+        } // end if
         if( isset( $params[IcalInterface::ORDER] )) {
             if( ! is_int( $params[IcalInterface::ORDER] ) ||
                 ( $params[IcalInterface::ORDER] != (int) $params[IcalInterface::ORDER] )) { // note !=
@@ -168,7 +165,7 @@ class ParameterFactory
             if( 1 > $params[IcalInterface::ORDER] ) {
                 $params[IcalInterface::ORDER] = 1;
             }
-        }
+        } // end if
         if( ! empty( $params )) { // accept other or iana-token (Other IANA-registered) parameter types, last
             foreach( $params as $paramKey => $paramValue ) {
                 $attr1 .= sprintf( $FMTCMN, $paramKey, $paramValue );
@@ -210,63 +207,6 @@ class ParameterFactory
         } // end foreach
         ksort( $xparams, SORT_STRING );
         return [ $params, $xparams ];
-    }
-
-    /**
-     * Remove key/value from array (if found)
-     *
-     * @param string[]    $array          iCal property parameters
-     * @param string      $expectedKey    expected key
-     * @param null|string $expectedValue  expected value
-     * @return void
-     * @since  2.30.2 - 2021-02-04
-     */
-    public static function ifExistRemove( array & $array, string $expectedKey, ? string $expectedValue = null ) : void
-    {
-        if( empty( $array )) {
-            return;
-        }
-        foreach( $array as $key => $value ) {
-            if(( 0 === strcasecmp( $expectedKey, $key )) &&
-                ( empty( $expectedValue ) ||
-                ( 0 === strcasecmp( $expectedValue, $value )))) {
-                unset( $array[$key] );
-                $array = array_filter( $array );
-                break;
-            } // end if
-        } // end foreach
-    }
-
-    /**
-     * Return true if property parameter VALUE is set to argument, otherwise false
-     *
-     * @param mixed[] $parameterArr
-     * @param string $arg
-     * @return bool
-     * @since  2.27.14 - 2019-03-01
-     */
-    public static function isParamsValueSet( array $parameterArr, string $arg ) : bool
-    {
-        if( empty( $parameterArr ) || ! isset( $parameterArr[Util::$LCparams] )) {
-            return  false;
-        }
-        return Util::issetKeyAndEquals(
-            $parameterArr[Util::$LCparams],
-            IcalInterface::VALUE,
-            strtoupper( $arg )
-        );
-    }
-
-    /**
-     * Return param[TZID] or empty string
-     *
-     * @param mixed[] $parameterArr
-     * @return string
-     * @since  2.27.14 - 2019-02-10
-     */
-    public static function getParamTzid( array $parameterArr ) : string
-    {
-        return ( $parameterArr[Util::$LCparams][IcalInterface::TZID] ?? Util::$SP0 );
     }
 
     /**
@@ -318,12 +258,9 @@ class ParameterFactory
                     $paramValue = (string) $paramValue;
                     break;
             } // end switch
-            if( IcalInterface::VALUE === $paramKey ) {
-                $output[IcalInterface::VALUE] = strtoupper( $paramValue );
-            }
-            else {
-                $output[$paramKey] = $paramValue;
-            }
+            $output[$paramKey] = ( IcalInterface::VALUE === $paramKey )
+                ? strtoupper( $paramValue )
+                : $paramValue;
         } // end foreach
         if( is_array( $defaults ) && ! empty( $defaults )) {
             foreach( array_change_key_case( $defaults, CASE_UPPER ) as $paramKey => $paramValue ) {
@@ -335,7 +272,7 @@ class ParameterFactory
         return $output;
     }
 
-    private static string $CIRKUMFLEX = '^';
+    private static string $CIRCUMFLEX = '^';
     private static string $CFN        = '^n';
     private static string $CFCF       = '^^';
     private static string $CFSQ       = "^'";
@@ -357,13 +294,13 @@ class ParameterFactory
     public static function circumflexQuoteInvoke( string $value ) : string
     {
         $nlCharsExist = str_contains( $value, StringFactory::$NLCHARS );
-        $cfCfExist    = str_contains( $value, self::$CIRKUMFLEX );
+        $cfCfExist    = str_contains( $value, self::$CIRCUMFLEX );
         $quotExist    = str_contains( $value, StringFactory::$QQ );
         if( $nlCharsExist ) {
             $value = str_replace( StringFactory::$NLCHARS, self::$CFN, $value );
         }
         if( $cfCfExist ) {
-            $value = str_replace( self::$CIRKUMFLEX, self::$CFCF, $value );
+            $value = str_replace( self::$CIRCUMFLEX, self::$CFCF, $value );
         }
         if( $quotExist ) {
             $value = str_replace( StringFactory::$QQ, self::$CFSQ, $value );
@@ -398,7 +335,7 @@ class ParameterFactory
             $value = str_replace( self::$CFN, StringFactory::$NLCHARS, $value );
         }
         if( str_contains( $value, self::$CFCF )) {
-            $value = str_replace( self::$CFCF, self::$CIRKUMFLEX, $value );
+            $value = str_replace( self::$CFCF, self::$CIRCUMFLEX, $value );
         }
         if( str_contains( $value, self::$CFSQ )) {
             $value = str_replace( self::$CFSQ, StringFactory::$QQ, $value );

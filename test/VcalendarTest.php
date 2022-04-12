@@ -157,9 +157,9 @@ class VcalendarTest extends TestCase
     {
         $vcalendar = Vcalendar::factory();
 
-        $getMethod    = StringFactory::getGetMethodName( $propName );
         $createMethod = StringFactory::getCreateMethodName( $propName );
         $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+        $getMethod    = StringFactory::getGetMethodName( $propName );
         $setMethod    = StringFactory::getSetMethodName( $propName );
         $vcalendar->{$setMethod}( $value );
         $getValue = $vcalendar->{$getMethod}();
@@ -277,7 +277,7 @@ class VcalendarTest extends TestCase
 
         $value = $testStr . 1;
         $testArr[IcalInterface::CATEGORIES] = [ 1, $value ];
-        $v     = $vcalendar->getComponent( 1 );
+        $v     = $vcalendar->getComponent( 1 ); // Vevent
         $v->setCategories( $value );
         $v->setXprop( 'X-VALUE', $value );
         $v->setComment( 1 ); // remember $x

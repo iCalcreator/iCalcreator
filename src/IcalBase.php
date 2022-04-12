@@ -57,7 +57,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.30' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.39' );
 }
 
 /**
@@ -69,12 +69,15 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  */
 abstract class IcalBase implements IcalInterface
 {
-    use Traits\X_PROPtrait;
-
     /**
      * @var string
      */
     protected static string $INDEX = 'INDEX';
+
+    /**
+     * @var string
+     */
+    protected static string $SP0 = '';
 
     /**
      * @var string[]  iCal V*-component collection, subcomps to Vclendar
@@ -190,7 +193,7 @@ abstract class IcalBase implements IcalInterface
     protected static array $DATEPROPS  = [
         self::ACKNOWLEDGED, self::COMPLETED, self::CREATED,
         self::DTEND, self::DTSTAMP, self::DTSTART, self::DUE,
-        self::LAST_MODIFIED, self::RECURRENCE_ID,
+        self::LAST_MODIFIED, self::RECURRENCE_ID, self::TZUNTIL
     ];
 
     /**
@@ -263,6 +266,11 @@ abstract class IcalBase implements IcalInterface
      * @var array<string, int> delete multi-property index
      */
     protected array $propDelIx = [];
+
+    /**
+     * X-prefixed properties
+     */
+    use Traits\X_PROPtrait;
 
     /**
      * __clone method
@@ -429,11 +437,11 @@ abstract class IcalBase implements IcalInterface
             self::FREEBUSY, self::GEO, self::IMAGE,
             self::LAST_MODIFIED, self::LOCATION, self::LOCATION_TYPE, self::NAME,
             self::ORGANIZER, self::PARTICIPANT_TYPE, self::PERCENT_COMPLETE, self::PRIORITY, self::PROXIMITY,
-            self::RECURRENCE_ID, self::REFRESH_INTERVAL, self::RELATED_TO, self::REPEAT,
-            self::REQUEST_STATUS, self::RESOURCE_TYPE, self::RESOURCES, self::RRULE, self::RDATE,
+            self::RDATE, self::RECURRENCE_ID, self::REFRESH_INTERVAL, self::RELATED_TO, self::REPEAT,
+            self::REQUEST_STATUS, self::RESOURCE_TYPE, self::RESOURCES, self::RRULE,
             self::SEQUENCE, self::SOURCE, self::STATUS, self::STRUCTURED_DATA, self::STYLED_DESCRIPTION,
             self::SUMMARY, self::TRANSP,
-            self::TRIGGER, self::TZNAME, self::TZID, self::TZID_ALIAS_OF, self::TZUNTIL,
+            self::TRIGGER, self::TZID, self::TZID_ALIAS_OF, self::TZNAME, self::TZUNTIL,
             self::TZOFFSETFROM, self::TZOFFSETTO, self::TZURL, self::UID, self::URL, self::X_PROP,
         ];
         $compType = $this->getCompType();
@@ -524,6 +532,17 @@ abstract class IcalBase implements IcalInterface
             }
         }
         return $this;
+    }
+
+    /**
+     * Create iCal string of empty property
+     *
+     * @param string $propName
+     * @return string
+     */
+    protected function createSinglePropEmpty( string $propName ) : string
+    {
+        return $this->getConfig( self::ALLOWEMPTY ) ? StringFactory::createElement( $propName ) : Util::$SP0;
     }
 
     /**
@@ -774,7 +793,7 @@ abstract class IcalBase implements IcalInterface
      * @param null|int          $arg2      ordno if arg1 = component type
      * @throws InvalidArgumentException
      * @return static
-     * @since 2.41.2 2022-01-16
+     * @since 2.41.33 2022-03-28
      */
     public function setComponent(
         CalendarComponent $component,
@@ -784,12 +803,16 @@ abstract class IcalBase implements IcalInterface
     {
         $component->setConfig( $this->getConfig(), false, true );
         $compType = $component->getCompType();
-        if( in_array( $component->getCompType(), self::$UIDCOMPS, true )) {
+        if( in_array( $compType, self::$UIDCOMPS, true )) {
             /* make sure uid and dtstamp are set */
             $component->getUid();
             if( in_array( $compType, self::$DTSTAMPCOMPS, true )) {
                 $component->getDtstamp();
             }
+        }
+        elseif( in_array( $compType, self::$TZCOMPS )) {
+            array_unshift( $this->components, clone $component );
+            return $this;
         }
         if( null === $arg1 ) { // plain insert, last in chain
             self::assertComponents( $this, $component );
@@ -914,7 +937,7 @@ abstract class IcalBase implements IcalInterface
      * @throws InvalidArgumentException
      * @since  2.40.11 - 2022-01-26
      */
-    private static function assertComponents(
+    protected static function assertComponents(
         IcalBase $comp,
         CalendarComponent $subComp
     ) : void

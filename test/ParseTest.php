@@ -35,7 +35,7 @@ use Exception;
  *
  * testing parse + eol-htab
  *
- * @since  2.39 - 2021-06-19
+ * @since  2.41.31 - 2022-03-11
  */
 class ParseTest extends DtBase
 {
@@ -64,7 +64,7 @@ class ParseTest extends DtBase
             "BEGIN:VTIMEZONE\r\n" .
             "TZID:America/New_York\r\n" .
             "TZURL;x-a=first;VALUE=uri:message//:https://www.masked.de/account/subscriptio\r\n" .
-            " n/delivery/8878/%3Fweek=2021-W03" .
+            " n/delivery/8878/%3Fweek=2021-W03\r\n" .
             "BEGIN:STANDARD\r\n" .
             "DTSTART:20070101T020000\r\n" .
             "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;\r\n" .

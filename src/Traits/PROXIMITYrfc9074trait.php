@@ -29,22 +29,22 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * PROXIMITY property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait PROXIMITYrfc9074trait
 {
     /**
-     * @var null|mixed[]   Valarm component property PROXIMITY value
+     * @var null|Pc   Valarm component property PROXIMITY value
      */
-    protected ? array $proximity = null;
+    protected ? Pc $proximity = null;
 
     /**
      * Return formatted output for calendar Valarm component property proximity
@@ -54,17 +54,15 @@ trait PROXIMITYrfc9074trait
     public function createProximity() : string
     {
         if( empty( $this->proximity )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->proximity[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::PROXIMITY )
-                : Util::$SP0;
+        if( empty( $this->proximity->value )) {
+            return $this->createSinglePropEmpty( self::PROXIMITY );
         }
         return StringFactory::createElement(
             self::PROXIMITY,
-            ParameterFactory::createParams( $this->proximity[Util::$LCparams] ),
-            StringFactory::strrep( $this->proximity[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->proximity->params ),
+            StringFactory::strrep( $this->proximity->value )
         );
     }
 
@@ -84,38 +82,51 @@ trait PROXIMITYrfc9074trait
      * Get calendar Valarm component property proximity
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-13
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getProximity( ? bool $inclParam = false ) : array | bool | string
+    public function getProximity( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->proximity )) {
             return false;
         }
-        return $inclParam ? $this->proximity : $this->proximity[Util::$LCvalue];
+        return $inclParam ? clone $this->proximity : $this->proximity->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isProximitySet() : bool
+    {
+        return ! empty( $this->proximity->value );
     }
 
     /**
      * Set calendar component property proximity
      *
      * @since 2.23.12 - 2017-04-22
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2018-12-22
+     * @since 2.41.36 2022-04-03
      */
-    public function setProximity( ? string $value = null, ? array $params = [] ) : static
+    public function setProximity( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::PROXIMITY );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::PROXIMITY );
+            $value->setEmpty();
         }
-        $this->proximity = [
-            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        else {
+            $value->value = StringFactory::trimTrailNL( $value->value );
+        }
+        $this->proximity = $value;
         return $this;
     }
 }

@@ -30,8 +30,8 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Traits\MvalTrait;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -135,7 +135,7 @@ abstract class CalendarComponent extends IcalBase
             }
             if( is_array( $content )) {
                 foreach( $content as $part ) {
-                    if( str_contains( $part, Util::$COMMA ) ) {
+                    if( str_contains( $part, Util::$COMMA )) {
                         $part = explode( Util::$COMMA, $part );
                         foreach( $part as $contentPart ) {
                             $contentPart = trim( $contentPart );
@@ -160,7 +160,7 @@ abstract class CalendarComponent extends IcalBase
                     }
                 } // end foreach
             } // end if( is_array( $content ))
-            elseif( str_contains( $content, Util::$COMMA ) ) {
+            elseif( str_contains( $content, Util::$COMMA )) {
                 $content = explode( Util::$COMMA, $content );
                 foreach( $content as $contentPart ) {
                     $contentPart = trim( $contentPart );
@@ -370,7 +370,7 @@ abstract class CalendarComponent extends IcalBase
             }
             /* call set<Propname>(.. . */
             $method = StringFactory::getSetMethodName( $propName );
-            switch( strtoupper( $propName )) {
+            switch( $propName ) {
                 case self::ATTENDEE :
                     $this->{$method}( $value, CalAddressFactory::splitMultiParams( $propAttr ));
                     break;
@@ -384,9 +384,6 @@ abstract class CalendarComponent extends IcalBase
                 case self::STRUCTURED_DATA :    // dito
                 case self::STYLED_DESCRIPTION : // dito
                 case self::SUMMARY :
-                    if( empty( $value )) {
-                        $propAttr = [];
-                    }
                     $this->{$method}( StringFactory::strunrep( $value ), $propAttr );
                     break;
                 case self::REQUEST_STATUS :
@@ -501,168 +498,7 @@ abstract class CalendarComponent extends IcalBase
     }
 
     /**
-     * Component multi-prop methods
+     * Component multi-property help methods
      */
-
-    /**
-     * Recount property propIx, used at consecutive getProperty calls
-     *
-     * @param string[] $propArr   component (multi-)property
-     * @param int   $propIx getter counter
-     * @return bool
-     * @since  2.27.1 - 2018-12-15
-     */
-    public static function recountMvalPropix( array $propArr, int & $propIx ) : bool
-    {
-        if( empty( $propArr )) {
-            return false;
-        }
-        $last = key( array_slice( $propArr, -1, 1, true ));
-        while( ! isset( $propArr[$propIx] ) && ( $last > $propIx )) {
-            $propIx++;
-        }
-        return true;
-    }
-
-    /**
-     * Return propName index
-     *
-     * @param mixed[] $indexArr
-     * @param string $propName
-     * @param int|null $index
-     * @return int
-     * @since  2.27.1 - 2018-12-15
-     */
-    protected static function getIndex(
-        array & $indexArr,
-        string $propName,
-        ? int $index = null
-    ) : int
-    {
-        if( null === $index ) {
-            $index = ( isset( $indexArr[$propName] )) ? $indexArr[$propName] + 2 : 1;
-        }
-        --$index;
-        $indexArr[$propName] = $index;
-        return $index;
-    }
-
-    /**
-     * Get calendar component multpProp property
-     *
-     * @param mixed[]  $multiProp component (multi-)property
-     * @param string   $propName
-     * @param IcalBase $instance
-     * @param null|int $propIx    specific property in case of multiply occurrence
-     * @param bool     $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-15
-     */
-    public static function getPropertyM(
-        array $multiProp,
-        string $propName,
-        IcalBase $instance,
-        ? int $propIx = null,
-        ? bool $inclParam = false
-    ) : bool | string | array
-    {
-        if( empty( $multiProp )) {
-            unset( $instance->propIx[$propName] );
-            return false;
-        }
-        $propIx = self::getIndex( $instance->propIx, $propName, $propIx );
-        if( ! self::recountMvalPropix( $multiProp, $propIx )) {
-            unset( $instance->propIx[$propName] );
-            return false;
-        }
-        $instance->propIx[$propName] = $propIx;
-        if( ! isset( $multiProp[$propIx] )) {
-            unset( $instance->propIx[$propName] );
-            return false;
-        }
-        return ( $inclParam )
-            ? $multiProp[$propIx]
-            : $multiProp[$propIx][Util::$LCvalue];
-    }
-
-    /**
-     * Delete calendar component multiProp property[ix]
-     *
-     * @param mixed[]   $multiProp component (multi-)property
-     * @param string    $propName
-     * @param IcalBase  $instance
-     * @param null|int  $propDelIx specific property in case of multiply occurrence
-     * @return bool   true on success
-     * @since  2.27.1 - 2018-12-15
-     */
-    public static function deletePropertyM(
-        array & $multiProp,
-        string $propName,
-        IcalBase $instance,
-        ? int $propDelIx = null
-    ) : bool
-    {
-        if( empty( $multiProp ) ) {
-            unset( $instance->propDelIx[$propName] );
-            return false;
-        }
-        if( $propDelIx === null ) {
-            $propDelIx = null; // tidy up, altered default value
-        }
-        $propDelIx = self::getIndex( $instance->propDelIx, $propName, $propDelIx );
-        if( isset( $multiProp[$propDelIx] ) ) {
-            unset( $multiProp[$propDelIx] );
-        }
-        if( empty( $multiProp ) ) {
-            $multiProp = [];
-            unset( $instance->propDelIx[$propName] );
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check index and set (an indexed) content in a multiple value array
-     *
-     * @param null|mixed[]  $valueArr
-     * @param null|mixed    $value  whatever...
-     * @param null|mixed[]  $params
-     * @param null|string[] $defaults
-     * @param null|int      $index
-     * @return void
-     * @since  2.22.23 - 2017-04-08
-     */
-    public static function setMval(
-        ? array & $valueArr = [],
-        mixed $value = null,
-        ? array $params = [],
-        ? array $defaults = [],
-        ? int $index = null
-    ) : void
-    {
-        if( empty( $valueArr )) {
-            $valueArr = [];
-        }
-        $params2 = ParameterFactory::setParams( $params, $defaults );
-        if( null === $index ) { // i.e. next
-            $valueArr[] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params2,
-            ];
-            return;
-        }
-        --$index;
-        if( isset( $valueArr[$index] )) { // replace
-            $valueArr[$index] = [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params2,
-            ];
-            return;
-        }
-        $valueArr[$index] = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params2,
-        ];
-        ksort( $valueArr ); // order
-    }
+    use MvalTrait;
 }

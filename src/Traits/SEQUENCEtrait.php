@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -38,14 +39,14 @@ use function is_numeric;
 /**
  * SEQUENCE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait SEQUENCEtrait
 {
     /**
-     * @var null|mixed[] component property SEQUENCE value
+     * @var null|Pc component property SEQUENCE value
      */
-    protected ? array $sequence = null;
+    protected ? Pc $sequence = null;
 
     /**
      * Return formatted output for calendar component property sequence
@@ -55,20 +56,18 @@ trait SEQUENCEtrait
     public function createSequence() : string
     {
         if( empty( $this->sequence )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if(( ! isset( $this->sequence[Util::$LCvalue] ) ||
-                ( empty( $this->sequence[Util::$LCvalue] ) &&
-                    ! is_numeric( $this->sequence[Util::$LCvalue] ))) &&
-                ( 0 !== $this->sequence[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::SEQUENCE )
-                : Util::$SP0;
+        if(( ! isset( $this->sequence->value ) ||
+                ( empty( $this->sequence->value ) &&
+                    ! is_numeric( $this->sequence->value ))) &&
+            ( 0 !== $this->sequence->value )) {
+            return $this->createSinglePropEmpty( self::SEQUENCE );
         }
         return StringFactory::createElement(
             self::SEQUENCE,
-            ParameterFactory::createParams( $this->sequence[Util::$LCparams] ),
-            (string) $this->sequence[Util::$LCvalue]
+            ParameterFactory::createParams( $this->sequence->params ),
+            (string) $this->sequence->value
         );
     }
 
@@ -88,43 +87,52 @@ trait SEQUENCEtrait
      * Get calendar component property sequence
      *
      * @param null|bool   $inclParam
-     * @return bool|int|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|int|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getSequence( ? bool $inclParam = false ) : bool | int | string | array
+    public function getSequence( ? bool $inclParam = false ) : bool | int | string | Pc
     {
         if( null === $this->sequence ) {
             return false;
         }
-        return $inclParam
-            ? $this->sequence
-            : $this->sequence[Util::$LCvalue];
+        return $inclParam ? clone $this->sequence : $this->sequence->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isSequenceSet() : bool
+    {
+        return ! empty( $this->sequence->value );
     }
 
     /**
      * Set calendar component property sequence
      *
-     * @param null|int|string $value
+     * @param null|int|string|Pc $value
      * @param null|mixed[]    $params
      * @return static
-     * @since  2.27.2 - 2019-01-04
+     * @since 2.41.36 2022-04-03
      */
-    public function setSequence( null|int|string $value = null, ? array $params = [] ) : static
+    public function setSequence( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if(( $value === null ) || ( $value === Util::$SP0 )) {
-            $value = ( isset( $this->sequence[Util::$LCvalue] ) &&
-                ( -1 < $this->sequence[Util::$LCvalue] ))
-                ? (int) $this->sequence[Util::$LCvalue] + 1
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
+            $value->value = ( isset( $this->sequence->value ) &&
+                ( -1 < $this->sequence->value ))
+                ? (int) $this->sequence->value + 1
                 : 0;
         }
         else {
-            Util::assertInteger( $value, self::SEQUENCE );
-            $value = (int) $value;
+            Util::assertInteger( $value->value, self::SEQUENCE, 0 );
+            $value->value = (int) $value->value;
         }
-        $this->sequence = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->sequence = $value;
         return $this;
     }
 }

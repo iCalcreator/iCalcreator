@@ -40,17 +40,19 @@ use function ucfirst;
 /**
  * iCalcreator utility/support class
  *
- * @since  2.27.2 - 2018-12-21
+ * @since  2.41.36 - 2022-04-03
  */
 class Util
 {
     /**
      * @var string  misc. values
+     * @deprecated
      */
     public static string $LCvalue       = 'value';
 
     /**
      * @var string
+     * @deprecated
      */
     public static string $LCparams      = 'params';
 
@@ -230,7 +232,7 @@ class Util
                 sprintf( $ERR1, $propName, gettype( $value ), var_export( $value, true ))
             );
         }
-        return  (string) $value;
+        return (string) $value;
     }
 
     /**

@@ -106,7 +106,7 @@ class SelectFactory
      * @return mixed[]|bool    false on select error
      * @throws RuntimeException
      * @throws Exception
-     * @since  2.40.16 - 2022-02-01
+     * @since  2.41.36 - 2022-04-03
      */
     public static function selectComponents(
         Vcalendar                        $calendar,
@@ -175,9 +175,9 @@ class SelectFactory
                  ( false === ( $prop = $component->getDue( true ))))) {
                 continue;
             }
-            $compStart = UtilDateTime::factory( $prop[Util::$LCvalue], $prop[Util::$LCparams] );
+            $compStart = UtilDateTime::factory( $prop->value, $prop->params );
             $dtStartTz = $compStart->getTimezoneName();
-            if( ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE )) {
+            if( $prop->hasParamValue( Vcalendar::DATE )) {
                 $compStartHis = null;
             }
             else {
@@ -212,12 +212,8 @@ class SelectFactory
             $recurId = null;
             if( ! $isFreebusyCompType &&
                ( false !== ( $prop = $component->getRecurrenceid( true )))) {
-                $recurId  = UtilDateTime::factory( $prop[Util::$LCvalue], $prop[Util::$LCparams], $dtStartTz );
-                $rangeSet = Util::issetKeyAndEquals(
-                    $prop[Util::$LCparams],
-                    Vcalendar::RANGE,
-                    Vcalendar::THISANDFUTURE
-                );
+                $recurId  = UtilDateTime::factory( $prop->value, $prop->params, $dtStartTz );
+                $rangeSet = $prop->hasParamKey( Vcalendar::RANGE, Vcalendar::THISANDFUTURE );
                 $recurIdList[$recurId->key] = [
                     $compStart->getClone(),
                     $compEnd->getClone(),
@@ -621,7 +617,7 @@ class SelectFactory
      * @param UtilDateTime      $workEnd
      * @param string            $compStartHis
      * @throws Exception
-     * @since 2.27.14 - 2019-02-27
+     * @since 2.41.36 - 2022-04-03
      */
     private static function getAllEXRULEdates(
         CalendarComponent $component,
@@ -634,12 +630,11 @@ class SelectFactory
     ) : void
     {
         if( false !== ( $prop = $component->getExrule( true ))) {
-            $isValueDate = ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE );
-            $prop        = $prop[Util::$LCvalue];
-            if( isset( $prop[Vcalendar::UNTIL] ) && ! $isValueDate ) {
+            $isValueDate = $prop->hasParamValue( Vcalendar::DATE );
+            if( isset( $prop->value[Vcalendar::UNTIL] ) && ! $isValueDate ) {
                 // convert UNTIL date to DTSTART timezone
-                $prop[Vcalendar::UNTIL] = UtilDateTime::factory(
-                    $prop[Vcalendar::UNTIL],
+                $prop->value[Vcalendar::UNTIL] = UtilDateTime::factory(
+                    $prop->value[Vcalendar::UNTIL],
                     [ Vcalendar::TZID => Vcalendar::UTC ],
                     $dtStartTz
                 );
@@ -647,7 +642,7 @@ class SelectFactory
             $exdateList2 = [];
             RecurFactory::recur2date(
                 $exdateList2,
-                $prop,
+                $prop->value,
                 $compStart,
                 $workStart,
                 $workEnd
@@ -665,7 +660,7 @@ class SelectFactory
      * @param mixed[]           $exdateList
      * @param string            $dtStartTz
      * @throws Exception
-     * @since 2.27.2 - 2018-12-29
+     * @since 2.41.36 - 2022-04-03
      */
     private static function getAllEXDATEdates(
         CalendarComponent $component,
@@ -674,12 +669,8 @@ class SelectFactory
     ) : void
     {
         while( false !== ( $prop = $component->getExdate( null, true ))) {
-            foreach( $prop[Util::$LCvalue] as $exdate ) {
-                $exdate = UtilDateTime::factory(
-                    $exdate,
-                    $prop[Util::$LCparams],
-                    $dtStartTz
-                );
+            foreach( $prop->value as $exdate ) {
+                $exdate = UtilDateTime::factory( $exdate, $prop->params, $dtStartTz );
                 $exdateList[$exdate->key] = true;
             } // end - foreach( $exdate as $exdate )
         } // end while
@@ -698,7 +689,7 @@ class SelectFactory
      * @param mixed[]           $exdateList
      * @param null|DateInterval $compDuration
      * @throws Exception
-     * @since 2.27.14 - 2019-02-27
+     * @since 2.41.36 - 2022-04-03
      */
     private static function getAllRRULEdates(
         CalendarComponent $component,
@@ -715,24 +706,17 @@ class SelectFactory
         $exdateYmdList = self::getYmdList( $exdateList );
         $recurYmdList  = self::getYmdList( $recurList );
         if( false !== ( $prop = $component->getRrule( true ))) {
-            $isValueDate = ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE );
-            $prop        = $prop[Util::$LCvalue];
-            if( isset( $prop[Vcalendar::UNTIL] ) && ! $isValueDate ) {
+            $isValueDate = $prop->hasParamValue( Vcalendar::DATE );
+            if( isset( $prop->value[Vcalendar::UNTIL] ) && ! $isValueDate ) {
                 // convert RRULE['UNTIL'] to same timezone as DTSTART !!
-                $prop[Vcalendar::UNTIL] = UtilDateTime::factory(
-                    $prop[Vcalendar::UNTIL],
+                $prop->value[Vcalendar::UNTIL] = UtilDateTime::factory(
+                    $prop->value[Vcalendar::UNTIL],
                     [ Vcalendar::TZID => Vcalendar::UTC ],
                     $dtStartTz
                 );
             }
             $recurList2  = [];
-            RecurFactory::recur2date(
-                $recurList2,
-                $prop,
-                $compStart,
-                $workStart,
-                $workEnd
-            );
+            RecurFactory::recur2date( $recurList2, $prop->value, $compStart, $workStart, $workEnd );
             foreach( $recurList2 as $recurKey => $recurValue ) { // recurkey=Ymd
                 if( isset( $exdateYmdList[$recurKey] )) {        // exclude on Ymd basis
                     continue;
@@ -762,7 +746,7 @@ class SelectFactory
      * @param string            $compStartHis
      * @param null|DateInterval $compDuration
      * @throws Exception
-     * @since 2.40 - 2021-10-04
+     * @since 2.41.36 - 2022-04-03
      */
     private static function getAllRDATEdates(
         CalendarComponent $component,
@@ -779,13 +763,11 @@ class SelectFactory
         $exdateYmdList = self::getYmdList( $exdateList );
         $recurYmdList  = self::getYmdList( $recurList );
         while( false !== ( $prop = $component->getRdate( null, true ))) {
-            $rDateFmt = $prop[Util::$LCparams][Vcalendar::VALUE] ?? Vcalendar::DATE_TIME;
+            $rDateFmt = $prop->getParams( Vcalendar::VALUE ) ?? Vcalendar::DATE_TIME;
             // DATE or PERIOD
-            $params   = $prop[Util::$LCparams];
-            $prop     = $prop[Util::$LCvalue];
-            foreach( $prop as $theRdate ) {
+            foreach( $prop->value as $theRdate ) {
                 if( Vcalendar::PERIOD === $rDateFmt ) {            // all days within PERIOD
-                    $rDate = UtilDateTime::factory( $theRdate[0], $params, $dtStartTz );
+                    $rDate = UtilDateTime::factory( $theRdate[0], $prop->params, $dtStartTz );
                     if( ! self::inScope( $rDate, $workStart, $rDate, $fcnEnd, $format )) {
                         continue;
                     }
@@ -804,7 +786,7 @@ class SelectFactory
                     }
                     if( $theRdate[1] instanceof DateTime ) { // date-date period end
                         $recurList[$rDate->key] = $rDate->diff( // save duration
-                            UtilDateTime::factory( $theRdate[1], $params, $dtStartTz )
+                            UtilDateTime::factory( $theRdate[1], $prop->params, $dtStartTz )
                         );
                         continue;
                     }
@@ -815,13 +797,13 @@ class SelectFactory
                 if( Vcalendar::DATE === $rDateFmt ) {          // single recurrence, DATE (=Ymd)
                     $rDate = UtilDateTime::factory(
                         $theRdate,
-                        array_merge( $params, [ Vcalendar::TZID => $dtStartTz ] ),
+                        array_merge( $prop->params, [ Vcalendar::TZID => $dtStartTz ] ),
                         $dtStartTz
                     );
                     $rDateYmdHisKey = $rDate->key . $compStartHis;
                 }
                 else { // single recurrence, DATETIME
-                    $rDate = UtilDateTime::factory( $theRdate, $params, $dtStartTz );
+                    $rDate = UtilDateTime::factory( $theRdate, $prop->params, $dtStartTz );
                     // set start date for recurrence + DateInterval/false (+opt His)
                     $rDateYmdHisKey = $rDate->key;
                 }
@@ -829,13 +811,7 @@ class SelectFactory
                 switch( true ) {
                     case ( isset( $exdateYmdList[$cmpKey] )) : // excluded on Ymd basis
                         break;
-                    case ( ! self::inScope(
-                        $rDate,
-                        $workStart,
-                        $rDate,
-                        $fcnEnd,
-                        $format
-                    )) :
+                    case ( ! self::inScope( $rDate, $workStart, $rDate, $fcnEnd, $format )) :
                         break;
                     default :
                         if( isset( $recurYmdList[$cmpKey] )) {  // rDate replaces rRule
@@ -977,7 +953,7 @@ class SelectFactory
      * @param string            $dtStartTz
      * @return null|UtilDateTime
      * @throws Exception
-     * @since 2.27.6 - 2018-12-29
+     * @since 2.41.36 - 2022-04-03
      */
     private static function getCompEndDate( CalendarComponent $component, string $dtStartTz ) : null | UtilDateTime
     {
@@ -989,27 +965,22 @@ class SelectFactory
         $isVeventCompType   = ( Vcalendar::VEVENT === $compType );
         if(( $isVeventCompType || $isFreebusyCompType ) &&
           ( false !== ( $prop = $component->getDtend( true )))) {
-            $compEnd = UtilDateTime::factory(
-                $prop[Util::$LCvalue],
-                $prop[Util::$LCparams],
-                $dtStartTz
-            );
+            $compEnd = UtilDateTime::factory( $prop->value, $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DTENDEXIST] = true;
         }
         if( empty( $prop ) &&
             $isVtodoCompType &&
             ( false !== ( $prop = $component->getDue( true )))) {
-            $compEnd = UtilDateTime::factory( $prop[Util::$LCvalue],  $prop[Util::$LCparams], $dtStartTz );
+            $compEnd = UtilDateTime::factory( $prop->value,  $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DUEEXIST] = true;
         }
         if( empty( $prop ) && // duration in dtend (array) format
             ( $isVeventCompType || $isVtodoCompType ) &&
             ( false !== ( $prop = $component->getDuration( true, true )))) {
-            $compEnd = UtilDateTime::factory( $prop[Util::$LCvalue], $prop[Util::$LCparams], $dtStartTz );
+            $compEnd = UtilDateTime::factory( $prop->value, $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DURATIONEXIST] = true;
         }
-        if( ! empty( $prop ) &&
-            ParameterFactory::isParamsValueSet( $prop, Vcalendar::DATE )) {
+        if( ! empty( $prop ) && $prop->hasParamValue( Vcalendar::DATE )) {
             /* a DTEND without time part denotes an end of an event that actually ends the day before,
                for an all-day event DTSTART=20071201 DTEND=20071202, taking place 20071201!!! */
             $compEnd->SCbools[self::$ENDALLDAYEVENT] = true;
@@ -1060,7 +1031,7 @@ class SelectFactory
      *
      * @param CalendarComponent $component     (Vevent/Vtodo/Vjournal)
      * @param mixed[] $recurIdComps
-     * @since 2.27.1 - 2018-12-16
+     * @since 2.41.36 - 2022-04-03
      */
     private static function updateRecurrIdComps( CalendarComponent $component, array $recurIdComps ) : void
     {
@@ -1080,18 +1051,13 @@ class SelectFactory
             if( ! empty( $summary )) {
                 $value = $recurIdComps[$RecurrIdKey][4]->getSummary();
                 if( empty( $value )) {
-                    $recurIdComps[$RecurrIdKey][4]->setSummary(
-                        $summary[Util::$LCvalue],
-                        $summary[Util::$LCparams] );
+                    $recurIdComps[$RecurrIdKey][4]->setSummary( $summary->value, $summary->params );
                 }
             }
             if( ! empty( $description )) {
                 $value = $recurIdComps[$RecurrIdKey][4]->getDescription();
                 if( empty( $value )) {
-                    $recurIdComps[$RecurrIdKey][4]->setDescription(
-                        $description[Util::$LCvalue],
-                        $description[Util::$LCparams]
-                    );
+                    $recurIdComps[$RecurrIdKey][4]->setDescription( $description->value, $description->params );
                 }
             } // end if
             if( empty( $comments )) {
@@ -1102,9 +1068,7 @@ class SelectFactory
                 continue;
             }
             foreach( $comments as $prop ) {
-                $recurIdComps[$RecurrIdKey][4]->setComment(
-                    $prop[Util::$LCvalue],
-                    $prop[Util::$LCparams] );
+                $recurIdComps[$RecurrIdKey][4]->setComment( $prop->value, $prop->params );
             }
         } // end foreach
     }

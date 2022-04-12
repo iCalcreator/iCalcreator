@@ -46,7 +46,8 @@ class SelectComponentsTest extends TestCase
     /**
      * Vevent calendar sub-provider
      *
-     * demo calendar
+     * demoUsage.md calendar
+     *
      * @throws Exception
      */
     public static function veventCalendarSubProvider() : Vcalendar

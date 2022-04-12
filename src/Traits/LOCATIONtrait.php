@@ -29,19 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * LOCATION property functions
  *
- * @since 2.41.4 2022-01-20
+ * LOCATION may occur multiply times i Participant, once otherwise
+ *
+ * @since 2.41.36 2022-04-11
  */
 trait LOCATIONtrait
 {
     /**
-     * @var null|mixed[] component property LOCATION value
+     * @var null|Pc[] component property LOCATION value
      */
     protected ? array $location = null;
 
@@ -53,21 +55,21 @@ trait LOCATIONtrait
     public function createLocation() : string
     {
         if( empty( $this->location )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->location as $locationPart ) {
-            if( empty( $locationPart[Util::$LCvalue] ) ) {
+            if( empty( $locationPart->value ) ) {
                 $output .= $this->getConfig( self::ALLOWEMPTY )
                     ? StringFactory::createElement( self::LOCATION )
-                    : Util::$SP0;
+                    : self::$SP0;
                 continue;
             }
             $output .= StringFactory::createElement(
                 self::LOCATION,
-                ParameterFactory::createParams( $locationPart[Util::$LCparams], self::$ALTRPLANGARR, $lang ),
-                StringFactory::strrep( $locationPart[Util::$LCvalue] )
+                ParameterFactory::createParams( $locationPart->params, self::$ALTRPLANGARR, $lang ),
+                StringFactory::strrep( $locationPart->value )
             ); // end foreach
         }
         return $output;
@@ -78,7 +80,7 @@ trait LOCATIONtrait
      *
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
-     * @since 2.41.4 2022-01-20
+     * @since 2.41.36 2022-04-11
      */
     public function deleteLocation( ? int $propDelIx = null ) : bool
     {
@@ -87,10 +89,10 @@ trait LOCATIONtrait
             unset( $this->propDelIx[self::LOCATION] );
             return false;
         }
-        if( self::PARTICIPANT !== $this->getCompType()) {
+        if( self::isLocationSingleProp( $this->getCompType())) {
             $propDelIx = null;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->location,
             self::LOCATION,
             $this,
@@ -103,51 +105,85 @@ trait LOCATIONtrait
      *
      * @param null|bool|int   $propIx specific property in case of multiply occurrence
      * @param null|bool  $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.41.4 2022-01-20
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-11
      */
-    public function getLocation( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getLocation( null|bool|int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->location )) {
             unset( $this->propIx[self::LOCATION] );
             return false;
         }
-        if( self::PARTICIPANT !== $this->getCompType()) {
+        $isSingleProp = self::isLocationSingleProp( $this->getCompType());
+        if( $isSingleProp ) {
             if( is_bool( $propIx )) {
                 $inclParam = $propIx;
             }
-//          $propIx = null;
-            $propIx = 1;
+            $propIx = null;
         }
-        return self::getPropertyM(
+        $result = self::getMvalProperty(
             $this->location,
             self::LOCATION,
             $this,
             $propIx,
             $inclParam
         );
+        if( $isSingleProp ) {
+            unset( $this->propIx[self::LOCATION] );
+        }
+        return $result;
+    }
+
+    /**
+     * Return bool true if LOCATION property may only occur once in component
+     *
+     * @param string $compName
+     * @return bool
+     * @since 2.41.36 2022-04-11
+     */
+    public static function isLocationSingleProp( string $compName ) : bool
+    {
+        return ( self::PARTICIPANT !== $compName );
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isLocationSet() : bool
+    {
+        return self::isMvalSet( $this->location );
     }
 
     /**
      * Set calendar component property location
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|int      $index  if NOT comp PARTICIPANT : 1
+     * @param null|string|Pc    $value
+     * @param null|int|mixed[]  $params
+     * @param null|int          $index  if NOT comp PARTICIPANT : 1
      * @return static
-     * @since 2.41.4 2022-01-18
+     * @since 2.41.36 2022-04-11
      */
-    public function setLocation( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setLocation(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::LOCATION );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::LOCATION );
+            $value->setEmpty();
         }
-        if( self::PARTICIPANT !== $this->getCompType()) {
+        else {
+            $value->value = StringFactory::trimTrailNL( $value->value );
+        }
+        if( self::isLocationSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        self::setMval( $this->location, $value, $params, null, $index );
+        self::setMval( $this->location, $value, $index );
         return $this;
     }
 }

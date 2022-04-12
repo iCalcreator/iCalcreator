@@ -33,6 +33,7 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -42,14 +43,14 @@ use Kigkonsult\Icalcreator\VAcomponent;
 /**
  * DTEND property functions
  *
- * @since 2.41.28 2022-02-20
+ * @since 2.41.36 2022-04-03
  */
 trait DTENDtrait
 {
     /**
-     * @var null|mixed[] component property DTEND value
+     * @var null|Pc component property DTEND value
      */
-    protected ? array $dtend = null;
+    protected ? Pc $dtend = null;
 
     /**
      * Return formatted output for calendar component property dtend
@@ -58,30 +59,24 @@ trait DTENDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.1 2019-06-24
+     * @since 2.41.36 2022-04-03
      */
     public function createDtend() : string
     {
         if( empty( $this->dtend )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->dtend[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::DTEND )
-                : Util::$SP0;
+        if( empty( $this->dtend->value )) {
+            return $this->createSinglePropEmpty( self::DTEND );
         }
         $isDATE = ( ! empty( $this->dtstart ))
-            ? ParameterFactory::isParamsValueSet( $this->dtstart, self::DATE )
-            : ParameterFactory::isParamsValueSet( $this->dtend, self::DATE );
-        $isLocalTime = isset( $this->dtend[Util::$LCparams][Util::$ISLOCALTIME] );
+            ? $this->dtstart->hasParamValue( self::DATE )
+            : $this->dtend->hasParamValue( self::DATE );
+        $isLocalTime = $this->dtend->hasParamKey( Util::$ISLOCALTIME );
         return StringFactory::createElement(
             self::DTEND,
-            ParameterFactory::createParams( $this->dtend[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str(
-                $this->dtend[Util::$LCvalue],
-                $isDATE,
-                $isLocalTime
-            )
+            ParameterFactory::createParams( $this->dtend->params ),
+            DateTimeFactory::dateTime2Str( $this->dtend->value, $isDATE, $isLocalTime )
         );
     }
 
@@ -101,62 +96,65 @@ trait DTENDtrait
      * Return calendar component property dtend
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|DateTime|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getDtend( ? bool $inclParam = false ) : DateTime | bool | string | array
+    public function getDtend( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->dtend )) {
             return false;
         }
-        return $inclParam ? $this->dtend : $this->dtend[Util::$LCvalue];
+        return $inclParam ? clone $this->dtend : $this->dtend->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isDtendSet() : bool
+    {
+        return ! empty( $this->dtend->value );
     }
 
     /**
      * Set calendar component property dtend
      *
-     * @param null|string|DateTimeInterface $value
+     * @param null|string|Pc|DateTimeInterface $value
      * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.28 2022-02-20
+     * @since 2.41.36 2022-04-03
      */
-    public function setDtend( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
+    public function setDtend( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::DTEND );
-            $this->dtend = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => [],
-            ];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::DTEND );
+            $this->dtend = $value->setEmpty();
             return $this;
         }
-        $params  = array_change_key_case( $params ?? [], CASE_UPPER );
-        $dtstart = (array) $this->getDtstart( true );
-        if( isset( $dtstart[Util::$LCparams][self::VALUE] )) {
-            $params[self::VALUE] = $dtstart[Util::$LCparams][self::VALUE];
+        $dtstart = $this->getDtstart( true );
+        if( $this->isDtstartSet()) {
+            if( $dtstart->hasParamValue()) {
+                $value->addParamValue( $dtstart->getParams( self::VALUE ));
+            }
+            if( $dtstart->hasParamKey( Util::$ISLOCALTIME )) {
+                $value->addParam( Util::$ISLOCALTIME, true );
+            }
         }
-        if( isset( $dtstart[Util::$LCparams][Util::$ISLOCALTIME] )) {
-            $params[Util::$ISLOCALTIME] = true;
-        }
-        if( $this instanceof VAcomponent ) {
-            $params[self::VALUE] = self::DATE_TIME; // rfc7953
-        }
-        $this->dtend = DateTimeFactory::setDate(
-            $value,
-            ParameterFactory::setParams(
-                $params,
-                DateTimeFactory::$DEFAULTVALUEDATETIME
-            ),
-            ( self::VFREEBUSY === $this->getCompType()) // $forceUTC
+        $value->addParam(
+            self::VALUE,
+            self::DATE_TIME,
+            ( $this instanceof VAcomponent ) // req for VAcomponent, default others
         );
-        if( ! empty( $dtstart ) && ( Util::issetAndNotEmpty( $dtstart, Util::$LCvalue ))) {
-            DateTimeFactory::assertDatesAreInSequence(
-                $dtstart[Util::$LCvalue],
-                $this->dtend[Util::$LCvalue],
-                self::DTEND
-            );
+        $this->dtend = DateTimeFactory::setDate( $value, ( self::VFREEBUSY === $this->getCompType())); // $forceUTC
+        if( $this->isDtstartSet()) {
+            DateTimeFactory::assertDatesAreInSequence( $dtstart->value, $this->dtend->value, self::DTEND );
         }
         return $this;
     }

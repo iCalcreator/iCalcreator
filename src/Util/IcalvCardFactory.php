@@ -121,7 +121,7 @@ class IcalvCardFactory
         ? int & $count = 0
     ) : string
     {
-        $calendar->participants2Attendees( $inclParam );
+        $calendar->participants2Attendees();
         $hits   = ( true === $inclParam )
             ? CalAddressFactory::getCalAdressesAllFromProperty( $calendar )
             : CalAddressFactory::getCalAddresses( $calendar ); // not from params, value only

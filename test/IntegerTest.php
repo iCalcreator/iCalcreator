@@ -72,10 +72,10 @@ class IntegerTest extends DtBase
             ],
             null,
             self::$STCPAR,
-            [
-                Util::$LCvalue  => '',
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                '',
+                []
+            ),
             ':'
         ];
 
@@ -87,10 +87,10 @@ class IntegerTest extends DtBase
             ],
             $value,
             self::$STCPAR,
-            [
-                Util::$LCvalue  => 0,
-                Util::$LCparams => self::$STCPAR
-            ],
+            Pc::factory(
+                0,
+                self::$STCPAR
+            ),
             ParameterFactory::createParams( self::$STCPAR ) .
             ':0'
         ];
@@ -106,10 +106,10 @@ class IntegerTest extends DtBase
             ],
             $value,
             self::$STCPAR,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => self::$STCPAR
-            ],
+            Pc::factory(
+                $value,
+                self::$STCPAR
+            ),
             ParameterFactory::createParams( self::$STCPAR ) .
             ':' . $value
         ];
@@ -118,14 +118,14 @@ class IntegerTest extends DtBase
         $dataArr[] = [
             19,
             [
-                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
+                IcalInterface::SEQUENCE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
             $value,
             self::$STCPAR,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => self::$STCPAR
-            ],
+            Pc::factory(
+                $value,
+                self::$STCPAR
+            ),
             ParameterFactory::createParams( self::$STCPAR ) .
             ':' . $value
         ];
@@ -138,10 +138,10 @@ class IntegerTest extends DtBase
             ],
             $value,
             self::$STCPAR,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => self::$STCPAR
-            ],
+            Pc::factory(
+                $value,
+                self::$STCPAR
+            ),
             ParameterFactory::createParams( self::$STCPAR ) .
             ':' . $value
         ];
@@ -158,7 +158,7 @@ class IntegerTest extends DtBase
      * @param mixed[] $propComps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -167,11 +167,12 @@ class IntegerTest extends DtBase
         array  $propComps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
-        $c = new Vcalendar();
+        $c       = new Vcalendar();
+        $pcInput = false;
         foreach( $propComps as $propName => $theComps ) {
             $getMethod    = StringFactory::getGetMethodName( $propName );
             $createMethod = StringFactory::getCreateMethodName( $propName );
@@ -200,9 +201,9 @@ class IntegerTest extends DtBase
                     return;
                 }
                 $getValue = $comp->{$getMethod}( true );
-                if(( empty( $getValue[Util::$LCvalue] ) && IcalInterface::SEQUENCE === $propName )) {
-                    $expectedGet[Util::$LCvalue]  = 0;
-                    $expectedGet[Util::$LCparams] = self::$STCPAR;
+                if(( empty( $getValue->value ) && IcalInterface::SEQUENCE === $propName )) {
+                    $expectedGet->value  = 0;
+                    $expectedGet->params = self::$STCPAR;
                 }
                 $this->assertEquals(
                     $expectedGet,
@@ -219,7 +220,15 @@ class IntegerTest extends DtBase
                     $comp->{$getMethod}(),
                     sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
-                $comp->{$setMethod}( $value, $params );
+
+                if( $pcInput ) {
+                    $comp->{$setMethod}( Pc::factory( $value, $params ));
+                }
+                else {
+                    $comp->{$setMethod}( $value, $params );
+                }
+                $pcInput = ! $pcInput;
+
             } // end foreach
         } // end foreach
 

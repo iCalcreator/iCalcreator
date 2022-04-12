@@ -29,23 +29,23 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * CONTACT property functions
  *
- * @throws InvalidArgumentException
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-11
  */
 trait CONTACTtrait
 {
     /**
-     * @var null|mixed[] component property CONTACT value
+     * @var null|Pc[] component property CONTACT value
      */
-    protected ? array $contact = [];
+    protected ? array $contact = null;
 
     /**
      * Return formatted output for calendar component property contact
@@ -55,20 +55,20 @@ trait CONTACTtrait
     public function createContact() : string
     {
         if( empty( $this->contact )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->contact as $contact ) {
-            if( ! empty( $contact[Util::$LCvalue] )) {
+            if( ! empty( $contact->value )) {
                 $output .= StringFactory::createElement(
                     self::CONTACT,
                     ParameterFactory::createParams(
-                        $contact[Util::$LCparams],
+                        $contact->params,
                         self::$ALTRPLANGARR,
                         $lang
                     ),
-                    StringFactory::strrep( $contact[Util::$LCvalue] )
+                    StringFactory::strrep( $contact->value )
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
@@ -83,7 +83,7 @@ trait CONTACTtrait
      *
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
-     * @since  2.27.1 - 2018-12-15
+     * @since 2.41.32 2022-03-17
      */
     public function deleteContact( ? int $propDelIx = null ) : bool
     {
@@ -91,7 +91,10 @@ trait CONTACTtrait
             unset( $this->propDelIx[self::CONTACT] );
             return false;
         }
-        return  self::deletePropertyM(
+        if( self::isContactSingleProp( $this->getCompType())) {
+            $propDelIx = null;
+        }
+        return self::deletePropertyM(
             $this->contact,
             self::CONTACT,
             $this,
@@ -102,51 +105,89 @@ trait CONTACTtrait
     /**
      * Get calendar component property contact
      *
-     * @param null|int    $propIx specific property in case of multiply occurrence
-     * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @param null|bool|int $propIx specific property in case of multiply occurrence
+     * @param null|bool     $inclParam
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-11
      */
-    public function getContact( ? int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getContact( null|bool|int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->contact )) {
             unset( $this->propIx[self::CONTACT] );
             return false;
         }
-        return  self::getPropertyM(
+        $isSingleType = self::isContactSingleProp( $this->getCompType());
+        if( $isSingleType ) {
+            if( is_bool( $propIx )) {
+                $inclParam = $propIx;
+            }
+            $propIx = null;
+        }
+        $result = self::getMvalProperty(
             $this->contact,
             self::CONTACT,
             $this,
             $propIx,
             $inclParam
         );
+        if( $isSingleType ) {
+            unset( $this->propIx[self::VFREEBUSY] );
+        }
+        return $result;
+    }
+
+    /**
+     * Return bool true if Contact property may only occur once in component
+     *
+     * @param string $compName
+     * @return bool
+     * @since 2.41.36 2022-04-11
+     */
+    public static function isContactSingleProp( string $compName ) : bool
+    {
+        return ( self::VFREEBUSY === $compName );
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isContactSet() : bool
+    {
+        return self::isMvalSet( $this->contact );
     }
 
     /**
      * Set calendar component property contact
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|int      $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params
+     * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-11
      */
-    public function setContact( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setContact(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::CONTACT );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::CONTACT );
+            $value->setEmpty();
         }
-        Util::assertString( $value, self::CONTACT );
-         self::setMval(
-            $this->contact,
-            StringFactory::trimTrailNL( $value ),
-             $params,
-            null,
-            $index
-        );
+        else {
+            $value->value = Util::assertString( $value->value, self::CONTACT );
+            $value->value = StringFactory::trimTrailNL( $value->value );
+        }
+        if( self::isContactSingleProp( $this->getCompType())) {
+            $index = 1;
+        }
+        self::setMval( $this->contact, $value, $index );
         return $this;
     }
 }

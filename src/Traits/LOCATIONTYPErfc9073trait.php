@@ -29,22 +29,22 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * LOCATION-TYPE property functions
  *
- * @since 2.41.5 2022-01-19
+ * @since 2.41.36 2022-04-03
  */
 trait LOCATIONTYPErfc9073trait
 {
     /**
-     * @var null|mixed[] component property LOCATION-TYPE value
+     * @var null|Pc component property LOCATION-TYPE value
      */
-    protected ? array $locationtype = null;
+    protected ? Pc $locationtype = null;
 
     /**
      * Return formatted output for calendar component property LOCATION-TYPE
@@ -54,17 +54,15 @@ trait LOCATIONTYPErfc9073trait
     public function createLocationtype() : string
     {
         if( empty( $this->locationtype )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->locationtype[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::LOCATION_TYPE )
-                : Util::$SP0;
+        if( empty( $this->locationtype->value )) {
+            return $this->createSinglePropEmpty( self::LOCATION_TYPE );
         }
         return StringFactory::createElement(
             self::LOCATION_TYPE,
-            ParameterFactory::createParams( $this->locationtype[Util::$LCparams] ),
-            $this->locationtype[Util::$LCvalue]
+            ParameterFactory::createParams( $this->locationtype->params ),
+            $this->locationtype->value
         );
     }
 
@@ -83,14 +81,25 @@ trait LOCATIONTYPErfc9073trait
      * Get calendar component property LOCATION-TYPE
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getLocationtype( ? bool $inclParam = false ) : array | bool | string
+    public function getLocationtype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->locationtype )) {
             return false;
         }
-        return $inclParam ? $this->locationtype : $this->locationtype[Util::$LCvalue];
+        return $inclParam ? clone $this->locationtype : $this->locationtype->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isLocationtypeSet() : bool
+    {
+        return ! empty( $this->locationtype->value );
     }
 
     /**
@@ -99,25 +108,24 @@ trait LOCATIONTYPErfc9073trait
      * Values for this parameter are taken from the values defined in Section 3 of [RFC4589].
      * New location types SHOULD be registered in the manner laid down in Section 5 of [RFC4589].
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setLocationtype( ? string $value = null, ? array $params = [] ) : static
+    public function setLocationtype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::LOCATION_TYPE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::LOCATION_TYPE );
+            $value->setEmpty();
         }
         else {
-            $value  = StringFactory::trimTrailNL( $value );
+            $value->value = StringFactory::trimTrailNL( $value->value );
         }
-        $this->locationtype = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->locationtype = $value;
         return $this;
     }
 }

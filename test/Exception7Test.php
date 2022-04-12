@@ -28,166 +28,76 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * class Exception7Test
  *
- * Testing RRULE exceptions
+ * Testing exceptions TZOFFSETFROM and TZOFFSETTO
  *
- * @since  2.29.25 - 2020-09-04
+ * @since  2.27.14 - 2019-02-27
  */
 class Exception7Test extends TestCase
 {
     /**
-     * rruleExceptionsTest provider
+     * DateIntervalFactoryTest provider
      *
      * @return mixed[]
      */
-    public function rruleExceptionsTestProvider() : array
+    public function DateIntervalFactoryTestProvider() : array
     {
-        $dataArr   = [];
-        $dataSetNo = 0;
-        $DATASET   = 'DATASET';
+        $dataArr = [];
 
-        // '#1 The FREQ rule part MUST be specified in the recurrence rule.';
         $dataArr[] = [
             11,
-            [
-                IcalInterface::BYMONTH   => 11,
-                IcalInterface::BYDAY     => [
-                    [ IcalInterface::DAY => IcalInterface::TH ],
-                ],
-                IcalInterface::BYSETPOS  => 4,
-                $DATASET             => $dataSetNo++
-            ],
+            IcalInterface::TZOFFSETFROM,
+            null,
+            [ IcalInterface::ALLOWEMPTY => false ]
         ];
 
-        // '#2 Unkown BYDAY day : ';
+        $dataArr[] = [
+            11,
+            IcalInterface::TZOFFSETFROM,
+            'abc',
+            []
+        ];
+
         $dataArr[] = [
             21,
-            [
-                IcalInterface::FREQ      => IcalInterface::MONTHLY,
-                IcalInterface::BYMONTH   => 11,
-                IcalInterface::BYDAY     => 'EN',
-                IcalInterface::BYSETPOS  => 4,
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-        $dataArr[] = [
-            22,
-            [
-                IcalInterface::FREQ      => IcalInterface::MONTHLY,
-                IcalInterface::BYMONTH   => 11,
-                IcalInterface::BYDAY     => [
-                    [ IcalInterface::DAY => 'EN' ],
-                ],
-                IcalInterface::BYSETPOS  => 4,
-                $DATASET             => $dataSetNo++
-            ],
+            IcalInterface::TZOFFSETTO,
+            null,
+            [ IcalInterface::ALLOWEMPTY => false ]
         ];
 
-        //  '#3 The BYDAY rule part MUST NOT ' .
-        //  'be specified with a numeric value ' .
-        //  'when the FREQ rule part is not set to MONTHLY or YEARLY. ';
         $dataArr[] = [
-            31,
-            [
-                IcalInterface::FREQ      => IcalInterface::WEEKLY,
-                IcalInterface::BYDAY     => [
-                    [ 1, IcalInterface::DAY => IcalInterface::MO ],
-                ],
-                IcalInterface::BYSETPOS  => 4,
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-
-
-        //  '#4 The BYDAY rule part MUST NOT ' .
-        //  'be specified with a numeric value ' .
-        //  'with the FREQ rule part set to YEARLY ' .
-        //  'when the BYWEEKNO rule part is specified. ';
-        $dataArr[] = [
-            41,
-            [
-                IcalInterface::FREQ      => IcalInterface::YEARLY,
-                IcalInterface::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
-                IcalInterface::BYDAY     => [
-                    [ -1, IcalInterface::DAY => IcalInterface::MO ],
-                ],
-                IcalInterface::BYSETPOS  => 4,
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-
-        //  '#5 The BYMONTHDAY rule part MUST NOT be specified ' .
-        //  'when the FREQ rule part is set to WEEKLY. ';
-        $dataArr[] = [
-            51,
-            [
-                IcalInterface::FREQ       => IcalInterface::WEEKLY,
-                IcalInterface::BYMONTHDAY => [ 5, 10, 15, 20, 25 ],
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-
-        //  '#6 The BYYEARDAY rule part MUST NOT be specified ' .
-        //  'when the FREQ rule part is set to DAILY, WEEKLY, or MONTHLY. ';
-        $dataArr[] = [
-            61,
-            [
-                IcalInterface::FREQ       => IcalInterface::DAILY,
-                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-        $dataArr[] = [
-            62,
-            [
-                IcalInterface::FREQ       => IcalInterface::WEEKLY,
-                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-        $dataArr[] = [
-            63,
-            [
-                IcalInterface::FREQ       => IcalInterface::MONTHLY,
-                IcalInterface::BYYEARDAY => [ 5, 10, 15, 20, 25 ],
-                $DATASET             => $dataSetNo++
-            ],
-        ];
-
-        //  '#7 The BYWEEKNO rule part MUST NOT be used ' .
-        //  'when the FREQ rule part is set to anything other than YEARLY.';
-        $dataArr[] = [
-            71,
-            [
-                IcalInterface::FREQ      => IcalInterface::MONTHLY,
-                IcalInterface::BYWEEKNO  => [ 5, 10, 15, 20, 25 ],
-                $DATASET             => $dataSetNo++
-            ],
+            21,
+            IcalInterface::TZOFFSETTO,
+            'abc',
+            []
         ];
 
         return $dataArr;
     }
 
     /**
+     * Testing DateInterval::factory
+     *
      * @test
-     * @dataProvider rruleExceptionsTestProvider
-     * @param int     $case
-     * @param mixed[] $rrule
-     * @throws Exception
-     * @throws Exception
+     * @dataProvider DateIntervalFactoryTestProvider
+     * @param int         $case
+     * @param string      $property
+     * @param string|null $value
+     * @param mixed[]     $config
      */
-    public function rruleExceptionsTest( int $case, array $rrule ) : void
+    public function DateIntervalFactoryTest( int $case, string $property, string $value  = null, array $config = [] ) : void
     {
-        $calendar = new Vcalendar();
+        $standard = new Standard( $config );
+        $method   = StringFactory::getSetMethodName( $property );
         $ok = false;
         try {
-            $calendar->newVevent()->setRrule( $rrule );
+            $standard->{$method}( $value );
         }
         catch ( InvalidArgumentException $e ) {
             $ok = true;

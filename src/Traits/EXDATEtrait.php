@@ -32,19 +32,19 @@ namespace Kigkonsult\Icalcreator\Traits;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * EXDATE property functions
  *
- * @since 2.29.2 2019-06-23
+ * @since 2.41.36 2022-04-09
  */
 trait EXDATEtrait
 {
     /**
-     * @var null|mixed[] component property EXDATE value
+     * @var null|Pc[] component property EXDATE value
      */
     protected ? array $exdate = null;
 
@@ -58,7 +58,7 @@ trait EXDATEtrait
     public function createExdate() : string
     {
         if( empty( $this->exdate )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
         return RexdateFactory::formatExdate(
             $this->exdate,
@@ -79,7 +79,7 @@ trait EXDATEtrait
             unset( $this->propDelIx[self::EXDATE] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->exdate,
             self::EXDATE,
             $this,
@@ -92,16 +92,16 @@ trait EXDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|bool|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
+    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->exdate )) {
             unset( $this->propIx[self::EXDATE] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->exdate,
             self::EXDATE,
             $this,
@@ -111,37 +111,44 @@ trait EXDATEtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isExdateSet() : bool
+    {
+        return self::isMvalSet( $this->exdate );
+    }
+
+    /**
      * Set calendar component property exdate
      *
-     * @param null|string|mixed[]|DateTimeInterface|DateTimeInterface[] $value
-     * @param null|mixed[]  $params
-     * @param null|integer  $index
+     * @param null|string|Pc|mixed[]|DateTimeInterface|DateTimeInterface[] $value
+     * @param null|int|mixed[]  $params
+     * @param null|int          $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.36 2022-04-09
      */
     public function setExdate(
-        null|string|array|DateTimeInterface $value = null,
-        ? array $params = [],
+        null|string|array|DateTimeInterface|Pc $value = null,
+        null|int|array $params = [],
         ? int $index = null
     ) : static
     {
-        if( empty( $value ) ||
-            ( is_array( $value) && ( 1 === count( $value )) && empty( reset( $value )))) {
-            $this->assertEmptyValue( $value, self::EXDATE );
-             self::setMval( $this->exdate, Util::$SP0, [], null, $index );
-            return $this;
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value ) ||
+            ( is_array( $value->value ) && ( 1 === count( $value->value )) && empty( reset( $value->value )))) {
+            $this->assertEmptyValue( $value->value, self::EXDATE );
+            $value->setEmpty();
         }
-        $value = self::checkSingleExdates( $value );
-        $input = RexdateFactory::prepInputExdate( $value, $params ?? [] );
-        self::setMval(
-            $this->exdate,
-            $input[Util::$LCvalue],
-            $input[Util::$LCparams],
-            null,
-            $index
-        );
+        else {
+            $value->value = self::checkSingleExdates( $value->value );
+            $value = RexdateFactory::prepInputExdate( $value );
+        }
+        self::setMval( $this->exdate, $value, $index );
         return $this;
     }
 

@@ -31,20 +31,21 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * EXRULE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait EXRULEtrait
 {
     /**
-     * @var null|mixed[] component property EXRULE value
+     * @var null|Pc component property EXRULE value
      */
-    protected ? array $exrule = null;
+    protected ? Pc $exrule = null;
 
     /**
      * Return formatted output for calendar component property exrule
@@ -53,7 +54,7 @@ trait EXRULEtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.27.13 - 2019-01-09
+     * @since 2.41.36 2022-04-03
      */
     public function createExrule() : string
     {
@@ -80,15 +81,26 @@ trait EXRULEtrait
      * Get calendar component property exrule
      *
      * @param null|bool $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.29.6 2019-06-27
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getExrule( ?bool $inclParam = false ) : bool | array | string
+    public function getExrule( ?bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->exrule )) {
             return false;
         }
-        return $inclParam ? $this->exrule : $this->exrule[Util::$LCvalue];
+        return $inclParam ? clone $this->exrule : $this->exrule->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isExruleSet() : bool
+    {
+        return ! empty( $this->exrule->value );
     }
 
     /**
@@ -99,19 +111,23 @@ trait EXRULEtrait
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.29.6 2019-06-23
+     * @since 2.41.36 2022-04-03
      */
     public function setExrule( ? array $exruleset = null, ? array $params = [] ) : static
     {
-        if( empty( $exruleset )) {
-            $this->assertEmptyValue( $exruleset, self::EXRULE );
-            $exruleset = [];
-            $params    = [];
+        $value = ( $exruleset instanceof Pc )
+            ? clone $exruleset
+            : Pc::factory( $exruleset, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::EXRULE );
+            $value->setEmpty();
         }
-        $this->exrule = RecurFactory::setRexrule(
-            $exruleset,
-            array_merge( $params ?? [], $this->getDtstartParams())
-        );
+        else {
+            foreach( $this->getDtstartParams() as $k => $v ) {
+                $value->addParam( $k, $v );
+            }
+        }
+        $this->exrule = RecurFactory::setRexrule( $value );
         return $this;
     }
 }

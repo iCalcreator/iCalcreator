@@ -29,7 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -40,14 +40,14 @@ use function strtoupper;
 /**
  * STATUS property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait STATUStrait
 {
     /**
-     * @var null|mixed[] component property STATUS value
+     * @var null|Pc component property STATUS value
      */
-    protected ? array $status = null;
+    protected ? Pc $status = null;
 
     /**
      * Return formatted output for calendar component property status
@@ -57,17 +57,15 @@ trait STATUStrait
     public function createStatus() : string
     {
         if( empty( $this->status )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->status[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::STATUS )
-                : Util::$SP0;
+        if( empty( $this->status->value )) {
+            return $this->createSinglePropEmpty( self::STATUS );
         }
         return StringFactory::createElement(
             self::STATUS,
-            ParameterFactory::createParams( $this->status[Util::$LCparams] ),
-            $this->status[Util::$LCvalue]
+            ParameterFactory::createParams( $this->status->params ),
+            $this->status->value
         );
     }
 
@@ -87,27 +85,38 @@ trait STATUStrait
      * Get calendar component property status
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getStatus( ? bool $inclParam = false ) : array | bool | string
+    public function getStatus( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->status )) {
             return false;
         }
-        return $inclParam ? $this->status : $this->status[Util::$LCvalue];
+        return $inclParam ? clone $this->status : $this->status->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isStatusSet() : bool
+    {
+        return ! empty( $this->status->value );
     }
 
     /**
      * Set calendar component property status
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-03
      */
-    public function setStatus( ? string $value = null, ? array $params = [] ) : static
+    public function setStatus( null|string|Pc $value = null, ? array $params = [] ) : static
     {
         static $ALLOWED_VEVENT = [
             self::CONFIRMED,
@@ -125,27 +134,29 @@ trait STATUStrait
             self::DRAFT,
             self::F_NAL,
         ];
-        $value = strtoupper( StringFactory::trimTrailNL( $value ?? Util::$SP0));
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( ! empty( $value->value )) {
+            Util::assertString( $value->value, self::SOURCE );
+            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
+        }
         switch( true ) {
-            case ( empty( $value )) :
-                $this->assertEmptyValue( $value, self::STATUS );
-                $value  = Util::$SP0;
-                $params = [];
+            case ( empty( $value->value )) :
+                $this->assertEmptyValue( $value->value, self::STATUS );
+                $value->setEmpty();
                 break;
-            case ( IcalInterface::VEVENT === $this->getCompType()) :
-                Util::assertInEnumeration( $value, $ALLOWED_VEVENT, self::STATUS );
+            case (self::VEVENT === $this->getCompType()) :
+                Util::assertInEnumeration( $value->value, $ALLOWED_VEVENT, self::STATUS );
                 break;
-            case ( IcalInterface::VTODO === $this->getCompType()) :
-                Util::assertInEnumeration( $value, $ALLOWED_VTODO, self::STATUS );
+            case (self::VTODO === $this->getCompType()) :
+                Util::assertInEnumeration( $value->value, $ALLOWED_VTODO, self::STATUS );
                 break;
-            case ( IcalInterface::VJOURNAL === $this->getCompType()) :
-                Util::assertInEnumeration( $value, $ALLOWED_VJOURNAL, self::STATUS );
+            case (self::VJOURNAL === $this->getCompType()) :
+                Util::assertInEnumeration( $value->value, $ALLOWED_VJOURNAL, self::STATUS );
                 break;
         } // end switch
-        $this->status = [
-            Util::$LCvalue  => $value ,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->status = $value;
         return $this;
     }
 }

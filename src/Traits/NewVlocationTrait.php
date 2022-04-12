@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Exception;
 use Kigkonsult\Icalcreator\Vlocation;
 
 trait NewVlocationTrait
@@ -36,9 +37,10 @@ trait NewVlocationTrait
     /**
      * Return Vlocation object instance
      *
-     * @param null|string $locationType  property LOCATION-TYPE value
-     * @param null|string $name          property NAME value
+     * @param null|string $locationType property LOCATION-TYPE value
+     * @param null|string $name property NAME value
      * @return Vlocation
+     * @throws Exception
      * @since  2.41.18 - 2022-02-18
      */
     public function newVlocation( ? string $locationType = null, ? string $name = null ) : Vlocation

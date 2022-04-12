@@ -30,25 +30,24 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 use function sprintf;
 
 /**
  * TZOFFSETFROM property functions
  *
- * @since 2.27.3 2018-12-22
+ * @since 2.41.36 2022-04-03
  */
 trait TZOFFSETFROMtrait
 {
     /**
-     * @var null|mixed[] component property TZOFFSETFROM value
+     * @var null|Pc component property TZOFFSETFROM value
      */
-    protected ? array $tzoffsetfrom = null;
+    protected ? Pc $tzoffsetfrom = null;
 
     /**
      * Return formatted output for calendar component property tzoffsetfrom
@@ -58,17 +57,15 @@ trait TZOFFSETFROMtrait
     public function createTzoffsetfrom() : string
     {
         if( empty( $this->tzoffsetfrom )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->tzoffsetfrom[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::TZOFFSETFROM )
-                : Util::$SP0;
+        if( empty( $this->tzoffsetfrom->value )) {
+            return $this->createSinglePropEmpty( self::TZOFFSETFROM );
         }
         return StringFactory::createElement(
             self::TZOFFSETFROM,
-            ParameterFactory::createParams( $this->tzoffsetfrom[Util::$LCparams] ),
-            $this->tzoffsetfrom[Util::$LCvalue]
+            ParameterFactory::createParams( $this->tzoffsetfrom->params ),
+            $this->tzoffsetfrom->value
         );
     }
 
@@ -88,43 +85,51 @@ trait TZOFFSETFROMtrait
      * Get calendar component property tzoffsetfrom
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-13
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTzoffsetfrom( ? bool $inclParam = false ) : array | bool | string
+    public function getTzoffsetfrom( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzoffsetfrom )) {
             return false;
         }
-        return $inclParam
-            ? $this->tzoffsetfrom
-            : $this->tzoffsetfrom[Util::$LCvalue];
+        return $inclParam ? clone $this->tzoffsetfrom : $this->tzoffsetfrom->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isTzoffsetfromSet() : bool
+    {
+        return ! empty( $this->tzoffsetfrom->value );
     }
 
     /**
      * Set calendar component property tzoffsetfrom
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.27.3 2019-03-14
+     * @since 2.41.36 2022-04-03
      */
-    public function setTzoffsetfrom( ? string $value = null, ? array $params = [] ) : static
+    public function setTzoffsetfrom( null|string|Pc $value = null, ? array $params = [] ) : static
     {
         static $ERR = 'Invalid %s offset value %s';
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::TZOFFSETFROM );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TZOFFSETFROM );
+            $value->setEmpty();
         }
-        elseif( ! DateTimeZoneFactory::hasOffset( $value )) {
-            throw new InvalidArgumentException( sprintf( $ERR, IcalInterface::TZOFFSETFROM, $value ));
+        elseif( ! DateTimeZoneFactory::hasOffset( $value->value )) {
+            throw new InvalidArgumentException( sprintf( $ERR,self::TZOFFSETFROM, $value->value ));
         }
-        $this->tzoffsetfrom = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->tzoffsetfrom = $value->setParams( ParameterFactory::setParams( $params ));
         return $this;
     }
 }

@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -38,14 +39,14 @@ use InvalidArgumentException;
 /**
  * CALENDAR-ADDRESS property functions
  *
- * @since  2.41.4 - 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait CALENDAR_ADDRESSrfc9073trait
 {
     /**
-     * @var null|mixed[] component property CALENDAR-ADDRESS value
+     * @var null|Pc component property CALENDAR-ADDRESS value
      */
-    protected ? array $calendaraddress = null;
+    protected ? Pc $calendaraddress = null;
 
     /**
      * Return formatted output for calendar component property calendaraddress
@@ -55,17 +56,15 @@ trait CALENDAR_ADDRESSrfc9073trait
     public function createCalendaraddress() : string
     {
         if( empty( $this->calendaraddress )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->calendaraddress[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::CALENDAR_ADDRESS )
-                : Util::$SP0;
+        if( empty( $this->calendaraddress->value )) {
+            return $this->createSinglePropEmpty( self::CALENDAR_ADDRESS );
         }
         return StringFactory::createElement(
             self::CALENDAR_ADDRESS,
-            ParameterFactory::createParams( $this->calendaraddress[Util::$LCparams] ),
-            $this->calendaraddress[Util::$LCvalue]
+            ParameterFactory::createParams( $this->calendaraddress->params ),
+            $this->calendaraddress->value
         );
     }
 
@@ -84,39 +83,50 @@ trait CALENDAR_ADDRESSrfc9073trait
      * Get calendar component property calendaraddress
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getCalendaraddress( ? bool $inclParam = false ) : array | bool | string
+    public function getCalendaraddress( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->calendaraddress )) {
             return false;
         }
-        return $inclParam ? $this->calendaraddress : $this->calendaraddress[Util::$LCvalue];
+        return $inclParam ? clone $this->calendaraddress : $this->calendaraddress->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isCalendaraddressSet() : bool
+    {
+        return ! empty( $this->calendaraddress->value );
     }
 
     /**
      * Set calendar component property calendaraddress
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setCalendaraddress( ? string $value = null, ? array $params = [] ) : static
+    public function setCalendaraddress( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::CALENDAR_ADDRESS );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::CALENDAR_ADDRESS );
+            $value->setEmpty();
         }
-        $value = CalAddressFactory::conformCalAddress( $value, true );
-        if( ! empty( $value )) {
-            CalAddressFactory::assertCalAddress( $value );
+        else {
+            $value->value = Util::assertString( $value->value, self::CALENDAR_ADDRESS );
+            $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
+            CalAddressFactory::assertCalAddress( $value->value );
         }
-        $this->calendaraddress = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->calendaraddress = $value;
         return $this;
     }
 }

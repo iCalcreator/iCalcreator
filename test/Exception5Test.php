@@ -28,234 +28,97 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use ArgumentCountError;
-use PHPUnit\Framework\TestCase;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Exception;
+use Kigkonsult\Icalcreator\Util\StringFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * class Exception5Test
  *
- * Testing ALLOWEMPTY = false exceptions
+ * Testing SEQUENCE/PERCENT_COMPLETE integer exceptions
  *
  * @since  2.27.14 - 2019-02-27
  */
 class Exception5Test extends TestCase
 {
-    private static string $ERRFMT = "%s error in case #%s, <%s>->%s";
-
     /**
-     * AllowEmptyTest1 provider
+     * integerTest provider
      *
      * @return mixed[]
      */
-    public function AllowEmptyTest1Provider() : array
+    public function integerTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             11,
             [
-                IcalInterface::VEVENT =>
-                    [
-                        IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
-                        IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::CONTACT,
-                        IcalInterface::DESCRIPTION, IcalInterface::DTEND, IcalInterface::DTSTART,
-                        IcalInterface::DURATION, IcalInterface::EXDATE, IcalInterface::EXRULE,
-                        IcalInterface::GEO, IcalInterface::LOCATION, IcalInterface::ORGANIZER,
-                        IcalInterface::PRIORITY, IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
-                        IcalInterface::REQUEST_STATUS, IcalInterface::RESOURCES, IcalInterface::RRULE, IcalInterface::RDATE,
-                        IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::TRANSP, IcalInterface::URL,
-                    ],
-            ]
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
+            ],
+            'NaN',
         ];
 
         $dataArr[] = [
             12,
             [
-                IcalInterface::VTODO => [
-                    IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
-                    IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::COMPLETED, IcalInterface::CONTACT,
-                    IcalInterface::DESCRIPTION, IcalInterface::DTSTART, IcalInterface::DUE,
-                    IcalInterface::DURATION, IcalInterface::EXDATE, IcalInterface::EXRULE,
-                    IcalInterface::GEO, IcalInterface::LOCATION, IcalInterface::ORGANIZER,
-                    IcalInterface::PRIORITY, IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
-                    IcalInterface::REQUEST_STATUS, IcalInterface::RESOURCES, IcalInterface::RRULE, IcalInterface::RDATE,
-                    IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::URL,
-                ],
+                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
             ],
+            -1,
         ];
 
         $dataArr[] = [
-            13,
+            21,
             [
-                IcalInterface::VJOURNAL => [
-                    IcalInterface::ATTACH, IcalInterface::ATTENDEE, IcalInterface::CATEGORIES,
-                    IcalInterface::KLASS, IcalInterface::COMMENT, IcalInterface::CONTACT,
-                    IcalInterface::DESCRIPTION, IcalInterface::DTSTART,
-                    IcalInterface::EXDATE, IcalInterface::EXRULE,
-                    IcalInterface::ORGANIZER,
-                    IcalInterface::RECURRENCE_ID, IcalInterface::RELATED_TO,
-                    IcalInterface::REQUEST_STATUS, IcalInterface::RRULE, IcalInterface::RDATE,
-                    IcalInterface::STATUS, IcalInterface::SUMMARY, IcalInterface::URL,
-                ],
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
             ],
+            'NaN',
         ];
 
         $dataArr[] = [
-            14,
+            22,
             [
-                IcalInterface::VFREEBUSY => [
-                    IcalInterface::ATTENDEE, IcalInterface::COMMENT, IcalInterface::CONTACT,
-                    IcalInterface::DTEND, IcalInterface::DTSTART, IcalInterface::DURATION,
-                    IcalInterface::FREEBUSY, IcalInterface::REQUEST_STATUS, IcalInterface::URL,
-                ],
-            ]
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
+            ],
+            -1,
         ];
 
         $dataArr[] = [
-            15,
+            23,
             [
-                IcalInterface::VTIMEZONE => [
-                    IcalInterface::TZID, IcalInterface::TZURL,
-                ],
-            ]
+                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
+            ],
+            101,
         ];
 
         return $dataArr;
     }
 
     /**
-     * Test Vevent, Vtodo, Vjournal, Vfreebusy, Vtimezone
+     * Testing SEQUENCE/PERCENT_COMPLETE integer exceptions
      *
      * @test
-     * @dataProvider AllowEmptyTest1Provider
+     * @dataProvider integerTestProvider
      * @param int     $case
-     * @param mixed[] $compProps
+     * @param mixed[] $propComps
+     * @param mixed   $value
      */
-    public function AllowEmptyTest1( int $case, array $compProps ) : void
+    public function integerTest( int $case, array $propComps, mixed $value ) : void
     {
-        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
-        foreach( $compProps as $theComp => $propNames ) {
-            $newMethod = 'new' . $theComp;
-            $comp = $calendar->{$newMethod}();
-            foreach( $propNames as $propName ) {
-                $setMethod = StringFactory::getSetMethodName( $propName );
-                $ok = false;
-                try {
-                    $comp->{$setMethod}();
-                }
-                catch( Exception $e ) {
-                    $ok = true;
-                }
-                $this->assertTrue( $ok, sprintf( self::$ERRFMT, __FUNCTION__ , $case, $theComp, $propName ));
-            } // end foreach
-        } // end foreach
-    }
-
-    /**
-     * Test Vevent, Vtodo, Vjournal, Vfreebusy, Vtimezone X-prop
-     *
-     * @test
-     */
-    public function AllowEmptyTest2() : void
-    {
-        $comps = [
-            IcalInterface::VEVENT,
-            IcalInterface::VTODO,
-            IcalInterface::VJOURNAL,
-            IcalInterface::VFREEBUSY,
-            IcalInterface::VTIMEZONE
-        ];
-        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
-        foreach( $comps as $x => $theComp ) {
-            $newMethod = 'new' . $theComp;
-            $ok = false;
-            try {
-                $calendar->{$newMethod}()->setXprop();
-            }
-            catch( ArgumentCountError $e ) {
-                $ok = true;
-            }
-            catch( Exception $e ) {
-                $ok = true;
-            }
-            $this->assertTrue( $ok, sprintf( self::$ERRFMT, __FUNCTION__, $x, $theComp, 'xProp' ) );
-        } // end foreach
-    }
-
-    /**
-     * Test Valarm X-prop
-     *
-     * @test
-     */
-    public function AllowEmptyTest3() : void
-    {
-        $compProps = [
-            IcalInterface::VEVENT => [
-                IcalInterface::ACTION, IcalInterface::DESCRIPTION, IcalInterface::TRIGGER, IcalInterface::SUMMARY,
-                IcalInterface::ATTENDEE,
-                IcalInterface::DURATION, IcalInterface::REPEAT,
-                IcalInterface::ATTACH,
-            ],
-            IcalInterface::VTODO => [
-                IcalInterface::ACTION, IcalInterface::DESCRIPTION, IcalInterface::TRIGGER, IcalInterface::SUMMARY,
-                IcalInterface::ATTENDEE,
-                IcalInterface::DURATION, IcalInterface::REPEAT,
-                IcalInterface::ATTACH,
-            ],
-        ];
-        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
-        foreach( $compProps as $theComp => $propNames) {
-            $newMethod = 'new' . $theComp;
-            $comp      = $calendar->{$newMethod}()->newValarm();
-            foreach( $propNames as $x => $propName ) {
-                $setMethod = StringFactory::getSetMethodName( $propName );
+        $calendar = new Vcalendar();
+        foreach( $propComps as $propName => $theComps ) {
+            $setMethod    = StringFactory::getSetMethodName( $propName );
+            foreach( $theComps as $theComp ) {
+                $newMethod = 'new' . $theComp;
                 $ok        = false;
                 try {
-                    $comp->{$setMethod}();
+                    $calendar->{$newMethod}()
+                             ->{$setMethod}( $value );
                 }
                 catch( Exception $e ) {
                     $ok = true;
                 }
-                $this->assertTrue( $ok, sprintf( self::$ERRFMT, __FUNCTION__, $x, $theComp, $propName ) );
-            } // end foreach
-        } // end foreach
-    }
-
-    /**
-     * Test Valarm/Standard/Daylight X-prop
-     *
-     * @test
-     */
-    public function AllowEmptyTest4() : void
-    {
-        $compProps = [
-            IcalInterface::VEVENT => [
-                IcalInterface::VALARM
-            ],
-            IcalInterface::VTIMEZONE => [
-                IcalInterface::STANDARD,
-                IcalInterface::DAYLIGHT
-            ],
-        ];
-        $calendar = new Vcalendar( [ IcalInterface::ALLOWEMPTY => false ] );
-        foreach( $compProps as $theComp => $compNames ) {
-            $newMethod1 = 'new' . $theComp;
-            foreach( $compNames as $x => $subComp ) {
-                $newMethod2 = 'new' . $subComp;
-                $ok = false;
-                try {
-                    $calendar->{$newMethod1}()->{$newMethod2}()->setXprop();
-                }
-                catch( ArgumentCountError $e ) {
-                    $ok = true;
-                }
-                catch( Exception $e ) {
-                    $ok = true;
-                }
-                $this->assertTrue( $ok, sprintf( self::$ERRFMT, __FUNCTION__, $x, $theComp, 'xProp' ) );
-            } // end foreach
-        } // end foreach
+                $this->assertTrue( $ok, 'error in case #' . $case );
+            }
+        }
     }
 }

@@ -30,23 +30,21 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\CalendarComponent;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
-use function array_change_key_case;
 use function sprintf;
 
 /**
  * IMAGE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-09
  */
 trait IMAGErfc7986trait
 {
     /**
-     * @var null|mixed[] component property IMAGE value
+     * @var null|Pc[] component property IMAGE value
      */
     protected ? array $image = null;
 
@@ -58,18 +56,15 @@ trait IMAGErfc7986trait
     public function createImage() : string
     {
         if( empty( $this->image )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         foreach( $this->image as $imagePart ) {
-            if( ! empty( $imagePart[Util::$LCvalue] )) {
+            if( ! empty( $imagePart->value )) {
                 $output .= StringFactory::createElement(
                     self::IMAGE,
-                    ParameterFactory::createParams(
-                        $imagePart[Util::$LCparams],
-                        [ self::ALTREP, self::DISPLAY ]
-                    ),
-                    $imagePart[Util::$LCvalue]
+                    ParameterFactory::createParams( $imagePart->params, [ self::ALTREP, self::DISPLAY ] ),
+                    $imagePart->value
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
@@ -91,7 +86,7 @@ trait IMAGErfc7986trait
             unset( $this->propDelIx[self::IMAGE] );
             return false;
         }
-        return CalendarComponent::deletePropertyM(
+        return self::deletePropertyM(
             $this->image,
             self::IMAGE,
             $this,
@@ -104,15 +99,15 @@ trait IMAGErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getImage( ?int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getImage( ?int $propIx = null, ?bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->image )) {
             unset( $this->propIx[self::IMAGE] );
             return false;
         }
-        return CalendarComponent::getPropertyM(
+        return self::getMvalProperty(
             $this->image,
             self::IMAGE,
             $this,
@@ -122,47 +117,57 @@ trait IMAGErfc7986trait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isImageSet() : bool
+    {
+        return self::isMvalSet( $this->image );
+    }
+
+    /**
      * Set calendar component property image
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[]  $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setImage( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setImage(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::IMAGE );
-            CalendarComponent::setMval( $this->image, Util::$SP0, [], null, $index );
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::IMAGE );
+            self::setMval( $this->image, $value->setEmpty(), $index );
             return $this;
         }
-        $params     = array_change_key_case( $params ?? [], CASE_UPPER );
         switch( true ) {
-            case isset( $params[self::ENCODING] ) :
-                $params[self::VALUE] = self::BINARY;
+            case $value->hasParamKey( self::ENCODING ) :
+                $value->addParamValue( self::BINARY );
                 break;
-            case ( ! isset( $params[self::VALUE] )) :
-                $params[self::VALUE] = self::URI;
+            case ! $value->hasParamKey( self::VALUE ) :
+                $value->addParamValue( self::URI );
                 break;
-            case ( self::URI === $params[self::VALUE] ) :
+            case ( self::URI === $value->getParams( self::VALUE )) :
                 break;
-            case ( self::BINARY === $params[self::VALUE] ) :
-                $params[self::ENCODING] = self::BASE64;
+            case ( self::BINARY === $value->getParams( self::VALUE )) :
+                $value->addParam( self::ENCODING, self::BASE64 );
                 break;
             default :
                 throw new InvalidArgumentException(
-                    sprintf( $FMTERR2, $params[self::VALUE] )
+                    sprintf( $FMTERR2, $value->getParams( self::VALUE ))
                 );
         } // end switch
-        // remove defaults
-        ParameterFactory::ifExistRemove(
-            $params,
-            self::DISPLAY,
-            self::BADGE
-        );
-        CalendarComponent::setMval( $this->image, $value, $params, null, $index );
+        $value->removeParam(self::DISPLAY,self::BADGE ); // remove defaults
+        self::setMval( $this->image, $value, $index );
         return $this;
     }
 }

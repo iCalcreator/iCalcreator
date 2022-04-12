@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -36,36 +37,34 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * COLOR property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  * @see https://www.w3.org/TR/css-color-3/#svg-color
  */
 trait COLORrfc7986trait
 {
     /**
-     * @var null|mixed[] component property COLOR value
+     * @var null|Pc component property COLOR value
      */
-    protected ? array $color = null;
+    protected ? Pc $color = null;
 
     /**
      * Return formatted output for calendar (component property color
      *
      * @return string
-     * @since 2.29.5 2019-06-16
+     * @since 2.41.36 2022-04-03
      */
     public function createColor() : string
     {
         if( empty( $this->color )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->color[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::COLOR )
-                : Util::$SP0;
+        if( empty( $this->color->value )) {
+            return $this->createSinglePropEmpty( self::COLOR );
         }
         return StringFactory::createElement(
             self::COLOR,
-            ParameterFactory::createParams( $this->color[Util::$LCparams] ),
-            $this->color[Util::$LCvalue]
+            ParameterFactory::createParams( $this->color->params ),
+            $this->color->value
         );
     }
 
@@ -85,39 +84,50 @@ trait COLORrfc7986trait
      * Get calendar component property color
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.29.5 2019-06-16
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getColor( ? bool $inclParam = false ) : array | bool | string
+    public function getColor( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->color )) {
             return false;
         }
-        return $inclParam ? $this->color : $this->color[Util::$LCvalue];
+        return $inclParam ? clone $this->color : $this->color->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isColorSet() : bool
+    {
+        return ! empty( $this->color->value );
     }
 
     /**
      * Set calendar component property color
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-03
      */
-    public function setColor( ? string $value = null, ? array $params = [] ) : static
+    public function setColor( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::COLOR );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::COLOR );
+            $value->setEmpty();
         }
         else {
-            Util::assertString( $value, self::COLOR );
+            $value->value = Util::assertString( $value->value, self::COLOR );
+            $value->value = StringFactory::trimTrailNL( $value->value );
         }
-        $this->color = [
-            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->color = $value;
         return $this;
     }
 }

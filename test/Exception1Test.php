@@ -204,7 +204,7 @@ class Exception1Test extends TestCase
     {
         $ok = false;
         try {
-            $result = DateTimeFactory::setDate( $value, $params );
+            $result = DateTimeFactory::setDate( Pc::factory( $value, $params ));
         }
         catch ( Exception $e ) {
             $ok = true;

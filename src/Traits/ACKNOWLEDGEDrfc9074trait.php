@@ -33,25 +33,22 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-
-use function array_change_key_case;
 
 /**
  * ACKNOWLEDGED property functions
  *
- * @since 2.41.2 2022-01-16
+ * @since 2.41.36 2022-04-03
  */
 trait ACKNOWLEDGEDrfc9074trait
 {
     /**
-     * @var null|mixed[] component property ACKNOWLEDGED value
+     * @var null|Pc component property ACKNOWLEDGED value
      */
-    protected ? array $acknowledged = null;
+    protected ? Pc $acknowledged = null;
 
     /**
      * Return formatted output for calendar component property acknowledged
@@ -63,12 +60,15 @@ trait ACKNOWLEDGEDrfc9074trait
     public function createAcknowledged() : string
     {
         if( empty( $this->acknowledged )) {
-            return Util::$SP0;
+            return self::$SP0;
+        }
+        if( empty( $this->acknowledged->value )) {
+            return $this->createSinglePropEmpty( self::ACKNOWLEDGED );
         }
         return StringFactory::createElement(
             self::ACKNOWLEDGED,
-            ParameterFactory::createParams( $this->acknowledged[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->acknowledged[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->acknowledged->params ),
+            DateTimeFactory::dateTime2Str( $this->acknowledged->value )
         );
     }
 
@@ -87,39 +87,49 @@ trait ACKNOWLEDGEDrfc9074trait
      * Return calendar component property acknowledged
      *
      * @param null|bool   $inclParam
-     * @return bool|string|DateTime|mixed[]
+     * @return bool|string|DateTime|Pc
      */
-    public function getAcknowledged( ? bool $inclParam = false ) : DateTime | bool | string | array
+    public function getAcknowledged( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->acknowledged )) {
             return false;
         }
-        return $inclParam
-            ? $this->acknowledged
-            : $this->acknowledged[Util::$LCvalue];
+        return $inclParam ? clone $this->acknowledged : $this->acknowledged->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isAcknowledgedSet() : bool
+    {
+        return ! empty( $this->acknowledged->value );
     }
 
     /**
      * Set calendar component property acknowledged, if empty: 'now'
      *
-     * @param null|string|DateTimeInterface  $value
+     * @param null|string|Pc|DateTimeInterface  $value
      * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function setAcknowledged( DateTimeInterface | string | null $value = null, ? array $params = [] ) : static
+    public function setAcknowledged(
+        null | string | Pc | DateTimeInterface $value = null,
+        ? array $params = []
+    ) : static
     {
-        if( empty( $value )) {
-            $this->acknowledged = [
-                Util::$LCvalue  => DateTimeFactory::factory( null, self::UTC ),
-                Util::$LCparams => [],
-            ];
-            return $this;
-        }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
-        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
-        $this->acknowledged = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $value->addParamValue( self::DATE_TIME ); // req
+        $this->acknowledged = empty( $value->value )
+            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
+                ->removeParam( self::VALUE )
+            : DateTimeFactory::setDate( $value, true );
         return $this;
     }
 }

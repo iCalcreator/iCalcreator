@@ -29,24 +29,24 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\CalendarComponent;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 /**
  * NAME property functions
  *
- * May occur multiply times in Vcalendar but once in Vlocation/Vresource
+ * NAME may occur multiply times in Vcalendar but once in Vlocation/Vresource
  *
- * @since 2.41.5 2022-01-21
+ * @since 2.41.36 2022-04-11
  */
 trait NAMErfc7986trait
 {
     /**
-     * @var null|mixed[] component property NAME value
+     * @var null|Pc[] component property NAME value
      */
     protected ? array $name = null;
 
@@ -54,17 +54,17 @@ trait NAMErfc7986trait
      * Return formatted output for calendar component property name
      *
      * @return string
-     * @since 2.29.5 2019-06-16
+     * @since 2.41.36 2022-04-03
      */
     public function createName() : string
     {
         if( empty( $this->name )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->name as $namePart ) {
-            if( empty( $namePart[Util::$LCvalue] )) {
+            if( empty( $namePart->value )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::NAME );
                 }
@@ -72,12 +72,8 @@ trait NAMErfc7986trait
             }
             $output .= StringFactory::createElement(
                 self::NAME,
-                ParameterFactory::createParams(
-                    $namePart[Util::$LCparams],
-                    self::$ALTRPLANGARR,
-                    $lang
-                ),
-                StringFactory::strrep( $namePart[Util::$LCvalue] )
+                ParameterFactory::createParams( $namePart->params, self::$ALTRPLANGARR, $lang ),
+                StringFactory::strrep( $namePart->value )
             );
         }
         return $output;
@@ -88,7 +84,7 @@ trait NAMErfc7986trait
      *
      * @param null|int   $propDelIx   specific property in case of multiply occurrence
      * @return bool
-     * @since 2.41.5 2022-01-21
+     * @since 2.41.36 2022-04-11
      */
     public function deleteName( ? int $propDelIx = null ) : bool
     {
@@ -96,10 +92,10 @@ trait NAMErfc7986trait
             unset( $this->propDelIx[self::NAME] );
             return false;
         }
-        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+        if( self::isNameSingleProp( $this->getCompType())) {
             $propDelIx = null;
         }
-        return CalendarComponent::deletePropertyM(
+        return self::deletePropertyM(
             $this->name,
             self::NAME,
             $this,
@@ -112,54 +108,82 @@ trait NAMErfc7986trait
      *
      * @param null|bool|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.41.5 2022-01-21
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-11
      */
-    public function getName( null|bool|int $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getName( null|bool|int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->name )) {
             unset( $this->propIx[self::NAME] );
             return false;
         }
-        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+        $isSingleType = self::isNameSingleProp( $this->getCompType());
+        if( $isSingleType ) {
             if( is_bool( $propIx )) {
                 $inclParam = $propIx;
             }
             $propIx = null;
         }
-        return CalendarComponent::getPropertyM(
+        $result = self::getMvalProperty(
             $this->name,
             self::NAME,
             $this,
             $propIx,
             $inclParam
         );
+        if( $isSingleType ) {
+            unset( $this->propIx[self::NAME] );
+        }
+        return $result;
+    }
+
+    /**
+     * Return bool true if NAME property may only occur once in component
+     *
+     * @param string $compName
+     * @return bool
+     * @since 2.41.36 2022-04-11
+     */
+    public static function isNameSingleProp( string $compName ) : bool
+    {
+        return ( Vcalendar::VCALENDAR !== $compName );
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isNameSet() : bool
+    {
+        return self::isMvalSet( $this->name );
     }
 
     /**
      * Set calendar component property name
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|integer  $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params
+     * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.5 2022-01-21
+     * @since 2.41.36 2022-04-11
      */
-    public function setName( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setName( null|string|Pc $value = null, null|int|array $params = [], ? int $index = null ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::NAME );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::NAME );
+            $value->setEmpty();
         }
         else {
-            Util::assertString( $value, self::NAME );
+            Util::assertString( $value->value, self::NAME );
         }
-        if( Vcalendar::VCALENDAR !== $this->getCompType()) {
+        if( self::isNameSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        CalendarComponent::setMval( $this->name, $value, $params, null, $index );
+        self::setMval( $this->name, $value, $index );
         return $this;
     }
 }

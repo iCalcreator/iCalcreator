@@ -28,69 +28,112 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use PHPUnit\Framework\TestCase;
-use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
+use Kigkonsult\Icalcreator\Util\RexdateFactory;
+use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Exception;
 
 /**
  * class Exception3Test
  *
- * Testing exceptions in DateIntervalFactory
+ * Testing exception in RexdateFactory
  *
- * @since  2.27.14 - 2019-02-27
+ * @since  2.27.14 - 2019-02-26
  */
 class Exception3Test extends TestCase
 {
     /**
-     * DateIntervalFactoryTest provider
+     * RexdateFactoryPrepInputExdateTest provider
      *
      * @return mixed[]
+     * @throws Exception
      */
-    public function DateIntervalFactoryTestProvider() : array
+    public function Provider1() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
             1,
-            ''
+            [
+                [
+                    DateTimeFactory::factory( 'now' )
+                ]
+            ],
+            [ IcalInterface::TZID => 'invalid/timezone' ]
         ];
 
         $dataArr[] = [
-            1,
-            'xyz'
+            12,
+            [
+                [
+                    '011201250101'
+                ]
+            ],
+            [ IcalInterface::TZID => 'invalid/timezone' ]
         ];
 
         $dataArr[] = [
-            1,
-            'PT1X'
+            13,
+            [
+                '01120125010161'
+            ],
+            []
         ];
 
         $dataArr[] = [
-            1,
-            'T1D'
+            30,
+            [
+                [
+                    'Kalle Stropp'
+                ]
+            ],
+            []
         ];
 
         return $dataArr;
     }
 
     /**
-     * Testing DateInterval::factory
+     * Testing RexdateFactory::prepInputExdate
      *
      * @test
-     * @dataProvider DateIntervalFactoryTestProvider
-     * @param int $case
-     * @param mixed  $value
+     * @dataProvider Provider1
+     *
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed[] $params
      */
-    public function DateIntervalFactoryTest(
-        int   $case,
-        mixed $value
-    ) : void
+    public function RexdateFactoryPrepInputExdateTest( int $case, mixed $value, array $params ) : void
     {
         $ok = false;
         try {
-            $result = DateIntervalFactory::factory( $value );
+            $result = RexdateFactory::prepInputExdate( Pc::factory( $value, ParameterFactory::setParams( $params )));
         }
         catch ( Exception $e ) {
+            $ok = true;
+        }
+        $this->assertTrue( $ok, 'error in case #' . $case );
+    }
+
+
+    /**
+     * Testing RexdateFactory::prepInputRdate
+     *
+     * @test
+     * @dataProvider Provider1
+     *
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed[] $params
+     */
+    public function RexdateFactoryprepInputRdateTest( int $case, mixed $value, array $params ) : void
+    {
+        $ok = false;
+        try {
+            $result = RexdateFactory::prepInputRdate( Pc::factory( $value, ParameterFactory::setParams( $params )));
+        }
+        catch( Exception $e ) {
             $ok = true;
         }
         $this->assertTrue( $ok, 'error in case #' . $case );

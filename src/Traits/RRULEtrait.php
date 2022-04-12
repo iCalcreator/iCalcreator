@@ -31,20 +31,21 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * RRULE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait RRULEtrait
 {
     /**
-     * @var null|mixed[] component property RRULE value
+     * @var null|Pc component property RRULE value
      */
-    protected ? array $rrule = null;
+    protected ? Pc $rrule = null;
 
     /**
      * Return formatted output for calendar component property rrule
@@ -53,7 +54,7 @@ trait RRULEtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.27.13 - 2019-01-09
+     * @since 2.41.36 2022-04-03
      */
     public function createRrule() : string
     {
@@ -80,38 +81,53 @@ trait RRULEtrait
      * Get calendar component property rrule
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.29.6 2019-06-23
+     * @return bool|array|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getRrule( ? bool $inclParam = false ) : bool | array | string
+    public function getRrule( ? bool $inclParam = false ) : bool | array | Pc
     {
         if( empty( $this->rrule )) {
             return false;
         }
-        return $inclParam ? $this->rrule : $this->rrule[Util::$LCvalue];
+        return $inclParam ? clone $this->rrule : $this->rrule->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isRruleSet() : bool
+    {
+        return ! empty( $this->rrule->value );
     }
 
     /**
      * Set calendar component property rrule
      *
-     * @param null|mixed[]  $rruleset  string[]
+     * @param null|mixed[]|Pc  $rruleset  string[]
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.29.6 2019-06-23
+     * @since 2.41.36 2022-04-03
      */
-    public function setRrule( ? array $rruleset = null, ? array $params = [] ) : static
+    public function setRrule( null|array|Pc $rruleset = null, ? array $params = [] ) : static
     {
-        if( empty( $rruleset )) {
-            $this->assertEmptyValue( $rruleset, self::RRULE );
-            $rruleset = [];
-            $params   = [];
+        $value = ( $rruleset instanceof Pc )
+            ? clone $rruleset
+            : Pc::factory( $rruleset, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::RRULE );
+            $value->setEmpty();
         }
-        $this->rrule = RecurFactory::setRexrule(
-            $rruleset,
-            array_merge( $params ?? [], $this->getDtstartParams())
-        );
+        else {
+            foreach( $this->getDtstartParams() as $k => $v ) {
+                $value->addParam( $k, $v );
+            }
+        }
+        $this->rrule = RecurFactory::setRexrule( $value );
         return $this;
     }
 }

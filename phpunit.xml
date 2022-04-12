@@ -37,32 +37,35 @@
 >
     <testsuites>
         <testsuite name="Vcalendar Tests">
+            <file>test/PcTest.php</file>
             <file>test/VcalendarTest.php</file>
             <file>test/FactoryCompTest.php</file>
         </testsuite>
         <testsuite name="Date Tests">
             <file>test/Exception1Test.php</file>
             <file>test/DateTest.php</file>
-            <file>test/Exception6Test.php</file>
+            <file>test/Exception7Test.php</file>
             <file>test/DateTzTest.php</file>
-            <file>test/Exception2Test.php</file>
+            <file>test/Exception3Test.php</file>
             <file>test/DateTimeTest.php</file>
             <file>test/DateTimeUTCTest.php</file>
+            <file>test/Exception2Test.php</file>
         </testsuite>
         <testsuite name="DateInterval Tests">
-            <file>test/Exception3Test.php</file>
+            <file>test/Exception4Test.php</file>
             <file>test/DateIntervalTest1.php</file>
             <file>test/DateIntervalTest2.php</file>
             <file>test/DateIntervalTest3.php</file>
         </testsuite>
         <testsuite name="Integer property Tests">
-            <file>test/Exception4Test.php</file>
+            <file>test/Exception5Test.php</file>
             <file>test/IntegerTest.php</file>
         </testsuite>
         <testsuite name="Misc. property Tests">
-            <file>test/Exception5Test.php</file>
+            <file>test/Exception6Test.php</file>
             <file>test/Prop1TextSingleTest.php</file>
             <file>test/Prop2TextMultiTest.php</file>
+            <file>test/Prop3Comp2PropTest.php</file>
             <file>test/PropXTest.php</file>
             <file>test/PropEmptyTest.php</file>
             <file>test/ParseTest.php</file>
@@ -81,7 +84,7 @@
             <file>test/RecurMonthTest.php</file>
             <file>test/RecurWeekTest.php</file>
             <file>test/RecurDayTest.php</file>
-            <file>test/Exception7Test.php</file>
+            <file>test/Exception8Test.php</file>
             <file>test/SelectComponentsTest.php</file>
             <file>test/SelectComponentsTest2.php</file>
         </testsuite>
@@ -103,6 +106,7 @@
             <file>src/IcalBase.php</file>
             <file>src/IcalInterface.php</file>
             <file>src/Participant.php</file>
+            <file>src/Pc.php</file>
             <file>src/Standard.php</file>
             <file>src/V2component.php</file>
             <file>src/V3component.php</file>
@@ -147,6 +151,7 @@
             <file>src/Traits/LOCATIONtrait.php</file>
             <file>src/Traits/LOCATIONTYPErfc9073trait.php</file>
             <file>src/Traits/METHODtrait.php</file>
+            <file>src/Traits/MvalTrait.php</file>
             <file>src/Traits/NAMErfc7986trait.php</file>
             <file>src/Traits/NewVlocationTrait.php</file>
             <file>src/Traits/ORGANIZERtrait.php</file>

@@ -30,20 +30,21 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * ATTENDEE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait ATTENDEEtrait
 {
     /**
-     * @var null|mixed[] component property ATTENDEE value
+     * @var null|Pc[] component property ATTENDEE value
      */
-    protected ? array $attendee = [];
+    protected ? array $attendee = null;
 
     /**
      * Return formatted output for calendar component property attendee
@@ -53,7 +54,7 @@ trait ATTENDEEtrait
     public function createAttendee() : string
     {
         if( empty( $this->attendee )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
         return CalAddressFactory::outputFormatAttendee(
             $this->attendee,
@@ -74,7 +75,7 @@ trait ATTENDEEtrait
             unset( $this->propDelIx[self::ATTENDEE] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->attendee,
             self::ATTENDEE,
             $this,
@@ -87,16 +88,16 @@ trait ATTENDEEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      * @since  2.27.1 - 2018-12-12
      */
-    public function getAttendee( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getAttendee( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->attendee )) {
             unset( $this->propIx[self::ATTENDEE] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getMvalProperty(
             $this->attendee,
             self::ATTENDEE,
             $this,
@@ -106,34 +107,49 @@ trait ATTENDEEtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isAttendeeSet() : bool
+    {
+        return self::isMvalSet( $this->attendee );
+    }
+
+    /**
      * Set calendar component property attendee
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|integer  $index
+     * @param null|string|Pc $value
+     * @param null|int|mixed[]   $params
+     * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since  2.27.8 - 2019-03-17
+     * @since 2.41.36 2022-04-09
      */
-    public function setAttendee( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setAttendee(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::ATTENDEE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::ATTENDEE );
+            $value->setEmpty();
         }
-        $value = CalAddressFactory::conformCalAddress( $value, true );
-        if( ! empty( $value )) {
-            CalAddressFactory::assertCalAddress( $value );
+        else {
+            $value->value = Util::assertString( $value->value, self::ATTENDEE );
+            $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
+            CalAddressFactory::assertCalAddress( $value->value );
+            CalAddressFactory::sameValueAndEMAILparam( $value );
+            $value->params = CalAddressFactory::inputPrepAttendeeParams(
+                $value->params,
+                $this->getCompType(),
+                $this->getConfig( self::LANGUAGE )
+            );
         }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
-        CalAddressFactory::sameValueAndEMAILparam( $value, $params );
-        $params = CalAddressFactory::inputPrepAttendeeParams(
-            $params,
-            $this->getCompType(),
-            $this->getConfig( self::LANGUAGE )
-        );
-         self::setMval( $this->attendee, $value, $params, null, $index );
+        self::setMval( $this->attendee, $value, $index );
         return $this;
     }
 }

@@ -195,10 +195,7 @@ class DateIntervalTest1 extends DtBase
         return [
             1000 + $cnt,
             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
-            [
-                Util::$LCvalue  => $getValue,
-                Util::$LCparams => []
-            ],
+            Pc::factory( $getValue ),
             ':' . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -224,10 +221,7 @@ class DateIntervalTest1 extends DtBase
         return [
             3000 + $cnt,
             self::durationArray2string( $dateIntervalArray ),
-            [
-                Util::$LCvalue  => $getValue,
-                Util::$LCparams => [],
-            ],
+            Pc::factory( $getValue ),
             ':' . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::factory(
@@ -284,11 +278,11 @@ class DateIntervalTest1 extends DtBase
      * @dataProvider DateInterval123Provider
      * @param int|string $case
      * @param mixed   $value
-     * @param mixed[] $expectedGet
+     * @param pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDateInterval123( int | string $case, mixed $value, array $expectedGet, string $expectedString ) : void
+    public function testDateInterval123( int | string $case, mixed $value, pc $expectedGet, string $expectedString ) : void
     {
         static $compProp = [
             IcalInterface::VEVENT        => [ IcalInterface::DURATION ],
@@ -307,8 +301,8 @@ class DateIntervalTest1 extends DtBase
         $c->{$setMethod}( $value );
 
         $getValue = $c->{$getMethod}( true );
-        $expGet   = $expectedGet;
-        $expGet[Util::$LCparams] += [ IcalInterface::VALUE => IcalInterface::DURATION ];
+        $expGet   = clone $expectedGet;
+        $expGet->params += [ IcalInterface::VALUE => IcalInterface::DURATION ];
         $this->assertEquals(
             $expGet,
             $getValue,
@@ -326,6 +320,7 @@ class DateIntervalTest1 extends DtBase
         );
         $c->{$setMethod}( $value ); // test ###
 
+        $pcInput = false;
         foreach( $compProp as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp = match ( true ) {
@@ -334,19 +329,28 @@ class DateIntervalTest1 extends DtBase
                 default                               => $c->{$newMethod}(),
             };
             foreach( $props as $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $createMethod = StringFactory::getCreateMethodName( $propName );
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' in ' . var_export( $value, true )); // test ###
-                $comp->{$setMethod}( $value );
+
+                if( $pcInput ) {
+                    $comp->{$setMethod}( Pc::factory( $value ));
+                }
+                else {
+                    $comp->{$setMethod}( $value );
+                }
+
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 /*
-                if( Vcalendar::TRIGGER == $propName ) {
-                    $expectedGet[Util::$LCvalue]['relatedStart'] = true;
-                    unset( $expectedGet[Util::$LCvalue]['before'], $getValue[Util::$LCvalue]['before'] );
+                if( Vcalendar::TRIGGER === $propName ) {
+                    $expGet->addParamValue( IcalInterface::DURATION );
+                }
+                else {
+                    $expGet->removeParam( IcalInterface::VALUE, IcalInterface::DURATION );
                 }
                 */
                 $this->assertEquals(

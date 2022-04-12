@@ -28,9 +28,11 @@
  */
 namespace Kigkonsult\Icalcreator;
 
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -40,6 +42,28 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class DateTest extends DtBase
 {
+    private static array $compsProps = [
+        IcalInterface::VEVENT => [
+            IcalInterface::DTSTART,
+            IcalInterface::DTEND,
+            IcalInterface::RECURRENCE_ID,
+            IcalInterface::EXDATE,
+            IcalInterface::RDATE
+        ],
+        IcalInterface::VTODO         => [ IcalInterface::DTSTART, IcalInterface::DUE, IcalInterface::RECURRENCE_ID ],
+        IcalInterface::VJOURNAL      => [ IcalInterface::DTSTART, IcalInterface::RECURRENCE_ID ],
+//          IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTART, IcalInterface::DTEND ], datetime required
+    ];
+    private static array $compsProps2 = [
+        IcalInterface::VEVENT        => [ IcalInterface::EXDATE, IcalInterface::RDATE ],
+        IcalInterface::AVAILABLE     => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
+    ];
+
+    private static array $compsProps3 = [
+        IcalInterface::VEVENT        => [ IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
+        IcalInterface::VTODO         => [ IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
+    ];
+
     /**
      * set and restore local timezone from const
      */
@@ -63,6 +87,94 @@ class DateTest extends DtBase
     }
 
     /**
+     * Test date isPropSet Methods and properties with no-args set-method (i.e. 'now')
+     *
+     * @test
+     * @throws Exception
+     */
+    public function isPropSetTest1() : void
+    {
+        foreach( self::$compsProps as $theComp => $propNames ) {
+            $this->isPropSetTest2( 1, $theComp, $propNames );
+        }
+        foreach( self::$compsProps2 as $theComp => $propNames ) {
+            $this->isPropSetTest2( 2, $theComp, $propNames );
+        }
+        foreach( self::$compsProps3 as $theComp => $propNames ) {
+            $vcalendar = new Vcalendar();
+            $comp      = $vcalendar->{'new' . $theComp}();
+            foreach( $propNames as $propName ) {
+                $isPropSetMethod = StringFactory::getIsMethodSetName( $propName );
+                $setMethod       = StringFactory::getSetMethodName( $propName );
+                $this->assertFalse(
+                    $comp->{$isPropSetMethod}(),
+                    'error case 3-1 ' . $comp->getCompType() . '::' . $propName . ', expected false'
+                );
+                if(( IcalInterface::VTODO === $theComp ) && ( IcalInterface::COMPLETED === $propName )) {
+                    $comp->{$setMethod}( new dateTime());
+                }
+                else {
+                    $comp->{$setMethod}();
+                }
+                $this->assertTrue(
+                    $comp->{$isPropSetMethod}(),
+                    'error case 3-2 ' . $comp->getCompType() . '::' . $propName . ', expected true'
+                );
+            }
+        }
+    }
+
+    /**
+     * @param int $case
+     * @param string $theComp
+     * @param array $propNames
+     */
+    private function isPropSetTest2( int $case, string $theComp, array $propNames ) : void
+    {
+        $case += 10;
+        $vcalendar = new Vcalendar();
+        $newMethod = 'new' . $theComp;
+        $comp = match ( true ) {
+            IcalInterface::PARTICIPANT === $theComp => $vcalendar->newVevent()->{$newMethod}(),
+            IcalInterface::AVAILABLE === $theComp   => $vcalendar->newVavailability()->{$newMethod}(),
+            default                                 => $vcalendar->{$newMethod}(),
+        };
+        $this->assertTrue(
+            $comp->isUidSet(),
+            'error case ' . $case . '-1 ' . $theComp . '::dtstart, expected true'
+        );
+        $this->assertTrue(
+            $comp->isDtstampSet(),
+            'error case ' . $case . '-2 ' . $theComp . '::dtstart, expected true'
+        );
+        $this->isPropSetTest3( $case, $comp, $propNames );
+    }
+
+    /**
+     * @param int $case
+     * @param CalendarComponent $comp
+     * @param array $propNames
+     */
+    private function isPropSetTest3( int $case, CalendarComponent $comp, array $propNames ) : void
+    {
+        $case    += 100;
+        $dateTime = new DateTime();
+        foreach( $propNames as $propName ) {
+            $isPropSetMethod = StringFactory::getIsMethodSetName( $propName );
+            $setMethod       = StringFactory::getSetMethodName( $propName );
+            $this->assertFalse(
+                $comp->{$isPropSetMethod}(),
+                'error case ' . $case . '-11 ' . $comp->getCompType() . '::' . $propName . ', expected false'
+            );
+            $comp->{$setMethod}( $dateTime );
+            $this->assertTrue(
+                $comp->{$isPropSetMethod}(),
+                'error case ' . $case . '-12 ' . $comp->getCompType() . '::' . $propName . ', expected true'
+            );
+        }
+    }
+
+    /**
      * testDATE provider
      *
      * @return mixed[]
@@ -78,10 +190,7 @@ class DateTest extends DtBase
             100,
             null,
             null,
-            [
-                Util::$LCvalue => '',
-                Util::$LCparams => []
-            ],
+            Pc::factory()->setEmpty(),
             ':'
         ];
 
@@ -90,10 +199,10 @@ class DateTest extends DtBase
             101,
             $dateTime,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
@@ -102,10 +211,10 @@ class DateTest extends DtBase
             102,
             $dateTime,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
@@ -114,10 +223,10 @@ class DateTest extends DtBase
             103,
             $dateTime,
             [],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ IcalInterface::TZID => LTZ ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::TZID => LTZ ]
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime, LTZ)
         ];
 
@@ -126,10 +235,10 @@ class DateTest extends DtBase
             114,
             DATEYmd,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
@@ -139,10 +248,10 @@ class DateTest extends DtBase
             115,
             DATEYmdTHis,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
@@ -151,10 +260,10 @@ class DateTest extends DtBase
             116,
             DATEYmdTHis,
             [],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -164,11 +273,10 @@ class DateTest extends DtBase
             117,
             DATEYmdTHis . 'Z',
             [ IcalInterface::VALUE => IcalInterface::DATE ],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams =>
-                    [ IcalInterface::VALUE => IcalInterface::DATE ]
-            ],
+            Pc::factory(
+                $dateTime,
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
             $this->getDateTimeAsCreateShortString( $dateTime )
         ];
 
@@ -177,10 +285,10 @@ class DateTest extends DtBase
             118,
             DATEYmdTHis . 'Z',
             [],
-            [
-                Util::$LCvalue  => $dateTime,
-                Util::$LCparams => []
-            ],
+            Pc::factory(
+                $dateTime,
+                []
+            ),
             $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
         ];
 
@@ -190,10 +298,10 @@ class DateTest extends DtBase
                 200 + $x,
                 $dateTime->format( 'Ymd' ),
                 [ IcalInterface::VALUE => IcalInterface::DATE ],
-                [
-                    Util::$LCvalue  => clone $dateTime,
-                    Util::$LCparams => [ IcalInterface::VALUE => IcalInterface::DATE ]
-                ],
+                Pc::factory(
+                    clone $dateTime,
+                    [ IcalInterface::VALUE => IcalInterface::DATE ]
+                ),
                 $this->getDateTimeAsCreateShortString( $dateTime )
             ];
             $dateTime->modify( '-1 day ' );
@@ -210,7 +318,7 @@ class DateTest extends DtBase
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      * @throws InvalidArgumentException
@@ -219,30 +327,13 @@ class DateTest extends DtBase
         int    $case,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
-        static $compsProps = [
-            IcalInterface::VEVENT => [
-                IcalInterface::DTSTART,
-                IcalInterface::DTEND,
-                IcalInterface::RECURRENCE_ID,
-                IcalInterface::EXDATE,
-                IcalInterface::RDATE
-            ],
-            IcalInterface::VTODO         => [ IcalInterface::DTSTART, IcalInterface::DUE, IcalInterface::RECURRENCE_ID ],
-            IcalInterface::VJOURNAL      => [ IcalInterface::DTSTART, IcalInterface::RECURRENCE_ID ],
-//          IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTART, IcalInterface::DTEND ], datetime required
-        ];
-        static $compsProps2 = [
-            IcalInterface::VEVENT        => [ IcalInterface::EXDATE, IcalInterface::RDATE ],
-            IcalInterface::AVAILABLE     => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
-        ];
-
 //      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
 
-        $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
-        $this->theTestMethod1b( $case, $compsProps2, $value, $params, $expectedGet, $expectedString );
+        $this->theTestMethod( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
+        $this->theTestMethod1b( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
     }
 }

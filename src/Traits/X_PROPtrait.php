@@ -29,12 +29,12 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
-use function array_change_key_case;
 use function count;
 use function implode;
 use function is_array;
@@ -45,14 +45,14 @@ use function strtoupper;
 /**
  * X-property functions
  *
- * @since  2.41.30 - 2022-03-04
+ * @since 2.41.36 2022-04-04
  */
 trait X_PROPtrait
 {
     /**
-     * @var null|mixed[] component property X-property value
+     * @var null|mixed[] component property X-properties  ( name => value )
      */
-    protected ? array $xprop = null;
+    protected ? array $xprop = [];
 
     /**
      * Return formatted output for calendar/component property x-prop
@@ -62,39 +62,35 @@ trait X_PROPtrait
     public function createXprop() : string
     {
         if( empty( $this->xprop ) || ! is_array( $this->xprop )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->xprop as $xpropName => $xpropPart ) {
-            if( ! isset( $xpropPart[Util::$LCvalue] ) ||
-                ( empty( $xpropPart[Util::$LCvalue] ) &&
-                    ! is_numeric( $xpropPart[Util::$LCvalue] ))) {
+        foreach( array_keys( $this->xprop ) as $xpropName ) {
+            $xpropPart = clone $this->xprop[$xpropName];
+            if( ! isset( $xpropPart->value ) ||
+                ( empty( $xpropPart->value ) && ! is_numeric( $xpropPart->value ))) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( $xpropName );
                 }
                 continue;
             }
-            if( is_array( $xpropPart[Util::$LCvalue] )) {
-                foreach( $xpropPart[Util::$LCvalue] as $pix => $theXpart ) {
-                    $xpropPart[Util::$LCvalue][$pix] =
+            if( is_array( $xpropPart->value )) {
+                foreach( $xpropPart->value as $pix => $theXpart ) {
+                    $xpropPart->value[$pix] =
                         StringFactory::strrep( $theXpart );
                 }
-                $xpropPart[Util::$LCvalue] =
-                    implode( Util::$COMMA, $xpropPart[Util::$LCvalue] );
+                $xpropPart->value =
+                    implode( Util::$COMMA, $xpropPart->value );
             }
             else {
-                $xpropPart[Util::$LCvalue] =
-                    StringFactory::strrep( $xpropPart[Util::$LCvalue] );
+                $xpropPart->value =
+                    StringFactory::strrep( $xpropPart->value );
             }
             $output .= StringFactory::createElement(
                 $xpropName,
-                ParameterFactory::createParams(
-                    $xpropPart[Util::$LCparams],
-                    [ self::LANGUAGE ],
-                    $lang
-                ),
-                $xpropPart[Util::$LCvalue]
+                ParameterFactory::createParams( $xpropPart->params, [ self::LANGUAGE ], $lang ),
+                $xpropPart->value
             );
         } // end foreach
         return $output;
@@ -104,11 +100,11 @@ trait X_PROPtrait
      * Delete component property X-prop value
      *
      * @param null|string $propName
-     * @param null|int    $propDelIx removal counter
+     * @param null|int    $currPropDelIx removal index
      * @return bool
      * @since  2.27.1 - 2018-12-15
      */
-    public function deleteXprop( ? string $propName = null, ? int $propDelIx = null ) : bool
+    public function deleteXprop( ? string $propName = null, ? int $currPropDelIx = null ) : bool
     {
         $propName = ( $propName ) ? strtoupper( $propName ) : self::X_PROP;
         if( empty( $this->xprop )) {
@@ -119,15 +115,12 @@ trait X_PROPtrait
             }
             return false;
         }
-        if( is_null( $propDelIx )) {
-            $propDelIx = (
-                isset( $this->propDelIx[$propName] ) &&
-                ( self::X_PROP !== $propName )
-            )
+        if( null === $currPropDelIx ) {
+            $currPropDelIx = ( isset( $this->propDelIx[$propName] ) && ( self::X_PROP !== $propName ))
                 ? $this->propDelIx[$propName] + 2
                 : 1;
         }
-        $this->propDelIx[$propName] = --$propDelIx;
+        $this->propDelIx[$propName] = --$currPropDelIx;
         $reduced = [];
         if( $propName !== self::X_PROP ) {
             if( ! isset( $this->xprop[$propName] )) {
@@ -135,27 +128,26 @@ trait X_PROPtrait
                 return false;
             }
             foreach( $this->xprop as $k => $xValue ) {
-                if(( $k !== $propName ) && ! empty( $xValue )) {
+                if( $k !== $propName ) {
                     $reduced[$k] = $xValue;
                 }
             }
-        }
+        } // end if
         else {
-            if( count( $this->xprop ) <= $propDelIx ) {
+            if( count( $this->xprop ) <= $currPropDelIx ) {
                 unset( $this->propDelIx[$propName] );
                 return false;
             }
             $xpropNo = 0;
             foreach( $this->xprop as $xpropKey => $xpropValue ) {
-                if( $propDelIx !== $xpropNo ) {
+                if( $currPropDelIx !== $xpropNo ) {
                     $reduced[$xpropKey] = $xpropValue;
                 }
                 $xpropNo++;
             }
-        }
+        } // end else
         $this->xprop = $reduced;
         if( empty( $this->xprop )) {
-            $this->xprop = null;
             unset( $this->propDelIx[$propName] );
             return false;
         }
@@ -166,16 +158,16 @@ trait X_PROPtrait
      * Get calendar component property x-prop
      *
      * @param null|string $propName
-     * @param null|int    $propIx    specific property in case of multiply occurrence
+     * @param null|int    $currPropIx    specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.41.30 - 2022-03-04
+     * @return bool|array  [ propName, string/Pc ]
+     * @since 2.41.36 2022-04-03
      */
     public function getXprop(
         ? string $propName = null,
-        ? int $propIx = null,
-        ? bool $inclParam = false
-    ) : bool | string | array
+        ? int    $currPropIx = null,
+        ? bool   $inclParam = false
+    ) : bool | array
     {
         if( empty( $this->xprop )) {
             foreach( $this->propIx as $propName2 => $v ) {
@@ -191,66 +183,74 @@ trait X_PROPtrait
                 return false;
             }
             return $inclParam
-                ? [ $propName, $this->xprop[$propName], ]
-                : [ $propName, $this->xprop[$propName][Util::$LCvalue], ];
+                ? [ $propName, clone $this->xprop[$propName], ]
+                : [ $propName, $this->xprop[$propName]->value, ];
         }
         //  $propName == self::X_PROP i.e. any
-        if( $propIx === null ) {
-            $propIx = ( isset( $this->propIx[$propName] ))
+        if( null === $currPropIx ) {
+            $currPropIx = ( isset( $this->propIx[$propName] ))
                 ? $this->propIx[$propName] + 2
                 : 1;
         }
-        $this->propIx[$propName] = --$propIx;
+        $this->propIx[$propName] = --$currPropIx;
         $xpropNo = 0;
-        foreach( $this->xprop as $xpropKey => $xpropValue ) {
-            if( $propIx === $xpropNo ) {
+        foreach( $this->xprop as $xpropName2 => $xpropValue ) {
+            if( $currPropIx === $xpropNo ) {
                 return $inclParam
-                    ? [ $xpropKey, $this->xprop[$xpropKey], ]
-                    : [ $xpropKey, $this->xprop[$xpropKey][Util::$LCvalue], ];
+                    ? [ $xpropName2, clone $this->xprop[$xpropName2], ]
+                    : [ $xpropName2, $this->xprop[$xpropName2]->value, ];
             }
             $xpropNo++;
         } // end foreach
         unset( $this->propIx[$propName] );
-        return false; // not found ??
+        return false; // not found
+    }
+
+    /**
+     * Return bool true if spec xPropName or any set (also empty)
+     *
+     * @param null|string $xPropName
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isXpropSet( ? string $xPropName = null ) : bool
+    {
+        return empty( $xPropName ) ? ( ! empty( $this->xprop )) : ! empty( $this->xprop[$xPropName] );
     }
 
     /**
      * Set calendar property x-prop
      *
      * @param string        $xPropName
-     * @param null|int|float|string  $value
+     * @param null|int|float|string|Pc  $value
      * @param null|mixed[]  $params     optional
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
-     * @todo more value typed asserts ??
+     * @since 2.41.36 2022-04-03
      */
-    public function setXprop( string $xPropName, null|int|float|string $value = null, ? array $params = [] ) : static
+    public function setXprop( string $xPropName, null|int|float|string|Pc $value = null, ? array $params = [] ) : static
     {
         static $MSG = 'Invalid X-property name : \'%s\'';
         if( empty( $xPropName ) || ! StringFactory::isXprefixed( $xPropName )) {
             throw new InvalidArgumentException( sprintf( $MSG, $xPropName ));
         }
         $xPropName = strtoupper( $xPropName );
-        $params    = array_change_key_case( $params ?? [], CASE_UPPER );
-        if( null === $value ) {
-            $this->assertEmptyValue( $value, $xPropName );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( null === $value->value ) {
+            $this->assertEmptyValue( $value->value, $xPropName );
+            $value->setEmpty();
         }
-        if( ! isset( $params[self::VALUE] ) ||
-            ( self::TEXT === $params[self::VALUE] )) {
-            $value = Util::assertString( $value, $xPropName );
-            $value = StringFactory::trimTrailNL( $value );
+        if( ! $value->hasParamKey( self::VALUE ) ||
+            $value->hasParamValue( self::TEXT )) {
+            $value->value = Util::assertString( $value->value, $xPropName );
+            $value->value = StringFactory::trimTrailNL( $value->value );
         }
-        $xprop = [
-            Util::$LCvalue  => (string) $value,
-            Util::$LCparams => ParameterFactory::setParams( $params )
-        ];
         if( ! is_array( $this->xprop )) {
             $this->xprop = [];
         }
-        $this->xprop[$xPropName] = $xprop;
+        $this->xprop[$xPropName] = $value;
         return $this;
     }
 }

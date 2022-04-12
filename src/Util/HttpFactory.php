@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Util;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function clearstatcache;
@@ -176,23 +177,19 @@ class HttpFactory
     /**
      * Set calendar component property uri; URL, TZURL, SOURCE
      *
-     * @param null|mixed[]  $valueArr
-     * @param null|string   $value
-     * @param null|mixed[]  $params
+     * @param null|Pc  $propValue
+     * @param Pc       $value
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.30.3 - 2021-02-14
+     * @since 2.41.36 2022-04-03
      */
-    public static function urlSet( ? array & $valueArr = [], ? string $value = null, ? array $params = [] ) : void
+    public static function urlSet( ? Pc & $propValue, Pc $value ) : void
     {
-        if( ! empty( $value )) {
-            StringFactory::checkFixUriValue( $value );
-            self::assertUrl( $value );
+        if( ! empty( $value->value )) {
+            StringFactory::checkFixUriValue( $value->value );
+            self::assertUrl( $value->value );
+            $value->removeParam(IcalInterface::VALUE );
         }
-        ParameterFactory::ifExistRemove( $params, IcalInterface::VALUE, IcalInterface::URI );
-        $valueArr = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $propValue = $value;
     }
 }

@@ -28,97 +28,71 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use Exception;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use PHPUnit\Framework\TestCase;
+use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
+use Exception;
 
 /**
  * class Exception4Test
  *
- * Testing SEQUENCE/PERCENT_COMPLETE integer exceptions
+ * Testing exceptions in DateIntervalFactory
  *
  * @since  2.27.14 - 2019-02-27
  */
 class Exception4Test extends TestCase
 {
     /**
-     * integerTest provider
+     * DateIntervalFactoryTest provider
      *
      * @return mixed[]
      */
-    public function integerTestProvider() : array
+    public function DateIntervalFactoryTestProvider() : array
     {
         $dataArr = [];
 
         $dataArr[] = [
-            11,
-            [
-                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
-            ],
-            'NaN',
+            1,
+            ''
         ];
 
         $dataArr[] = [
-            12,
-            [
-                IcalInterface::SEQUENCE         => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ],
-            ],
-            -1,
+            1,
+            'xyz'
         ];
 
         $dataArr[] = [
-            21,
-            [
-                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
-            ],
-            'NaN',
+            1,
+            'PT1X'
         ];
 
         $dataArr[] = [
-            22,
-            [
-                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
-            ],
-            -1,
-        ];
-
-        $dataArr[] = [
-            23,
-            [
-                IcalInterface::PERCENT_COMPLETE => [ IcalInterface::VTODO ],
-            ],
-            101,
+            1,
+            'T1D'
         ];
 
         return $dataArr;
     }
 
     /**
-     * Testing SEQUENCE/PERCENT_COMPLETE integer exceptions
+     * Testing DateInterval::factory
      *
      * @test
-     * @dataProvider integerTestProvider
-     * @param int     $case
-     * @param mixed[] $propComps
-     * @param mixed   $value
+     * @dataProvider DateIntervalFactoryTestProvider
+     * @param int $case
+     * @param mixed  $value
      */
-    public function integerTest( int $case, array $propComps, mixed $value ) : void
+    public function DateIntervalFactoryTest(
+        int   $case,
+        mixed $value
+    ) : void
     {
-        $calendar = new Vcalendar();
-        foreach( $propComps as $propName => $theComps ) {
-            $setMethod    = StringFactory::getSetMethodName( $propName );
-            foreach( $theComps as $theComp ) {
-                $newMethod = 'new' . $theComp;
-                $ok        = false;
-                try {
-                    $calendar->{$newMethod}()
-                             ->{$setMethod}( $value );
-                }
-                catch( Exception $e ) {
-                    $ok = true;
-                }
-                $this->assertTrue( $ok, 'error in case #' . $case );
-            }
+        $ok = false;
+        try {
+            $result = DateIntervalFactory::factory( $value );
         }
+        catch ( Exception $e ) {
+            $ok = true;
+        }
+        $this->assertTrue( $ok, 'error in case #' . $case );
     }
 }

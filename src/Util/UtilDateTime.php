@@ -228,7 +228,7 @@ class UtilDateTime extends DateTime
                 );
             }
         } // end if
-        if( ParameterFactory::isParamsValueSet( [ Util::$LCparams => $params ], IcalInterface::DATE )) {
+        if( isset( $params[IcalInterface::VALUE] ) && ( IcalInterface::DATE === $params[IcalInterface::VALUE] )) {
             $iCaldateTime->dateFormat = $Y_M_D;
             $iCaldateTime->key        = $iCaldateTime->format( DateTimeFactory::$Ymd );
         }

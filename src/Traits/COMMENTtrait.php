@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -37,12 +38,12 @@ use InvalidArgumentException;
 /**
  * COMMENT property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.41.36 2022-04-03
  */
 trait COMMENTtrait
 {
     /**
-     * @var null|mixed[] component property COMMENT value
+     * @var null|Pc[] component property COMMENT value
      */
     protected ? array $comment = null;
 
@@ -54,12 +55,12 @@ trait COMMENTtrait
     public function createComment() : string
     {
         if( empty( $this->comment )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->comment as $commentPart ) {
-            if( empty( $commentPart[Util::$LCvalue] )) {
+        foreach( $this->comment as $commentPart ) { // Pc
+            if( empty( $commentPart->value )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::COMMENT );
                 }
@@ -68,11 +69,11 @@ trait COMMENTtrait
             $output .= StringFactory::createElement(
                 self::COMMENT,
                 ParameterFactory::createParams(
-                    $commentPart[Util::$LCparams],
+                    $commentPart->params,
                     self::$ALTRPLANGARR,
                     $lang
                 ),
-                StringFactory::strrep( $commentPart[Util::$LCvalue] )
+                StringFactory::strrep( $commentPart->value )
             );
         } // end foreach
         return $output;
@@ -91,7 +92,7 @@ trait COMMENTtrait
             unset( $this->propDelIx[self::COMMENT] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->comment,
             self::COMMENT,
             $this,
@@ -104,16 +105,16 @@ trait COMMENTtrait
      *
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getComment( int $propIx = null, bool $inclParam = false ) : bool | array | string
+    public function getComment( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->comment )) {
             unset( $this->propIx[self::COMMENT] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->comment,
             self::COMMENT,
             $this,
@@ -123,24 +124,42 @@ trait COMMENTtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isCommentSet() : bool
+    {
+        return self::isMvalSet( $this->comment );
+    }
+
+    /**
      * Set calendar component property comment
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|int      $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params
+     * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-03
      */
-    public function setComment( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setComment(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::COMMENT );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::COMMENT );
+            $value->setEmpty();
         }
-        $value  = Util::assertString( $value, self::COMMENT );
-        self::setMval( $this->comment, $value, $params, null, $index );
+        else {
+            $value->value = Util::assertString( $value->value, self::COMMENT );
+            $value->value = StringFactory::trimTrailNL( $value->value );
+        }
+        self::setMval( $this->comment, $value, $index );
         return $this;
     }
 }

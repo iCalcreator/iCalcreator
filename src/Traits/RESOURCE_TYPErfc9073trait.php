@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -36,14 +37,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * RESOURCE_TYPE property functions
  *
- * @since 2.41.7 2022-01-20
+ * @since 2.41.36 2022-04-03
  */
 trait RESOURCE_TYPErfc9073trait
 {
     /**
-     * @var null|mixed[] component property resourcetype value
+     * @var null|Pc component property resourcetype value
      */
-    protected ? array $resourcetype = null;
+    protected ? Pc $resourcetype = null;
 
     /**
      * Return formatted output for calendar component property resourcetype
@@ -53,17 +54,15 @@ trait RESOURCE_TYPErfc9073trait
     public function createResourcetype() : string
     {
         if( empty( $this->resourcetype )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->resourcetype[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::RESOURCE_TYPE )
-                : Util::$SP0;
+        if( empty( $this->resourcetype->value )) {
+            return $this->createSinglePropEmpty( self::RESOURCE_TYPE );
         }
         return StringFactory::createElement(
             self::RESOURCE_TYPE,
-            ParameterFactory::createParams( $this->resourcetype[Util::$LCparams] ),
-            StringFactory::strrep( $this->resourcetype[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->resourcetype->params ),
+            StringFactory::strrep( $this->resourcetype->value )
         );
     }
 
@@ -82,35 +81,47 @@ trait RESOURCE_TYPErfc9073trait
      * Get calendar component property resourcetype
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getResourcetype( ? bool $inclParam = false ) : array | bool | string
+    public function getResourcetype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->resourcetype )) {
             return false;
         }
-        return $inclParam ? $this->resourcetype : $this->resourcetype[Util::$LCvalue];
+        return $inclParam ? clone $this->resourcetype : $this->resourcetype->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isResourcetypeSet() : bool
+    {
+        return ! empty( $this->resourcetype->value );
     }
 
     /**
      * Set calendar component property resourcetype
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      */
-    public function setResourcetype( ? string $value = null, ? array $params = [] ) : static
+    public function setResourcetype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::RESOURCE_TYPE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::RESOURCE_TYPE );
+            $value->setEmpty();
         }
-        Util::assertString( $value, self::RESOURCE_TYPE );
-        $this->resourcetype = [
-            Util::$LCvalue  => (string) $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        else {
+            Util::assertString( $value->value, self::RESOURCE_TYPE );
+        }
+        $this->resourcetype = $value;
         return $this;
     }
 }

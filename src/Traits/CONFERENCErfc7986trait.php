@@ -29,21 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
-use function array_change_key_case;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * CONFERENCE property functions
  *
- * @since 2.29.21 2019-06-17
+ * @since 2.41.36 2022-04-03
  */
 trait CONFERENCErfc7986trait
 {
     /**
-     * @var null|mixed[] component property CONFERENCE value
+     * @var null|Pc[] component property CONFERENCE value
      */
     protected ? array $conference = null;
 
@@ -55,20 +55,20 @@ trait CONFERENCErfc7986trait
     public function createConference() : string
     {
         if( empty( $this->conference )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->conference as $conferencePart ) {
-            if( ! empty( $conferencePart[Util::$LCvalue] )) {
+            if( ! empty( $conferencePart->value )) {
                 $output .= StringFactory::createElement(
                     self::CONFERENCE,
                     ParameterFactory::createParams(
-                        $conferencePart[Util::$LCparams],
+                        $conferencePart->params,
                         [ self::FEATURE, self::LABEL, self::LANGUAGE ],
                         $lang
                     ),
-                    $conferencePart[Util::$LCvalue]
+                    $conferencePart->value
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
@@ -90,7 +90,7 @@ trait CONFERENCErfc7986trait
             unset( $this->propDelIx[self::CONFERENCE] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->conference,
             self::CONFERENCE,
             $this,
@@ -103,15 +103,15 @@ trait CONFERENCErfc7986trait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getConference( ? int $propIx = null, ?bool $inclParam = false ) : array | bool | string
+    public function getConference( ? int $propIx = null, ?bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->conference )) {
             unset( $this->propIx[self::CONFERENCE] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getMvalProperty(
             $this->conference,
             self::CONFERENCE,
             $this,
@@ -121,30 +121,44 @@ trait CONFERENCErfc7986trait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isConferenceSet() : bool
+    {
+        return self::isMvalSet( $this->conference );
+    }
+
+    /**
      * Set calendar component property conference
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[]  $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
      * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token ??
      * @todo fix labelparam   - LABEL ??
      */
-    public function setConference( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setConference(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::CONFERENCE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::CONFERENCE );
+            $value->setEmpty();
         }
         else {
-            $params = array_change_key_case( $params ?? [], CASE_UPPER );
-            if( ! isset( $params[self::VALUE] ) ) { // required
-                $params[self::VALUE] = self::URI;
-            }
+            $value->value = Util::assertString( $value->value, self::CONFERENCE );
+            $value->value = StringFactory::trimTrailNL( $value->value );
+            $value->addParamValue( self::URI, false ); // VALUE required
         }
-         self::setMval( $this->conference, $value, $params, null, $index );
+         self::setMval( $this->conference, $value, $index );
         return $this;
     }
 }

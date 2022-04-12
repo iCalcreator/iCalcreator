@@ -29,10 +29,11 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 use function number_format;
 use function filter_var;
@@ -42,50 +43,45 @@ use function var_export;
 /**
  * REQUEST-STATUS property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait REQUEST_STATUStrait
 {
     /**
-     * @var null|mixed[] component property REQUEST-STATUS value
+     * @var null|Pc[] component property REQUEST-STATUS value
      */
-    protected ?array $requeststatus = null;
+    protected ? array $requeststatus = null;
 
     /**
      * Return formatted output for calendar component property request-status
      *
      * @return string
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.36 2022-04-03
      */
     public function createRequeststatus() : string
     {
         if( empty( $this->requeststatus )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->requeststatus as $rStat ) {
-            if( empty( $rStat[Util::$LCvalue][self::STATCODE] )) {
+            if( empty( $rStat->value[self::STATCODE] )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::REQUEST_STATUS );
                 }
                 continue;
             }
             $content =
-                $rStat[Util::$LCvalue][self::STATCODE] .
+                $rStat->value[self::STATCODE] .
                 Util::$SEMIC .
-                StringFactory::strrep( $rStat[Util::$LCvalue][self::STATDESC] );
-            if( isset( $rStat[Util::$LCvalue][self::EXTDATA] )) {
-                $content .= Util::$SEMIC .
-                    StringFactory::strrep( $rStat[Util::$LCvalue][self::EXTDATA] );
+                StringFactory::strrep( $rStat->value[self::STATDESC] );
+            if( isset( $rStat->value[self::EXTDATA] )) {
+                $content .= Util::$SEMIC . StringFactory::strrep( $rStat->value[self::EXTDATA] );
             }
             $output .= StringFactory::createElement(
                 self::REQUEST_STATUS,
-                ParameterFactory::createParams(
-                    $rStat[Util::$LCparams],
-                    [ self::LANGUAGE ],
-                    $lang
-                ),
+                ParameterFactory::createParams( $rStat->params, [ self::LANGUAGE ], $lang ),
                 $content
             );
         } // end foreach
@@ -105,7 +101,7 @@ trait REQUEST_STATUStrait
             unset( $this->propDelIx[self::REQUEST_STATUS] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->requeststatus,
             self::REQUEST_STATUS,
             $this,
@@ -118,16 +114,16 @@ trait REQUEST_STATUStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|bool|mixed[]
-     * @since 2.29.9 2019-08-05
+     * @return string|bool|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getRequeststatus( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array
+    public function getRequeststatus( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->requeststatus )) {
             unset( $this->propIx[self::REQUEST_STATUS] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getMvalProperty(
             $this->requeststatus,
             self::REQUEST_STATUS,
             $this,
@@ -137,31 +133,49 @@ trait REQUEST_STATUStrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isRequeststatusSet() : bool
+    {
+        return self::isMvalSet( $this->requeststatus );
+    }
+
+    /**
      * Set calendar component property request-status
      *
-     * @param null|int|float|string $statCode 1*DIGIT 1*2("." 1*DIGIT)
-     * @param null|string    $text
+     * @param null|int|float|string|Pc $statCode 1*DIGIT 1*2("." 1*DIGIT)
+     * @param null|int|string    $text
      * @param null|string    $extData
      * @param null|mixed[]   $params
-     * @param null|integer   $index
+     * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-03
      */
     public function setRequeststatus(
-        null|int|float|string $statCode = null,
-        ? string $text = null,
+        null|int|float|string|Pc $statCode = null,
+        null|int|string $text = null,
         ? string $extData = null,
         ? array $params = [],
         ? int $index = null
     ) : static
     {
         static $ERR = 'Invalid %s status code value %s';
+        if( $statCode instanceof Pc ) {
+            $index    = ( null !== $text ) ? (int) $text : null;
+            $params   = (array) $statCode->getParams();
+            $extData  = $statCode->value[self::EXTDATA]  ?? self::$SP0;
+            $text     = $statCode->value[self::STATDESC] ?? self::$SP0;
+            $statCode = $statCode->value[self::STATCODE] ?? null;
+        }
         if( empty( $statCode ) || empty( $text )) {
-            $this->assertEmptyValue( Util::$SP0, self::REQUEST_STATUS );
+            $this->assertEmptyValue( self::$SP0, self::REQUEST_STATUS );
             $statCode = null;
-            $text     = Util::$SP0;
-            $params = [];
+            $text     = self::$SP0;
+            $params   = [];
         }
         else {
             if( false === filter_var( $statCode, FILTER_VALIDATE_FLOAT )) {
@@ -175,11 +189,15 @@ trait REQUEST_STATUStrait
             self::STATCODE => number_format((float) $statCode, 2, Util::$DOT, null ),
             self::STATDESC => StringFactory::trimTrailNL( $text ),
         ];
-        if( ! empty( $extData )) {
+        if(( ! empty( $statCode ) || empty( $text )) && ! empty( $extData )) {
             Util::assertString( $extData, self::REQUEST_STATUS );
             $input[self::EXTDATA] = StringFactory::trimTrailNL( $extData );
         }
-        self::setMval( $this->requeststatus, $input, $params, null, $index );
+        self::setMval(
+            $this->requeststatus,
+            Pc::factory( $input, ParameterFactory::setParams( $params )),
+            $index
+        );
         return $this;
     }
 }

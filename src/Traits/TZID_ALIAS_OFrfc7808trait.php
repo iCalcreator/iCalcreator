@@ -29,19 +29,20 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * TZID-ALIAS-OF property functions
  *
- * @since 2.41.1 2022-01-15
+ * @since 2.41.36 2022-04-09
  */
 trait TZID_ALIAS_OFrfc7808trait
 {
     /**
-     * @var null|mixed[] component property SUMMARY value
+     * @var null|Pc[] component property TZID_ALIAS_OF value
      */
     protected ? array $tzidaliasof = null;
 
@@ -49,16 +50,16 @@ trait TZID_ALIAS_OFrfc7808trait
      * Return formatted output for calendar component property TZID-ALIAS-OF
      *
      * @return string
-     * @since 2.41.1 2022-01-15
+     * @since 2.41.36 2022-04-03
      */
     public function createTzidaliasof() : string
     {
         if( empty( $this->tzidaliasof )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         foreach( $this->tzidaliasof as $tzidaliasofPart ) {
-            if( empty( $tzidaliasofPart[Util::$LCvalue] )) {
+            if( empty( $tzidaliasofPart->value )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::TZID_ALIAS_OF );
                 }
@@ -66,8 +67,8 @@ trait TZID_ALIAS_OFrfc7808trait
             }
             $output .= StringFactory::createElement(
                 self::TZID_ALIAS_OF,
-                ParameterFactory::createParams( $tzidaliasofPart[Util::$LCparams] ),
-                StringFactory::strrep( $tzidaliasofPart[Util::$LCvalue] )
+                ParameterFactory::createParams( $tzidaliasofPart->params ),
+                StringFactory::strrep( $tzidaliasofPart->value )
             );
         } // end foreach
         return $output;
@@ -86,7 +87,7 @@ trait TZID_ALIAS_OFrfc7808trait
             unset( $this->propDelIx[self::TZID_ALIAS_OF] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->tzidaliasof,
             self::TZID_ALIAS_OF,
             $this,
@@ -99,16 +100,16 @@ trait TZID_ALIAS_OFrfc7808trait
      *
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since 2.41.1 2022-01-15
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTzidaliasof( int $propIx = null, bool $inclParam = false ) : array | bool | string
+    public function getTzidaliasof( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzidaliasof )) {
             unset( $this->propIx[self::TZID_ALIAS_OF] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->tzidaliasof,
             self::TZID_ALIAS_OF,
             $this,
@@ -118,23 +119,40 @@ trait TZID_ALIAS_OFrfc7808trait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isTzidaliasofSet() : bool
+    {
+        return self::isMvalSet( $this->tzidaliasof );
+    }
+
+    /**
      * Set calendar component property TZID-ALIAS-OF
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|int      $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params
+     * @param null|int         $index
      * @return static
-     * @since 2.41.1 2022-01-15
+     * @since 2.41.36 2022-04-09
      */
-    public function setTzidaliasof( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setTzidaliasof(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::TZID_ALIAS_OF );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TZID_ALIAS_OF );
+            $value->setEmpty();
         }
-        Util::assertString( $value, self::TZID_ALIAS_OF );
-        self::setMval( $this->tzidaliasof, $value, $params, null, $index );
+        else {
+            Util::assertString( $value->value, self::TZID_ALIAS_OF );
+        }
+        self::setMval( $this->tzidaliasof, $value, $index );
         return $this;
     }
 }

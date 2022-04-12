@@ -42,7 +42,7 @@ trait Participants2AttendeesTrait
      * Used in V3component (Vevent, Vtodo ), VFreebusy, Vjournal
      *
      * @return static
-     * @since 2.41.17 - 2022-02-18
+     * @since 2.41.34 - 2022-03-28
      */
     public function participants2Attendees() : static
     {
@@ -54,7 +54,7 @@ trait Participants2AttendeesTrait
             self::CALENDAR_ADDRESS,
             self::X_PARTICIPANTID,
             self::PARTICIPANT_TYPE,
-            self::X_PARTICIPANT_TYPE
+            [ self::X_PARTICIPANT_TYPE, self::ROLE ]
         );
         if( ! empty( $participants )) {
             $this->comPropUpdFromSub( self::ATTENDEE, true, $participants, $lcArr );

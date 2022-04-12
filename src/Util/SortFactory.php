@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Util;
 use DateTime;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function array_slice;
@@ -223,15 +224,15 @@ class SortFactory
     /**
      * Sort callback function for exdate
      *
-     * @param mixed[] $a
-     * @param mixed[] $b
+     * @param Pc $a
+     * @param Pc $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
-    public static function sortExdate2( array $a, array $b ) : int
+    public static function sortExdate2( Pc $a, Pc $b ) : int
     {
-        $a1 = reset( $a[Util::$LCvalue] );
-        $b1 = reset( $b[Util::$LCvalue] );
+        $a1 = reset( $a->value );
+        $b1 = reset( $b->value );
         return strcmp(
             $a1->format( DateTimeFactory::$YmdTHis ),
             $b1->format( DateTimeFactory::$YmdTHis )
@@ -267,16 +268,16 @@ class SortFactory
     /**
      * Sort callback function for rdate, sort multiple RDATEs in order (after 1st datetime/date/period)
      *
-     * @param mixed[] $a
-     * @param mixed[] $b
+     * @param Pc $a
+     * @param Pc $b
      * @return int
-     * @since 2.29.11 2019-08-29
+     * @since 2.41.36 2022-04-03
      */
-    public static function sortRdate2( array $a, array $b ) : int
+    public static function sortRdate2( Pc $a, Pc $b ) : int
     {
         return strcmp(
-            self::sortRdate2GetValue( $a[Util::$LCvalue] ),
-            self::sortRdate2GetValue( $b[Util::$LCvalue] )
+            self::sortRdate2GetValue( $a->value ),
+            self::sortRdate2GetValue( $b->value )
         );
     }
 

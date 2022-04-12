@@ -34,6 +34,7 @@ use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
 use LogicException;
 
@@ -50,7 +51,6 @@ use function explode;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_null;
 use function is_string;
 use function ksort;
 use function mktime;
@@ -222,8 +222,8 @@ class RecurFactory
      *  In the case of the "STANDARD" and "DAYLIGHT" sub-components
      *    the UNTIL rule part MUST always be specified as a date with UTC time.
      *  If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param string        $recurProperty
-     * @param null|mixed[]  $recurData
+     * @param string        $recurPropName
+     * @param null|Pc       $recurData
      * @param null|bool     $allowEmpty
      * @return string
      * @throws Exception
@@ -232,41 +232,36 @@ class RecurFactory
      * @todo above
      */
     public static function formatRecur(
-        string $recurProperty,
-        ? array $recurData = [],
-        ? bool $allowEmpty = true
+        string  $recurPropName,
+        ? Pc $recurData = null,
+        ? bool  $allowEmpty = true
     ) : string
     {
         static $FMTRSCALEEQ      = 'RSCALE=%s';
         static $FMTFREQEQ        = 'FREQ=%s';
         static $FMTDEFAULTEQ     = ';%s=%s';
         static $FMTOTHEREQ       = ';%s=';
-        static $RECURBYDAYSORTER = null;
-        if( is_null( $RECURBYDAYSORTER )) {
-            $RECURBYDAYSORTER    = [ __CLASS__, 'recurBydaySort' ];
-        }
-        if( empty( $recurData )) {
+        static $RECURBYDAYSORTER = [ __CLASS__, 'recurBydaySort' ];
+        if( null === $recurData ) {
             return Util::$SP0;
         }
-        $output = Util::$SP0;
-        if( empty( $recurData[Util::$LCvalue] )) {
+        if( empty( $recurData->value )) {
             return ( $allowEmpty )
-                ? StringFactory::createElement( $recurProperty )
+                ? StringFactory::createElement( $recurPropName )
                 : Util::$SP0;
         }
-        $isValueDate = ParameterFactory::isParamsValueSet( $recurData, IcalInterface::DATE );
-        if( isset( $recurData[Util::$LCparams] )) {
-            ParameterFactory::ifExistRemove(
-                $recurData[Util::$LCparams],
-                IcalInterface::VALUE
-            );
-            $attributes = ParameterFactory::createParams( $recurData[Util::$LCparams] );
+        $output      = Util::$SP0;
+        $isValueDate = $recurData->hasParamValue( IcalInterface::DATE );
+        if( ! empty( $recurData->params )) {
+            $recurData = clone $recurData;
+            $recurData->removeParam( IcalInterface::VALUE );
+            $attributes = ParameterFactory::createParams( $recurData->params );
         }
         else {
-            $attributes = null;
+            $attributes = Util::$SP0;
         }
         $content1 = $content2 = null;
-        foreach( $recurData[Util::$LCvalue] as $ruleLabel => $ruleValue ) {
+        foreach( $recurData->value as $ruleLabel => $ruleValue ) {
             $ruleLabel = strtoupper( $ruleLabel );
             switch( $ruleLabel ) {
                 case IcalInterface::RSCALE :
@@ -328,7 +323,7 @@ class RecurFactory
             } // end switch( $ruleLabel )
         } // end foreach( $theRule[Util::$LCvalue] )) as $ruleLabel => $ruleValue )
         $output .= StringFactory::createElement(
-            $recurProperty,
+            $recurPropName,
             $attributes,
             $content1 . $content2
         );
@@ -411,27 +406,25 @@ class RecurFactory
      *
      * "The value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
      * "If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param mixed[] $rexrule
-     * @param mixed[] $params    merged with dtstart params
-     * @return mixed[]
+     * @param Pc $rexrule   params merged with dtstart params
+     * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.29.25 - 2020-09-02
+     * @since 2.41.36 2022-04-03
      * @todo "The BYSECOND, BYMINUTE and BYHOUR rule parts MUST NOT be specified
      *        when the associated "DTSTART" property has a DATE value type."
      */
-    public static function setRexrule( array $rexrule, array $params ) : array
+    public static function setRexrule( Pc $rexrule ) : Pc
     {
         static $ERR    = 'Invalid input date \'%s\'';
-        $input  = [];
-        if( empty( $rexrule )) {
-            return $input;
+        if( empty( $rexrule->value )) {
+            return $rexrule;
         }
-        $params      = [ Util::$LCparams => $params ];
-        $isValueDate = ParameterFactory::isParamsValueSet( $params, IcalInterface::DATE );
-        $paramTZid   = ParameterFactory::getParamTzid( $params );
-        $rexrule     = array_change_key_case( $rexrule, CASE_UPPER );
-        foreach( $rexrule as $ruleLabel => $ruleValue ) {
+        $input          = [];
+        $isValueDate    = $rexrule->hasParamValue( IcalInterface::DATE );
+        $paramTZid      = $rexrule->getParams( IcalInterface::TZID );
+        $rexrule->value = array_change_key_case( $rexrule->value, CASE_UPPER );
+        foreach( $rexrule->value as $ruleLabel => $ruleValue ) {
             switch( true ) {
                 case ( IcalInterface::UNTIL !== $ruleLabel ) :
                     $input[$ruleLabel] = $ruleValue;
@@ -442,10 +435,7 @@ class RecurFactory
                             DateTimeFactory::toDateTime( $ruleValue ),
                             IcalInterface::UTC
                         );
-                    ParameterFactory::ifExistRemove(
-                        $params[Util::$LCparams],
-                        IcalInterface::TZID
-                    );
+                    $rexrule->removeParam( IcalInterface::TZID ); // if exists
                     break;
                 case ( DateTimeFactory::isStringAndDate( $ruleValue )) :
                     [ $dateStr, $timezonePart ] =
@@ -458,15 +448,9 @@ class RecurFactory
                         true
                     );
                     if( ! $isValueDate ) {
-                        $dateTime = DateTimeFactory::setDateTimeTimeZone(
-                            $dateTime,
-                            IcalInterface::UTC
-                        );
+                        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, IcalInterface::UTC );
                     }
-                    ParameterFactory::ifExistRemove(
-                        $params[Util::$LCparams],
-                        IcalInterface::TZID
-                    );
+                    $rexrule->removeParam( IcalInterface::TZID ); // if exists
                     $input[$ruleLabel] = $dateTime;
                     break;
                 default :
@@ -476,12 +460,8 @@ class RecurFactory
             } // end switch
         } // end foreach( $rexrule as $ruleLabel => $ruleValue )
         $output = self::orderRRuleKeys( $input );
-
         if( ! isset( $output[IcalInterface::UNTIL] )) {
-            ParameterFactory::ifExistRemove(
-                $params[Util::$LCparams],
-                IcalInterface::TZID
-            );
+            $rexrule->removeParam( IcalInterface::TZID ); // if exists
         }
         try {
             RecurFactory2::assertRecur( $output );
@@ -489,7 +469,7 @@ class RecurFactory
         catch( LogicException $e ) {
             throw new InvalidArgumentException( $e->getMessage(), $e->getCode(), $e );
         }
-        return [ Util::$LCvalue => $output ] + $params;
+        return $rexrule->setValue( $output );
     }
 
     /**
@@ -669,11 +649,11 @@ class RecurFactory
             }
             foreach( $RRULEPROPS as $rruleProp ) {
                 $getMethod = StringFactory::getGetMethodName( $rruleProp );
-                if( false === ( $prop = $component->{$getMethod}( true ))) {
+                if( false === ( $propValue = $component->{$getMethod}( true ))) {
                     continue;
                 }
-                if( isset( $prop[Util::$LCvalue][IcalInterface::RSCALE] ) &&
-                    ! in_array( $prop[Util::$LCvalue][IcalInterface::RSCALE], $ACCEPTED )) { // no third arg
+                if( isset( $propValue->value[IcalInterface::RSCALE] ) &&
+                    ! in_array( $propValue->value[IcalInterface::RSCALE], $ACCEPTED )) { // no third arg
                     $foundUids[] = $component->getUID();
                 }
             } // end foreach

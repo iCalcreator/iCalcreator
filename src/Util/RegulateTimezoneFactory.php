@@ -645,10 +645,8 @@ class RegulateTimezoneFactory
         unset( $propAttr[IcalInterface::TZID] );
         $values = explode( Util::$COMMA, $value );
         foreach( array_keys( $values ) as $x ) {
-            if( ParameterFactory::isParamsValueSet(
-                [ Util::$LCparams => $propAttr ],
-                IcalInterface::PERIOD
-            )) { // RDATE
+            if( isset( $propAttr[IcalInterface::VALUE] ) &&
+                ( IcalInterface::PERIOD === $propAttr[IcalInterface::VALUE] )) { // RDATE
                 $thePeriods     = explode( Util::$SLASH, $values[$x] );
                 $thePeriods[0] .= IcalInterface::Z;
                 if( ! DateIntervalFactory::isStringAndDuration( $thePeriods[1] )) {

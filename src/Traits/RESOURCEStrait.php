@@ -29,19 +29,19 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * RESOURCES property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-09
  */
 trait RESOURCEStrait
 {
     /**
-     * @var null|mixed[] component property RESOURCES value
+     * @var null|Pc[] component property RESOURCES value
      */
     protected ? array $resources = null;
 
@@ -49,7 +49,7 @@ trait RESOURCEStrait
      * Return formatted output for calendar component property resources
      *
      * @return string
-     * @since  2.29.11 - 2019-08-30
+     * @since 2.41.36 2022-04-03
      */
     public function createResources() : string
     {
@@ -75,7 +75,7 @@ trait RESOURCEStrait
             unset( $this->propDelIx[self::RESOURCES] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->resources,
             self::RESOURCES,
             $this,
@@ -88,16 +88,16 @@ trait RESOURCEStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getResources( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getResources( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->resources )) {
             unset( $this->propIx[self::RESOURCES] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getMvalProperty(
             $this->resources,
             self::RESOURCES,
             $this,
@@ -107,27 +107,41 @@ trait RESOURCEStrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isResourcesSet() : bool
+    {
+        return self::isMvalSet( $this->resources );
+    }
+
+    /**
      * Set calendar component property resources
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|integer  $index
+     * @param null|string|Pc    $value
+     * @param null|int|mixed[]  $params
+     * @param null|int          $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-09
      */
-    public function setResources( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setResources(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::RESOURCES );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::RESOURCES );
+            $value->setEmpty();
         }
         else {
-            Util::assertString( $value, self::RESOURCES );
-            $value  = StringFactory::trimTrailNL( $value );
+            $value->value= StringFactory::trimTrailNL( $value->value );
         }
-        self::setMval( $this->resources, $value, $params, null, $index );
+        self::setMval( $this->resources, $value, $index );
         return $this;
     }
 }

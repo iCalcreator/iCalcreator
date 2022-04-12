@@ -30,7 +30,6 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 use function array_keys;
 use function in_array;
@@ -45,38 +44,40 @@ trait SubCompsGetTrait
      * @param string $detailPropName
      * @param string $xParamRefId
      * @param string $xPropTypeName
-     * @param string $xParamTypeRef
+     * @param string|string[] $xParamTypeRef
      * @return array[]
-     * @since 2.41.17 - 2022-02-18
+     * @since 2.41.34 - 2022-03-28
      */
     protected function getSubCompsDetailType(
         string $compType,
         string $detailPropName,
         string $xParamRefId,
         string $xPropTypeName,
-        string $xParamTypeRef
+        string|array $xParamTypeRef
     ) : array
     {
         $vSubValues = $lcArr = [];
         $method1    = StringFactory::getGetMethodName( $detailPropName );
+        $method2    = StringFactory::getGetMethodName( $xPropTypeName );
         foreach( array_keys( $this->components ) as $cix ) {
             if( $compType !== $this->components[$cix]->getCompType()) {
                 continue;
             }
             if(( false === ( $content = $this->components[$cix]->{$method1}( true ))) ||
-                empty( $content[Util::$LCvalue] )) {
+                empty( $content->value )) {
                 continue;
             }
-            $value   = $content[Util::$LCvalue];
+            $value   = $content->value;
             $lcValue = mb_strtolower( $value );
-            if( in_array( $lcValue, $lcArr )) {
+            if( in_array( $lcValue, $lcArr, true )) { // no dupl.
                 continue;
             }
-            $vSubValues[$value] = $content[Util::$LCparams];
-            $vSubValues[$value][$xParamRefId]       = $this->components[$cix]->getUID();
-            $method = StringFactory::getGetMethodName( $xPropTypeName );
-            if( false !== ( $type = $this->components[$cix]->{$method}())) {
-                $vSubValues[$value][$xParamTypeRef] = $type;
+            $vSubValues[$value] = $content->params;
+            $vSubValues[$value][$xParamRefId]  = $this->components[$cix]->getUID();
+            if( false !== ( $type = $this->components[$cix]->{$method2}())) {
+                foreach((array) $xParamTypeRef as $pKey ) {
+                    $vSubValues[$value][$pKey] = $type;
+                }
             }
             $lcArr[$value] = $lcValue;
         } // end foreach
@@ -99,9 +100,9 @@ trait SubCompsGetTrait
         $method       = StringFactory::getGetMethodName( $propName );
         $compPropData = [];
         while( false !== ( $content = $this->{$method}( null, true ))) {
-            $value = $content[Util::$LCvalue];
+            $value = $content->value;
             if( ! empty( $value )) {
-                $compPropData[$value] = $content[Util::$LCparams];
+                $compPropData[$value] = $content->params;
             }
             if( ! $multi ) {
                 break; // the only one is found
@@ -110,7 +111,7 @@ trait SubCompsGetTrait
         // check for hits (ignore case), if hit then update this::hit and remove current $subCompsData
         $update = false;
         foreach( array_keys( $compPropData ) as $cValue ) {
-            if( in_array( mb_strtolower( $cValue ), $lcArr )) {
+            if( in_array( mb_strtolower( $cValue ), $lcArr, true )) {
                 $update = true;
                 foreach( $subCompsData[$cValue] as $vParamKey => $vParamValue ) {
                     if( ! isset( $compPropData[$cValue][$vParamKey] )) {

@@ -29,20 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * TZNAME property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-09
  */
 trait TZNAMEtrait
 {
     /**
-     * @var null|mixed[] component property TZNAME value
+     * @var null|Pc[] component property TZNAME value
      */
     protected ? array $tzname = null;
 
@@ -54,20 +55,16 @@ trait TZNAMEtrait
     public function createTzname() : string
     {
         if( empty( $this->tzname )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output = Util::$SP0;
+        $output = self::$SP0;
         $lang   = $this->getConfig( self::LANGUAGE );
         foreach( $this->tzname as $theName ) {
-            if( ! empty( $theName[Util::$LCvalue] )) {
+            if( ! empty( $theName->value )) {
                 $output .= StringFactory::createElement(
                     self::TZNAME,
-                    ParameterFactory::createParams(
-                        $theName[Util::$LCparams],
-                        [ self::LANGUAGE ],
-                        $lang
-                    ),
-                    StringFactory::strrep( $theName[Util::$LCvalue] )
+                    ParameterFactory::createParams( $theName->params, [ self::LANGUAGE ], $lang ),
+                    StringFactory::strrep( $theName->value )
                 );
             }
             elseif( $this->getConfig( self::ALLOWEMPTY )) {
@@ -103,16 +100,16 @@ trait TZNAMEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTzname( ? int $propIx = null, ? bool $inclParam = false ) : array | bool | string
+    public function getTzname( ? int $propIx = null, ? bool $inclParam = false ) : bool | string |Pc
     {
         if( empty( $this->tzname )) {
             unset( $this->propIx[self::TZNAME] );
             return false;
         }
-        return  self::getPropertyM(
+        return self::getMvalProperty(
             $this->tzname,
             self::TZNAME,
             $this,
@@ -122,30 +119,42 @@ trait TZNAMEtrait
     }
 
     /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isTznameSet() : bool
+    {
+        return self::isMvalSet( $this->tzname );
+    }
+
+    /**
      * Set calendar component property tzname
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params
-     * @param null|integer  $index
+     * @param null|string|Pc  $value
+     * @param null|int|mixed[]    $params
+     * @param null|int        $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.36 2022-04-09
      */
-    public function setTzname( ? string $value = null, ? array $params = [], ? int $index = null) : static
+    public function setTzname(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::TZNAME );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TZNAME );
+            $value->setEmpty();
         }
-        Util::assertString( $value, self::TZNAME );
-         self::setMval(
-            $this->tzname,
-            StringFactory::trimTrailNL( $value ),
-             $params,
-            null,
-            $index
-        );
+        else {
+            Util::assertString( $value->value, self::TZNAME );
+            $value->value = StringFactory::trimTrailNL( $value->value );
+        }
+         self::setMval( $this->tzname, $value, $index );
         return $this;
     }
 }

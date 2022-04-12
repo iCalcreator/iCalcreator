@@ -126,15 +126,19 @@ class VtimezonePopulateFactoryTest extends DtBase
         $vtimezone = $calendar2->getComponent( IcalInterface::VTIMEZONE );
 
         $expTz     = IcalInterface::UTC;
+        $this->assertTrue(
+            $vtimezone->isTzidSet(),
+            sprintf( self::$ERRFMT, __FUNCTION__, 21, IcalInterface::TZID, IcalInterface::TRUE, IcalInterface::FALSE )
+        );
         $vtTzid    = $vtimezone->getTzid();
         $this->assertEquals(
             $expTz,
             $vtTzid,
-            sprintf( self::$ERRFMT, __FUNCTION__, 21, IcalInterface::TZID, $expTz, $vtTzid )
+            sprintf( self::$ERRFMT, __FUNCTION__, 22, IcalInterface::TZID, $expTz, $vtTzid )
         );
         $this->assertFalse( $vtimezone->getComponent( IcalInterface::STANDARD ));
 
-        $this->parseCalendarTest( 21, $calendar1 );
+        $this->parseCalendarTest( 23, $calendar1 );
     }
 
     /**
@@ -308,24 +312,36 @@ class VtimezonePopulateFactoryTest extends DtBase
         );
 
         // test get/set of TZID-ALIAS-OF in Vtimezone (with TZID value)
-        $vtimezone->setTzidAliasOf( $vtTzid . 1 );
-        $vtimezone->setTzidAliasOf( $vtTzid . 2 );
+        $this->assertFalse(
+            $vtimezone->isTzidaliasofSet(),
+                sprintf( self::$ERRFMT, __FUNCTION__, $case . '-2a', IcalInterface::TZID_ALIAS_OF, IcalInterface::FALSE, IcalInterface::TRUE )
+        );
+        $vtimezone->setTzidaliasof( $vtTzid . 1 );
+        $this->assertTrue(
+            $vtimezone->isTzidaliasofSet(),
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-2b', IcalInterface::TZID_ALIAS_OF, IcalInterface::TRUE, IcalInterface::FALSE )
+        );
+        $vtimezone->setTzidaliasof( $vtTzid . 2 );
         foreach( [ 1, 2 ] as $x ) {
             $this->assertEquals(
                 $vtTzid . $x,
-                $vtimezone->getTzidAliasOf(),
-                sprintf( self::$ERRFMT, __FUNCTION__, $case . '-2-' . $x, IcalInterface::TZID_ALIAS_OF, $expTz, $vtTzid )
+                $vtimezone->getTzidaliasof(),
+                sprintf( self::$ERRFMT, __FUNCTION__, $case . '-2c-' . $x, IcalInterface::TZID_ALIAS_OF, $expTz, $vtTzid )
             );
         }
 
         $calendar1->replaceComponent( $vtimezone ); // assure TZID_ALIAS_OF is set in calendars Vtimezone
 
         // test isset TZUNTIL
+        $this->assertTrue(
+            $vtimezone->isTzuntilSet(),
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-3a', IcalInterface::TZUNTIL, IcalInterface::TRUE, IcalInterface::FALSE )
+        );
         $tzUntil = $vtimezone->getTzuntil();
         $this->assertInstanceOf(
             DateTime::class,
             $tzUntil,
-            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-3', IcalInterface::TZUNTIL, $expTz, $vtTzid )
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-3c', IcalInterface::TZUNTIL, $expTz, $vtTzid )
         );
 
         $standard = $vtimezone->getComponent( IcalInterface::STANDARD );
@@ -341,6 +357,10 @@ class VtimezonePopulateFactoryTest extends DtBase
             )
         );
 
+        $this->assertTrue(
+            $standard->isTzoffsetfromSet(),
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-5a', IcalInterface::TZOFFSETFROM, IcalInterface::TRUE, IcalInterface::FALSE )
+        );
         $getValue = $standard->getTzoffsetfrom();
         $this->assertEquals(
             '+0200',
@@ -348,13 +368,17 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-5',
+                $case . '-5c',
                 IcalInterface::STANDARD . '::' . IcalInterface::TZOFFSETFROM,
                 '+0200',
                 $getValue
             )
         );
 
+        $this->assertTrue(
+            $standard->isTzoffsetfromSet(),
+            sprintf( self::$ERRFMT, __FUNCTION__, $case . '-6a', IcalInterface::TZOFFSETTO, IcalInterface::TRUE, IcalInterface::FALSE )
+        );
         $getValue = $standard->getTzoffsetTo();
         $this->assertEquals(
             '+0100',
@@ -362,7 +386,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             sprintf(
                 self::$ERRFMT,
                 __FUNCTION__,
-                $case . '-6',
+                $case . '-6c',
                 IcalInterface::STANDARD . '::' . IcalInterface::TZOFFSETTO,
                 '+0100',
                 $getValue

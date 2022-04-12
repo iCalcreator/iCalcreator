@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -36,14 +37,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * PARTICIPANT_TYPE property functions
  *
- * @since 2.41.4 2022-01-18
+ * @since 2.41.36 2022-04-03
  */
 trait PARTICIPANT_TYPErfc9073trait
 {
     /**
-     * @var null|mixed[] component property PARTICIPANT_TYPE value
+     * @var null|Pc component property PARTICIPANT_TYPE value
      */
-    protected ? array $participanttype = null;
+    protected ? Pc $participanttype = null;
 
     /**
      * Return formatted output for calendar component property participanttype
@@ -53,17 +54,15 @@ trait PARTICIPANT_TYPErfc9073trait
     public function createParticipanttype() : string
     {
         if( empty( $this->participanttype )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->participanttype[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::PARTICIPANT_TYPE )
-                : Util::$SP0;
+        if( empty( $this->participanttype->value )) {
+            return $this->createSinglePropEmpty( self::PARTICIPANT_TYPE );
         }
         return StringFactory::createElement(
             self::PARTICIPANT_TYPE,
-            ParameterFactory::createParams( $this->participanttype[Util::$LCparams] ),
-            StringFactory::strrep( $this->participanttype[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->participanttype->params ),
+            StringFactory::strrep( $this->participanttype->value )
         );
     }
 
@@ -82,35 +81,46 @@ trait PARTICIPANT_TYPErfc9073trait
      * Get calendar component property participanttype
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getParticipanttype( ? bool $inclParam = false ) : array | bool | string
+    public function getParticipanttype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->participanttype )) {
             return false;
         }
-        return $inclParam ? $this->participanttype : $this->participanttype[Util::$LCvalue];
+        return $inclParam ? clone $this->participanttype : $this->participanttype->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     */
+    public function isParticipanttypeSet() : bool
+    {
+        return ! empty( $this->participanttype->value );
     }
 
     /**
      * Set calendar component property participanttype
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      */
-    public function setParticipanttype( ? string $value = null, ? array $params = [] ) : static
+    public function setParticipanttype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::PARTICIPANT_TYPE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::PARTICIPANT_TYPE );
+            $value->setEmpty();
         }
-        Util::assertString( $value, self::PARTICIPANT_TYPE );
-        $this->participanttype = [
-            Util::$LCvalue  => (string) $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        else {
+            Util::assertString( $value->value, self::PARTICIPANT_TYPE );
+        }
+        $this->participanttype = $value;
         return $this;
     }
 }

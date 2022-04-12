@@ -29,20 +29,21 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use InvalidArgumentException;
 
 /**
  * STRUCTURED-DATA property functions
  *
- * @since 2.41.3 2022-01-17
+ * @since 2.41.36 2022-04-09
  */
 trait STRUCTURED_DATArfc9073trait
 {
     /**
-     * @var null|mixed[] component property structureddata value
+     * @var null|Pc[] component property structureddata value
      */
     protected ? array $structureddata = null;
 
@@ -54,11 +55,11 @@ trait STRUCTURED_DATArfc9073trait
     public function createStructureddata() : string
     {
         if( empty( $this->structureddata )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        $output  = Util::$SP0;
+        $output  = self::$SP0;
         foreach( $this->structureddata as $part ) {
-            if( empty( $part[Util::$LCvalue] )) {
+            if( empty( $part->value )) {
                 if( $this->getConfig( self::ALLOWEMPTY )) {
                     $output .= StringFactory::createElement( self::STRUCTURED_DATA );
                 }
@@ -66,8 +67,8 @@ trait STRUCTURED_DATArfc9073trait
             }
             $output .= StringFactory::createElement(
                 self::STRUCTURED_DATA,
-                ParameterFactory::createParams( $part[Util::$LCparams] ),
-                StringFactory::strrep( $part[Util::$LCvalue] )
+                ParameterFactory::createParams( $part->params ),
+                StringFactory::strrep( $part->value )
             );
         } // end foreach
         return $output;
@@ -85,7 +86,7 @@ trait STRUCTURED_DATArfc9073trait
             unset( $this->propDelIx[self::STRUCTURED_DATA] );
             return false;
         }
-        return  self::deletePropertyM(
+        return self::deletePropertyM(
             $this->structureddata,
             self::STRUCTURED_DATA,
             $this,
@@ -98,21 +99,32 @@ trait STRUCTURED_DATArfc9073trait
      *
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getStructureddata( int $propIx = null, bool $inclParam = false ) : bool | array | string
+    public function getStructureddata( int $propIx = null, bool $inclParam = false ) : bool | string |Pc
     {
         if( empty( $this->structureddata )) {
             unset( $this->propIx[self::STRUCTURED_DATA] );
             return false;
         }
-        return self::getPropertyM(
+        return self::getMvalProperty(
             $this->structureddata,
             self::STRUCTURED_DATA,
             $this,
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isStructureddataSet() : bool
+    {
+        return self::isMvalSet( $this->structureddata );
     }
 
     /**
@@ -123,30 +135,32 @@ trait STRUCTURED_DATArfc9073trait
      * fmttypeparam/ schemaparam are OPTIONAL for a URI value, REQUIRED for a TEXT or BINARY value
      * and MUST NOT occur more than once
      *
-     * @param null|string   $value
-     * @param null|mixed[]  $params   VALUE TEXT/URI
-     * @param null|int      $index
+     * @param null|string|Pc   $value
+     * @param null|int|mixed[] $params   VALUE TEXT/URI
+     * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setStructureddata( ? string $value = null, ? array $params = [], ? int $index = null ) : static
+    public function setStructureddata(
+        null|string|Pc $value = null,
+        null|int|array $params = [],
+        ? int $index = null
+    ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::STRUCTURED_DATA );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = self::marshallInputMval( $value, $params, $index );
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::STRUCTURED_DATA );
+            $value->setEmpty();
         }
         else {
-            $params = array_change_key_case( $params ?? [], CASE_UPPER );
-            if( ! isset( $params[self::VALUE] )) {
-                $params[self::VALUE] = self::TEXT; // must have one
-            }
-            if(( self::BINARY === $params[self::VALUE] ) && ! isset( $params[self::ENCODING] )) {
-                $params[self::ENCODING] = self::BASE64;
+            $value->value  = Util::assertString( $value->value, self::STRUCTURED_DATA );
+            $value->addParamValue( self::TEXT, false ); // must have VALUE
+            if( $value->hasParamValue( self::BINARY ) &&
+                ! $value->hasParamKey( self::ENCODING )) {
+                $value->addParam( self::ENCODING, self::BASE64 );
             }
         }
-        $value  = Util::assertString( $value, self::STRUCTURED_DATA );
-        self::setMval( $this->structureddata, $value, $params, [], $index );
+        self::setMval( $this->structureddata, $value, $index );
         return $this;
     }
 }

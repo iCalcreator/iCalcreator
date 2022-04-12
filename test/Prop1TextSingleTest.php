@@ -40,7 +40,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  * testing VALUE TEXT etc
  *   ATTACH, ATTENDEE, CATEGORIES, CLASS, COMMENT, CONTACT, DESCRIPTION, LOCATION, ORGANIZER,
  *   RELATED-TO, REQUEST_STATUS, RESOURCES, STATUS, SUMMARY, TRANSP, URL, X-PROP
- *   COLOR, IMAGE, CONFERENCE, NAME
+ *   COLOR, IMAGE, CONFERENCE
  * testing GeoLocation
  * testing empty properties
  * testing parse eol-htab
@@ -83,10 +83,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::TRANSP . ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -108,10 +108,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::DESCRIPTION .
             ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
@@ -135,10 +135,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::LOCATION .
             ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
@@ -163,10 +163,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::SUMMARY .
             ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
@@ -190,10 +190,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::SUMMARY .
             ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
@@ -209,10 +209,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::SOURCE . ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -234,10 +234,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value1,
             $params1,
-            [
-                Util::$LCvalue  => $value2,
-                Util::$LCparams => $params2
-            ],
+            Pc::factory(
+                $value2,
+                $params2
+            ),
             IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
@@ -259,10 +259,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value1,
             $params1,
-            [
-                Util::$LCvalue  => $value2,
-                Util::$LCparams => $params2
-            ],
+            Pc::factory(
+                $value2,
+                $params2
+            ),
             IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
@@ -285,10 +285,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value1,
             $params1,
-            [
-                Util::$LCvalue  => $value2,
-                Util::$LCparams => $params2
-            ],
+            Pc::factory(
+                $value2,
+                $params2
+            ),
             IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
@@ -310,10 +310,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value1,
             $params1,
-            [
-                Util::$LCvalue  => $value2,
-                Util::$LCparams => $params2
-            ],
+            Pc::factory(
+                $value2,
+                $params2
+            ),
             IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
 
@@ -335,10 +335,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value1,
             $params1,
-            [
-                Util::$LCvalue  => $value2,
-                Util::$LCparams => $params2
-            ],
+            Pc::factory(
+                $value2,
+                $params2
+            ),
             IcalInterface::URL .
             ParameterFactory::createParams( $params2 ) . ':' . $value2
         ];
@@ -351,10 +351,10 @@ class Prop1TextSingleTest extends DtBase
                 IcalInterface::SENT_BY        => 'MAILTO:boss1071@example.com',
                 IcalInterface::LANGUAGE       => 'EN'
             ] + self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1071,
             [
@@ -387,10 +387,10 @@ class Prop1TextSingleTest extends DtBase
                 IcalInterface::SENT_BY       => 'MAILTO:boss1072@example.com',
                 IcalInterface::EMAIL         => 'another1072@example.com'
             ] + self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => 'MAILTO:' . $value,
-            Util::$LCparams => $params2
-        ];
+        $getValue  = Pc::factory(
+            'MAILTO:' . $value,
+            $params2
+        );
         $dataArr[] = [
             1072,
             [
@@ -415,10 +415,10 @@ class Prop1TextSingleTest extends DtBase
         // CLASS
         $value  = IcalInterface::CONFIDENTIAL;
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1081,
             [
@@ -438,10 +438,10 @@ class Prop1TextSingleTest extends DtBase
         // STATUS
         $value  = IcalInterface::TENTATIVE;
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1091,
             [
@@ -456,10 +456,10 @@ class Prop1TextSingleTest extends DtBase
         // STATUS
         $value  = IcalInterface::NEEDS_ACTION;
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1092,
             [
@@ -474,10 +474,10 @@ class Prop1TextSingleTest extends DtBase
         // STATUS
         $value  = IcalInterface::F_NAL;
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1093,
             [
@@ -492,10 +492,10 @@ class Prop1TextSingleTest extends DtBase
         // GEO
         $value  = [ IcalInterface::LATITUDE => 10.10, IcalInterface::LONGITUDE => 10.10 ];
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1101,
             [
@@ -506,19 +506,19 @@ class Prop1TextSingleTest extends DtBase
             $getValue,
             IcalInterface::GEO . ParameterFactory::createParams( $params ) .
             ':' .
-            GeoFactory::geo2str2( $getValue[Util::$LCvalue][IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
+            GeoFactory::geo2str2( $getValue->value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
             Util::$SEMIC .
-            GeoFactory::geo2str2( $getValue[Util::$LCvalue][IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
+            GeoFactory::geo2str2( $getValue->value[IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
 
         ];
 
         // COLOR
         $value  = 'black';
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1103,
             [
@@ -533,10 +533,10 @@ class Prop1TextSingleTest extends DtBase
         // CALENDAR-ADDRESS
         $value  = 'MAILTO:ildoit1071@example.com';
         $params = self::$STCPAR;
-        $getValue  = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => $params
-        ];
+        $getValue  = Pc::factory(
+            $value,
+            $params
+        );
         $dataArr[] = [
             1201,
             [
@@ -559,10 +559,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::LOCATION_TYPE . ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -576,10 +576,10 @@ class Prop1TextSingleTest extends DtBase
             ],
             $value,
             $params,
-            [
-                Util::$LCvalue  => $value,
-                Util::$LCparams => $params
-            ],
+            Pc::factory(
+                $value,
+                $params
+            ),
             IcalInterface::BUSYTYPE . ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
@@ -595,7 +595,7 @@ class Prop1TextSingleTest extends DtBase
      * @param mixed[] $propComps
      * @param mixed   $value
      * @param mixed   $params
-     * @param mixed[] $expectedGet
+     * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
      */
@@ -604,12 +604,12 @@ class Prop1TextSingleTest extends DtBase
         array  $propComps,
         mixed  $value,
         mixed  $params,
-        array  $expectedGet,
+        Pc     $expectedGet,
         string $expectedString
     ) : void
     {
         $c        = new Vcalendar();
-        $urlIsSet = false;
+        $urlIsSet = $pcInput = false;
         foreach( $propComps as $propName => $theComps ) {
             if( IcalInterface::SOURCE === $propName ) {
                 $c->setSource( $value, $params );
@@ -640,52 +640,25 @@ class Prop1TextSingleTest extends DtBase
                         break;
                 }
 
-                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $createMethod = StringFactory::getCreateMethodName( $propName );
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+                $isMethod     = StringFactory::getIsMethodSetName( $propName );
+                $getMethod    = StringFactory::getGetMethodName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
 
                 if( IcalInterface::GEO === $propName ) {
                     $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
                 }
-
-                elseif(( IcalInterface::LOCATION === $propName ) &&
-                    in_array( $theComp, [ IcalInterface::VEVENT, IcalInterface::VTODO ], true ) ) {
-                    $vlocation = $comp->newVlocation()->setName( $value );
-                    $comp->vlocationNames2Location();
-                    $location  = $comp->getLocation( true );
-                    $this->assertEquals(
-                        $value,
-                        $location[Util::$LCvalue],
-                        sprintf( self::$ERRFMT, null, $case . '-1a1', __FUNCTION__, $theComp, $getMethod )
-                    );
-                    $this->assertTrue(
-                        isset( $location[Util::$LCparams][Vcalendar::X_VLOCATIONID] ),
-                        sprintf( self::$ERRFMT, null, $case . '-1a2', __FUNCTION__, $theComp, $getMethod )
-                    );
-                    $comp->deleteLocation();
-                    // while( false !== $comp->deleteLocation()) {
-                    //    continue;
-                    // };
-                    $comp->setLocation( $value, $params );  // overwrite
-                } // end elseif
-                else {
-                    $comp->{$setMethod}( $value, $params );
+                if( IcalInterface::GEO !== $propName ) {
+                    if( $pcInput ) {
+                        $comp->{$setMethod}( Pc::factory( $value, $params ) );
+                    }
+                    else {
+                        $comp->{$setMethod}( $value, $params );
+                    }
+                    $pcInput = ! $pcInput;
                 }
-                if( IcalInterface::CALENDAR_ADDRESS === $propName ) {
-                    $vevent->participants2Attendees();
-                    $attendee = $vevent->getAttendee( null, true );
-                    $this->assertEquals(
-                        $value,
-                        $attendee[Util::$LCvalue],
-                        sprintf( self::$ERRFMT, null, $case . '-1b1', __FUNCTION__, $theComp, $getMethod )
-                    );
-                    $this->assertTrue(
-                        isset( $attendee[Util::$LCparams][Vcalendar::X_PARTICIPANTID] ),
-                        sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $getMethod )
-                    );
-                }
-                elseif( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
+                if( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
                     $vevent->newParticipant()->{$newMethod}()->{$setMethod}( $value, $params );
                 }
 
@@ -707,8 +680,12 @@ class Prop1TextSingleTest extends DtBase
 
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4a', __FUNCTION__, $theComp, $getMethod )
+                );
+                $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-4', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-4b', __FUNCTION__, $theComp, $getMethod )
                 );
 
                 if( IcalInterface::GEO === $propName ) {
@@ -717,6 +694,10 @@ class Prop1TextSingleTest extends DtBase
                 else {
                     $comp->{$setMethod}( $value, $params );
                 }
+                $this->assertTrue(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4c', __FUNCTION__, $theComp, $getMethod )
+                );
             } // end foreach
         } // end foreach
 

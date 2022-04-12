@@ -30,7 +30,6 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 use function gethostbyname;
 use function sprintf;
@@ -46,7 +45,7 @@ trait PRODIDtrait
     /**
      * @var null|string calendar property PRODID
      */
-    protected ?string $prodid = null;
+    protected ? string $prodid = null;
 
     /**
      * Return formatted output for calendar property prodid
@@ -104,7 +103,7 @@ trait PRODIDtrait
             $lang = strtoupper( $lang );
         }
         else {
-            $lang = Util::$SP0;
+            $lang = self::$SP0;
         }
         $this->prodid = sprintf( $FMT, $unique_id, ICALCREATOR_VERSION, $lang );
     }

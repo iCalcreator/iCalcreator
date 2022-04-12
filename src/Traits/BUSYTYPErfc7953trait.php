@@ -29,8 +29,8 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
@@ -39,14 +39,14 @@ use function strtoupper;
 /**
  * rfc7953 BUSYTYPE property functions
  *
- * @since 2.41.9 2022-01-22
+ * @since 2.41.36 2022-04-03
  */
 trait BUSYTYPErfc7953trait
 {
     /**
-     * @var null|mixed[] component property busytype value
+     * @var null|Pc component property busytype value
      */
-    protected ? array $busytype = null;
+    protected ? Pc $busytype = null;
 
     /**
      * Return formatted output for calendar component property busytype
@@ -56,17 +56,15 @@ trait BUSYTYPErfc7953trait
     public function createBusytype() : string
     {
         if( empty( $this->busytype )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->busytype[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::BUSYTYPE )
-                : Util::$SP0;
+        if( empty( $this->busytype->value )) {
+            return $this->createSinglePropEmpty( self::BUSYTYPE );
         }
         return StringFactory::createElement(
             self::BUSYTYPE,
-            ParameterFactory::createParams( $this->busytype[Util::$LCparams] ),
-            $this->busytype[Util::$LCvalue]
+            ParameterFactory::createParams( $this->busytype->params ),
+            $this->busytype->value
         );
     }
 
@@ -85,38 +83,48 @@ trait BUSYTYPErfc7953trait
      * Get calendar component property busytype
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
+     * @return bool|string|Pc
      */
-    public function getBusytype( ? bool $inclParam = false ) : array | bool | string
+    public function getBusytype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->busytype )) {
             return false;
         }
-        return $inclParam ? $this->busytype : $this->busytype[Util::$LCvalue];
+        return $inclParam ? clone $this->busytype : $this->busytype->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isBusytypeSet() : bool
+    {
+        return ! empty( $this->busytype->value );
     }
 
     /**
      * Set calendar component property busytype
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setBusytype( ? string $value = null, ? array $params = [] ) : static
+    public function setBusytype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::BUSYTYPE );
-            $value  = Util::$SP0;
-            $params = [];
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::BUSYTYPE );
+            $value->setEmpty();
         }
         else {
-            $value = strtoupper( StringFactory::trimTrailNL( $value ));
+            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
         }
-        $this->busytype = [
-            Util::$LCvalue  => $value,
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $this->busytype = $value;
         return $this;
     }
 }

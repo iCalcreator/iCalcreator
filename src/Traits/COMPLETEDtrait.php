@@ -33,25 +33,22 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
-
-use function array_change_key_case;
 
 /**
  * COMPLETED property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait COMPLETEDtrait
 {
     /**
-     * @var null|mixed[] component property COMPLETED value
+     * @var null|Pc component property COMPLETED value
      */
-    protected ? array $completed = null;
+    protected ? Pc $completed = null;
 
     /**
      * Return formatted output for calendar component property completed
@@ -59,22 +56,20 @@ trait COMPLETEDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.1 2019-06-22
+     * @since 2.41.36 2022-04-03
      */
     public function createCompleted() : string
     {
         if( empty( $this->completed )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->completed[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::COMPLETED )
-                : Util::$SP0;
+        if( empty( $this->completed->value )) {
+            return $this->createSinglePropEmpty( self::COMPLETED );
         }
         return StringFactory::createElement(
             self::COMPLETED,
-            ParameterFactory::createParams( $this->completed[Util::$LCparams] ),
-            DateTimeFactory::dateTime2Str( $this->completed[Util::$LCvalue] )
+            ParameterFactory::createParams( $this->completed->params ),
+            DateTimeFactory::dateTime2Str( $this->completed->value )
         );
     }
 
@@ -94,40 +89,53 @@ trait COMPLETEDtrait
      * Return calendar component property completed
      *
      * @param null|bool  $inclParam
-     * @return bool|string|DateTime|mixed[]
-     * @since  2.27.1 - 2018-12-12
+     * @return bool|string|DateTime|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getCompleted( ? bool $inclParam = false ) : DateTime | bool | array | string
+    public function getCompleted( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->completed )) {
             return false;
         }
-        return $inclParam ? $this->completed : $this->completed[Util::$LCvalue];
+        return $inclParam ? clone $this->completed : $this->completed->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isCompletedSet() : bool
+    {
+        return ! empty( $this->completed->value );
     }
 
     /**
      * Set calendar component property completed
      *
-     * @param null|string|DateTimeInterface $value
+     * @param null|string|Pc|DateTimeInterface $value
      * @param null|mixed[]  $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.36 2022-04-03
      */
-    public function setCompleted( null|string|DateTimeInterface $value = null, ? array $params = [] ) : static
+    public function setCompleted( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::COMPLETED );
-            $this->completed = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => [],
-            ];
-            return $this;
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::COMPLETED );
+            $value->setEmpty();
         }
-        $params = array_change_key_case( $params ?? [], CASE_UPPER );
-        $params[IcalInterface::VALUE] = IcalInterface::DATE_TIME;
-        $this->completed = DateTimeFactory::setDate( $value, $params, true ); // $forceUTC
+        else {
+            $value->addParamValue( self::DATE_TIME ); // req.
+            $value = DateTimeFactory::setDate( $value, true ); // $forceUTC
+
+        }
+        $this->completed = $value;
         return $this;
     }
 }

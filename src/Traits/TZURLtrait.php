@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
@@ -37,14 +38,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * TZURL property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait TZURLtrait
 {
     /**
-     * @var null|mixed[] component property TZURL value
+     * @var null|Pc component property TZURL value
      */
-    protected ? array $tzurl = null;
+    protected ? Pc $tzurl = null;
 
     /**
      * Return formatted output for calendar component property tzurl
@@ -54,17 +55,15 @@ trait TZURLtrait
     public function createTzurl() : string
     {
         if( empty( $this->tzurl )) {
-            return Util::$SP0;
+            return self::$SP0;
         }
-        if( empty( $this->tzurl[Util::$LCvalue] )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::TZURL )
-                : Util::$SP0;
+        if( empty( $this->tzurl->value )) {
+            return $this->createSinglePropEmpty( self::TZURL );
         }
         return StringFactory::createElement(
             self::TZURL,
-            ParameterFactory::createParams( $this->tzurl[Util::$LCparams] ),
-            $this->tzurl[Util::$LCvalue]
+            ParameterFactory::createParams( $this->tzurl->params ),
+            $this->tzurl->value
         );
     }
 
@@ -84,15 +83,26 @@ trait TZURLtrait
      * Get calendar component property tzurl
      *
      * @param null|bool   $inclParam
-     * @return bool|string|mixed[]
-     * @since  2.27.1 - 2018-12-13
+     * @return bool|string|Pc
+     * @since 2.41.36 2022-04-03
      */
-    public function getTzurl( ? bool $inclParam = false ) : array | bool | string
+    public function getTzurl( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzurl )) {
             return false;
         }
-        return $inclParam ? $this->tzurl : $this->tzurl[Util::$LCvalue];
+        return $inclParam ? clone $this->tzurl : $this->tzurl->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.36 2022-04-03
+     */
+    public function isTzurlSet() : bool
+    {
+        return ! empty( $this->tzurl->value );
     }
 
     /**
@@ -102,22 +112,24 @@ trait TZURLtrait
      * This URI form can be useful within an organization, but is problematic
      * in the Internet.
      *
-     * @param null|string   $value
+     * @param null|string|Pc   $value
      * @param null|mixed[]  $params
      * @return static
-     * @since  2.30.2 - 2021-02-04
+     * @since 2.41.36 2022-04-03
      */
-    public function setTzurl( ? string $value = null, ? array $params = [] ) : static
+    public function setTzurl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value )) {
-            $this->assertEmptyValue( $value, self::TZURL );
-            $this->tzurl = [
-                Util::$LCvalue  => Util::$SP0,
-                Util::$LCparams => [],
-            ];
-            return $this;
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TZURL );
+            $this->tzurl = $value->setEmpty();
         }
-        HttpFactory::urlSet( $this->tzurl, $value, $params );
+        else {
+            Util::assertString( $value->value, self::TZURL );
+            HttpFactory::urlSet( $this->tzurl, $value );
+        }
         return $this;
     }
 }

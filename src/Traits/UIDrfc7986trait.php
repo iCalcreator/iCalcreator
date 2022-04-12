@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -44,21 +45,22 @@ use function vsprintf;
 /**
  * UID property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.36 2022-04-03
  */
 trait UIDrfc7986trait
 {
     /**
-     * @var null|mixed[] component property UID value
+     * @var null|Pc component property UID value
      */
-    protected ? array $uid = null;
+    protected ? Pc $uid = null;
 
     /**
      * Return formatted output for calendar component property uid
      *
      * If uid is missing, uid is created
      * @return string
-     * @since 2.29.5 2019-06-17
+     * @throws Exception
+     * @since 2.41.36 2022-04-03
      */
     public function createUid() : string
     {
@@ -67,8 +69,8 @@ trait UIDrfc7986trait
         }
         return StringFactory::createElement(
             self::UID,
-            ParameterFactory::createParams( $this->uid[Util::$LCparams] ),
-            $this->uid[Util::$LCvalue]
+            ParameterFactory::createParams( $this->uid->params ),
+            $this->uid->value
         );
     }
 
@@ -87,78 +89,83 @@ trait UIDrfc7986trait
     /**
      * Get calendar component property uid
      *
-     * @param null|bool   $inclParam
-     * @return string|mixed[]
-     * @since 2.29.5 2019-06-17
+     * @param null|bool $inclParam
+     * @return string|Pc
+     * @throws Exception
+     * @since 2.41.36 2022-04-03
      */
-    public function getUid( ? bool $inclParam = false ) : array | string
+    public function getUid( ? bool $inclParam = false ) : string | Pc
     {
         if( self::isUidEmpty( $this->uid )) {
             $this->uid = self::makeUid();
         }
-        return $inclParam ? $this->uid : $this->uid[Util::$LCvalue];
+        return $inclParam ? clone $this->uid : $this->uid->value;
+    }
+
+    /**
+     * Return bool true if set (and ignore empty property)
+     *
+     * @return bool
+     * @since 2.41.35 2022-03-28
+     */
+    public function isUidSet() : bool
+    {
+        return true;
     }
 
     /**
      * Return bool true if uid is empty
      *
-     * @param null|mixed[]   $array
+     * @param null|Pc   $uid
      * @return bool
-     * @since 2.29.5 2019-06-17
+     * @since 2.41.36 2022-04-03
      */
-    private static function isUidEmpty( ? array $array ) : bool
+    private static function isUidEmpty( ? Pc $uid ) : bool
     {
-        if( empty( $array )) {
-            return true;
-        }
-        if( empty( $array[Util::$LCvalue] ) && ( Util::$ZERO !== $array[Util::$LCvalue] )) {
-            return true;
-        }
-        return false;
+        return (( null === $uid ) || ( empty( $uid->value ) && ( Util::$ZERO !== $uid->value )));
     }
 
     /**
      * Return an unique id for a calendar/component object instance
      *
-     * @return mixed[]
+     * @return Pc
      * @throws Exception
-     * @since 2.29.5 2019-06-17
+     * @since 2.41.36 2022-04-03
      * @see https://www.php.net/manual/en/function.com-create-guid.php#117893
      */
-    private static function makeUid() : array
+    private static function makeUid() : Pc
     {
         static $FMT = '%s%s-%s-%s-%s-%s%s%s';
         $bytes    = StringFactory::getRandChars( 32 ); // i.e. 16
         $bytes[6] = chr(ord( $bytes[6] ) & 0x0f | 0x40 ); // set version to 0100
         $bytes[8] = chr(ord( $bytes[8] ) & 0x3f | 0x80 ); // set bits 6-7 to 10
         $uid      = vsprintf( $FMT, str_split( bin2hex( $bytes ), 4 ));
-        return [
-            Util::$LCvalue  => $uid,
-            Util::$LCparams => [],
-        ];
+        return Pc::factory( $uid );
     }
 
     /**
      * Set calendar component property uid
      *
      * If empty input, male one
-     * @param null|int|string $value
-     * @param null|mixed[]    $params
+     * @param null|int|string|Pc $value
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @throws Exception
+     * @since 2.41.36 2022-04-03
      */
-    public function setUid( null|int|string $value = null, ? array $params = [] ) : static
+    public function setUid( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        if( empty( $value ) && ( Util::$ZERO !== (string) $value )) {
+        $value = ( $value instanceof Pc )
+            ? clone $value
+            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        if( empty( $value->value ) && ( Util::$ZERO !== (string) $value->value )) {
             $this->uid = self::makeUid();
             return $this;
         } // no allowEmpty check here !!!!
-        $value = Util::assertString( $value, self::UID );
-        $this->uid = [
-            Util::$LCvalue  => StringFactory::trimTrailNL( $value ),
-            Util::$LCparams => ParameterFactory::setParams( $params ),
-        ];
+        $value->value = Util::assertString( $value->value, self::UID );
+        $value->value = StringFactory::trimTrailNL( $value->value );
+        $this->uid = $value;
         return $this;
     }
 }
