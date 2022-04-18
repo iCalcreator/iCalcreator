@@ -92,10 +92,10 @@ trait EXDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|Pc
+     * @return bool|string|array|Pc
      * @since 2.41.36 2022-04-03
      */
-    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
+    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array | Pc
     {
         if( empty( $this->exdate )) {
             unset( $this->propIx[self::EXDATE] );
