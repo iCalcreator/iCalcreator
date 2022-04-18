@@ -178,7 +178,7 @@ class SelectFactory
             $compStart = UtilDateTime::factory( $prop->value, $prop->params );
             $dtStartTz = $compStart->getTimezoneName();
             if( $prop->hasParamValue( Vcalendar::DATE )) {
-                $compStartHis = null;
+                $compStartHis = '';
             }
             else {
                 $his          = $compStart->getTime();
