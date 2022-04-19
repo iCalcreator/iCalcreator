@@ -107,11 +107,15 @@ trait REPEATtrait
      */
     public function isRepeatSet() : bool
     {
-        return ! empty( $this->repeat->value );
+        return ( ! empty( $this->repeat->value ) ||
+            (( null !== $this->repeat ) && ( 0 === $this->repeat->value )));
     }
 
     /**
      * Set calendar component property repeat
+     *
+     * .. defines the number of times an alarm should be repeated after its initial trigger.
+     * Default 0 (zero).
      *
      * @param null|int|string|Pc $value
      * @param null|mixed[]    $params
@@ -128,7 +132,7 @@ trait REPEATtrait
             $value->setEmpty();
         }
         else {
-            Util::assertInteger( $value->value, self::REPEAT );
+            Util::assertInteger( $value->value, self::REPEAT, 0 );
             $value->value = (int) $value->value;
         }
         $this->repeat = $value;

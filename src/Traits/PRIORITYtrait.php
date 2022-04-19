@@ -99,15 +99,23 @@ trait PRIORITYtrait
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.43 2022-04-15
      */
     public function isPrioritySet() : bool
     {
-        return ( ! empty( $this->priority->value ) || ( 0 === $this->priority->value ));
+        return ( ! empty( $this->priority->value ) ||
+            (( null !== $this->priority ) && ( 0 === $this->priority->value )));
     }
 
     /**
      * Set calendar component property priority
+     *
+     * .. an integer in the range 0 to 9.
+     * A value of 0 specifies an undefined priority.
+     * A value of 1 is the highest priority.
+     * A value of 2 is the second highest priority.
+     * Subsequent numbers specify a decreasing ordinal priority.
+     * A value of 9 is the lowest priority.
      *
      * @param null|int|string|Pc $value
      * @param null|mixed[]    $params
@@ -120,7 +128,7 @@ trait PRIORITYtrait
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
+        if(( $value->value === null ) || ( Util::$SP0 === $value->value )) {
             $this->assertEmptyValue( $value->value, self::PRIORITY );
             $value->setEmpty();
         }

@@ -102,15 +102,21 @@ trait SEQUENCEtrait
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.43 2022-04-15
      */
     public function isSequenceSet() : bool
     {
-        return ! empty( $this->sequence->value );
+        return ( ! empty( $this->sequence->value ) ||
+            (( null !== $this->sequence ) && ( 0 === $this->sequence->value )));
     }
 
     /**
      * Set calendar component property sequence
+     *
+     * When a calendar component is created, its sequence number is 0.
+     * It is monotonically incremented by the "Organizer's" CUA
+     * each time the "Organizer" makes a significant revision to the calendar component.
+     * Init 0 (zero)
      *
      * @param null|int|string|Pc $value
      * @param null|mixed[]    $params

@@ -81,10 +81,10 @@ trait EXRULEtrait
      * Get calendar component property exrule
      *
      * @param null|bool $inclParam
-     * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @return bool|array|Pc
+     * @since 2.41.41 2022-04-15
      */
-    public function getExrule( ?bool $inclParam = false ) : bool | string | Pc
+    public function getExrule( ? bool $inclParam = false ) : bool | array | Pc
     {
         if( empty( $this->exrule )) {
             return false;

@@ -114,10 +114,10 @@ trait REQUEST_STATUStrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|bool|Pc
-     * @since 2.41.36 2022-04-03
+     * @return bool|array|Pc
+     * @since 2.41.40 2022-04-15
      */
-    public function getRequeststatus( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
+    public function getRequeststatus( ? int $propIx = null, ? bool $inclParam = false ) : bool | array | Pc
     {
         if( empty( $this->requeststatus )) {
             unset( $this->propIx[self::REQUEST_STATUS] );

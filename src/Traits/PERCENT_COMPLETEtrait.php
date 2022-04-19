@@ -98,18 +98,23 @@ trait PERCENT_COMPLETEtrait
     }
 
     /**
-     * Return bool true if set (and ignore empty property)
+     * Return bool true if set
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.43 2022-04-15
      */
-    public function ispercentcompleteSet() : bool
+    public function isPercentcompleteSet() : bool
     {
-        return ( ! empty( $this->percentcomplete->value ) || ( 0 === $this->percentcomplete->value ));
+        return ( ! empty( $this->percentcomplete->value ) ||
+            (( null !== $this->percentcomplete ) && ( 0 === $this->percentcomplete->value )));
     }
 
     /**
      * Set calendar component property percent-complete
+     *
+     * .. a positive integer between 0 and
+     * 100.  A value of "0" indicates the to-do has not yet been started.
+     * A value of "100" indicates that the to-do has been completed.
      *
      * @param null|int|string|Pc  $value  0 accepted
      * @param null|mixed[]     $params
@@ -122,7 +127,7 @@ trait PERCENT_COMPLETEtrait
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
+        if(( $value->value === null ) || ( Util::$SP0 === $value->value )) {
             $this->assertEmptyValue( $value->value, self::PERCENT_COMPLETE );
             $value->setEmpty();
         }

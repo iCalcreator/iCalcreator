@@ -134,15 +134,19 @@ class Pc extends ArrayObject
     /**
      * Return all parameters (array) or single parameter key value, null if not exists
      *
-     * @param null|string $pKey
+     * @param null|string $pKey   paramter key
+     * @param bool $asXparamKey    only if not empty pKey, opt do X-prefix pkey
      * @return null|string|array
      */
-    public function getParams( ? string $pKey = null ) : null|string|array
+    public function getParams( ? string $pKey = null, ? bool $asXparamKey = false ) : null|string|array
     {
-        if( null !== $pKey ) {
-            return $this->hasParamKey( $pKey ) ? $this->params[strtoupper( $pKey )] : null;
+        if( null === $pKey ) {
+            return $this->params;
         }
-        return $this->params;
+        $pKey = $asXparamKey ? self::setXPrefix( $pKey ) : strtoupper( $pKey );
+        return $this->hasParamKey( $pKey )
+            ? $this->params[$pKey]
+            : null;
     }
 
     /**
@@ -288,18 +292,18 @@ class Pc extends ArrayObject
     protected static string $xPrefix = 'X-';
 
     /**
-     * Return bool true if value is X-Prefixed
+     * Return bool true if (key-)value is X-prefixed
      *
-     * @param string $value
+     * @param string $key
      * @return bool
      */
-    public static function isXprefixed( string $value ) : bool
+    public static function isXprefixed( string $key ) : bool
     {
-        return str_starts_with( strtoupper( $value ), self::$xPrefix );
+        return str_starts_with( strtoupper( $key ), self::$xPrefix );
     }
 
     /**
-     * Return X-prefixed string key in upper case
+     * Return X-prefixed key in upper case
      *
      * @param string $key
      * @return string
@@ -310,13 +314,13 @@ class Pc extends ArrayObject
     }
 
     /**
-     * Remove opt. leading x-prefix from value
+     * Return string with opt. leading x-prefix removed
      *
-     * @param string $value
+     * @param string $key
      * @return string
      */
-    public static function unsetXPrefix( string $value ) : string
+    public static function unsetXPrefix( string $key ) : string
     {
-        return self::isXprefixed( $value ) ? substr( $value, 2 ) : $value;
+        return self::isXprefixed( $key ) ? substr( $key, 2 ) : $key;
     }
 }

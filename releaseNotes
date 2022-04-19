@@ -229,6 +229,12 @@ v3.39   3.4 release candidate
           rewrite Vcalendar/Component::set<property> methods
           Vcalendar/Component::set<property> methods accepts Pc as first arg
 
-2.41.37   <component>::createAttendee() param format bug
+2.41.37   Component::createAttendee() param format bug
 2.41.38   Altered Freebusy::getFreebusy() output, fbBusyType now in params
 2.41.39   Multi-properties help methods moved to trait
+
+
+2.41.40   Component::getRequeststatus() bug, return array
+2.41.41   Component::getExrule() bug, return bool|array|Pc
+2.41.42   Pc::getParams() new arg (bool) asXparamkey
+2.41.43   int property value Component::is/set-mehods bug

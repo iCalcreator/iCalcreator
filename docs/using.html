@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.39 manual</title>
+    <title>iCalcreator 2.41.43 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.39">
+<meta name="description" content="using iCalcreator v2.41.43">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.39</p>
+<p class="header">iCalcreator v2.41.43</p>
 <p>
-iCalcreator v2.41.39<br>
+iCalcreator v2.41.43<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -369,12 +369,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.39/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.43/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.39</dt>
+    <dt>v2.41.43</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +383,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.39 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.43 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -473,6 +473,12 @@ Here are update headlines in this version.
         Component::createAttendee() param format bug<br>
         Changed Freebusy::getFreebusy() output, fbBusyType now in params<br>
         Multi-properties help methods moved to trait
+    </li>
+
+
+    <li>
+        fixed bugs: requestSstatus exRule, int properties<br>
+        Pc::getParams() new arg (bool) asXparamkey
     </li>
 
 </ul>
@@ -3199,7 +3205,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.39//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.43//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -3722,7 +3728,7 @@ Other string formats, acceptable by <em>PHP</em> strtotime function, may work.
     <a href="#VCALENDAR">VCALENDAR</a>
     <a href="#CALSCALE">CALSCALE</a>,
     <a href="#METHOD">METHOD</a> and
-    <a href="#VERSION">VERSION</a>) 
+    <a href="#VERSION">VERSION</a>)
     properties value and parameters
     are stored in a (class) Pc instance,
     changed from a PHP type array to an somewhat restricted ArrayObject extend class, Pc.
@@ -3762,7 +3768,7 @@ $event->setSummary( Pc::factory( $value, $params ));
 
 <dl>
     <dt><span class="format">Pc::factory( [ value [, params ]] )</span></dt>
-    <dd>Pc class factory method, static</dd>
+    <dd>Pc class factory (static) method</dd>
     <dd><span class="comment">value = mixed </span></dd>
     <dd><span class="comment">params = array </span></dd>
     <dd>Return class instance</dd>
@@ -3791,8 +3797,9 @@ $event->setSummary( Pc::factory( $value, $params ));
     <dt><span class="format">Pc::getParamKeys()</span></dt>
     <dd>Return array, property parameter keys (in uppercase)</dd>
 
-    <dt><span class="format">Pc::getParams( [ pKey ] )</span></dt>
+    <dt><span class="format">Pc::getParams( [ pKey [, asXparamKey ] ] )</span></dt>
     <dd><span class="comment">pKey = string, set to uppercase </span></dd>
+    <dd><span class="comment">asXparamKey = bool, opt do X-prefix pkey, default false </span></dd>
     <dd>Return all property parameters (key/value) assoc array or single parameter key value, null if not key exists</dd>
     <dd><br></dd>
 
@@ -3848,6 +3855,22 @@ $event->setSummary( Pc::factory( $value, $params ));
     <dd><span class="comment">overwrite = bool, default true </span></dd>
     <dd>Set property parameter X-key/value array, default overwrite (keys set to uppercase )</dd>
     <dd>Return class instance</dd>
+    <dd><br></dd>
+
+    <dt><span class="format">isXprefixed( key )</span></dt>
+    <dd>static method</dd>
+    <dd><span class="comment">key = string </span></dd>
+    <dd>Return bool true if key is X-Prefixed, otherwise false</dd>
+
+    <dt><span class="format">setXPrefix( key )</span></dt>
+    <dd>static method</dd>
+    <dd><span class="comment">key = string </span></dd>
+    <dd>Return (string) X-prefixed key in upper case</dd>
+
+    <dt><span class="format">unsetXPrefix( key )</span></dt>
+    <dd>static method</dd>
+    <dd><span class="comment">key = string </span></dd>
+    <dd>Return string with opt. leading x-prefix removed</dd>
 
 </dl>
 
@@ -10276,13 +10299,13 @@ catch( InvalidArgumentException $e ) {
     - Kigkonsult\Icalcreator\Vcalendar::X_LIC_LOCATION<br>
     are available.
 </p>
-
-
 <p>The value type is TEXT.</p>
-
+<p>Component, below, stands for <a href="#VCALENDAR">VCALENDAR</a> or any calendarComponent.</p>
 <p>
-    Component, below, stands for <a href="#VCALENDAR">VCALENDAR</a> or any calendarComponent. 
+    Note <a href="#propValueParam">Pc</a>::isXprefixed() / setXPrefix() / unsetXPrefix()
+    (last) key utility (static) methods.
 </p>
+
 
 <h5>Create X-PROPERTY</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise empty string.</p>
@@ -10859,7 +10882,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.39
+<tr><td>Version  <td>2.41.43
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

@@ -174,9 +174,10 @@ class IntegerTest extends DtBase
         $c       = new Vcalendar();
         $pcInput = false;
         foreach( $propComps as $propName => $theComps ) {
-            $getMethod    = StringFactory::getGetMethodName( $propName );
             $createMethod = StringFactory::getCreateMethodName( $propName );
             $deleteMethod = StringFactory::getDeleteMethodName( $propName );
+            $getMethod    = StringFactory::getGetMethodName( $propName );
+            $isMethod     = StringFactory::getIsMethodSetName( $propName );
             $setMethod    = StringFactory::getSetMethodName( $propName );
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
@@ -186,6 +187,10 @@ class IntegerTest extends DtBase
                 else {
                     $comp      = $c->{$newMethod}();
                 }
+                $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, '1 ', $case, __FUNCTION__, $theComp, $isMethod )
+                );
                 try {
                     $comp->{$setMethod}( $value, $params );
                 }
@@ -199,7 +204,13 @@ class IntegerTest extends DtBase
                     }
                     $this->assertTrue( $ok );
                     return;
-                }
+                } // end catch
+                $this->assertSame(
+                    ((( IcalInterface::SEQUENCE === $propName ) || // empty input updates seq.
+                        ( ! empty( $value ) || (( null !== $value ) && ( 0 === $value ))))),
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, '2 ', $case, __FUNCTION__, $theComp, $isMethod ) . ' ' . var_export( $value, true )
+                );
                 $getValue = $comp->{$getMethod}( true );
                 if(( empty( $getValue->value ) && IcalInterface::SEQUENCE === $propName )) {
                     $expectedGet->value  = 0;
@@ -208,17 +219,21 @@ class IntegerTest extends DtBase
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '3 ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case, __FUNCTION__, $theComp, $createMethod )
+                    sprintf( self::$ERRFMT, '4 ', $case, __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, '5 (after delete) ', $case, __FUNCTION__, $theComp, $isMethod )
+                );
+                $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, ' 6 (after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
 
                 if( $pcInput ) {
@@ -228,9 +243,8 @@ class IntegerTest extends DtBase
                     $comp->{$setMethod}( $value, $params );
                 }
                 $pcInput = ! $pcInput;
-
-            } // end foreach
-        } // end foreach
+            } // end foreach  component
+        } // end foreach,  $propName => $theComps
 
         $this->parseCalendarTest( $case, $c, $expectedString );
     }
