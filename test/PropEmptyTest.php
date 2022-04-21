@@ -37,25 +37,39 @@ class PropEmptyTest extends DtBase
      *
      * @test
      * @throws Exception
+     * @since 2.41.44 2022-04-21
      */
     public function emptyTest5() : void
     {
         $c = Vcalendar::factory()
-                      ->setCalscale( 'gregorian' )
-                      ->setMethod( 'testing' )
-                      ->setXprop( 'X-vcalendar-empty' )
+            ->setCalscale( 'gregorian' )
+            ->setMethod( 'testing' )
+            ->setXprop( 'X-vcalendar-empty' )
 
-                      ->setUid()
-                      ->setLastmodified()
-                      ->setUrl()
-                      ->setRefreshinterval()
-                      ->setSource()
-                      ->setColor()
+            ->setUid()
+            ->setLastmodified()
+            ->setUrl()
+            ->setRefreshinterval()
+            ->setSource()
+            ->setColor()
 
-                      ->setName()
-                      ->setDescription()
-                      ->setCategories()
-                      ->setImage();
+            ->setName()
+            ->setDescription()
+            ->setCategories()
+            ->setImage();
+
+        $tz = $c->newVtimezone()
+            ->setComment()
+            ->setDtstart()
+            ->setRdate()
+            ->setRrule()
+            ->setTzid()
+            ->setTzname()
+            ->setTzoffsetfrom()
+            ->setTzoffsetto()
+            ->setTzuntil()
+            ->setTzurl()
+            ->setTzidAliasOf();
 
         $o1 = $c->newVevent()
                ->setClass()

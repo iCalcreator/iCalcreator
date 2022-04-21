@@ -43,7 +43,7 @@ use SimpleXMLElement;
 /**
  * class DtBase
  *
- * @since 2.41.4 2021-01-18
+ * @since 2.41.44 2022-04-21
  */
 class DtBase extends TestCase
 {
@@ -59,6 +59,7 @@ class DtBase extends TestCase
      * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
+     * @since 2.41.44 2022-04-21
      */
     public function theTestMethod(
         int    $case,
@@ -70,7 +71,7 @@ class DtBase extends TestCase
     ) : void
     {
         $c       = new Vcalendar();
-        $pcInput = false;
+        $pcInput = $firstLastmodifiedLoad = false;
         foreach( $compsProps as $theComp => $props ) {
             $newMethod = 'new' . $theComp;
             $comp = match ( true ) {
@@ -83,13 +84,32 @@ class DtBase extends TestCase
                 $createMethod = StringFactory::getCreateMethodName( $propName );
                 $deleteMethod = StringFactory::getDeleteMethodName( $propName );
                 $getMethod    = StringFactory::getGetMethodName( $propName );
+                $isMethod     = StringFactory::getIsMethodSetName( $propName );
                 $setMethod    = StringFactory::getSetMethodName( $propName );
                 if( IcalInterface::LAST_MODIFIED === $propName ) {
+                    if( ! $firstLastmodifiedLoad ) {
+                        $this->assertFalse(
+                            $c->{$isMethod}(),
+                            sprintf( self::$ERRFMT, null, $case . '-110', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
+                            . PHP_EOL . $c->createCalendar() // test ###
+                        );
+                    }
                     $c->setLastmodified( $value, $params );
-                }
+                    $firstLastmodifiedLoad = true;
+                    $this->assertTrue(
+                        $c->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-111', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
+                    );
+                } // end if last-mod...
 
 //   echo PHP_EOL . __FUNCTION__ . ' #' . $case . ' start <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
 
+                if( $propName !== IcalInterface::DTSTAMP ) {
+                    $this->assertFalse(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-112', __FUNCTION__, $theComp, $isMethod )
+                    );
+                }
                 if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true ) ) {
                     $comp->{$setMethod}( [ $value ], $params );
                     $getValue = $comp->{$getMethod}( null, true );
@@ -104,13 +124,19 @@ class DtBase extends TestCase
                     $comp->{$setMethod}( $value, $params );
                     $getValue = $comp->{$getMethod}( true );
                 } // end else
+                if( null !== $value ) {
+                    $this->assertTrue(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-113', __FUNCTION__, $theComp, $isMethod )
+                    );
+                }
 
                 if( $expectedGet->value instanceof DateTime && $getValue->value instanceof DateTime ) {
                     $getValue->removeParam( Util::$ISLOCALTIME );
                     $this->assertEquals(
                         $expectedGet->params,
                         $getValue->params,
-                        sprintf( self::$ERRFMT, null, $case . '-11a', __FUNCTION__, $theComp, $getMethod )
+                        sprintf( self::$ERRFMT, null, $case . '-114', __FUNCTION__, $theComp, $getMethod )
                     );
                     $fmt = match ( true ) {
                         $expectedGet->hasParamValue( IcalInterface::DATE )
@@ -122,25 +148,33 @@ class DtBase extends TestCase
                     $this->assertEquals(
                         $expectedGet->value->format( $fmt ),
                         $getValue->value->format( $fmt ),
-                        sprintf( self::$ERRFMT, null, $case . '-11b', __FUNCTION__, $theComp, $getMethod )
+                        sprintf( self::$ERRFMT, null, $case . '-115', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case . '-12', __FUNCTION__, $theComp, $createMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-116', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 if( IcalInterface::DTSTAMP === $propName ) {
+                    $this->assertTrue(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-117', __FUNCTION__, $theComp, $isMethod )
+                    );
                     $this->assertNotFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-13', __FUNCTION__, $theComp, $getMethod )
+                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-118', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 else {
                     $this->assertFalse(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-119', __FUNCTION__, $theComp, $isMethod )
+                    );
+                    $this->assertFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-14', __FUNCTION__, $theComp, $getMethod )
+                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-120', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 if( $pcInput ) {
@@ -148,6 +182,12 @@ class DtBase extends TestCase
                 }
                 else {
                     $comp->{$setMethod}( $value, $params );
+                }
+                if( null !== $value ) {
+                    $this->assertTrue(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-121', __FUNCTION__, $theComp, $isMethod )
+                    );
                 }
                 $pcInput = ! $pcInput;
             } // end foreach

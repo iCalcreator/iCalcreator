@@ -566,6 +566,7 @@ class DateTimeUTCTest extends DtBase
      * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
+     * @since 2.41.44 2022-04-21
      */
     public function testDateTime11( int $case, mixed $value, mixed $params, Pc $expectedGet, string $expectedString ) : void
     {
@@ -574,7 +575,7 @@ class DateTimeUTCTest extends DtBase
             IcalInterface::VTODO         => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED, IcalInterface::COMPLETED ],
             IcalInterface::VJOURNAL      => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
             IcalInterface::VFREEBUSY     => [ IcalInterface::DTSTAMP, IcalInterface::DTSTART ],
-            IcalInterface::VTIMEZONE     => [ IcalInterface::LAST_MODIFIED ],
+            IcalInterface::VTIMEZONE     => [ IcalInterface::LAST_MODIFIED , IcalInterface::TZUNTIL ],
             IcalInterface::PARTICIPANT   => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
             IcalInterface::AVAILABLE     => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],
             IcalInterface::VAVAILABILITY => [ IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED, IcalInterface::CREATED ],

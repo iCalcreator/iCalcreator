@@ -41,7 +41,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 /**
  * TZUNTIL property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.44 2022-04-21
  */
 trait TZUNTILrfc7808trait
 {
@@ -56,14 +56,14 @@ trait TZUNTILrfc7808trait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.44 2022-04-21
      */
     public function createTzuntil() : string
     {
         if( empty( $this->tzuntil )) {
             return self::$SP0;
         }
-        if( empty( $this->action->value )) {
+        if( empty( $this->tzuntil->value )) {
             return $this->createSinglePropEmpty( self::TZUNTIL );
         }
         return StringFactory::createElement(
@@ -112,14 +112,14 @@ trait TZUNTILrfc7808trait
     }
 
     /**
-     * Set calendar component property last-modified
+     * Set calendar component property TZUNTIL, datetime UTC
      *
      * @param null|string|Pc|DateTimeInterface  $value
      * @param null|mixed[]   $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.44 2022-04-21
      */
     public function setTzuntil(
         null | string | Pc | DateTimeInterface $value = null,
@@ -129,10 +129,14 @@ trait TZUNTILrfc7808trait
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->addParamValue( self::DATE_TIME ); // req
-        $this->tzuntil = empty( $value->value )
-            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
-            : DateTimeFactory::setDate( $value, true ); // $forceUTC
+        if( empty( $value->value )) {
+            $this->assertEmptyValue( $value->value, self::TZUNTIL );
+            $this->tzuntil = $value->setEmpty();
+        }
+        else {
+            $value->addParamValue( self::DATE_TIME ); // req
+            $this->tzuntil = DateTimeFactory::setDate( $value, true ); // force UTC
+        }
         return $this;
     }
 }
