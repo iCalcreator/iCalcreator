@@ -43,8 +43,8 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class DateTzTest extends DtBase
 {
-    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-    private static array $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
+    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    private   static array  $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
 
     /**
      * set and restore local timezone from const

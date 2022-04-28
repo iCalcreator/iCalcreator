@@ -39,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\RexdateFactory;
 /**
  * EXDATE property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.46 2022-04-27
  */
 trait EXDATEtrait
 {
@@ -92,22 +92,23 @@ trait EXDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @return bool|string|array|Pc
+     * @since 2.41.46 2022-04-27
      */
-    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
+    public function getExdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array | Pc
     {
         if( empty( $this->exdate )) {
             unset( $this->propIx[self::EXDATE] );
             return false;
         }
-        return self::getMvalProperty(
+        $output = self::getMvalProperty(
             $this->exdate,
             self::EXDATE,
             $this,
             $propIx,
             $inclParam
         );
+        return empty( $output ) ? false : $output;
     }
 
     /**
@@ -130,7 +131,7 @@ trait EXDATEtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.46 2022-04-27
      */
     public function setExdate(
         null|string|array|DateTimeInterface|Pc $value = null,
@@ -138,14 +139,13 @@ trait EXDATEtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value ) ||
-            ( is_array( $value->value ) && ( 1 === count( $value->value )) && empty( reset( $value->value )))) {
+        $value        = self::marshallInputMval( $value, $params, $index );
+        $value->value = self::checkSingleExdates( $value->value );
+        if( empty( $value->value )) {
             $this->assertEmptyValue( $value->value, self::EXDATE );
             $value->setEmpty();
         }
         else {
-            $value->value = self::checkSingleExdates( $value->value );
             $value = RexdateFactory::prepInputExdate( $value );
         }
         self::setMval( $this->exdate, $value, $index );
@@ -153,20 +153,43 @@ trait EXDATEtrait
     }
 
     /**
-     * Return $value is single input
+     * Return $value as array of single (date) inputs
      *
-     * @param DateTimeInterface|string|DateTimeInterface[]|string[] $value
-     * @return string|mixed[]
-     * @since 2.29.16 2020-01-24
+     * Accepts only (array) DateTimeInterface/string-date OR empty
+     *
+     * @param null|string|DateTimeInterface|DateTimeInterface[]|string[] $value
+     * @return mixed[]
+     * @throws InvalidArgumentException
+     * @since 2.41.46 2022-04-27
      */
-    private static function checkSingleExdates( array | DateTimeInterface | string $value ) : string|array
+    private static function checkSingleExdates( null|string|array|DateTimeInterface $value ) : array
     {
-        if( $value instanceof DateTimeInterface ) {
+        if( empty( $value )) {
+            return [];
+        }
+        if(( $value instanceof DateTimeInterface ) ||
+            DateTimeFactory::isStringAndDate( $value )) {
             return [ $value ];
         }
-        if( DateTimeFactory::isStringAndDate( $value )) {
-            return [ $value ];
+        if( is_array( $value )) {
+            $output = [];
+            foreach( $value as $x => $value2 ) {
+                if( empty( $value2 )) {
+                    continue;
+                }
+                if(( $value2 instanceof DateTimeInterface ) || DateTimeFactory::isStringAndDate( $value2 )) {
+                    $output[] = $value2;
+                    continue;
+                }
+                throw new InvalidArgumentException(
+                    sprintf( RexdateFactory::$REXDATEERR, self::EXDATE, $x, var_export( $value2, true )
+                    )
+                );
+            }
+            return $output;
         }
-        return $value;
+        throw new InvalidArgumentException(
+            sprintf( RexdateFactory::$REXDATEERR,self::EXDATE, 10, var_export( $value, true ))
+        );
     }
 }

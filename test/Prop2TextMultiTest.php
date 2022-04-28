@@ -52,7 +52,7 @@ class Prop2TextMultiTest extends DtBase
     /**
      * @var string
      */
-    private static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
+    protected static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
 
     /**
      * @var array|string[]

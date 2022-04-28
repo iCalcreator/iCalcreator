@@ -44,7 +44,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 class DateTimeUTCTest extends DtBase
 {
 
-    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
 
     /**
      * set and restore local timezone from const

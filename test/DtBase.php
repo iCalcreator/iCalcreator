@@ -43,11 +43,11 @@ use SimpleXMLElement;
 /**
  * class DtBase
  *
- * @since 2.41.44 2022-04-21
+ * @since 2.41.44 2022-04-27
  */
 class DtBase extends TestCase
 {
-    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
 
     /**
      * The test method, case prefix '-1x'
@@ -110,7 +110,7 @@ class DtBase extends TestCase
                         sprintf( self::$ERRFMT, null, $case . '-112', __FUNCTION__, $theComp, $isMethod )
                     );
                 }
-                if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true ) ) {
+                if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true )) {
                     $comp->{$setMethod}( [ $value ], $params );
                     $getValue = $comp->{$getMethod}( null, true );
                     if( ! empty( $getValue->value )) {
@@ -190,14 +190,14 @@ class DtBase extends TestCase
                     );
                 }
                 $pcInput = ! $pcInput;
-            } // end foreach
-        } // end foreach
+            } // end foreach  .. => propName
+        } // end foreach  comp => props
 
         $this->parseCalendarTest( $case, $c, $expectedString, $theComp, $propName );
     }
 
     /**
-     * The test method 1b, single EXDATE + RDATE, case prefix '-1bx'
+     * The test method 1b, single EXDATE + RDATE, case prefix '-1bx' also multi EXDATE + RDATE
      *
      * @param int|string $case
      * @param array      $compsProps
@@ -207,7 +207,7 @@ class DtBase extends TestCase
      * @param string     $expectedString
      * @throws Exception
      */
-    public function theTestMethod1b(
+    public function exdateRdateSpecTest(
         int | string $case,
         array        $compsProps,
         mixed        $value,
@@ -269,7 +269,7 @@ class DtBase extends TestCase
                     }
                     $expGet = $expVal->format( $fmt );
                     $getVal = reset( $getValue->value );
-                    while( is_array( $getVal ) && ! $getVal instanceof DateTime ) {
+                    while( is_array( $getVal ) && ! $getVal instanceof DateTime ) { // exDate/Rdate
                         $getVal = reset( $getVal );
                     }
                     $getVal = $getVal->format( $fmt );
@@ -302,8 +302,8 @@ class DtBase extends TestCase
                     );
                 }
                 $comp->{$setMethod}( $value, $params );
-                if( ! empty( $value ) ) {
-                    $comp->{$setMethod}( [ $value, $value ], $params );
+                if( ! empty( $value ) && ! is_array( $value )) {
+                    $comp->{$setMethod}( [ $value, $value ], $params ); // set aray of (single) values
                 }
             } // end foreach
         } // end foreach

@@ -239,4 +239,8 @@ v3.39   3.4 release candidate
 2.41.42   Pc::getParams() new arg (bool) asXparamkey
 2.41.43   int property value Component::is/set-mehods bug
 
-2.42.44   github::#101, Tzuntil trait bug and upd logic
+2.41.44   github::#101, Tzuntil trait bug and upd logic
+
+
+2.41.45   github::#99,  SelectFactoy::selectComponents() bug
+2.41.46   github::#100, Component::getExdate() bug, return bool|array|Pc

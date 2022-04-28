@@ -55,7 +55,7 @@ use function usort;
 /**
  * iCalcreator geo support class
  *
- * @since  2.40.9 - 2021-12-02
+ * @since  2.41.45 - 2022-04-27
  */
 class SelectFactory
 {
@@ -106,7 +106,7 @@ class SelectFactory
      * @return mixed[]|bool    false on select error
      * @throws RuntimeException
      * @throws Exception
-     * @since  2.41.36 - 2022-04-03
+     * @since  2.41.45 - 2022-04-27
      */
     public static function selectComponents(
         Vcalendar                        $calendar,
@@ -175,12 +175,10 @@ class SelectFactory
                  ( false === ( $prop = $component->getDue( true ))))) {
                 continue;
             }
-            $compStart = UtilDateTime::factory( $prop->value, $prop->params );
-            $dtStartTz = $compStart->getTimezoneName();
-            if( $prop->hasParamValue( Vcalendar::DATE )) {
-                $compStartHis = null;
-            }
-            else {
+            $compStart    = UtilDateTime::factory( $prop->value, $prop->params );
+            $dtStartTz    = $compStart->getTimezoneName();
+            $compStartHis = Util::$SP0;
+            if( ! $prop->hasParamValue( Vcalendar::DATE )) {
                 $his          = $compStart->getTime();
                 $compStartHis = sprintf( $HIS, $his[0], $his[1], $his[2] );
             }

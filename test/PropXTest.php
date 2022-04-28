@@ -37,7 +37,7 @@ class PropXTest extends DtBase
     /*
      *
      */
-    private static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
+    protected static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
 
     /**
      * @var string[]

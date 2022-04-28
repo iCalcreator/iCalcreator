@@ -49,14 +49,14 @@ use function var_export;
 /**
  * iCalcreator EXDATE/RDATE support class
  *
- * @since 2.29.16 2020-01-24
+ * @since 2.41.44 2022-04-27
  */
 class RexdateFactory
 {
     /**
      * @var string
      */
-    private static string $REXDATEERR = 'Unknown %s value (#%d) : %s';
+    public static string $REXDATEERR = 'Unknown %s value (#%d) : %s';
 
     /**
      * Return formatted output for calendar component property data value type recur
@@ -117,7 +117,7 @@ class RexdateFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.44 2022-04-27
      */
     public static function prepInputExdate( Pc $pc ) : Pc
     {

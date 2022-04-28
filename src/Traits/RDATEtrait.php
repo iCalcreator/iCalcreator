@@ -45,7 +45,7 @@ use function reset;
 /**
  * RDATE property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.44 2022-04-27
  */
 trait RDATEtrait
 {
@@ -98,9 +98,9 @@ trait RDATEtrait
      *
      * @param null|int    $propIx specific property in case of multiply occurrence
      * @param null|bool   $inclParam
-     * @return string|bool|array|Pc
+     * @return bool|string|array|Pc
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.44 2022-04-27
      */
     public function getRdate( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | array | Pc
     {
@@ -115,10 +115,7 @@ trait RDATEtrait
             $propIx,
             $inclParam
         );
-        if( empty( $output )) {
-            return false;
-        }
-        return $output;
+        return empty( $output ) ? false : $output;
     }
 
     /**

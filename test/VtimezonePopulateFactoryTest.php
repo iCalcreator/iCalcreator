@@ -45,7 +45,7 @@ class VtimezonePopulateFactoryTest extends DtBase
     /**
      * @var string
      */
-    private static string $ERRFMT = "%s Error in case #%s, %s, exp %s, got %s";
+    protected static string $ERRFMT = "%s Error in case #%s, %s, exp %s, got %s";
 
     /**
      * @var array|string[]

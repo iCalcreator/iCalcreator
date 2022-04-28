@@ -29,6 +29,7 @@
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
+use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -200,7 +201,7 @@ class DateTest extends DtBase
             $dateTime,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
             Pc::factory(
-                $dateTime,
+                clone $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
             $this->getDateTimeAsCreateShortString( $dateTime )
@@ -212,7 +213,7 @@ class DateTest extends DtBase
             $dateTime,
             [ IcalInterface::VALUE => IcalInterface::DATE ],
             Pc::factory(
-                $dateTime,
+                clone $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
             $this->getDateTimeAsCreateShortString( $dateTime )
@@ -224,10 +225,10 @@ class DateTest extends DtBase
             $dateTime,
             [],
             Pc::factory(
-                $dateTime,
+                clone $dateTime,
                 [ IcalInterface::TZID => LTZ ]
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime, LTZ)
+            $this->getDateTimeAsCreateLongString( clone $dateTime, LTZ)
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmd );
@@ -334,6 +335,185 @@ class DateTest extends DtBase
 //      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
 
         $this->theTestMethod( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
-        $this->theTestMethod1b( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
+        $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
+    }
+
+    /**
+     * testRexDATE provider
+     *
+     * @return mixed[]
+     * @throws Exception
+     */
+    public function RexDATEProvider() : array
+    {
+        date_default_timezone_set( LTZ );
+
+        $dataArr = [];
+
+        $dateTime  = DateTimeFactory::factory( DATEYmd );
+        $dataArr[] = [ // test set #101 DateTime
+            101,
+            [ clone $dateTime, clone $dateTime ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
+            $this->getDateTimeAsCreateShortString( clone $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+        ];
+
+        $dateTime  = DateTimeFactory::factory( DATEYmdTHis );
+        $dataArr[] = [ // test set #102 DateTime
+            102,
+            [ clone $dateTime, clone $dateTime ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
+            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+        ];
+
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
+        $dataArr[] = [ // test set #103 DateTime
+            103,
+            [ clone $dateTime, clone $dateTime ],
+            [],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                [ IcalInterface::TZID => LTZ ]
+            ),
+            $this->getDateTimeAsCreateLongString( clone $dateTime, LTZ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
+        ];
+
+        $dateTime  = DateTimeFactory::factory( DATEYmd );
+        $dateTime2 = DateTimeFactory::factory( DATEYmd, IcalInterface::UTC );
+        $dataArr[] = [ // test set #114 string
+            114,
+            [ DATEYmd, DATEYmd ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
+            Pc::factory(
+                [ (clone $dateTime2), (clone $dateTime2) ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
+            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+        ];
+
+
+        $dateTime  = DateTimeFactory::factory( DATEYmdTHis );
+        $dateTime2 = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
+        $dataArr[] = [ // test set #115 string
+            115,
+            [ DATEYmdTHis, DATEYmdTHis ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
+            Pc::factory(
+                [ (clone $dateTime2), (clone $dateTime2) ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
+            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+        ];
+
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
+        $dataArr[] = [ // test set #116 string
+            116,
+            [ DATEYmdTHis, DATEYmdTHis ],
+            [],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                [ Util::$ISLOCALTIME => true ]
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
+        ];
+
+
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
+        $dataArr[] = [ // test set #117 string
+            117,
+            [ DATEYmdTHis . 'Z', DATEYmdTHis . 'Z' ],
+            [ IcalInterface::VALUE => IcalInterface::DATE ],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ]
+            ),
+            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+        ];
+
+        $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
+        $dataArr[] = [ // test set #118 string
+            118,
+            [ DATEYmdTHis . 'Z', DATEYmdTHis . 'Z' ],
+            [],
+            Pc::factory(
+                [ clone $dateTime, clone $dateTime ],
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC ) .
+            ',' . $dateTime->format( DateTimeFactory::$YmdTHis ) . 'Z'
+        ];
+
+        $dateTime  = DateTimeFactory::factory( '20160305' );
+        for( $x = 1; $x < 10; $x++ ) {
+            $dateTime2 = DateTimeFactory::factory( $dateTime->format( DateTimeFactory::$YmdTHis ), IcalInterface::UTC );
+            $dataArr[] = [ // test set #101 DateTime
+                200 + $x,
+                [ $dateTime->format( 'Ymd' ), $dateTime->format( 'Ymd' ) ],
+                [ IcalInterface::VALUE => IcalInterface::DATE ],
+                Pc::factory(
+                    [ (clone $dateTime2), (clone $dateTime2) ],
+                    [ IcalInterface::VALUE => IcalInterface::DATE ]
+                ),
+                $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            ];
+            $dateTime->modify( '-1 day ' );
+        } // end for
+
+        return $dataArr;
+    }
+
+    /**
+     * Testing VALUE DATE (multi) EXDATE + RDATE
+     *
+     * @test
+     * @dataProvider RexDATEProvider
+     * @param int     $case
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param Pc      $expectedGet
+     * @param string  $expectedString
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function testRexDATE(
+        int    $case,
+        mixed  $value,
+        mixed  $params,
+        Pc     $expectedGet,
+        string $expectedString
+    ) : void
+    {
+        $c         = new Vcalendar();
+        foreach( self::$compsProps2 as $theComp => $props ) {
+            $newMethod = 'new' . $theComp;
+            if( IcalInterface::AVAILABLE === $theComp ) {
+                $comp = $c->newVavailability()->{$newMethod}();
+            }
+            else {
+                $comp = $c->{$newMethod}();
+            }
+            foreach( $props as $propName ) {
+                $getMethod = StringFactory::getGetMethodName( $propName );
+                $setMethod = StringFactory::getSetMethodName( $propName );
+                $comp->{$setMethod}( $value, $params );
+                $getValue = $comp->{$getMethod}( null, true );
+                $this->assertEquals(
+                    $expectedGet,
+                    $getValue,
+                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case, __FUNCTION__, $theComp, $getMethod )
+                    . PHP_EOL . 'expectedGet : ' . var_export( $expectedGet, true )
+                    . PHP_EOL . 'getValue    : ' . var_export( $getValue, true )
+                );
+            } // end foreach  propName
+        } // end foreach
+        $this->parseCalendarTest( $case, $c, $expectedString );
     }
 }

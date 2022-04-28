@@ -47,7 +47,7 @@ class IntegerTest extends DtBase
     /**
      * @var string
      */
-    private static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
 
     /**
      * @var string[]

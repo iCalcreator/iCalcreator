@@ -31,10 +31,10 @@ namespace Kigkonsult\Icalcreator;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * class DateTimeTest, testing DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
@@ -308,7 +308,7 @@ class DateTimeTest extends DtBase
      * @dataProvider DateTime1Provider
      *
      * @param int     $case
-     * @param mixed   $value
+     * @param null|DateTimeInterface   $value
      * @param mixed   $params
      * @param Pc      $expectedGet
      * @param string  $expectedString
@@ -316,39 +316,54 @@ class DateTimeTest extends DtBase
      */
     public function testDateTime1(
         int    $case,
-        mixed  $value,
+        ? DateTimeInterface $value,
         mixed  $params,
         Pc     $expectedGet,
         string $expectedString
     ) : void
     {
-        $expectedGet2 = empty( $value )
-            ? []
-            : Pc::factory(
-                [ clone $expectedGet->value, new DateInterval( 'P1D' ) ],
-                $expectedGet->params + [ IcalInterface::VALUE => IcalInterface::PERIOD ]
-            );
-
         foreach( self::$propsCompsProps as $compsProps ) {
             $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         }
 
-        $this->theTestMethod1b( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
+        $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
         if( empty( $value )) {
             return;
         }
-        $value          = [ $value, 'P1D' ];
-        $params         = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
-        $expectedString = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
-        $this->theTestMethod1b(
+        $value2       = [ $value, 'P1D' ];
+        $params2      = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
+        $expectedGet2 =  Pc::factory(
+            [ clone $expectedGet->value, new DateInterval( 'P1D' ) ],
+            $expectedGet->params + [ IcalInterface::VALUE => IcalInterface::PERIOD ]
+        );
+        $expectedString2 = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
+        $this->exdateRdateSpecTest(
             $case . 'P',
             [
                 IcalInterface::VEVENT => [ IcalInterface::RDATE ]
             ],
-            $value,
-            $params,
+            $value2,
+            $params2,
             $expectedGet2,
-            $expectedString
+            $expectedString2
+        );
+
+        $value3          = [ $value, $value ];
+        $expectedGet3    = Pc::factory(
+            [ $expectedGet->value, $expectedGet->value ],
+            $expectedGet->params
+        );
+        $zExt = ( 'Z' === substr( $expectedString, -1 )) ? 'Z' : '';
+        $expectedString3 = $expectedString . ',' . $expectedGet->value->format( DateTimeFactory::$YmdTHis ) . $zExt;
+        $this->exdateRdateSpecTest(
+            $case . 'M',
+            [
+                IcalInterface::VEVENT => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
+            ],
+            $value3,
+            $params,
+            $expectedGet3,
+            $expectedString3
         );
     }
 
@@ -674,26 +689,44 @@ class DateTimeTest extends DtBase
             $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         }
 
-        $this->theTestMethod1b( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
+        $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
         if( empty( $value )) {
             return;
         }
-        $value          = [ $value, 'P1D' ];
-        $params         = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
-        $expectedGet    = Pc::factory(
+        $value2          = [ $value, 'P1D' ];
+        $params2         = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
+        $expectedGet2    = Pc::factory(
             [ $expectedGet->value, new DateInterval( 'P1D' ) ],
             $expectedGet->params + [ IcalInterface::VALUE => IcalInterface::PERIOD ]
         );
-        $expectedString = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
-        $this->theTestMethod1b(
+        $expectedString3 = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
+        $this->exdateRdateSpecTest(
             $case . 'P',
             [
                 IcalInterface::VEVENT => [ IcalInterface::RDATE ]
             ],
-            $value,
+            $value2,
+            $params2,
+            $expectedGet2,
+            $expectedString3
+        );
+
+        $value3          = [ $value, $value ];
+        $expectedGet3    = Pc::factory(
+            [ $expectedGet->value, $expectedGet->value ],
+            $expectedGet->params
+        );
+        $zExt = ( 'Z' === substr( $expectedString, -1 )) ? 'Z' : '';
+        $expectedString3 = $expectedString . ',' . $expectedGet->value->format( DateTimeFactory::$YmdTHis ) . $zExt;
+        $this->exdateRdateSpecTest(
+            $case . 'M',
+            [
+                IcalInterface::VEVENT => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
+            ],
+            $value3,
             $params,
-            $expectedGet,
-            $expectedString
+            $expectedGet3,
+            $expectedString3
         );
     }
 
@@ -1002,26 +1035,44 @@ class DateTimeTest extends DtBase
             $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         }
 
-        $this->theTestMethod1b( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
+        $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
         if( empty( $value )) {
             return;
         }
-        $value          = [ $value, 'P1D' ];
-        $params         = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
-        $expectedGet    = Pc::factory(
+        $value2          = [ $value, 'P1D' ];
+        $params2         = [ IcalInterface::VALUE => IcalInterface::PERIOD ] + $params;
+        $expectedGet2    = Pc::factory(
             [ $expectedGet->value, new DateInterval( 'P1D' ) ],
             $expectedGet->params + [ IcalInterface::VALUE => IcalInterface::PERIOD ]
         );
-        $expectedString = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
-        $this->theTestMethod1b(
+        $expectedString2 = ';' . IcalInterface::VALUE . '=' . IcalInterface::PERIOD . $expectedString . '/P1D';
+        $this->exdateRdateSpecTest(
             $case . 'P',
             [
                 IcalInterface::VEVENT => [ IcalInterface::RDATE ]
             ],
-            $value,
+            $value2,
+            $params2,
+            $expectedGet2,
+            $expectedString2
+        );
+
+        $value3          = [ $value, $value ];
+        $expectedGet3    = Pc::factory(
+            [ $expectedGet->value, $expectedGet->value ],
+            $expectedGet->params
+        );
+        $zExt = ( 'Z' === substr( $expectedString, -1 )) ? 'Z' : '';
+        $expectedString3 = $expectedString . ',' . $expectedGet->value->format( DateTimeFactory::$YmdTHis ) . $zExt;
+        $this->exdateRdateSpecTest(
+            $case . 'M',
+            [
+                IcalInterface::VEVENT => [ IcalInterface::EXDATE, IcalInterface::RDATE ]
+            ],
+            $value3,
             $params,
-            $expectedGet,
-            $expectedString
+            $expectedGet3,
+            $expectedString3
         );
     }
 }
