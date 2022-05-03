@@ -110,12 +110,12 @@ class DateTimeTest extends DtBase
     ];
 
     /**
-     * testDateTime1 provider
+     * dateTimeTest1 provider
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function DateTime1Provider() : array
+    public function dateTimeTest1Provider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -305,7 +305,7 @@ class DateTimeTest extends DtBase
      * Testing VALUE DATE-TIME with DateTimeInterface, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
      *
      * @test
-     * @dataProvider DateTime1Provider
+     * @dataProvider dateTimeTest1Provider
      *
      * @param int     $case
      * @param null|DateTimeInterface   $value
@@ -314,7 +314,7 @@ class DateTimeTest extends DtBase
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDateTime1(
+    public function dateTimeTest1(
         int    $case,
         ? DateTimeInterface $value,
         mixed  $params,
@@ -323,7 +323,7 @@ class DateTimeTest extends DtBase
     ) : void
     {
         foreach( self::$propsCompsProps as $compsProps ) {
-            $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+            $this->thePropTest( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         }
 
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
@@ -353,7 +353,7 @@ class DateTimeTest extends DtBase
             [ $expectedGet->value, $expectedGet->value ],
             $expectedGet->params
         );
-        $zExt = ( 'Z' === substr( $expectedString, -1 )) ? 'Z' : '';
+        $zExt = ( str_ends_with( $expectedString, 'Z' ) ) ? 'Z' : '';
         $expectedString3 = $expectedString . ',' . $expectedGet->value->format( DateTimeFactory::$YmdTHis ) . $zExt;
         $this->exdateRdateSpecTest(
             $case . 'M',
@@ -368,12 +368,12 @@ class DateTimeTest extends DtBase
     }
 
     /**
-     * testDateTime7 provider
+     * dateTimeTest7 provider
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function DateTime7Provider() : array
+    public function dateTimeTest7Provider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -669,7 +669,7 @@ class DateTimeTest extends DtBase
      * Testing VALUE DATE-TIME with full string datetime, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
      *
      * @test
-     * @dataProvider DateTime7Provider
+     * @dataProvider dateTimeTest7Provider
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
@@ -677,7 +677,7 @@ class DateTimeTest extends DtBase
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDateTime7(
+    public function dateTimeTest7(
         int    $case,
         mixed  $value,
         mixed  $params,
@@ -685,8 +685,9 @@ class DateTimeTest extends DtBase
         string $expectedString
     ) : void
     {
-        foreach( self::$propsCompsProps as $comps => $compsProps ) {
-            $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+        foreach( self::$propsCompsProps as $compsProps ) {
+            $this->thePropTest( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+            $this->propGetNoParamsTest( $case, $compsProps, $value, $params, $expectedGet );
         }
 
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
@@ -731,12 +732,12 @@ class DateTimeTest extends DtBase
     }
 
     /**
-     * testDateTime8 provider
+     * dateTimeTest8 provider
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function DateTime8Provider() : array
+    public function dateTimeTest8Provider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -1015,7 +1016,7 @@ class DateTimeTest extends DtBase
      * Testing VALUE DATE-TIME with short string datetime, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
      *
      * @test
-     * @dataProvider DateTime8Provider
+     * @dataProvider dateTimeTest8Provider
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
@@ -1023,7 +1024,7 @@ class DateTimeTest extends DtBase
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDateTime8(
+    public function dateTimeTest8(
         int    $case,
         mixed  $value,
         mixed  $params,
@@ -1031,8 +1032,9 @@ class DateTimeTest extends DtBase
         string $expectedString
     ) : void
     {
-        foreach( self::$propsCompsProps as $comps => $compsProps ) {
-            $this->theTestMethod( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+        foreach( self::$propsCompsProps as $compsProps ) {
+            $this->thePropTest( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+            $this->propGetNoParamsTest( $case, $compsProps, $value, $params, $expectedGet );
         }
 
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
@@ -1062,7 +1064,7 @@ class DateTimeTest extends DtBase
             [ $expectedGet->value, $expectedGet->value ],
             $expectedGet->params
         );
-        $zExt = ( 'Z' === substr( $expectedString, -1 )) ? 'Z' : '';
+        $zExt = ( str_ends_with( $expectedString, 'Z' ) ) ? 'Z' : '';
         $expectedString3 = $expectedString . ',' . $expectedGet->value->format( DateTimeFactory::$YmdTHis ) . $zExt;
         $this->exdateRdateSpecTest(
             $case . 'M',

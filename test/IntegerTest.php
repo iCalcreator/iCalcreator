@@ -28,9 +28,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Exception;
 
 /**
@@ -44,10 +42,7 @@ use Exception;
  */
 class IntegerTest extends DtBase
 {
-    /**
-     * @var string
-     */
-    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    use GetPropMethodNamesTrait;
 
     /**
      * @var string[]
@@ -174,11 +169,7 @@ class IntegerTest extends DtBase
         $c       = new Vcalendar();
         $pcInput = false;
         foreach( $propComps as $propName => $theComps ) {
-            $createMethod = StringFactory::getCreateMethodName( $propName );
-            $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-            $getMethod    = StringFactory::getGetMethodName( $propName );
-            $isMethod     = StringFactory::getIsMethodSetName( $propName );
-            $setMethod    = StringFactory::getSetMethodName( $propName );
+            [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
             foreach( $theComps as $theComp ) {
                 $newMethod = 'new' . $theComp;
                 if( IcalInterface::VALARM === $theComp ) {

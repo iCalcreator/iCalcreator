@@ -40,7 +40,7 @@ Please review
 
 ###### Builds
 
-v2.41.46 - v2.42 pre-release
+v2.41.49 - v2.42 pre-release
 
 v2.40 - stable PHP8
 

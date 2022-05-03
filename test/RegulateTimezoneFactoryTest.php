@@ -316,9 +316,9 @@ END:VCALENDAR
             RegulateTimezoneFactory::$otherTzToPhpTz
         );
 
-        $calendar = sprintf( self::$calendar2, 'W. Europe Standard Time' );
+        // $calendar = sprintf( self::$calendar2, 'W. Europe Standard Time' );
         $otherTzToPhpTz = RegulateTimezoneFactory::$otherTzToPhpTz;
-        $tzFactory = new RegulateTimezoneFactory( self::$calendar2 );
+        $tzFactory      = new RegulateTimezoneFactory( self::$calendar2 );
         $tzFactory->addOtherTzPhpRelation( 'otherTimezone', 'Europe/Stockholm' );
         $this->assertEquals(
             $otherTzToPhpTz + ['otherTimezone' => 'Europe/Stockholm'],
@@ -362,13 +362,14 @@ END:VCALENDAR
     /**
      * Test exception
      *
-     * @test
+     * @ test       is accepted BUT content skipped (i.e. NO test here)
      *
      * @throws Exception
      */
     public function TzTest8() : void
     {
         $this->expectException( UnexpectedValueException::class );
-        $calendar2 = RegulateTimezoneFactory::process( 'grodan boll' );
+        $calendarStr = RegulateTimezoneFactory::process( 'grodan boll' );
+//      echo $calendarStr . PHP_EOL; // test ###
     }
 }

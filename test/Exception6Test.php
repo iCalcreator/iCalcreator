@@ -130,8 +130,9 @@ class Exception6Test extends TestCase
      *
      * @test
      * @dataProvider AllowEmptyTest1Provider
-     * @param int     $case
+     * @param int $case
      * @param mixed[] $compProps
+     * @throws Exception
      */
     public function AllowEmptyTest1( int $case, array $compProps ) : void
     {

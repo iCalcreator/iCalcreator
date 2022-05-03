@@ -33,7 +33,6 @@ use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -48,11 +47,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 class ValarmTest extends DtBase
 {
     /**
-     * @var string
-     */
-    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
-
-    /**
      * @var array|string[]
      */
     private static array $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
@@ -61,6 +55,7 @@ class ValarmTest extends DtBase
      * valarmTest provider
      *
      * @return mixed[]
+     * @throws Exception
      */
     public function valarmTestProvider() : array
     {
@@ -549,11 +544,13 @@ class ValarmTest extends DtBase
                     ->setXprop( 'x-case', $case . ' location 2' ); // by-pass test
             }
 
-            $createMethod = StringFactory::getCreateMethodName( $propName );
-            $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-            $getMethod    = StringFactory::getGetMethodName( $propName );
-            $isMethod     = StringFactory::getIsMethodSetName( $propName );
-            $setMethod    = StringFactory::getSetMethodName( $propName );
+            [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+            if( IcalInterface::UID !== $propName ) { // always (sort of...) set
+                $this->assertFalse(
+                    $a1->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, IcalInterface::VALARM, $isMethod )
+                );
+            }
 
             // set first
             if( $pcInput ) {
@@ -562,6 +559,12 @@ class ValarmTest extends DtBase
             else {
                 $a1->{$setMethod}( $value, $params );
             }
+            $this->assertSame(
+                ! empty( $value ),
+                $a1->{$isMethod}(),
+                sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, IcalInterface::VALARM, $isMethod )
+                    . ', exp: ' . ( empty( $value ) ? IcalInterface::FALSE : IcalInterface::TRUE )
+            );
 
 //          echo __FUNCTION__ . ' case #' . $case . PHP_EOL . $a1->createComponent() . PHP_EOL; // test ###
 
@@ -571,7 +574,7 @@ class ValarmTest extends DtBase
             $this->assertEquals(
                 $expectedGet,
                 $getValue,
-                sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, IcalInterface::VALARM, $getMethod )
+                sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, IcalInterface::VALARM, $getMethod )
             );
             $actualString = $a1->{$createMethod}();
             $actualString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], '', $actualString );
@@ -579,17 +582,17 @@ class ValarmTest extends DtBase
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,
                 trim( $actualString ),
-                sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, 'Valarm', $createMethod )
+                sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, 'Valarm', $createMethod )
             );
             if( $propName !== IcalInterface::UID ) { // sort of mandatory
                 $a1->{$deleteMethod}();
                 $this->assertFalse(
                     $a1->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-3a', __FUNCTION__, 'Valarm', $isMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-5', __FUNCTION__, 'Valarm', $isMethod )
                 );
                 $this->assertFalse(
                     $a1->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-3b', __FUNCTION__, 'Valarm', $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-6', __FUNCTION__, 'Valarm', $getMethod )
                 );
                 $a1->{$setMethod}( $value, $params ); // set again
                 $expected = ! empty( $value );
@@ -598,7 +601,7 @@ class ValarmTest extends DtBase
                     $a1->{$isMethod}(),
                     sprintf( self::$ERRFMT, '(exp ' .
                         ( $expected ? IcalInterface::TRUE : IcalInterface::FALSE ) .
-                        ' after set) ', $case . '-3c', __FUNCTION__, 'Valarm', $isMethod )
+                        ' after set) ', $case . '-7', __FUNCTION__, 'Valarm', $isMethod )
                     . PHP_EOL . ' iCal string ' . $a1->{$createMethod}() // test ###
 
                 );

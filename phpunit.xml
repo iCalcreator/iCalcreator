@@ -69,6 +69,7 @@
             <file>test/PropXTest.php</file>
             <file>test/PropEmptyTest.php</file>
             <file>test/ParseTest.php</file>
+            <file>test/StringfuncTest.php</file>
         </testsuite>
         <testsuite name="Valarm property Tests">
             <file>test/ValarmTest.php</file>

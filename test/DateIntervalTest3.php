@@ -354,12 +354,17 @@ class DateIntervalTest3 extends DtBase
             $newMethod = 'new' . $theComp;
             $comp      = $c->{$newMethod}();
             foreach( $props as $propName ) {
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
+                $this->assertFalse(
+                    $comp->$isMethod(),
+                    "Error in case #$case-11, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
                 $comp->{$setMethod}( IcalInterface::BUSY, $value );
+                $this->assertTrue(
+                    $comp->$isMethod(),
+                    "Error in case #$case-12, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 if( isset( $expectedGet->value[0] ) && // Freebusy
@@ -379,17 +384,17 @@ class DateIntervalTest3 extends DtBase
                 $this->assertEquals(
                     $exp,
                     $act,
-                    "Error in case #{$case}-11, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "Error in case #$case-13, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
                 );
                 $this->assertEquals(
                     $propName . $expectedString,
                     trim( $comp->{$createMethod}()),
-                    "Error in case #{$case}-12, " . __FUNCTION__. " <{$theComp}>->{$createMethod}"
+                    "Error in case #$case-14, " . __FUNCTION__. " <$theComp>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    "(after delete) Error in case #{$case}-13, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "(after delete) Error in case #$case-15, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
                 );
 
                 if( $pcInput ) {
@@ -428,12 +433,17 @@ class DateIntervalTest3 extends DtBase
             $newMethod = 'new' . $theComp;
             $comp      = $c->{$newMethod}();
             foreach( $props as $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
+                $this->assertFalse(
+                    $comp->$isMethod(),
+                    "Error in case #$case-21, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
                 $comp->{$setMethod}( IcalInterface::BUSY, [ $value ] );
+                $this->assertTrue(
+                    $comp->$isMethod(),
+                    "Error in case #$case-22, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
@@ -454,17 +464,17 @@ class DateIntervalTest3 extends DtBase
                 $this->assertEquals(
                     $exp,
                     $act,
-                    "Error in case #{$case}-21, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "Error in case #$case-23, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
                 );
                 $this->assertEquals(
                     $propName . $expectedString,
                     trim( $comp->{$createMethod}()),
-                    "Error in case #{$case}-22, " . __FUNCTION__. " <{$theComp}>->{$createMethod}"
+                    "Error in case #$case-24, " . __FUNCTION__. " <$theComp>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    "(after delete) Error in case #{$case}-23, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "(after delete) Error in case #$case-25, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
                 );
 
                 if( $pcInput ) {
@@ -505,12 +515,17 @@ class DateIntervalTest3 extends DtBase
             $newMethod = 'new' . $theComp;
             $comp      = $c->{$newMethod}();
             foreach( $props as $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
+                $this->assertFalse(
+                    $comp->$isMethod(),
+                    "Error in case #$case-31, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
                 $comp->{$setMethod}( IcalInterface::BUSY, [ $value, $value ] );
+                $this->assertTrue(
+                    $comp->$isMethod(),
+                    "Error in case #$case-32, " . __FUNCTION__ . " <$theComp>->$isMethod"
+                );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
@@ -529,7 +544,7 @@ class DateIntervalTest3 extends DtBase
                 $this->assertEquals(
                     $expGet,
                     $getValue,
-                    "Error in case #{$case}-31, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "Error in case #$case-33, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
                     . PHP_EOL . ' expGet' . var_export( $expGet, true)
                     . PHP_EOL . ' getValue' . var_export( $getValue, true)
                 );
@@ -537,12 +552,12 @@ class DateIntervalTest3 extends DtBase
                 $this->assertEquals(
                     $propName . $expectedString,
                     str_replace( ["\r\n", ' '], null, $comp->{$createMethod}()),
-                    "Error in case #{$case}-32, " . __FUNCTION__. " <{$theComp}>->{$createMethod}"
+                    "Error in case #$case-34, " . __FUNCTION__. " <$theComp>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    "(after delete) Error in case #{$case}-33, " . __FUNCTION__ . " <{$theComp}>->{$getMethod}"
+                    "(after delete) Error in case #$case-35, " . __FUNCTION__ . " <$theComp>->$getMethod"
                 );
                 if( $pcInput ) {
                     $comp->{$setMethod}( Pc::factory( $value, [ IcalInterface::FBTYPE => IcalInterface::BUSY ] ));

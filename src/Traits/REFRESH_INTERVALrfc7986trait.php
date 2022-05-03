@@ -40,7 +40,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 /**
  * REFRESH_INTERVAL property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.48 2022-04-29
  */
 trait REFRESH_INTERVALrfc7986trait
 {
@@ -90,7 +90,7 @@ trait REFRESH_INTERVALrfc7986trait
      * @param null|bool   $inclParam
      * @return bool|string|DateInterval|Pc
      * @throws Exception
-     * @since 2.43 2021-10-30
+     * @since 2.41.48 2022-04-29
      */
     public function getRefreshinterval( ? bool $inclParam = false ) : DateInterval | bool | string | Pc
     {
@@ -104,9 +104,9 @@ trait REFRESH_INTERVALrfc7986trait
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.48 2022-04-29
      */
-    public function isRefreshinterval() : bool
+    public function isRefreshintervalSet() : bool
     {
         return ! empty( $this->refreshinterval->value );
     }

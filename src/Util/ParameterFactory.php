@@ -127,7 +127,7 @@ class ParameterFactory
         }
         foreach( $KEYGRP2 as $key ) { // DIR, ALTREP
             if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
-                $delim  = str_contains( $params[$key], StringFactory::$QQ )
+                    $delim  = str_contains( $params[$key], StringFactory::$QQ )
                     ? Util::$SP0
                     : StringFactory::$QQ;
                 $attr1 .= sprintf( $FMTQTD, $key, $delim, $params[$key], $delim );
@@ -177,7 +177,7 @@ class ParameterFactory
     /**
      * Return parameter with opt. quoted parameter value
      *
-     * Quotes a value if it contains ':', ';' or ','
+     * "-Quotes a value if it contains ':', ';' or ','
      *
      * @param mixed[] $inputParams
      * @return mixed[][]

@@ -50,11 +50,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 class Prop1TextSingleTest extends DtBase
 {
     /**
-     * @var string
-     */
-    protected static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
-
-    /**
      * @var string[]
      */
     private static array $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
@@ -103,7 +98,8 @@ class Prop1TextSingleTest extends DtBase
                     IcalInterface::VEVENT,
                     IcalInterface::VTODO,
                     IcalInterface::AVAILABLE,
-                    IcalInterface::VAVAILABILITY
+                    IcalInterface::VAVAILABILITY,
+                    IcalInterface::VRESOURCE
                 ]
             ],
             $value,
@@ -499,7 +495,7 @@ class Prop1TextSingleTest extends DtBase
         $dataArr[] = [
             1101,
             [
-                IcalInterface::GEO => [ IcalInterface::VEVENT, IcalInterface::VTODO ]
+                IcalInterface::GEO => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VRESOURCE ]
             ],
             $value,
             $params,
@@ -583,6 +579,23 @@ class Prop1TextSingleTest extends DtBase
             IcalInterface::BUSYTYPE . ParameterFactory::createParams( $params ) . ':' . $value
         ];
 
+        // RESOURCE_TYPE
+        $value  = IcalInterface::BUSY_UNAVAILABLE;
+        $params = self::$STCPAR;
+        $dataArr[] = [
+            1501,
+            [
+                IcalInterface::RESOURCE_TYPE => [ IcalInterface::VRESOURCE ]
+            ],
+            $value,
+            $params,
+            Pc::factory(
+                $value,
+                $params
+            ),
+            IcalInterface::RESOURCE_TYPE . ParameterFactory::createParams( $params ) . ':' . $value
+        ];
+
         return $dataArr;
     }
 
@@ -628,7 +641,8 @@ class Prop1TextSingleTest extends DtBase
 
                 $newMethod = 'new' . $theComp;
                 switch( true ) {
-                    case in_array( $propName, [ IcalInterface::CALENDAR_ADDRESS, IcalInterface::LOCATION_TYPE ], true ) :
+                    case in_array( $propName, [ IcalInterface::CALENDAR_ADDRESS, IcalInterface::LOCATION_TYPE ], true ) ||
+                        ( $theComp === IcalInterface::VRESOURCE ) :
                         $vevent = $c->newVevent();
                         $comp  = $vevent->{$newMethod}();
                         break;
@@ -640,11 +654,11 @@ class Prop1TextSingleTest extends DtBase
                         break;
                 }
 
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $isMethod     = StringFactory::getIsMethodSetName( $propName );
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+                $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $isMethod )
+                );
 
                 if( IcalInterface::GEO === $propName ) {
                     $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
@@ -658,6 +672,10 @@ class Prop1TextSingleTest extends DtBase
                     }
                     $pcInput = ! $pcInput;
                 }
+                $this->assertTrue(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                );
                 if( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
                     $vevent->newParticipant()->{$newMethod}()->{$setMethod}( $value, $params );
                 }
@@ -666,7 +684,7 @@ class Prop1TextSingleTest extends DtBase
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $getMethod ) .
+                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $getMethod ) .
                         ', got : ' . var_export( $getValue, true ) . ', exp : ' . var_export( $expectedGet, true )
                 );
 
@@ -675,17 +693,17 @@ class Prop1TextSingleTest extends DtBase
                 $this->assertEquals(
                     $expectedString,
                     trim( $createString ),
-                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $createMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
                 );
 
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4a', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-4b', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-6', __FUNCTION__, $theComp, $getMethod )
                 );
 
                 if( IcalInterface::GEO === $propName ) {
@@ -696,7 +714,7 @@ class Prop1TextSingleTest extends DtBase
                 }
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4c', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-7', __FUNCTION__, $theComp, $getMethod )
                 );
             } // end foreach
         } // end foreach
@@ -720,7 +738,7 @@ class Prop1TextSingleTest extends DtBase
         $latitude  = 12.34;
         $longitude = 56.5678;
 
-        foreach( $compProps as $compNames => $theComp  ) {
+        foreach( $compProps as $theComp  ) {
             $newMethod1 = 'new' . $theComp;
             $comp = $calendar->{$newMethod1}();
 

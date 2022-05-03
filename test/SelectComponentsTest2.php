@@ -37,6 +37,7 @@ class SelectComponentsTest2 extends TestCase
 {
     /**
      * @return mixed[]
+     * @throws \Exception
      */
     public function SelectComponentsTest21Provider() : array
     {

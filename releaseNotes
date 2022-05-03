@@ -244,3 +244,7 @@ v3.39   3.4 release candidate
 
 2.41.45   github::#99,  SelectFactoy::selectComponents() bug
 2.41.46   github::#100, Component::getExdate() bug, return bool|array|Pc
+
+2.41.47   Extended tests
+2.41.48   Refresh_interval trait bug
+2.41.49   Calendar parse upd

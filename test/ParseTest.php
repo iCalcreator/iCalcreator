@@ -29,22 +29,114 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use UnexpectedValueException;
+use Kigkonsult\Icalcreator\Util\Util;
 
 /**
- * class ParseTest,
+ * Class ParseTest,
  *
- * testing parse + eol-htab
+ * Testing Vcalendar parse + eol-htab
  *
  * @since  2.41.31 - 2022-03-11
  */
 class ParseTest extends DtBase
 {
     /**
-     * parseTest6 provider
+     * parseExceptionsTest provider
      *
      * @return mixed[]
      */
-    public function parse6Provider() : array
+    public function parseExceptionsTestProvider() : array
+    {
+
+        $dataArr = [];
+
+        $dataArr[] = [
+            0,
+            ""
+        ];
+
+        $dataArr[] = [
+            1,
+            []
+        ];
+
+        $dataArr[] = [
+            2,
+            "\r\n"
+        ];
+
+        $dataArr[] = [
+            3,
+            [ "\r\n" ]
+        ];
+
+        $dataArr[] = [
+            4,
+            "BEGIN:VCALENDAR\r\n"
+        ];
+
+        $dataArr[] = [
+            5,
+            [ "BEGIN:VCALENDAR\r\n" ]
+        ];
+
+        $dataArr[] = [
+            6,
+            "END:VCALENDAR\r\n"
+        ];
+        $dataArr[] = [
+            7,
+            [ "END:VCALENDAR\r\n" ]
+        ];
+
+        $dataArr[] = [
+            8,
+            "BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n"
+        ];
+
+        $dataArr[] = [
+            9,
+            [ "BEGIN:VCALENDAR\r\n", "END:VCALENDAR\r\n" ]
+        ];
+
+        /*   is accepted BUT content skipped
+        $dataArr[] = [
+            10,
+            "grodan boll"
+        ];
+        */
+
+        return $dataArr;
+    }
+
+    /**
+     * @test
+     * @dataProvider parseExceptionsTestProvider
+     * @param int $case
+     * @param string|string[] $value
+     */
+    public function parseExceptionsTest( int $case, string|array $value ) : void
+    {
+        $calendar = new Vcalendar();
+        $ok = false;
+        try {
+            $calendar->parse( $value );
+
+            echo $calendar->createCalendar() . PHP_EOL; // test ###
+        }
+        catch ( UnexpectedValueException $e ) {
+            $ok = true;
+        }
+        $this->assertTrue( $ok, __FUNCTION__ . ' error in case #' .  $case );
+    }
+
+    /**
+     * parseCalendarTest provider
+     *
+     * @return mixed[]
+     */
+    public function parseCalendarTestProvider() : array
     {
 
         $dataArr = [];
@@ -334,22 +426,267 @@ class ParseTest extends DtBase
     }
 
     /**
-     * Testing parse eol-htab, also test of empty unique_id
+     * Testing Vcalendar parse eol-htab, also test of empty unique_id, parse input as string
      *
      * @test
-     * @dataProvider parse6Provider
+     * @dataProvider parseCalendarTestProvider
      * @param int $case
      * @param string $value
      * @param string $expectedvalue
      * @throws Exception
      */
-    public function parseTest6( int $case, string $value, string $expectedvalue ) : void
+    public function parseCalendarTest1( int $case, string $value, string $expectedvalue ) : void
     {
-        $c = new Vcalendar();
-        $c->parse( $value );
+        $calendar = new Vcalendar();
+        $calendar->parse( $value );
 
-        $this->parseCalendarTest( $case, $c, $expectedvalue );
+        $this->parseCalendarTest( $case, $calendar, $expectedvalue );
 
         // echo $c->createCalendar() . PHP_EOL; // test ###
+    }
+
+    /**
+     * Testing Vcalendar parse eol-htab, also test of empty unique_id, parse input as array
+     *
+     * @test
+     * @dataProvider parseCalendarTestProvider
+     * @param int $case
+     * @param string $value
+     * @param string $expectedvalue
+     * @throws Exception
+     */
+    public function parseCalendarTest2( int $case, string $value, string $expectedvalue ) : void
+    {
+        $calendar = new Vcalendar();
+
+        $calendar->parse( explode( Util::$CRLF, $value ));
+
+        $this->parseCalendarTest( $case, $calendar, $expectedvalue );
+
+        // echo $c->createCalendar() . PHP_EOL; // test ###
+    }
+
+    /**
+     * parseCompTest provider
+     *
+     * @return mixed[]
+     */
+    public function parseCompTestProvider() : array
+    {
+        $dataArr = [];
+
+        $dataArr[] = [
+            701,
+            "DTSTAMP:19970324T120035Z"
+        ];
+        $dataArr[] = [
+            703,
+            "SEQUENCE:0"
+        ];
+        $dataArr[] = [
+            705,
+            "ORGANIZER:MAILTO:jdoe@host1.com"
+        ];
+        $dataArr[] = [
+            707,
+            [
+                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host1.com",
+                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host2.com",
+                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host3.com",
+                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host4.com"
+            ]
+        ];
+        $dataArr[] = [
+            709,
+            "DTSTART:19970324T123000Z"
+        ];
+        $dataArr[] = [
+            711,
+            "DTEND:19970324T210000Z"
+        ];
+        $dataArr[] = [
+            713,
+            "CATEGORIES:MEETING,PROJECT"
+        ];
+        $dataArr[] = [
+            715,
+            "CLASS:PUBLIC"
+        ];
+        $dataArr[] = [
+            717,
+            "SUMMARY:Calendaring Interoperability Planning Meeting"
+        ];
+        $dataArr[] = [
+            719,
+            "STATUS:TENTATIVE"
+        ];
+        $dataArr[] = [
+            721,
+            'DESCRIPTION:Project xyz Review Meeting Minutes\n' .
+            ' Agenda\n' .
+            ' 1. Review of project version 1.0 requirements.\n' .
+            ' 2. Definition of project processes.\n' .
+            ' 3. Review of project schedule.\n' .
+            ' Participants: John Smith, Jane Doe, Jim Dandy\n' .
+            ' - It was decided that the requirements need to be signed off by product marketing.\n' .
+            ' - Project processes were accepted.\n' .
+            ' - Project schedule needs to account for scheduled holidays and employee vacation time. Check with HR for specific dates.\n' .
+            ' - New schedule will be distributed by Friday.\n' .
+            ' - Next weeks meeting is cancelled. No meeting until 3/23.'
+        ];
+        $dataArr[] = [
+            723,
+            [
+            'COMMENT:Project xyz Review Meeting Minutes\n' .
+            ' Agenda\n' .
+            ' 1. Review of project version 1.0 requirements.\n' .
+            ' 2. Definition of project processes.\n' .
+            ' 3. Review of project schedule.\n' .
+            ' Participants: John Smith, Jane Doe, Jim Dandy\n' .
+            ' - It was decided that the requirements need to be signed off by product marketing.\n' .
+            ' - Project processes were accepted.\n' .
+            ' - Project schedule needs to account for scheduled holidays and employee vacation time. Check with HR for specific dates.\n' .
+            ' - New schedule will be distributed by Friday.\n' .
+            ' - Next weeks meeting is cancelled. No meeting until 3/23.'
+            ]
+        ];
+        $dataArr[] = [
+            725,
+            'LOCATION:LDB Lobby'
+        ];
+        $dataArr[] = [
+            727,
+            "ATTACH;FMTTYPE=application/postscript:ftp://xyz.com/pub/conf/bkgrnd.ps"
+        ];
+        $dataArr[] = [
+            729,
+            [
+                "BEGIN:VALARM",
+                "ACTION:AUDIO",
+                "TRIGGER;VALUE=DATE-TIME:19970224T070000Z",
+                "ATTACH;FMTTYPE=audio/basic:http://host.com/pub/audio-files/ssbanner.aud",
+                "REPEAT:4",
+                "DURATION:PT1H",
+                "X-alarm:non-standard ALARM property", "END:VALARM"
+            ]
+        ];
+        $dataArr[] = [
+            731,
+            "X-XOMMENT:non-standard property will be displayed, comma escaped"
+        ];
+        $dataArr[] = [
+            733,
+            'STRUCTURED-DATA;FMTTYPE=application/ld+json;VALUE=TEXT;SCHEMA="https://schema.org/Sp' .
+            'ortsEvent":{\n' .
+            '\'@type\': \'SportsEvent\',\n' .
+            '\'homeTeam\': \'Pittsburgh Pirates\',\n' .
+            '\'awayTeam\': \'San Francisco Giants\'\n' .
+            '}'
+        ];
+        $dataArr[] = [
+            735,
+            'DESCRIPTION;ALTREP="https://username:password@hostname.domin.com:9090/path?arg=value#anchor":Description here...'
+        ];
+
+        return $dataArr;
+    }
+
+    /**
+     * Testing CalendarCompomponent parse, rfc5545 rendered properties
+     *
+     * @test
+     * @dataProvider parseCompTestProvider
+     * @param int $case
+     * @param string|array $value
+     * @throws Exception
+     */
+    public function parseCompTest( int $case, string|array $value ) : void
+    {
+        $calendar = new Vcalendar();
+
+        if( is_array( $value )) {
+            $vevent = $calendar->newVevent();
+            $vevent->parse( $value );
+            $this->parseCalendarTest( $case . '-a', $calendar, $value[1] ?? $value[0] );
+
+            $vevent = $calendar->newVevent();
+            $vevent->parse( implode( Util::$CRLF, $value ));
+            $this->parseCalendarTest( $case . '-s', $calendar, $value[1] ?? $value[0] );
+        }
+        else {
+            $vevent = $calendar->newVevent();
+            $vevent->parse( explode( Util::$CRLF, $value ));
+            $this->parseCalendarTest( $case . '-a', $calendar, $value );
+
+            $vevent = $calendar->newVevent();
+            $vevent->parse( $value );
+            $this->parseCalendarTest( $case . '-s', $calendar, $value );
+
+        }
+
+//      if( 35 === $case ) echo $calendar->createCalendar() . PHP_EOL; // test ###
+    }
+
+    /**
+     * parseCompPortnrTest provider
+     *
+     * @return mixed[]
+     */
+    public function parseCompPortnrTestProvider() : array
+    {
+        $dataArr = [];
+
+        // quoted ALTREP value
+        $dataArr[] = [
+            811,
+            'DESCRIPTION;ALTREP="https://811username:password@hostname.domin.com:9090/path?arg=value#anchor":Description here...',
+            null
+        ];
+
+        // quoted ALTREP value AND other param
+        $dataArr[] = [
+            812,
+            'DESCRIPTION;ALTREP="https://812username:password@hostname.domin.com:9090/path?arg=value#anchor";LANGUAGE=EN:Description here...',
+            null
+        ];
+
+        // unquoted ALTREP value
+        /*
+        $dataArr[] = [
+            821,
+            'DESCRIPTION;ALTREP=https://821username:password@hostname.domain.com:9090/path?arg=value#anchor:Description here...',
+            'DESCRIPTION;ALTREP="https://821username:password@hostname.domin.com:9090/path?arg=value#anchor":Description here...'
+        ];
+
+        // unquoted ALTREP value AND other param
+        $dataArr[] = [
+            831,
+            'DESCRIPTION;ALTREP=https://831username:password@hostname.domain.com:9090/path?arg=value#anchor;LANGUAGE=EN:Description here...',
+            'DESCRIPTION;ALTREP="https://831username:password@hostname.domin.com:9090/path?arg=value#anchor";LANGUAGE=EN:Description here...'
+        ];
+        */
+
+        return $dataArr;
+
+    }
+
+    /**
+     * Testing CalendarCompomponent parse, rfc5545 rendered property with portnr
+     *
+     * Known bug here: property parse with param ALTREP (etc?) with unquoted url with ..>user.passwd@<.. before hostname
+     *
+     * @test
+     * @dataProvider parseCompPortnrTestProvider
+     * @param int $case
+     * @param string $value
+     * @param string $expected
+     * @throws Exception
+     */
+    public function parseCompPortnrTest( int $case, string $value, ? string $expected = null ) : void
+    {
+        $calendar = new Vcalendar();
+        $calendar->newVevent()
+            ->parse( $value );
+        $this->parseCalendarTest( $case, $calendar, $expected ?? $value );
     }
 }

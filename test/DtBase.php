@@ -34,7 +34,6 @@ use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
-use Kigkonsult\Icalcreator\Util\RecurFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use PHPUnit\Framework\TestCase;
@@ -45,12 +44,14 @@ use SimpleXMLElement;
  *
  * @since 2.41.44 2022-04-27
  */
-class DtBase extends TestCase
+abstract class DtBase extends TestCase
 {
+    use GetPropMethodNamesTrait;
+
     protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
 
     /**
-     * The test method, case prefix '-1x'
+     * The test method, case suffix '-1xx', test prop create-, delete-, get- is- and set-methods
      *
      * @param int     $case
      * @param array   $compsProps
@@ -59,9 +60,9 @@ class DtBase extends TestCase
      * @param Pc      $expectedGet
      * @param string  $expectedString
      * @throws Exception
-     * @since 2.41.44 2022-04-21
+     * @since 2.41.47 2022-04-29
      */
-    public function theTestMethod(
+    public function thePropTest(
         int    $case,
         array  $compsProps,
         mixed  $value,
@@ -81,11 +82,7 @@ class DtBase extends TestCase
                 default                                 => $c->{$newMethod}(),
             };
             foreach( $props as $propName ) {
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $isMethod     = StringFactory::getIsMethodSetName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 if( IcalInterface::LAST_MODIFIED === $propName ) {
                     if( ! $firstLastmodifiedLoad ) {
                         $this->assertFalse(
@@ -150,7 +147,7 @@ class DtBase extends TestCase
                         $getValue->value->format( $fmt ),
                         sprintf( self::$ERRFMT, null, $case . '-115', __FUNCTION__, $theComp, $getMethod )
                     );
-                }
+                } // end if
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
@@ -166,7 +163,7 @@ class DtBase extends TestCase
                         $comp->{$getMethod}(),
                         sprintf( self::$ERRFMT, '(after delete) ', $case . '-118', __FUNCTION__, $theComp, $getMethod )
                     );
-                }
+                } // end if
                 else {
                     $this->assertFalse(
                         $comp->{$isMethod}(),
@@ -176,7 +173,7 @@ class DtBase extends TestCase
                         $comp->{$getMethod}(),
                         sprintf( self::$ERRFMT, '(after delete) ', $case . '-120', __FUNCTION__, $theComp, $getMethod )
                     );
-                }
+                } // end else
                 if( $pcInput ) {
                     $comp->{$setMethod}( Pc::factory( $value, $params ));
                 }
@@ -197,7 +194,82 @@ class DtBase extends TestCase
     }
 
     /**
-     * The test method 1b, single EXDATE + RDATE, case prefix '-1bx' also multi EXDATE + RDATE
+     * The test method, case suffix '-2xx', test prop get--method without params
+     *
+     * @param int     $case
+     * @param array   $compsProps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param Pc      $expectedGet
+     * @throws Exception
+     * @since 2.41.44 2022-04-21
+     */
+    public function propGetNoParamsTest(
+        int    $case,
+        array  $compsProps,
+        mixed  $value,
+        mixed  $params,
+        Pc     $expectedGet
+    ) : void
+    {
+        $c = new Vcalendar();
+        foreach( $compsProps as $theComp => $props ) {
+            $newMethod = 'new' . $theComp;
+            $comp = match ( true ) {
+                IcalInterface::PARTICIPANT === $theComp => $c->newVevent()->{$newMethod}()
+                    ->setDtstamp( $value, $params ),
+                IcalInterface::AVAILABLE === $theComp => $c->newVavailability()->{$newMethod}(),
+                default => $c->{$newMethod}(),
+            };
+            foreach( $props as $propName ) {
+                [ , , $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+                if( IcalInterface::DTSTAMP !== $propName ) {
+                    $this->assertFalse(
+                        $comp->{$isMethod}(),
+                        sprintf( self::$ERRFMT, null, $case . '-211', __FUNCTION__, $theComp, $isMethod )
+                    );
+                }
+                if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true )) {
+                    $comp->{$setMethod}( [ $value ], $params );
+                    $getValue = $comp->{$getMethod}();
+                    if( ! empty( $getValue )) {
+                        $getValue = reset( $getValue );
+                    }
+                }
+                else {
+                    if( in_array( $propName, [ IcalInterface::DTEND, IcalInterface::DUE, IcalInterface::RECURRENCE_ID, ], true ) ) {
+                        $comp->setDtstart( $value, $params );
+                    }
+                    $comp->{$setMethod}( $value, $params );
+                    $getValue = $comp->{$getMethod}();
+                } // end else
+                $this->assertSame(
+                    ! empty( $value ),
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-212', __FUNCTION__, $theComp, $isMethod )
+                       . ', exp ' . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
+                );
+                if( $expectedGet->value instanceof DateTime && $getValue instanceof DateTime ) {
+                    $this->assertEquals(
+                        $expectedGet->value->format( DateTimeFactory::$YmdHis ),
+                        $getValue->format( DateTimeFactory::$YmdHis ),
+                        sprintf( self::$ERRFMT, null, $case . '-213', __FUNCTION__, $theComp, $getMethod )
+                    );
+                } // end if
+                else {
+                    $this->assertEquals(
+                        $expectedGet->value ?? '',
+                        $getValue,
+                        sprintf( self::$ERRFMT, null, $case . '-214', __FUNCTION__, $theComp, $getMethod )
+                    );
+                }
+
+            } // end foreach props...
+        } // end foreach $compsProps...
+    }
+
+    /**
+     * The test method suffix -1b... , single EXDATE + RDATE, case prefix '-1bx' also multi EXDATE + RDATE
      *
      * @param int|string $case
      * @param array      $compsProps
@@ -227,10 +299,11 @@ class DtBase extends TestCase
                 $comp = $c->{$newMethod}();
             }
             foreach( $props as $propName ) {
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+                $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
+                );
                 //              error_log( __FUNCTION__ . ' #' . $case . '-1b1' . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
 
                 if( $pcInput ) {
@@ -240,13 +313,19 @@ class DtBase extends TestCase
                     $comp->{$setMethod}( $value, $params );
                 }
                 $pcInput = ! $pcInput;
+                $this->assertSame(
+                    ! empty( $value ),
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, null, $case . '-1b1', __FUNCTION__, $theComp, $isMethod )
+                         . ', exp ' . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
+                );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 $getValue->removeParam( Util::$ISLOCALTIME );
                 $this->assertEquals(
                     $expectedGet->params,
                     $getValue->params,
-                    sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
                 if( ! empty( $expectedGet->value )) {
                     $expVal = $expectedGet->value;
@@ -446,28 +525,6 @@ class DtBase extends TestCase
             $out3,
             sprintf( self::$ERRFMT, null, $case . '-36e', __FUNCTION__, $theComp, $propName )
         );
-    }
-
-    /**
-     * Return the datetime as assoc array
-     *
-     * @param DateTime $dateTime
-     * @return mixed[]
-     */
-    public function getDateTimeAsArray( DateTime $dateTime ) : array
-    {
-        $output =  [
-            RecurFactory::$LCYEAR  => $dateTime->format( 'Y' ),
-            RecurFactory::$LCMONTH => $dateTime->format( 'm' ),
-            RecurFactory::$LCDAY   => $dateTime->format( 'd' ),
-            RecurFactory::$LCHOUR  => $dateTime->format( 'H' ),
-            RecurFactory::$LCMIN   => $dateTime->format( 'i' ),
-            RecurFactory::$LCSEC   => $dateTime->format( 's' ),
-        ];
-        if( DateTimeZoneFactory::isUTCtimeZone( $dateTime->getTimezone()->getName() )) {
-            $output[RecurFactory::$LCtz] = 'Z';
-        }
-        return $output;
     }
 
     /**

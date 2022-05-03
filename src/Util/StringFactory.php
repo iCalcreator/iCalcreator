@@ -33,6 +33,7 @@ use Exception;
 use Kigkonsult\Icalcreator\IcalInterface;
 use UnexpectedValueException;
 
+use function array_unshift;
 use function bin2hex;
 use function count;
 use function ctype_digit;
@@ -58,9 +59,9 @@ use function substr_count;
 use function trim;
 
 /**
- * iCalcreator TEXT support class
+ * iCalcreator string support class
  *
- * @since  2.40.11 - 2022-01-15
+ * @since  2.41.49 - 2022-05-02
  */
 class StringFactory
 {
@@ -120,11 +121,12 @@ class StringFactory
      * Return rows to parse from string or array
      *
      * Used by Vcalendar & RegulateTimezoneFactory
+     *
      * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return string[]
      * @throws UnexpectedValueException
      * @throws Exception
-     * @since  2.29.3 - 2019-08-29
+     * @since  2.41.49 - 2022-05-01
      */
     public static function conformParseInput( string | array $unParsedText ) : array
     {
@@ -144,49 +146,68 @@ class StringFactory
                 $rows[$lix] = self::trimTrailNL( $row );
             }
         }
+        if( empty( $rows )) { /* err 9 */
+            throw new UnexpectedValueException(
+                sprintf( $ERR10, 9, Util::$SP0 )
+            );
+        }
         /* skip leading (empty/invalid) lines (and remove leading BOM chars etc) */
-        $rows = self::trimLeadingRows( $rows );
-        $cnt  = count( $rows );
-        if( 3 > $cnt ) { /* err 10 */
+        $rows  = self::trimLeadingRows( $rows );
+        /* skip trailing empty lines and ensure an end row */
+        $rows  = self::trimTrailingRows( $rows );
+        $cnt   = count( $rows );
+        if( 2 === $cnt ) { /* err 10 */
             throw new UnexpectedValueException(
                 sprintf( $ERR10, $cnt, PHP_EOL . implode( PHP_EOL, $rows ))
             );
         }
-        /* skip trailing empty lines and ensure an end row */
-        return self::trimTrailingRows( $rows );
+        return $rows;
+
     }
 
     /**
      * Return array to parse with leading (empty/invalid) lines removed (incl leading BOM chars etc)
      *
+     * Ensure BEGIN:CALENDAR on the first row
+     *
      * @param string[] $rows
      * @return string[]
-     * @since  2.29.3 - 2019-08-29
+     * @since  2.41.49 - 2022-05-01
      */
     private static function trimLeadingRows( array $rows ) : array
     {
+        $beginFound = false;
         foreach( $rows as $lix => $row ) {
             if( false !== stripos( $row, self::$BEGIN_VCALENDAR )) {
                 $rows[$lix] = self::$BEGIN_VCALENDAR;
+                $beginFound = true;
+                continue;
+            }
+            if( ! empty( trim( $row ))) {
                 break;
             }
             unset( $rows[$lix] );
         } // end foreach
+        if( ! $beginFound ) {
+            array_unshift( $rows, self::$BEGIN_VCALENDAR );
+        }
         return $rows;
     }
 
     /**
      * Return array to parse with trailing empty lines removed and ensured an end row
      *
+     * Ensure END:CALENDAR on the last row
+     *
      * @param string[] $rows
      * @return string[]
-     * @since  2.29.3 - 2019-08-29
+     * @since  2.41.49 - 2022-05-01
      */
     private static function trimTrailingRows( array $rows ) : array
     {
-        $lix = array_keys( $rows );
-        $lix = end( $lix );
-        while( 3 < $lix ) {
+        end( $rows );
+        $lix = key( $rows );
+        while( 0 <= $lix ) {
             $tst = trim( $rows[$lix] );
             if(( self::$NLCHARS === $tst ) || empty( $tst )) {
                 unset( $rows[$lix] );
@@ -321,12 +342,18 @@ class StringFactory
         return ( 0 === stripos( $name, $X_ ));
     }
 
-    public static function hasColonOrSemicOrComma( mixed $value ): bool
+    /**
+     * Return bool true if string contains any of :;,
+     *
+     * @param mixed $string
+     * @return bool
+     */
+    public static function hasColonOrSemicOrComma( mixed $string ): bool
     {
-        return ( is_string( $value ) &&
-            ( str_contains( $value,  Util::$COLON ) ||
-                str_contains( $value, Util::$SEMIC ) ||
-                str_contains( $value, Util::$COMMA )));
+        return ( is_string( $string ) &&
+            ( str_contains( $string,  Util::$COLON ) ||
+                str_contains( $string, Util::$SEMIC ) ||
+                str_contains( $string, Util::$COMMA )));
     }
 
     /**
@@ -443,11 +470,12 @@ class StringFactory
     /**
      * Return array property value and attributes
      *
-     * Attributes are prefixed by ';', value by ':', BUT they may exists in attr/values (quoted?)
+     * Attributes are prefixed by ';', value by ':', BUT they may exist in both attr (quoted?) and values
+     * Known bug here: property parse with param ALTREP (etc?) with unquoted url with ..>user.passwd@<.. before hostname
      *
      * @param string      $line     property content
      * @param null|string $propName
-     * @return mixed[]   [ line, [*propAttr] ]
+     * @return mixed[]   [ value, [ *( propAttrKey => propAttrValue) ] ]
      * @since  2.30.3 - 2021-02-14
      */
     public static function splitContent( string $line, ? string $propName = null ) : array
@@ -517,7 +545,7 @@ class StringFactory
     }
 
     /**
-     * Return true if single param only (and no colons in param values)
+     * Return true if single param only (and no colon/semicolon in param values)
      *
      * 2nd most frequent
      *
@@ -623,23 +651,26 @@ class StringFactory
     }
 
     /**
-     * Return bool true if leading chars in string is a port number (e.i. followed by '/')
+     * Return bool true if leading chars in (unquoted) string is a port number (i.e. followed by '/')
      *
      * @param string $string
      * @return bool
-     * @since  2.27.22 - 2020-09-01
+     * @since  2.41.49 - 2022-05-02
      */
     private static function hasPortNUmber( string $string ) : bool
     {
         $len      = strlen( $string );
+        $hasDigit = false;
         for( $x = 0; $x < $len; $x++ ) {
             $str1 = $string[$x];
-            if( ! ctype_digit( $str1 )) {
-                break;
+            if( ctype_digit( $str1 )) {
+                $hasDigit = true;
+                continue;
             }
-            if( Util::$SLASH === $str1 ) {
+            if( $hasDigit &&( Util::$SLASH === $str1 )) {
                 return true;
             }
+            break;
         } // end for
         return false;
     }
@@ -757,9 +788,10 @@ class StringFactory
     private static string $SP0 = '';
 
     /**
-     * Return substring after first found needle in haystack, '' on not found
+     * Return substring after first found needle in haystack
      *
      * Case-sensitive search for needle in haystack
+     * If needle is not found in haystack, '' is returned
      *
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $needle
@@ -776,9 +808,10 @@ class StringFactory
     }
 
     /**
-     * Return substring after last found  needle in haystack, '' on not found
+     * Return substring after last found  needle in haystack
      *
      * Case-sensitive search for needle in haystack
+     * If needle is not found in haystack, '' is returned
      *
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $needle
@@ -795,9 +828,10 @@ class StringFactory
     }
 
     /**
-     * Return substring before first found needle in haystack, '' on not found
+     * Return substring before first found needle in haystack
      *
      * Case-sensitive search for needle in haystack
+     * If needle is not found in haystack, '' is returned
      *
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $needle
@@ -813,9 +847,10 @@ class StringFactory
     }
 
     /**
-     * Return substring before last needle in haystack, '' on not found
+     * Return substring before last needle in haystack
      *
      * Case-sensitive search for needle in haystack
+     * If needle is not found in haystack, '' is returned
      *
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $needle
@@ -831,7 +866,7 @@ class StringFactory
     }
 
     /**
-     * Return substring between needles in haystack
+     * Return substring between (first found) needles in haystack
      *
      * Case-sensitive search for needles in haystack
      * If no needles found in haystack, '' is returned
@@ -848,7 +883,7 @@ class StringFactory
     {
         $exists1 = str_contains( $haystack, $needle1 );
         $exists2 = str_contains( $haystack, $needle2 );
-        return match ( true ) {
+        return match( true ) {
             ! $exists1 && ! $exists2 => self::$SP0,
             $exists1 && ! $exists2   => self::after( $needle1, $haystack ),
             ! $exists1 && $exists2   => self::before( $needle2, $haystack ),
@@ -860,6 +895,9 @@ class StringFactory
      * Return substring between last needles in haystack
      *
      * Case-sensitive search for needles in haystack
+     * If no needles found in haystack, '' is returned
+     * If only needle1 found, substring after(last) is returned
+     * If only needle2 found, substring before(last) is returned
      *
      * @link https://php.net/manual/en/function.substr.php#112707
      * @param string $needle1
@@ -869,7 +907,14 @@ class StringFactory
      */
     public static function betweenLast( string $needle1, string $needle2, string $haystack ) : string
     {
-        return self::afterLast( $needle1, self::beforeLast( $needle2, $haystack ));
+        $exists1 = str_contains( $haystack, $needle1 );
+        $exists2 = str_contains( $haystack, $needle2 );
+        return match( true ) {
+            ! $exists1 && ! $exists2 => self::$SP0,
+            $exists1 && ! $exists2   => self::afterLast( $needle1, $haystack ),
+            ! $exists1 && $exists2   => self::beforeLast( $needle2, $haystack ),
+            default                  => self::afterLast( $needle1, self::beforeLast( $needle2, $haystack ))
+        };
     }
 
     /**

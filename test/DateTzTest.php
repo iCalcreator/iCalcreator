@@ -33,7 +33,6 @@ use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -43,7 +42,6 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class DateTzTest extends DtBase
 {
-    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
     private   static array  $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
 
     /**
@@ -73,7 +71,7 @@ class DateTzTest extends DtBase
      *
      * @return mixed[]
      */
-    public function DATEtz1Provider() : array
+    public function dateTzTest1Provider() : array
     {
         $dataArr = [];
 
@@ -116,7 +114,7 @@ class DateTzTest extends DtBase
      * Testing Vtimezone and TZID, TZURL
      *
      * @test
-     * @dataProvider DATEtz1Provider
+     * @dataProvider dateTzTest1Provider
      * @param int     $case
      * @param string  $propName
      * @param mixed   $value
@@ -126,7 +124,7 @@ class DateTzTest extends DtBase
      * @throws Exception
      * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
      */
-    public function testDATEtz1(
+    public function dateTzTest1(
         int    $case,
         string $propName,
         mixed  $value,
@@ -138,17 +136,23 @@ class DateTzTest extends DtBase
         $c = new Vcalendar();
         $v = $c->newVtimezone();
 
-        $getMethod    = StringFactory::getGetMethodName( $propName );
-        $createMethod = StringFactory::getCreateMethodName( $propName );
-        $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-        $setMethod    = StringFactory::getSetMethodName( $propName );
+        [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+        $this->assertFalse(
+            $v->{$isMethod}(),
+            sprintf( self::$ERRFMT, null, $case . '-11', __FUNCTION__, 'Vtimezone', $isMethod )
+        );
 
         $v->{$setMethod}( $value, $params );
+        $this->assertTrue(
+            $v->{$isMethod}(),
+            sprintf( self::$ERRFMT, null, $case . '-12', __FUNCTION__, 'Vtimezone', $isMethod )
+        );
+
         $getValue = $v->{$getMethod}( true );
         $this->assertEquals(
             $expectedGet,
             $getValue,
-            sprintf( self::$ERRFMT, null, $case . '-11', __FUNCTION__, 'Vtimezone', $getMethod )
+            sprintf( self::$ERRFMT, null, $case . '-13', __FUNCTION__, 'Vtimezone', $getMethod )
         );
         $this->assertEquals(
             strtoupper( $propName ) . $expectedString,
@@ -158,7 +162,7 @@ class DateTzTest extends DtBase
         $v->{$deleteMethod}();
         $this->assertFalse(
             $v->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-12', __FUNCTION__, 'Vtimezone', $getMethod )
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-14', __FUNCTION__, 'Vtimezone', $getMethod )
         );
         $v->{$setMethod}( $value, $params );
 
@@ -166,12 +170,12 @@ class DateTzTest extends DtBase
     }
 
     /**
-     * testDATEtz2 provider
+     * dateTzTest2 provider
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function DATEtz2Provider() : array
+    public function dateTzTest2Provider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -462,7 +466,7 @@ class DateTzTest extends DtBase
      * Testing VALUE DATETIME for Standard/Daylight (always local time), also empty value, DTSTART
      *
      * @test
-     * @dataProvider DATEtz2Provider
+     * @dataProvider dateTzTest2Provider
      * @param int     $case
      * @param string  $propName
      * @param mixed   $value
@@ -471,7 +475,7 @@ class DateTzTest extends DtBase
      * @param string  $expectedString
      * @throws Exception
      */
-    public function testDATEtz2(
+    public function dateTzTest2(
         int    $case,
         string $propName,
         mixed  $value,
@@ -493,18 +497,26 @@ class DateTzTest extends DtBase
             $newMethod    = 'new' . $theComp;
             $comp         = $v->{$newMethod}();
 
-            $getMethod    = StringFactory::getGetMethodName( $propName );
-            $createMethod = StringFactory::getCreateMethodName( $propName );
-            $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-            $setMethod    = StringFactory::getSetMethodName( $propName );
+            [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+            $this->assertFalse(
+                $comp->{$isMethod}(),
+                sprintf( self::$ERRFMT, null, $case . '-21', __FUNCTION__, $theComp, $isMethod )
+            );
 
             $comp->{$setMethod}( $value, $params );
+            $this->assertSame(
+                ! empty( $value ),
+                $comp->{$isMethod}(),
+                sprintf( self::$ERRFMT, null, $case . '-22', __FUNCTION__, $theComp, $isMethod )
+                    . ", exp " . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
+            );
+
             if( IcalInterface::TZNAME === $propName ) {
                 $getValue = $comp->{$getMethod}( null, true );
             }
             else {
                 $getValue = $comp->{$getMethod}( true );
-                unset( $getValue[Util::$LCparams][Util::$ISLOCALTIME] );
+                unset( $getValue->  params[Util::$ISLOCALTIME] );
                 if( $getValue->value instanceof DateTime ) {
                     $getValue->value = $getValue->value->format( DateTimeFactory::$YmdTHis );
                 }
@@ -512,17 +524,17 @@ class DateTzTest extends DtBase
             $this->assertEquals(
                 $expectedGet,
                 $getValue,
-                sprintf( self::$ERRFMT, null, $case . '-21', __FUNCTION__, $theComp, $getMethod )
+                sprintf( self::$ERRFMT, null, $case . '-23', __FUNCTION__, $theComp, $getMethod )
             );
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,
                 trim( $comp->{$createMethod}() ),
-                "create error in case #{$case}-22 {$theComp}::{$getMethod}"
+                sprintf( self::$ERRFMT, null, $case . '-24', __FUNCTION__, $theComp, $getMethod )
             );
             $comp->{$deleteMethod}();
             $this->assertFalse(
                 $comp->{$getMethod}(),
-                sprintf( self::$ERRFMT, '(after delete) ', $case . '-23', __FUNCTION__, $theComp, $getMethod )
+                sprintf( self::$ERRFMT, '(after delete) ', $case . '-25', __FUNCTION__, $theComp, $getMethod )
             );
             $comp->{$setMethod}( $value, $params );
         } // end foreach

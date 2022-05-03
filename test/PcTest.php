@@ -4,11 +4,9 @@ namespace Kigkonsult\Icalcreator;
 
 use ArrayIterator;
 use ArrayObject;
-use Exception;
 use IteratorIterator;
 use Kigkonsult\Icalcreator\Util\Util;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class PcTest extends TestCase
 {

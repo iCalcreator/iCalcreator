@@ -29,7 +29,6 @@
 namespace Kigkonsult\Icalcreator;
 
 use DateTime;
-use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -129,6 +128,7 @@ class DateTest extends DtBase
      * @param int $case
      * @param string $theComp
      * @param array $propNames
+     * @throws Exception
      */
     private function isPropSetTest2( int $case, string $theComp, array $propNames ) : void
     {
@@ -181,7 +181,7 @@ class DateTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function DATEProvider() : array
+    public function DATEtestProvider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -315,7 +315,7 @@ class DateTest extends DtBase
      * Testing VALUE DATE, also empty value, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
      *
      * @test
-     * @dataProvider DATEProvider
+     * @dataProvider DATEtestProvider
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
@@ -324,7 +324,7 @@ class DateTest extends DtBase
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function testDATE(
+    public function DATEtest(
         int    $case,
         mixed  $value,
         mixed  $params,
@@ -334,7 +334,8 @@ class DateTest extends DtBase
     {
 //      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
 
-        $this->theTestMethod( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
+        $this->thePropTest( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
+        $this->propGetNoParamsTest( $case, self::$compsProps, $value, $params, $expectedGet );
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
     }
 
@@ -344,7 +345,7 @@ class DateTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function RexDATEProvider() : array
+    public function RexDATEtestProvider() : array
     {
         date_default_timezone_set( LTZ );
 
@@ -474,7 +475,7 @@ class DateTest extends DtBase
      * Testing VALUE DATE (multi) EXDATE + RDATE
      *
      * @test
-     * @dataProvider RexDATEProvider
+     * @dataProvider RexDATEtestProvider
      * @param int     $case
      * @param mixed   $value
      * @param mixed   $params
@@ -483,7 +484,7 @@ class DateTest extends DtBase
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function testRexDATE(
+    public function rexDATEtest(
         int    $case,
         mixed  $value,
         mixed  $params,
@@ -501,14 +502,22 @@ class DateTest extends DtBase
                 $comp = $c->{$newMethod}();
             }
             foreach( $props as $propName ) {
-                $getMethod = StringFactory::getGetMethodName( $propName );
-                $setMethod = StringFactory::getSetMethodName( $propName );
+                [ , , $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+                $this->assertFalse(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-1', __FUNCTION__, $theComp, $isMethod )
+                );
                 $comp->{$setMethod}( $value, $params );
+                $this->assertTrue(
+                    $comp->{$isMethod}(),
+                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                );
+
                 $getValue = $comp->{$getMethod}( null, true );
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case, __FUNCTION__, $theComp, $getMethod )
+                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-3', __FUNCTION__, $theComp, $getMethod )
                     . PHP_EOL . 'expectedGet : ' . var_export( $expectedGet, true )
                     . PHP_EOL . 'getValue    : ' . var_export( $getValue, true )
                 );

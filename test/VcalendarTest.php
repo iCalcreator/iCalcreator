@@ -30,7 +30,6 @@ namespace Kigkonsult\Icalcreator;
 
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -45,6 +44,7 @@ use PHPUnit\Framework\TestCase;
  */
 class VcalendarTest extends TestCase
 {
+    use GetPropMethodNamesTrait;
     /**
      * @var string
      */
@@ -157,21 +157,31 @@ class VcalendarTest extends TestCase
     {
         $vcalendar = Vcalendar::factory();
 
-        $createMethod = StringFactory::getCreateMethodName( $propName );
-        $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-        $getMethod    = StringFactory::getGetMethodName( $propName );
-        $setMethod    = StringFactory::getSetMethodName( $propName );
+        [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+        if( IcalInterface::VERSION !== $propName ) {
+            $this->assertFalse(
+                $vcalendar->{$isMethod}(),
+                sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
+            );
+        }
         $vcalendar->{$setMethod}( $value );
+        if( IcalInterface::VERSION !== $propName ) {
+            $this->assertTrue(
+                $vcalendar->{$isMethod}(),
+                sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
+            );
+        }
+
         $getValue = $vcalendar->{$getMethod}();
         $this->assertEquals(
             $expectedGet,
             $getValue,
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Vcalendar', $getMethod )
+            sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, Vcalendar::VCALENDAR, $getMethod )
         );
         $this->assertEquals(
             strtoupper( $propName ) . $expectedString,
             trim( $vcalendar->{$createMethod}() ),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Vcalendar', $createMethod )
+            sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, Vcalendar::VCALENDAR, $createMethod )
         );
 
         switch( $propName ) {
@@ -179,14 +189,14 @@ class VcalendarTest extends TestCase
                 $vcalendar->{$deleteMethod}();
                 $this->assertNotFalse(
                     $vcalendar->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, 'Vcalendar', $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-5', __FUNCTION__, Vcalendar::VCALENDAR, $getMethod )
                 );
                 break;
             case IcalInterface::METHOD :
                 $vcalendar->{$deleteMethod}();
                 $this->assertFalse(
                     $vcalendar->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case, __FUNCTION__, 'Vcalendar', $getMethod )
+                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-6', __FUNCTION__, Vcalendar::VCALENDAR, $getMethod )
                 );
                 $vcalendar->{$setMethod}( $value );
                 break;
@@ -198,12 +208,12 @@ class VcalendarTest extends TestCase
         $v->deleteUid();
         $this->assertNotFalse(
             $v->getUid(),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'VEVENT', 'getUid' )
+            sprintf( self::$ERRFMT, null, $case . '-7', __FUNCTION__, 'VEVENT', 'getUid' )
         );
         $v->deleteDtstamp();
         $this->assertNotFalse(
             $v->getDtstamp(),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'VEVENT', 'getDtstamp' )
+            sprintf( self::$ERRFMT, null, $case . '-8', __FUNCTION__, 'VEVENT', 'getDtstamp' )
         );
 
         $calendar1String = $vcalendar->createCalendar();
@@ -216,10 +226,8 @@ class VcalendarTest extends TestCase
         $this->assertEquals(
             $calendar1String,
             $vcalendar2->createCalendar(),
-            sprintf( self::$ERRFMT, null, $case, __FUNCTION__, 'Error in calendar compare', null )
+            sprintf( self::$ERRFMT, null, $case . '-9', __FUNCTION__, 'Error in calendar compare', null )
         );
-
-        unset( $vcalendar, $vcalendar2 );
     }
 
     /**

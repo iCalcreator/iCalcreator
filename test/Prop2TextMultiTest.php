@@ -50,11 +50,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 class Prop2TextMultiTest extends DtBase
 {
     /**
-     * @var string
-     */
-    protected static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
-
-    /**
      * @var array|string[]
      */
     private static array $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
@@ -68,6 +63,7 @@ class Prop2TextMultiTest extends DtBase
      * miscTest2 provider, test values for TEXT (MULTI) properties
      *
      * @return mixed[]
+     * @throws Exception
      */
     public function textMulti2Provider() : array
     {
@@ -261,9 +257,9 @@ class Prop2TextMultiTest extends DtBase
             $params
         );
         $getValue2 = $getValue;
-        $getValue2[Util::$LCparams][IcalInterface::MEMBER]         = [ 'MAILTO:DEV-GROUP2062@example.com' ];
-        $getValue2[Util::$LCparams][IcalInterface::DELEGATED_TO]   = [ 'MAILTO:bob2062@example.com' ];
-        $getValue2[Util::$LCparams][IcalInterface::DELEGATED_FROM] = [ 'MAILTO:jane2062@example.com' ];
+        $getValue2->params[IcalInterface::MEMBER]         = [ 'MAILTO:DEV-GROUP2062@example.com' ];
+        $getValue2->params[IcalInterface::DELEGATED_TO]   = [ 'MAILTO:bob2062@example.com' ];
+        $getValue2->params[IcalInterface::DELEGATED_FROM] = [ 'MAILTO:jane2062@example.com' ];
         $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue2 ], true ));
         $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
@@ -591,6 +587,8 @@ class Prop2TextMultiTest extends DtBase
                     IcalInterface::VEVENT,
                     IcalInterface::VTODO,
                     IcalInterface::VJOURNAL,
+                    IcalInterface::VLOCATION,
+                    IcalInterface::VRESOURCE
                 ]
             ],
             $value,
@@ -613,6 +611,8 @@ class Prop2TextMultiTest extends DtBase
                     IcalInterface::VEVENT,
                     IcalInterface::VTODO,
                     IcalInterface::VJOURNAL,
+                    IcalInterface::VLOCATION,
+                    IcalInterface::VRESOURCE
                 ]
             ],
             $value,
@@ -645,6 +645,8 @@ class Prop2TextMultiTest extends DtBase
                     IcalInterface::VEVENT,
                     IcalInterface::VTODO,
                     IcalInterface::VJOURNAL,
+                    IcalInterface::VLOCATION,
+                    IcalInterface::VRESOURCE
                 ]
             ],
             $value,
@@ -702,7 +704,7 @@ class Prop2TextMultiTest extends DtBase
                     IcalInterface::VTODO,
                     IcalInterface::VJOURNAL,
                     IcalInterface::VFREEBUSY,
-//                  IcalInterface::PARTICIPANT,   // todo
+//                  IcalInterface::PARTICIPANT,   // @todo
                 ]
             ],
             $value,
@@ -821,9 +823,10 @@ class Prop2TextMultiTest extends DtBase
                 }
                 $newMethod = 'new' . $theComp;
                 $comp = match ( true ) {
-                    IcalInterface::AVAILABLE === $theComp   => $c->newVavailability()->{$newMethod}(),
-                    IcalInterface::PARTICIPANT === $theComp => $c->newVevent()->{$newMethod}(),
-                    default                                 => $c->{$newMethod}(),
+                    IcalInterface::AVAILABLE === $theComp => $c->newVavailability()->{$newMethod}(),
+                    in_array( $theComp, [ IcalInterface::PARTICIPANT, IcalInterface::VLOCATION, IcalInterface::VRESOURCE ], true )
+                                                          => $c->newVevent()->{$newMethod}(),
+                    default                               => $c->{$newMethod}(),
                 };
                 $this->propNameTest(
                     $case . '-2',
@@ -893,10 +896,11 @@ class Prop2TextMultiTest extends DtBase
             return;
         }
 
-        $createMethod = StringFactory::getCreateMethodName( $propName );
-        $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-        $isMethod     = StringFactory::getIsMethodSetName( $propName );
-        $setMethod    = StringFactory::getSetMethodName( $propName );
+        [ $createMethod, $deleteMethod, , $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
+        $this->assertFalse(
+            $instance->{$isMethod}(),
+            sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $instance->getCompType(), $isMethod )
+        );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {
             $instance->{$setMethod}(
@@ -909,12 +913,16 @@ class Prop2TextMultiTest extends DtBase
         else {
             $instance->{$setMethod}( $value, $params );
         }
+        $this->assertTrue(
+            $instance->{$isMethod}(),
+            sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $instance->getCompType(), $isMethod )
+        );
 
         $getValue = $instance->{$getMethod}( null, true );
         $this->assertEquals(
             $expectedGet,
             $getValue,
-            sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $instance->getCompType(), $getMethod )
+            sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
         $createString = str_replace( Util::$CRLF . ' ' , null, $instance->{$createMethod}());
@@ -922,22 +930,22 @@ class Prop2TextMultiTest extends DtBase
         $this->assertEquals(
             $expectedString,
             trim( $createString ),
-            sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $instance->getCompType(), $createMethod )
+            sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $instance->getCompType(), $createMethod )
         );
 
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-3a', __FUNCTION__, $instance->getCompType(), $getMethod )
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-5a', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-3b', __FUNCTION__, $instance->getCompType(), $getMethod )
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-5b', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
         $this->assertFalse(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-3c', __FUNCTION__, $instance->getCompType(), $getMethod )
+            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-5c', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {
@@ -964,18 +972,18 @@ class Prop2TextMultiTest extends DtBase
         }
         $this->assertTrue(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4a', __FUNCTION__, $instance->getCompType(), $isMethod )
+            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-6a', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
 
         $instance->{$deleteMethod}();
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-4b', __FUNCTION__, $instance->getCompType(), $isMethod )
+            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-6b', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-4c', __FUNCTION__, $instance->getCompType(), $getMethod )
+            sprintf( self::$ERRFMT, '(after delete) ', $case . '-6c', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {

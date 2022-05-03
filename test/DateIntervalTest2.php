@@ -33,7 +33,6 @@ use Exception;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -178,14 +177,14 @@ class DateIntervalTest2 extends DtBase
 
 
     /**
-     * DateInterval678ProviderDateInterval sub-provider, TRIGGER
+     * dateInterval678TestProviderDateInterval sub-provider, TRIGGER
      *
      * @param mixed[] $dateIntervalArray
      * @param int $cnt
      * @return mixed[]
      * @throws Exception
      */
-    public static function DateInterval678ProviderDateInterval( array $dateIntervalArray, int $cnt ) : array
+    public static function dateInterval678TestProviderDateInterval( array $dateIntervalArray, int $cnt ) : array
     {
         $dateInterval = (array) DateIntervalFactory::factory(
             self::durationArray2string( $dateIntervalArray )
@@ -233,14 +232,14 @@ class DateIntervalTest2 extends DtBase
 
 
     /**
-     * DateInterval678ProviderDateIntervalString sub-provider, TRIGGER
+     * dateInterval678TestProviderDateIntervalString sub-provider, TRIGGER
      *
      * @param mixed[] $input
      * @param int $cnt
      * @return mixed[]
      * @throws Exception
      */
-    public static function DateInterval678ProviderDateIntervalString( array $input, int $cnt ) : array
+    public static function dateInterval678TestProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $dateIntervalArray = $input;
         $value  = DateIntervalFactory::factory( self::durationArray2string( $dateIntervalArray ));
@@ -286,19 +285,19 @@ class DateIntervalTest2 extends DtBase
     }
 
     /**
-     * testDateInterval678 provider
+     * testdateInterval678Test provider
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function DateInterval678Provider() : array
+    public function dateInterval678TestProvider() : array
     {
         $dataArr = [];
 
         // DateInterval input
         $cnt = 0;
         while( 100 > $cnt ) {
-            $dataArr[] = self::DateInterval678ProviderDateInterval(
+            $dataArr[] = self::dateInterval678TestProviderDateInterval(
                 self::DateIntervalArrayGenerator(),
                 $cnt
             );
@@ -308,7 +307,7 @@ class DateIntervalTest2 extends DtBase
         // string input
         $cnt = 0;
         while( 100 > $cnt ) {
-            $dataArr[] = self::DateInterval678ProviderDateIntervalString(
+            $dataArr[] = self::dateInterval678TestProviderDateIntervalString(
                 self::DateIntervalArrayGenerator(),
                 $cnt
             );
@@ -322,7 +321,7 @@ class DateIntervalTest2 extends DtBase
      * Testing DateInterval for TRIGGER
      *
      * @test
-     * @dataProvider DateInterval678Provider
+     * @dataProvider dateInterval678TestProvider
      * @param int|string $case
      * @param mixed  $value
      * @param mixed[] $params
@@ -330,7 +329,13 @@ class DateIntervalTest2 extends DtBase
      * @param string $expectedString
      * @throws Exception
      */
-    public function testDateInterval678( int | string $case, mixed $value, array $params, pc $expectedGet, string $expectedString ) : void
+    public function dateInterval678Test( 
+        int | string $case, 
+        mixed $value, 
+        array $params, 
+        pc $expectedGet, 
+        string $expectedString
+    ) : void
     {
         static $compProp = [
             IcalInterface::VALARM  => [ IcalInterface::TRIGGER ],
@@ -341,15 +346,16 @@ class DateIntervalTest2 extends DtBase
             $newMethod = 'new' . $theComp;
             $comp   = $c->newVevent()->{$newMethod}();
             foreach( $props as $propName ) {
-                $getMethod    = StringFactory::getGetMethodName( $propName );
-                $createMethod = StringFactory::getCreateMethodName( $propName );
-                $deleteMethod = StringFactory::getDeleteMethodName( $propName );
-                $setMethod    = StringFactory::getSetMethodName( $propName );
+                [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 /* // test ###
                 error_log( __FUNCTION__ . ' #' . $case . ' in ' . // test ###
-                    var_export( [ Util::$LCvalue => $value, Util::$LCparams => $params ], true ) // test ###
+                    var_export( [ Util::$LCvalue => $value, Pc::$LCparams => $params ], true ) // test ###
                 ); // test ###
                 */
+                $this->assertFalse(
+                    $comp->$isMethod(),
+                    "get error in case #$case-1, <$theComp>->$isMethod"
+                );
                 if( $pcInput ) {
                     $comp->{$setMethod}( Pc::factory( $value, $params ));
                 }
@@ -357,29 +363,31 @@ class DateIntervalTest2 extends DtBase
                     $comp->{$setMethod}( $value, $params );
                 }
                 $pcInput = ! $pcInput;
+                $this->assertTrue(
+                    $comp->$isMethod(),
+                    "get error in case #$case-2, <$theComp>->$isMethod"
+                );
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    "get error in case #{$case}-1, <{$theComp}>->{$getMethod}"
+                    "get error in case #$case-3, <$theComp>->{$getMethod}"
                 );
 
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}()),
-                    "create error in case #{$case}-2, <{$theComp}>->{$createMethod}"
+                    "create error in case #$case-4, <$theComp>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
                 $this->assertFalse(
                     $comp->{$getMethod}( true ),
-                    "get (after delete) error in case #{$case}-3, <{$theComp}>->{$deleteMethod}"
+                    "get (after delete) error in case #$case-5, <$theComp>->{$deleteMethod}"
                 );
                 $comp->{$setMethod}( $value, $params ); // test ###
             }
