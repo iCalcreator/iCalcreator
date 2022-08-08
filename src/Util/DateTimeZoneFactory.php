@@ -93,7 +93,13 @@ class DateTimeZoneFactory
             $timeZone = new DateTimeZone( $tzString );
         }
         catch( Exception $e ) {
-            throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
+            try {
+                $tzString = \IntlTimeZone::getIDForWindowsID($tzString);
+                $timeZone = new DateTimeZone( $tzString );
+            }
+            catch ( Exception $e ) {
+                throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
+            }
         }
         return $timeZone;
     }
