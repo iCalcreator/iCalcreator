@@ -30,15 +30,14 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * STRUCTURED-DATA property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait STRUCTURED_DATArfc9073trait
 {
@@ -54,24 +53,11 @@ trait STRUCTURED_DATArfc9073trait
      */
     public function createStructureddata() : string
     {
-        if( empty( $this->structureddata )) {
-            return self::$SP0;
-        }
-        $output  = self::$SP0;
-        foreach( $this->structureddata as $part ) {
-            if( empty( $part->value )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::STRUCTURED_DATA );
-                }
-                continue;
-            }
-            $output .= StringFactory::createElement(
-                self::STRUCTURED_DATA,
-                ParameterFactory::createParams( $part->params ),
-                StringFactory::strrep( $part->value )
-            );
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::STRUCTURED_DATA,
+            $this->structureddata,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -114,6 +100,18 @@ trait STRUCTURED_DATArfc9073trait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property structureddata
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllStructureddata( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->structureddata, $inclParam );
     }
 
     /**

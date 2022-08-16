@@ -29,8 +29,8 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -39,7 +39,7 @@ use InvalidArgumentException;
 /**
  * SOURCE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait SOURCErfc7986trait
 {
@@ -55,18 +55,10 @@ trait SOURCErfc7986trait
      */
     public function createSource() : string
     {
-        if( empty( $this->source )) {
-            return self::$SP0;
-        }
-        if( empty( $this->source->value )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::SOURCE )
-                : self::$SP0;
-        }
-        return StringFactory::createElement(
+        return SingleProps::format(
             self::SOURCE,
-            ParameterFactory::createParams( $this->source->params ),
-            $this->source->value
+            $this->source,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

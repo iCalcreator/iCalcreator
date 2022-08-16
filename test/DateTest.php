@@ -33,7 +33,6 @@ use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * class DateTest, testing VALUE DATE, also empty value, DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
@@ -332,8 +331,9 @@ class DateTest extends DtBase
         string $expectedString
     ) : void
     {
-//      echo __FUNCTION__ . ' start #' . $case . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
-
+//      error_log( __FUNCTION__ . ' start #' . $case .
+//          ' value : ' . var_export( $value, true ) .
+//          ' params : ' . var_export( $params, true )); // test ###
         $this->thePropTest( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
         $this->propGetNoParamsTest( $case, self::$compsProps, $value, $params, $expectedGet );
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
@@ -421,7 +421,7 @@ class DateTest extends DtBase
             [],
             Pc::factory(
                 [ clone $dateTime, clone $dateTime ],
-                [ Util::$ISLOCALTIME => true ]
+                [ IcalInterface::ISLOCALTIME => true ]
             ),
             $this->getDateTimeAsCreateLongString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
         ];

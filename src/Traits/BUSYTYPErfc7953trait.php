@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -39,7 +40,7 @@ use function strtoupper;
 /**
  * rfc7953 BUSYTYPE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait BUSYTYPErfc7953trait
 {
@@ -55,16 +56,10 @@ trait BUSYTYPErfc7953trait
      */
     public function createBusytype() : string
     {
-        if( empty( $this->busytype )) {
-            return self::$SP0;
-        }
-        if( empty( $this->busytype->value )) {
-            return $this->createSinglePropEmpty( self::BUSYTYPE );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::BUSYTYPE,
-            ParameterFactory::createParams( $this->busytype->params ),
-            $this->busytype->value
+            $this->busytype,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

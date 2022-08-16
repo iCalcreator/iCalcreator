@@ -33,15 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * TZUNTIL property functions
  *
- * @since 2.41.44 2022-04-21
+ * @since 2.41.55 - 2022-08-13
  */
 trait TZUNTILrfc7808trait
 {
@@ -56,20 +56,14 @@ trait TZUNTILrfc7808trait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.44 2022-04-21
+     * @since 2.41.55 - 2022-08-13
      */
     public function createTzuntil() : string
     {
-        if( empty( $this->tzuntil )) {
-            return self::$SP0;
-        }
-        if( empty( $this->tzuntil->value )) {
-            return $this->createSinglePropEmpty( self::TZUNTIL );
-        }
-        return StringFactory::createElement(
+        return  DtxProperty::format(
             self::TZUNTIL,
-            ParameterFactory::createParams( $this->tzuntil->params ),
-            DateTimeFactory::dateTime2Str( $this->tzuntil->value )
+            $this->tzuntil,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

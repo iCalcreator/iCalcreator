@@ -30,14 +30,12 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use Kigkonsult\Icalcreator\Formatter\Vlocation as Formatter;
 
 /**
  * iCalcreator Vlocation component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vlocation extends CalendarComponent
 {
@@ -60,6 +58,45 @@ final class Vlocation extends CalendarComponent
     protected static string $compSgn = 'vl';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setUid();
+    }
+
+    /**
+     * Return Vlocation object instance
+     *
+     * @param null|array $config
+     * @param null|string $locationType property LOCATION-TYPE value
+     * @param null|string $name property NAME value
+     * @return Vlocation
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        ? string $locationType = null,
+        ? string $name = null
+    ) : Vlocation
+    {
+        $instance = new Vlocation( $config );
+        if( null !== $locationType ) {
+            $instance->setLocationtype( $locationType );
+        }
+        if( null !== $name ) {
+            $instance->setName( $name );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
      * @since 2.41.5 2022-01-19
@@ -70,7 +107,6 @@ final class Vlocation extends CalendarComponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->propDelIx
@@ -95,21 +131,10 @@ final class Vlocation extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Duration/Trigger err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDescription() .
-            $this->createGeo() .
-            $this->createUrl() .
-            $this->createLocationtype() .
-            $this->createName() .
-            $this->createStructureddata() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

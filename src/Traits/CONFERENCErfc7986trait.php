@@ -29,16 +29,16 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * CONFERENCE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait CONFERENCErfc7986trait
 {
@@ -54,28 +54,12 @@ trait CONFERENCErfc7986trait
      */
     public function createConference() : string
     {
-        if( empty( $this->conference )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->conference as $conferencePart ) {
-            if( ! empty( $conferencePart->value )) {
-                $output .= StringFactory::createElement(
-                    self::CONFERENCE,
-                    ParameterFactory::createParams(
-                        $conferencePart->params,
-                        [ self::FEATURE, self::LABEL, self::LANGUAGE ],
-                        $lang
-                    ),
-                    $conferencePart->value
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::CONFERENCE );
-            }
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::CONFERENCE,
+            $this->conference,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -118,6 +102,18 @@ trait CONFERENCErfc7986trait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property conference
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllConference( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->conference, $inclParam );
     }
 
     /**

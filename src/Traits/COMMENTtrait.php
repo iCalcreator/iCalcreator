@@ -29,16 +29,16 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * COMMENT property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait COMMENTtrait
 {
@@ -54,29 +54,12 @@ trait COMMENTtrait
      */
     public function createComment() : string
     {
-        if( empty( $this->comment )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->comment as $commentPart ) { // Pc
-            if( empty( $commentPart->value )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::COMMENT );
-                }
-                continue;
-            }
-            $output .= StringFactory::createElement(
-                self::COMMENT,
-                ParameterFactory::createParams(
-                    $commentPart->params,
-                    self::$ALTRPLANGARR,
-                    $lang
-                ),
-                StringFactory::strrep( $commentPart->value )
-            );
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::COMMENT,
+            $this->comment,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -121,6 +104,18 @@ trait COMMENTtrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property comment
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllComment( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->comment, $inclParam );
     }
 
     /**

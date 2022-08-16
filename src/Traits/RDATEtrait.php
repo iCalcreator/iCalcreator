@@ -32,13 +32,14 @@ namespace Kigkonsult\Icalcreator\Traits;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Rdate;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function count;
+use function in_array;
 use function is_array;
 use function reset;
 
@@ -62,13 +63,10 @@ trait RDATEtrait
      */
     public function createRdate() : string
     {
-        if( empty( $this->rdate )) {
-            return self::$SP0;
-        }
-        return RexdateFactory::formatRdate(
+        return Rdate::format(
+            self::RDATE,
             $this->rdate,
-            $this->getConfig( self::ALLOWEMPTY ),
-            $this->getCompType()
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -119,6 +117,18 @@ trait RDATEtrait
     }
 
     /**
+     * Return array, all calendar component property rdate
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllRdate( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->rdate, $inclParam );
+    }
+
+    /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
@@ -157,8 +167,8 @@ trait RDATEtrait
             $value->value,
             $value->hasParamValue( self::PERIOD )
         );
-        if( Util::isCompInList( $this->getCompType(), Vcalendar::$TZCOMPS )) {
-            $value->addParam( Util::$ISLOCALTIME, true );
+        if( in_array( $this->getCompType(), Vcalendar::$TZCOMPS, true )) {
+            $value->addParam( self::ISLOCALTIME, true );
         }
         self::setMval( $this->rdate, RexdateFactory::prepInputRdate( $value ), $index );
         return $this;

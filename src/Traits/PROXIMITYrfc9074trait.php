@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -37,7 +38,7 @@ use InvalidArgumentException;
 /**
  * PROXIMITY property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait PROXIMITYrfc9074trait
 {
@@ -53,16 +54,10 @@ trait PROXIMITYrfc9074trait
      */
     public function createProximity() : string
     {
-        if( empty( $this->proximity )) {
-            return self::$SP0;
-        }
-        if( empty( $this->proximity->value )) {
-            return $this->createSinglePropEmpty( self::PROXIMITY );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::PROXIMITY,
-            ParameterFactory::createParams( $this->proximity->params ),
-            StringFactory::strrep( $this->proximity->value )
+            $this->proximity,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

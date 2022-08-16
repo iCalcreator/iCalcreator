@@ -30,15 +30,14 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * STYLED-DESCRIPTION property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait STYLED_DESCRIPTIONrfc9073trait
 {
@@ -54,33 +53,12 @@ trait STYLED_DESCRIPTIONrfc9073trait
      */
     public function createStyleddescription() : string
     {
-        if( empty( $this->styleddescription )) {
-            return self::$SP0;
-        }
-        $output  = self::$SP0;
-        $txtLang = $this->getConfig( self::LANGUAGE );
-        foreach( $this->styleddescription as $part ) {
-            if( empty( $part->value )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::STYLED_DESCRIPTION );
-                }
-                continue;
-            }
-            if( $part->hasParamValue( self::TEXT )) {
-                $ctrKeys = self::$ALTRPLANGARR;
-                $lang    = $txtLang;
-            }
-            else {
-                $ctrKeys = [];
-                $lang    = null;
-            }
-            $output .= StringFactory::createElement(
-                self::STYLED_DESCRIPTION,
-                ParameterFactory::createParams( $part->params, $ctrKeys, $lang ),
-                StringFactory::strrep( $part->value )
-            );
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::STYLED_DESCRIPTION,
+            $this->styleddescription,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -123,6 +101,18 @@ trait STYLED_DESCRIPTIONrfc9073trait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property styleddescription
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllStyleddescription( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->styleddescription, $inclParam );
     }
 
     /**

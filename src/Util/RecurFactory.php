@@ -56,10 +56,8 @@ use function ksort;
 use function mktime;
 use function sprintf;
 use function strcasecmp;
-use function strlen;
 use function strtoupper;
 use function substr;
-use function trim;
 use function usort;
 use function var_export;
 
@@ -186,222 +184,6 @@ class RecurFactory
     private static string $WEEKNO_DOWN     = 'weekno_down';
 
     /**
-     * Sort recur dates
-     *
-     * @param string $byDayA
-     * @param string $byDayB
-     * @return int
-     */
-    private static function recurBydaySort( string $byDayA, string $byDayB ) : int
-    {
-        static $days = [
-            IcalInterface::SU => 0,
-            IcalInterface::MO => 1,
-            IcalInterface::TU => 2,
-            IcalInterface::WE => 3,
-            IcalInterface::TH => 4,
-            IcalInterface::FR => 5,
-            IcalInterface::SA => 6,
-        ];
-        return ( $days[substr( $byDayA, -2 )] < $days[substr( $byDayB, -2 )] )
-            ? -1
-            : 1;
-    }
-
-    /**
-     * Return formatted output for calendar component property data value type recur
-     *
-     * "The value of the UNTIL rule part MUST have the same value type as the "DTSTART" property.
-     *  Furthermore, if the "DTSTART" property is specified as a date with local time,
-     *    then the UNTIL rule part MUST also be specified as a date with local time.
-     *  If the "DTSTART" property is specified as a date
-     *      with UTC time
-     *      or
-     *      a date with local time and time zone reference,
-     *    then the UNTIL rule part MUST be specified as a date with UTC time.
-     *  In the case of the "STANDARD" and "DAYLIGHT" sub-components
-     *    the UNTIL rule part MUST always be specified as a date with UTC time.
-     *  If specified as a DATE-TIME value, then it MUST be specified in a UTC time format."
-     * @param string        $recurPropName
-     * @param null|Pc       $recurData
-     * @param null|bool     $allowEmpty
-     * @return string
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @since 2.41.16 - 2022-01-31
-     * @todo above
-     */
-    public static function formatRecur(
-        string  $recurPropName,
-        ? Pc $recurData = null,
-        ? bool  $allowEmpty = true
-    ) : string
-    {
-        static $FMTRSCALEEQ      = 'RSCALE=%s';
-        static $FMTFREQEQ        = 'FREQ=%s';
-        static $FMTDEFAULTEQ     = ';%s=%s';
-        static $FMTOTHEREQ       = ';%s=';
-        static $RECURBYDAYSORTER = [ __CLASS__, 'recurBydaySort' ];
-        if( null === $recurData ) {
-            return Util::$SP0;
-        }
-        if( empty( $recurData->value )) {
-            return ( $allowEmpty )
-                ? StringFactory::createElement( $recurPropName )
-                : Util::$SP0;
-        }
-        $output      = Util::$SP0;
-        $isValueDate = $recurData->hasParamValue( IcalInterface::DATE );
-        if( ! empty( $recurData->params )) {
-            $recurData = clone $recurData;
-            $recurData->removeParam( IcalInterface::VALUE );
-            $attributes = ParameterFactory::createParams( $recurData->params );
-        }
-        else {
-            $attributes = Util::$SP0;
-        }
-        $content1 = $content2 = null;
-        foreach( $recurData->value as $ruleLabel => $ruleValue ) {
-            $ruleLabel = strtoupper( $ruleLabel );
-            switch( $ruleLabel ) {
-                case IcalInterface::RSCALE :
-                    $content1 .= sprintf( $FMTRSCALEEQ, $ruleValue );
-                    break;
-                case IcalInterface::FREQ :
-                    if( ! empty( $content1 )) {
-                        $content1 .= Util::$SEMIC;
-                    }
-                    $content1 .= sprintf( $FMTFREQEQ, $ruleValue );
-                    break;
-                case IcalInterface::UNTIL :
-                    $content2  .= sprintf(
-                        $FMTDEFAULTEQ,
-                        IcalInterface::UNTIL,
-                        DateTimeFactory::dateTime2Str( $ruleValue, $isValueDate )
-                    );
-                    break;
-                case IcalInterface::COUNT :
-                case IcalInterface::INTERVAL :
-                case IcalInterface::WKST :
-                    $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
-                    break;
-                case IcalInterface::BYDAY :
-                    $byday = [ Util::$SP0 ];
-                    $bx    = 0;
-                    foreach( $ruleValue as $bydayPart ) {
-                        if( ! empty( $byday[$bx] ) &&   // new day
-                            ! ctype_digit( substr( $byday[$bx], -1 ))) {
-                            $byday[++$bx] = Util::$SP0;
-                        }
-                        if( ! is_array( $bydayPart )) {  // day without rel pos number
-                            $byday[$bx] .= $bydayPart;
-                        }
-                        else {                          // day with rel pos number
-                            foreach( $bydayPart as $bydayPart2 ) {
-                                $byday[$bx] .= $bydayPart2;
-                            }
-                        }
-                    } // end foreach( $ruleValue as $bix => $bydayPart )
-                    if( 1 < count( $byday )) {
-                        usort( $byday, $RECURBYDAYSORTER );
-                    }
-                    $content2 .= sprintf(
-                        $FMTDEFAULTEQ,
-                        IcalInterface::BYDAY,
-                        implode( Util::$COMMA, $byday )
-                    );
-                    break;
-                default : // BYSECOND/BYMINUTE/BYHOUR/BYMONTHDAY/BYYEARDAY/BYWEEKNO/BYMONTH/BYSETPOS...
-                    if( is_array( $ruleValue )) {
-                        $content2 .= sprintf( $FMTOTHEREQ, $ruleLabel );
-                        $content2 .= implode( Util::$COMMA, $ruleValue );
-                    }
-                    else {
-                        $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
-                    }
-                    break;
-            } // end switch( $ruleLabel )
-        } // end foreach( $theRule[Util::$LCvalue] )) as $ruleLabel => $ruleValue )
-        $output .= StringFactory::createElement(
-            $recurPropName,
-            $attributes,
-            $content1 . $content2
-        );
-        return $output;
-    }
-
-    /**
-     * Return (array) parsed rexrule string
-     *
-     * @param string $row
-     * @return mixed[]
-     * @since 2.27.3 - 2018-12-28
-     */
-    public static function parseRexrule( string $row ) : array
-    {
-        static $EQ = '=';
-        $recur     = [];
-        $values    = explode( Util::$SEMIC, $row );
-        foreach( $values as $value2 ) {
-            if( empty( $value2 )) {
-                continue;
-            } // ;-char in end position ???
-            $value3    = explode( $EQ, $value2, 2 );
-            $ruleLabel = strtoupper( $value3[0] );
-            if( IcalInterface::BYDAY === $ruleLabel ) {
-                $value4 = explode( Util::$COMMA, $value3[1] );
-                if( 1 < count( $value4 )) {
-                    foreach( $value4 as $v5ix => $value5 ) {
-                        $value4[$v5ix] =
-                            self::updateDayNoAndDayName( trim( $value5 ));
-                    }
-                }
-                else {
-                    $value4 = self::updateDayNoAndDayName(
-                        trim( $value3[1] )
-                    );
-                }
-                $recur[$ruleLabel] = $value4;
-            } // end if
-            else {
-                $value4 = explode( Util::$COMMA, $value3[1] );
-                if( 1 < count( $value4 )) {
-                    $value3[1] = $value4;
-                }
-                $recur[$ruleLabel] = $value3[1];
-            } // end else
-        } // end - foreach( $values.. .
-        return $recur;
-    }
-
-    /**
-     * Return array, day rel pos number (opt) and day name abbr
-     *
-     * @param string $dayValueBase
-     * @return mixed[]
-     * @since  2.27.16 - 2019-03-03
-     */
-    private static function updateDayNoAndDayName( string $dayValueBase ) : array
-    {
-        $output = [];
-        $dayno  = $dayName = false;
-        if(( ctype_alpha( substr( $dayValueBase, -1 ))) &&
-            ( ctype_alpha( $dayValueBase[strlen( $dayValueBase ) - 2] ))) {
-            $dayName = substr( $dayValueBase, -2, 2 );
-            if( 2 < strlen( $dayValueBase )) {
-                $dayno = (int) substr( $dayValueBase, 0, ( strlen( $dayValueBase ) - 2 ));
-            }
-        }
-        if( false !== $dayno ) {
-            $output[] = $dayno;
-        }
-        if( false !== $dayName ) {
-            $output[IcalInterface::DAY] = $dayName;
-        }
-        return $output;
-    }
-
-    /**
      * Convert input format for EXRULE and RRULE to internal format
      *
      * "The value of the UNTIL rule part MUST have the same value type as the "DTSTART" property."
@@ -410,6 +192,7 @@ class RecurFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
+     * @throws LogicException
      * @since 2.41.36 2022-04-03
      * @todo "The BYSECOND, BYMINUTE and BYHOUR rule parts MUST NOT be specified
      *        when the associated "DTSTART" property has a DATE value type."
@@ -644,7 +427,7 @@ class RecurFactory
         $foundUids = [];
         $calendar->resetCompCounter();
         while( $component = $calendar->getComponent()) {
-            if( ! Util::isCompInList( $component->getCompType(), $compTypes )) {
+            if( ! in_array( $component->getCompType(), $compTypes, true )) {
                 continue;
             }
             foreach( $RRULEPROPS as $rruleProp ) {
@@ -653,7 +436,7 @@ class RecurFactory
                     continue;
                 }
                 if( isset( $propValue->value[IcalInterface::RSCALE] ) &&
-                    ! in_array( $propValue->value[IcalInterface::RSCALE], $ACCEPTED )) { // no third arg
+                    ! in_array( $propValue->value[IcalInterface::RSCALE], $ACCEPTED, true )) {
                     $foundUids[] = $component->getUID();
                 }
             } // end foreach

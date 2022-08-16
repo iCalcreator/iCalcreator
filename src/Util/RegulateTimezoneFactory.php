@@ -33,7 +33,10 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Parser\ComponentParser;
+use Kigkonsult\Icalcreator\Parser\VcalendarParser;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -42,6 +45,7 @@ use function array_reverse;
 use function arsort;
 use function explode;
 use function implode;
+use function in_array;
 use function key;
 use function reset;
 use function sprintf;
@@ -215,9 +219,10 @@ class RegulateTimezoneFactory
     /**
      * Class constructor
      *
-     * @param null|string|string[]   $inputiCal    strict rfc2445 formatted calendar
-     * @param null|string[]     $otherTzPhpRelations  [ other => phpTz ]
+     * @param null|string|string[] $inputiCal strict rfc2445 formatted calendar
+     * @param null|string[] $otherTzPhpRelations [ other => phpTz ]
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function __construct( null|string|array $inputiCal = null, ? array $otherTzPhpRelations = [] )
     {
@@ -234,10 +239,11 @@ class RegulateTimezoneFactory
     /**
      * Class factory method
      *
-     * @param null|string|string[] $inputiCal    strict rfc2445 formatted calendar
-     * @param null|string[]   $otherTzPhpRelations  [ other => phpTz ]
+     * @param null|string|string[] $inputiCal strict rfc2445 formatted calendar
+     * @param null|string[] $otherTzPhpRelations [ other => phpTz ]
      * @return self
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public static function factory( null|string|array $inputiCal = null, ? array $otherTzPhpRelations = [] ) : self
     {
@@ -302,7 +308,7 @@ class RegulateTimezoneFactory
             }
             /* split property name  and  opt.params and value */
             [$propName, $row2] = StringFactory::getPropName( $row );
-            if( ! Util::isPropInList( $propName, self::$TZIDPROPS )) {
+            if( ! in_array( $propName, self::$TZIDPROPS, true )) {
                 $this->setOutputiCalRow( $row );
                 continue;
             }
@@ -385,7 +391,7 @@ class RegulateTimezoneFactory
                 continue;
             }
             /* separate attributes from value */
-            [ $value, $propAttr ] = StringFactory::splitContent( $row2 );
+            [ $value, $propAttr ] = ComponentParser::splitContent( $row2 );
             $currTzId = $value;
             $valueNew = null;
             switch( true ) {
@@ -537,7 +543,7 @@ class RegulateTimezoneFactory
     private static function splitContent( string $row2 ) : array
     {
         /* separate attributes from value */
-        [ $value, $propAttr ] = StringFactory::splitContent( $row2 );
+        [ $value, $propAttr ] = ComponentParser::splitContent( $row2 );
         /* fix splitContent UTC 'bug' */
         self::fixUTCx( $row2, $value, $propAttr );
         return [ $value, $propAttr ];
@@ -572,9 +578,7 @@ class RegulateTimezoneFactory
         if( $throwException ?? true ) {
             throw new RuntimeException( sprintf( $ERR, $offset, $seconds ));
         }
-        else {
-            return Util::$SP0;
-        }
+        return Util::$SP0;
     }
 
     /**
@@ -715,13 +719,14 @@ class RegulateTimezoneFactory
      * @param string|mixed[] $inputiCal
      * @return self
      * @throws UnexpectedValueException
+     * @throws Exception
      */
     public function setInputiCal( string | array $inputiCal ) : self
     {
         /* get rows to parse */
-        $rows = StringFactory::conformParseInput( $inputiCal );
+        $rows = VcalendarParser::conformParseInput( $inputiCal );
         /* concatenate property values spread over several rows */
-        $this->inputiCal = StringFactory::concatRows( $rows );
+        $this->inputiCal = VcalendarParser::concatRows( $rows );
         /* Initiate output */
         $this->setEmptyVtimezoneRows();
         return $this;
@@ -782,7 +787,7 @@ class RegulateTimezoneFactory
      */
     private function setOutputiCalRow( string $row ) : void
     {
-        $this->outputiCal .= StringFactory::size75( $row );
+        $this->outputiCal .= Property::size75( $row );
     }
 
     /**
@@ -795,8 +800,11 @@ class RegulateTimezoneFactory
      */
     private function setOutputiCalRowElements( string $propName, string $value, array $propAttr ) : void
     {
-        $params = ParameterFactory::createParams( $propAttr );
-        $this->outputiCal .= StringFactory::createElement( $propName, $params, $value );
+        $this->outputiCal .= Property::createElement(
+            $propName,
+            Property::createParams( $propAttr ),
+            $value
+        );
     }
 
 

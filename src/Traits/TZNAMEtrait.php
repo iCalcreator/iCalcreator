@@ -30,15 +30,15 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * TZNAME property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait TZNAMEtrait
 {
@@ -54,24 +54,12 @@ trait TZNAMEtrait
      */
     public function createTzname() : string
     {
-        if( empty( $this->tzname )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->tzname as $theName ) {
-            if( ! empty( $theName->value )) {
-                $output .= StringFactory::createElement(
-                    self::TZNAME,
-                    ParameterFactory::createParams( $theName->params, [ self::LANGUAGE ], $lang ),
-                    StringFactory::strrep( $theName->value )
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::TZNAME );
-            }
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::TZNAME,
+            $this->tzname,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -116,6 +104,18 @@ trait TZNAMEtrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property tzname
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllTzname( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->tzname, $inclParam );
     }
 
     /**

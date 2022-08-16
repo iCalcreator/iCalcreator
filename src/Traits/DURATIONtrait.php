@@ -33,6 +33,7 @@ use DateInterval;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DurDates;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -41,7 +42,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 /**
  * DURATION property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.56 2022-08-15
  */
 trait DURATIONtrait
 {
@@ -55,20 +56,14 @@ trait DURATIONtrait
      *
      * @return string
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 2022-08-13
      */
     public function createDuration() : string
     {
-        if( empty( $this->duration )) {
-            return self::$SP0;
-        }
-        if( empty( $this->duration->value )) {
-            return $this->createSinglePropEmpty( self::DURATION );
-        }
-        return StringFactory::createElement(
+        return DurDates::format(
             self::DURATION,
-            ParameterFactory::createParams( $this->duration->params ),
-            DateIntervalFactory::dateInterval2String( $this->duration->value )
+            $this->duration,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -141,7 +136,7 @@ trait DURATIONtrait
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.56 2022-08-15
      * @todo "When the "DURATION" property relates to a
      *        "DTSTART" property that is specified as a DATE value, then the
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
@@ -149,6 +144,7 @@ trait DURATIONtrait
      */
     public function setDuration( null|string|DateInterval|Pc $value = null, ? array $params = [] ) : static
     {
+        static $FMTERRPROPFMT = 'Invalid %s input format (%s)';
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
@@ -173,11 +169,7 @@ trait DURATIONtrait
                 break;
             default :
                 throw new InvalidArgumentException(
-                    sprintf(
-                        self::$FMTERRPROPFMT,
-                        self::DURATION,
-                        var_export( $value->value, true )
-                    )
+                    sprintf( $FMTERRPROPFMT, self::DURATION, var_export( $value->value, true ))
                 );
         } // end switch
         $this->duration = $value;

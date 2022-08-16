@@ -29,10 +29,13 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use Exception;
+use Kigkonsult\Icalcreator\Formatter\DScomponent as Formatter;
+
 /**
  * iCalcreator (Vtimezone) Daylight component class
  *
- * @since  2.29.11 - 2019-08-30
+ * @since  2.29.55 - 2022-08-13
  */
 final class Daylight extends DScomponent
 {
@@ -40,4 +43,16 @@ final class Daylight extends DScomponent
      * @var string
      */
     protected static string $compSgn = 'd';
+
+    /**
+     * Return formatted output for calendar component VTIMEZONE Daylight object instances
+     *
+     * @return string
+     * @throws Exception  (on Rdate err)
+     * @since 2.41.55 2022-08-13
+     */
+    public function createComponent() : string
+    {
+        return Formatter::format( $this );
+    }
 }

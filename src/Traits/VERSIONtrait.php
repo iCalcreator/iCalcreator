@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\CalMetProVer;
 
 /**
  * VERSION property functions
@@ -54,7 +55,7 @@ trait VERSIONtrait
      */
     public function createVersion() : string
     {
-        return sprintf( self::$FMTICAL, self::VERSION, $this->version );
+        return CalMetProVer::format( self::VERSION, $this->version );
     }
 
     /**

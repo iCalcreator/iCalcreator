@@ -33,9 +33,7 @@ use InvalidArgumentException;
 use function array_key_exists;
 use function in_array;
 use function is_array;
-use function strtolower;
 use function strtoupper;
-use function ucfirst;
 
 /**
  * iCalcreator utility/support class
@@ -55,11 +53,6 @@ class Util
      * @deprecated
      */
     public static string $LCparams      = 'params';
-
-    /**
-     * @var string
-     */
-    public static string $ISLOCALTIME   = 'ISLOCALTIME';
 
     /**
      * @var string
@@ -115,35 +108,6 @@ class Util
      * @var string
      */
     public static string $SLASH         = '/';
-
-    /**
-     * Return bool true if compType is in array
-     *
-     * @param string    $compType   component name
-     * @param string[]  $compList   list of components
-     * @return bool
-     * @since  2.26 - 2018-11-03
-     */
-    public static function isCompInList( string $compType, array $compList ) : bool
-    {
-        if( empty( $compType )) {
-            return false;
-        }
-        return in_array( ucfirst( strtolower( $compType ) ), $compList, true );
-    }
-
-    /**
-     * Return bool true if property is in array
-     *
-     * @param string   $propName   property name
-     * @param string[] $propList   list of properties
-     * @return bool
-     * @since  2.26 - 2018-11-04
-     */
-    public static function isPropInList( string $propName, array $propList ) : bool
-    {
-        return in_array( strtoupper( $propName ), $propList, true );
-    }
 
     /**
      * Return bool true if array key is isset and not empty

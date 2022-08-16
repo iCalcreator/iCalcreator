@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -38,7 +39,7 @@ use InvalidArgumentException;
 /**
  * TZID property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait TZIDtrait
 {
@@ -54,16 +55,10 @@ trait TZIDtrait
      */
     public function createTzid() : string
     {
-        if( empty( $this->tzid )) {
-            return self::$SP0;
-        }
-        if( empty( $this->tzid->value )) {
-            return $this->createSinglePropEmpty( self::TZID );
-        }
-        return StringFactory::createElement(
+        return SingleProps::format(
             self::TZID,
-            ParameterFactory::createParams( $this->tzid->params ),
-            StringFactory::strrep( $this->tzid->value )
+            $this->tzid,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -126,7 +121,7 @@ trait TZIDtrait
             $value->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::RESOURCE_TYPE );
+            Util::assertString( $value->value, self::TZID );
             $value->value = StringFactory::trimTrailNL( $value->value );
         }
         $this->tzid = $value->setParams( ParameterFactory::setParams( $params ));

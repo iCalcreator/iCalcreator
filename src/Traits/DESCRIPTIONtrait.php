@@ -30,9 +30,9 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -41,7 +41,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  *
  * DESCRIPTION may occur multiply times i Vcalendar and Vjournal, once otherwise
  *
- * @since 2.41.36 2022-04-11
+ * @since 2.41.55 2022-08-13
  */
 trait DESCRIPTIONtrait
 {
@@ -58,28 +58,12 @@ trait DESCRIPTIONtrait
      */
     public function createDescription() : string
     {
-        if( empty( $this->description )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->description as $description ) {
-            if( ! empty( $description->value )) {
-                $output .= StringFactory::createElement(
-                    self::DESCRIPTION,
-                    ParameterFactory::createParams(
-                        $description->params,
-                        self::$ALTRPLANGARR,
-                        $lang
-                    ),
-                    StringFactory::strrep( $description->value )
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::DESCRIPTION );
-            }
-        }
-        return $output;
+        return MultiProps::format(
+            self::DESCRIPTION,
+            $this->description,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -141,6 +125,18 @@ trait DESCRIPTIONtrait
     }
 
     /**
+     * Return array, all calendar component property description
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllDescription( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->description, $inclParam );
+    }
+
+    /**
      * Return bool true if DESCRIPTION property may only occur once in component
      *
      * @param string $compName
@@ -150,7 +146,7 @@ trait DESCRIPTIONtrait
     public static function isDescriptionSingleProp( string $compName ) : bool
     {
         static $MULTIDESCRCOMPS = [ Vcalendar::VCALENDAR,self::VJOURNAL ];
-        return ( ! in_array( $compName, $MULTIDESCRCOMPS ));
+        return ( ! in_array( $compName, $MULTIDESCRCOMPS, true ) );
     }
 
     /**

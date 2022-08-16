@@ -30,14 +30,12 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use Kigkonsult\Icalcreator\Formatter\Vresource as Formatter;
 
 /**
  * iCalcreator Vlocation component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vresource extends CalendarComponent
 {
@@ -59,6 +57,45 @@ final class Vresource extends CalendarComponent
     protected static string $compSgn = 'vr';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setUid();
+    }
+
+    /**
+     * Return Vresource object instance
+     *
+     * @param null|array $config
+     * @param null|string $resourceType property RESOURCE-TYPE value
+     * @param null|string $name property NAME value
+     * @return Vresource
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        ? string $resourceType = null,
+        ? string $name = null
+    ): Vresource
+    {
+        $instance = new Vresource( $config );
+        if( null !== $resourceType ) {
+            $instance->setResourcetype( $resourceType );
+        }
+        if( null !== $name ) {
+            $instance->setName( $name );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
      * @since 2.41.7 2022-01-20
@@ -69,7 +106,6 @@ final class Vresource extends CalendarComponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->propDelIx
@@ -93,20 +129,10 @@ final class Vresource extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Duration/Trigger err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDescription() .
-            $this->createGeo() .
-            $this->createName() .
-            $this->createResourcetype() .
-            $this->createStructureddata() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

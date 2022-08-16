@@ -59,14 +59,7 @@ class PropEmptyTest extends DtBase
             ->setImage();
 
         $tz = $c->newVtimezone()
-            ->setComment()
-            ->setDtstart()
-            ->setRdate()
-            ->setRrule()
             ->setTzid()
-            ->setTzname()
-            ->setTzoffsetfrom()
-            ->setTzoffsetto()
             ->setTzuntil()
             ->setTzurl()
             ->setTzidAliasOf();

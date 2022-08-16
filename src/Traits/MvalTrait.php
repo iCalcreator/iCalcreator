@@ -120,6 +120,32 @@ trait MvalTrait
     }
 
     /**
+     * Return array, all calendar component multiProp properties
+     *
+     * @param null|mixed[]  $multiProp component (multi-)property
+     * @param bool     $inclParam
+     * @return array
+     * @since  2.41.51 - 2022-08-09
+     */
+    protected static function getMvalProperties(
+        ? array $multiProp = [],
+        ? bool $inclParam = false
+    ) : array
+    {
+        if( empty( $multiProp )) {
+            return [];
+        }
+        if( $inclParam ) {
+            return $multiProp;
+        }
+        $output = [];
+        foreach( $multiProp as $property ) {
+            $output[] = $property->value;
+        }
+        return $output;
+    }
+
+    /**
      * Get calendar component multpProp property
      *
      * @param mixed[]  $multiProp component (multi-)property
@@ -164,7 +190,7 @@ trait MvalTrait
      * @return bool
      * @since 2.41.36 2022-04-09
      */
-    protected static function isMvalSet( ? array & $valueArr = [] ) : bool
+    protected static function isMvalSet( ? array $valueArr = [] ) : bool
     {
         if( empty( $valueArr )) {
             return false;

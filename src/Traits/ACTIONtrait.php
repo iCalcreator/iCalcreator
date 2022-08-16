@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -40,7 +41,7 @@ use function strtoupper;
 /**
  * ACTION property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait ACTIONtrait
 {
@@ -56,16 +57,10 @@ trait ACTIONtrait
      */
     public function createAction() : string
     {
-        if( empty( $this->action )) {
-            return self::$SP0;
-        }
-        if( empty( $this->action->value )) {
-            return $this->createSinglePropEmpty( self::ACTION );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::ACTION,
-            ParameterFactory::createParams( $this->action->params ),
-            $this->action->value
+            $this->action,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

@@ -26,7 +26,7 @@
  *            You should have received a copy of the GNU Lesser General Public License
  *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
-
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use DateInterval;
@@ -317,7 +317,7 @@ class IcalXMLFactory
      * @return bool|string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-08
+     * @since 2.41.51 2022-08-09
      */
     public static function iCal2XML( Vcalendar $calendar ) : bool | string
     {
@@ -335,7 +335,7 @@ class IcalXMLFactory
             if( false !== ( $contents = $calendar->{$method}())) {
                 self::addXMLchildText( $properties, $propName, Pc::factory( $contents ));
             }
-        }
+        } // end foreach
         foreach( self::$calPropsrfc7986Single as $propName ) {
             $method = StringFactory::getGetMethodName( $propName );
             switch( strtoupper( $propName )) {
@@ -365,12 +365,12 @@ class IcalXMLFactory
             } // end switch
         } // end foreach
         foreach( self::$calPropsrfc7986Multi as $propName ) {
-            $method = StringFactory::getGetMethodName( $propName );
+            $method = StringFactory::getGetAllMethodName( $propName );
             switch( strtoupper( $propName )) {
                 case IcalInterface::CATEGORIES :  // fall through
                 case IcalInterface::DESCRIPTION : // fall through
                 case IcalInterface::NAME :
-                    while( false !== ( $contents = $calendar->{$method}( null, true ))) {
+                    foreach( $calendar->{$method}( true ) as $contents ) {
                         if( ! empty( $langCal )) {
                             $contents->addParam( IcalInterface::LANGUAGE, $langCal, false );
                         }
@@ -378,13 +378,13 @@ class IcalXMLFactory
                     } // end while
                     break;
                 case IcalInterface::IMAGE :
-                    while( false !== ( $contents = $calendar->{$method}( null, true ))) {
+                    foreach( $calendar->{$method}( true ) as $contents ) {
                         self::addXMLchildBinaryUri( $properties, $propName, $contents );
                     } // end while
                     break;
             } // end switch
         } // end foreach
-        while( false !== ( $contents = $calendar->getXprop( null, null, true ))) {
+        foreach( $calendar->getAllXprop( true ) as $contents ) {
             self::addXMLchild( $properties, $contents[0], self::$unknown, $contents[1] );
         } // end while
         /** prepare to fix components with properties/subComponents */
@@ -407,7 +407,7 @@ class IcalXMLFactory
      * @param SimpleXMLElement $parentXml
      * @param bool|string $langCal
      * @throws Exception
-     * @since 2.41.36 2022-04-04
+     * @since 2.41.51 2022-08-09
      */
     private static function compProps2Xml(
         CalendarComponent $component,
@@ -420,24 +420,26 @@ class IcalXMLFactory
         $langComp   = $component->getConfig( IcalInterface::LANGUAGE );
         $props      = $component->getConfig( IcalInterface::SETPROPERTYNAMES );
         foreach( $props as $propName ) {
+            $method = Vcalendar::isMultiProp( $propName )
+                ? StringFactory::getGetAllMethodName( $propName )
+                : StringFactory::getGetMethodName( $propName );
             switch( strtoupper( $propName )) {
                 case IcalInterface::ATTACH :          // may occur multiple times
                 case IcalInterface::IMAGE :
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method }( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         self::addXMLchildBinaryUri( $properties, $propName, $contents );
                     } // end while
                     break;
                 case IcalInterface::ATTENDEE :
-                    while( false !== ( $contents = $component->getAttendee( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         if( $contents->hasParamKey( IcalInterface::CN ) && $langCal ) {
                             self::addLanguage( $contents->params, $langComp, $langCal );
                         }
                         self::addXMLchildCalAddress( $properties, $propName, $contents );
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::EXDATE :
-                    while( false !== ( $contents = $component->getExdate( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         $isDateSet = $contents->hasParamValue( IcalInterface::DATE );
                         $contents->removeParam( IcalInterface::VALUE );
                         if( $isDateSet ) {
@@ -446,21 +448,21 @@ class IcalXMLFactory
                         else {
                             self::addXMLchildDateTime( $properties, $propName, $contents );
                         }
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::FREEBUSY :
-                    while( false !== ( $contents = $component->getFreebusy( null, true ))) {
+                    foreach( $component->{$method}( true ) as $fix => $contents ) {
                         self::addXMLchild( $properties, $propName, self::$period, $contents );
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::REQUEST_STATUS :
-                    while( false !== ( $contents = $component->getRequeststatus( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         self::addLanguage( $contents->params, $langComp, $langCal );
                         self::addXMLchild( $properties, $propName, self::$rstatus, $contents );
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::RDATE :
-                    while( false !== ( $contents = $component->getRdate( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         $type = self::$date_time;
                         if( $contents->hasParamKey( IcalInterface::VALUE, IcalInterface::DATE )) {
                             $type = self::$date;
@@ -470,14 +472,12 @@ class IcalXMLFactory
                         } // end if
                         $contents->removeParam( IcalInterface::VALUE );
                         self::addXMLchild( $properties, $propName, $type, $contents );
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::DESCRIPTION :   // multiple in VCALENDAR/VJOURNAL, single elsewere
                     // fall through
                 case IcalInterface::LOCATION :      // multiple in PARTICIPANT, single elsewere
-                    static $singlePartVj = [ Vcalendar::VCALENDAR, IcalInterface::VJOURNAL ];
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method}( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         self::addLanguage( $contents->params, $langComp, $langCal );
                         self::addXMLchildText( $properties, $propName, $contents );
                         if(( IcalInterface::DESCRIPTION === $propName ) &&
@@ -488,11 +488,10 @@ class IcalXMLFactory
                             $component::isLocationSingleProp( $compName )) {
                             break;
                         }
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::STYLED_DESCRIPTION :
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method}( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         if( $contents->hasParamValue( IcalInterface::URI )) {
                             self::addXMLchildUri( $properties, $propName, $contents );
                         }
@@ -500,17 +499,17 @@ class IcalXMLFactory
                             self::addLanguage( $contents->params, $langComp, $langCal );
                             self::addXMLchildText( $properties, $propName, $contents );
                         }
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::CATEGORIES :    // fall through
                 case IcalInterface::COMMENT :       // fall through
                 case IcalInterface::CONTACT :       // fall through  // single in VFREEBUSY, multiple elsewere
+                case IcalInterface::NAME :          // dito, multi i Vcalendar, single in Vlocation/Vresource (here)
                 case IcalInterface::RELATED_TO :    // fall through
                 case IcalInterface::TZID_ALIAS_OF : // fall through
                 case IcalInterface::TZNAME :        // fall through
                 case IcalInterface::RESOURCES :
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method}( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         if(( IcalInterface::RELATED_TO !== $propName )) {
                             self::addLanguage( $contents->params, $langComp, $langCal );
                         } // end if
@@ -518,7 +517,10 @@ class IcalXMLFactory
                         if(( IcalInterface::CONTACT === $propName ) && $component::isContactSingleProp( $compName )) {
                             break;
                         }
-                    } // end while
+                        if( IcalInterface::NAME === $propName ) {
+                            break;
+                        }
+                    } // end foreach
                     break;
                 case IcalInterface::ACKNOWLEDGED :    // fall through
                 case IcalInterface::CREATED :         // fall through
@@ -530,7 +532,6 @@ class IcalXMLFactory
                 case IcalInterface::DUE :             // fall through
                 case IcalInterface::RECURRENCE_ID :   // fall through
                 case IcalInterface::TZUNTIL :         // fall through
-                    $method = StringFactory::getGetMethodName( $propName );
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         $sDateSet = $contents->hasParamValue( IcalInterface::DATE );
                         $contents->removeParam( IcalInterface::VALUE );
@@ -543,13 +544,12 @@ class IcalXMLFactory
                     } // end if
                     break;
                 case IcalInterface::DURATION :
-                    if( false !== ( $contents = $component->getDuration( true ))) {
+                    if( false !== ( $contents = $component->{$method}( true ))) {
                         self::addXMLchildDuration( $properties, $propName, $contents );
                     }
                     break;
                 case IcalInterface::EXRULE :
                 case IcalInterface::RRULE :
-                    $method = StringFactory::getGetMethodName( $propName );
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         self::addXMLchildRecur( $properties, $propName, $contents );
                     }
@@ -559,7 +559,6 @@ class IcalXMLFactory
                 case IcalInterface::KLASS :     // fall through
                 case IcalInterface::COLOR :     // fall through
                 case IcalInterface::LOCATION_TYPE :    // dito
-                case IcalInterface::NAME :      // dito, multi i Vcalendar, single in Vlocation/Vresource (here)
                 case IcalInterface::PROXIMITY : // fall through
                 case IcalInterface::PARTICIPANT_TYPE : // dito
                 case IcalInterface::RESOURCE_TYPE :    // dito
@@ -568,7 +567,6 @@ class IcalXMLFactory
                 case IcalInterface::TRANSP :    // fall through
                 case IcalInterface::TZID :      // fall through
                 case IcalInterface::UID :
-                    $method = StringFactory::getGetMethodName( $propName );
                     static $locNameSum = [ IcalInterface::LOCATION_TYPE, IcalInterface::NAME, IcalInterface::SUMMARY ];
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         if( in_array( $propName, $locNameSum,true ))  {
@@ -578,13 +576,12 @@ class IcalXMLFactory
                     }
                     break;
                 case IcalInterface::GEO :
-                    if( false !== ( $contents = $component->getGeo( true ))) {
+                    if( false !== ( $contents = $component->{$method}( true ))) {
                         self::addXMLchild( $properties, $propName, strtolower( IcalInterface::GEO ), $contents );
                     }
                     break;
                 case IcalInterface::CALENDAR_ADDRESS : // fall through
                 case IcalInterface::ORGANIZER :
-                    $method = StringFactory::getGetMethodName( $propName );
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         if(( IcalInterface::ORGANIZER === $propName ) &&
                             $contents->hasParamKey( IcalInterface::CN )) {
@@ -595,36 +592,29 @@ class IcalXMLFactory
                     break;
                 case IcalInterface::PERCENT_COMPLETE : // fall through
                 case IcalInterface::PRIORITY :         // fall through
+                case IcalInterface::REPEAT :           // fall through
                 case IcalInterface::SEQUENCE :
-                    $method = StringFactory::getGetMethodName( $propName );
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         self::addXMLchildInteger( $properties, $propName, $contents );
                     }
                     break;
                 case IcalInterface::STRUCTURED_DATA :
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method}( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         if( $contents->hasParamValue( IcalInterface::TEXT )) {
                             self::addXMLchildText( $properties, $propName, $contents );
                         }
                         else {
                             self::addXMLchildBinaryUri( $properties, $propName, $contents );
                         }
-                    } // end while
+                    } // end foreach
                     break;
                 case IcalInterface::CONFERENCE :
-                    $method = StringFactory::getGetMethodName( $propName );
-                    while( false !== ( $contents = $component->{$method}( null, true ))) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         self::addXMLchildUri( $properties, $propName, $contents );
-                    } // end while
-                    break;
-                case IcalInterface::REPEAT :
-                    if( false !== ( $contents = $component->getRepeat( true ))) {
-                        self::addXMLchildInteger( $properties, $propName, $contents );
-                    }
+                    } // end foreach
                     break;
                 case IcalInterface::TRIGGER :
-                    if( false !== ( $contents = $component->getTrigger( true ))) {
+                    if( false !== ( $contents = $component->{$method}( true ))) {
                         if( $contents->value instanceof DateInterval ) {
                             self::addXMLchildDuration( $properties, $propName, $contents );
                         }
@@ -635,7 +625,6 @@ class IcalXMLFactory
                     break;
                 case IcalInterface::TZOFFSETFROM : // fall through
                 case IcalInterface::TZOFFSETTO :
-                    $method = StringFactory::getGetMethodName( $propName );
                     if( false !== ( $contents = $component->{$method}( true ))) {
                         self::addXMLchild( $properties, $propName, self::$utc_offset, $contents );
                     }
@@ -671,11 +660,11 @@ class IcalXMLFactory
      * Add parameter language if not set
      *
      * @param string[] $params
-     * @param string $langComp
+     * @param bool|string $langComp
      * @param bool|string $langCal
      * @return void
      */
-    private static function addLanguage( array & $params, string $langComp, bool | string $langCal ) : void
+    private static function addLanguage( array & $params, bool | string $langComp, bool | string $langCal ) : void
     {
         switch( true ) {
             case isset( $params[IcalInterface::LANGUAGE] ) :
@@ -869,7 +858,7 @@ class IcalXMLFactory
             return;
         }
         $recurDateIsSet = false;
-        $isLocalTime    = $subData->hasParamKey(Util::$ISLOCALTIME );
+        $isLocalTime    = $subData->hasParamKey(IcalInterface::ISLOCALTIME );
         $isOneParm      = ( 1 === count( $subData->params ));
         switch( true ) {
             case ( empty( $subData->params ) || ( $isOneParm && $isLocalTime )) :
@@ -895,7 +884,7 @@ class IcalXMLFactory
                         }
                         continue;
                     } // end if VALUE
-                    if( Util::$ISLOCALTIME === $pKey ) {
+                    if( IcalInterface::ISLOCALTIME === $pKey ) {
                         continue;
                     }
                     $pKey = strtolower( $pKey );
@@ -997,10 +986,7 @@ class IcalXMLFactory
                         case $UNTIL :
                             $child->addChild(
                                 $ruleLabel,
-                                DateTimeFactory::dateTime2Str(
-                                    $ruleValue,
-                                    $recurDateIsSet
-                                )
+                                DateTimeFactory::dateTime2Str( $ruleValue, $recurDateIsSet )
                             );
                             break;
                         case self::$bysecond :
@@ -1013,7 +999,7 @@ class IcalXMLFactory
                         case self::$bysetpos :
                             if( is_array( $ruleValue )) {
                                 foreach( $ruleValue as $valuePart ) {
-                                    $child->addChild( $ruleLabel, $valuePart );
+                                    $child->addChild( $ruleLabel, (string) $valuePart );
                                 }
                             }
                             else {
@@ -1044,7 +1030,7 @@ class IcalXMLFactory
                         case self::$interval :
                         case self::$wkst :
                         default:
-                            $child->addChild( $ruleLabel, $ruleValue );
+                            $child->addChild( $ruleLabel, (string) $ruleValue );
                             break;
                     } // end switch( $ruleLabel )
                 } // end foreach( $value as $ruleLabel => $ruleValue )
@@ -1129,7 +1115,7 @@ class IcalXMLFactory
      * @param IcalInterface $iCal
      * @param string    $xml
      * @return IcalInterface|bool    false on error
-     * @since  2.41.4 - 2011-01-18
+     * @since  2.41.54 - 2022-08-13
      */
     private static function XMLgetComps( IcalInterface $iCal, string $xml ) : IcalInterface | bool
     {
@@ -1185,9 +1171,10 @@ class IcalXMLFactory
             $xml = self::XMLgetTagContent1( $xml, self::$components, $endIx );
         }
         while( ! empty( $xml )) {
-            $xml2 = self::XMLgetTagContent2( $xml, $tagName, $endIx );
-            if( Util::isCompInList( $tagName, $ALLCOMPS )) {
-                $newCompMethod = $NEW . ucfirst( strtolower( $tagName ));
+            $xml2     = self::XMLgetTagContent2( $xml, $tagName, $endIx );
+            $compType = ucfirst( strtolower( $tagName ));
+            if( in_array( $compType, $ALLCOMPS, true )) {
+                $newCompMethod = $NEW . $compType;
                 $iCalComp      = $iCal->{$newCompMethod}();
                 self::XMLgetComps( $iCalComp, $xml2 );
             }
@@ -1202,7 +1189,7 @@ class IcalXMLFactory
      * @param  IcalInterface $iCalComp iCalcreator calendar/component instance
      * @param  string        $xml
      * @return void
-     * @since  2.41.16 - 2022-01-31
+     * @since  2.41.56 - 2022-08-15
      * @noinspection UnsupportedStringOffsetOperationsInspection
      */
     private static function XMLgetProps( IcalInterface $iCalComp, string $xml ) : void
@@ -1418,10 +1405,14 @@ class IcalXMLFactory
             } // end switch( $propName )
             $method = StringFactory::getSetMethodName( $propName );
             switch( true ) {
-                case ( Util::isPropInList( $propName, $VERSIONPRODID )) :
+                case ( in_array( $propName, $VERSIONPRODID, true )) :
                     break;
                 case ( StringFactory::isXprefixed( $propName )) :
                     $iCalComp->setXprop( $propName, $value, $params );
+                    break;
+                case ( in_array( $propName, [ IcalInterface::EXRULE, IcalInterface::RRULE ], true ) &&
+                    isset( $value[self::$recur] ) && empty( $value[self::$recur] )) :
+                    $iCalComp->{$method}(); // empty rexRule
                     break;
                 case ( IcalInterface::FREEBUSY === $propName ) :
                     $fbtype = $params[IcalInterface::FBTYPE] ?? null;

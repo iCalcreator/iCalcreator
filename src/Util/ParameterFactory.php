@@ -50,166 +50,6 @@ use function trim;
 class ParameterFactory
 {
     /**
-     * Return formatted output for calendar component property parameters
-     *
-     * @param mixed[]          $inputParams
-     * @param null|string[]    $ctrKeys
-     * @param null|bool|string $lang  bool false if config lang not found
-     * @return string
-     * @since 2.41.4 2022-01-18
-     */
-    public static function createParams(
-        array $inputParams,
-        ? array $ctrKeys = [],
-        null|bool|string $lang = null
-    ) : string
-    {
-        static $FMTFMTTYPE = ';FMTTYPE=%s%s';
-        static $FMTKEQV    = '%s=%s';
-        static $FMTQTD     = ';%s=%s%s%s';
-        static $FMTCMN     = ';%s=%s';
-        static $KEYGRP1    = [
-            IcalInterface::VALUE,
-            IcalInterface::TZID,
-            IcalInterface::RANGE,
-            IcalInterface::RELTYPE
-        ];
-        static $KEYGRP2    = [ IcalInterface::DIR, IcalInterface::ALTREP ];
-        static $KEYGRP3    = [
-            IcalInterface::SENT_BY,
-            IcalInterface::DISPLAY,
-            IcalInterface::FEATURE,
-            IcalInterface::LABEL
-        ];
-
-        if( isset( $inputParams[Util::$ISLOCALTIME ] )) {
-            unset( $inputParams[Util::$ISLOCALTIME ] );
-        }
-        if( empty( $inputParams ) && empty( $ctrKeys ) && empty( $lang )) {
-            return Util::$SP0;
-        }
-        $attrLANG       = $attr1 = $attr2 = Util::$SP0;
-        $hasCNattrKey   = in_array( IcalInterface::CN, $ctrKeys, true );
-        $hasLANGattrKey = in_array( IcalInterface::LANGUAGE, $ctrKeys, true );
-        $CNattrExist    = false;
-        [ $params, $xparams ] = self::quoteParams( $inputParams );
-        foreach( $xparams as $paramKey => $paramValue ) {
-            $attr2 .= Util::$SEMIC;
-            $attr2 .= ( ctype_digit((string) $paramKey )) // ??
-                ? $paramValue
-                : sprintf( $FMTKEQV, $paramKey, $paramValue );
-        }
-        if( isset( $params[IcalInterface::FMTTYPE] ) && // as defined in Section 4.2 of RFC4288
-            ! in_array( IcalInterface::FMTTYPE, $ctrKeys, true )) { // ATTACH/IMAGE
-            $attr1 .= sprintf( $FMTFMTTYPE, $params[IcalInterface::FMTTYPE], $attr2 );
-            $attr2 = Util::$SP0;
-            unset( $params[IcalInterface::FMTTYPE] );
-        }
-        if( isset( $params[IcalInterface::ENCODING] ) &&
-            ! in_array( IcalInterface::ENCODING, $ctrKeys, true )) {
-            if( ! empty( $attr2 )) {
-                $attr1 .= $attr2;
-                $attr2 = Util::$SP0;
-            }
-            $attr1 .= sprintf( $FMTCMN, IcalInterface::ENCODING, $params[IcalInterface::ENCODING] );
-            unset( $params[IcalInterface::ENCODING] );
-        }
-        foreach( $KEYGRP1 as $key ) { // VALUE, TZID, RANGE, RELTYPE
-            if( isset( $params[$key] ) && ! in_array( $key, $ctrKeys, true )) {
-                $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
-                unset( $params[$key] );
-            }
-        } // end foreach
-        if( isset( $params[IcalInterface::CN] ) && $hasCNattrKey ) {
-            $attr1      .= sprintf( $FMTCMN, IcalInterface::CN, $params[IcalInterface::CN] );
-            $CNattrExist = true;
-            unset( $params[IcalInterface::CN] );
-        }
-        foreach( $KEYGRP2 as $key ) { // DIR, ALTREP
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
-                    $delim  = str_contains( $params[$key], StringFactory::$QQ )
-                    ? Util::$SP0
-                    : StringFactory::$QQ;
-                $attr1 .= sprintf( $FMTQTD, $key, $delim, $params[$key], $delim );
-                unset( $params[$key] );
-            }
-        } // end foreach
-        foreach( $KEYGRP3 as $key ) { // SENT_BY, DISPLAY, FEATURE, LABEL
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
-                $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
-                unset( $params[$key] );
-            }
-        } // end foreach
-        if( isset( $params[IcalInterface::LANGUAGE] ) && $hasLANGattrKey ) {
-            $attrLANG .= sprintf( $FMTCMN, IcalInterface::LANGUAGE, $params[IcalInterface::LANGUAGE] );
-            unset( $params[IcalInterface::LANGUAGE] );
-        }
-        elseif(( $CNattrExist || $hasLANGattrKey ) && is_string( $lang ) && ! empty( $lang )) {
-            $attrLANG .= sprintf( $FMTCMN, IcalInterface::LANGUAGE, $lang );
-        }
-        if( isset( $params[IcalInterface::DERIVED] )) {
-            if( IcalInterface::FALSE === $params[IcalInterface::DERIVED] ) {
-                unset( $params[IcalInterface::DERIVED] ); // skip default FALSE for DERIVED
-            }
-            elseif( IcalInterface::TRUE !== $params[IcalInterface::DERIVED] ) {
-                $params[IcalInterface::DERIVED] = ((bool) $params[IcalInterface::DERIVED] )
-                    ? IcalInterface::TRUE
-                    : IcalInterface::FALSE;
-            }
-        } // end if
-        if( isset( $params[IcalInterface::ORDER] )) {
-            if( ! is_int( $params[IcalInterface::ORDER] ) ||
-                ( $params[IcalInterface::ORDER] != (int) $params[IcalInterface::ORDER] )) { // note !=
-                $params[IcalInterface::ORDER] = (int) $params[IcalInterface::ORDER];
-            }
-            if( 1 > $params[IcalInterface::ORDER] ) {
-                $params[IcalInterface::ORDER] = 1;
-            }
-        } // end if
-        if( ! empty( $params )) { // accept other or iana-token (Other IANA-registered) parameter types, last
-            foreach( $params as $paramKey => $paramValue ) {
-                $attr1 .= sprintf( $FMTCMN, $paramKey, $paramValue );
-            }
-        }
-        return $attr1 . $attrLANG . $attr2;
-    }
-
-    /**
-     * Return parameter with opt. quoted parameter value
-     *
-     * "-Quotes a value if it contains ':', ';' or ','
-     *
-     * @param mixed[] $inputParams
-     * @return mixed[][]
-     */
-    private static function quoteParams( array $inputParams ) : array
-    {
-        static $DFKEYS     = [ IcalInterface::DISPLAY, IcalInterface::FEATURE ];
-        static $FMTQ       = '"%s"';
-        $params = $xparams = [];
-        foreach( array_change_key_case( $inputParams, CASE_UPPER ) as $paramKey => $paramValue ) {
-            $paramValue = self::circumflexQuoteInvoke( $paramValue );
-            if( StringFactory::hasColonOrSemicOrComma( $paramValue ) &&
-                ! in_array( $paramKey, $DFKEYS, true )) { // DISPLAY, FEATURE
-                $paramValue = sprintf( $FMTQ, $paramValue );
-            }
-            switch( true ) {
-                case ctype_digit((string) $paramKey ) : // ??
-                    $xparams[] = $paramValue;
-                    break;
-                case StringFactory::isXprefixed( $paramKey ) :
-                    $xparams[$paramKey] = $paramValue;
-                    break;
-                default :
-                    $params[$paramKey] = $paramValue;
-                    break;
-            } // end switch
-        } // end foreach
-        ksort( $xparams, SORT_STRING );
-        return [ $params, $xparams ];
-    }
-
-    /**
      * Return (conformed) iCal component property parameters
      *
      * Trim quoted values, default parameters may be set, if missing
@@ -277,36 +117,7 @@ class ParameterFactory
     private static string $CFCF       = '^^';
     private static string $CFSQ       = "^'";
     private static string $CFQQ       = '^"';
-
-    /**
-     * Return parameter VALUE with opt. circumflex formatted as of rfc6868
-     *
-     * formatted text line breaks are encoded into ^n (U+005E, U+006E)
-     * the ^ character (U+005E) is encoded into ^^ (U+005E, U+005E)
-     * the " character (U+0022) is encoded into ^' (U+005E, U+0027)
-     *
-     * Also ' is encoded into ^' (U+005E, U+0027), NOT rfc6868
-     *
-     * @param string $value
-     * @return string
-     * @since 2022-01-31 2.41.15
-     */
-    public static function circumflexQuoteInvoke( string $value ) : string
-    {
-        $nlCharsExist = str_contains( $value, StringFactory::$NLCHARS );
-        $cfCfExist    = str_contains( $value, self::$CIRCUMFLEX );
-        $quotExist    = str_contains( $value, StringFactory::$QQ );
-        if( $nlCharsExist ) {
-            $value = str_replace( StringFactory::$NLCHARS, self::$CFN, $value );
-        }
-        if( $cfCfExist ) {
-            $value = str_replace( self::$CIRCUMFLEX, self::$CFCF, $value );
-        }
-        if( $quotExist ) {
-            $value = str_replace( StringFactory::$QQ, self::$CFSQ, $value );
-        }
-        return $value;
-    }
+    private static string $NLCHARS    = '\n';
 
     /**
      * Return parsed parameter VALUE with opt. circumflex deformatted as of rfc6868
@@ -332,7 +143,7 @@ class ParameterFactory
             return $value;
         }
         if( str_contains( $value, self::$CFN )) {
-            $value = str_replace( self::$CFN, StringFactory::$NLCHARS, $value );
+            $value = str_replace( self::$CFN, self::$NLCHARS, $value );
         }
         if( str_contains( $value, self::$CFCF )) {
             $value = str_replace( self::$CFCF, self::$CIRCUMFLEX, $value );

@@ -29,8 +29,9 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -82,7 +83,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::TRANSP . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::TRANSP . Property::createParams( $params ) . ':' . $value
         ];
 
         // DESCRIPTION
@@ -109,7 +110,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -136,7 +137,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::LOCATION .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -164,7 +165,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::SUMMARY .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -191,7 +192,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::SUMMARY .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -209,7 +210,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::SOURCE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::SOURCE . Property::createParams( $params ) . ':' . $value
         ];
 
         // URL 1
@@ -234,7 +235,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 2
@@ -259,7 +260,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
         ];
 
 
@@ -285,7 +286,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 5
@@ -310,7 +311,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . ParameterFactory::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
         ];
 
         // URL 6
@@ -336,7 +337,7 @@ class Prop1TextSingleTest extends DtBase
                 $params2
             ),
             IcalInterface::URL .
-            ParameterFactory::createParams( $params2 ) . ':' . $value2
+            Property::createParams( $params2 ) . ':' . $value2
         ];
 
         // ORGANIZER
@@ -344,11 +345,11 @@ class Prop1TextSingleTest extends DtBase
         $params = [
                 IcalInterface::CN             => 'John Doe',
                 IcalInterface::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
-                IcalInterface::SENT_BY        => 'MAILTO:boss1071@example.com',
+                IcalInterface::SENT_BY        => 'mailto:boss1071@example.com',
                 IcalInterface::LANGUAGE       => 'EN'
             ] + self::$STCPAR;
         $getValue  = Pc::factory(
-            $value,
+            CalAddressFactory::conformCalAddress( $value ),
             $params
         );
         $dataArr[] = [
@@ -360,7 +361,7 @@ class Prop1TextSingleTest extends DtBase
             $params + [ IcalInterface::EMAIL => 'ildoit1071@example.com' ], // removed, same as value
             $getValue,
             IcalInterface::ORGANIZER .
-            ParameterFactory::createParams(
+            Property::createParams(
                 $params,
                 [
                     IcalInterface::CN,
@@ -369,7 +370,7 @@ class Prop1TextSingleTest extends DtBase
                     IcalInterface::LANGUAGE
                 ]
             ) .
-            ':' . $value
+            ':' . CalAddressFactory::conformCalAddress( $value )
         ];
 
         $value  = 'ildoit1072@example.com';
@@ -380,13 +381,14 @@ class Prop1TextSingleTest extends DtBase
             ] + self::$STCPAR;
         $params2 = [
                 IcalInterface::CN            => 'Jane Doe',
-                IcalInterface::SENT_BY       => 'MAILTO:boss1072@example.com',
+                IcalInterface::SENT_BY       => 'mailto:boss1072@example.com',
                 IcalInterface::EMAIL         => 'another1072@example.com'
             ] + self::$STCPAR;
         $getValue  = Pc::factory(
-            'MAILTO:' . $value,
+            CalAddressFactory::conformCalAddress( $value, true ),
             $params2
         );
+        $getValue->params[IcalInterface::EMAIL] = 'another1072@example.com';
         $dataArr[] = [
             1072,
             [
@@ -396,7 +398,7 @@ class Prop1TextSingleTest extends DtBase
             $params,
             $getValue,
             IcalInterface::ORGANIZER .
-            ParameterFactory::createParams(
+            Property::createParams(
                 $params2,
                 [
                     IcalInterface::CN,
@@ -405,7 +407,7 @@ class Prop1TextSingleTest extends DtBase
                     IcalInterface::LANGUAGE
                 ]
             ) .
-            ':' . 'MAILTO:' . $value
+            ':' . 'mailto:' . $value
         ];
 
         // CLASS
@@ -428,7 +430,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::KLASS . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::KLASS . Property::createParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -446,7 +448,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -464,7 +466,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -482,7 +484,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
         ];
 
         // GEO
@@ -500,7 +502,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::GEO . ParameterFactory::createParams( $params ) .
+            IcalInterface::GEO . Property::createParams( $params ) .
             ':' .
             GeoFactory::geo2str2( $getValue->value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
             Util::$SEMIC .
@@ -523,14 +525,14 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::COLOR . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::COLOR . Property::createParams( $params ) . ':' . $value
         ];
 
         // CALENDAR-ADDRESS
         $value  = 'MAILTO:ildoit1071@example.com';
         $params = self::$STCPAR;
         $getValue  = Pc::factory(
-            $value,
+            CalAddressFactory::conformCalAddress( $value ),
             $params
         );
         $dataArr[] = [
@@ -542,7 +544,7 @@ class Prop1TextSingleTest extends DtBase
             $params,
             $getValue,
             IcalInterface::CALENDAR_ADDRESS .
-            ParameterFactory::createParams( $params ) . ':' . $value
+            Property::createParams( $params ) . ':' . CalAddressFactory::conformCalAddress( $value )
         ];
 
         // LOCATION-TYPE
@@ -559,7 +561,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::LOCATION_TYPE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::LOCATION_TYPE . Property::createParams( $params ) . ':' . $value
         ];
 
         // BUSYTYPE
@@ -576,7 +578,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::BUSYTYPE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::BUSYTYPE . Property::createParams( $params ) . ':' . $value
         ];
 
         // RESOURCE_TYPE
@@ -593,7 +595,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::RESOURCE_TYPE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::RESOURCE_TYPE . Property::createParams( $params ) . ':' . $value
         ];
 
         return $dataArr;

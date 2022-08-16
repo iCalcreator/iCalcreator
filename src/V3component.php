@@ -36,11 +36,10 @@ use Exception;
 /**
  * iCalcreator VEVENT/VTODO component base class
  *
- * @since  2.41.17 - 2022-02-16
+ * @since  2.41.53 - 2022-08-08
  */
 abstract class V3component extends V2component
 {
-
     /**
      * Return Valarm object instance
      *
@@ -48,7 +47,7 @@ abstract class V3component extends V2component
      * @param null|string|DateInterval|DateTimeInterface $trigger  property TRIGGER value
      * @return Valarm
      * @throws Exception
-     * @since  2.41.25 - 2022-02-22
+     * @since  2.41.53 - 2022-08-08
      */
     public function newValarm(
         ? string $action = null,
@@ -56,14 +55,7 @@ abstract class V3component extends V2component
     ) : Valarm
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Valarm( $this->getConfig());
-        $this->components[$ix]->getUid();
-        if( null !== $action ) {
-            $this->components[$ix]->setAction( $action );
-        }
-        if( null !== $trigger ) {
-            $this->components[$ix]->setTrigger( $trigger );
-        }
+        $this->components[$ix] = Valarm::factory( $this->getConfig(), $action, $trigger );
         return $this->components[$ix];
     }
 

@@ -186,7 +186,7 @@ class DateTimeFactory
     {
         $isValueDate = $value->hasParamValue( IcalInterface::DATE );
         $paramTZid   = $value->getParams( IcalInterface::TZID ) ?? Util::$SP0;
-        $isLocalTime = $value->hasParamKey( Util::$ISLOCALTIME );
+        $isLocalTime = $value->hasParamKey( IcalInterface::ISLOCALTIME );
         if( ! empty( $paramTZid )) {
             if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
                 $paramTZid = DateTimeZoneFactory::getTimeZoneNameFromOffset( $paramTZid );
@@ -328,11 +328,11 @@ class DateTimeFactory
         switch( true ) {
             case ( $isValueDate ) :
                 $pc->removeParam(IcalInterface::TZID );
-                $pc->removeParam( Util::$ISLOCALTIME );
+                $pc->removeParam( IcalInterface::ISLOCALTIME );
                 break;
             case ( $isLocalTime ) :
                 $pc->removeParam( IcalInterface::TZID );
-                $pc->addParam( Util::$ISLOCALTIME, true );
+                $pc->addParam( IcalInterface::ISLOCALTIME, true );
                 break;
             case ( ! empty( $paramTZid ) && ! DateTimeZoneFactory::isUTCtimeZone( $paramTZid )) :
                 $pc->addParam( IcalInterface::TZID, $paramTZid );

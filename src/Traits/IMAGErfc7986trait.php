@@ -30,16 +30,15 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function sprintf;
 
 /**
  * IMAGE property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait IMAGErfc7986trait
 {
@@ -55,23 +54,11 @@ trait IMAGErfc7986trait
      */
     public function createImage() : string
     {
-        if( empty( $this->image )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( $this->image as $imagePart ) {
-            if( ! empty( $imagePart->value )) {
-                $output .= StringFactory::createElement(
-                    self::IMAGE,
-                    ParameterFactory::createParams( $imagePart->params, [ self::ALTREP, self::DISPLAY ] ),
-                    $imagePart->value
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::IMAGE );
-            }
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::IMAGE,
+            $this->image,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -114,6 +101,18 @@ trait IMAGErfc7986trait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property image
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllImage( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->image, $inclParam );
     }
 
     /**

@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -45,7 +46,7 @@ use function vsprintf;
 /**
  * UID property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait UIDrfc7986trait
 {
@@ -60,30 +61,15 @@ trait UIDrfc7986trait
      * If uid is missing, uid is created
      * @return string
      * @throws Exception
-     * @since 2.41.36 2022-04-03
-     */
+     * @since 2.41.55 2022-08-13
+s     */
     public function createUid() : string
     {
-        if( self::isUidEmpty( $this->uid )) {
-            $this->uid = self::makeUid();
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::UID,
-            ParameterFactory::createParams( $this->uid->params ),
-            $this->uid->value
+            $this->uid,
+            $this->getConfig( self::ALLOWEMPTY )
         );
-    }
-
-    /**
-     * Delete calendar component property uid
-     *
-     * @return bool
-     * @since 2.29.5 2019-06-17
-     */
-    public function deleteUid() : bool
-    {
-        $this->uid = null;
-        return true;
     }
 
     /**
@@ -92,13 +78,10 @@ trait UIDrfc7986trait
      * @param null|bool $inclParam
      * @return string|Pc
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.53 2022-08-11
      */
     public function getUid( ? bool $inclParam = false ) : string | Pc
     {
-        if( self::isUidEmpty( $this->uid )) {
-            $this->uid = self::makeUid();
-        }
         return $inclParam ? clone $this->uid : $this->uid->value;
     }
 
@@ -111,18 +94,6 @@ trait UIDrfc7986trait
     public function isUidSet() : bool
     {
         return true;
-    }
-
-    /**
-     * Return bool true if uid is empty
-     *
-     * @param null|Pc   $uid
-     * @return bool
-     * @since 2.41.36 2022-04-03
-     */
-    private static function isUidEmpty( ? Pc $uid ) : bool
-    {
-        return (( null === $uid ) || ( empty( $uid->value ) && ( Util::$ZERO !== $uid->value )));
     }
 
     /**

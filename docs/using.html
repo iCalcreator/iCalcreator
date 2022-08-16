@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.49 manual</title>
+    <title>iCalcreator 2.41.56 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.49">
+<meta name="description" content="using iCalcreator v2.41.56">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.49</p>
+<p class="header">iCalcreator v2.41.56</p>
 <p>
-iCalcreator v2.41.49<br>
+iCalcreator v2.41.56<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -369,12 +369,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.49/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.56/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.49</dt>
+    <dt>v2.41.56</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +383,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.49 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.56 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -439,19 +439,19 @@ Here are update headlines in this version.
     </li>
 
     <li>
-        upd multi Decription<br>
+        <b>upd</b> multi Decription<br>
         bug component::setDtend()<br>
-        upd createCalendar/Component methods<br>
+        <b>upd</b> createCalendar/Component methods<br>
         using.html doc upd<br>
         Vcalendar/Component::getXprop() consecutive invokes bug
     </li>
 
     <li>
         Parsetest upd<br>
-        doc upd GEO/NAME component occurence<br>
+        <b>upd</b> doc GEO/NAME component occurence<br>
         CONTACT/DESCRIPTION/LOCATION/NAME property get-methods and IcalXMLFactory::compProps2Xml() logic<br>
         Vcalendar::setComponents() bug, insert Vtimezone(s) first (not last)<br>
-        upd participants2Attendees() : Participant-type to (ATTENDEE) parameter ROLE
+        <b>upd</b> participants2Attendees() : Participant-type to (ATTENDEE) parameter ROLE
         <br><br>
     </li>
     <li>
@@ -485,7 +485,30 @@ Here are update headlines in this version.
         Extended tests<br>
         Refresh_Interval trait bug<br>
         Calendar parse upd
+        <br><br>
     </li>
+
+    <li>
+        <b>new</b> vCalendar/CalendarComponent::getComponents() methods, return array(*component)
+    </li>
+    <li>
+        ALL multi-props have &lt;getAllProperty&gt; method, return array, values only / full
+    </li>
+    <li>
+        opt URI (email) mailto-prefix in lowercase
+    </li>
+    <li>
+        <b>new</b> class factory methods, upd class constructs
+    </li>
+    <li>
+        Vcalendar/Component parser logic moved to parser classes<br>
+        Vcalendar/Component format logic moved to formatter classes
+    </li>
+    <li>
+        removed deleteDtstamp/deleteUid methods (use set-method to recreate)<br>
+        Vtimezone, Util and misc code tidy up...
+    </li>
+
 
 </ul>
 
@@ -608,9 +631,10 @@ $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
 <a href="#iCalcreator_component_object_methods">3.1.3 Vcalendar component object methods</a><br>
 <a href="#deleteComponent">3.1.3.1 deleteComponent</a><br>
 <a href="#getComponent">3.1.3.2 getComponent</a><br>
-<a href="#replaceComponent">3.1.3.3 replaceComponent</a><br>
-<a href="#selectComponents">3.1.3.4 selectComponents</a><br>
-<a href="#setComponent">3.1.3.5 setComponent</a><br>
+<a href="#getComponents">3.1.3.3 getComponents</a><br>
+<a href="#replaceComponent">3.1.3.4 replaceComponent</a><br>
+<a href="#selectComponents">3.1.3.5 selectComponents</a><br>
+<a href="#setComponent">3.1.3.6 setComponent</a><br>
 <br>
 <a href="#iCalcreator_calendar_methods">3.1.4 Vcalendar calendar methods</a><br>
 <a href="#parse_merge">3.1.4.1 parse and merge</a><br>
@@ -706,9 +730,10 @@ $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
 <a href="#iCalcreator_misc_methods">3.4 iCalcreator misc. methods</a><br>
 <a href="#deleteComponent_PROP">3.4.1 deleteComponent</a><br>
 <a href="#getComponent_PROP">3.4.2 getComponent</a><br>
-<a href="#setComponent_PROP">3.4.3 setComponent</a><br>
-<a href="#vtimezone_populate">3.4.4 Vtimezone populate</a><br>
-<a href="#msTimezone2PHPtz">3.4.5 Review timezones, opt alter to PHP timezone</a><br>
+<a href="#getComponents_PROP">3.4.3 getComponents</a><br>
+<a href="#setComponent_PROP">3.4.4 setComponent</a><br>
+<a href="#vtimezone_populate">3.4.5 Vtimezone populate</a><br>
+<a href="#msTimezone2PHPtz">3.4.6 Review timezones, opt alter to PHP timezone</a><br>
 
 <br>
 <a href="#TimezoneXMLjsonvCard">4 XML, json and vCard support</a><br>
@@ -1628,10 +1653,11 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::VEVENT is available
 </p>
 <p class="label">Format 1</p>
 <p>
-Create a new <a href="#VEVENT">VEVENT</a> object instance using an Vcalendar component factory-method.
+    Create a new <a href="#VEVENT">VEVENT</a> object instance
+    using a <a href="#VCALENDAR">VCALENDAR</a> component factory-method.
 </p>
 <p>
-Throws InvalidArgumentException on (set)config error.
+    Throws InvalidArgumentException on (set)config error.
 </p>
 
 <p class="format">Vcalendar::newVevent( [ dtstart [, dtend  [, duration  [, summary ]]]] )</p>
@@ -1648,12 +1674,41 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
 .. .
-$vevent    = $vcalendar-&gt;newVevent( $dtStart )
+$vevent    = $vcalendar-&gt;newVevent( $dtStart );
 .. .
 
 </p>
-
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VEVENT">VEVENT</a> object instance using a VEVENT factory-method.
+</p>
+<p>
+    Throws InvalidArgumentException on (set)config error.
+</p>
+
+<p class="format">Vevent::factory( [ config [, dtstart [, dtend  [, duration  [, summary ]]]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+dtstart  = property <a href="#DTSTART">DTSTART</a>  string|DateTimeInterface value
+dtend    = property <a href="#DTEND">DTEND</a>    string|DateTimeInterface value *
+duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
+summary  = property <a href="#SUMMARY">SUMMARY</a> string value
+*) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+.. .
+$vevent    = Vevent::factory( null, $dtStart );
+.. .
+
+$vcalendar-&gt;setComponent( $vevent );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VEVENT">VEVENT</a> object instance.</p>
 <p>
 Throws InvalidArgumentException on (set)config error.
@@ -1685,7 +1740,8 @@ $vcalendar-&gt;setComponent( $vevent );
 </p>
 <p class="label">Format 1</p>
 <p>
-    Create a new <a href="#VTODO">VTODO</a> object instance using an Vcalendar component factory-method.
+    Create a new <a href="#VTODO">VTODO</a> object instance
+    using a <a href="#VCALENDAR">VCALENDAR</a> component factory-method.
 </p>
 <p>
     Throws InvalidArgumentException on (set)config error.
@@ -1705,12 +1761,42 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
 .. .
-$vtodo     = $vcalendar-&gt;newVtodo( $dtStart )
+$vtodo     = $vcalendar-&gt;newVtodo( $dtStart );
 .. .
 
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VTODO">VTODO</a> object instance using VTODO factory-method.
+</p>
+<p>
+    Throws InvalidArgumentException on (set)config error.
+</p>
+
+<p class="format">Vcalendar::newVtodo( [ config [, dtstart [, due  [, duration  [, summary ]]]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+dtstart  = property <a href="#DTSTART">DTSTART</a>  string|DateTimeInterface value
+due      = property <a href="#DUE">DUE</a>      string|DateTimeInterface value *
+duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
+summary  = property <a href="#SUMMARY">SUMMARY</a> string value
+*) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+.. .
+$vtodo     = Vtodo::factory( null, $dtStart );
+.. .
+
+$vcalendar-&gt;setComponent( $vtodo );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VTODO">VTODO</a> object instance.</p>
 <p>
     Throws InvalidArgumentException on (set)config error.
@@ -1742,7 +1828,8 @@ $vcalendar-&gt;setComponent( $vtodo );
 </p>
 <p class="label">Format 1</p>
 <p>
-    Create a new <a href="#VJOURNAL">VJOURNAL</a> object instance using an Vcalendar component factory-method.
+    Create a new <a href="#VJOURNAL">VJOURNAL</a> object instance
+    using a <a href="#VCALENDAR">VCALENDAR</a> component factory-method.
 </p>
 
 <p class="format">Vcalendar::newVjournal( [ dtstart [, summary ]] )</p>
@@ -1756,12 +1843,36 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
 .. .
-$vjournal  = $vcalendar-&gt;newVjournal( $dtStart )
+$vjournal  = $vcalendar-&gt;newVjournal( $dtStart );
 .. .
 
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VJOURNAL">VJOURNAL</a> object instance using a VJOURNAL factory-method.
+</p>
+
+<p class="format">Vjournal::factory( [ config [, dtstart [, summary ]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+dtstart  = property <a href="#DTSTART">DTSTART</a> string|DateTimeInterface value
+summary  = property <a href="#SUMMARY">SUMMARY</a> string value
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+.. .
+$vjournal  = Vjournal::factory( null, $dtStart );
+.. .
+
+$vcalendar-&gt;setComponent( $vjournal );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VJOURNAL">VJOURNAL</a> object instance.</p>
 <p>
     Throws InvalidArgumentException on (set)config error.
@@ -1794,6 +1905,10 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::VFREEBUSY is availa
 </p>
 <p class="label">Format 1</p>
 <p>
+    Create a new <a href="#VFREEBUSY">VFREEBUSY</a> object instance
+    using a <a href="#VCALENDAR">VCALENDAR</a> component factory-method.
+</p>
+<p>
     Throws InvalidArgumentException on (set)config error.
 </p>
 
@@ -1809,12 +1924,41 @@ dtend    = property <a href="#DTEND">DTEND</a>   string|DateTimeInterface value
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
 .. .
-$vtodo     = $vcalendar-&gt;newVfreebusy( $attendee, $dtStart, $dtend )
+$vtodo     = $vcalendar-&gt;newVfreebusy( $attendee, $dtStart, $dtend );
 .. .
 
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VFREEBUSY">VFREEBUSY</a> object instance using a factory-method.
+</p>
+<p>
+    Throws InvalidArgumentException on (set)config error.
+</p>
+
+<p class="format">Vcalendar::newVfreebuy( [ config [, attendee [, dtstart [, dtend  ]]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+attendee = property <a href="#ATTENDEE">ATTENDEE</a> string value
+dtstart  = property <a href="#DTSTART">DTSTART</a>  string|DateTimeInterface value
+dtend    = property <a href="#DTEND">DTEND</a>   string|DateTimeInterface value
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$config    =[ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$vcalendar = new Vcalendar( $config );
+
+.. .
+$vtodo     = Vfreebusy::factory( $config, $attendee, $dtStart, $dtend );
+.. .
+
+$vcalendar-&gt;setComponent( $vfreebusy );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VTODO">VTODO</a> object instance.</p>
 <p>
     Throws InvalidArgumentException on (set)config error.
@@ -1847,11 +1991,11 @@ $vcalendar-&gt;setComponent( $vfreebusy );
 </p>
 <p class="label">Format 1</p>
 <p>
-Create a new <a href="#VALARM">VALARM</a> object instance using an Vcalendar component factory-method.
+Create a new <a href="#VALARM">VALARM</a> object instance using a Vcalendar component factory-method.
 The <a href="#VALARM">VALARM</a> calendar component MUST only appear (one or more)
 in either a <a href="#VEVENT">VEVENT</a> or <a href="#VTODO">VTODO</a> calendar component.
 </p>
-<p class="format">calendarComponent::newValarm( [ action [, trigger ]])</p>
+<p class="format">calendarComponent::newValarm( [ action [, trigger ]] )</p>
 <p class="comment">
 action  = property <a href="#ACTION">ACTION</a> string value
 trigger = property <a href="#TRIGGER">TRIGGER</a> string|DateInterval|DateTimeInterface value
@@ -1878,6 +2022,40 @@ $valarm    = $vtodo-&gt;newValarm( Vcalendar::AUDIO, $totoAlarmDtstart );
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VALARM">VALARM</a> object instance. using a factory-method.
+</p>
+<p>
+    Throws InvalidArgumentException on (set)config error.
+</p>
+<p class="format">Valarm::factory( [ config [, action [, trigger ]]] )</p>
+<p class="comment">
+config  = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+action  = property <a href="#ACTION">ACTION</a> string value
+trigger = property <a href="#TRIGGER">TRIGGER</a> string|DateInterval|DateTimeInterface value
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\Vevent;
+use Kigkonsult\Icalcreator\Valarm;
+
+$config    = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ]:
+$vcalendar = new Vcalendar( $config );
+
+ .. .
+$vevent    = Vevent::factory( $config );
+.. .
+
+$valarm    = Valarm::factory( $config, Vcalendar::DISPLAY, $veventAlarmDtstart );
+.. .
+
+$vevent-&gt;setComponent( $valarm );
+
+$vcalendar-&gt;setComponent( $vevent );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VALARM">VALARM</a> object instance.</p>
 <p>
 Throws InvalidArgumentException on (set)config error.
@@ -1951,6 +2129,37 @@ $vavailability = $vcalendar-&gt;newVavailability(
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VAVAILABILITY">VAVAILABILITY</a> object instance using a factory-method.
+</p>
+<p class="format">Vavailability::factory( [ config [, busytype [, [ dtstart [, dtend [, duration ]]]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+busytype = property <a href="#BUSYTYPE">BUSYTYPE</a> string value,
+dtstart  = property <a href="#DTSTART">DTSTART</a> string|DateTimeInterface datetime value,
+dtend    = property <a href="#DTEND">DTEND</a> string|DateTimeInterface datetime value *
+duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
+*) dtend and duration MUST NOT occur in the same <a href="#VAVAILABILITY">VAVAILABILITY</a>
+</p>
+
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+$vavailability = Vavailability::factory(
+    null,
+    &quot;BYSY&quot;,
+    &quot;20220101T080000&quot;,
+    &quot;20220101T170000&quot;
+);
+.. .
+
+$vcalendar-&gt;setComponent( $vavailability );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VAVAILABILITY">VAVAILABILITY</a> object instance.</p>
 <p class="format">Vavailability::__construct( [ config ] )</p>
 <p class="comment">
@@ -2014,6 +2223,37 @@ $available     = $vavailability-&gt;newAvailable();
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#AVAILABLE">AVAILABLE</a> object instance using a factory-method.
+</p>
+<p class="format">Available::factory( [ config [, dtstart [, dtend [, duration ]]]] )</p>
+<p class="comment">
+config   = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+dtstart  = property <a href="#DTSTART">DTSTART</a> string|DateTimeInterface datetime value,
+dtend    = property <a href="#DTEND">DTEND</a> string|DateTimeInterface datetime value *
+duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
+*) dtend and duration MUST NOT occur in the same <a href="#AVAILABLE">AVAILABLE</a>
+</p>
+
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+$vavailability = Vavailability::factory();
+.. .
+
+$available     = Available::factory();
+.. .
+
+$vavailability-&gt;setComponent( $available );
+.. .
+
+$vcalendar-&gt;setComponent( $vavailability );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#AVAILABLE">AVAILABLE</a> object instance.</p>
 <p class="format">Available::__construct( [ config ] )</p>
 <p class="comment">
@@ -2081,6 +2321,32 @@ $participant = $vevent-&gt;newParticipant( Vcalendar::SPONSOR, &quot;hq@acme.com
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#PARTICIPANT">PARTICIPANT</a> object instance using a factory-method.
+</p>
+<p class="format">Participant::factory( [ config [, participanttype [, calendaraddress ]]] )</p>
+<p class="comment">
+config          = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+participanttype = property <a href="#PARTICIPANT-TYPE">PARTICIPANT-TYPE</a> string value,
+calendaraddress = property <a href="#CALENDAR-ADDRESS">CALENDAR-ADDRESS</a> string CAL-ADDRESS (uri) value
+</p>
+
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+$vevent      = $vcalendar-&gt;newVevent();
+.. .
+
+$participant = Participant::factory( null, Vcalendar::SPONSOR, &quot;hq@acme.com&quot;);
+.. .
+
+$vevent-&gt;setComponent( $participant );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#PARTICIPANT">PARTICIPANT</a> object instance.</p>
 <p class="format">Participant::__construct( [ config ] )</p>
 <p class="comment">
@@ -2149,6 +2415,32 @@ $vlocation = $vevent-&gt;newVlocation();
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#PARTICIPANT">VLOCATION</a> object instance using a factory-method.
+</p>
+<p class="format">Vlocation:factory( [ config [, locationType [, name ]]] )</p>
+<p class="comment">
+config       = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+locationType = property <a href="#LOCATION-TYPE">LOCATION-TYPE</a> string value
+name         = property <a href="#NAME">NAME</a> string value
+</p>
+
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+$vevent    = $vcalendar-&gt;newVevent();
+.. .
+
+$vlocation = Vlocation::factory( null, $locationType , $name );
+.. .
+
+$vevent-&gt;setComponent( $vlocation );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VLOCATION">VLOCATION</a> object instance.</p>
 <p class="format">Vlocation::__construct( [ config ] )</p>
 <p class="comment">
@@ -2217,6 +2509,32 @@ $vresource = $vevent-&gt;newVresource();
 </p>
 
 <p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VRESOURCE">VRESOURCE</a> object instance using a factory-method.
+</p>
+<p class="format">Vresource::factory( [ config [, resourceType [, name ]]] )</p>
+<p class="comment">
+config       = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+resourceType = property <a href="#RESOURCE-TYPE">RESOURCE-TYPE</a> string value
+name         = property <a href="#NAME">NAME</a> string value
+</p>
+
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+$vevent    = $vcalendar-&gt;newVevent();
+.. .
+
+$vresource = Vresource:factory( null, $resourceType, $name );
+.. .
+
+$vevent-&gt;setComponent( $vresource );
+
+</p>
+
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VRESOURCE">VRESOURCE</a> object instance.</p>
 <p class="format">Vlocation::__construct( [ config ] )</p>
 <p class="comment">
@@ -2264,19 +2582,40 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::VTIMEZONE is availa
 </p>
 <p class="format">Vcalendar::newVtimezone( [ tzid ] )</p>
 <p class="comment">
-tzid = property <a href="#TZID">TZID</a> string value
+    tzid = property <a href="#TZID">TZID</a> string value
+</p>
+<p class="label">Example</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+    $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+
+    $vtimezone = $vcalendar-&gt;newVtimezone( &quot;Europe/Stockholm&quot;);
+    .. .
+
+</p>
+
+<p class="label">Format 2</p>
+<p>
+    Create a new <a href="#VTIMEZONE">VTIMEZONE</a> object instance using a factory-method.
+</p>
+<p class="format">Vtimezone::factory( [ config [, tzid ]] )</p>
+<p class="comment">
+config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
+tzid   = property <a href="#TZID">TZID</a> string value
 </p>
 <p class="label">Example</p>
 <p class="example">use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
-$vtimezone = $vcalendar-&gt;newVtimezone( &quot;Europe/Stockholm&quot;);
+$vtimezone = Vtimezone::factory( null, &quot;Europe/Stockholm&quot; );
 .. .
+
+$vcalendar-&gt;setComponent( $vtimezone );
 
 </p>
 
-<p class="label">Format 2</p>
+<p class="label">Format 3</p>
 <p>Create a new <a href="#VTIMEZONE">VTIMEZONE</a> object instance.</p>
 <p class="format">Vtimezone::_construct( [ config ] )</p>
 <p class="comment">
@@ -2312,7 +2651,7 @@ are available.
 <p>
     Create a new <a href="#VTIMEZONE">VTIMEZONE</a>
     <a href="#STANDARD">STANDARD</a> / <a href="#DAYLIGHT">DAYLIGHT</a> object instance
-    using an VTIMEZONE component factory-method.
+    using a VTIMEZONE component factory-method.
 </p>
 <p class="format">Vtimezone::newStandard()</p>
 <p class="format">Vtimezone::newDaylight()</p>
@@ -2423,8 +2762,8 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="label">Example</p>
 <p class="example">use Kigkonsult\Icalcreator\Vcalendar;
 
-$config    = ;
-$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+$config    = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+$vcalendar = new Vcalendar( $config );
 $vcalendar-&gt;setCalscale( &quot;GREGORIAN&quot; );
 
 </p>
@@ -2759,7 +3098,28 @@ while( $comp  = $vcalendar-&gt;getComponent( [ Vcalendar::RESOURCES =&gt; &quot;
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a id="replaceComponent"></a><h4>3.1.3.3 replaceComponent</h4>
+<a id="getComponents"></a><h4>3.1.3.3 getComponents</h4>
+<p>Return (array) Vcalendar instance components.</p>
+<p class="label">format</p>
+<p class="format">Vcalendar::getComponents( [ compType ] )</p>
+<p class="comment">compType : (string) component type
+
+<p class="label">Example</p>
+<p>Return all Vevents</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+$iCalContent = file_get_contents( &quot;calendar.ics&quot; );
+$vcalendar-&gt;parse( $iCalContent );
+foreach( $vcalendar-&gt;getComponents( Vcalendar::VEVENT ) as $component ) {
+.. .
+}
+
+</p>
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
+
+<a id="replaceComponent"></a><h4>3.1.3.4 replaceComponent</h4>
 <P>
 Replace calendar component in vcalendar based on component property <a href="#UID">UID</a>
 (<a href="#VEVENT">EVENT</a> / <a href="#VTODO">VTODO</a> / <a href="#VJOURNAL">VJOURNAL</a> / <a href="#VFREEBUSY">VFREEBUSY</a>).
@@ -2790,7 +3150,7 @@ $vcalendar-&gt;replaceComponent( $component );
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a id="selectComponents"></a><h4>3.1.3.4 selectComponents</h4>
+<a id="selectComponents"></a><h4>3.1.3.5 selectComponents</h4>
 <p class="label">Format 1</p>
 <p>
 Selects  <a href="#VEVENT">EVENT</a> / <a href="#VTODO">VTODO</a> / <a href="#VJOURNAL">VJOURNAL</a> /
@@ -3045,7 +3405,7 @@ exit;
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_component_object_methods">[up]</a>
 
-<a id="setComponent"></a><h4>3.1.3.5 setComponent</h4>
+<a id="setComponent"></a><h4>3.1.3.6 setComponent</h4>
 <p>
 Replace or update component in the Vcalendar instance.
 Also add a <strong>calendar</strong> component to the Vcalendar instance
@@ -3211,7 +3571,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.49//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.56//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -4146,6 +4506,15 @@ while( $valarm-&gt;deleteAttach()) {
     continue;
 }
 </p>
+
+<h5>Get ALL ATTACH</h5>
+<p>Returns array : all ATTACH, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllAttach( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get ATTACH</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -4310,6 +4679,14 @@ while( $valarm-&gt;deleteAttendee()) {
     continue;
 }
 </p>
+<h5>Get ALL ATTENDEE</h5>
+<p>Returns array : all ATTENDEE, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllAttendee( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get ATTENDEE</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -4317,7 +4694,7 @@ while( $valarm-&gt;deleteAttendee()) {
 <p class="comment">output = attendeeValue<sup>1</sup></p>
 <p class="label">Format 2</p>
 <p>Note details about <a href="#propValueParam">property value/params</a>.</p>
-<p class="format">calendarComponent::getAttendee( propOrderNo/null , true )</p>
+<p class="format">calendarComponent::getAttendee( propOrderNo/null, true )</p>
 <p class="comment">propOrderNo = (int) specific property value</p>
 <p class="comment">output = [
     &quot;value&quot;  =&gt; attendeeValue<sup>1</sup>,
@@ -4436,8 +4813,8 @@ PARTSTAT       = Vcalendar::PARTSTAT =&gt; &quot;NEEDS-ACTION&quot;
                             (Experimental status)
                           / (string) iana-token
                             (Other IANA registered status)
-RSVP           = Vcalendar::RSVP =&gt; (string) &quot;TRUE&quot;
-                                  / &quot;FALSE&quot;, <b>Default</b> (reply expectation)
+RSVP           = Vcalendar::RSVP =&gt; (string) &quot;true&quot;
+                                  / &quot;false&quot;, <b>Default</b> (reply expectation)
 DELEGATED-TO   = &quot;DELEGATED-TO&quot; =&gt; array(*[(string) &quot;single <strong>calendar</strong> user
                                             to specified by the property
                                             has delegated participation&quot;])
@@ -4476,7 +4853,7 @@ $vevent-&gt;setAttendee(
         ],
         Vcalendar::ROLE     =&gt; &quot;CHAIR&quot;,
         Vcalendar::PARTSTAT =&gt; &quot;ACCEPTED&quot;,
-        Vcalendar::RSVP     =&gt; &quot;TRUE&quot;,
+        Vcalendar::RSVP     =&gt; &quot;true&quot;,
         Vcalendar::DELEGATED_TO =&gt; [
             &quot;part1@ical.net&quot;,
             &quot;part2@ical.net&quot;,
@@ -4635,6 +5012,15 @@ while( $vevent-&gt;deleteCategories()) {
     continue;
 }
 </p>
+
+<h5>Get ALL CATEGORIES</h5>
+<p>Returns array : all CATEGORIES, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllCategories( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get CATEGORIES</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -4957,6 +5343,15 @@ while( $vevent-&gt;deleteComment()) {
     continue;
 }
 </p>
+
+<h5>Get ALL COMMENT</h5>
+<p>Returns array : all COMMENT, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllComment( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get COMMENT</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -5079,6 +5474,15 @@ $str = $component-&gt;createConference();
 $vevent-&gt;deleteConference();
 
 </p>
+
+<h5>Get ALL CONFERENCE</h5>
+<p>Returns array : all CONFERENCE, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllConference( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get CONFERENCE</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -5212,6 +5616,15 @@ while( $vevent-&gt;deleteContact()) {
     continue;
 }
 </p>
+
+<h5>Get ALL CONTACT</h5>
+<p>Returns array : all CONTACT, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllContact( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get CONTACT</h5>
 <p>For CONTACT in <a href="#VFREEBUSY">VFREEBUSY</a> (may only occur once), skip the &quot;propOrderNo&quot; argument.</p>
 <p>If set, returns property value, otherwise bool false.</p>
@@ -5457,6 +5870,15 @@ To ease up usage, constants<br>
 $str = $component-&gt;createDescription();
 
 </p>
+
+<h5>Get ALL DESCRIPTION</h5>
+<p>Returns array : all DESCRIPTION, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllDescription( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Delete DESCRIPTION</h5>
 <p>Remove DESCRIPTION from component.</p>
 <p class="label">Format</p>
@@ -5751,7 +6173,10 @@ catch( Exception $e ) {
 <p>
 To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::DTSTAMP is available.
 </p>
-<p>For methods and formatting, explore the <a href="#CREATED">CREATED</a> property.</p>
+<p>
+    For methods and formatting, explore the <a href="#CREATED">CREATED</a> property.
+    Note, NO deleteDtstamp() method, use setDtstamp() to recreate.
+</p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
@@ -5994,6 +6419,7 @@ To ease up usage, constants<br>
     - Kigkonsult\Icalcreator\Vcalendar::DATE_TIME<br>
     are available.
 </p>
+
 <h5>Create EXDATE</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise empty string.</p>
 <p class="label">Format</p>
@@ -6003,6 +6429,7 @@ To ease up usage, constants<br>
 $str = $component-&gt;createExdate();
 
 </p>
+
 <h5>Delete EXDATE</h5>
 <p>Remove EXDATE from component.</p>
 <p class="label">Format</p>
@@ -6025,6 +6452,15 @@ while( $vjournal-&gt;deleteExdate()) {
     continue;
 }
 </p>
+
+<h5>Get ALL EXDATE</h5>
+<p>Returns array : all EXDATE, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllExdate( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get EXDATE</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -6179,6 +6615,15 @@ while( $vfreebusy-&gt;deleteFreebusy()) {
 }
 
 </p>
+
+<h5>Get ALL FREEBUSY</h5>
+<p>Returns array : all FREEBUSY, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllFreebusy( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get FREEBUSY</h5>
 <p>If set, returns property value, otherwise bool false. Note, NO freebusytype!</p>
 <p class="label">Format 1</p>
@@ -6529,6 +6974,7 @@ $vevent-&gt;setGeo( 11.23456, -23.45678 );
 $str = $component-&gt;createImage();
 
 </p>
+
 <h5>Delete IMAGE</h5>
 <p>Remove IMAGE from component.</p>
 <p class="label">Format</p>
@@ -6552,6 +6998,15 @@ while( $vevent-&gt;deleteImage()) {
 }
 
 </p>
+
+<h5>Get ALL IMAGE</h5>
+<p>Returns array : all IMAGE, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllImage( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get IMAGE</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -6734,6 +7189,7 @@ To ease up usage, constants<br>
     - Kigkonsult\Icalcreator\Vcalendar::LANGUAGE<br>
     are available.
 </p>
+
 <h5>Create LOCATION</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise empty string.</p>
 <p class="label">Format</p>
@@ -6743,6 +7199,7 @@ To ease up usage, constants<br>
 $str = $component-&gt;createLocation();
 
 </p>
+
 <h5>Delete LOCATION</h5>
 <p>Remove LOCATION from component.</p>
 <p>
@@ -6756,6 +7213,15 @@ $str = $component-&gt;createLocation();
 $vevent-&gt;deleteLocation();
 
 </p>
+
+<h5>Get ALL LOCATION</h5>
+<p>Returns array : all LOCATION, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllLocation( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get LOCATION</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p>
@@ -6905,6 +7371,14 @@ $str = $calendar-&gt;createName();
 <p class="example">
 $calendar-&gt;deleteName();
 
+</p>
+
+<h5>Get ALL NAME</h5>
+<p>Returns array : all NAME, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllName( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
 </p>
 
 <h5>Get NAME</h5>
@@ -7390,6 +7864,7 @@ To ease up usage, constants<br>
     - Kigkonsult\Icalcreator\Vcalendar::PERIOD<br>
     are available.
 </p>
+
 <h5>Create RDATE</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise empty string.</p>
 <p class="label">Format</p>
@@ -7399,6 +7874,7 @@ To ease up usage, constants<br>
 $str = $component-&gt;createRdate();
 
 </p>
+
 <h5>Delete RDATE</h5>
 <p>Remove RDATE from component.</p>
 <p class="label">Format</p>
@@ -7423,6 +7899,15 @@ while( $vjournal-&gt;deleteRdate()) {
 }
 
 </p>
+
+<h5>Get ALL RDATE</h5>
+<p>Returns array : all RDATE, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllRdate( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get RDATE</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -7726,6 +8211,7 @@ To ease up usage, constants<br>
 $str = $component-&gt;createRelatedTo();
 
 </p>
+
 <h5>Delete RELATED-TO</h5>
 <p>Remove RELATED-TO from component.</p>
 <p class="label">Format</p>
@@ -7750,6 +8236,15 @@ while( $vjournal-&gt;deleteRelatedto()) {
 }
 
 </p>
+
+<h5>Get ALL RELATED-TO</h5>
+<p>Returns array : all RELATED-TO, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllRelatedto( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get RELATED-TO</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -7927,6 +8422,7 @@ To ease up usage, constants<br>
     - Kigkonsult\Icalcreator\Vcalendar::LANGUAGE<br>
 are available.
 </p>
+
 <h5>Create REQUEST-STATUS</h5>
 <p>If set, returns [RFC5545] formatted string, otherwise empty string.</p>
 <p class="label">Format</p>
@@ -7936,6 +8432,7 @@ are available.
 $str = $component-&gt;createRequestStatus();
 
 </p>
+
 <h5>Delete REQUEST-STATUS</h5>
 <p>Remove REQUEST-STATUS from component.</p>
 <p class="label">Format</p>
@@ -7960,6 +8457,15 @@ while( $vjournal-&gt;deleteRequeststatus()) {
 }
 
 </p>
+
+<h5>Get ALL REQUEST-STATUS</h5>
+<p>Returns array : all REQUEST-STATUS, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllRequeststatus( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get REQUEST-STATUS</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -8119,6 +8625,7 @@ To ease up usage, constants<br>
 $str = $component-&gt;createResources();
 
 </p>
+
 <h5>Delete RESOURCES</h5>
 <p>Remove RESOURCES from component.</p>
 <p class="label">Format</p>
@@ -8143,6 +8650,15 @@ while( $vevent-&gt;deleteResources()) {
 }
 
 </p>
+
+<h5>Get ALL RESOURCES</h5>
+<p>Returns array : all RESOURCES, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllResources( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get RESOURCES</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -8865,6 +9381,7 @@ $vevent-&gt;setStatus( &quot;COMPLETED&quot; );
 $str = $component-&gt;createStructureddata();
 
 </p>
+
 <h5>Delete STRUCTURED-DATA</h5>
 <p>Remove STRUCTURED-DATA from component.</p>
 <p class="label">Format</p>
@@ -8888,6 +9405,15 @@ while( $vevent-&gt;deleteStructureddata()) {
 }
 
 </p>
+
+<h5>Get ALL STRUCTURED-DATA</h5>
+<p>Returns array : all STRUCTURED-DATA, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllStructureddata( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get STRUCTURED-DATA</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -9004,6 +9530,7 @@ $vevent-&gt;setStructureddata(
 $str = $component-&gt;createStyleddescription();
 
 </p>
+
 <h5>Delete STYLED-DESCRIPTION</h5>
 <p>Remove STYLED-DESCRIPTION from component.</p>
 <p class="label">Format</p>
@@ -9027,6 +9554,15 @@ while( $vevent-&gt;deleteStyleddescription()) {
 }
 
 </p>
+
+<h5>Get ALL STYLED-DESCRIPTION</h5>
+<p>Returns array : all STYLED-DESCRIPTION, value/params OR only values</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="label">Format</p>
+<p class="format">calendarComponent::getAllStyleddescription( [ valueOnly ] )</p>
+<p class="comment">valueOnly = (bool) default false, value/params OR only values (true)
+</p>
+
 <h5>Get STYLED-DESCRIPTION</h5>
 <p>If set, returns property value(-s), otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -9085,7 +9621,7 @@ altrep       = (string) an alternate text representation, URI
 lang         = (string) as defined in [RFC5546]
 contentType  = (string) The parameter value MUST be the TEXT for either an IANA
                registered content type or a non-standard content type.
-derived      = "TRUE" / "FALSE" default is FALSE
+derived      = &quot;true&quot; / &quot;false&quot; default is false
 xparams      = (string) key =&gt; (string) value // <span class="comment">key prefix &quot;X-&quot;</span>
 propOrderNo  = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 </p>
@@ -9638,6 +10174,7 @@ To ease up usage, constants <br>
 $str = $component-&gt;createTzname();
 
 </p>
+
 <h5>Delete TZNAME</h5>
 <p>Remove TZNAME from component.</p>
 <p class="label">Format</p>
@@ -9662,6 +10199,7 @@ while( $vtimezonestd-&gt;deleteTzname()) {
 }
 
 </p>
+
 <h5>Get TZNAME</h5>
 <p>If set, returns property value, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -10057,6 +10595,7 @@ The property (is OPTIONAL and) MUST NOT occur more than once in
     UID is (auto set to) a hex-encoded random Universally Unique Identifier (UUID) value
     as defined in Sections 4.4 and 4.5 of
     <a href="https://tools.ietf.org/html/rfc4122" title="Download rfc4122" target="_blank">rfc4122</a>.
+    Note, NO deleteUid() method, use setUid() to recreate.
 </p>
 <p class="label">Example</p>
 <p class="example">UID:5FC53010-1267-4F8E-BC28-1D7AE55A7C99</p>
@@ -10080,18 +10619,12 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::UID is available.
 $str = $component-&gt;createUid();
 
 </p>
+
 <h5>Delete UID</h5>
 <p>
-If UID is remove from a component, UID will automatically be recreated when Vcalendar output methods
-like <a href="#createCalendar">createCalendar</a> and <a href="#returnCalendar">returnCalendar</a>are used.
+Use component::setUid() to recreate.
 </p>
-<p class="label">Format</p>
-<p class="format">calendarComponent::deleteUid()</p>
-<p class="label">Example</p>
-<p class="example">
-$vevent-&gt;deleteUid();
 
-</p>
 <h5>Get UID</h5>
 <p>If set, returns property, otherwise bool false.</p>
 <p class="label">Format 1</p>
@@ -10428,6 +10961,32 @@ while( $xprop = $vcalendar-&gt;getXprop( null, null, true )) {
 
 </p>
 
+<h5>Get all X-properties</h5>
+<p>Returns array</p>
+
+<p class="label">Format 1</p>
+<p class="format">Component::getAllXprop()</p>
+<p class="comment">output = [
+    *[
+        propertyName<sup>1</sup>,
+        value<sup>2</sup> )
+    ]
+]
+</p>
+<p class="label">Format 2</p>
+<p>Note details about <a href="#propValueParam">property value/params</a>.</p>
+<p class="format">Component::getAllXprop( true )</p>
+<p class="comment">output = [
+    *[
+        propertyName<sup>1</sup>,
+        [
+            &quot;value&quot;  =&gt; value<sup>2</sup>,
+            &quot;params&quot; =&gt; params<sup>3</sup>
+        ]
+    ]
+]
+</p>
+
 <h5>is X-property set</h5>
 <p>Return bool true if X-property (key)  is set (i.e. non-empty).</p>
 <p class="label">Format</p>
@@ -10572,7 +11131,32 @@ while( $subComp = $comp1-&gt;getComponent()) {
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_misc_methods">[up]</a>
 
 
-<a id="setComponent_PROP"></a><h4>3.4.3 setComponent</h4>
+<a id="getComponents_PROP"></a><h4>3.4.3 getComponents</h4>
+<p>Return (array) subComponents from component.</p>
+<p class="label">format</p>
+<p class="format">calendarComponent::getComponents( [ compType ] )</p>
+<p class="comment">compType : (string) component type
+
+<p class="label">Example</p>
+<p>Return all Valarms</p>
+<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+
+$vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+$iCalContent = file_get_contents( &quot;calendar.ics&quot; );
+$vcalendar-&gt;parse( $iCalContent );
+foreach( $vcalendar-&gt;getComponents( Vcalendar::VEVENT ) as $component ) {
+    foreach( $component-&gt;getComponents( Vcalendar::VALARM ) as $subComponent ) {
+    .. .
+    }
+.. .
+}
+
+</p>
+<br>
+<a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_misc_methods">[up]</a>
+
+
+<a id="setComponent_PROP"></a><h4>3.4.4 setComponent</h4>
 Add <strong>calendar</strong> component to the Vcalendar instance or replace/update component in the Vcalendar instance.
 <p class="label">Format 1</p>
 <p class="format">calendarComponent::setComponent( component )
@@ -10614,7 +11198,7 @@ $vcalendar-&gt;setComponent( $vevent );
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#iCalcreator_misc_methods">[up]</a>
 
-<a id="vtimezone_populate"></a><h4>3.4.4 Vtimezone populate</h4>
+<a id="vtimezone_populate"></a><h4>3.4.5 Vtimezone populate</h4>
 <p>
     The Util/VtimezonePopulateFactory::process (static) method,
     applied on a Vcalendar instance,
@@ -10707,7 +11291,7 @@ END:VTIMEZONE
 
 
 
-<a id="msTimezone2PHPtz"></a><h4>3.4.5 Review timezones, opt alter to PHP timezone</h4>
+<a id="msTimezone2PHPtz"></a><h4>3.4.6 Review timezones, opt alter to PHP timezone</h4>
 <p>
     The Vcalendar::<a href="#parse_merge">parse</a> or component::<a href="#componentParse">parse</a>
     will throw exception when the input data contains PHP unknown timezones,
@@ -10805,7 +11389,14 @@ config  = (array)  iCalcreator config array (opt)</p>
 
 <a id="iCal2jSon"></a><h3>4.4 iCalcreator and json export</h3>
 <p>
-You can export iCal (XML) as json using a Vcalendar instance,
+    You can export and import
+    (<a href="https://tools.ietf.org/html/rfc8984" title="Download rfc8984" target="_blank">rfc8984</a>)
+    iCal json using
+    <a href="https://github.com/iCalcreator/PhpJsCalendar" title="PhpJsCalendar" target="_blank">PhpJsCalendar</a>.
+</p>
+
+<p>
+You can also export iCal (XML) as json using a Vcalendar instance
 <a href="#iCal2XML">IcalXMLFactory::iCal2XML()</a> (above),
 simplexml_load_string and json_encode as follows:
 </p>
@@ -10881,7 +11472,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.49
+<tr><td>Version  <td>2.41.56
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

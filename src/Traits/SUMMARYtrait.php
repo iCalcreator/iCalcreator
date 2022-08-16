@@ -29,15 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * SUMMARY property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait SUMMARYtrait
 {
@@ -53,20 +53,11 @@ trait SUMMARYtrait
      */
     public function createSummary() : string
     {
-        if( empty( $this->summary )) {
-            return self::$SP0;
-        }
-        if( empty( $this->summary->getValue())) {
-            return $this->createSinglePropEmpty( self::SUMMARY );
-        }
-        return StringFactory::createElement(
+        return SingleProps::format(
             self::SUMMARY,
-            ParameterFactory::createParams(
-                $this->summary->getParams(),
-                self::$ALTRPLANGARR,
-                $this->getConfig( self::LANGUAGE )
-            ),
-            StringFactory::strrep( $this->summary->getValue())
+            $this->summary,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
         );
     }
 

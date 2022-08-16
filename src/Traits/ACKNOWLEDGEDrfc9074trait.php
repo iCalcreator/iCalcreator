@@ -33,15 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * ACKNOWLEDGED property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait ACKNOWLEDGEDrfc9074trait
 {
@@ -59,16 +59,10 @@ trait ACKNOWLEDGEDrfc9074trait
      */
     public function createAcknowledged() : string
     {
-        if( empty( $this->acknowledged )) {
-            return self::$SP0;
-        }
-        if( empty( $this->acknowledged->value )) {
-            return $this->createSinglePropEmpty( self::ACKNOWLEDGED );
-        }
-        return StringFactory::createElement(
+        return  DtxProperty::format(
             self::ACKNOWLEDGED,
-            ParameterFactory::createParams( $this->acknowledged->params ),
-            DateTimeFactory::dateTime2Str( $this->acknowledged->value )
+            $this->acknowledged,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

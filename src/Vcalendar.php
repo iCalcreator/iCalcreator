@@ -34,7 +34,9 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Vcalendar as Formatter;
 use Kigkonsult\Icalcreator\Traits\MvalTrait;
+use Kigkonsult\Icalcreator\Parser\VcalendarParser;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\SelectFactory;
@@ -53,8 +55,6 @@ use function is_null;
 use function ksort;
 use function method_exists;
 use function property_exists;
-use function rtrim;
-use function str_starts_with;
 use function strlen;
 use function strpos;
 use function strtolower;
@@ -66,7 +66,7 @@ use function usort;
 /**
  * Vcalendar class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.54 - 2022-08-09
  */
 final class Vcalendar extends IcalBase
 {
@@ -95,22 +95,18 @@ final class Vcalendar extends IcalBase
     public const VCALENDAR = 'Vcalendar';
 
     /**
-     * @var string property output formats, used by CALSCALE, METHOD, PRODID and VERSION
-     */
-    private static string $FMTICAL = "%s:%s\r\n";
-
-    /**
      * Constructor for calendar object
      *
      * @param null|mixed[] $config
      * @throws Exception
-     * @since  2.39.1 - 2021-06-26
+     * @since 2.41.55 - 2022-08-13
      */
     public function __construct( ? array $config = [] )
     {
-        $this->compType     = self::VCALENDAR;
+        $this->compType = self::VCALENDAR;
         $this->setConfig( $config ?? [] );
         $this->setUid();
+        $this->prodid   = $this->makeProdid();
     }
 
     /**
@@ -129,7 +125,6 @@ final class Vcalendar extends IcalBase
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->compix,
             $this->propIx,
@@ -158,6 +153,7 @@ final class Vcalendar extends IcalBase
      *
      * @param null|mixed[] $config
      * @return self
+     * @throws Exception
      * @since  2.18.5 - 2013-08-29
      */
     public static function factory( ? array $config = [] ) : self
@@ -186,7 +182,7 @@ final class Vcalendar extends IcalBase
      *
      * CATEGORIES, LOCATION, GEOLOCATION, PRIORITY, RESOURCES, STATUS, SUMMARY
      * DTSTART (Ymd only)
-     * ATTENDEE*, CONTACT, ORGANIZER*   *:prefixed by "protocol" like "MAILTO:....
+     * ATTENDEE*, CONTACT, ORGANIZER*   *:prefixed by "protocol" like "mailto:....
      * RECURRENCE-ID *4 (alt. "R-UID")
      * RELATED-TO, URL, UID
      * @param string $propName
@@ -214,18 +210,18 @@ final class Vcalendar extends IcalBase
             self::URL
         ];
         $propName = strtoupper( $propName );
-        if( ! Util::isPropInList( $propName, $PROPS )) {
+        if( ! in_array( $propName, $PROPS, true )) {
             return false;
         }
         $output  = [];
         $content = null;
         foreach( array_keys( $this->components ) as $cix ) {
             switch( true ) {
-                case ( ! Util::isCompInList( $this->components[$cix]->getCompType(), self::$VCOMPS )) :
+                case ( ! in_array( $this->components[$cix]->getCompType(), self::$VCOMPS, true )) :
                     continue 2;
                 case ( ! property_exists( $this->components[$cix], StringFactory::getInternalPropName( $propName ))) :
                     continue 2;
-                case ( Util::isPropInList( $propName, self::$MPROPS1 )) :
+                case ( in_array( $propName, self::$MPROPS1, true )) :
                     $this->components[$cix]->getProperties( $propName, $output );
                     continue 2;
                 case (( 3 < strlen( $propName )) &&
@@ -292,7 +288,7 @@ final class Vcalendar extends IcalBase
      * @return Vevent
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.24 - 2022-02-19
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVevent(
         null|string|DateTimeInterface $dtstart = null,
@@ -302,21 +298,13 @@ final class Vcalendar extends IcalBase
     ) : Vevent
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vevent( $this->getConfig());
-        $this->components[$ix]->getDtstamp();
-        $this->components[$ix]->getUid();
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $dtend ) {
-            $this->components[$ix]->setDtend( $dtend );
-        }
-        elseif( null !== $duration ) {
-            $this->components[$ix]->setDuration( $duration );
-        }
-        if( null !== $summary ) {
-            $this->components[$ix]->setSummary( $summary );
-        }
+        $this->components[$ix] = Vevent::factory(
+            $this->getConfig(),
+            $dtstart,
+            $dtend,
+            $duration,
+            $summary
+        );
         return $this->components[$ix];
     }
 
@@ -330,7 +318,7 @@ final class Vcalendar extends IcalBase
      * @return Vtodo
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.26 - 2022-02-19
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVtodo(
         null|string|DateTimeInterface $dtstart = null,
@@ -340,21 +328,13 @@ final class Vcalendar extends IcalBase
     ) : Vtodo
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vtodo( $this->getConfig());
-        $this->components[$ix]->getDtstamp();
-        $this->components[$ix]->getUid();
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $due ) {
-            $this->components[$ix]->setDue( $due );
-        }
-        elseif( null !== $duration ) {
-            $this->components[$ix]->setDuration( $duration );
-        }
-        if( null !== $summary ) {
-            $this->components[$ix]->setSummary( $summary );
-        }
+        $this->components[$ix] = Vtodo::factory(
+            $this->getConfig(),
+            $dtstart,
+            $due,
+            $duration,
+            $summary
+        );
         return $this->components[$ix];
     }
 
@@ -366,7 +346,7 @@ final class Vcalendar extends IcalBase
      * @return Vjournal
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.27 - 2022-02-19
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVjournal(
         null|string|DateTimeInterface $dtstart = null,
@@ -374,15 +354,7 @@ final class Vcalendar extends IcalBase
     ) : Vjournal
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vjournal( $this->getConfig());
-        $this->components[$ix]->getDtstamp();
-        $this->components[$ix]->getUid();
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $summary ) {
-            $this->components[$ix]->setSummary( $summary );
-        }
+        $this->components[$ix] = Vjournal::factory( $this->getConfig(), $dtstart, $summary );
         return $this->components[$ix];
     }
 
@@ -395,7 +367,7 @@ final class Vcalendar extends IcalBase
      * @return Vfreebusy
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.28 - 2022-02-20
+     * @since  2.41.28 - 2022-08-08
      */
     public function newVfreebusy(
         ? string $attendee = null,
@@ -404,18 +376,7 @@ final class Vcalendar extends IcalBase
     ) : Vfreebusy
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vfreebusy( $this->getConfig());
-        $this->components[$ix]->getDtstamp();
-        $this->components[$ix]->getUid();
-        if( null !== $attendee ) {
-            $this->components[$ix]->setAttendee( $attendee );
-        }
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $dtend ) {
-            $this->components[$ix]->setDtend( $dtend );
-        }
+        $this->components[$ix] = Vfreebusy::factory( $this->getConfig(), $attendee, $dtstart, $dtend );
         return $this->components[$ix];
     }
 
@@ -429,7 +390,7 @@ final class Vcalendar extends IcalBase
      * @return Vavailability
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.41.22 - 2022-02-19
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVavailability(
         ? string $busyType = null,
@@ -438,24 +399,15 @@ final class Vcalendar extends IcalBase
         null|string|DateInterval $duration = null
     ) : Vavailability
     {
-        $comp = new Vavailability( $this->getConfig());
-        $comp->getDtstamp();
-        $comp->getUid();
         $ix   = $this->getNextComponentIndex();
-        $this->components[$ix] = $comp;
-        if( null !== $busyType ) {
-            $this->components[$ix]->setBusytype( $busyType );
-        }
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $dtend ) {
-            $this->components[$ix]->setDtend( $dtend );
-        }
-        elseif( null !== $duration ) {
-            $this->components[$ix]->setDuration( $duration );
-        }
-        return $comp;
+        $this->components[$ix] = Vavailability::factory(
+            $this->getConfig(),
+            $busyType,
+            $dtstart,
+            $dtend,
+            $duration
+        );
+        return $this->components[$ix];
     }
 
     /**
@@ -463,9 +415,9 @@ final class Vcalendar extends IcalBase
      *
      * @param null|string $tzid
      * @return Vtimezone
-     * @since  2.41.23 - 2022-02-19
+     * @since  2.41.53 - 2022-08-08
      */
-    public function newVtimezone( ? string $tzid = null) : Vtimezone
+    public function newVtimezone( ? string $tzid = null ) : Vtimezone
     {
         $vTimezones = $others = [];
         foreach( array_keys( $this->components ) as $cix ) {
@@ -476,10 +428,7 @@ final class Vcalendar extends IcalBase
             $others[] = clone $this->components[$cix];
         } // end foreach
         $vtix              = count( $vTimezones );
-        $vTimezones[$vtix] = new Vtimezone( $this->getConfig());
-        if( null !== $tzid ) {
-            $vTimezones[$vtix]->setTzid( $tzid );
-        }
+        $vTimezones[$vtix] = Vtimezone::factory( $this->getConfig(), $tzid );
         $this->components  = [];
         foreach( array_keys( $vTimezones ) as $cix ) {
             $this->components[] = $vTimezones[$cix];
@@ -502,7 +451,7 @@ final class Vcalendar extends IcalBase
     {
         static $ERRMSG1 = 'Invalid component type \'%s\' or Vtimezone with no TZID';
         static $ERRMSG2 = 'Vtimezone with tzid \'%s\' not found, found \'%s\'';
-        if( Util::isCompInList( $component->getCompType(), self::$VCOMPS )) {
+        if( in_array( $component->getCompType(), self::$VCOMPS, true )) {
             return $this->setComponent( $component, $component->getUid());
         }
         if(( self::VTIMEZONE !== $component->getCompType()) ||
@@ -600,7 +549,7 @@ final class Vcalendar extends IcalBase
         if( ! is_null( $sortArg )) {
             $sortArg = strtoupper( $sortArg );
             if(( self::DTSTAMP !== $sortArg ) &&
-                ! Util::isPropInList( $sortArg, self::$SELSORTPROPS )) {
+                ! in_array( $sortArg, self::$SELSORTPROPS, true )) {
                 $sortArg = null;
             }
         }
@@ -619,169 +568,12 @@ final class Vcalendar extends IcalBase
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @since  2.29.3  2019-08-29
+     * @since  2.41.54 - 2022-08-09
      */
     public function parse( string|array $unParsedText ) : self
     {
-        $rows = StringFactory::conformParseInput( $unParsedText );
-        $this->parse2intoComps( $rows );
-        $this->parse3thisProperties();
-        /* parse Components */
-        if( ! empty( $this->countComponents())) {
-            $this->parse4subComps();
-        }
+        VcalendarParser::factory( $this )->parse( $unParsedText );
         return $this;
-    }
-
-    /**
-     * Parse into calendar and comps data
-     *
-     * @param string[] $rows
-     * @return void
-     * @throws Exception
-     * @throws UnexpectedValueException
-     * @since  2.41.9 - 2022-01-27
-     */
-    private function parse2intoComps( array $rows ) : void
-    {
-        static $BEGIN_VCALENDAR     = 'BEGIN:VCALENDAR';
-        static $END_VCALENDAR       = 'END:VCALENDAR';
-        static $ENDSARR             = [ 'END:VAV', 'END:VEV', 'END:VFR', 'END:VJO', 'END:VTI', 'END:VTO' ];
-        static $BEGIN_VAVAILABILITY = 'BEGIN:VAVAILABILITY';
-        static $BEGIN_VEVENT        = 'BEGIN:VEVENT';
-        static $BEGIN_VFREEBUSY     = 'BEGIN:VFREEBUSY';
-        static $BEGIN_VJOURNAL      = 'BEGIN:VJOURNAL';
-        static $BEGIN_VTODO         = 'BEGIN:VTODO';
-        static $BEGIN_VTIMEZONE     = 'BEGIN:VTIMEZONE';
-        $comp    = $this;
-        /* identify components and update unparsed data for components */
-        foreach( $rows as $row ) {
-            switch( true ) {
-                case str_starts_with( $row, $BEGIN_VCALENDAR ) :
-                    break;
-                case str_starts_with( $row, $END_VCALENDAR ) :
-                    break 2;
-                case ( in_array( strtoupper( substr( $row, 0, 7 )), $ENDSARR, true )) :
-                    break;
-                case str_starts_with( $row, $BEGIN_VAVAILABILITY ) :
-                    $comp      = $this->newVavailability();
-                    break;
-                case str_starts_with( $row, $BEGIN_VEVENT ) :
-                    $comp      = $this->newVevent();
-                    break;
-                case str_starts_with( $row, $BEGIN_VFREEBUSY ) :
-                    $comp      = $this->newVfreebusy();
-                    break;
-                case str_starts_with( $row, $BEGIN_VJOURNAL ) :
-                    $comp      = $this->newVjournal();
-                    break;
-                case str_starts_with( $row, $BEGIN_VTODO ) :
-                    $comp      = $this->newVtodo();
-                    break;
-                case str_starts_with( $row, $BEGIN_VTIMEZONE ) :
-                    $comp      = $this->newVtimezone();
-                    break;
-                default : /* update component with unparsed data */
-                    $comp->unparsed[] = $row;
-                    break;
-            } // switch( true )
-        } // end foreach( $rows as $lix => $row )
-    }
-
-    /**
-     * Parse calendar data
-     *
-     * @return void
-     * @throws UnexpectedValueException
-     * @since  2.29.22 - 2020-08-26
-     */
-    private function parse3thisProperties() : void
-    {
-        static $BEGIN     = 'BEGIN:';
-        static $ERR       = 'Unknown ical component (row %d) %s';
-        static $PVPROPS   = [ self::PRODID, self::VERSION ];
-        static $CALPROPS  = [
-            self::CALSCALE,
-            self::METHOD,
-            self::PRODID,
-            self::VERSION,
-        ];
-        static $RFC7986PROPS = [
-            self::COLOR,
-            self::CATEGORIES,
-            self::DESCRIPTION,
-            self::IMAGE,
-            self::NAME,
-            self::LAST_MODIFIED,
-            self::REFRESH_INTERVAL,
-            self::SOURCE,
-            self::UID,
-            self::URL,
-        ];
-        if( ! isset( $this->unparsed ) ||
-            ! is_array( $this->unparsed ) ||
-            ( 1 > count( $this->unparsed ))) {
-            return;
-        }
-            /* concatenate property values spread over several rows */
-        static $TRIMCHARS = "\x00..\x1F";
-        $rows = StringFactory::concatRows( $this->unparsed );
-        foreach( $rows as $lix => $row ) {
-            if( str_starts_with( $row, $BEGIN )) {
-                throw new UnexpectedValueException(
-                    sprintf( $ERR, $lix, PHP_EOL . implode( PHP_EOL, $rows ))
-                );
-            }
-            /* split property name  and  opt.params and value */
-            [ $propName, $row ] = StringFactory::getPropName( $row );
-            switch( true ) {
-                case ( StringFactory::isXprefixed( $propName ) ||
-                       Util::isPropInList( $propName, $RFC7986PROPS )) :
-                    break;
-                case Util::isPropInList( $propName, $PVPROPS ) :
-                    continue 2;  // ignore version/prodid properties
-                case ( ! Util::isPropInList( $propName, $CALPROPS )) :
-                    continue 2;  // skip non standard property names
-            } // end switch
-            /* separate attributes from value */
-            [ $value, $propAttr ] = StringFactory::splitContent( $row );
-            /* update Property */
-            if( StringFactory::isXprefixed( $propName )) {
-                $this->setXprop( $propName, StringFactory::strunrep( $value ), $propAttr );
-                continue;
-            }
-            if( ! Util::isPropInList( $propName, self::$TEXTPROPS )) {
-                $value = StringFactory::trimTrailNL( $value );
-            }
-            $method = StringFactory::getSetMethodName( $propName );
-            switch( $propName ) {
-                case self::LAST_MODIFIED :    // fall through
-                case self::REFRESH_INTERVAL : // fall through
-                case self::URL :
-                    $this->{$method}( $value, $propAttr );
-                    break;
-                default :
-                    $value = StringFactory::strunrep( rtrim( $value, $TRIMCHARS ));
-                    $this->{$method}( $value, $propAttr );
-            } // end switch
-        } // end foreach
-        unset( $this->unparsed );
-    }
-
-    /**
-     * Parse sub-components
-     *
-     * @return void
-     * @since  2.29.3 - 2019-07-02
-     */
-    private function parse4subComps() : void
-    {
-        foreach( array_keys( $this->components ) as $ckey ) {
-            if( ! empty( $this->components[$ckey] ) &&
-                ! empty( $this->components[$ckey]->unparsed )) {
-                $this->components[$ckey]->parse();
-            }
-        } // end foreach
     }
 
     /**
@@ -886,38 +678,11 @@ final class Vcalendar extends IcalBase
      *
      * @return string
      * @throws Exception
-     * @since 2.41.29 2022-02-24
+     * @since 2.41.55 2022-08-13
      */
     public function createCalendar() : string
     {
-        static $BEGIN_VCALENDAR = "BEGIN:VCALENDAR";
-        static $END_VCALENDAR   = "END:VCALENDAR";
-        $calendar  =
-            $BEGIN_VCALENDAR . Util::$CRLF .
-            $this->createVersion() .
-            $this->createProdid() .
-            $this->createCalscale() .
-            $this->createMethod() .
-            $this->createLastmodified() .
-            $this->createUid() .
-            $this->createUrl() .
-            $this->createRefreshinterval() .
-            $this->createSource() .
-            $this->createColor() .
-            $this->createName() .
-            $this->createDescription() .
-            $this->createCategories() .
-            $this->createImage() .
-            $this->createXprop();
-        $config    = $this->getConfig();
-        $this->resetCompCounter();
-        foreach( array_keys( $this->components ) as $cix ) {
-            if( ! empty( $this->components[$cix] )) {
-                $this->components[$cix]->setConfig( $config, false, true );
-                $calendar .= $this->components[$cix]->createComponent();
-            }
-        }
-        return $calendar . $END_VCALENDAR . Util::$CRLF;
+        return Formatter::format( $this );
     }
 
     /**

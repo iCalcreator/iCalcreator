@@ -29,15 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * RESOURCE_TYPE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait RESOURCE_TYPErfc9073trait
 {
@@ -53,16 +53,10 @@ trait RESOURCE_TYPErfc9073trait
      */
     public function createResourcetype() : string
     {
-        if( empty( $this->resourcetype )) {
-            return self::$SP0;
-        }
-        if( empty( $this->resourcetype->value )) {
-            return $this->createSinglePropEmpty( self::RESOURCE_TYPE );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::RESOURCE_TYPE,
-            ParameterFactory::createParams( $this->resourcetype->params ),
-            StringFactory::strrep( $this->resourcetype->value )
+            $this->resourcetype,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

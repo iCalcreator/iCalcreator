@@ -29,17 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-
-use function is_numeric;
 
 /**
  * REPEAT property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait REPEATtrait
 {
@@ -58,14 +56,10 @@ trait REPEATtrait
         if( empty( $this->repeat )) {
             return self::$SP0;
         }
-        if( ! isset( $this->repeat->value ) ||
-            ( empty( $this->repeat->value ) && ! is_numeric( $this->repeat->value ))) {
-            return $this->createSinglePropEmpty( self::REPEAT );
-        }
-        return StringFactory::createElement(
+        return IntProperty::format(
             self::REPEAT,
-            ParameterFactory::createParams( $this->repeat->params ),
-            (string) $this->repeat->value
+            $this->repeat,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

@@ -33,15 +33,14 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * LAST-MODIFIED property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.55 - 2022-08-13
  */
 trait LAST_MODIFIEDtrait
 {
@@ -56,17 +55,14 @@ trait LAST_MODIFIEDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.55 - 2022-08-13
      */
     public function createLastmodified() : string
     {
-        if( empty( $this->lastmodified )) {
-            return self::$SP0;
-        }
-        return StringFactory::createElement(
+        return  DtxProperty::format(
             self::LAST_MODIFIED,
-            ParameterFactory::createParams( $this->lastmodified->params ),
-            DateTimeFactory::dateTime2Str( $this->lastmodified->value )
+            $this->lastmodified,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

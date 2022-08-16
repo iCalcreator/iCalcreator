@@ -29,8 +29,9 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Formatter\Property\Attendee;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -60,18 +61,18 @@ class Prop2TextMultiTest extends DtBase
     private static array $EOLCHARS = [ "\r\n ", "\r\n\t", PHP_EOL . " ", PHP_EOL . "\t" ];
 
     /**
-     * miscTest2 provider, test values for TEXT (MULTI) properties
+     * textMultiTest1/2 provider, test values for TEXT (MULTI) properties
      *
      * @return mixed[]
      * @throws Exception
      */
-    public function textMulti2Provider() : array
+    public function textMultiProvider() : array
     {
 
         $dataArr = [];
 
         // CATEGORIES
-        $value  = 'ANNIVERSARY,APPOINTMENT,BUSINESS,EDUCATION,HOLIDAY,MEETING,MISCELLANEOUS,NON-WORKING HOURS,NOT IN OFFICE,PERSONAL,PHONE CALL,SICK DAY,SPECIAL OCCASION,TRAVEL,VACATION';
+        $value  = 'test,ANNIVERSARY,APPOINTMENT,BUSINESS,EDUCATION,HOLIDAY,MEETING,MISCELLANEOUS,NON-WORKING HOURS,NOT IN OFFICE,PERSONAL,PHONE CALL,SICK DAY,SPECIAL OCCASION,TRAVEL,VACATION';
         $params = [
             IcalInterface::LANGUAGE => 'EN'
         ] + self::$STCPAR;
@@ -93,12 +94,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             strtoupper( IcalInterface::CATEGORIES ) .
-            ParameterFactory::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // COMMENT
-        $value  = 'This is a comment';
+        $value  = 'This is a test comment';
         $params = [
             IcalInterface::ALTREP   => 'This is an alternative representation',
             IcalInterface::LANGUAGE => 'EN'
@@ -122,12 +123,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::COMMENT .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // CONTACT
-        $value  = 'Jim Dolittle, ABC Industries, +1-919-555-1234';
+        $value  = 'Jim Dolittle, ABC test Industries, +1-919-555-1234';
         $params = [
             IcalInterface::ALTREP   => 'http://example.com/pdi/jdoe.vcf',
             IcalInterface::LANGUAGE => 'EN'
@@ -151,12 +152,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::CONTACT .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // DESCRIPTION
-        $value  = 'Meeting to provide technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
+        $value  = 'Meeting to provide technical test review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
         $params = [
             IcalInterface::ALTREP   => 'This is an alternative representation',
             IcalInterface::LANGUAGE => 'EN'
@@ -173,12 +174,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-                ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+                Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
                 ':' . $value
         ];
 
         // RESOURCES
-        $value  = 'EASEL,PROJECTOR,VCR';
+        $value  = 'test,EASEL,PROJECTOR,VCR';
         $params = [
                 IcalInterface::ALTREP   => 'This is an alternative representation',
                 IcalInterface::LANGUAGE => 'EN'
@@ -195,12 +196,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::RESOURCES .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // ATTENDEE
-        $value  = 'MAILTO:ildoit2061@example.com';
+        $value  = 'MAILTO:ildoit2061.test@example.com';
         $params = [
                 IcalInterface::CUTYPE         => IcalInterface::GROUP,
                 IcalInterface::MEMBER         => [
@@ -226,13 +227,20 @@ class Prop2TextMultiTest extends DtBase
                 IcalInterface::LANGUAGE       => 'EN'
             ] + self::$STCPAR;
         $getValue  = Pc::factory(
-            $value,
+            CalAddressFactory::conformCalAddress( $value ),
             $params
         );
         $getValue2 = clone $getValue;
-        $getValue2->params[IcalInterface::SENT_BY] = 'MAILTO:boss@example.com';
+        $getValue2->params[IcalInterface::SENT_BY] = 'mailto:boss@example.com';
         $getValue2->params[IcalInterface::EMAIL]   = 'hammer@example.com';
-        $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue2 ], true ));
+        foreach( $getValue2->getParams() as $pKey => $pValue ) {
+            if( in_array( $pKey, [ IcalInterface::MEMBER, IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM], true )) {
+                foreach( $pValue as $pIx => $pValue2 ) {
+                    $getValue2->params[$pKey][$pIx] = CalAddressFactory::conformCalAddress( $pValue2 );
+                }
+            }
+        } // end foreach
+        $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue2 ], true ));
         $expectedString = str_replace( Util::$CRLF . ' ' , '', $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
@@ -246,21 +254,21 @@ class Prop2TextMultiTest extends DtBase
             $expectedString
         ];
 
-        $value     = 'MAILTO:ildoit2062@example.com';
+        $value     = 'MAILTO:ildoit2062.test@example.com';
         $params    =  [
                 IcalInterface::MEMBER         => '"DEV-GROUP2062@example.com"',
                 IcalInterface::DELEGATED_TO   => '"bob2062@example.com"',
                 IcalInterface::DELEGATED_FROM => '"jane2062@example.com"',
             ] + self::$STCPAR;
         $getValue  = Pc::factory(
-            $value,
+            CalAddressFactory::conformCalAddress( $value ),
             $params
         );
         $getValue2 = $getValue;
-        $getValue2->params[IcalInterface::MEMBER]         = [ 'MAILTO:DEV-GROUP2062@example.com' ];
-        $getValue2->params[IcalInterface::DELEGATED_TO]   = [ 'MAILTO:bob2062@example.com' ];
-        $getValue2->params[IcalInterface::DELEGATED_FROM] = [ 'MAILTO:jane2062@example.com' ];
-        $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue2 ], true ));
+        $getValue2->params[IcalInterface::MEMBER]         = [ 'mailto:DEV-GROUP2062@example.com' ];
+        $getValue2->params[IcalInterface::DELEGATED_TO]   = [ 'mailto:bob2062@example.com' ];
+        $getValue2->params[IcalInterface::DELEGATED_FROM] = [ 'mailto:jane2062@example.com' ];
+        $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue2 ], true ));
         $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
@@ -274,13 +282,13 @@ class Prop2TextMultiTest extends DtBase
             $expectedString
         ];
 
-        $value     = 'MAILTO:ildoit2063@example.com';
+        $value     = 'MAILTO:ildoit2063.test@example.com';
         $params    =  self::$STCPAR;
         $getValue  = Pc::factory(
-            $value,
+            CalAddressFactory::conformCalAddress( $value ),
             $params
         );
-        $expectedString = trim( CalAddressFactory::outputFormatAttendee( [ $getValue ], true ));
+        $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue ], true ));
         $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
@@ -295,9 +303,9 @@ class Prop2TextMultiTest extends DtBase
         ];
 
         // RELATED-TO
-        $value  = StringFactory::getRandChars( 32 );
-        $params = self::$STCPAR;
-        $getValue  = Pc::factory(
+        $value    = 'test' . StringFactory::getRandChars( 32 );
+        $params   = self::$STCPAR;
+        $getValue = Pc::factory(
             $value,
             $params
         );
@@ -310,12 +318,12 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::RELATED_TO .
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' . $value
         ];
 
         // ATTACH
-        $value  = 'CID:jsmith.part3.960817T083000.xyzMail@example.com';
+        $value  = 'CID:jsmith.part3.test.960817T083000.xyzMail@example.com';
         $params = self::$STCPAR;
         $getValue  = Pc::factory(
             $value,
@@ -329,11 +337,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
         ];
 
         // ATTACH
-        $value  = 'ftp://example.com/pub/reports/r-960812.ps';
+        $value  = 'ftp://example.com/pub/reports/test/r-960812.ps';
         $params = [ IcalInterface::FMTTYPE => 'application/postscript' ] + self::$STCPAR;
         $getValue  = Pc::factory(
             $value,
@@ -347,11 +355,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
         ];
 
         // ATTACH
-        $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        $value  = 'testAAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
         $params = [
             IcalInterface::FMTTYPE  => 'image/vnd.microsoft.icon',
             IcalInterface::ENCODING => IcalInterface::BASE64,
@@ -369,12 +377,12 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
         ];
 
 
         // IMAGE
-        $value  = 'CID:jsmith.part3.960817T083000.xyzMail@example.com';
+        $value  = 'CID:jsmith.part3.test.960817T083000.xyzMail@example.com';
         $params = [ IcalInterface::VALUE => IcalInterface::URI ] + self::$STCPAR;
         $getValue  = Pc::factory(
             $value,
@@ -388,11 +396,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
         ];
 
         // IMAGE
-        $value  = 'ftp://example.com/pub/reports/r-960812.png';
+        $value  = 'ftp://example.com/pub/reports/test//r-960812.png';
         $params = [
             IcalInterface::VALUE   => IcalInterface::URI,
             IcalInterface::FMTTYPE => 'application/png',
@@ -410,11 +418,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
         ];
 
         // IMAGE
-        $value  = 'AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        $value  = 'testAAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAgIAAAICAgADAwMAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAAAAAABNEMQAAAAAAAkQgAAAAAAJEREQgAAACECQ0QgEgAAQxQzM0E0AABERCRCREQAADRDJEJEQwAAAhA0QwEQAAAAAEREAAAAAAAAREQAAAAAAAAkQgAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::BINARY,
                 IcalInterface::FMTTYPE  => 'image/vnd.microsoft.icon',
@@ -433,14 +441,14 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
         ];
 
 
         // REQUEST_STATUS
         $value  = [
             IcalInterface::STATCODE => '3.70',
-            IcalInterface::STATDESC => 'Invalid calendar user',
+            IcalInterface::STATDESC => 'Invalid test calendar user',
             IcalInterface::EXTDATA  => 'ATTENDEE:mailto:jsmith@example.com'
         ];
         $params = [ IcalInterface::LANGUAGE => 'EN' ] + self::$STCPAR;
@@ -462,7 +470,7 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::REQUEST_STATUS .
-            ParameterFactory::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' .
             number_format(
                 (float) $value[IcalInterface::STATCODE],
@@ -470,13 +478,13 @@ class Prop2TextMultiTest extends DtBase
                 Util::$DOT,
                 null
             ) . ';' .
-            StringFactory::strrep( $value[IcalInterface::STATDESC] ) . ';' .
-            StringFactory::strrep( $value[IcalInterface::EXTDATA] )
+            Property::strrep( $value[IcalInterface::STATDESC] ) . ';' .
+            Property::strrep( $value[IcalInterface::EXTDATA] )
         ];
 
 
         // CONFERENCE
-        $value  = 'rtsp://audio.example.com/';
+        $value  = 'rtsp://audio.example.test.com/';
         $params = [
                 IcalInterface::VALUE   => IcalInterface::URI,
                 IcalInterface::FEATURE => IcalInterface::AUDIO
@@ -496,11 +504,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
         ];
 
         // CONFERENCE
-        $value  = 'https://video-chat.example.com/;group-id=1234';
+        $value  = 'https://video-chat.example.test.com/;group-id=1234';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::URI,
                 IcalInterface::FEATURE  => IcalInterface::AUDIO . ',' . IcalInterface::VIDEO,
@@ -521,11 +529,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
         ];
 
         // CONFERENCE
-        $value  = 'https://video-chat.example.com/;group-id=1234';
+        $value  = 'https://video-chat.example.test.com/;group-id=1234';
         $params = [
                 IcalInterface::VALUE   => IcalInterface::URI,
                 IcalInterface::FEATURE => IcalInterface::VIDEO,
@@ -546,11 +554,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
         ];
 
         // NAME
-        $value  = 'A calendar name';
+        $value  = 'A calendar test name';
         $params = [
                 IcalInterface::ALTREP   => 'This is an alternative representation',
                 IcalInterface::LANGUAGE => 'EN'
@@ -568,12 +576,12 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::NAME .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // STRUCTURED-DATA - text
-        $value   = 'This is a STRUCTURED-DATA 2501';
+        $value   = 'This is a test STRUCTURED-DATA 2501';
         $params  = self::$STCPAR;
         $params2 = [ IcalInterface::VALUE => IcalInterface::TEXT ] + self::$STCPAR;
         $getValue  = Pc::factory(
@@ -594,11 +602,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA . ParameterFactory::createParams( $params2 ) . ':' . $value
+            IcalInterface::STRUCTURED_DATA . Property::createParams( $params2 ) . ':' . $value
         ];
 
         // STRUCTURED-DATA - uri
-        $value   = 'https://structured.data.org/structured_data2502';
+        $value   = 'https://structured.data.test.org/structured_data2502';
         $params  = [ IcalInterface::VALUE => IcalInterface::URI ] + self::$STCPAR;
         $getValue  = Pc::factory(
             $value,
@@ -618,11 +626,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA . ParameterFactory::createParams( $params ) . ':' . $value
+            IcalInterface::STRUCTURED_DATA . Property::createParams( $params ) . ':' . $value
         ];
 
         // STRUCTURED-DATA - binary
-        $value  = 'This is a BASE64 encoded data 2503==';
+        $value  = 'This is a test BASE64 encoded data 2503==';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::BINARY,
                 IcalInterface::FMTTYPE  => 'application/ld+json',
@@ -652,11 +660,13 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA . ParameterFactory::createParams( $params2 ) . ':' . $value
+            IcalInterface::STRUCTURED_DATA .
+                Property::createParams( $params2, [ IcalInterface::FMTTYPE, IcalInterface::SCHEMA ] ) .
+                ':' . $value
         ];
 
         // STYLED-DESCRIPTION - uri
-        $value  = 'http://example.org/desc2602.html';
+        $value  = 'http://example.org/desc2602.test.html';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::URI,
                 IcalInterface::ALTREP   => 'http://example.org/altrep202.html', // skipped
@@ -684,12 +694,12 @@ class Prop2TextMultiTest extends DtBase
                 $params2
             ),
             IcalInterface::STYLED_DESCRIPTION .
-                ParameterFactory::createParams( $params2, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] )
+                Property::createParams( $params2, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] )
                 . ':' . $value
         ];
 
         // STYLED-DESCRIPTION - text
-        $value  = 'This is a longer styled 2603 description property with a number of meaningless words';
+        $value  = 'This is a longer test styled 2603 description property with a number of meaningless words';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::TEXT,
                 IcalInterface::ALTREP   => 'http://example.org/altrep203.html',
@@ -714,12 +724,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::STYLED_DESCRIPTION .
-                ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+                Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
                 ':' . $value
         ];
 
         // DESCRIPTION may appear more than once in VJOURNAL
-        $value  = 'Meeting to provide technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
+        $value  = 'Meeting to provide test technical review for \'Phoenix\' design.\nHappy Face Conference Room. Phoenix design team MUST attend this meeting.\nRSVP to team leader.';
         $params = [
                 IcalInterface::ALTREP   => 'This is an alternative representation',
                 IcalInterface::LANGUAGE => 'EN'
@@ -736,12 +746,12 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // LOCATION may appear more than once in PARTICIPANT
-        $value  = 'Conference Room - F123, Bldg. 002';
+        $value  = 'Conference test Room - F123, Bldg. 002';
         $params = [
                 IcalInterface::ALTREP   => 'This is an alternative representation',
                 IcalInterface::LANGUAGE => 'EN'
@@ -758,7 +768,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::LOCATION .
-            ParameterFactory::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -769,7 +779,7 @@ class Prop2TextMultiTest extends DtBase
      * Testing value TEXT (MULTI) properties
      *
      * @test
-     * @dataProvider textMulti2Provider
+     * @dataProvider textMultiProvider
      *
      * @param int     $case
      * @param mixed[] $propComps
@@ -779,7 +789,7 @@ class Prop2TextMultiTest extends DtBase
      * @param string  $expectedString
      * @throws Exception
      */
-    public function textMultiTest2(
+    public function textMultiTest1(
         int    $case,
         array  $propComps,
         mixed  $value,
@@ -795,7 +805,6 @@ class Prop2TextMultiTest extends DtBase
                 IcalInterface::CATEGORIES,
                 IcalInterface::DESCRIPTION,
                 IcalInterface::IMAGE,
-                IcalInterface::LOCATION,
                 IcalInterface::NAME
             ], true ) ) {
                 $this->propNameTest(
@@ -1011,6 +1020,122 @@ class Prop2TextMultiTest extends DtBase
     }
 
     /**
+     * Testing value TEXT (MULTI) properties getAll<property> methods
+     *
+     * @test
+     * @dataProvider textMultiProvider
+     *
+     * @param int     $case
+     * @param mixed[] $propComps
+     * @param mixed   $value
+     * @param mixed   $params
+     * @param Pc      $expectedGet     NOT used here
+     * @param string  $expectedString  NOT used here
+     * @throws Exception
+     */
+    public function textMultiTest2(
+        int    $case,
+        array  $propComps,
+        mixed  $value,
+        mixed  $params,
+        Pc     $expectedGet,
+        string $expectedString
+    ) : void
+    {
+        $c = new Vcalendar();
+
+        foreach( $propComps as $propName => $theComps ) {
+            // vCalendar test
+            if( in_array( $propName, [
+                IcalInterface::CATEGORIES,
+                IcalInterface::DESCRIPTION,
+                IcalInterface::IMAGE,
+                IcalInterface::NAME
+            ], true )) {
+                $this->textMultiTest2test($case . '-21', $c, $propName, $value, $params );
+            }
+            if( IcalInterface::NAME === $propName ) {
+                return;
+            }
+
+            // components test
+            foreach( $theComps as $theComp ) {
+                if(( Vcalendar::CONTACT === $propName ) && ( Vcalendar::VFREEBUSY === $theComp )) {
+                    return;
+                }
+                $newMethod = 'new' . $theComp;
+                $comp = match ( true ) {
+                    IcalInterface::AVAILABLE === $theComp => $c->newVavailability()->{$newMethod}(),
+                    in_array( $theComp, [ IcalInterface::PARTICIPANT, IcalInterface::VLOCATION, IcalInterface::VRESOURCE ], true )
+                                                          => $c->newVevent()->{$newMethod}(),
+                    default                               => $c->{$newMethod}(),
+                };
+                $this->textMultiTest2test($case . '-22', $comp, $propName, $value, $params );
+            } // end foreach
+        } // end foreach
+    }
+
+    /**
+     * @param string $case
+     * @param Vcalendar|CalendarComponent $instance
+     * @param string $propName
+     * @param mixed $value
+     * @param mixed $params
+     */
+    public function textMultiTest2test(
+        string                        $case,
+        Vcalendar | CalendarComponent $instance,
+        string                        $propName,
+        mixed                         $value,
+        mixed                         $params
+    ) : void
+    {
+        static $TEST   = 'test';
+        $setMethodName = StringFactory::getSetMethodName( $propName );
+        $foreachName   = str_replace('set', 'getAll', $setMethodName );
+        if( IcalInterface::REQUEST_STATUS === $propName ) {
+            $instance->{$setMethodName}(
+                $value[IcalInterface::STATCODE],
+                str_replace( $TEST, $TEST . 0, $value[IcalInterface::STATDESC] ),
+                $value[IcalInterface::EXTDATA],
+                $params
+            );
+            $instance->{$setMethodName}(
+                $value[IcalInterface::STATCODE],
+                str_replace( $TEST, $TEST . 1, $value[IcalInterface::STATDESC] ),
+                $value[IcalInterface::EXTDATA],
+                $params
+            );
+        }
+        else {
+            $value1        = str_replace( $TEST, $TEST . 0, $value );
+            $value2        = str_replace( $TEST, $TEST . 1, $value );
+            $instance->{$setMethodName}( $value1, $params );
+            $instance->{$setMethodName}( $value2, $params );
+        }
+
+        foreach( $instance->{$foreachName}() as $x => $propValue ) {
+            $testValue = ( IcalInterface::REQUEST_STATUS === $propName ) ? $propValue[IcalInterface::STATDESC] : $propValue;
+            $this->assertStringContainsString(
+                $TEST . $x,
+                $testValue,
+                sprintf( self::$ERRFMT, '', $case . '-1', __FUNCTION__, $instance->getCompType(), $foreachName ) .
+                 PHP_EOL . var_export( $instance->{$foreachName}(), true )
+            );
+        }
+        foreach( $instance->{$foreachName}( true ) as $x => $propValue ) {
+            $testValue = ( IcalInterface::REQUEST_STATUS === $propName ) ? $propValue->value[IcalInterface::STATDESC] : $propValue->value;
+            $this->assertStringContainsString(
+                $TEST . $x,
+                $testValue,
+                sprintf( self::$ERRFMT, '', $case . '-2', __FUNCTION__, $instance->getCompType(), $foreachName ) .
+                PHP_EOL . var_export( $instance->{$foreachName}( true ), true )
+            );
+        }
+    }
+
+
+    /**
      * Testing value TEXT (MULTI) properties multi read
      *
      * @test
@@ -1026,8 +1151,9 @@ class Prop2TextMultiTest extends DtBase
             $calendar->isDescriptionSet(),
             '#0b multi Vcalendar::isDescriptionSet() NOT False '
         );
+        static $DESCRIPTION = 'Description ';
         for( $x = 1; $x <= 5; ++$x ) {
-            $calendar->setDescription( 'Description ' . $x );
+            $calendar->setDescription( $DESCRIPTION . $x );
             $this->assertFalse(
                 $calendar->isXpropSet( 'x-' . $x ),
                 '#0c multi Vcalendar::isXpropset() NOT False for ' . 'x-' . $x
@@ -1038,6 +1164,14 @@ class Prop2TextMultiTest extends DtBase
             $calendar->isDescriptionSet(),
             '#0d multi Vcalendar::isDescriptionSet() NOT true'
         );
+        $x = 0;
+        foreach( $calendar->getAllDescription() as $description ) { // and inclParams = false
+            $this->assertSame(
+                $description,
+                $DESCRIPTION . ++$x,
+                '#0ea multi Vcalendar::getAllDescription() diff'
+            );
+        } // end foreach
 
         $cnt1 = 0;
         while( false !== $calendar->getDescription()) {
@@ -1050,7 +1184,7 @@ class Prop2TextMultiTest extends DtBase
         $this->assertSame(
             5,
             $cnt2,
-            '#1a multi Vcalendar::getDescripton() counts is NOT 5'
+            '#1a multi Vcalendar::getDescription() counts is NOT 5'
         );
         $this->assertSame(
             $cnt1,
@@ -1086,14 +1220,23 @@ class Prop2TextMultiTest extends DtBase
             $event->isCommentSet(),
             '#3a multi Vcalendar::isComentSet() NOT false'
         );
+        static $COMMENT = 'Comment ';
         for( $x = 1; $x <= 5; ++$x ) {
-            $event->setComment( 'Comment ' . $x );
+            $event->setComment( $COMMENT . $x );
             $event->setXprop( 'x-' . $x, $x );
         }
         $this->assertTrue(
             $event->isCommentSet(),
             '#3b multi event->isCommentSet NOT true'
         );
+        $x = 0;
+        foreach( $event->getAllComment() as $comment ) { // and inclParams = false
+            $this->assertSame(
+                $comment,
+                $COMMENT . ++$x,
+                '#3c multi Vevent::getAllComment() diff'
+            );
+        } // end foreach
 
         $cnt1 = 0;
         while( false !== $event->getComment()) {
@@ -1106,12 +1249,12 @@ class Prop2TextMultiTest extends DtBase
         $this->assertSame(
             5,
             $cnt1,
-            '#3c multi Vevent::getComment() counts is NOT 5'
+            '#3d multi Vevent::getComment() counts is NOT 5'
         );
         $this->assertSame(
             $cnt1,
             $cnt2,
-            '#3d double multi Vevent::getComment() session counts do not match'
+            '#3e double multi Vevent::getComment() session counts do not match'
         );
 
         $cnt1 = 0;
@@ -1134,14 +1277,25 @@ class Prop2TextMultiTest extends DtBase
         );
 
         $alarm = $event->newValarm();
+        static $ATTACHval1 = 'https://test';
+        static $ATTACHval2 = 'info/doloribus-fuga-optio-enim-doloremque-consectetur.html';
         for( $x = 1; $x <= 5; ++$x ) {
-            $alarm->setAttach( 'https://test' . $x . 'info/doloribus-fuga-optio-enim-doloremque-consectetur.html');
+            $alarm->setAttach( $ATTACHval1 . $x . $ATTACHval2 );
             $alarm->setXprop( 'x-' . $x, $x );
         }
         $this->assertTrue(
             $alarm->isAttachSet(),
             '#5a multi alarm->isAttachSet NOT true'
         );
+        $x = 0;
+        foreach( $alarm->getAllAttach() as $attach ) { // and inclParams = false
+            $this->assertSame(
+                $attach,
+                $ATTACHval1 . ++$x . $ATTACHval2,
+                '#5b multi Valarm::getAllAttach() diff'
+            );
+        } // end foreach
+
         $cnt1 = 0;
         while( false !== $alarm->getAttach()) {
             ++$cnt1;
@@ -1153,12 +1307,12 @@ class Prop2TextMultiTest extends DtBase
         $this->assertSame(
             5,
             $cnt1,
-            '#5b multi Valarm::getAttach() counts is NOT 5'
+            '#5c multi Valarm::getAttach() counts is NOT 5'
         );
         $this->assertSame(
             $cnt1,
             $cnt2,
-            '#5c double multi Valarm::getAttach() session counts do not match'
+            '#5d double multi Valarm::getAttach() session counts do not match'
         );
 
         $cnt1 = 0;

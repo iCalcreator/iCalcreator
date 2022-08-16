@@ -485,11 +485,12 @@ interface IcalInterface
     /**
      * Class constants, config keys
      *
-     * LANGUAGE, TZID and URL, set above
+     * LANGUAGE set above
      */
     public const ALLOWEMPTY         = 'ALLOWEMPTY';
     public const COMPSINFO          = 'COMPSINFO';
-    public const UNIQUE_ID          = 'UNIQUE_ID';
+    public const ISLOCALTIME        = 'ISLOCALTIME';
     public const PROPINFO           = 'PROPINFO';
     public const SETPROPERTYNAMES   = 'SETPROPERTYNAMES';
+    public const UNIQUE_ID          = 'UNIQUE_ID';
 }

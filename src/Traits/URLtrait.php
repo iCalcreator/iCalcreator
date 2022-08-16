@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -43,7 +44,7 @@ use function substr;
 /**
  * URL property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait URLtrait
 {
@@ -59,16 +60,10 @@ trait URLtrait
      */
     public function createUrl() : string
     {
-        if( empty( $this->url )) {
-            return self::$SP0;
-        }
-        if( empty( $this->url->value )) {
-            return $this->createSinglePropEmpty( self::URL );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::URL,
-            ParameterFactory::createParams( $this->url->params ),
-            $this->url->value
+            $this->url,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

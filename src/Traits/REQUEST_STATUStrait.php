@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Requeststatus;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -43,7 +44,7 @@ use function var_export;
 /**
  * REQUEST-STATUS property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait REQUEST_STATUStrait
 {
@@ -56,36 +57,16 @@ trait REQUEST_STATUStrait
      * Return formatted output for calendar component property request-status
      *
      * @return string
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createRequeststatus() : string
     {
-        if( empty( $this->requeststatus )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->requeststatus as $rStat ) {
-            if( empty( $rStat->value[self::STATCODE] )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::REQUEST_STATUS );
-                }
-                continue;
-            }
-            $content =
-                $rStat->value[self::STATCODE] .
-                Util::$SEMIC .
-                StringFactory::strrep( $rStat->value[self::STATDESC] );
-            if( isset( $rStat->value[self::EXTDATA] )) {
-                $content .= Util::$SEMIC . StringFactory::strrep( $rStat->value[self::EXTDATA] );
-            }
-            $output .= StringFactory::createElement(
-                self::REQUEST_STATUS,
-                ParameterFactory::createParams( $rStat->params, [ self::LANGUAGE ], $lang ),
-                $content
-            );
-        } // end foreach
-        return $output;
+        return Requeststatus::format(
+            self::REQUEST_STATUS,
+            $this->requeststatus,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -130,6 +111,18 @@ trait REQUEST_STATUStrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property requeststatus
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllRequeststatus( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->requeststatus, $inclParam );
     }
 
     /**

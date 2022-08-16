@@ -30,27 +30,23 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Formatter\Vtimzone as Formatter;
 
 use function array_keys;
-use function sprintf;
-use function strtoupper;
+use function array_slice;
+use function array_unshift;
+use function key;
+use function ksort;
 
 /**
  * iCalcreator VTIMEZONE component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.56 - 2022-08-13
  */
 final class Vtimezone extends CalendarComponent
 {
-    use Traits\COMMENTtrait;
-    use Traits\DTSTARTtrait;
-    use Traits\LAST_MODIFIEDtrait;
-    use Traits\RDATEtrait;
-    use Traits\RRULEtrait;
     use Traits\TZIDtrait;
-    use Traits\TZNAMEtrait;
-    use Traits\TZOFFSETFROMtrait;
-    use Traits\TZOFFSETTOtrait;
+    use Traits\LAST_MODIFIEDtrait;
     use Traits\TZURLtrait;
     use Traits\TZUNTILrfc7808trait;
     use Traits\TZID_ALIAS_OFrfc7808trait;
@@ -61,9 +57,26 @@ final class Vtimezone extends CalendarComponent
     protected static string $compSgn = 'tz';
 
     /**
+     * Return Vtimezone object instance
+     *
+     * @param null|array $config
+     * @param null|string $tzid
+     * @return Vtimezone
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory( ? array $config = [], ? string $tzid = null ) : Vtimezone
+    {
+        $instance = new Vtimezone( $config );
+        if( null !== $tzid ) {
+            $instance->setTzid( $tzid );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
-     * @since 2.41.1 2022-01-15
+     * @since  2.41.56 - 2022-08-12
      */
     public function __destruct()
     {
@@ -76,7 +89,6 @@ final class Vtimezone extends CalendarComponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->compix,
@@ -87,15 +99,8 @@ final class Vtimezone extends CalendarComponent
             $this->srtk
         );
         unset(
-            $this->comment,
-            $this->dtstart,
-            $this->lastmodified,
-            $this->rdate,
-            $this->rrule,
             $this->tzid,
-            $this->tzname,
-            $this->tzoffsetfrom,
-            $this->tzoffsetto,
+            $this->lastmodified,
             $this->tzurl,
             $this->tzuntil,
             $this->tzidAliasOf
@@ -107,43 +112,11 @@ final class Vtimezone extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createTzid() .
-            $this->createTzidAliasOf() .
-            $this->createLastmodified() .
-            $this->createTzurl() .
-            $this->createDtstart() .
-            $this->createTzoffsetfrom() .
-            $this->createTzoffsetto() .
-            $this->createComment() .
-            $this->createRdate() .
-            $this->createRrule() .
-            $this->createTzname() .
-            $this->createTzuntil() .
-            $this->createXprop() .
-            $this->createSubComponent() .
-            sprintf( self::$FMTEND, $compType );
-    }
-
-    /**
-     * Return formatted output for subcomponents
-     *
-     * @return string
-     * @since  2.27.2 - 2018-12-21
-     * @throws Exception  (on Valarm/Standard/Daylight) err)
-     */
-    public function createSubComponent() : string
-    {
-        if( self::VTIMEZONE === $this->getCompType()) {
-            $this->sortVtimezonesSubComponents();
-        }
-        return parent::createSubComponent();
+        return Formatter::format( $this );
     }
 
     /**
@@ -152,7 +125,7 @@ final class Vtimezone extends CalendarComponent
      * sort : standard, daylight, in dtstart order
      * @since  2.29.1 - 2019-06-28
      */
-    private function sortVtimezonesSubComponents() : void
+    public function sortVtimezonesSubComponents() : void
     {
         if( empty( $this->components )) {
             return;

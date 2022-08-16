@@ -29,16 +29,18 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateInterval;
+use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Vevent as Formatter;
 
 use function array_keys;
-use function sprintf;
-use function strtoupper;
 
 /**
  * iCalcreator VEVENT component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vevent extends V3component
 {
@@ -84,6 +86,57 @@ final class Vevent extends V3component
     protected static string $compSgn = 'e';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Vevent object instance
+     *
+     * @param null|mixed[] $config
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend   one of dtend or duration
+     * @param null|string|DateInterval $duration
+     * @param null|string $summary
+     * @return Vevent
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+        null|string|DateInterval $duration = null,
+        ? string $summary = null
+    ) : Vevent
+    {
+        $instance = new Vevent( $config );
+        if( null !== $dtstart ) {
+            $instance->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $instance->setDtend( $dtend );
+        }
+        elseif( null !== $duration ) {
+            $instance->setDuration( $duration );
+        }
+        if( null !== $summary ) {
+            $instance->setSummary( $summary );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
      * @since 2.41.3 2022-01-17
@@ -99,7 +152,6 @@ final class Vevent extends V3component
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->compix,
             $this->propIx,
@@ -154,51 +206,10 @@ final class Vevent extends V3component
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since 2.41.29 2022-02-24
+     * @since 2.41.55 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createAttach() .
-            $this->createAttendee() .
-            $this->createCategories() .
-            $this->createClass() .
-            $this->createColor() .
-            $this->createComment() .
-            $this->createConference() .
-            $this->createContact() .
-            $this->createCreated() .
-            $this->createDescription() .
-            $this->createStyleddescription() .
-            $this->createStructureddata() .
-            $this->createDtstart() .
-            $this->createDtend() .
-            $this->createDuration() .
-            $this->createExdate() .
-            $this->createExrule() .
-            $this->createImage() .
-            $this->createGeo() .
-            $this->createLastmodified() .
-            $this->createLocation() .
-            $this->createOrganizer() .
-            $this->createPriority() .
-            $this->createRdate() .
-            $this->createRrule() .
-            $this->createRelatedto() .
-            $this->createRequeststatus() .
-            $this->createRecurrenceid() .
-            $this->createResources() .
-            $this->createSequence() .
-            $this->createStatus() .
-            $this->createSummary() .
-            $this->createTransp() .
-            $this->createUrl() .
-            $this->createXprop() .
-            $this->createSubComponent() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

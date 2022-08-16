@@ -29,8 +29,8 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
@@ -39,7 +39,7 @@ use InvalidArgumentException;
 /**
  * ORGANIZER property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait ORGANIZERtrait
 {
@@ -55,25 +55,11 @@ trait ORGANIZERtrait
      */
     public function createOrganizer() : string
     {
-        if( empty( $this->organizer )) {
-            return self::$SP0;
-        }
-        if( empty( $this->organizer->value )) {
-            return $this->createSinglePropEmpty( self::ORGANIZER );
-        }
-        return StringFactory::createElement(
+        return SingleProps::format(
             self::ORGANIZER,
-            ParameterFactory::createParams(
-                $this->organizer->params,
-                [
-                    self::CN,
-                    self::DIR,
-                    self::SENT_BY,
-                    self::LANGUAGE,
-                ],
-                $this->getConfig( self::LANGUAGE )
-            ),
-            $this->organizer->value
+            $this->organizer,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
         );
     }
 

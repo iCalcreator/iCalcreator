@@ -30,14 +30,13 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\CalMetProVer;
 use Kigkonsult\Icalcreator\Util\Util;
-
-use function sprintf;
 
 /**
  * CALSCALE property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.55 2022-08-13
  */
 trait CALSCALEtrait
 {
@@ -53,10 +52,7 @@ trait CALSCALEtrait
      */
     public function createCalscale() : string
     {
-        if( empty( $this->calscale )) {
-            $this->calscale =self::GREGORIAN;
-        }
-        return sprintf( self::$FMTICAL, self::CALSCALE, $this->calscale );
+        return CalMetProVer::format( self::CALSCALE, ( $this->action ?? self::GREGORIAN ));
     }
 
     /**

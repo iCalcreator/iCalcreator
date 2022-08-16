@@ -29,14 +29,13 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\CalMetProVer;
 use Kigkonsult\Icalcreator\Util\Util;
-
-use function sprintf;
 
 /**
  * METHOD property functions
  *
- * @since 2.40.11 2022-01-15
+ * @since 2.41.55 2022-08-13
  */
 trait METHODtrait
 {
@@ -52,9 +51,7 @@ trait METHODtrait
      */
     public function createMethod() : string
     {
-        return ( empty( $this->method ))
-            ? self::$SP0
-            : sprintf( self::$FMTICAL, self::METHOD, $this->method );
+        return CalMetProVer::format( self::METHOD, $this->method );
     }
 
     /**

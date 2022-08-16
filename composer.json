@@ -31,7 +31,10 @@
         "availability",
         "vtimezone",
         "standard",
-        "daylight"
+        "daylight",
+        "ical",
+        "xml",
+        "json"
     ],
     "license": "LGPL-3.0-or-later",
     "authors": [

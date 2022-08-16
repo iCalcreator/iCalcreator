@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Exdate;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
@@ -39,7 +40,7 @@ use Kigkonsult\Icalcreator\Util\RexdateFactory;
 /**
  * EXDATE property functions
  *
- * @since 2.41.46 2022-04-27
+ * @since 2.41.55 - 2022-08-13
  */
 trait EXDATEtrait
 {
@@ -57,10 +58,8 @@ trait EXDATEtrait
      */
     public function createExdate() : string
     {
-        if( empty( $this->exdate )) {
-            return self::$SP0;
-        }
-        return RexdateFactory::formatExdate(
+        return Exdate::format(
+            self::EXDATE,
             $this->exdate,
             $this->getConfig( self::ALLOWEMPTY )
         );
@@ -109,6 +108,18 @@ trait EXDATEtrait
             $inclParam
         );
         return empty( $output ) ? false : $output;
+    }
+
+    /**
+     * Return array, all calendar component property exdate
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllExdate( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->exdate, $inclParam );
     }
 
     /**

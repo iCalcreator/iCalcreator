@@ -31,36 +31,25 @@ namespace Kigkonsult\Icalcreator;
 
 use Exception;
 use Kigkonsult\Icalcreator\Traits\MvalTrait;
-use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\RecurFactory;
-use Kigkonsult\Icalcreator\Util\RexdateFactory;
+use Kigkonsult\Icalcreator\Parser\ComponentParser;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use UnexpectedValueException;
 
-use function array_keys;
-use function count;
 use function explode;
-use function get_class;
-use function implode;
 use function in_array;
 use function is_array;
 use function ksort;
 use function method_exists;
-use function property_exists;
-use function stripos;
 use function str_contains;
-use function str_starts_with;
 use function strtolower;
-use function strtoupper;
-use function substr;
 use function trim;
 use function ucfirst;
 
 /**
  *  Parent class for calendar components
  *
- * @since 2.41.1 2022-01-15
+ * @since  2.41.54 - 2022-08-09
  */
 abstract class CalendarComponent extends IcalBase
 {
@@ -122,7 +111,7 @@ abstract class CalendarComponent extends IcalBase
         if( empty( $output )) {
             $output = [];
         }
-        if( ! Util::isPropInList( $propName, self::$MPROPS1 )) {
+        if( ! in_array( $propName, self::$MPROPS1, true )) {
             return;
         }
         $method = StringFactory::getGetMethodName( $propName );
@@ -189,16 +178,6 @@ abstract class CalendarComponent extends IcalBase
         ksort( $output );
     }
 
-    /*
-     * @var string
-     */
-    protected static string $NLCHARS = '\n';
-
-    /*
-     * @var string
-     */
-    protected static string $BEGIN   = 'BEGIN:';
-
     /**
      * Parse data into component properties
      *
@@ -206,262 +185,13 @@ abstract class CalendarComponent extends IcalBase
      * @return static
      * @throws Exception
      * @throws UnexpectedValueException;
-     * @since  2.29.3 - 2019-06-20
+     * @since  2.41.54 - 2022-08-09
      * @// todo report invalid properties, Exception.. ??
      */
     public function parse( null|string|array $unParsedText = null ) : static
     {
-        $rows = $this->parse1prepInput( $unParsedText );
-        $this->parse2intoComps( $rows );
-        $this->parse3thisProperties();
-        $this->parse4subComps();
+        ComponentParser::factory( $this )->parse( $unParsedText );
         return $this;
-    }
-
-    /**
-     * Return rows to parse
-     *
-     * @param null|string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
-     * @return string[]
-     * @since  2.29.3 - 2019-06-20
-     */
-    private function parse1prepInput( null|string|array $unParsedText = null ) : array
-    {
-        switch( true ) {
-            case ( ! empty( $unParsedText )) :
-                $arrParse = false;
-                if( is_array( $unParsedText )) {
-                    $unParsedText = implode(
-                        self::$NLCHARS . Util::$CRLF,
-                        $unParsedText
-                    );
-                    $arrParse     = true;
-                }
-                $rows = StringFactory::convEolChar( $unParsedText );
-                if( $arrParse ) {
-                    foreach( $rows as $lix => $row ) {
-                        $rows[$lix] = StringFactory::trimTrailNL( $row );
-                    }
-                }
-                break;
-            case empty( $this->unparsed ) :
-                $rows = [];
-                break;
-            default :
-                $rows = $this->unparsed;
-                break;
-        } // end switch
-        /* skip leading (empty/invalid) lines */
-        foreach( $rows as $lix => $row ) {
-            if( false !== ( $pos = stripos( $row, self::$BEGIN ))) {
-                $rows[$lix] = substr( $row, $pos );
-                break;
-            }
-            $tst = trim( $row );
-            if(( self::$NLCHARS === $tst ) || empty( $tst )) {
-                unset( $rows[$lix] );
-            }
-        } // end foreach
-        return $rows;
-    }
-
-    /**
-     * Parse into this and sub-components data
-     *
-     * @param string[] $rows
-     * @return void
-     * @since  2.41.11 - 2022-01-27
-     */
-    private function parse2intoComps( array $rows ) : void
-    {
-        static $END_ALARM         = 'END:VALARM';
-        static $END_PARTICIPANT   = 'END:PARTICIPANT';
-        static $ENDSARR           = [ 'END:AV', 'END:DA', 'END:ST', 'END:VL', 'END:VR' ];
-        static $END               = 'END:';
-        static $BEGIN             = 'BEGIN:';
-        static $BEGIN_AVAILABLE   = 'BEGIN:AVAILABLE';
-        static $BEGIN_DAYLIGHT    = 'BEGIN:DAYLIGHT';
-        static $BEGIN_PARTICIPANT = 'BEGIN:PARTICIPANT';
-        static $BEGIN_STANDARD    = 'BEGIN:STANDARD';
-        static $BEGIN_VALARM      = 'BEGIN:VALARM';
-        static $BEGIN_VLOCATION   = 'BEGIN:VLOCATION';
-        static $BEGIN_VRESOURCE   = 'BEGIN:VRESOURCE';
-        $this->unparsed = [];
-        $comp     = $this;
-        $compType = strtoupper( $this->getCompType());
-        $beginTag = $BEGIN . $compType;
-        $endTag   = $END . $compType;
-        $isParticipantCurrent = $isValarmCurrent = false;
-        foreach( $rows as $lix => $row ) {
-            switch( true ) {
-                case str_starts_with( $row, $beginTag ) :  // begin:<thisComponent>
-                    break;
-                case str_starts_with( $row, $endTag ) : // end:<thisComponent>
-                    break 2;  // skip opt trailing empty lines..
-                case $isParticipantCurrent && str_starts_with( $row, $END_PARTICIPANT ) :
-                    $isParticipantCurrent = false;
-                    break;
-                case $isValarmCurrent && str_starts_with( $row, $END_ALARM ) :
-                    $isValarmCurrent = false;
-                    break;
-                case ( $isParticipantCurrent || $isValarmCurrent ) :
-                    $comp->unparsed[] = $row;
-                    break;
-                case ( in_array( strtoupper( substr( $row, 0, 6 )), $ENDSARR, true )) :
-                    break;
-                case str_starts_with( $row, $BEGIN_AVAILABLE ) :
-                    $comp     = $this->newAvailable();
-                    break;
-                case str_starts_with( $row, $BEGIN_VALARM ) :
-                    $comp     = $this->newValarm();
-                    $isValarmCurrent = true;
-                    break;
-                case str_starts_with( $row, $BEGIN_DAYLIGHT ) :
-                    $comp     = $this->newDaylight();
-                    break;
-                case str_starts_with( $row, $BEGIN_PARTICIPANT ) :
-                    $comp     = $this->newParticipant();
-                    $isParticipantCurrent = true;
-                    break;
-                case str_starts_with( $row, $BEGIN_STANDARD ) :
-                    $comp     = $this->newStandard();
-                    break;
-                case str_starts_with( $row, $BEGIN_VLOCATION ) :
-                    $comp     = $this->newVlocation();
-                    break;
-                case str_starts_with( $row, $BEGIN_VRESOURCE ) :
-                    $comp     = $this->newVresource();
-                    break;
-                default :
-                    $comp->unparsed[] = $row;
-                    break;
-            } // end switch( true )
-        } // end foreach( $rows as $lix => $row )
-    }
-
-    /**
-     * Parse this properties
-     *
-     * @return void
-     * @since 2.41.9 2022-01-22
-     * @todo report invalid properties ??
-     */
-    private function parse3thisProperties() : void
-    {
-        /* concatenate property values spread over several lines */
-        $this->unparsed = StringFactory::concatRows( $this->unparsed );
-        /* parse each property 'line' */
-        foreach( $this->unparsed as $row ) {
-            /* get propname  +  split property name  and  opt.params and value */
-            [ $propName, $row ] = StringFactory::getPropName( $row );
-            if( StringFactory::isXprefixed( $propName )) {
-                [ $value, $propAttr ] = StringFactory::splitContent( $row );
-                $this->setXprop( $propName, StringFactory::strunrep( $value ), $propAttr );
-                continue;
-            }
-            if( ! property_exists( $this, StringFactory::getInternalPropName( $propName ))) {
-                continue; // todo report invalid properties ??
-            } // skip property names not in comp
-            /* separate attributes from value */
-            [ $value, $propAttr ] = StringFactory::splitContent( $row, $propName );
-            if( ! Util::isPropInList( $propName, self::$TEXTPROPS ) &&
-                ( ! StringFactory::isXprefixed( $propName ))) {
-                $value = StringFactory::trimTrailNL( $value );
-            }
-            /* call set<Propname>(.. . */
-            $method = StringFactory::getSetMethodName( $propName );
-            switch( $propName ) {
-                case self::ATTENDEE :
-                    $this->{$method}( $value, CalAddressFactory::splitMultiParams( $propAttr ));
-                    break;
-                case self::CATEGORIES :   // fall through // i.e. self::$TEXTPROPS above
-                case self::COMMENT :      // fall through
-                case self::CONTACT :      // fall through
-                case self::DESCRIPTION :  // fall through
-                case self::LOCATION :     // fall through
-                case self::PROXIMITY :    // fall through
-                case self::RESOURCES :    // fall through
-                case self::STRUCTURED_DATA :    // dito
-                case self::STYLED_DESCRIPTION : // dito
-                case self::SUMMARY :
-                    $this->{$method}( StringFactory::strunrep( $value ), $propAttr );
-                    break;
-                case self::REQUEST_STATUS :
-                    $values    = explode( Util::$SEMIC, $value, 3 );
-                    $values[1] = ( isset( $values[1] ))
-                        ? StringFactory::strunrep( $values[1] )
-                        : null;
-                    $values[2] = ( isset( $values[2] ))
-                        ? StringFactory::strunrep( $values[2] )
-                        : null;
-                    $this->{$method}( $values[0], $values[1], $values[2], $propAttr );
-                    break;
-                case self::FREEBUSY :
-                    $class = get_class( $this );
-                    [ $fbtype, $values, $propAttr ] =
-                        $class::parseFreebusy( $value, $propAttr );
-                    $this->{$method}( $fbtype, $values, $propAttr );
-                    break;
-                case self::GEO :
-                    $values = explode( Util::$SEMIC, $value, 2 );
-                    if( 2 > count( $values )) {
-                        $values[1] = null;
-                    }
-                    $this->{$method}( $values[0], $values[1], $propAttr );
-                    break;
-                case self::EXDATE :
-                    $values = ( empty( $value ))
-                        ? null
-                        : explode( Util::$COMMA, $value );
-                    $this->{$method}( $values, $propAttr );
-                    break;
-                case self::RDATE :
-                    [ $values, $propAttr ] =
-                        RexdateFactory::parseRexdate( $value, $propAttr );
-                    $this->{$method}( $values, $propAttr );
-                    break;
-                case self::EXRULE :     // fall through
-                case self::RRULE :
-                    $recur  = RecurFactory::parseRexrule( $value );
-                    $this->{$method}( $recur, $propAttr );
-                    break;
-                case self::ACTION :         // fall through
-                case self::BUSYTYPE :       // dito
-                case self::KLASS :          // fall through
-                case self::RELATED_TO :     // fall through
-                case self::STATUS :         // fall through
-                case self::TRANSP :         // fall through
-                case self::TZID :           // fall through
-                case self::TZID_ALIAS_OF :  // fall through
-                case self::TZNAME :         // fall through
-                case self::UID :
-                    $value = StringFactory::strunrep( $value );
-                // fall through
-                default:
-                    $this->{$method}( $value, $propAttr );
-                    break;
-            } // end  switch( $propName.. .
-        } // end foreach( $this->unparsed as $lix => $row )
-        unset( $this->unparsed );
-    }
-
-    /**
-     * Parse sub-components
-     *
-     * @return void
-     * @since  2.29.3 - 2019-06-20
-     */
-    private function parse4subComps() : void
-    {
-        if( empty( $this->countComponents())) {
-            return;
-        }
-        foreach( array_keys( $this->components ) as $ckey ) {
-            if( ! empty( $this->components[$ckey] ) &&
-                ! empty( $this->components[$ckey]->unparsed )) {
-                $this->components[$ckey]->parse();
-            }
-        } // end foreach
     }
 
     /**
@@ -475,26 +205,6 @@ abstract class CalendarComponent extends IcalBase
     {
         $this->setComponent( $component );
         return $this;
-    }
-
-    /**
-     * Return formatted output for subcomponents
-     *
-     * @return string
-     * @since  2.27.2 - 2018-12-21
-     * @throws Exception  (on Valarm/Standard/Daylight) err)
-     */
-    public function createSubComponent() : string
-    {
-        $config = $this->getConfig();
-        $output = Util::$SP0;
-        foreach( array_keys( $this->components ) as $cix ) {
-            if( ! empty( $this->components[$cix] )) {
-                $this->components[$cix]->setConfig( $config, false, true );
-                $output .= $this->components[$cix]->createComponent();
-            }
-        }
-        return $output;
     }
 
     /**

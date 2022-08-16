@@ -117,7 +117,7 @@ class SortFactory
             self::setSortDefaultArgs( $c );
             return;
         }
-        if( Util::isPropInList( $sortArg, Vcalendar::$MPROPS1 )) { // all string
+        if( in_array( $sortArg, Vcalendar::$MPROPS1, true )) { // all string
             $propValues = [];
             $c->getProperties( $sortArg, $propValues );
             if( ! empty( $propValues )) {
@@ -127,7 +127,7 @@ class SortFactory
                 $c->srtk[0] = $c->getUid();
             }
             return;
-        } // end if( Util::isPropInList( $sortArg, Util::$MPROPS1 ))
+        } // end if
         $method = StringFactory::getGetMethodName( $sortArg );
         if( method_exists( $c, $method ) && ( false !== ( $d = $c->{$method}()))) {
             $c->srtk[0] = ( $d instanceof DateTime ) ? $d->getTimestamp() : $d;
@@ -153,7 +153,7 @@ class SortFactory
      * Set default (date-related/uid) sort arguments/parameters in component
      *
      * @param CalendarComponent $c valendar component
-     * @since 2.41.9 2022-01-30
+     * @since 2.41.53 2022-08-11
      */
     private static function setSortDefaultArgs( CalendarComponent $c ) : void
     {
@@ -195,48 +195,12 @@ class SortFactory
                 ( false !== ( $d = $c->getCreated()))) :
                 $c->srtk[2] = $d->getTimestamp();
                 break;
-            case ( false !== ( $d = $c->getDtstamp())) :
-                $c->srtk[2] = $d->getTimestamp();
+            default :
+                $c->srtk[2] = $c->getDtstamp()->getTimestamp();
                 break;
         } // end switch
         // sortkey 3 : uid
-        if( false === ( $c->srtk[3] = $c->getUid())) {
-            $c->srtk[3] = 0;
-        }
-    }
-
-    /**
-     * Sort callback function for exdate
-     *
-     * @param DateTime $a
-     * @param DateTime $b
-     * @return int
-     * @since 2.29.2 2019-06-23
-     */
-    public static function sortExdate1( DateTime $a, DateTime $b ) : int
-    {
-        return strcmp(
-            $a->format( DateTimeFactory::$YmdTHis ),
-            $b->format( DateTimeFactory::$YmdTHis )
-        );
-    }
-
-    /**
-     * Sort callback function for exdate
-     *
-     * @param Pc $a
-     * @param Pc $b
-     * @return int
-     * @since 2.29.2 2019-06-23
-     */
-    public static function sortExdate2( Pc $a, Pc $b ) : int
-    {
-        $a1 = reset( $a->value );
-        $b1 = reset( $b->value );
-        return strcmp(
-            $a1->format( DateTimeFactory::$YmdTHis ),
-            $b1->format( DateTimeFactory::$YmdTHis )
-        );
+        $c->srtk[3] = $c->getUid();
     }
 
     /**

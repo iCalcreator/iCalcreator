@@ -30,14 +30,12 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use Kigkonsult\Icalcreator\Formatter\Participant as Formatter;
 
 /**
  * iCalcreator PARTICIPANT component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Participant extends Vcomponent
 {
@@ -77,6 +75,51 @@ final class Participant extends Vcomponent
     protected static string $compSgn = 'p';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Participant object instance
+     *
+     * @param null|array $config
+     * @param null|string $participanttype property PARTICIPANT-TYPE value
+     * @param null|string $calendaraddress property CALENDAR-ADDRESS value
+     * @param null|string $url property URL value
+     * @return Participant
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        ? string $participanttype = null,
+        ? string $calendaraddress = null,
+        ? string $url = null
+    ) : Participant
+    {
+        $instance = new Participant( $config );
+        if( null !== $participanttype ) {
+            $instance->setParticipanttype( $participanttype );
+        }
+        if( null !== $calendaraddress ) {
+            $instance->setCalendaraddress( $calendaraddress );
+        }
+        if( null !== $url ) {
+            $instance->seturl( $url );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
      * @since 2.41.4 2022-01-18
@@ -87,7 +130,6 @@ final class Participant extends Vcomponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->compix,
@@ -133,40 +175,10 @@ final class Participant extends Vcomponent
      *
      * @return string
      * @throws Exception
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createParticipanttype() .
-            $this->createCalendaraddress() .
-            $this->createContact() .
-            $this->createLocation() .
-            $this->createCreated() .
-            $this->createSummary() .
-            $this->createDescription() .
-            $this->createStyleddescription() .
-            $this->createStructureddata() .
-            $this->createGeo() .
-            $this->createLastmodified() .
-            $this->createPriority() .
-            $this->createSequence() .
-            $this->createStatus() .
-            $this->createUrl() .
-            $this->createAttach() .
-            $this->createCategories() .
-            $this->createComment() .
-            $this->createRequeststatus() .
-            $this->createRelatedto() .
-            $this->createResources() .
-//      strucloc
-//      strucres
-            $this->createXprop() .
-            $this->createSubComponent() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

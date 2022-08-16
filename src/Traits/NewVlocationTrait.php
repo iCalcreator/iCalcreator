@@ -41,19 +41,12 @@ trait NewVlocationTrait
      * @param null|string $name property NAME value
      * @return Vlocation
      * @throws Exception
-     * @since  2.41.18 - 2022-02-18
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVlocation( ? string $locationType = null, ? string $name = null ) : Vlocation
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vlocation( $this->getConfig());
-        $this->components[$ix]->getUid();
-        if( null !== $locationType ) {
-            $this->components[$ix]->setLocationtype( $locationType );
-        }
-        if( null !== $name ) {
-            $this->components[$ix]->setName( $name );
-        }
+        $this->components[$ix] = Vlocation::factory( $this->getConfig(), $locationType, $name );
         return $this->components[$ix];
     }
 }

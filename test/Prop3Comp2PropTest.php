@@ -178,7 +178,7 @@ class Prop3Comp2PropTest extends TestCase
     public function participants2AttendeesTest() : void
     {
         $case            = 300;
-        $calendarAddress = 'MAILTO::calendar.address@internet.com';
+        $calendarAddress = 'mailto::calendar.address@internet.com';
         $calendar        = new Vcalendar();
         $event           = $calendar->newVevent();
         $participant     = $event->newParticipant( IcalInterface::PARTICIPANT_TYPE, $calendarAddress );

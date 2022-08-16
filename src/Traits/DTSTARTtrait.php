@@ -33,17 +33,18 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\VAcomponent;
+
+use function in_array;
 
 /**
  * DTSTART property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait DTSTARTtrait
 {
@@ -62,20 +63,12 @@ trait DTSTARTtrait
      */
     public function createDtstart() : string
     {
-        if( empty( $this->dtstart )) {
-            return self::$SP0;
-        }
-        if( empty( $this->dtstart->value )) {
-            return $this->createSinglePropEmpty( self::DTSTART );
-        }
-        return StringFactory::createElement(
+        return  Dt1Property::format(
             self::DTSTART,
-            ParameterFactory::createParams( $this->dtstart->params ),
-            DateTimeFactory::dateTime2Str(
-                $this->dtstart->value,
-                $this->dtstart->hasParamValue( self::DATE ),
-                $this->dtstart->hasParamKey( Util::$ISLOCALTIME )
-            )
+            $this->dtstart,
+            $this->getConfig( self::ALLOWEMPTY ),
+            Dt1Property::getIsDate( $this->dtstart ),
+            Dt1Property::getIsLocalTime( $this->dtstart )
         );
     }
 
@@ -165,8 +158,8 @@ trait DTSTARTtrait
             case ( $this instanceof VAcomponent ) :
                 $value->addParamValue( self::DATE_TIME ); // req, rfc7953
                 break;
-            case ( Util::isCompInList( $compType, self::$TZCOMPS )) :
-                $value->addParam( Util::$ISLOCALTIME, true );
+            case ( in_array( $compType, self::$TZCOMPS, true )) :
+                $value->addParam( self::ISLOCALTIME, true );
                 $value->addParamValue( self::DATE_TIME ); // req
                 break;
             default :

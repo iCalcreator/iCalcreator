@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -40,7 +41,7 @@ use function strtoupper;
 /**
  * STATUS property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait STATUStrait
 {
@@ -56,16 +57,10 @@ trait STATUStrait
      */
     public function createStatus() : string
     {
-        if( empty( $this->status )) {
-            return self::$SP0;
-        }
-        if( empty( $this->status->value )) {
-            return $this->createSinglePropEmpty( self::STATUS );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::STATUS,
-            ParameterFactory::createParams( $this->status->params ),
-            $this->status->value
+            $this->status,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

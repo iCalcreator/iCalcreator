@@ -29,16 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * ATTACH property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait ATTACHtrait
 {
@@ -54,23 +53,11 @@ trait ATTACHtrait
      */
     public function createAttach() : string
     {
-        if( empty( $this->attach )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( $this->attach as $attachPart ) {
-            if( ! empty( $attachPart->value )) {
-                $output .= StringFactory::createElement(
-                    self::ATTACH,
-                    ParameterFactory::createParams( $attachPart->params ),
-                    $attachPart->value
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::ATTACH );
-            }
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::ATTACH,
+            $this->attach,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -115,6 +102,18 @@ trait ATTACHtrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property attachs
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllAttach( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->attach, $inclParam );
     }
 
     /**

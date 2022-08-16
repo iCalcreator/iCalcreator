@@ -30,15 +30,15 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * CONTACT property functions
  *
- * @since 2.41.36 2022-04-11
+ * @since 2.41.55 2022-08-13
  */
 trait CONTACTtrait
 {
@@ -54,28 +54,12 @@ trait CONTACTtrait
      */
     public function createContact() : string
     {
-        if( empty( $this->contact )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->contact as $contact ) {
-            if( ! empty( $contact->value )) {
-                $output .= StringFactory::createElement(
-                    self::CONTACT,
-                    ParameterFactory::createParams(
-                        $contact->params,
-                        self::$ALTRPLANGARR,
-                        $lang
-                    ),
-                    StringFactory::strrep( $contact->value )
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::CONTACT );
-            }
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::CONTACT,
+            $this->contact,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -134,6 +118,18 @@ trait CONTACTtrait
             unset( $this->propIx[self::VFREEBUSY] );
         }
         return $result;
+    }
+
+    /**
+     * Return array, all calendar component property contact
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllContact( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->contact, $inclParam );
     }
 
     /**

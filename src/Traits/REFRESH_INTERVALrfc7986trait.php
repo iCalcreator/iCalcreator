@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DurDates;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -40,7 +41,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 /**
  * REFRESH_INTERVAL property functions
  *
- * @since 2.41.48 2022-04-29
+ * @since 2.41.55 2022-08-13
  */
 trait REFRESH_INTERVALrfc7986trait
 {
@@ -54,22 +55,14 @@ trait REFRESH_INTERVALrfc7986trait
      *
      * @return string
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 2022-08-13
      */
     public function createRefreshinterval() : string
     {
-        if( empty( $this->refreshinterval )) {
-            return self::$SP0;
-        }
-        if( empty( $this->refreshinterval->value )) {
-            return $this->getConfig( self::ALLOWEMPTY )
-                ? StringFactory::createElement( self::REFRESH_INTERVAL )
-                : self::$SP0;
-        }
-        return StringFactory::createElement(
+        return DurDates::format(
             self::REFRESH_INTERVAL,
-            ParameterFactory::createParams( $this->refreshinterval->params ),
-            DateIntervalFactory::dateInterval2String( $this->refreshinterval->value )
+            $this->refreshinterval,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -112,14 +105,14 @@ trait REFRESH_INTERVALrfc7986trait
     }
 
     /**
-     * Set calendar component property refresh_interval
+     * Set calendar component property refresh_interval, VALUE DURATION required
      *
      * @param null|string|DateInterval|Pc   $value
      * @param null|mixed[]  $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.56 2022-08-14
      */
     public function setRefreshinterval( null|string|DateInterval|Pc $value = null, ? array $params = [] ) : static
     {
@@ -152,7 +145,7 @@ trait REFRESH_INTERVALrfc7986trait
                     sprintf( $FMTERR, self::REFRESH_INTERVAL )
                 );
         } // end switch
-        $this->refreshinterval = $value;
+        $this->refreshinterval = $value->addParam( self::VALUE, self::DURATION );
         return $this;
     }
 }

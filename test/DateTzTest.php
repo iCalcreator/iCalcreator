@@ -30,10 +30,9 @@ namespace Kigkonsult\Icalcreator;
 
 use DateTime;
 use Exception;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * class DateTzTest, testing VALUE DATETIME for Standard/Daylight (always local time), also empty value, DTSTART
@@ -86,7 +85,7 @@ class DateTzTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' .
             $value
         ];
@@ -102,7 +101,7 @@ class DateTzTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' .
             $value
         ];
@@ -156,7 +155,7 @@ class DateTzTest extends DtBase
         );
         $this->assertEquals(
             strtoupper( $propName ) . $expectedString,
-            str_replace( "\r\n ", null, trim( $v->{$createMethod}() )),
+            str_replace( "\r\n ", null, trim( $v->{$createMethod}())),
             "create error in case #{$case}"
         );
         $v->{$deleteMethod}();
@@ -205,7 +204,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -220,7 +219,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -235,7 +234,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -251,7 +250,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -265,7 +264,7 @@ class DateTzTest extends DtBase
                 $dateTime,
                 self::$STCPAR
             ),
-            ParameterFactory::createParams( self::$STCPAR ) .
+            Property::createParams( self::$STCPAR ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -280,7 +279,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -296,7 +295,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -312,7 +311,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -327,7 +326,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -343,7 +342,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -358,7 +357,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -373,7 +372,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             $this->getDateTimeAsCreateLongString( $dateTime )
         ];
 
@@ -390,7 +389,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':20170326T020000'
         ];
 
@@ -406,7 +405,7 @@ class DateTzTest extends DtBase
                 clone $dateTime,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':20170326T020000'
         ];
 
@@ -423,7 +422,7 @@ class DateTzTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' .
             $value
         ];
@@ -440,7 +439,7 @@ class DateTzTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' . $value
         ];
 
@@ -455,7 +454,7 @@ class DateTzTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) .
+            Property::createParams( $params ) .
             ':' . $value
         ];
 
@@ -516,7 +515,7 @@ class DateTzTest extends DtBase
             }
             else {
                 $getValue = $comp->{$getMethod}( true );
-                unset( $getValue->  params[Util::$ISLOCALTIME] );
+                unset( $getValue->  params[IcalInterface::ISLOCALTIME] );
                 if( $getValue->value instanceof DateTime ) {
                     $getValue->value = $getValue->value->format( DateTimeFactory::$YmdTHis );
                 }
@@ -528,7 +527,7 @@ class DateTzTest extends DtBase
             );
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,
-                trim( $comp->{$createMethod}() ),
+                trim( $comp->{$createMethod}()),
                 sprintf( self::$ERRFMT, null, $case . '-24', __FUNCTION__, $theComp, $getMethod )
             );
             $comp->{$deleteMethod}();

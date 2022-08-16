@@ -206,6 +206,8 @@ class DateTimeUTCTest extends DtBase
 
                 $getValue = $comp->{$getMethod}( null, true );
 
+                // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $getValue, true )); // test ###
+
                 $this->assertEquals(
                     $expectedGet->value,
                     $getValue->value[0][0] ?? '',
@@ -233,8 +235,8 @@ class DateTimeUTCTest extends DtBase
                     $comp->{$setMethod}( IcalInterface::BUSY, [ $value, $value ] );
                 }
                 $pcInput = ! $pcInput;
-            }
-        }
+            } // end foreach   propName
+        } // end foreach   theComp
         $calendar1Str = $calendar1->createCalendar();
         $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1Str );
         $createString = str_replace( '\,', ',', $createString );

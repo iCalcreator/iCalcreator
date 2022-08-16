@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -40,7 +41,7 @@ use function strtoupper;
 /**
  * TRANSP property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait TRANSPtrait
 {
@@ -56,16 +57,10 @@ trait TRANSPtrait
      */
     public function createTransp() : string
     {
-        if( empty( $this->transp )) {
-            return self::$SP0;
-        }
-        if( empty( $this->transp->value )) {
-            return $this->createSinglePropEmpty( self::TRANSP );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::TRANSP,
-            ParameterFactory::createParams( $this->transp->params ),
-            $this->transp->value
+            $this->transp,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

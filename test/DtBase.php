@@ -129,7 +129,7 @@ abstract class DtBase extends TestCase
                 }
 
                 if( $expectedGet->value instanceof DateTime && $getValue->value instanceof DateTime ) {
-                    $getValue->removeParam( Util::$ISLOCALTIME );
+                    $getValue->removeParam( IcalInterface::ISLOCALTIME );
                     $this->assertEquals(
                         $expectedGet->params,
                         $getValue->params,
@@ -138,7 +138,7 @@ abstract class DtBase extends TestCase
                     $fmt = match ( true ) {
                         $expectedGet->hasParamValue( IcalInterface::DATE )
                                 => DateTimeFactory::$Ymd,
-                        $getValue->hasParamkey( Util::$ISLOCALTIME )
+                        $getValue->hasParamkey( IcalInterface::ISLOCALTIME )
                                 => DateTimeFactory::$YmdHis,
                         default => DateTimeFactory::$YMDHISe,
                     };
@@ -153,7 +153,9 @@ abstract class DtBase extends TestCase
                     trim( $comp->{$createMethod}() ),
                     sprintf( self::$ERRFMT, null, $case . '-116', __FUNCTION__, $theComp, $createMethod )
                 );
-                $comp->{$deleteMethod}();
+                if( method_exists( $comp, $deleteMethod )) { // Dtstamp/Uid has NO deleteMethod
+                    $comp->{$deleteMethod}();
+                }
                 if( IcalInterface::DTSTAMP === $propName ) {
                     $this->assertTrue(
                         $comp->{$isMethod}(),
@@ -304,7 +306,7 @@ abstract class DtBase extends TestCase
                     $comp->{$isMethod}(),
                     sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
-                //              error_log( __FUNCTION__ . ' #' . $case . '-1b1' . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
+                // error_log( __FUNCTION__ . ' #' . $case . '-1b1' . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
 
                 if( $pcInput ) {
                     $comp->{$setMethod}( Pc::factory( $value, $params ));
@@ -321,7 +323,7 @@ abstract class DtBase extends TestCase
                 );
 
                 $getValue = $comp->{$getMethod}( null, true );
-                $getValue->removeParam( Util::$ISLOCALTIME );
+                $getValue->removeParam( IcalInterface::ISLOCALTIME );
                 $this->assertEquals(
                     $expectedGet->params,
                     $getValue->params,
@@ -336,7 +338,7 @@ abstract class DtBase extends TestCase
                         case $expectedGet->hasParamValue(IcalInterface::DATE ) :
                             $fmt = DateTimeFactory::$Ymd;
                             break;
-                        case $getValue->hasParamKey( Util::$ISLOCALTIME ) :
+                        case $getValue->hasParamKey( IcalInterface::ISLOCALTIME ) :
                             $fmt = DateTimeFactory::$YmdHis;
                             break;
                         default :
@@ -415,6 +417,8 @@ abstract class DtBase extends TestCase
 
         $calendarStr1 = $calendar->createCalendar();
 
+//      error_log( __FUNCTION__ . ' #' . $case . ' calendar1 : ' . $calendarStr1 ); // test ###
+
         if( ! empty( $expectedString )) {
             $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], Util::$SP0, $calendarStr1 );
             $createString = str_replace( '\,', ',', $createString );
@@ -460,6 +464,9 @@ abstract class DtBase extends TestCase
 
             $c2->setUid( $calendarUid ); // else UID compare error
             $calendarStr2 = $c2->createCalendar();
+
+//          error_log( __FUNCTION__ . ' #' . $case . ' calendar2 : ' . $calendarStr2 ); // test ###
+
             $this->assertEquals(
                 $calendarStr1,
                 $calendarStr2,
@@ -472,13 +479,13 @@ abstract class DtBase extends TestCase
             $calendarStr2 = $calendarStr1;
         }
 
-//      echo __FUNCTION__ . ' #' . $case . ' calendar2 : ' . $calendarStr2 . PHP_EOL; // test ###
+//      error_log( __FUNCTION__ . ' #' . $case . ' calendar2 : ' . $calendarStr2 ); // test ###
 
         $calendar3    = new Vcalendar();
         $calendar3->parse( $calendarStr2 );
         $calendarStr3 = $calendar3->createCalendar();
 
-//    echo __FUNCTION__ . ' start #' . $case . ' calendar3 : ' . $calendarStr3 . PHP_EOL; // test ###
+//      error_log( __FUNCTION__ . ' start #' . $case . ' calendar3 : ' . $calendarStr3 ); // test ###
 
         $this->assertEquals(
             $calendarStr1,

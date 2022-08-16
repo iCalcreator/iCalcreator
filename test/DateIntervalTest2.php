@@ -30,8 +30,8 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -221,7 +221,7 @@ class DateIntervalTest2 extends DtBase
             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
             $params,
             $getValue,
-            ParameterFactory::createParams( $getValue->params ) .
+            Property::createParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -273,7 +273,7 @@ class DateIntervalTest2 extends DtBase
             $diPrefix . self::durationArray2string( $dateIntervalArray ),
             $params,
             $getValue,
-            ParameterFactory::createParams( $getValue->params ) .
+            Property::createParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::factory(

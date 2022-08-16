@@ -29,15 +29,14 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * TZID-ALIAS-OF property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait TZID_ALIAS_OFrfc7808trait
 {
@@ -50,28 +49,15 @@ trait TZID_ALIAS_OFrfc7808trait
      * Return formatted output for calendar component property TZID-ALIAS-OF
      *
      * @return string
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 2022-08-13
      */
     public function createTzidaliasof() : string
     {
-        if( empty( $this->tzidaliasof )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( $this->tzidaliasof as $tzidaliasofPart ) {
-            if( empty( $tzidaliasofPart->value )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::TZID_ALIAS_OF );
-                }
-                continue;
-            }
-            $output .= StringFactory::createElement(
-                self::TZID_ALIAS_OF,
-                ParameterFactory::createParams( $tzidaliasofPart->params ),
-                StringFactory::strrep( $tzidaliasofPart->value )
-            );
-        } // end foreach
-        return $output;
+        return MultiProps::format(
+            self::TZID_ALIAS_OF,
+            $this->tzidaliasof,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -116,6 +102,18 @@ trait TZID_ALIAS_OFrfc7808trait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property tzidaliasof
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllTzidaliasof( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->tzidaliasof, $inclParam );
     }
 
     /**

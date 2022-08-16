@@ -33,9 +33,9 @@ use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Freebusy;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -45,14 +45,12 @@ use function in_array;
 use function is_array;
 use function reset;
 use function sprintf;
-use function usort;
 use function var_export;
-use Kigkonsult\Icalcreator\Util\SortFactory;
 
 /**
  * FREEBUSY property functions
  *
- * @since 2.41.38 2022-04-06
+ * @since 2.41.55 - 2022-08-13
  */
 trait FREEBUSYtrait
 {
@@ -64,7 +62,7 @@ trait FREEBUSYtrait
     /**
      * @var string[] FREEBUSY param keywords
      */
-    protected static array $FREEBUSYKEYS = [
+    private static array $FREEBUSYKEYS = [
         self::FREE,
         self::BUSY,
         self::BUSY_UNAVAILABLE,
@@ -76,48 +74,15 @@ trait FREEBUSYtrait
      *
      * @return string
      * @throws Exception
-     * @since 2.41.36 2022-04-04
+     * @since 2.41.55 - 2022-08-13
      */
     public function createFreebusy() : string
     {
-        static $FMT = ';FBTYPE=%s';
-        static $SORTER = [ SortFactory::class, 'sortRdate1' ];
-        if( empty( $this->freebusy )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( array_keys( $this->freebusy ) as $fbIx ) {
-            $freebusyPart = clone $this->freebusy[$fbIx];
-            if( empty( $freebusyPart->value )) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( self::FREEBUSY );
-                }
-                continue;
-            }
-            $attributes  = sprintf( $FMT, $freebusyPart->getParams( self::FBTYPE ));
-            $freebusyPart->removeParam( self::FBTYPE );
-            $attributes .= ParameterFactory::createParams( $freebusyPart->params );
-            $cnt         = count( $freebusyPart->value );
-            if( 1 < $cnt ) {
-                usort( $freebusyPart->value, $SORTER );
-            }
-            $content      = self::$SP0;
-            foreach( $freebusyPart->value as $freebusyPeriod ) {
-                if( ! empty( $content )) {
-                    $content .= Util::$COMMA;
-                }
-                $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[0] );
-                $content .= Util::$SLASH;
-                if( $freebusyPeriod[1] instanceof DateInterval ) {  // period with duration
-                    $content .= DateIntervalFactory::dateInterval2String( $freebusyPeriod[1] );
-                }
-                else {  // period ends with date-time
-                    $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[1] );
-                }
-            } // end foreach
-            $output .= StringFactory::createElement( self::FREEBUSY, $attributes, $content );
-        } // end foreach( $this->freebusy as $fx => $freebusyPart )
-        return $output;
+        return Freebusy::format(
+            self::FREEBUSY,
+            $this->freebusy,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -170,6 +135,18 @@ trait FREEBUSYtrait
     }
 
     /**
+     * Return array, all calendar component property freebusy
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllFreebusy( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->freebusy, $inclParam );
+    }
+
+    /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
@@ -178,39 +155,6 @@ trait FREEBUSYtrait
     public function isFreebusySet() : bool
     {
         return self::isMvalSet( $this->freebusy );
-    }
-
-    /**
-     * Return type, value and parameters from parsed row and propAttr
-     *
-     * @param string  $row
-     * @param mixed[] $propAttr
-     * @return mixed[]
-     * @since  2.27.11 - 2019-01-04
-     */
-    protected static function parseFreebusy( string $row, array $propAttr ) : array
-    {
-        static $SS = '/';
-        $fbtype = $values = null;
-        if( ! empty( $propAttr )) {
-            foreach( $propAttr as $k => $v ) {
-                if( 0 === strcasecmp( self::FBTYPE, $k )) {
-                    $fbtype = $v;
-                    unset( $propAttr[$k] );
-                    break;
-                }
-            }
-        }
-        if( ! empty( $row )) {
-            $values = explode( Util::$COMMA, $row );
-            foreach( $values as $vix => $value ) {
-                $value2 = explode( $SS, $value ); // '/'
-                if( 1 < count( $value2 )) {
-                    $values[$vix] = $value2;
-                }
-            }
-        }
-        return [ $fbtype, $values, $propAttr, ];
     }
 
     /**

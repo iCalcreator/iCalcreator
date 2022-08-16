@@ -29,15 +29,16 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Vjournal as Formatter;
 
-use function sprintf;
-use function strtoupper;
 
 /**
  * iCalcreator VJOURNAL component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vjournal extends V2component
 {
@@ -77,6 +78,47 @@ final class Vjournal extends V2component
     protected static string $compSgn = 'j';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Vjournal object instance
+     *
+     * @param null|array $config
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string $summary
+     * @return Vjournal
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        null|string|DateTimeInterface $dtstart = null,
+        ? string $summary = null
+    ) : Vjournal
+    {
+        $instance = new Vjournal( $config );
+        if( null !== $dtstart ) {
+            $instance->setDtstart( $dtstart );
+        }
+        if( null !== $summary ) {
+            $instance->setSummary( $summary );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      *
      * @since 2.41.3 2022-01-17
@@ -87,7 +129,6 @@ final class Vjournal extends V2component
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->compix,
             $this->propIx,
@@ -134,42 +175,10 @@ final class Vjournal extends V2component
      *
      * @return string
      * @throws Exception  (on Rdate err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createAttach() .
-            $this->createAttendee() .
-            $this->createCategories() .
-            $this->createClass() .
-            $this->createColor() .
-            $this->createComment() .
-            $this->createContact() .
-            $this->createCreated() .
-            $this->createDescription() .
-            $this->createStyleddescription() .
-            $this->createStructureddata() .
-            $this->createDtstart() .
-            $this->createExdate() .
-            $this->createExrule() .
-            $this->createImage() .
-            $this->createLastmodified() .
-            $this->createOrganizer() .
-            $this->createRdate() .
-            $this->createRequeststatus() .
-            $this->createRecurrenceid() .
-            $this->createRelatedto() .
-            $this->createRrule() .
-            $this->createSequence() .
-            $this->createStatus() .
-            $this->createSummary() .
-            $this->createUrl() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

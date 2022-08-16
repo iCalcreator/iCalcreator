@@ -29,17 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-
-use function is_numeric;
 
 /**
  * SEQUENCE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait SEQUENCEtrait
 {
@@ -55,19 +53,10 @@ trait SEQUENCEtrait
      */
     public function createSequence() : string
     {
-        if( empty( $this->sequence )) {
-            return self::$SP0;
-        }
-        if(( ! isset( $this->sequence->value ) ||
-                ( empty( $this->sequence->value ) &&
-                    ! is_numeric( $this->sequence->value ))) &&
-            ( 0 !== $this->sequence->value )) {
-            return $this->createSinglePropEmpty( self::SEQUENCE );
-        }
-        return StringFactory::createElement(
+        return IntProperty::format(
             self::SEQUENCE,
-            ParameterFactory::createParams( $this->sequence->params ),
-            (string) $this->sequence->value
+            $this->sequence,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -114,8 +103,8 @@ trait SEQUENCEtrait
      * Set calendar component property sequence
      *
      * When a calendar component is created, its sequence number is 0.
-     * It is monotonically incremented by the "Organizer's" CUA
-     * each time the "Organizer" makes a significant revision to the calendar component.
+     * It is monotonically incremented by the "SingleProps2's" CUA
+     * each time the "SingleProps2" makes a significant revision to the calendar component.
      * Init 0 (zero)
      *
      * @param null|int|string|Pc $value

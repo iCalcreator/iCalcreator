@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Recur;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
@@ -38,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\RecurFactory;
 /**
  * RRULE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait RRULEtrait
 {
@@ -54,11 +55,11 @@ trait RRULEtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createRrule() : string
     {
-        return RecurFactory::formatRecur(
+        return Recur::format(
             self::RRULE,
             $this->rrule,
             $this->getConfig( self::ALLOWEMPTY )

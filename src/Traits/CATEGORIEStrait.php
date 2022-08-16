@@ -29,16 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * CATEGORIES property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait CATEGORIEStrait
 {
@@ -51,57 +50,16 @@ trait CATEGORIEStrait
      * Return formatted output for calendar component property categories
      *
      * @return string
-     * @since  2.29.11 - 2019-08-30
+     * @since 2.41.55 2022-08-13
      */
     public function createCategories() : string
     {
-        return self::createCatRes(
+        return MultiProps::format(
             self::CATEGORIES,
             $this->categories,
-            $this->getConfig( self::LANGUAGE ),
             $this->getConfig( self::ALLOWEMPTY ),
-            [ self::LANGUAGE ]
+            $this->getConfig( self::LANGUAGE )
         );
-    }
-
-    /**
-     * Return formatted output for calendar component properties categories/resources
-     *
-     * @param string        $propName
-     * @param null|Pc[]  $pValArr
-     * @param bool|string   $lang   bool false on not config lang found
-     * @param bool          $allowEmpty
-     * @param string[]      $specPkeys
-     * @return string
-     * @since 2.41.36 2022-04-03
-     */
-    private static function createCatRes(
-        string $propName,
-        ? array $pValArr,
-        bool|string $lang,
-        bool $allowEmpty,
-        array $specPkeys
-    ) : string
-    {
-        if( empty( $pValArr )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( $pValArr as $valuePart ) { // Pc
-            if( empty( $valuePart->value )) {
-                if( $allowEmpty) {
-                    $output .= StringFactory::createElement( $propName );
-                }
-                continue;
-            }
-            $content = StringFactory::strrep( $valuePart->value );
-            $output .= StringFactory::createElement(
-                $propName,
-                ParameterFactory::createParams( $valuePart->params, $specPkeys, $lang ),
-                $content
-            );
-        }
-        return $output;
     }
 
     /**
@@ -146,6 +104,18 @@ trait CATEGORIEStrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property categories
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllCategories( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->categories, $inclParam );
     }
 
     /**

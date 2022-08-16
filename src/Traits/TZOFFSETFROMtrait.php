@@ -30,17 +30,17 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function sprintf;
 
 /**
  * TZOFFSETFROM property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait TZOFFSETFROMtrait
 {
@@ -56,16 +56,10 @@ trait TZOFFSETFROMtrait
      */
     public function createTzoffsetfrom() : string
     {
-        if( empty( $this->tzoffsetfrom )) {
-            return self::$SP0;
-        }
-        if( empty( $this->tzoffsetfrom->value )) {
-            return $this->createSinglePropEmpty( self::TZOFFSETFROM );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::TZOFFSETFROM,
-            ParameterFactory::createParams( $this->tzoffsetfrom->params ),
-            $this->tzoffsetfrom->value
+            $this->tzoffsetfrom,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

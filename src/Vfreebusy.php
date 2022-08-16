@@ -29,15 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateTimeInterface;
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Vfreebusy as Formatter;
 
 /**
  * iCalcreator VFREEBUSY component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vfreebusy extends V2component
 {
@@ -62,6 +62,52 @@ final class Vfreebusy extends V2component
     protected static string $compSgn = 'f';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Vfreebusy object instance
+     *
+     * @param null|array $config
+     * @param null|string $attendee
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend
+     * @return Vfreebusy
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @since  2.41.28 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        ? string $attendee = null,
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+    ) : Vfreebusy
+    {
+        $instance = new Vfreebusy( $config );
+        if( null !== $attendee ) {
+            $instance->setAttendee( $attendee );
+        }
+        if( null !== $dtstart ) {
+            $instance->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $instance->setDtend( $dtend );
+        }
+        return $instance;
+    }
+
+        /**
      * Destructor
      *
      * @since 2.41.3 2022-01-17
@@ -72,7 +118,6 @@ final class Vfreebusy extends V2component
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->compix,
@@ -104,27 +149,10 @@ final class Vfreebusy extends V2component
      *
      * @return string
      * @throws Exception  (on Duration/Freebusy err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createAttendee() .
-            $this->createStyleddescription() .
-            $this->createComment() .
-            $this->createContact() .
-            $this->createDtstart() .
-            $this->createDtend() .
-            $this->createDuration() .
-            $this->createFreebusy() .
-            $this->createOrganizer() .
-            $this->createRequeststatus() .
-            $this->createUrl() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

@@ -29,16 +29,16 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * LOCATION property functions
  *
  * LOCATION may occur multiply times i Participant, once otherwise
  *
- * @since 2.41.36 2022-04-11
+ * @since 2.41.55 2022-08-13
  */
 trait LOCATIONtrait
 {
@@ -54,25 +54,12 @@ trait LOCATIONtrait
      */
     public function createLocation() : string
     {
-        if( empty( $this->location )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( $this->location as $locationPart ) {
-            if( empty( $locationPart->value ) ) {
-                $output .= $this->getConfig( self::ALLOWEMPTY )
-                    ? StringFactory::createElement( self::LOCATION )
-                    : self::$SP0;
-                continue;
-            }
-            $output .= StringFactory::createElement(
-                self::LOCATION,
-                ParameterFactory::createParams( $locationPart->params, self::$ALTRPLANGARR, $lang ),
-                StringFactory::strrep( $locationPart->value )
-            ); // end foreach
-        }
-        return $output;
+        return MultiProps::format(
+            self::LOCATION,
+            $this->location,
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -132,6 +119,18 @@ trait LOCATIONtrait
             unset( $this->propIx[self::LOCATION] );
         }
         return $result;
+    }
+
+    /**
+     * Return array, all calendar component property location
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllLocation( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->location, $inclParam );
     }
 
     /**

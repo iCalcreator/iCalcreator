@@ -29,15 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateInterval;
+use DateTimeInterface;
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use Kigkonsult\Icalcreator\Formatter\Valarm as Formatter;
 
 /**
  * iCalcreator VALARM component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Valarm extends CalendarComponent
 {
@@ -61,6 +61,46 @@ final class Valarm extends CalendarComponent
     protected static string $compSgn = 'a';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setUid();
+    }
+
+    /**
+     * Return Valarm object instance
+     *
+     * @param null|array $config
+     * @param null|string $action property ACTION value
+     * @param null|string|DateInterval|DateTimeInterface $trigger  property TRIGGER value
+     * @return Valarm
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = null,
+        ? string $action = null,
+        null|string|DateInterval|DateTimeInterface $trigger = null
+    ) : Valarm
+    {
+        $instance = new Valarm( $config );
+        if( null !== $action ) {
+            $instance->setAction( $action );
+        }
+        if( null !== $trigger ) {
+            $instance->setTrigger( $trigger );
+        }
+        return $instance;
+    }
+
+
+        /**
      * Destructor
      *
      * @since 2.41.3 2022-01-17
@@ -71,7 +111,6 @@ final class Valarm extends CalendarComponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->propDelIx
@@ -107,28 +146,10 @@ final class Valarm extends CalendarComponent
      *
      * @return string
      * @throws Exception  (on Duration/Trigger err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createRelatedto().
-            $this->createAction() .
-            $this->createAttach() .
-            $this->createAttendee() .
-            $this->createDescription() .
-            $this->createStyleddescription() .
-            $this->createProximity() .
-            $this->createDuration() .
-            $this->createRepeat() .
-            $this->createSummary() .
-            $this->createTrigger() .
-            $this->createAcknowledged() .
-            $this->createXprop() .
-            $this->createSubComponent() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

@@ -29,19 +29,19 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
+use DateInterval;
+use DateTimeInterface;
 use Exception;
-
-use function sprintf;
-use function strtoupper;
+use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Available as Formatter;
 
 /**
  * iCalcreator rfc7953 Available component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Available extends VAcomponent
 {
-
     // the following are OPTIONAL but MUST NOT occur more than once (and NOT declared in VAcomponent)
     use Traits\RECURRENCE_IDtrait;
     use Traits\RRULEtrait;
@@ -56,6 +56,52 @@ final class Available extends VAcomponent
     protected static string $compSgn = 'av';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Available object instance
+     *
+     * @param null|array $config
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend
+     * @param null|string|DateInterval $duration
+     * @return Available
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @since 2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+        null|string|DateInterval $duration = null
+    ) : Available
+    {
+        $instance = new Available( $config );
+        if( null !== $dtstart ) {
+            $instance->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $instance->setDtend( $dtend );
+        }
+        elseif( null !== $duration ) {
+            $instance->setDuration( $duration );
+        }
+        return $instance;
+    }
+
+        /**
      * Destructor
      *
      * @since 2.41.3 2022-01-17
@@ -66,7 +112,6 @@ final class Available extends VAcomponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->compix,
             $this->propIx,
@@ -98,36 +143,14 @@ final class Available extends VAcomponent
     }
 
     /**
-     * Return formatted output for calendar component VEVENT object instance
+     * Return formatted output for calendar component Available object instance
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since 2.41.29 2022-02-24
+     * @since 2.41.55 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createCategories() .
-            $this->createComment() .
-            $this->createContact() .
-            $this->createCreated() .
-            $this->createDescription() .
-            $this->createDtstart() .
-            $this->createDtend() .
-            $this->createDuration() .
-            $this->createExdate() .
-            $this->createRrule() .
-            $this->createLastmodified() .
-            $this->createLocation() .
-            $this->createRdate() .
-            $this->createRrule() .
-            $this->createRecurrenceid() .
-            $this->createSummary() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

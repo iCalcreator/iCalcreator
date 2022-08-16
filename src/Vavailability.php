@@ -33,15 +33,14 @@ use DateInterval;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Vavailability as Formatter;
 
 use function array_keys;
-use function sprintf;
-use function strtoupper;
 
 /**
  * iCalcreator rfc7953 VAVAILABILITY component class
  *
- * @since 2.41.29 2022-02-24
+ * @since  2.41.55 - 2022-08-13
  */
 final class Vavailability extends VAcomponent
 {
@@ -59,6 +58,57 @@ final class Vavailability extends VAcomponent
     protected static string $compSgn = 'va';
 
     /**
+     * Constructor
+     *
+     * @param null|mixed[] $config
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-11
+     */
+    public function __construct( ? array $config = [] )
+    {
+        parent::__construct( $config );
+        $this->setDtstamp();
+        $this->setUid();
+    }
+
+    /**
+     * Return Vavailability object instance
+     *
+     * @param null|array $config
+     * @param null|string $busyType
+     * @param null|string|DateTimeInterface $dtstart
+     * @param null|string|DateTimeInterface $dtend
+     * @param null|string|DateInterval $duration
+     * @return Vavailability
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @since  2.41.53 - 2022-08-08
+     */
+    public static function factory(
+        ? array $config = [],
+        ? string $busyType = null,
+        null|string|DateTimeInterface $dtstart = null,
+        null|string|DateTimeInterface $dtend = null,
+        null|string|DateInterval $duration = null
+    ) : Vavailability
+    {
+        $instance = new Vavailability( $config );
+        if( null !== $busyType ) {
+            $instance->setBusytype( $busyType );
+        }
+        if( null !== $dtstart ) {
+            $instance->setDtstart( $dtstart );
+        }
+        if( null !== $dtend ) {
+            $instance->setDtend( $dtend );
+        }
+        elseif( null !== $duration ) {
+            $instance->setDuration( $duration );
+        }
+        return $instance;
+    }
+
+    /**
      * Destructor
      */
     public function __destruct()
@@ -72,7 +122,6 @@ final class Vavailability extends VAcomponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->compix,
             $this->propIx,
@@ -113,6 +162,7 @@ final class Vavailability extends VAcomponent
      * @return Available
      * @throws InvalidArgumentException
      * @throws Exception
+     * @since 2.41.53 - 2022-08-08
      */
     public function newAvailable(
         null|string|DateTimeInterface $dtstart = null,
@@ -121,54 +171,19 @@ final class Vavailability extends VAcomponent
     ) : Available
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Available( $this->getConfig());
-        $this->components[$ix]->getDtstamp();
-        $this->components[$ix]->getUid();
-        if( null !== $dtstart ) {
-            $this->components[$ix]->setDtstart( $dtstart );
-        }
-        if( null !== $dtend ) {
-            $this->components[$ix]->setDtend( $dtend );
-        }
-        elseif( null !== $duration ) {
-            $this->components[$ix]->setDuration( $duration );
-        }
+        $this->components[$ix] = Available::factory( $this->getConfig(), $dtstart, $dtend, $duration );
         return $this->components[$ix];
     }
 
     /**
-     * Return formatted output for calendar component VEVENT object instance
+     * Return formatted output for calendar component Vavailability object instance
      *
      * @return string
      * @throws Exception  (on Duration/Rdate err)
-     * @since 2.41.29 2022-02-24
+     * @since  2.41.55 - 2022-08-13
      */
     public function createComponent() : string
     {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createUid() .
-            $this->createDtstamp() .
-            $this->createBusytype() .
-            $this->createCategories() .
-            $this->createClass() .
-            $this->createCreated() .
-            $this->createSummary() .
-            $this->createDescription() .
-            $this->createComment() .
-            $this->createContact() .
-            $this->createDtstart() .
-            $this->createDtend() .
-            $this->createDuration() .
-            $this->createLastmodified() .
-            $this->createLocation() .
-            $this->createOrganizer() .
-            $this->createPriority() .
-            $this->createSequence() .
-            $this->createUrl() .
-            $this->createXprop() .
-            $this->createSubComponent() .
-            sprintf( self::$FMTEND, $compType );
+        return Formatter::format( $this );
     }
 }

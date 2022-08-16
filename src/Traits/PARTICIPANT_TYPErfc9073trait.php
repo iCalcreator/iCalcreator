@@ -29,15 +29,15 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * PARTICIPANT_TYPE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait PARTICIPANT_TYPErfc9073trait
 {
@@ -53,16 +53,10 @@ trait PARTICIPANT_TYPErfc9073trait
      */
     public function createParticipanttype() : string
     {
-        if( empty( $this->participanttype )) {
-            return self::$SP0;
-        }
-        if( empty( $this->participanttype->value )) {
-            return $this->createSinglePropEmpty( self::PARTICIPANT_TYPE );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::PARTICIPANT_TYPE,
-            ParameterFactory::createParams( $this->participanttype->params ),
-            StringFactory::strrep( $this->participanttype->value )
+            $this->participanttype,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

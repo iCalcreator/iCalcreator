@@ -205,6 +205,7 @@ class ParseTest extends DtBase
         $dataArr[] = [
             611,
             "BEGIN:VCALENDAR\r\n" .
+            "X-TEST:611\r\n" .
             "BEGIN:VEVENT\r\n" .
             "CREATED:20200215T145739Z\r\n" .
             "DESCRIPTION: Piano Sonata No 3\n\r\n" .
@@ -217,41 +218,41 @@ class ParseTest extends DtBase
             "UID:123456\r\n" .
             "IMAGE;VALUE=URI;DISPLAY=BADGE;FMTTYPE=image/png:h\r\n" .
             " ttp://example.com/images/concert.png\r\n" .
-            "X-TEST:611\r\n" .
             "BEGIN:PARTICIPANT\r\n" .
             "PARTICIPANT-TYPE:SPONSOR\r\n" .
             "UID:dG9tQGZvb2Jhci5xlLmNvbQ\r\n" .
-            "STRUCTURED-DATA;VALUE=URI:http://example.com/sponsor.vcf\r\n" .
+            "STRUCTURED-DATA;VALUE=URI:http://example.com/vevent.participant1.sponsor.vcf\r\n" .
             "END:PARTICIPANT\r\n" .
             "BEGIN:PARTICIPANT\r\n" .
             "PARTICIPANT-TYPE:PERFORMER:\r\n" .
             "UID:em9lQGZvb2GFtcGxlLmNvbQ\r\n" .
-            "STRUCTURED-DATA;VALUE=URI:http://www.example.com/people/johndoe.vcf\r\n" .
+            "STRUCTURED-DATA;VALUE=URI:http://www.example.com/vevent.participant2/johndoe.vcf\r\n" .
             "BEGIN:VLOCATION\r\n" .
             "UID:123456-abcdef-123456780\r\n" .
             "NAME:The curators office\r\n" .
-            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/curator/office.vcf\r\n" .
+            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/vevent.participant2.vlocation1/office.vcf\r\n" .
             "END:VLOCATION\r\n" .
             "END:PARTICIPANT\r\n" .
             "BEGIN:VLOCATION\r\n" .
             "UID:123456-abcdef-98765432\r\n" .
             "NAME:The venue\r\n" .
-            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/venues/big-hall.vcf\r\n" .
+            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/vevent.vlocation1/big-hall.vcf\r\n" .
             "END:VLOCATION\r\n" .
             "BEGIN:VLOCATION\r\n" .
             "UID:123456-abcdef-87654321\r\n" .
             "NAME:Parking for the venue\r\n" .
-            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/venues/parking.vcf\r\n" .
+            "STRUCTURED-DATA;VALUE=URI:http://dir.example.com/vevent.vlocation2/parking.vcf\r\n" .
             "END:VLOCATION\r\n" .
             "END:VEVENT\r\n" .
             "END:VCALENDAR\r\n",
-            'STRUCTURED-DATA;VALUE=URI:http://dir.example.com/venues/parking.vcf'
+            'STRUCTURED-DATA;VALUE=URI:http://dir.example.com/vevent.vlocation2/parking.vcf'
         ];
 
         // rfc 9073 8.2.  Example 2
         $dataArr[] = [
             621,
             "BEGIN:VCALENDAR\r\n" .
+            "X-TEST:621\r\n" .
             "BEGIN:VEVENT\r\n" .
             "CREATED:20200215T145739Z\r\n" .
             "DTSTAMP:20200215T145739Z\r\n" .
@@ -261,8 +262,8 @@ class ParseTest extends DtBase
             "SUMMARY:Conference planning\r\n" .
             "UID:123456\r\n" .
             "ORGANIZER:mailto:a@example.com\r\n" .
-            "ATTENDEE;PARTSTAT=ACCEPTED;CN=A:mailto:a@example.com\r\n" .
-            "ATTENDEE;RSVP=TRUE;CN=B:mailto:b@example.com\r\n" .
+            "ATTENDEE;PARTSTAT=ACCEPTED;CN=A:mailto:a@example1.com\r\n" .
+            "ATTENDEE;RSVP=TRUE;CN=B:mailto:b@example2.com\r\n" .
             "X-TEST:621\r\n" .
             "BEGIN:PARTICIPANT\r\n" .
             "PARTICIPANT-TYPE:ACTIVE:\r\n" .
@@ -292,8 +293,8 @@ class ParseTest extends DtBase
             "PARTICIPANT-TYPE:ACTIVE:\r\n" .
             "UID:v39lQGZvb2GFtcGxlLmNvbQ\r\n" .
 
-            "STRUCTURED-DATA;FMTTYPE=application/ld+json;SCHEMA=\"https://schema.org/Sp\r\n" .
-            " ortsEvent\";VALUE=TEXT:{\n                                                      \r\n" .
+            "STRUCTURED-DATA;VALUE=TEXT;FMTTYPE=application/ld+json;SCHEMA=\"https://schema.org/Sp\r\n" .
+            " ortsEvent\":{\n                                                      \r\n" .
             " \"@context\": \"http://schema.org\"\\,\n                                          \r\n" .
             " \"@type\": \"SportsEvent\"\\,\n                                                   \r\n" .
             " \"homeTeam\": \"Pittsburgh Pirates\"\\,\n                                         \r\n" .
@@ -437,6 +438,8 @@ class ParseTest extends DtBase
      */
     public function parseCalendarTest1( int $case, string $value, string $expectedvalue ) : void
     {
+//      error_log( __METHOD__ . ' case ' . $case . ' start' ); // test ###
+
         $calendar = new Vcalendar();
         $calendar->parse( $value );
 
@@ -458,12 +461,32 @@ class ParseTest extends DtBase
     public function parseCalendarTest2( int $case, string $value, string $expectedvalue ) : void
     {
         $calendar = new Vcalendar();
-
         $calendar->parse( explode( Util::$CRLF, $value ));
 
         $this->parseCalendarTest( $case, $calendar, $expectedvalue );
 
         // echo $c->createCalendar() . PHP_EOL; // test ###
+    }
+
+    /**
+     * Testing Vcalendar OLD Vcalendar->createCalendar() and NEW Formatter\Vcalendar::format()
+     *
+     * @test
+     * @dataProvider parseCalendarTestProvider
+     * @param int $case
+     * @param string $value
+     * @param string $expectedvalue
+     * @throws Exception
+     */
+    public function parseCalendarTest3( int $case, string $value, string $expectedvalue ) : void
+    {
+        $calendar = new Vcalendar();
+        $calendar->parse( explode( Util::$CRLF, $value ));
+
+        $this->assertSame(
+            $calendar->createCalendar(),
+            \Kigkonsult\Icalcreator\Formatter\Vcalendar::format( $calendar )
+        );
     }
 
     /**
@@ -485,15 +508,15 @@ class ParseTest extends DtBase
         ];
         $dataArr[] = [
             705,
-            "ORGANIZER:MAILTO:jdoe@host1.com"
+            "ORGANIZER:mailto:jdoe@host1.com"
         ];
         $dataArr[] = [
             707,
             [
-                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host1.com",
-                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host2.com",
-                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host3.com",
-                "ATTENDEE;RSVP=TRUE:MAILTO:jsmith@host4.com"
+                "ATTENDEE;RSVP=TRUE:mailto:jsmith@host1.com",
+                "ATTENDEE;RSVP=TRUE:mailto:jsmith@host2.com",
+                "ATTENDEE;RSVP=TRUE:mailto:jsmith@host3.com",
+                "ATTENDEE;RSVP=TRUE:mailto:jsmith@host4.com"
             ]
         ];
         $dataArr[] = [
@@ -576,7 +599,7 @@ class ParseTest extends DtBase
         ];
         $dataArr[] = [
             733,
-            'STRUCTURED-DATA;FMTTYPE=application/ld+json;VALUE=TEXT;SCHEMA="https://schema.org/Sp' .
+            'STRUCTURED-DATA;VALUE=TEXT;FMTTYPE=application/ld+json;SCHEMA="https://schema.org/Sp' .
             'ortsEvent":{\n' .
             '\'@type\': \'SportsEvent\',\n' .
             '\'homeTeam\': \'Pittsburgh Pirates\',\n' .
@@ -679,7 +702,7 @@ class ParseTest extends DtBase
      * @dataProvider parseCompPortnrTestProvider
      * @param int $case
      * @param string $value
-     * @param string $expected
+     * @param string|null $expected
      * @throws Exception
      */
     public function parseCompPortnrTest( int $case, string $value, ? string $expected = null ) : void

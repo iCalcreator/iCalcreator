@@ -30,15 +30,15 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * RELATED-TO property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait RELATED_TOtrait
 {
@@ -55,23 +55,11 @@ trait RELATED_TOtrait
      */
     public function createRelatedto() : string
     {
-        if( empty( $this->relatedto )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        foreach( $this->relatedto as $relation ) {
-            if( ! empty( $relation->value )) {
-                $output .= StringFactory::createElement(
-                    self::RELATED_TO,
-                    ParameterFactory::createParams( $relation->params ),
-                    StringFactory::strrep( $relation->value )
-                );
-            }
-            elseif( $this->getConfig( self::ALLOWEMPTY )) {
-                $output .= StringFactory::createElement( self::RELATED_TO );
-            }
-        }
-        return $output;
+        return MultiProps::format(
+            self::RELATED_TO,
+            $this->relatedto,
+            $this->getConfig( self::ALLOWEMPTY )
+        );
     }
 
     /**
@@ -116,6 +104,18 @@ trait RELATED_TOtrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property relatedto
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllRelatedto( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->relatedto, $inclParam );
     }
 
     /**

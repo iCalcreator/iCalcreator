@@ -33,6 +33,72 @@ use PHPUnit\Framework\TestCase;
 
 class StringfuncTest extends TestCase
 {
+
+    /**
+     * Tests VcardFormatterUtil::size75()
+     *
+     * Same as in PhpVcardMgr MiscTest for VcardFormatterUtil::size75()
+     *
+     * @test
+     */
+    public function utf8Test() : void
+    {
+        $string1 = self::getUtf8String();
+        $string2 = Vcalendar::factory()->parse(
+            Vcalendar::factory()->setComponent(( new Vevent())->setComment( $string1 ))->createCalendar()
+        )
+            ->getComponent( Vcalendar::VEVENT )
+            ->getComment();
+        $this->assertSame(
+            $string1,
+            $string2
+        );
+    }
+
+    /**
+     * https://stackoverflow.com/questions/2748956/how-would-you-create-a-string-of-all-utf-8-characters
+     *
+     * @param int $i
+     * @return string
+     */
+    private static function unichr( int $i ) : string
+    {
+        static $UCS = 'UCS-4LE';
+        static $UTF = 'UTF-8';
+        static $V   = 'V';
+        return iconv( $UCS, $UTF, pack( $V, $i ));
+    }
+
+    /**
+     * @return string
+     */
+    private static function getUtf8String() : string
+    {
+        $codeunits = [];
+        for( $i = 0x0080; $i < 0x07FF; ( $i += 0xFF )) { // two bytes char
+            $codeunits[] = self::unichr( $i );
+        }
+        for( $i = 0xF900; $i < 0xFFFF; ( $i += 0xFFF )) {  // three bytes chars
+            $codeunits[] = self::unichr( $i );
+        }
+        for( $i = 0x10000; $i < 0x1FFFF; ( $i += 0xFFFF )) {  // four bytes chars
+            $codeunits[] = self::unichr( $i );
+        }
+        for( $i = 0x200000; $i < 0x3FFFFFF; ( $i += 0xFFFF )) {  // five bytes chars
+            $codeunits[] = self::unichr( $i );
+        }
+        for( $i = 0x4000000; $i < 0x7FFFFFFF; ( $i += 0xFFFF )) {  // six bytes chars
+            $codeunits[] = self::unichr( $i );
+        }
+        shuffle( $codeunits );
+        // test 75-char-row-split at eol-chars, i.e on split inside '\n'-shars
+        //        123456789012345678901234567890123456789012345678901234567890123456789012345
+        //                 1         2         3         4         5         6         7         8
+        //        NOTE:
+        $intro = '----------------------------------------------------------------------\n\n\n\n';
+        return $intro . implode( $codeunits );
+    }
+
     /**
      * @test
      */

@@ -30,13 +30,14 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\MultiProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * RESOURCES property functions
  *
- * @since 2.41.36 2022-04-09
+ * @since 2.41.55 2022-08-13
  */
 trait RESOURCEStrait
 {
@@ -49,16 +50,15 @@ trait RESOURCEStrait
      * Return formatted output for calendar component property resources
      *
      * @return string
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 2022-08-13
      */
     public function createResources() : string
     {
-        return self::createCatRes(
+        return MultiProps::format(
             self::RESOURCES,
             $this->resources,
-            $this->getConfig( self::LANGUAGE ),
             $this->getConfig( self::ALLOWEMPTY ),
-            self::$ALTRPLANGARR
+            $this->getConfig( self::LANGUAGE )
         );
     }
 
@@ -104,6 +104,18 @@ trait RESOURCEStrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property resources
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-06
+     */
+    public function getAllResources( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->resources, $inclParam );
     }
 
     /**

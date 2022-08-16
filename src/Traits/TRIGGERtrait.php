@@ -33,12 +33,12 @@ use DateTimeInterface;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DurDates;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 use function strtoupper;
@@ -61,7 +61,7 @@ use function substr;
 /**
  * TRIGGER property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.56 2022-08-15
  */
 trait TRIGGERtrait
 {
@@ -73,6 +73,7 @@ trait TRIGGERtrait
     /**
      * @var string  iCal TRIGGER param keywords
      * @since  2.26.8 - 2019-03-08
+     * @deprecated
      */
     public static string $RELATEDSTART = 'relatedStart';
     public static string $BEFORE       = 'before';
@@ -82,28 +83,14 @@ trait TRIGGERtrait
      *
      * @return string
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 2022-08-13
      */
     public function createTrigger() : string
     {
-        if( empty( $this->trigger )) {
-            return self::$SP0;
-        }
-        if( empty( $this->trigger->value )) {
-            return $this->createSinglePropEmpty( self::TRIGGER );
-        }
-        $strParams = ParameterFactory::createParams( $this->trigger->params );
-        if( $this->trigger->value instanceof DateInterval ) {
-            return StringFactory::createElement(
-                self::TRIGGER,
-                $strParams,
-                DateIntervalFactory::dateInterval2String( $this->trigger->value, true )
-            );
-        }
-        return StringFactory::createElement(
+        return DurDates::format(
             self::TRIGGER,
-            $strParams,
-            DateTimeFactory::dateTime2Str( $this->trigger->value )
+            $this->trigger,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -154,7 +141,7 @@ trait TRIGGERtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.56 2022-08-15
      * @todo ?? "If the trigger is set relative to START, then the "DTSTART"
      *        property MUST be present in the associated "VEVENT" or "VTODO"
      *        calendar component.  If an alarm is specified for an event with
@@ -170,6 +157,7 @@ trait TRIGGERtrait
         ? array $params = []
     ) : static
     {
+        static $FMTERRPROPFMT = 'Invalid %s input format (%s)';
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
@@ -201,7 +189,7 @@ trait TRIGGERtrait
                 return $this->setTriggerStringDateValue( $value );
         } // end switch
         throw new InvalidArgumentException(
-            sprintf( self::$FMTERRPROPFMT, self::TRIGGER, var_export( $value->value, true ))
+            sprintf( $FMTERRPROPFMT, self::TRIGGER, var_export( $value->value, true ))
         );
     }
 

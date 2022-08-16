@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Attendee;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -37,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * ATTENDEE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait ATTENDEEtrait
 {
@@ -53,10 +54,8 @@ trait ATTENDEEtrait
      */
     public function createAttendee() : string
     {
-        if( empty( $this->attendee )) {
-            return self::$SP0;
-        }
-        return CalAddressFactory::outputFormatAttendee(
+        return Attendee::format(
+            self::ATTENDEE,
             $this->attendee,
             $this->getConfig( self::ALLOWEMPTY )
         );
@@ -104,6 +103,18 @@ trait ATTENDEEtrait
             $propIx,
             $inclParam
         );
+    }
+
+    /**
+     * Return array, all calendar component property attendees
+     *
+     * @param null|bool   $inclParam
+     * @return Pc[]
+     * @since 2.41.51 2022-08-6
+     */
+    public function getAllAttendee( ? bool $inclParam = false ) : array
+    {
+        return self::getMvalProperties( $this->attendee, $inclParam );
     }
 
     /**

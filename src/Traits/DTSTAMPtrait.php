@@ -33,15 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * DTSTAMP property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait DTSTAMPtrait
 {
@@ -56,46 +56,28 @@ trait DTSTAMPtrait
      * @return string
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createDtstamp() : string
     {
-        if( empty( $this->dtstamp->value )) {
-            $this->dtstamp = self::getUtcDateTimePc();
-        }
-        return StringFactory::createElement(
+        return  DtxProperty::format(
             self::DTSTAMP,
-            ParameterFactory::createParams( $this->dtstamp->params ),
-            DateTimeFactory::dateTime2Str( $this->dtstamp->value )
+            $this->dtstamp,
+            $this->getConfig( self::ALLOWEMPTY )
         );
-    }
-
-    /**
-     * Delete calendar component property dtstamp
-     *
-     * @return bool
-     * @since  2.27.1 - 2018-12-15
-     */
-    public function deleteDtstamp() : bool
-    {
-        $this->dtstamp = null;
-        return true;
     }
 
     /**
      * Return calendar component property dtstamp
      *
      * @param bool   $inclParam
-     * @return bool|string|DateTime|Pc
+     * @return DateTime|Pc
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.53 2022-08-11
      */
-    public function getDtstamp( ? bool $inclParam = false ) : DateTime | bool | string | Pc
+    public function getDtstamp( ? bool $inclParam = false ) : DateTime | Pc
     {
-        if( empty( $this->dtstamp )) {
-            $this->dtstamp = self::getUtcDateTimePc();
-        }
         return $inclParam ? clone $this->dtstamp : $this->dtstamp->value;
     }
 

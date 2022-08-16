@@ -29,18 +29,16 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
-use function is_numeric;
-
 /**
  * PERCENT-COMPLETE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait PERCENT_COMPLETEtrait
 {
@@ -56,17 +54,10 @@ trait PERCENT_COMPLETEtrait
      */
     public function createPercentcomplete() : string
     {
-        if( empty( $this->percentcomplete )) {
-            return self::$SP0;
-        }
-        if( ! isset( $this->percentcomplete->value ) ||
-            ( empty( $this->percentcomplete->value ) && ! is_numeric( $this->percentcomplete->value ))) {
-            return $this->createSinglePropEmpty( self::PERCENT_COMPLETE );
-        }
-        return StringFactory::createElement(
+        return IntProperty::format(
             self::PERCENT_COMPLETE,
-            ParameterFactory::createParams( $this->percentcomplete->params ),
-            (string) $this->percentcomplete->value
+            $this->percentcomplete,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

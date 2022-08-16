@@ -29,7 +29,7 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\Util;
 
 class PropXTest extends DtBase
@@ -75,7 +75,7 @@ class PropXTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) . ':' . $value
+            Property::createParams( $params ) . ':' . $value
         ];
 
         $propName  = 'X-ALARM-CNT';
@@ -99,7 +99,7 @@ class PropXTest extends DtBase
                 $value,
                 $params
             ),
-            ParameterFactory::createParams( $params ) . ':' . $value
+            Property::createParams( $params ) . ':' . $value
         ];
 
         return $dataArr;

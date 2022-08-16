@@ -33,17 +33,16 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\VAcomponent;
 
 /**
  * DTEND property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait DTENDtrait
 {
@@ -59,24 +58,16 @@ trait DTENDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createDtend() : string
     {
-        if( empty( $this->dtend )) {
-            return self::$SP0;
-        }
-        if( empty( $this->dtend->value )) {
-            return $this->createSinglePropEmpty( self::DTEND );
-        }
-        $isDATE = ( ! empty( $this->dtstart ))
-            ? $this->dtstart->hasParamValue( self::DATE )
-            : $this->dtend->hasParamValue( self::DATE );
-        $isLocalTime = $this->dtend->hasParamKey( Util::$ISLOCALTIME );
-        return StringFactory::createElement(
+        return  Dt1Property::format(
             self::DTEND,
-            ParameterFactory::createParams( $this->dtend->params ),
-            DateTimeFactory::dateTime2Str( $this->dtend->value, $isDATE, $isLocalTime )
+            $this->dtend,
+            $this->getConfig( self::ALLOWEMPTY ),
+            Dt1Property::getIsDate( $this->dtstart, $this->dtend ),
+            Dt1Property::getIsLocalTime( $this->dtend )
         );
     }
 
@@ -143,8 +134,8 @@ trait DTENDtrait
             if( $dtstart->hasParamValue()) {
                 $value->addParamValue( $dtstart->getParams( self::VALUE ));
             }
-            if( $dtstart->hasParamKey( Util::$ISLOCALTIME )) {
-                $value->addParam( Util::$ISLOCALTIME, true );
+            if( $dtstart->hasParamKey( self::ISLOCALTIME )) {
+                $value->addParam( self::ISLOCALTIME, true );
             }
         }
         $value->addParam(

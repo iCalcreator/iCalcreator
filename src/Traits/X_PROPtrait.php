@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Xproperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -36,16 +37,14 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function count;
-use function implode;
 use function is_array;
-use function is_numeric;
 use function sprintf;
 use function strtoupper;
 
 /**
  * X-property functions
  *
- * @since 2.41.36 2022-04-04
+ * @since 2.41.55 2022-08-13
  */
 trait X_PROPtrait
 {
@@ -61,39 +60,11 @@ trait X_PROPtrait
      */
     public function createXprop() : string
     {
-        if( empty( $this->xprop ) || ! is_array( $this->xprop )) {
-            return self::$SP0;
-        }
-        $output = self::$SP0;
-        $lang   = $this->getConfig( self::LANGUAGE );
-        foreach( array_keys( $this->xprop ) as $xpropName ) {
-            $xpropPart = clone $this->xprop[$xpropName];
-            if( ! isset( $xpropPart->value ) ||
-                ( empty( $xpropPart->value ) && ! is_numeric( $xpropPart->value ))) {
-                if( $this->getConfig( self::ALLOWEMPTY )) {
-                    $output .= StringFactory::createElement( $xpropName );
-                }
-                continue;
-            }
-            if( is_array( $xpropPart->value )) {
-                foreach( $xpropPart->value as $pix => $theXpart ) {
-                    $xpropPart->value[$pix] =
-                        StringFactory::strrep( $theXpart );
-                }
-                $xpropPart->value =
-                    implode( Util::$COMMA, $xpropPart->value );
-            }
-            else {
-                $xpropPart->value =
-                    StringFactory::strrep( $xpropPart->value );
-            }
-            $output .= StringFactory::createElement(
-                $xpropName,
-                ParameterFactory::createParams( $xpropPart->params, [ self::LANGUAGE ], $lang ),
-                $xpropPart->value
-            );
-        } // end foreach
-        return $output;
+        return Xproperty::format(
+            $this->getAllXprop( true ),
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getConfig( self::LANGUAGE )
+        );
     }
 
     /**
@@ -206,6 +177,26 @@ trait X_PROPtrait
         return false; // not found
     }
 
+    /**
+     * Return array, all calendar component X-properties
+     *
+     * @param null|bool   $inclParam
+     * @return array   [ *( xPropName, Pc/value ) ]
+     * @since 2.41.51 2022-08-09
+     */
+    public function getAllXprop( ? bool $inclParam = false ) : array
+    {
+        if( empty( $this->xprop )) {
+            return [];
+        }
+        $output = [];
+        foreach( $this->xprop as $xPropName => $xPropValue ) {
+            $output[] = $inclParam
+                ? [ $xPropName, clone $this->xprop[$xPropName], ]
+                : [ $xPropName, $this->xprop[$xPropName]->value, ];
+        } // end foreach
+        return $output;
+    }
     /**
      * Return bool true if spec xPropName or any set (also empty)
      *

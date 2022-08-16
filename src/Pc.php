@@ -206,7 +206,7 @@ class Pc extends ArrayObject
      */
     public function removeParam( ? string $pKey = null, ? string $pValue = null  ) : Pc
     {
-        if(( null === $pKey ) && ( null == $pValue )) {
+        if(( null === $pKey ) && ( null === $pValue )) {
             $this->params = [];
         }
         elseif(( null === $pValue ) || ( $this->hasParamKey( $pKey, $pValue ))) {

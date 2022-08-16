@@ -29,15 +29,10 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
-use Exception;
-
-use function sprintf;
-use function strtoupper;
-
 /**
  * iCalcreator (Vtimezone) Daylight/Standard base component class
  *
- * @since 2.41.29 2022-02-24
+ * @since 2.41.55 2022-08-13
  */
 abstract class DScomponent extends CalendarComponent
 {
@@ -64,7 +59,6 @@ abstract class DScomponent extends CalendarComponent
             $this->compType,
             $this->xprop,
             $this->components,
-            $this->unparsed,
             $this->config,
             $this->propIx,
             $this->compix,
@@ -83,28 +77,5 @@ abstract class DScomponent extends CalendarComponent
             $this->tzoffsetfrom,
             $this->tzoffsetto
         );
-    }
-
-    /**
-     * Return formatted output for calendar component VTIMEZONE Daylight/Standard object instances
-     *
-     * @return string
-     * @throws Exception  (on Rdate err)
-     * @since 2.41.29 2022-02-24
-     */
-    public function createComponent() : string
-    {
-        $compType    = strtoupper( $this->getCompType());
-        return
-            sprintf( self::$FMTBEGIN, $compType ) .
-            $this->createTzname() .
-            $this->createDtstart() .
-            $this->createTzoffsetfrom() .
-            $this->createTzoffsetto() .
-            $this->createRdate() .
-            $this->createRrule() .
-            $this->createComment() .
-            $this->createXprop() .
-            sprintf( self::$FMTEND, $compType );
     }
 }

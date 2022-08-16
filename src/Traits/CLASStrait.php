@@ -30,17 +30,19 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
+use function in_array;
 use function strtoupper;
 
 /**
  * CLASS property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait CLASStrait
 {
@@ -61,16 +63,10 @@ trait CLASStrait
      */
     public function createClass() : string
     {
-        if( empty( $this->{self::$KLASS} )) {
-            return self::$SP0;
-        }
-        if( empty( $this->{self::$KLASS}->value )) {
-            return $this->createSinglePropEmpty( self::KLASS );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::KLASS,
-            ParameterFactory::createParams( $this->{self::$KLASS}->params ),
-            $this->{self::$KLASS}->value
+            $this->{self::$KLASS},
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -135,7 +131,7 @@ trait CLASStrait
             $this->assertEmptyValue( $value->value, self::KLASS );
             $value->setEmpty();
         }
-        elseif( ! Util::isPropInList( $value->value, $STDVALUES )) {
+        elseif( ! in_array( $value->value, $STDVALUES, true )) {
             $value->value = Util::assertString( $value->value, self::KLASS );
             $value->value = StringFactory::trimTrailNL( $value->value );
             $value->value = strtoupper( $value->value );

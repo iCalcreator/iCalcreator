@@ -33,16 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * RECURRENCE-ID property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait RECURRENCE_IDtrait
 {
@@ -57,24 +56,16 @@ trait RECURRENCE_IDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createRecurrenceid() : string
     {
-        if( empty( $this->recurrenceid )) {
-            return self::$SP0;
-        }
-        if( empty( $this->recurrenceid->value )) {
-            return $this->createSinglePropEmpty( self::RECURRENCE_ID );
-        }
-        return StringFactory::createElement(
+        return  Dt1Property::format(
             self::RECURRENCE_ID,
-            ParameterFactory::createParams( $this->recurrenceid->params ),
-            DateTimeFactory::dateTime2Str(
-                $this->recurrenceid->value,
-                $this->recurrenceid->hasParamValue( self::DATE ),
-                $this->recurrenceid->hasParamKey( Util::$ISLOCALTIME )
-            )
+            $this->recurrenceid,
+            $this->getConfig( self::ALLOWEMPTY ),
+            Dt1Property::getIsDate( $this->dtstart, $this->recurrenceid ),
+            Dt1Property::getIsLocalTime( $this->recurrenceid )
         );
     }
 

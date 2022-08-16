@@ -37,10 +37,11 @@ Please review
 - releaseNotes for release brief overview,
 - docs/summary and docs/using for details.
 
+For iCal json (JSCalendar, [rfc8984]) export and import, use [github.com/PhpJsCalendar].
 
 ###### Builds
 
-v2.41.49 - v2.42 pre-release
+v2.41.56 - v2.42 pre-release
 
 v2.40 - stable PHP8
 
@@ -84,6 +85,7 @@ iCalcreator is licensed under the LGPLv3 License.
 
 [demo]:docs/demoUsage.md
 [github.com/iCalcreator]:https://github.com/iCalcreator/iCalcreator/issues
+[github.com/PhpJsCalendar]:https://github.com/iCalcreator/PhpJsCalendar
 [paypal.me/kigkonsult]:https://paypal.me/kigkonsult
 [PHPCompatibility]:https://github.com/PHPCompatibility/PHPCompatibility
 [PHPStan]:https://github.com/phpstan/phpstan
@@ -96,5 +98,6 @@ iCalcreator is licensed under the LGPLv3 License.
 [rfc7808]:https://www.rfc-editor.org/info/rfc7808
 [rfc7953]:https://www.rfc-editor.org/info/rfc7953
 [rfc7986]:https://www.rfc-editor.org/info/rfc7986
+[rfc8984]:https://www.rfc-editor.org/info/rfc8984
 [rfc9073]:https://www.rfc-editor.org/info/rfc9073
 [rfc9074]:https://www.rfc-editor.org/info/rfc9074

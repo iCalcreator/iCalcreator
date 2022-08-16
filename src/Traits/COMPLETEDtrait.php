@@ -33,15 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * COMPLETED property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait COMPLETEDtrait
 {
@@ -56,20 +56,14 @@ trait COMPLETEDtrait
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.55 - 2022-08-13
      */
     public function createCompleted() : string
     {
-        if( empty( $this->completed )) {
-            return self::$SP0;
-        }
-        if( empty( $this->completed->value )) {
-            return $this->createSinglePropEmpty( self::COMPLETED );
-        }
-        return StringFactory::createElement(
+        return  DtxProperty::format(
             self::COMPLETED,
-            ParameterFactory::createParams( $this->completed->params ),
-            DateTimeFactory::dateTime2Str( $this->completed->value )
+            $this->completed,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

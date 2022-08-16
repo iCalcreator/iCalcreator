@@ -29,8 +29,8 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
@@ -39,7 +39,7 @@ use InvalidArgumentException;
 /**
  * CALENDAR-ADDRESS property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait CALENDAR_ADDRESSrfc9073trait
 {
@@ -55,16 +55,10 @@ trait CALENDAR_ADDRESSrfc9073trait
      */
     public function createCalendaraddress() : string
     {
-        if( empty( $this->calendaraddress )) {
-            return self::$SP0;
-        }
-        if( empty( $this->calendaraddress->value )) {
-            return $this->createSinglePropEmpty( self::CALENDAR_ADDRESS );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::CALENDAR_ADDRESS,
-            ParameterFactory::createParams( $this->calendaraddress->params ),
-            $this->calendaraddress->value
+            $this->calendaraddress,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

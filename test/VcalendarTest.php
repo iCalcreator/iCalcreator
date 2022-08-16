@@ -204,18 +204,6 @@ class VcalendarTest extends TestCase
                 break;
         }
 
-        $v = $vcalendar->newVevent();
-        $v->deleteUid();
-        $this->assertNotFalse(
-            $v->getUid(),
-            sprintf( self::$ERRFMT, null, $case . '-7', __FUNCTION__, 'VEVENT', 'getUid' )
-        );
-        $v->deleteDtstamp();
-        $this->assertNotFalse(
-            $v->getDtstamp(),
-            sprintf( self::$ERRFMT, null, $case . '-8', __FUNCTION__, 'VEVENT', 'getDtstamp' )
-        );
-
         $calendar1String = $vcalendar->createCalendar();
 
         $vcalendar2 = new Vcalendar();
@@ -499,8 +487,8 @@ class VcalendarTest extends TestCase
 
         // fetch all components
         $compArr = [];
-        while( $comp = $vcalendar->getComponent()) {
-            $compArr[] = $comp;
+        while( $component = $vcalendar->getComponent()) {
+            $compArr[] = $component;
         }
 
         // check fetch on type and order number
@@ -542,22 +530,42 @@ class VcalendarTest extends TestCase
         );
 
         // check components are set in order
-        foreach( $compArr as $comp ) {
-            $vcalendar->setComponent( $comp );
+        foreach( $compArr as $component ) {
+            $vcalendar->setComponent( $component );
         }
+
+        foreach( $vcalendar->getComponents( Vcalendar::VEVENT ) as $component ) {
+            $this->assertEquals(
+                Vcalendar::VEVENT,
+                $component->getCompType(),
+                'getComponents-error 12, Vevent expected, got ' . $component->getCompType()
+            );
+        }
+
         $x = 0;
-        while( $comp = $vcalendar->getComponent()) {
+        foreach( $vcalendar->getComponents() as $component ) {
             ++$x;
             $this->assertEquals(
                 $x,
-                $comp->getXprop( 'X-SET_NO' )[1],
-                'setComponent-error 12, comp . ' . $x . ' is not in order'
+                $component->getXprop( 'X-SET_NO' )[1],
+                'getComponents-error 13, comp . ' . $x . ' is not in order'
             );
-//          if( method_exists( $comp, 'getUid' )) { echo $x . ' - ' . $comp->getUid() . PHP_EOL; } // test ###
+        }
+
+        $x = 0;
+        while( $component = $vcalendar->getComponent()) {
+            ++$x;
+            $this->assertEquals(
+                $x,
+                $component->getXprop( 'X-SET_NO' )[1],
+                'getComponent-error 14, comp . ' . $x . ' is not in order'
+            );
         }
         // check number of components
         $this->assertSame(
-            30, $vcalendar->countComponents(), 'deleteComponent-error 13, has ' . $vcalendar->countComponents()
+            30,
+            $vcalendar->countComponents(),
+            'countComponent-error 15, has ' . $vcalendar->countComponents()
         );
     }
 }

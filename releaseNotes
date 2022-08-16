@@ -233,7 +233,6 @@ v3.39   3.4 release candidate
 2.41.38   Altered Freebusy::getFreebusy() output, fbBusyType now in params
 2.41.39   Multi-properties help methods moved to trait
 
-
 2.41.40   Component::getRequeststatus() bug, return array
 2.41.41   Component::getExrule() bug, return bool|array|Pc
 2.41.42   Pc::getParams() new arg (bool) asXparamkey
@@ -241,10 +240,18 @@ v3.39   3.4 release candidate
 
 2.41.44   github::#101, Tzuntil trait bug and upd logic
 
-
 2.41.45   github::#99,  SelectFactoy::selectComponents() bug
 2.41.46   github::#100, Component::getExdate() bug, return bool|array|Pc
 
 2.41.47   Extended tests
 2.41.48   Refresh_interval trait bug
 2.41.49   Calendar parse upd
+
+2.41.50   vCalendar/CalenadarComponent::getComponents()
+2.41.51   ALL multi-props have <getAllProperty> method, return array, values only / full
+2.41.52   opt URI (email) mailto-prefix in lowercase
+2.41.53   new class factory methods, upd class constructs
+          removed deleteDtstamp/deleteUid methods (use set-method to recreate)
+2.41.54   moved Vcalendar/Component parser logic to parser classes
+2.41.55   moved Vcalendar/Component format logic to formatter classes
+2.41.56   Vtimezone, Util and misc code tidy up...

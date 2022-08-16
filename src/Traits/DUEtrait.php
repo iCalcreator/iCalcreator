@@ -33,16 +33,15 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * DUE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 - 2022-08-13
  */
 trait DUEtrait
 {
@@ -63,22 +62,12 @@ trait DUEtrait
      */
     public function createDue() : string
     {
-        if( empty( $this->due )) {
-            return self::$SP0;
-        }
-        if( empty( $this->due->value )) {
-            return $this->createSinglePropEmpty( self::DUE );
-        }
-        return StringFactory::createElement(
+        return  Dt1Property::format(
             self::DUE,
-            ParameterFactory::createParams( $this->due->params ),
-            DateTimeFactory::dateTime2Str(
-                $this->due->value,
-                (( ! empty( $this->dtstart ))// isDate
-                    ? $this->dtstart->hasParamValue( self::DATE )
-                    : $this->due->hasParamValue( self::DATE )),
-                $this->due->hasParamKey( Util::$ISLOCALTIME )
-            )
+            $this->due,
+            $this->getConfig( self::ALLOWEMPTY ),
+            Dt1Property::getIsDate( $this->dtstart, $this->due ),
+            Dt1Property::getIsLocalTime( $this->due )
         );
     }
 
@@ -145,8 +134,8 @@ trait DUEtrait
             if( $dtstart->hasParamValue()) {
                 $value->addParamValue( $dtstart->getParams( self::VALUE ));
             }
-            if( $dtstart->hasParamKey( Util::$ISLOCALTIME )) {
-                $value->addParam( Util::$ISLOCALTIME, true );
+            if( $dtstart->hasParamKey( self::ISLOCALTIME )) {
+                $value->addParam( self::ISLOCALTIME, true );
             }
         }
         $value->addParamValue( self::DATE_TIME, false );

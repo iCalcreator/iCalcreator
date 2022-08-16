@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
@@ -37,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * COLOR property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  * @see https://www.w3.org/TR/css-color-3/#svg-color
  */
 trait COLORrfc7986trait
@@ -55,16 +56,10 @@ trait COLORrfc7986trait
      */
     public function createColor() : string
     {
-        if( empty( $this->color )) {
-            return self::$SP0;
-        }
-        if( empty( $this->color->value )) {
-            return $this->createSinglePropEmpty( self::COLOR );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::COLOR,
-            ParameterFactory::createParams( $this->color->params ),
-            $this->color->value
+            $this->color,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

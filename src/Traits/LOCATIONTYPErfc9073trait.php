@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -37,7 +38,7 @@ use InvalidArgumentException;
 /**
  * LOCATION-TYPE property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait LOCATIONTYPErfc9073trait
 {
@@ -53,16 +54,10 @@ trait LOCATIONTYPErfc9073trait
      */
     public function createLocationtype() : string
     {
-        if( empty( $this->locationtype )) {
-            return self::$SP0;
-        }
-        if( empty( $this->locationtype->value )) {
-            return $this->createSinglePropEmpty( self::LOCATION_TYPE );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::LOCATION_TYPE,
-            ParameterFactory::createParams( $this->locationtype->params ),
-            $this->locationtype->value
+            $this->locationtype,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 

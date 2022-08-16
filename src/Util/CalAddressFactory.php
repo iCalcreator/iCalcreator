@@ -35,14 +35,11 @@ use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\CalendarComponent;
 
-use function count;
-use function explode;
 use function in_array;
 use function is_array;
 use function method_exists;
 use function sprintf;
 use function strcasecmp;
-use function strtoupper;
 use function substr;
 use function trim;
 
@@ -64,20 +61,10 @@ class CalAddressFactory
     ];
 
     /**
-     * Attendee parameters with cal-address
-     *
-     * @var string[]
-     */
-    private static array $ParamArrayKeys = [
-        IcalInterface::MEMBER,
-        IcalInterface::DELEGATED_TO,
-        IcalInterface::DELEGATED_FROM,
-    ];
-
-    /**
      * @var string Prefix for Ical cal-address etc
+     * @since 2.41.52  2022-08-06
      */
-    public  static string $MAILTOCOLON = 'MAILTO:';
+    public  static string $MAILTOCOLON = 'mailto:';
     private static string $AT          = '@';
 
     /**
@@ -116,7 +103,7 @@ class CalAddressFactory
      * @param string $calAddress
      * @param bool $forceMailto   force if missing
      * @return string
-     * @since  2.27.8 - 2019-03-17
+     * @since  2.41.52 - 2022-08-06
      */
     public static function conformCalAddress( string $calAddress, ? bool $forceMailto = false ) : string
     {
@@ -124,7 +111,7 @@ class CalAddressFactory
             case empty( $calAddress ) :
                 break;
             case ( 0 === strcasecmp( self::$MAILTOCOLON, substr( $calAddress, 0, 7 ))) :
-                // exists, force uppercase
+                // exists, force lowercase
                 $calAddress = self::$MAILTOCOLON . substr( $calAddress, 7 );
                 break;
             case $forceMailto :
@@ -136,7 +123,7 @@ class CalAddressFactory
     }
 
     /**
-     * Return bool true if email has leading MAILTO:
+     * Return bool true if email has leading mailto:
      *
      * @param string $email
      * @return bool
@@ -148,18 +135,15 @@ class CalAddressFactory
     }
 
     /**
-     * Return email without prefix (anycase) 'MAILTO;
+     * Return email without prefix (anycase) 'mailto;
      *
      * @param string $email
      * @return string
-     * @since  2.27.8 - 2019-03-17
+     * @since  2.41.52 - 2022-08-06
      */
     public static function removeMailtoPrefix( string $email ) : string
     {
-        if( self::hasMailtoPrefix( $email )) {
-            return substr( $email, 7 );
-        }
-        return $email;
+        return self::hasMailtoPrefix( $email ) ? substr( $email, 7 ) : $email;
     }
 
     /**
@@ -336,8 +320,10 @@ class CalAddressFactory
     public static function getCalAdressesAllFromAttendee( CalendarComponent $component ) : array
     {
         $output = [];
-        while(( false !== ( $propValue = $component->getAttendee( null, true ))) &&
-            ! empty( $propValue )) {
+        foreach( $component->getAllAttendee( true ) as $propValue ) {
+            if( empty( $propValue )) {
+               continue;
+            }
             $value = self::removeMailtoPrefix( $propValue->value );
             if( !in_array( $value, $output, true )) {
                 $output[] = $value;
@@ -366,7 +352,7 @@ class CalAddressFactory
                         break;
                 } // end switch
             } // end foreach
-        } // end while
+        } // end foreach
         return $output;
     }
 
@@ -409,8 +395,10 @@ class CalAddressFactory
     public static function getCalAdressesAllFromContact( CalendarComponent $component ) : array
     {
         $output = [];
-        while(( false !== ( $propValue = $component->getContact( null, true ))) &&
-            ! empty( $propValue )) {
+        foreach( $component->getAllContact( true ) as $propValue ) {
+            if( empty( $propValue )) {
+                continue;
+            }
             $value =
                 (str_contains( $propValue->value, Util::$COMMA ))
                     ? StringFactory::before( Util::$COMMA, $propValue->value )
@@ -426,34 +414,6 @@ class CalAddressFactory
             }
         } // end while
         return $output;
-    }
-
-    /**
-     * Return quoted item
-     *
-     * @param string $item
-     * @return string
-     * @since  2.27.11 - 2019-01-03
-     */
-    private static function getQuotedItem( string $item ) : string
-    {
-        static $FMTQVALUE = '"%s"';
-        return sprintf( $FMTQVALUE, $item );
-    }
-
-    /**
-     * Return string of comma-separated quoted array members
-     *
-     * @param string[] $list
-     * @return string
-     * @since  2.27.11 - 2019-01-03
-     */
-    private static function getQuotedListItems( array $list ) : string
-    {
-        foreach( $list as & $v ) {
-            $v = self::getQuotedItem( $v );
-        }
-        return implode( Util::$COMMA, $list );
     }
 
     /**
@@ -476,7 +436,7 @@ class CalAddressFactory
         $params2 = [];
         foreach( $params as $pLabel => $pValue ) {
             if( ! StringFactory::isXprefixed( $pLabel ) &&
-                Util::isCompInList( $compType, $NoParamComps )) { // skip
+                in_array( $compType, $NoParamComps, true )) { // skip
                 continue;
             }
             $params2[$pLabel] = match( $pLabel ) {
@@ -569,151 +529,5 @@ class CalAddressFactory
         );
         self::assertCalAddress( $calAddress );
         return $calAddress;
-    }
-
-    /**
-     * Return formatted output for calendar component property attendee
-     *
-     * @param Pc[] $attendeeData
-     * @param bool    $allowEmpty
-     * @return string
-     * @since  2022-04-04 2.41.37
-     */
-    public static function outputFormatAttendee(
-        array $attendeeData,
-        bool $allowEmpty
-    ) : string
-    {
-        static $AllKeys = [
-            IcalInterface::CUTYPE,
-            IcalInterface::MEMBER,
-            IcalInterface::ROLE,
-            IcalInterface::PARTSTAT,
-            IcalInterface::RSVP,
-            IcalInterface::DELEGATED_TO,
-            IcalInterface::DELEGATED_FROM,
-            IcalInterface::SENT_BY,
-            IcalInterface::EMAIL,
-            IcalInterface::DIR,
-            IcalInterface::CN,
-            IcalInterface::LANGUAGE
-        ];
-        static $KEYGRP1 = [ IcalInterface::ROLE, IcalInterface::PARTSTAT, IcalInterface::RSVP ];
-        static $KEYGRP2 = [ IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM ];
-        static $KEYGRP3 = [ IcalInterface::SENT_BY, IcalInterface::EMAIL ];
-        static $KEYGRP4 = [ IcalInterface::CN, IcalInterface::LANGUAGE ];
-        static $FMTKEYVALUE = ';%s=%s';
-        static $FMTDIREQ    = ';%s=%s%s%s';
-        $output = Util::$SP0;
-        foreach( array_keys( $attendeeData ) as $aPix ) { // Pc
-            $attendeePart = clone $attendeeData[$aPix];
-            if( empty( $attendeePart->value )) {
-                if( $allowEmpty ) {
-                    $output .= StringFactory::createElement( IcalInterface::ATTENDEE );
-                }
-                continue;
-            }
-            $content     = $attendeePart->value;
-            if( empty( $attendeePart->params )) {
-                $output .= StringFactory::createElement( IcalInterface::ATTENDEE, null, $content );
-                continue;
-            }
-            $attributes = Util::$SP0;
-            foreach( $attendeePart->params as $pLabel2 => $pValue2 ) { // fix (opt) quotes
-                if( is_array( $pValue2 ) || in_array( $pLabel2, self::$ParamArrayKeys, true )) {
-                    continue;
-                } // all but DELEGATED-FROM, DELEGATED-TO, MEMBER
-                $attendeePart->params[$pLabel2] = ParameterFactory::circumflexQuoteInvoke( $pValue2 );
-                if( StringFactory::hasColonOrSemicOrComma( $pValue2 )) {
-                    $attendeePart->params[$pLabel2] = self::getQuotedItem( $pValue2 );
-                }
-            } // end foreach
-            /* set attendee parameters in (almost) rfc2445 order */
-            if( isset( $attendeePart->params[IcalInterface::CUTYPE] )) {
-                $attributes .= sprintf(
-                    $FMTKEYVALUE,
-                    IcalInterface::CUTYPE,
-                    $attendeePart->params[IcalInterface::CUTYPE]
-                );
-            }
-            if( isset( $attendeePart->params[IcalInterface::MEMBER] )) {
-                $attributes .= sprintf(
-                    $FMTKEYVALUE,
-                    IcalInterface::MEMBER,
-                    self::getQuotedListItems( $attendeePart->params[IcalInterface::MEMBER] )
-                );
-            }
-            foreach( $KEYGRP1 as $key ) { // ROLE, PARTSTAT, RSVP
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
-                }
-            } // end foreach
-            foreach( $KEYGRP2 as $key ) { // DELEGATED_TO, DELEGATED_FROM
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf(
-                        $FMTKEYVALUE,
-                        $key,
-                        self::getQuotedListItems( $attendeePart->params[$key] )
-                    );
-                }
-            } // end foreach
-            foreach( $KEYGRP3 as $key ) { // SENT_BY, EMAIL
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
-                }
-            } // end foreach
-            if( isset( $attendeePart->params[IcalInterface::DIR] )) {
-                $delim = ( ! str_contains( $attendeePart->params[IcalInterface::DIR], StringFactory::$QQ ))
-                    ? StringFactory::$QQ
-                    : null;
-                $attributes .= sprintf(
-                    $FMTDIREQ,
-                    IcalInterface::DIR,
-                    $delim,
-                    $attendeePart->params[IcalInterface::DIR],
-                    $delim
-                );
-            }
-            foreach( $KEYGRP4 as $key ) { // CN, LANGUAGE
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
-                }
-            } // end foreach
-            $xParams = [];
-            foreach( $attendeePart->params as $pLabel2 => $pValue2 ) {
-                if( ! in_array( $pLabel2, $AllKeys, true )) {
-                    $xParams[$pLabel2] = $pValue2;
-                }
-            }
-            if( ! empty( $xParams )) {
-                ksort( $xParams, SORT_STRING );
-                foreach( $xParams as $pLabel2 => $pValue2 ) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $pLabel2, $pValue2 );
-                }
-            }
-            $output .= StringFactory::createElement( IcalInterface::ATTENDEE, $attributes, $content );
-        } // end foreach( $attendeeData as $ax => $attendeePart )
-        return $output;
-    }
-
-    /**
-     * Split multiple Attendees MEMBER/DELEGATED-TO/DELEGATED-FROM into array, if found
-     *
-     * @param mixed[] $propAttr
-     * @return mixed[]
-     * @since  2.27.11 - 2019-01-04
-     */
-    public static function splitMultiParams( array $propAttr ) : array
-    {
-        foreach( $propAttr as $pix => $attr ) {
-            if( ! in_array( strtoupper( $pix ), self::$ParamArrayKeys, true )) {
-                continue;
-            }  // 'MEMBER', 'DELEGATED-TO', 'DELEGATED-FROM'
-            $attr2 = explode( Util::$COMMA, $attr );
-            if( 1 < count( $attr2 )) {
-                $propAttr[$pix] = $attr2;
-            }
-        }
-        return $propAttr;
     }
 }

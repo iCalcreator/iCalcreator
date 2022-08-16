@@ -5,7 +5,6 @@ namespace Kigkonsult\Icalcreator;
 use ArrayIterator;
 use ArrayObject;
 use IteratorIterator;
-use Kigkonsult\Icalcreator\Util\Util;
 use PHPUnit\Framework\TestCase;
 
 class PcTest extends TestCase
@@ -118,7 +117,7 @@ class PcTest extends TestCase
         $propValue2  = Vcalendar::UNKNOWN;
         $xKey        = 'x-key';
         $xValue      = 'xValue';
-        $propParams  = [ Vcalendar::LANGUAGE => 'en', Util::$ISLOCALTIME => true, $xKey => $xValue ];
+        $propParams  = [ Vcalendar::LANGUAGE => 'en', Vcalendar::ISLOCALTIME => true, $xKey => $xValue ];
         $propParams2 = [ Vcalendar::VALUE => Vcalendar::DATE_TIME ];
         $altLang     = 'sv';
         $xKey2       = 'x-key2';
@@ -176,7 +175,7 @@ class PcTest extends TestCase
         $xKey        = 'x-key';
         $xValue      = 'xValue';
         $language    = 'en';
-        $propParams  = [ Vcalendar::LANGUAGE => $language, Util::$ISLOCALTIME => true, $xKey => $xValue ];
+        $propParams  = [ Vcalendar::LANGUAGE => $language, Vcalendar::ISLOCALTIME => true, $xKey => $xValue ];
         $propParams2 = [ Vcalendar::VALUE => Vcalendar::DATE_TIME ];
         $altLang     = 'sv';
         $xKey2       = 'x-key2';

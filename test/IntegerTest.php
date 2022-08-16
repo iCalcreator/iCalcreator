@@ -28,7 +28,7 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Exception;
 
 /**
@@ -86,7 +86,7 @@ class IntegerTest extends DtBase
                 0,
                 self::$STCPAR
             ),
-            ParameterFactory::createParams( self::$STCPAR ) .
+            Property::createParams( self::$STCPAR ) .
             ':0'
         ];
 
@@ -105,7 +105,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            ParameterFactory::createParams( self::$STCPAR ) .
+            Property::createParams( self::$STCPAR ) .
             ':' . $value
         ];
 
@@ -121,7 +121,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            ParameterFactory::createParams( self::$STCPAR ) .
+            Property::createParams( self::$STCPAR ) .
             ':' . $value
         ];
 
@@ -137,7 +137,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            ParameterFactory::createParams( self::$STCPAR ) .
+            Property::createParams( self::$STCPAR ) .
             ':' . $value
         ];
 

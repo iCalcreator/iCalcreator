@@ -30,17 +30,17 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Traits;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function sprintf;
 
 /**
  * TZOFFSETTO property functions
  *
- * @since 2.41.36 2022-04-03
+ * @since 2.41.55 2022-08-13
  */
 trait TZOFFSETTOtrait
 {
@@ -56,16 +56,10 @@ trait TZOFFSETTOtrait
      */
     public function createTzoffsetto() : string
     {
-        if( empty( $this->tzoffsetto )) {
-            return self::$SP0;
-        }
-        if( empty( $this->tzoffsetto->value )) {
-            return $this->createSinglePropEmpty( self::TZOFFSETTO );
-        }
-        return StringFactory::createElement(
+        return Property::format(
             self::TZOFFSETTO,
-            ParameterFactory::createParams( $this->tzoffsetto->params ),
-            $this->tzoffsetto->value
+            $this->tzoffsetto,
+            $this->getConfig( self::ALLOWEMPTY )
         );
     }
 
@@ -127,9 +121,7 @@ trait TZOFFSETTOtrait
             $value->setEmpty();
         }
         elseif( ! DateTimeZoneFactory::hasOffset( $value->value )) {
-            throw new InvalidArgumentException(
-                sprintf( $ERR,self::TZOFFSETTO, $value->value )
-            );
+            throw new InvalidArgumentException( sprintf( $ERR,self::TZOFFSETTO, $value->value ));
         }
         $this->tzoffsetto = $value->setParams( ParameterFactory::setParams( $params ));
         return $this;

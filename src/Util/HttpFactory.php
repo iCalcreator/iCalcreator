@@ -26,7 +26,7 @@
  *            You should have received a copy of the GNU Lesser General Public License
  *            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
  */
-
+declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use Exception;
@@ -151,7 +151,7 @@ class HttpFactory
         static $URN  = 'urn';
         static $HTTP = 'http://';
         static $MSG  = 'URL validity error #%d, \'%s\'';
-        $url2 = (str_contains( $url, $UC ))
+        $url2 = str_contains( $url, $UC )
             ? str_replace( $UC, Util::$MINUS, $url )
             : $url;
         $no   = 0;
@@ -159,7 +159,7 @@ class HttpFactory
             if( false !== filter_var( $url2, FILTER_VALIDATE_URL )) {
                 break;
             }
-            if( empty( parse_url( $url2, PHP_URL_SCHEME)) &&
+            if( empty( parse_url( $url2, PHP_URL_SCHEME )) &&
                 ( false !== filter_var( $HTTP . $url2, FILTER_VALIDATE_URL ))) {
                 break;
             }

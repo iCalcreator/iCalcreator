@@ -41,7 +41,7 @@ abstract class V2component extends Vcomponent
      * @param null|string $url property URL value
      * @return Participant
      * @throws Exception
-     * @since  2.41.8 - 2022-01-20
+     * @since  2.41.53 - 2022-08-08
      */
     public function newParticipant(
         ? string $participanttype = null,
@@ -50,18 +50,12 @@ abstract class V2component extends Vcomponent
     ) : Participant
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Participant( $this->getConfig());
-        $this->components[$ix]->getUid();
-        $this->components[$ix]->getDtstamp();
-        if( null !== $participanttype ) {
-            $this->components[$ix]->setParticipanttype( $participanttype );
-        }
-        if( null !== $calendaraddress ) {
-            $this->components[$ix]->setCalendaraddress( $calendaraddress );
-        }
-        if( null !== $url ) {
-            $this->components[$ix]->seturl( $url );
-        }
+        $this->components[$ix] = Participant::factory(
+            $this->getConfig(),
+            $participanttype,
+            $calendaraddress,
+            $url
+        );
         return $this->components[$ix];
     }
 }

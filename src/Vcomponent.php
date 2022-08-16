@@ -34,7 +34,7 @@ use Exception;
 /**
  * iCalcreator Vcomponents base class
  *
- * @since  2.27.6 - 2018-12-28
+ * @since  2.41.53 - 2022-08-08
  */
 abstract class Vcomponent extends CalendarComponent
 {
@@ -66,19 +66,12 @@ abstract class Vcomponent extends CalendarComponent
      * @param null|string $name property NAME value
      * @return Vresource
      * @throws Exception
-     * @since  2.41.21 - 2022-02-18
+     * @since  2.41.53 - 2022-08-08
      */
     public function newVresource( ? string $resourceType = null, ? string $name = null ) : Vresource
     {
         $ix = $this->getNextComponentIndex();
-        $this->components[$ix] = new Vresource( $this->getConfig());
-        $this->components[$ix]->getUid();
-        if( null !== $resourceType ) {
-            $this->components[$ix]->setResourcetype( $resourceType );
-        }
-        if( null !== $name ) {
-            $this->components[$ix]->setName( $name );
-        }
+        $this->components[$ix] = Vresource::factory( $this->getConfig(), $resourceType, $name );
         return $this->components[$ix];
     }
 }

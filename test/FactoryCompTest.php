@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +50,7 @@ class FactoryCompTest extends TestCase
     private static string $PT1H     = 'PT1H';
     private static ? DateInterval $duration;
     private static string $extra    = 'This is a summary';
-    private static string $attendee = 'MAILTO:some.one@internet.com';
+    private static string $attendee = 'mailto:some.one@internet.com';
     private static ? string $dtStartTxtUtc;
     private static ? string $dtEndTxtUtc;
     private static string $NEW      = 'new';
@@ -215,7 +216,7 @@ class FactoryCompTest extends TestCase
         );
 
         $this->assertSame(
-            self::$attendee,
+            CalAddressFactory::conformCalAddress( self::$attendee ),
             self::$calendar->newVfreebusy( self::$attendee )
                 ->getAttendee(),
             sprintf( self::$ERR1, __FUNCTION__, 1, IcalInterface::ATTENDEE )
@@ -434,7 +435,7 @@ class FactoryCompTest extends TestCase
                 sprintf( self::$ERR2, __FUNCTION__, ( 1 + $x ), 2, IcalInterface::PARTICIPANT_TYPE )
             );
             $this->assertSame(
-                self::$attendee,
+                CalAddressFactory::conformCalAddress( self::$attendee ),
                 self::$calendar->{$newComp}()->newParticipant( null, self::$attendee )
                     ->getCalendaraddress(),
                 sprintf( self::$ERR2, __FUNCTION__, ( 1 + $x ), 3, IcalInterface::CALENDAR_ADDRESS )

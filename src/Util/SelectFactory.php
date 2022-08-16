@@ -156,7 +156,7 @@ class SelectFactory
                 continue;
             }
             /* skip invalid type components */
-            if( ! Util::isCompInList( $component->getCompType(), $cType )) {
+            if( ! in_array( $component->getCompType(), $cType, true )) {
                 continue;
             }
             /* get UID */
@@ -909,7 +909,7 @@ class SelectFactory
         }
         foreach( $cType as & $theType ) {
             $theType     = ucfirst( strtolower( $theType ));
-            if( ! Util::isCompInList( $theType, Vcalendar::$VCOMPS )) {
+            if( ! in_array( $theType, Vcalendar::$VCOMPS, true )) {
                 $theType = Vcalendar::VEVENT;
             }
         }
@@ -1087,12 +1087,12 @@ class SelectFactory
             if( empty( $component3 )) {
                 continue;
             }
-            if( ! Util::isCompInList( $component3->getCompType(), Vcalendar::$VCOMPS )) {
+            if( ! in_array( $component3->getCompType(), Vcalendar::$VCOMPS, true )) {
                 continue;
             }
             $uid = $component3->getUid();
             foreach( $selectOptions as $propName => $propValue ) {
-                if( ! Util::isPropInList( $propName, Vcalendar::$SELSORTPROPS )) {
+                if( ! in_array( $propName, Vcalendar::$SELSORTPROPS, true )) {
                     continue;
                 }
                 if( ! is_array( $propValue )) {
@@ -1102,7 +1102,7 @@ class SelectFactory
                     $output[$uid][] = $component3;
                     continue;
                 }
-                if( Util::isPropInList( $propName, Vcalendar::$MPROPS1 )) {
+                if( in_array( $propName, Vcalendar::$MPROPS1, true )) {
                     $propValues = [];
                     $component3->getProperties( $propName, $propValues );
                     $propValues = array_keys( $propValues );
