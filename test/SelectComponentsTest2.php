@@ -754,9 +754,6 @@ END:VCALENDAR
         array    $startDates
     ) : void
     {
-
-        // echo __FUNCTION__ . ' start case ' . $case .PHP_EOL; // test ###
-
         $vCalender = new Vcalendar();
         $yearHits  = $vCalender->parse( $ics )
             ->selectComponents( $startDate, (clone $startDate )->modify( '10 year' )); // startDate/endDate

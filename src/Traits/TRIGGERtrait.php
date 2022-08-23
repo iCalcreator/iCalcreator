@@ -185,7 +185,8 @@ trait TRIGGERtrait
             case ( ! $isParamsDateTimeSet && DateIntervalFactory::isStringAndDuration( $value->value )) :
                 return $this->setTriggerStringDurationValue( $value );
             // date in a string
-            case( $isParamsDateTimeSet && DateTimeFactory::isStringAndDate( $value->value )) :
+            case( $isParamsDateTimeSet &&
+                DateTimeFactory::isStringAndDate( $value->value )) :
                 return $this->setTriggerStringDateValue( $value );
         } // end switch
         throw new InvalidArgumentException(

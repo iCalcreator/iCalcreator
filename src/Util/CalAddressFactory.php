@@ -36,7 +36,6 @@ use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\CalendarComponent;
 
 use function in_array;
-use function is_array;
 use function method_exists;
 use function sprintf;
 use function strcasecmp;

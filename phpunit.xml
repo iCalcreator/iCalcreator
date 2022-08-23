@@ -77,9 +77,6 @@
         <testsuite name="Vtimezone populate Tests">
             <file>test/VtimezonePopulateFactoryTest.php</file>
         </testsuite>
-        <testsuite name="Timezone regulate Tests">
-            <file>test/RegulateTimezoneFactoryTest.php</file>
-        </testsuite>
         <testsuite name="Recur Tests">
             <file>test/RecurYearTest.php</file>
             <file>test/RecurMonthTest.php</file>
@@ -102,6 +99,9 @@
         <include>
             <directory>./src</directory>
         </include>
+        <exclude>
+            <file>./src/Util/RegulateTimezoneFactory.php</file>
+        </exclude>
         <!-- Require the PHP Xdebug (2.7.0 or later) and tokenizer extensions-->
         <!-- Remove or comment after your own choice-->
         <!-- Note, all output in report/logging will be saved in 'testDocs' folder -->
@@ -136,5 +136,7 @@
         <const name="OFFSET" value="+0300"/>
         <!-- define some other timeZone -->
         <const name="TZ2" value="Europe/Stockholm"/>
+        <!-- display recur tests result (1) or not (0)-->
+        <const name="DISPRECUR" value="0"/>
     </php>
 </phpunit>

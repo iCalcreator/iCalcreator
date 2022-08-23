@@ -44,11 +44,9 @@ use function array_unique;
 use function checkdate;
 use function count;
 use function ctype_alpha;
-use function ctype_digit;
 use function date;
 use function end;
 use function explode;
-use function implode;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -57,8 +55,6 @@ use function mktime;
 use function sprintf;
 use function strcasecmp;
 use function strtoupper;
-use function substr;
-use function usort;
 use function var_export;
 
 /**
@@ -193,7 +189,7 @@ class RecurFactory
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.57 2022-08-17
      * @todo "The BYSECOND, BYMINUTE and BYHOUR rule parts MUST NOT be specified
      *        when the associated "DTSTART" property has a DATE value type."
      */
@@ -220,7 +216,7 @@ class RecurFactory
                         );
                     $rexrule->removeParam( IcalInterface::TZID ); // if exists
                     break;
-                case ( DateTimeFactory::isStringAndDate( $ruleValue )) :
+                case DateTimeFactory::isStringAndDate( $ruleValue ) :
                     [ $dateStr, $timezonePart ] =
                         DateTimeFactory::splitIntoDateStrAndTimezone( $ruleValue );
                     $isLocalTime = ( empty( $timezonePart ) && empty( $paramTZid ));

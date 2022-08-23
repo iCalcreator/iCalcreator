@@ -507,15 +507,21 @@ class RecurDayTest extends RecurBaseTest
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurDaily1( $recur )) {
-            echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurDaily1( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'rcrDaily1  time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
-        echo $recurDisp . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'rcrDaily1  time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+        }
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $recurDisp . PHP_EOL; // test ###
+        }
         $this->assertEquals(
             array_keys( $result ),
             array_keys( $resultX ),
@@ -758,15 +764,19 @@ class RecurDayTest extends RecurBaseTest
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurDaily2( $recur )) {
-            echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NO isRecurDaily1' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurDaily2( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'rcrDaily2  time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
-        echo $recurDisp . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'rcrDaily2  time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+            echo $recurDisp . PHP_EOL; // test ###
+        }
         $this->assertEquals(
             $expects,
             array_keys( $resultX ),

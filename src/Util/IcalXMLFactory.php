@@ -432,7 +432,7 @@ class IcalXMLFactory
                     break;
                 case IcalInterface::ATTENDEE :
                     foreach( $component->{$method}( true ) as $contents ) {
-                        if( $contents->hasParamKey( IcalInterface::CN ) && $langCal ) {
+                        if( $langCal && $contents->hasParamKey( IcalInterface::CN )) {
                             self::addLanguage( $contents->params, $langComp, $langCal );
                         }
                         self::addXMLchildCalAddress( $properties, $propName, $contents );

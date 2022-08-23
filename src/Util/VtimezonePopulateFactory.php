@@ -119,9 +119,7 @@ class VtimezonePopulateFactory
         $timezone = empty( $timezone )
             ? [ self::getTimezone( $calendar, $xProp ) ]
             : (array) $timezone;
-        while( false !== $calendar->deleteComponent( IcalInterface::VTIMEZONE )) {
-            continue; // remove all Vtimezones
-        }
+        while( false !== $calendar->deleteComponent( IcalInterface::VTIMEZONE )) {} // remove all Vtimezones
         foreach( $timezone as $theTimezone ) {
             DateTimeZoneFactory::assertDateTimeZone( $theTimezone );
             self::processSingleTimezone( $calendar, $theTimezone, $xProp, $start, $end );

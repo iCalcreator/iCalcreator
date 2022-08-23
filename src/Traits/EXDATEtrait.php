@@ -171,15 +171,14 @@ trait EXDATEtrait
      * @param null|string|DateTimeInterface|DateTimeInterface[]|string[] $value
      * @return mixed[]
      * @throws InvalidArgumentException
-     * @since 2.41.46 2022-04-27
+     * @since 2.41.57 2022-08-18
      */
     private static function checkSingleExdates( null|string|array|DateTimeInterface $value ) : array
     {
         if( empty( $value )) {
             return [];
         }
-        if(( $value instanceof DateTimeInterface ) ||
-            DateTimeFactory::isStringAndDate( $value )) {
+        if(( $value instanceof DateTimeInterface ) || DateTimeFactory::isStringAndDate( $value )) {
             return [ $value ];
         }
         if( is_array( $value )) {
@@ -188,7 +187,8 @@ trait EXDATEtrait
                 if( empty( $value2 )) {
                     continue;
                 }
-                if(( $value2 instanceof DateTimeInterface ) || DateTimeFactory::isStringAndDate( $value2 )) {
+                if(( $value2 instanceof DateTimeInterface ) ||
+                    DateTimeFactory::isStringAndDate( $value2 )) {
                     $output[] = $value2;
                     continue;
                 }

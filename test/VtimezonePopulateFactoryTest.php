@@ -511,8 +511,6 @@ class VtimezonePopulateFactoryTest extends DtBase
             $calendar1->createCalendar(),
             'calendar compare error ' . $case . '-15'
         );
-
-//      if( 1 === $case ) { echo $calendar1Str . PHP_EOL;  } // test ###
     }
 
     /**
@@ -601,7 +599,5 @@ class VtimezonePopulateFactoryTest extends DtBase
             $tzId,
             __METHOD__ . ' 43 expected ' . $timezone4 . ' got ' . $tzId
         );
-
-//      echo $vCalendar->createCalendar() . PHP_EOL; // test ###
     }
 }

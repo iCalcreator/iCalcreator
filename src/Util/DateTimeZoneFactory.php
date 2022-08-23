@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use DateTimeZone;
 use Exception;
+use IntlTimeZone;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
 
@@ -75,7 +76,7 @@ class DateTimeZoneFactory
      * @param string $tzString
      * @return DateTimeZone
      * @throws InvalidArgumentException
-     * @since  2.27.14 - 2019-01-31
+     * @since  2.41.57 - 2022-08-19
      */
     public static function assertDateTimeZone( string $tzString ) : DateTimeZone
     {
@@ -86,14 +87,20 @@ class DateTimeZoneFactory
         if( self::hasOffset( $tzString )) {
             $tzString = self::getTimeZoneNameFromOffset( $tzString );
         }
-        elseif( in_array( $tzString, self::$UTCARR, true ) ) {
+        elseif( in_array( $tzString, self::$UTCARR, true )) {
             $tzString = IcalInterface::UTC;
         }
         try {
             $timeZone = new DateTimeZone( $tzString );
         }
         catch( Exception $e ) {
-            throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
+            if( false === ( $tzString2 = IntlTimeZone::getIDForWindowsID( $tzString ))) {
+                throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
+            }
+            if( in_array( $tzString2, self::$UTCARR, true )) {
+                $tzString2 = IcalInterface::UTC;
+            }
+            $timeZone = new DateTimeZone( $tzString2 );
         }
         return $timeZone;
     }
@@ -205,7 +212,7 @@ class DateTimeZoneFactory
         if( IcalInterface::Z === substr( $string, -1 )) {
             return false;
         }
-        if( str_contains( $string, Util::$COLON ) ) {
+        if( str_contains( $string, Util::$COLON )) {
             $string = str_replace( Util::$COLON, Util::$SP0, $string );
         }
         if( DateIntervalFactory::hasPlusMinusPrefix( substr( $string, -5 )) &&
@@ -224,6 +231,7 @@ class DateTimeZoneFactory
      *
      * @param null|string $timeZoneString
      * @return bool
+     * @throws Exception
      * @since  2.27.8 - 2019-01-21
      */
     public static function isUTCtimeZone( ? string $timeZoneString ) : bool
@@ -232,12 +240,18 @@ class DateTimeZoneFactory
             return false;
         }
         if( self::hasOffset( $timeZoneString )) {
-            if( str_contains( $timeZoneString, Util::$COLON ) ) {
+            if( str_contains( $timeZoneString, Util::$COLON )) {
                 $timeZoneString = str_replace( Util::$COLON, Util::$SP0, $timeZoneString );
             }
             return ( empty((int) $timeZoneString ));
         }
-        return ( in_array( strtoupper( $timeZoneString ), self::$UTCARR, true ) );
+        try {
+            $tz = self::factory( $timeZoneString );
+        }
+        catch( Exception $e ) {
+            return false;
+        }
+        return empty( $tz->getOffset( DateTimeFactory::factory( null, $timeZoneString )));
     }
 
     /**
@@ -251,7 +265,7 @@ class DateTimeZoneFactory
     {
         $offset  = trim( $offset );
         $seconds = 0;
-        if( str_contains( $offset, Util::$COLON ) ) {
+        if( str_contains( $offset, Util::$COLON )) {
             $offset = str_replace( Util::$COLON, Util::$SP0, $offset );
         }
         $strLen = strlen( $offset );

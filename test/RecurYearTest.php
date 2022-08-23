@@ -479,8 +479,10 @@ class RecurYearTest extends RecurBaseTest
 
         if( '19-23l' === $case ) {
             $result = array_flip( $expects );
-            echo $strCase . 'expects                  : ' .
-                implode( ' - ', array_keys( $result ) ) . PHP_EOL;        // test ###
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . 'expects                  : ' .
+                    implode( ' - ', array_keys( $result ) ) . PHP_EOL;        // test ###
+            }
         }
         else {
             $result = $this->recur2dateTest( // return old
@@ -494,15 +496,19 @@ class RecurYearTest extends RecurBaseTest
         }
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurYearly1( $recur )) {
-            echo $strCase . ' NOT isRecurYearly1 ' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NOT isRecurYearly1 ' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         }
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurYearly1( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'year smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX ) ) . PHP_EOL;        // test ###
-        echo $recurDisp . ' start ' . $start->format( 'Ymd' ) . ' end ' . $end->format( 'Ymd' ) . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'year smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL;        // test ###
+            echo $recurDisp . ' start ' . $start->format( 'Ymd' ) . ' end ' . $end->format( 'Ymd' ) . PHP_EOL; // test ###
+        }
         $endFormat = is_array( $end )
             ? implode( '-', $end )
             : $end->format( 'Ymd' );
@@ -603,15 +609,19 @@ class RecurYearTest extends RecurBaseTest
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurYearly2( $recur )) {
-            echo $strCase . ' NOT isRecurYearly2 ' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NOT isRecurYearly2 ' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurMonthlyYearly3( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'year smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
-        echo $recurDisp . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'year smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+            echo $recurDisp . PHP_EOL; // test ###
+        }
         $this->assertEquals(
             $expects,
             array_keys( $resultX ),

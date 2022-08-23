@@ -62,6 +62,7 @@ use function timezone_name_from_abbr;
  * Cover Vtimezone property TZID and component date properties DTSTART, DTEND, DUE, RECURRENCE-ID, EXDATE, RDATE
  *
  * @since  2.29.10 - 2019-09-02
+ * @deprecated (2.41.57)
  */
 class RegulateTimezoneFactory
 {

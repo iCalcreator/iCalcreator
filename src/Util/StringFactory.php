@@ -30,15 +30,11 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use Exception;
-use Kigkonsult\Icalcreator\IcalInterface;
 
 use function bin2hex;
-use function ctype_digit;
 use function explode;
 use function floor;
 use function implode;
-use function in_array;
-use function ord;
 use function random_bytes;
 use function rtrim;
 use function sprintf;
@@ -50,10 +46,7 @@ use function stripos;
 use function strpos;
 use function strrev;
 use function strtolower;
-use function strtoupper;
 use function substr;
-use function substr_count;
-use function trim;
 
 /**
  * iCalcreator string support class

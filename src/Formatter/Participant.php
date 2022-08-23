@@ -51,7 +51,7 @@ final class Participant extends FormatBase
         $compType   = strtoupper( $source->getCompType());
         $allowEmpty = $source->getConfig( self::ALLOWEMPTY );
         $lang       = $source->getConfig( self::LANGUAGE );
-        $output     =
+        return
             sprintf( self::$FMTBEGIN, $compType ) .
             Property\Property::format(
                 self::UID,
@@ -186,6 +186,5 @@ final class Participant extends FormatBase
             ) .
             self::formatSubComponents( $source ) .
             sprintf( self::$FMTEND, $compType );
-        return $output;
     }
 }

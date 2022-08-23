@@ -438,14 +438,11 @@ class ParseTest extends DtBase
      */
     public function parseCalendarTest1( int $case, string $value, string $expectedvalue ) : void
     {
-//      error_log( __METHOD__ . ' case ' . $case . ' start' ); // test ###
 
         $calendar = new Vcalendar();
         $calendar->parse( $value );
 
         $this->parseCalendarTest( $case, $calendar, $expectedvalue );
-
-        // echo $c->createCalendar() . PHP_EOL; // test ###
     }
 
     /**
@@ -464,8 +461,6 @@ class ParseTest extends DtBase
         $calendar->parse( explode( Util::$CRLF, $value ));
 
         $this->parseCalendarTest( $case, $calendar, $expectedvalue );
-
-        // echo $c->createCalendar() . PHP_EOL; // test ###
     }
 
     /**
@@ -646,8 +641,6 @@ class ParseTest extends DtBase
             $this->parseCalendarTest( $case . '-s', $calendar, $value );
 
         }
-
-//      if( 35 === $case ) echo $calendar->createCalendar() . PHP_EOL; // test ###
     }
 
     /**

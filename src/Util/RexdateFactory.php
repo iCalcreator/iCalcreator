@@ -35,16 +35,11 @@ use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Vcalendar;
 
-use function array_keys;
 use function count;
-use function explode;
-use function in_array;
 use function is_array;
 use function reset;
 use function substr;
-use function usort;
 use function var_export;
 
 /**
@@ -66,7 +61,7 @@ class RexdateFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.44 2022-04-27
+     * @since 2.41.57 2022-08-18
      */
     public static function prepInputExdate( Pc $pc ) : Pc
     {
@@ -74,7 +69,7 @@ class RexdateFactory
         $output      = ( clone $pc )->setValue( [] );
         $output->addParam( IcalInterface::VALUE, IcalInterface::DATE_TIME, false );
         $isValueDate = $output->hasParamValue( IcalInterface::DATE );
-        $paramTZid   = $output->getParams( IcalInterface::TZID ) ?? '';
+        $paramTZid   = $output->getParams( IcalInterface::TZID ) ?? Util::$SP0;
         $forceUTC    = ( IcalInterface::UTC === $paramTZid );
         $isLocalTime = false;
         if( ! empty( $paramTZid )) {
@@ -85,8 +80,7 @@ class RexdateFactory
                 DateTimeZoneFactory::assertDateTimeZone( $paramTZid );
             }
         }
-        foreach(( array_keys( $exdates )) as $eix ) {
-            $theExdate = $exdates[$eix];
+        foreach( $exdates as $eix => $theExdate ) {
             $wDate     = match ( true ) {
                 $theExdate instanceof DateTimeInterface => DateTimeFactory::conformDateTime(
                     DateTimeFactory::toDateTime( $theExdate ),
@@ -94,13 +88,14 @@ class RexdateFactory
                     $forceUTC,
                     $paramTZid
                 ),
-                DateTimeFactory::isStringAndDate( $theExdate ) => DateTimeFactory::conformStringDate(
-                    $theExdate,
-                    $isValueDate,
-                    $forceUTC,
-                    $isLocalTime,
-                    $paramTZid
-                ),
+                DateTimeFactory::isStringAndDate( $theExdate ) =>
+                    DateTimeFactory::conformStringDate(
+                        $theExdate,
+                        $isValueDate,
+                        $forceUTC,
+                        $isLocalTime,
+                        $paramTZid
+                    ),
                 default => throw new InvalidArgumentException(
                     sprintf(
                         self::$REXDATEERR,
@@ -125,7 +120,7 @@ class RexdateFactory
      * @return Pc
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.57 2022-08-18
      */
     public static function prepInputRdate( Pc $input ) : Pc
     {
@@ -171,7 +166,7 @@ class RexdateFactory
                         $paramTZid
                     );
                     break;
-                case ( DateTimeFactory::isStringAndDate( $theRdate )) : // SINGLE string date(time)
+                case DateTimeFactory::isStringAndDate( $theRdate ) : // SINGLE string date(time)
                     $output->value[] = DateTimeFactory::conformStringDate(
                         $theRdate,
                         $isValueDate,
@@ -205,7 +200,7 @@ class RexdateFactory
      * @return mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.40 2021-10-04
+     * @since 2.41.57 2022-08-18
      */
     private static function getPeriod(
         array $period,
@@ -224,8 +219,9 @@ class RexdateFactory
                 $wDate[$perX] = $rPeriod;
                 continue;
             }
-            if( is_array( $rPeriod ) && ( 1 === count( $rPeriod )) &&
-                DateTimeFactory::isStringAndDate( reset( $rPeriod ))) { // text-date
+            if( is_array( $rPeriod ) &&
+                ( 1 === count( $rPeriod )) &&
+                DateTimeFactory::isStringAndDate( reset( $rPeriod ))) { // text date ex. 2006-08-03 10:12:18
                 $rPeriod = reset( $rPeriod );
             }
             switch( true ) {
@@ -249,7 +245,7 @@ class RexdateFactory
                             new DateInterval( $rPeriod )
                         );
                     continue 2;
-                case ( DateTimeFactory::isStringAndDate( $rPeriod )) : // text date ex. 2006-08-03 10:12:18
+                case DateTimeFactory::isStringAndDate( $rPeriod ) : // text date ex. 2006-08-03 10:12:18
                     $wDate[$perX] = DateTimeFactory::conformStringDate(
                         $rPeriod,
                         $isValueDate,

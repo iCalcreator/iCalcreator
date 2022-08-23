@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator;
 use Exception;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
@@ -405,7 +406,7 @@ class DateTimeUTCTest extends DtBase
     }
 
     /**
-     * testDateTime11 provider
+     * testDateTime11 provider,VALUE DATE-TIME with DateTime
      *
      * @return mixed[]
      * @throws Exception
@@ -577,6 +578,8 @@ class DateTimeUTCTest extends DtBase
     /**
      * Testing VALUE DATE-TIME with DateTime, DTSTAMP, LAST_MODIFIED, CREATED, COMPLETED, DTSTART (VFREEBUSY)
      *
+     * Also with PHP DATE format constants, test string
+     *
      * @test
      * @dataProvider dateTimeUTCTest11Provider
      * @param int     $case
@@ -601,6 +604,11 @@ class DateTimeUTCTest extends DtBase
         ];
         $this->thePropTest( $case, $compsProps, $value, $params, $expectedGet, $expectedString );
         $this->propGetNoParamsTest( $case, $compsProps, $value, $params, $expectedGet );
+
+        // also PHP contants for string format
+        foreach( self::$DATECONSTANTFORMTS as $format ) {
+            $this->thePropTest( 100000 + $case, $compsProps, $value, $params, $expectedGet, $expectedString );
+        }
     }
 
     /**
@@ -685,7 +693,7 @@ class DateTimeUTCTest extends DtBase
 
 
     /**
-     * testDateTime17 provider
+     * testDateTime17 provider, full string datetime
      *
      * @return mixed[]
      * @throws Exception
@@ -903,6 +911,64 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
+
+        // testing MS timezone
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            17108,
+            $dateTime . ' ' . $msTz,
+            [],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            17112,
+            $dateTime . ' ' . $msTz,
+            [ IcalInterface::TZID => TZ2 ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            17113,
+            $dateTime . ' ' . $msTz,
+            [ IcalInterface::TZID => IcalInterface::UTC ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            17114,
+            $dateTime . ' ' . $msTz,
+            [ IcalInterface::TZID => OFFSET ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
         return $dataArr;
     }
 
@@ -1037,7 +1103,8 @@ class DateTimeUTCTest extends DtBase
     }
 
     /**
-     * testDateTime18 provider
+     * dateTimeUTCTest18 provider, VALUE DATE-TIME with short string datetime
+     *
      * @throws Exception
      */
     public function dateTimeUTCTest18Provider() : array
@@ -1245,6 +1312,64 @@ class DateTimeUTCTest extends DtBase
         $dataArr[] = [
             18028,
             DATEYmd . OFFSET,
+            [ IcalInterface::TZID => OFFSET ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+
+        // testing MS timezone
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            18108,
+            DATEYmd . ' ' . $msTz,
+            [],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            18112,
+            DATEYmd . ' ' . $msTz,
+            [ IcalInterface::TZID => TZ2 ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            18113,
+            DATEYmd . ' ' . $msTz,
+            [ IcalInterface::TZID => IcalInterface::UTC ],
+            Pc::factory(
+                $dateTime2,
+                []
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+        ];
+
+        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
+        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
+        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dataArr[] = [
+            18114,
+            DATEYmd . ' ' . $msTz,
             [ IcalInterface::TZID => OFFSET ],
             Pc::factory(
                 $dateTime2,

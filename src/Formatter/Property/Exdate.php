@@ -34,7 +34,6 @@ use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 
-use function array_keys;
 use function count;
 use function reset;
 use function strcmp;
@@ -79,15 +78,16 @@ final class Exdate extends PropertyBase
         if( 1 < count( $exdates )) {
             usort( $exdates, $SORTER2 );
         }
+        $eix = 0;
         foreach( $exdates as $theExdate ) { // Pc
-            $content     = self::$SP0;
-            foreach(( array_keys( $theExdate->value )) as $eix ) {
-                $formatted  = DateTimeFactory::dateTime2Str(
-                    $theExdate->value[$eix],
+            $content = self::$SP0;
+            foreach( $theExdate->value as $exDatePart ) {
+                $formatted = DateTimeFactory::dateTime2Str(
+                    $exDatePart,
                     $theExdate->hasParamValue(self::DATE ),
                     $theExdate->hasParamKey( self::ISLOCALTIME )
                 );
-                $content .= ( 0 < $eix ) ? self::$COMMA . $formatted : $formatted;
+                $content .= ( 0 < $eix++ ) ? self::$COMMA . $formatted : $formatted;
             } // end foreach
             $output .= self::createElement(
                 $propName,

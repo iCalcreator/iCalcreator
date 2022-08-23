@@ -58,6 +58,7 @@
     },
     "require": {
         "php": ">=8.0",
+        "ext-intl": "*",
         "ext-openssl": "*",
         "ext-simplexml": "*",
         "ext-zlib": "*",

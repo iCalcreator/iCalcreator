@@ -36,6 +36,7 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
 
 use Kigkonsult\Icalcreator\Pc;
+use function ctype_alpha;
 use function ctype_digit;
 use function date_default_timezone_get;
 use function in_array;
@@ -92,7 +93,8 @@ class DateTimeFactory
     public static function factory( ? string $dateTimeString = null, ? string $timeZoneString = null ) : DateTime
     {
         static $AT      = '@';
-        $dateTimeString = $dateTimeString ?? 'now';
+        static $NOW     = 'now';
+        $dateTimeString = $dateTimeString ?? $NOW;
         if(( $AT === $dateTimeString[0] ) &&
             ctype_digit( substr( $dateTimeString, 1 ))) {
             try {
@@ -118,7 +120,7 @@ class DateTimeFactory
             catch( InvalidArgumentException | Exception $e ) {
                 throw $e;
             }
-        } // end if
+        } // end if @
         return self::assertDateTimeString( $dateTimeString, $timeZoneString );
     }
 
@@ -155,7 +157,7 @@ class DateTimeFactory
     }
 
     /**
-     * Return DateTime if DateTimeInterface else string
+     * Return DateTime
      *
      * @param DateTimeInterface $dateTime
      * @return DateTime
@@ -168,7 +170,7 @@ class DateTimeFactory
             return $dateTime;
         }
         $dtTmp = new DateTime( self::$NOW, $dateTime->getTimezone());
-        $dtTmp->setTimestamp( $dateTime->getTimestamp() );
+        $dtTmp->setTimestamp( $dateTime->getTimestamp());
         return $dtTmp;
     }
 
@@ -204,7 +206,7 @@ class DateTimeFactory
                     $paramTZid
                 );
                 break;
-            case ( self::isStringAndDate( $value->value )) :
+            case self::isStringAndDate( $value->value ) :
                 // string ex. "2006-08-03 10:12:18 [[[+/-]1234[56]] / timezone]"
                 $dateTime = self::conformStringDate(
                     $value->value,
@@ -310,11 +312,12 @@ class DateTimeFactory
     /**
      * Conform date parameters
      *
-     * @param Pc        $pc
-     * @param bool      $isValueDate
-     * @param bool      $isLocalTime
+     * @param Pc $pc
+     * @param bool $isValueDate
+     * @param bool $isLocalTime
      * @param null|string $paramTZid
      * @return void
+     * @throws Exception
      * @since  2.41.36 - 2022-04-03
      */
     public static function conformDateTimeParams(
@@ -346,16 +349,17 @@ class DateTimeFactory
     /**
      * Return array [<datePart>, <timezonePart>] from (split) string
      *
-     * @param string    $string
+     * @param string $string
      * @return mixed[]  [<datePart>, <timezonePart>]
-     * @since  2.27.14 - 2019-03-08
+     * @throws Exception
+     * @since  2.41.57 - 2022-08-19
      */
     public static function splitIntoDateStrAndTimezone( string $string ) : array
     {
-        $string = trim( $string );
+        $string = self::concatIcalDateStr( trim( $string ));
         if(( DateTimeZoneFactory::$UTCARR[0] === substr( $string, -1 )) &&
             ( ctype_digit( substr( $string, -3, 2 )))) { // nnZ
-            return [ substr( $string, 0, -1 ), DateTimeZoneFactory::$UTCARR[1] ]; // UTC
+            return [ substr( $string, 0, -1 ), IcalInterface::UTC ]; // Z
         }
         $strLen = strlen( $string );
         if( self::isDateTimeStrInIcal( $string )) {
@@ -379,23 +383,29 @@ class DateTimeFactory
             $tz      = DateTimeZoneFactory::getTimeZoneNameFromOffset( $tz );
             return [ $string2, $tz ];
         } // end if
-        if( false !== strrpos( $string, Util::$SP1 )) {
-            $tz      = StringFactory::afterLast( Util::$SP1, $string );
-            $string2 = StringFactory::beforeLast( Util::$SP1, $string );
-            if( DateTimeZoneFactory::isUTCtimeZone( $tz )) {
-                $tz = IcalInterface::UTC;
+        // if no space found then no trailing timezone
+        if( false === strrpos( $string, Util::$SP1 )) {
+            return [ $string, null ];
+        }
+        if( DateTimeZoneFactory::isUTCtimeZone( trim( substr( $string, -3 )))) {
+            return [ trim( substr( $string, 0, -3 )), IcalInterface::UTC ];
+        }
+        // timezone is always after a digit and, hopefully, a space-delim
+        $pos = strlen( $string ) - 1;
+        while( true ) {
+            if( 7 > $pos ) {
+                break;
             }
-            $found = true;
-            try {
-                DateTimeZoneFactory::assertDateTimeZone( $tz );
+            if( self::hasLeadingDateAndTrailingString( $string, $pos )) {
+                $p1   = 1 + $pos;
+                if( isset( $string[$p1] )) {
+                    $pos += ctype_alpha( $string[$p1] ) ? 1 : 2;
+                    return [ trim( substr( $string, 0, $pos )), trim( substr( $string, $pos )) ];
+                }
+                return [ trim( substr( $string, 0, $pos )), null ];
             }
-            catch( InvalidArgumentException $e ) {
-                $found = false;
-            }
-            if( $found ) {
-                return [ $string2, $tz ];
-            }
-        } // end if
+            --$pos;
+        }
         return [ $string, null ];
     }
 
@@ -564,7 +574,7 @@ class DateTimeFactory
      * @return DateTime
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.27.14 - 2019-02-04
+     * @since  2.41.57 - 2022-08-20
      */
     public static function setDateTimeTimeZone(
         DateTimeInterface $dateTime,
@@ -581,10 +591,12 @@ class DateTimeFactory
         $currTz = $dateTime->getTimezone()->getName();
         if( DateTimeZoneFactory::isUTCtimeZone( $currTz ) &&
             DateTimeZoneFactory::isUTCtimeZone( $tz )) {
-            return $dateTime;
+            return $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
         }
         if( 0 === strcasecmp( $currTz, $tz )) { // same
-            return $dateTime;
+            return empty( $dateTime->getOffset())
+                ? $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ))
+                : $dateTime;
         }
         try {
             $tzt = DateTimeZoneFactory::factory( $tz );
@@ -597,15 +609,17 @@ class DateTimeFactory
             );
         }
         $dateTime->setTimezone( $tzt );
-        return $dateTime;
+        return empty( $dateTime->getOffset())
+            ? $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ))
+            : $dateTime;
     }
 
     /*
-     *  Return bool true if string contains a valid date
+     *  Return bool true if string contains a valid date, opt with some timezne
      *
      * @param mixed $str
      * @return bool
-     * @since  2.27.14 - 2019-02-17
+     * @since  2.41.57 - 2022-08-19
      */
     public static function isStringAndDate( mixed $string ) : bool
     {
@@ -613,8 +627,46 @@ class DateTimeFactory
             return false;
         }
         $string = trim( $string );
-        return (( 8 <= strlen( $string )) && ( false !== strtotime ( $string )));
+        if(( false !== strtotime( $string )) &&
+            (( 8 <= strlen( $string )) || ( false === strrpos( $string, Util::$SP1 )))) {
+            return true;
+        }
+        // date(time)-part is a valid strtotime string, the trailing chars may be a timezone or offset
+        // timezone/offset is always after a digit
+        $pos = strlen( $string ) -1;
+        while( true ) {
+            if( 7 > $pos ) {
+                break;
+            }
+            if( self::hasLeadingDateAndTrailingString( $string, $pos )) {
+                return true;
+            }
+            --$pos;
+        }
+        return false;
     }
+
+    /**
+     * Return bool true if string has a leading date and a trailing string
+     *
+     * @param string $string
+     * @param int $pos
+     * @return bool
+     */
+    private static function hasLeadingDateAndTrailingString( string $string, int $pos ) : bool
+    {
+        $p1 = 1 + $pos;
+        return ( ctype_digit( $string[$pos] ) &&
+            ( ! isset( $string[$p1] ) ||
+                (( ' ' === $string[$p1] ) || ctype_alpha( $string[$p1] )))  &&
+            ( false !== strtotime( substr( $string, 0, $p1 )))
+        );
+    }
+
+    /**
+     * @var string[]
+     */
+    private static array $Tarr = ['T','t'];
 
     /*
      * Return bool true if dateStr starts with format YYYYmmdd[T/t]HHmmss
@@ -625,13 +677,55 @@ class DateTimeFactory
      */
     private static function isDateTimeStrInIcal( string $dateStr ) : bool
     {
-        static $Tarr = ['T','t'];
         if( 15 > strlen( $dateStr )) {
             return false;
         }
         return ( ctype_digit( substr( $dateStr, 0, 8 )) &&
-               in_array( $dateStr[8], $Tarr ) &&
+               in_array( $dateStr[8], self::$Tarr, true ) &&
             ctype_digit( substr( $dateStr, 9, 6 )));
+    }
+
+    /**
+     * Concat '2022-08-19' to '20220819' and  '2022-08-19 09:00:00' to '20220819T090000'
+     *
+     * @param string $string
+     * @return string
+     */
+    private static function concatIcalDateStr( string $string ) : string
+    {
+        $string = trim( $string );
+        $strLen = strlen( $string );
+        if(( 10 === $strLen ) &&
+            ctype_digit( substr( $string, 0, 4 )) &&
+            ( Util::$MINUS === $string[4] ) &&
+            ctype_digit( substr( $string, 5, 2 )) &&
+            ( Util::$MINUS === $string[7] ) &&
+            ctype_digit( substr( $string, 8, 2 ))) {
+            return substr( $string, 0, 4 ) .
+                substr( $string, 5, 2 ) .
+                substr( $string, 8, 2 );
+        } // end if 10
+        if(( 19 === $strLen ) &&
+            ctype_digit( substr( $string, 0, 4 )) &&
+            ( Util::$MINUS === $string[4] ) &&
+            ctype_digit( substr( $string, 5, 2 )) &&
+            ( Util::$MINUS === $string[7] ) &&
+            ctype_digit( substr( $string, 8, 2 )) &&
+            ( empty( $string[10] ) || in_array( $string[10], self::$Tarr, true )) &&
+            ctype_digit( substr( $string, 11, 2 )) &&
+            ( Util::$COLON === $string[13] ) &&
+            ctype_digit( substr( $string, 14, 2 )) &&
+            ( Util::$COLON === $string[16] ) &&
+            ctype_digit( substr( $string, 17, 2 ))) {
+            return substr( $string, 0, 4 ) .
+                substr( $string, 5, 2 ) .
+                substr( $string, 8, 2 ) .
+                self::$Tarr[0] .
+                substr( $string, 11, 2 ) .
+                substr( $string, 14, 2 ) .
+                substr( $string, 17, 2 );
+        }
+        return $string;
     }
 
     /**

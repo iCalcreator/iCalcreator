@@ -255,3 +255,7 @@ v3.39   3.4 release candidate
 2.41.54   moved Vcalendar/Component parser logic to parser classes
 2.41.55   moved Vcalendar/Component format logic to formatter classes
 2.41.56   Vtimezone, Util and misc code tidy up...
+
+2.41.57   GitHub#103 (non-PHP timezones)
+          Note Vtimezone::TZID property still accepts any timezone,
+          RegulateTimezoneFactory (+RegulateTimezoneFactoryTest) deprecated

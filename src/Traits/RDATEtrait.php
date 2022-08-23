@@ -182,7 +182,7 @@ trait RDATEtrait
      * @return string|mixed[]
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.57 2022-08-57
      */
     private static function checkSingleRdates( string|array|DateTimeInterface $rDates, bool $isPeriod ) : string|array
     {
@@ -197,7 +197,7 @@ trait RDATEtrait
             if( $first instanceof DateTimeInterface ) {
                 return [ $rDates ];
             }
-            if( DateTimeFactory::isStringAndDate( $first )) {
+            if( DateTimeFactory::isStringAndDate( $first )){
                 return [ $rDates ];
             }
         }

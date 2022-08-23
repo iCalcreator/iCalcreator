@@ -131,9 +131,7 @@ trait SubCompsGetTrait
         if( $update ) {
             // remove all
             $method = StringFactory::getDeleteMethodName( $propName );
-            while( false !== $this->{$method}()) {
-                continue;
-            }
+            while( false !== $this->{$method}()) {}
             // force write back
             $subCompsData = array_merge( $subCompsData, $compPropData );
         }

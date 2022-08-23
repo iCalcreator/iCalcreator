@@ -781,23 +781,15 @@ class RecurMonthTest extends RecurBaseTest
         float        $prepTime
     ) : void
     {
-
-//      error_log('' ); // test ###
-//      error_log( __FUNCTION__ . ' start ' . $case ); // test ###
-
-        /*
-        if( '29-21-18D' != $case ) {
-            $this->assertTrue( true );
-            return;
-        }
-        */
         $saveStartDate = clone $start;
         $strCase       = str_pad( $case, 12 );
 
         if( in_array( $case, [ '29-21-18C', '29-21-18D', '29-21-18E', '29-21-18F', '31' ], true ) ) {
             $result = array_flip( $expects );
-            echo
-                $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects  ) . ' count: ' . count( $expects ) . PHP_EOL; // test ###
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . 'expects    time:' . number_format( $prepTime, 6 ) .
+                    ' : ' . implode( ' - ', $expects ) . ' count: ' . count( $expects ) . PHP_EOL; // test ###
+            }
         }
         else {
             $result = $this->recur2dateTest(
@@ -815,15 +807,19 @@ class RecurMonthTest extends RecurBaseTest
         }
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurMonthly1( $recur )) {
-            echo $strCase . ' NOT isRecurMonthly1 ' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NOT isRecurMonthly1 ' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         } // end if
         $time     = microtime( true );
         $resultX  = RecurFactory2::recurMonthly1( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'mnth smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX )) . ' count: ' . count( $resultX ) . PHP_EOL; // test ###
-        echo $recurDisp . ' start ' . $start->format( 'Ymd' ) . ' end ' . $end->format( 'Ymd' ) . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'mnth smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . ' count: ' . count( $resultX ) . PHP_EOL; // test ###
+            echo $recurDisp . ' start ' . $start->format( 'Ymd' ) . ' end ' . $end->format( 'Ymd' ) . PHP_EOL; // test ###
+        }
         $this->assertEquals(
             array_keys( $result ),
             array_keys( $resultX ),
@@ -966,8 +962,10 @@ class RecurMonthTest extends RecurBaseTest
             $case . ' exp: ' .implode( ', ', $exp ) . ' - got: ' .implode( ', ', $list )
         );
 
-        echo $case . ' : ' . $year . ' - ' . $month . ' recur : ' . str_replace( [PHP_EOL, ' ' ], '', var_export( $recurByDay, true )) . PHP_EOL; // test ###
-        echo $case . ' result : ' . implode( ', ', $list ) . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $case . ' : ' . $year . ' - ' . $month . ' recur : ' . str_replace( [ PHP_EOL, ' ' ], '', var_export( $recurByDay, true ) ) . PHP_EOL; // test ###
+            echo $case . ' result : ' . implode( ', ', $list ) . PHP_EOL; // test ###
+        }
     }
 
     /**
@@ -1201,27 +1199,9 @@ class RecurMonthTest extends RecurBaseTest
         array            $expects
     ) : void
     {
-        /*
-        if( '7266' != $case ) {
-            $this->assertTrue( true );  // test ###
-            return;
-        }
-        */
         $saveStartDate = clone $start;
 
         $result = $expects;
-        /*
-        $result = $this->recur2dateTest(
-            $case,
-            $start,
-            $end,
-            $recur,
-            $expects,
-            0.0
-        );
-        */
-
-//      error_log( 'start case ' . $case ); // test ###
 
         if( ! isset( $recur[IcalInterface::INTERVAL] )) {
             $recur[IcalInterface::INTERVAL] = 1;
@@ -1229,16 +1209,20 @@ class RecurMonthTest extends RecurBaseTest
         $strCase   = str_pad( $case, 12 );
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         if( ! RecurFactory2::isRecurMonthly2( $recur )) {
-            echo $strCase . ' NOT isRecurMonthly2 ' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NOT isRecurMonthly2 ' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         } // end if
         $time     = microtime( true );
 //      $resultX  = RecurFactory2::recurMonthly2( $recur, $start, clone $start, $end );
         $resultX  = RecurFactory2::recurMonthlyYearly3( $recur, $start, clone $start, $end );
         $execTime = microtime( true ) - $time;
-        echo $strCase . 'mnth smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
-            implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
-        echo $recurDisp . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo $strCase . 'mnth smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
+                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+            echo $recurDisp . PHP_EOL; // test ###
+        }
         $this->assertEquals(
             $result, // array_keys( $result ),
             array_keys( $resultX ),

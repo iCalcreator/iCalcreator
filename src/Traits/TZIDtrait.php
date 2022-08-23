@@ -109,7 +109,6 @@ trait TZIDtrait
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03
-     * @todo assert PHP timezone ?
      */
     public function setTzid( null|string|Pc $value = null, ? array $params = [] ) : static
     {

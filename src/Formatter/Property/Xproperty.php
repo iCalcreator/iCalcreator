@@ -56,8 +56,7 @@ final class Xproperty extends PropertyBase
         }
         $output = self::$SP0;
         foreach( $values as $xpropBase ) {
-            $xpropName = $xpropBase[0];
-            $xpropPc   = $xpropBase[1];
+            [ $xpropName, $xpropPc ] = $xpropBase;
             if( ! isset( $xpropPc->value ) ||
                 ( empty( $xpropPc->value ) && ! is_numeric( $xpropPc->value ))) {
                 if( $allowEmpty ) {

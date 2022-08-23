@@ -567,8 +567,6 @@ class ValarmTest extends DtBase
                     . ', exp: ' . ( empty( $value ) ? IcalInterface::FALSE : IcalInterface::TRUE )
             );
 
-//          echo __FUNCTION__ . ' case #' . $case . PHP_EOL . $a1->createComponent() . PHP_EOL; // test ###
-
             $getValue = ( in_array( $propName, $MULTIPROPS, true ))
                 ? $a1->{$getMethod}( null, true )
                 : $a1->{$getMethod}( true );
@@ -607,8 +605,6 @@ class ValarmTest extends DtBase
 
                 );
             } // end if propName !== UID
-
-//          echo __FUNCTION__ . ' case #' . $case . PHP_EOL . $c->createCalendar() . PHP_EOL; // test ###
 
             $this->parseCalendarTest( $case, $c, $expectedString );
 

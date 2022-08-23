@@ -32,13 +32,10 @@ namespace Kigkonsult\Icalcreator\Util;
 use Kigkonsult\Icalcreator\IcalInterface;
 
 use function array_change_key_case;
-use function ctype_digit;
 use function in_array;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function ksort;
-use function sprintf;
 use function strtoupper;
 use function trim;
 

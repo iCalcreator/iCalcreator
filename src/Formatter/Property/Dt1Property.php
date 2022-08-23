@@ -30,7 +30,6 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Exception;
-use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 

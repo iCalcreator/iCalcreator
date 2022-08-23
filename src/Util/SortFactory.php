@@ -41,7 +41,6 @@ use function in_array;
 use function is_null;
 use function key;
 use function method_exists;
-use function reset;
 use function strcmp;
 
 /**
@@ -190,15 +189,11 @@ class SortFactory
                 $c->srtk[1] = $d->getTimestamp();
                 break;
         } // end switch
-        switch( true ) { // sortkey 2 : created/dtstamp
-            case (( IcalInterface::VFREEBUSY !== $compType  ) &&
-                ( false !== ( $d = $c->getCreated()))) :
-                $c->srtk[2] = $d->getTimestamp();
-                break;
-            default :
-                $c->srtk[2] = $c->getDtstamp()->getTimestamp();
-                break;
-        } // end switch
+        // sortkey 2 : created/dtstamp
+        $c->srtk[2] = (( IcalInterface::VFREEBUSY !== $compType  ) &&
+            ( false !== ( $d = $c->getCreated())))
+            ? $d->getTimestamp()
+            : $c->getDtstamp()->getTimestamp();
         // sortkey 3 : uid
         $c->srtk[3] = $c->getUid();
     }

@@ -175,7 +175,7 @@ class DateTest extends DtBase
     }
 
     /**
-     * testDATE provider
+     * DATEtest provider
      *
      * @return mixed[]
      * @throws Exception
@@ -305,6 +305,20 @@ class DateTest extends DtBase
                 $this->getDateTimeAsCreateShortString( $dateTime )
             ];
             $dateTime->modify( '-1 day ' );
+        } // end for
+
+        $dateTime  = DateTimeFactory::factory( '20160305' );
+        foreach( self::$DATECONSTANTFORMTS as $x => $format ) {
+            $dataArr[] = [ // test set #101 DateTime
+                301 + $x,
+                $dateTime->format( $format ),
+                [ IcalInterface::VALUE => IcalInterface::DATE ],
+                Pc::factory(
+                    clone $dateTime,
+                    [ IcalInterface::VALUE => IcalInterface::DATE ]
+                ),
+                $this->getDateTimeAsCreateShortString( $dateTime )
+            ];
         } // end for
 
         return $dataArr;

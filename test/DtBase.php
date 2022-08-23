@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use IntlTimeZone;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
 use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
@@ -71,6 +72,9 @@ abstract class DtBase extends TestCase
         string $expectedString
     ) : void
     {
+
+//      error_log( __METHOD__ . ' IN 1 ' . $case . ' ' . var_export( $value, true )); // test ###
+
         $c       = new Vcalendar();
         $pcInput = $firstLastmodifiedLoad = false;
         foreach( $compsProps as $theComp => $props ) {
@@ -99,7 +103,7 @@ abstract class DtBase extends TestCase
                     );
                 } // end if last-mod...
 
-//   echo PHP_EOL . __FUNCTION__ . ' #' . $case . ' start <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true ) . PHP_EOL; // test ###
+// error_log( __METHOD__ . ' #' . $case . ' start <' . $theComp . '>->' . $propName . ' value IN : ' . var_export( $value, true )); // test ###
 
                 if( $propName !== IcalInterface::DTSTAMP ) {
                     $this->assertFalse(
@@ -120,7 +124,11 @@ abstract class DtBase extends TestCase
                     }
                     $comp->{$setMethod}( $value, $params );
                     $getValue = $comp->{$getMethod}( true );
+
+// error_log( __METHOD__ . ' #' . $case . '  got  <' . $theComp . '>->' . $propName . ' value IN : ' . var_export( $getValue, true )); // test ###
+
                 } // end else
+
                 if( null !== $value ) {
                     $this->assertTrue(
                         $comp->{$isMethod}(),
@@ -306,7 +314,6 @@ abstract class DtBase extends TestCase
                     $comp->{$isMethod}(),
                     sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
-                // error_log( __FUNCTION__ . ' #' . $case . '-1b1' . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
 
                 if( $pcInput ) {
                     $comp->{$setMethod}( Pc::factory( $value, $params ));
@@ -331,8 +338,6 @@ abstract class DtBase extends TestCase
                 );
                 if( ! empty( $expectedGet->value )) {
                     $expVal = $expectedGet->value;
-
-                    // echo __FUNCTION__ . ' ' . $getMethod . ' ' . var_export( $expectedGet, true ) . PHP_EOL; // test ###
 
                     switch( true ) {
                         case $expectedGet->hasParamValue(IcalInterface::DATE ) :
@@ -413,11 +418,7 @@ abstract class DtBase extends TestCase
         static $xmlStartChars = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<icalendar xmlns=\"urn:ietf:params:xml:ns:icalendar-2.0\"><!-- kigkonsult.se iCalcreator";
         static $xmlEndChars   = "</icalendar>\n";
 
-//      error_log( __METHOD__ . ' case ' . $case . ' ' . __FUNCTION__ . ' ' . $theComp . '::' . $propName . ' start' . PHP_EOL ); // test ###
-
         $calendarStr1 = $calendar->createCalendar();
-
-//      error_log( __FUNCTION__ . ' #' . $case . ' calendar1 : ' . $calendarStr1 ); // test ###
 
         if( ! empty( $expectedString )) {
             $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], Util::$SP0, $calendarStr1 );
@@ -430,8 +431,6 @@ abstract class DtBase extends TestCase
         }
 
         if( ! empty( $expectedString )) {
-
-            // echo 'start convert to XML' . PHP_EOL; // test ###
 
             $calendarUid = $calendar->getUid();
             $xml         = IcalXMLFactory::iCal2XML( $calendar );
@@ -448,24 +447,15 @@ abstract class DtBase extends TestCase
                 );
             }
 
-//            if( 5 > $case ) {        // test ###
-//            echo __METHOD__ . PHP_EOL . $calendarStr1 . PHP_EOL; // test ###
-//            echo __METHOD__ . PHP_EOL . $xml . PHP_EOL; // test ###
-//            }                        // test ###
-
-            // echo 'start XML convert to iCal' . PHP_EOL; // test ###
+            // 'start XML convert to iCal'
             $c2  = IcalXMLFactory::XML2iCal( $xml );
             $this->assertTrue(
                 ( $c2 instanceof Vcalendar ),
                 sprintf( self::$ERRFMT, null, $case . '-33', __FUNCTION__, $theComp, $propName )
             );
 
-            // echo 'start create calendar' . PHP_EOL; // test ###
-
             $c2->setUid( $calendarUid ); // else UID compare error
             $calendarStr2 = $c2->createCalendar();
-
-//          error_log( __FUNCTION__ . ' #' . $case . ' calendar2 : ' . $calendarStr2 ); // test ###
 
             $this->assertEquals(
                 $calendarStr1,
@@ -473,19 +463,15 @@ abstract class DtBase extends TestCase
                 sprintf( self::$ERRFMT, null, $case . '-34', __FUNCTION__, $theComp, $propName )
                 . PHP_EOL . str_replace( '><', '>' . PHP_EOL . '<', $xml ) . PHP_EOL
             );
-//          echo __FUNCTION__ . ' #' . $case . ' passed test 34' . PHP_EOL; // test ###
         } // end if( ! empty( $expectedString ))
         else {
             $calendarStr2 = $calendarStr1;
         }
 
-//      error_log( __FUNCTION__ . ' #' . $case . ' calendar2 : ' . $calendarStr2 ); // test ###
-
         $calendar3    = new Vcalendar();
         $calendar3->parse( $calendarStr2 );
         $calendarStr3 = $calendar3->createCalendar();
 
-//      error_log( __FUNCTION__ . ' start #' . $case . ' calendar3 : ' . $calendarStr3 ); // test ###
 
         $this->assertEquals(
             $calendarStr1,
@@ -567,4 +553,92 @@ abstract class DtBase extends TestCase
         $fmt = $prefix ? $FMT1 : $FMT2;
         return sprintf( $fmt, $dateTime->format( DateTimeFactory::$Ymd ));
     }
+
+    /**
+     * Return a random ms timezone and the corr PHP one
+     *
+     * @link https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11
+     * @return string[]
+     * @since  2.41.57 - 2022-08-17
+     */
+    public static function getRandomMsAndPhpTz() : array
+    {
+        static $MSTZ = [
+           'Afghanistan Standard Time',
+           'Arab Standard Time',
+           'Arabian Standard Time',
+           'Arabic Standard Time',
+           'Argentina Standard Time',
+           'Atlantic Standard Time',
+           'AUS Eastern Standard Time',
+           'Azerbaijan Standard Time',
+           'Bangladesh Standard Time',
+           'Belarus Standard Time',
+           'Cape Verde Standard Time',
+           'Caucasus Standard Time',
+           'Central America Standard Time',
+           'Central Asia Standard Time',
+           'Central Europe Standard Time',
+           'Central European Standard Time',
+           'Central Pacific Standard Time',
+           'Central Standard Time (Mexico)',
+           'China Standard Time',
+           'E. Africa Standard Time',
+           'E. Europe Standard Time',
+           'E. South America Standard Time',
+           'Eastern Standard Time',
+           'Egypt Standard Time',
+           'Fiji Standard Time',
+           'FLE Standard Time',
+           'Georgian Standard Time',
+           'GMT Standard Time',
+           'Greenwich Standard Time',
+           'GTB Standard Time',
+           'Hawaiian Standard Time',
+           'India Standard Time',
+           'Iran Standard Time',
+           'Israel Standard Time',
+           'Jordan Standard Time',
+           'Korea Standard Time',
+           'Mauritius Standard Time',
+           'Middle East Standard Time',
+           'Montevideo Standard Time',
+           'Morocco Standard Time',
+           'Mountain Standard Time',
+           'Myanmar Standard Time',
+           'Namibia Standard Time',
+           'Nepal Standard Time',
+           'New Zealand Standard Time',
+           'Pacific SA Standard Time',
+           'Pacific Standard Time',
+           'Paraguay Standard Time',
+           'Romance Standard Time',
+           'Russian Standard Time',
+           'SA Eastern Standard Time',
+           'SA Pacific Standard Time',
+        ];
+        $key    = array_rand( $MSTZ, 1 );
+        $msTz   = $MSTZ[$key];
+        $phpTz  = IntlTimeZone::getIDForWindowsID( $msTz );
+        return [ $msTz, $phpTz ];
+    }
+
+    /**
+     * @var array
+     */
+    protected static array $DATECONSTANTFORMTS = [
+        DATE_ATOM,
+        DATE_COOKIE,
+        DATE_ISO8601,
+        DATE_RFC822,
+        DATE_RFC850,
+        DATE_RFC1036,
+        DATE_RFC1123,
+//      DATE_RFC7231, date in fixed GMT
+        DATE_RFC2822,
+        DATE_RFC3339,
+        DATE_RFC3339_EXTENDED,
+        DATE_RSS,
+        DATE_W3C
+    ];
 }

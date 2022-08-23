@@ -214,7 +214,7 @@ trait FREEBUSYtrait
      *
      * @param string|mixed[] $fbValues
      * @return string|mixed[]
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.16 2022-08-18
      */
     private static function checkSingleValues( string | array $fbValues ) : string|array
     {
@@ -228,7 +228,7 @@ trait FREEBUSYtrait
         if( $first instanceof DateTimeInterface ) {
             return [ $fbValues ];
         }
-        if( DateTimeFactory::isStringAndDate( $first )) {
+        if( DateTimeFactory::isStringAndDate( $first)) {
             return [ $fbValues ];
         }
         return $fbValues;
@@ -242,6 +242,7 @@ trait FREEBUSYtrait
      * @return mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
+     * @since 2.41.57 2022-08-17
      */
     private static function marshallFreebusyPeriod( int $fbix1, array $fbPeriod ) : array
     {
@@ -260,7 +261,7 @@ trait FREEBUSYtrait
                     // interval (always 2nd part)
                     $freebusyPeriod[$fbix2] = $fbMember;
                     break;
-                case ( DateTimeFactory::isStringAndDate( $fbMember )) :
+                case DateTimeFactory::isStringAndDate( $fbMember ) :
                     // text date ex. 2006-08-03 10:12:18
                     [ $dateStr, $timezonePart ] =
                         DateTimeFactory::splitIntoDateStrAndTimezone( $fbMember );

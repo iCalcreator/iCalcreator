@@ -307,9 +307,11 @@ class RecurWeekTest extends RecurBaseTest
             $time     = microtime( true );
             $resultX  = RecurFactory2::recurWeekly1( $recur, $start, clone $start, $end );
             $execTime = microtime( true ) - $time;
-            echo $strCase . 'week smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
-                implode( ' - ', array_keys( $resultX )) . PHP_EOL; // test ###
-            echo $recurDisp . PHP_EOL; // test ###
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . 'week smpl1 time:' . number_format( $execTime, 6 ) . ' : ' .
+                    implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+                echo $recurDisp . PHP_EOL; // test ###
+            }
             $this->assertEquals(
                 array_keys( $result ),
                 array_keys( $resultX ),
@@ -324,9 +326,11 @@ class RecurWeekTest extends RecurBaseTest
             $time     = microtime( true );
             $resultX  = RecurFactory2::recurWeekly2( $recur, $start, clone $start, $end );
             $execTime = microtime( true ) - $time;
-            echo $strCase . 'week smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
-                implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
-            echo $recurDisp . PHP_EOL; // test ###
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . 'week smpl2 time:' . number_format( $execTime, 6 ) . ' : ' .
+                    implode( ' - ', array_keys( $resultX ) ) . PHP_EOL; // test ###
+                echo $recurDisp . PHP_EOL; // test ###
+            }
             $this->assertEquals(
                 array_keys( $result ),
                 array_keys( $resultX ),
@@ -338,7 +342,9 @@ class RecurWeekTest extends RecurBaseTest
             );
         }
         else {
-            echo $strCase . ' NOT isRecurWeekly1/2 ' . $recurDisp . PHP_EOL;
+            if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+                echo $strCase . ' NOT isRecurWeekly1/2 ' . $recurDisp . PHP_EOL;
+            }
             $this->fail();
         }
     }

@@ -61,9 +61,11 @@ abstract class RecurBaseTest extends TestCase
      */
     public static function tearDownAfterClass() : void
     {
-        echo PHP_EOL;
-        echo 'Tot result time:' . number_format( self::$totResultTime, 6 ) . PHP_EOL; // test ###
-        echo 'Tot expect time:' . number_format( self::$totExpectTime, 6 ) . PHP_EOL; // test ###
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            echo PHP_EOL;
+            echo 'Tot result time:' . number_format( self::$totResultTime, 6 ) . PHP_EOL; // test ###
+            echo 'Tot expect time:' . number_format( self::$totExpectTime, 6 ) . PHP_EOL; // test ###
+        }
     }
 
     /**
@@ -109,14 +111,15 @@ abstract class RecurBaseTest extends TestCase
         self::$totResultTime += $execTime2;
         self::$totExpectTime += $prepTime;
 
-        $strCase = str_pad( $case, 12 );
-        echo PHP_EOL .  // test ###
-            $strCase . 'resultOld  time:' . number_format( $execTime1, 6 ) . ' : ' . implode( ' - ', array_keys( $result1 )) . ' count: ' . count( $result1 ) . PHP_EOL; // test ###
-        echo   // test ###
-            $strCase . 'resultNew  time:' . number_format( $execTime2, 6 ) . ' : ' . implode( ' - ', array_keys( $result2 )) . ' count: ' . count( $result2 ) . PHP_EOL; // test ###
-        echo
-            $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects  ) . ' count: ' . count( $expects ) . PHP_EOL; // test ###
-
+        if( defined( 'DISPRECUR' ) && ( '1' === DISPRECUR )) {
+            $strCase = str_pad( $case, 12 );
+            echo PHP_EOL .  // test ###
+                $strCase . 'resultOld  time:' . number_format( $execTime1, 6 ) . ' : ' . implode( ' - ', array_keys( $result1 ) ) . ' count: ' . count( $result1 ) . PHP_EOL; // test ###
+            echo   // test ###
+                $strCase . 'resultNew  time:' . number_format( $execTime2, 6 ) . ' : ' . implode( ' - ', array_keys( $result2 ) ) . ' count: ' . count( $result2 ) . PHP_EOL; // test ###
+            echo
+                $strCase . 'expects    time:' . number_format( $prepTime, 6 ) . ' : ' . implode( ' - ', $expects ) . ' count: ' . count( $expects ) . PHP_EOL; // test ###
+        }
         $recurDisp = str_replace( [PHP_EOL, ' ' ], '', var_export( $recur, true ));
         $result = array_keys( $result1 );
         RecurFactory2::assureIntArray( $expects );
