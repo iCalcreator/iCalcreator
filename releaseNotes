@@ -258,4 +258,8 @@ v3.39   3.4 release candidate
 
 2.41.57   GitHub#103 (non-PHP timezones)
           Note Vtimezone::TZID property still accepts any timezone,
-          RegulateTimezoneFactory (+RegulateTimezoneFactoryTest) deprecated
+          RegulateTimezoneFactory deprecated (RegulateTimezoneFactoryTest removed)
+
+2.41.58   upd (Traits/) getAll-methods return type
+2.41.59   code clean up, phpdoc args etc
+2.41.60   setTzOffset conform logic

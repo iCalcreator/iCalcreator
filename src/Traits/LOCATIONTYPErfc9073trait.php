@@ -104,7 +104,7 @@ trait LOCATIONTYPErfc9073trait
      * New location types SHOULD be registered in the manner laid down in Section 5 of [RFC4589].
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      */

@@ -56,7 +56,7 @@ trait CATEGORIEStrait
     {
         return MultiProps::format(
             self::CATEGORIES,
-            $this->categories,
+            $this->categories ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -110,8 +110,8 @@ trait CATEGORIEStrait
      * Return array, all calendar component property categories
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllCategories( ? bool $inclParam = false ) : array
     {
@@ -133,7 +133,7 @@ trait CATEGORIEStrait
      * Set calendar component property categories
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[]  $params
+     * @param null|int|array $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException

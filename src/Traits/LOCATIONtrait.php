@@ -56,7 +56,7 @@ trait LOCATIONtrait
     {
         return MultiProps::format(
             self::LOCATION,
-            $this->location,
+            $this->location ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -125,8 +125,8 @@ trait LOCATIONtrait
      * Return array, all calendar component property location
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllLocation( ? bool $inclParam = false ) : array
     {
@@ -160,7 +160,7 @@ trait LOCATIONtrait
      * Set calendar component property location
      *
      * @param null|string|Pc    $value
-     * @param null|int|mixed[]  $params
+     * @param null|int|array $params
      * @param null|int          $index  if NOT comp PARTICIPANT : 1
      * @return static
      * @since 2.41.36 2022-04-11

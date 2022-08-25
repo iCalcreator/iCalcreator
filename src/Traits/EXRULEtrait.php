@@ -107,8 +107,8 @@ trait EXRULEtrait
     /**
      * Set calendar component property exrule
      *
-     * @param null|mixed[]  $exruleset
-     * @param null|mixed[]  $params
+     * @param null|array $exruleset
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception

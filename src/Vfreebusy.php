@@ -64,7 +64,7 @@ final class Vfreebusy extends V2component
     /**
      * Constructor
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @throws Exception
      * @since  2.41.53 - 2022-08-11
      */

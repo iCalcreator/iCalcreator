@@ -102,7 +102,7 @@ class VcalendarTest extends TestCase
     {
         $dataArr = [];
 
-        $value     = 'GREGORIAN';
+        $value     = 'JULIAN'; // 'GREGORIAN';
         $dataArr[] = [
             1,
             IcalInterface::CALSCALE,

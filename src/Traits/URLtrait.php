@@ -117,7 +117,7 @@ trait URLtrait
      *  Ex. 'URL:geo:40.443,-79.945;u=10'
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

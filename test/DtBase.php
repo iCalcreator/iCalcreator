@@ -624,6 +624,8 @@ abstract class DtBase extends TestCase
     }
 
     /**
+     * PHp date constant formats etc
+     *
      * @var array
      */
     protected static array $DATECONSTANTFORMTS = [
@@ -639,6 +641,8 @@ abstract class DtBase extends TestCase
         DATE_RFC3339,
         DATE_RFC3339_EXTENDED,
         DATE_RSS,
-        DATE_W3C
+        DATE_W3C,
+        'j F Y G:i:s T', // not tested elsewhere, @todo minutes/seconds without leading zeros
+//      'l jS \of F Y h:i:s A T' // somewhat odd...  @todo fix trailing am/pm?
     ];
 }

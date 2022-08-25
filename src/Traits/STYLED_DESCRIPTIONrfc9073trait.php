@@ -55,7 +55,7 @@ trait STYLED_DESCRIPTIONrfc9073trait
     {
         return MultiProps::format(
             self::STYLED_DESCRIPTION,
-            $this->styleddescription,
+            $this->styleddescription ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -107,8 +107,8 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * Return array, all calendar component property styleddescription
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllStyleddescription( ? bool $inclParam = false ) : array
     {
@@ -138,7 +138,7 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * then the "DESCRIPTION" property should either be absent or have the parameter DERIVED=TRUE.
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params   VALUE TEXT/URI
+     * @param null|int|array $params   VALUE TEXT/URI
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException

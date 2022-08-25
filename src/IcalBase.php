@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.57' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.60' );
 }
 
 /**
@@ -218,12 +218,12 @@ abstract class IcalBase implements IcalInterface
     protected static array $ALTRPLANGARR  = [ self::ALTREP, self::LANGUAGE ];
 
     /**
-     * @var mixed[] container for sub-components
+     * @var array container for sub-components
      */
     protected array $components = [];
 
     /**
-     * @var mixed[] $config configuration with defaults
+     * @var array $config configuration with defaults
      */
     protected array $config = [
         self::ALLOWEMPTY => true,
@@ -242,12 +242,12 @@ abstract class IcalBase implements IcalInterface
     /**
      * @var array<string, int> get multi-property index
      */
-    protected array $propIx = [];
+    protected $propIx = [];
 
     /**
      * @var array<string, int> delete multi-property index
      */
-    protected array $propDelIx = [];
+    protected $propDelIx = [];
 
     /**
      * X-prefixed properties
@@ -405,7 +405,7 @@ abstract class IcalBase implements IcalInterface
     /**
      * Return array( propertyName => count )
      *
-     * @return mixed[]
+     * @return array
      * @since 2.41.51 2022-08-09
      */
     protected function getpropInfo() : array
@@ -453,8 +453,8 @@ abstract class IcalBase implements IcalInterface
     /**
      * Set Vcalendar/component config
      *
-     * @param string|mixed[]           $config
-     * @param null|bool|string|mixed[] $value
+     * @param string|array $config
+     * @param null|bool|string|array $value
      * @param bool                     $softUpdate
      * @return static
      * @throws InvalidArgumentException

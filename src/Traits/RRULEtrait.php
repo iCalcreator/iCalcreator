@@ -107,8 +107,8 @@ trait RRULEtrait
     /**
      * Set calendar component property rrule
      *
-     * @param null|mixed[]|Pc  $rruleset  string[]
-     * @param null|mixed[]  $params
+     * @param null|array|Pc  $rruleset  string[]
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception

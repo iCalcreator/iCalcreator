@@ -60,7 +60,7 @@ trait EXDATEtrait
     {
         return Exdate::format(
             self::EXDATE,
-            $this->exdate,
+            $this->exdate ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -114,8 +114,8 @@ trait EXDATEtrait
      * Return array, all calendar component property exdate
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllExdate( ? bool $inclParam = false ) : array
     {
@@ -136,8 +136,8 @@ trait EXDATEtrait
     /**
      * Set calendar component property exdate
      *
-     * @param null|string|Pc|mixed[]|DateTimeInterface|DateTimeInterface[] $value
-     * @param null|int|mixed[]  $params
+     * @param null|string|Pc|array|DateTimeInterface|DateTimeInterface[] $value
+     * @param null|int|array $params
      * @param null|int          $index
      * @return static
      * @throws Exception
@@ -169,7 +169,7 @@ trait EXDATEtrait
      * Accepts only (array) DateTimeInterface/string-date OR empty
      *
      * @param null|string|DateTimeInterface|DateTimeInterface[]|string[] $value
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @since 2.41.57 2022-08-18
      */

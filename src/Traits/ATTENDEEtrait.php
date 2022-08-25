@@ -56,7 +56,7 @@ trait ATTENDEEtrait
     {
         return Attendee::format(
             self::ATTENDEE,
-            $this->attendee,
+            $this->attendee ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -108,9 +108,9 @@ trait ATTENDEEtrait
     /**
      * Return array, all calendar component property attendees
      *
-     * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-6
+     * @param null|bool $inclParam
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllAttendee( ? bool $inclParam = false ) : array
     {
@@ -132,7 +132,7 @@ trait ATTENDEEtrait
      * Set calendar component property attendee
      *
      * @param null|string|Pc $value
-     * @param null|int|mixed[]   $params
+     * @param null|int|array $params
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException

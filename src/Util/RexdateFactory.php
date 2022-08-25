@@ -192,12 +192,12 @@ class RexdateFactory
     /**
      * Return managed period (dateTime/dateTime or dateTime/dateInterval)
      *
-     * @param mixed[] $period
+     * @param array $period
      * @param int     $rpix
      * @param bool    $isValueDate
      * @param string  $paramTZid
      * @param bool    $isLocalTime
-     * @return mixed[]
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.41.57 2022-08-18

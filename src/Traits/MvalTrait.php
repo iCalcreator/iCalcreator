@@ -66,7 +66,7 @@ trait MvalTrait
     /**
      * Delete calendar component multiProp property[ix]
      *
-     * @param mixed[]   $multiProp component (multi-)property
+     * @param array $multiProp component (multi-)property
      * @param string    $propName
      * @param IcalBase  $instance
      * @param null|int  $propDelIx specific property in case of multiply occurrence
@@ -99,7 +99,7 @@ trait MvalTrait
     /**
      * Return propName index
      *
-     * @param mixed[] $indexArr
+     * @param array $indexArr
      * @param string $propName
      * @param int|null $index
      * @return int
@@ -122,7 +122,7 @@ trait MvalTrait
     /**
      * Return array, all calendar component multiProp properties
      *
-     * @param null|mixed[]  $multiProp component (multi-)property
+     * @param null|array $multiProp component (multi-)property
      * @param bool     $inclParam
      * @return array
      * @since  2.41.51 - 2022-08-09
@@ -148,7 +148,7 @@ trait MvalTrait
     /**
      * Get calendar component multpProp property
      *
-     * @param mixed[]  $multiProp component (multi-)property
+     * @param array $multiProp component (multi-)property
      * @param string   $propName
      * @param IcalBase $instance
      * @param null|int $propIx    specific property in case of multiply occurrence
@@ -208,7 +208,7 @@ trait MvalTrait
      * Marshall input for multi-value properties
      *
      * @param mixed            $value
-     * @param null|int|mixed[] $params
+     * @param null|int|array $params
      * @param null|int         $index
      * @return Pc
      * @since 2.41.36 2022-04-09
@@ -230,7 +230,7 @@ trait MvalTrait
     /**
      * Check index and set (an indexed) content in a multiple value array
      *
-     * @param null|mixed[]  $valueArr
+     * @param null|array $valueArr
      * @param Pc            $value
      * @param null|int      $index
      * @return void

@@ -51,9 +51,9 @@ use function vsprintf;
 trait UIDrfc7986trait
 {
     /**
-     * @var null|Pc component property UID value
+     * @var Pc component property UID value
      */
-    protected ? Pc $uid = null;
+    protected Pc $uid;
 
     /**
      * Return formatted output for calendar component property uid
@@ -119,7 +119,7 @@ s     */
      *
      * If empty input, male one
      * @param null|int|string|Pc $value
-     * @param null|mixed[] $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception

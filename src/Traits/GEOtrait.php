@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Formatter\Property\Geo;
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
@@ -111,6 +112,9 @@ trait GEOtrait
         if( false === ( $geo = $this->getGeo())) {
             return false;
         }
+        if( ! method_exists( $this, StringFactory::getGetMethodName( self::LOCATION ))) {
+            return false;
+        }
         $loc     = $this->getLocation();
         $content = ( empty( $loc )) ? self::$SP0 : $loc . Util::$SLASH;
         return $content .
@@ -123,7 +127,7 @@ trait GEOtrait
      *
      * @param null|int|float|string|Pc $latitude
      * @param null|int|float|string $longitude
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @since 2.41.36 2022-04-03
      */

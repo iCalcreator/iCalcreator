@@ -103,7 +103,7 @@ trait BUSYTYPErfc7953trait
      * Set calendar component property busytype
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      */

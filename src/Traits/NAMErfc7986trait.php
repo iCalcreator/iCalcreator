@@ -59,7 +59,7 @@ trait NAMErfc7986trait
     {
         return MultiProps::format(
             self::NAME,
-            $this->name,
+            $this->name ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -127,8 +127,8 @@ trait NAMErfc7986trait
      * Return array, all calendar component property name
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllName( ? bool $inclParam = false ) : array
     {
@@ -162,7 +162,7 @@ trait NAMErfc7986trait
      * Set calendar component property name
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params
+     * @param null|int|array $params
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException

@@ -6,6 +6,9 @@ use ArrayObject;
 
 /**
  * Property Contents
+ *
+ * @property mixed value
+ * @property array params
  */
 class Pc extends ArrayObject
 {
@@ -25,7 +28,7 @@ class Pc extends ArrayObject
     private static string $paramValueKey = IcalInterface::VALUE;
 
     /**
-     * @var mixed[]
+     * @var array
      */
     private static array $propTmpl       = [ 'value' => null, 'params' => [] ];
 
@@ -38,7 +41,7 @@ class Pc extends ArrayObject
      * Class constructor
      *
      * @overrides
-     * @param mixed[] $array         ignored
+     * @param array $array         ignored
      * @param int $flags             ignored
      * @param string $iteratorClass  ArrayIterator
      */
@@ -77,13 +80,16 @@ class Pc extends ArrayObject
      * Value methods
      */
 
+    /**
+     * @return array
+     */
     public function getAsArray() : array
     {
         return $this->getArrayCopy();
     }
 
     /**
-     * Return bool true if value property is set, i.e not null
+     * Return bool true if property value is set, i.e not null
      *
      * @return bool
      */
@@ -134,8 +140,8 @@ class Pc extends ArrayObject
     /**
      * Return all parameters (array) or single parameter key value, null if not exists
      *
-     * @param null|string $pKey   paramter key
-     * @param bool $asXparamKey    only if not empty pKey, opt do X-prefix pkey
+     * @param null|string $pKey   parameter key
+     * @param bool $asXparamKey   only if not empty pKey, opt do X-prefix pkey
      * @return null|string|array
      */
     public function getParams( ? string $pKey = null, ? bool $asXparamKey = false ) : null|string|array
@@ -160,7 +166,7 @@ class Pc extends ArrayObject
     {
         $key = strtoupper( $pKey);
         return ( null === $pValue )
-            ? isset( $this->params[strtoupper( $key)] )
+            ? isset( $this->params[$key] )
             : ( isset( $this->params[$key] ) && ( $pValue === $this->params[$key] ));
     }
 
@@ -177,7 +183,7 @@ class Pc extends ArrayObject
     }
 
     /**
-     * Return bool true if params has VALUE key with spec. value
+     * Return bool true if params has VALUE key, opt with spec. value
      *
      * @param null|string $pValue
      * @return bool

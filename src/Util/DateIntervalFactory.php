@@ -48,11 +48,6 @@ use function trim;
 class DateIntervalFactory
 {
     /**
-     * Class constant
-     */
-    public const INTERVAL_ISO8601 = 'P%yY%mM%dDT%hH%iM%sS';
-
-    /**
      * @var string  duration keys etc
      */
     private static string $Y = 'Y';
@@ -377,7 +372,7 @@ class DateIntervalFactory
     /**
      * Get DateInterval from (DateInterval) array
      *
-     * @param mixed[] $dateIntervalArr
+     * @param array $dateIntervalArr
      * @return DateInterval
      * @throws Exception  on DateInterval create error
      * @since  2.27.2 - 2018-12-21

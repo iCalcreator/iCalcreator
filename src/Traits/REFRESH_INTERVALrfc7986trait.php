@@ -108,7 +108,7 @@ trait REFRESH_INTERVALrfc7986trait
      * Set calendar component property refresh_interval, VALUE DURATION required
      *
      * @param null|string|DateInterval|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception

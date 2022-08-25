@@ -36,22 +36,24 @@ use function is_numeric;
 
 /**
  * Format X-properties
+ *
+ * @since 2.41.59 2022-08-25
  */
 final class Xproperty extends PropertyBase
 {
     /**
-     * @param null|Pc[] $values
+     * @param array $values  [ *( propname, Pc ) ]
      * @param null|bool $allowEmpty
      * @param null|bool|string $lang
      * @return string
      */
     public static function format(
-        ? array $values = [],
+        array $values,
         ? bool $allowEmpty = true,
         null|bool|string $lang = false
     ) : string
     {
-        if( empty( $values ) || ! is_array( $values )) {
+        if( empty( $values )) {
             return self::$SP0;
         }
         $output = self::$SP0;

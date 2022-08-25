@@ -111,7 +111,7 @@ trait PRIORITYtrait
      * A value of 9 is the lowest priority.
      *
      * @param null|int|string|Pc $value
-     * @param null|mixed[]    $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

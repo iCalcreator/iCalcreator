@@ -58,12 +58,6 @@ use function var_export;
  */
 class DateTimeFactory
 {
-
-    /**
-     * @var string[]
-     */
-    public static array $DEFAULTVALUEDATETIME = [ IcalInterface::VALUE => IcalInterface::DATE_TIME ];
-
     /**
      * @var string
      */
@@ -350,7 +344,7 @@ class DateTimeFactory
      * Return array [<datePart>, <timezonePart>] from (split) string
      *
      * @param string $string
-     * @return mixed[]  [<datePart>, <timezonePart>]
+     * @return array  [<datePart>, <timezonePart>]
      * @throws Exception
      * @since  2.41.57 - 2022-08-19
      */
@@ -402,7 +396,7 @@ class DateTimeFactory
                     $pos += ctype_alpha( $string[$p1] ) ? 1 : 2;
                     return [ trim( substr( $string, 0, $pos )), trim( substr( $string, $pos )) ];
                 }
-                return [ trim( substr( $string, 0, $pos )), null ];
+                return [ trim( substr( $string, 0, $p1 )), null ];
             }
             --$pos;
         }

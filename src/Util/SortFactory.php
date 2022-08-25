@@ -164,14 +164,13 @@ class SortFactory
             IcalInterface::VTODO
         ];
         $compType = $c->getCompType();
-        switch( true ) { // sortkey 0 : dtstart
-            case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTSTART ))) :
-                $c->srtk[0] = $d[1];
-                break;
-            case ( false !== ( $d = $c->getDtstart())) :
+        // sortkey 0 : dtstart
+        if( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTSTART ))) {
+            $c->srtk[0] = $d[1];
+        }
+        elseif( false !== ( $d = $c->getDtstart())) {
                 $c->srtk[0] = $d->getTimestamp();
-                break;
-        } // end switch
+        }
         switch( true ) { // sortkey 1 : dtend/due(/duration)
             case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTEND ))) :
                 $c->srtk[1] = $d[1];
@@ -201,8 +200,8 @@ class SortFactory
     /**
      * Sort callback function for freebusy and rdate, sort single property
      *
-     * @param mixed[]|DateTime $a
-     * @param mixed[]|DateTime $b
+     * @param array|DateTime $a
+     * @param array|DateTime $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -243,7 +242,7 @@ class SortFactory
     /**
      * Return sortValue from RDATE value
      *
-     * @param mixed[]|DateTime $v
+     * @param array|DateTime $v
      * @return string
      * @since 2.29.2 2019-06-23
      */

@@ -43,9 +43,9 @@ use function strtoupper;
 trait PRODIDtrait
 {
     /**
-     * @var null|string calendar property PRODID
+     * @var string calendar property PRODID
      */
-    protected ? string $prodid = null;
+    protected string $prodid;
 
     /**
      * Return formatted output for calendar property prodid

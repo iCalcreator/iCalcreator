@@ -54,7 +54,7 @@ use function ucfirst;
 abstract class CalendarComponent extends IcalBase
 {
     /**
-     * @var mixed[]  component sort params
+     * @var array  component sort params
      */
     public array $srtk = [];
 
@@ -81,7 +81,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Constructor for calendar component
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @since  2.27.14 - 2019-07-03
      */
     public function __construct( ? array $config = [] )
@@ -102,7 +102,7 @@ abstract class CalendarComponent extends IcalBase
      * and for each, number of occurrence (values)
      *
      * @param string $propName
-     * @param mixed[] $output incremented result array
+     * @param array $output incremented result array
      * @return void
      * @since  2.29.17 - 2020-01-25
      */

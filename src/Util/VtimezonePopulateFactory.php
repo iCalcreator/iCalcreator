@@ -318,7 +318,7 @@ class VtimezonePopulateFactory
      * @param string $timezone
      * @param int    $start
      * @param int    $end
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.41.1 2022-01-15
@@ -403,8 +403,8 @@ class VtimezonePopulateFactory
     /**
      * Return bool true if foundTrans matches trans
      *
-     * @param mixed[] $foundTrans
-     * @param mixed[] $trans
+     * @param array $foundTrans
+     * @param array $trans
      * @return bool
      * @since  2.27.15 - 2019-02-23
      */
@@ -421,9 +421,9 @@ class VtimezonePopulateFactory
     /**
      * Return (array) build 'found'-trans
      *
-     * @param mixed[]  $backupTrans
+     * @param array $backupTrans
      * @param string   $timezone
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.27.15 - 2019-02-23

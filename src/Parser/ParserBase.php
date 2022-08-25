@@ -150,7 +150,7 @@ abstract class ParserBase implements IcalInterface
      *
      * @param string      $line     property content
      * @param null|string $propName
-     * @return mixed[]   [ value, [ *( propAttrKey => propAttrValue) ] ]
+     * @return array   [ value, [ *( propAttrKey => propAttrValue) ] ]
      * @since  2.30.3 - 2021-02-14
      */
     public static function splitContent( string $line, ?string $propName = null ) : array

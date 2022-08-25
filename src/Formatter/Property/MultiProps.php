@@ -41,20 +41,20 @@ use function in_array;
  * Format ATTACH, IMAGE
  *
  * 15
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.59 - 2022-08-25
  */
 final class MultiProps extends PropertyBase
 {
     /**
      * @param string $propName
-     * @param bool|Pc[] $values
+     * @param Pc[] $values
      * @param null|bool $allowEmpty
      * @param null|bool|string $lang
      * @return string
      */
     public static function format(
         string $propName,
-        bool|array $values,
+        array $values,
         ? bool $allowEmpty = true,
         null|bool|string $lang = false
     ) : string

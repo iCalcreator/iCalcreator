@@ -100,7 +100,7 @@ trait RESOURCE_TYPErfc9073trait
      * Set calendar component property resourcetype
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      */
     public function setResourcetype( null|string|Pc $value = null, ? array $params = [] ) : static

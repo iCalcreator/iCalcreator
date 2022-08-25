@@ -198,47 +198,6 @@ class IcalXMLFactory
      */
     private static string $time           = 'time';
 
-
-    /**
-     * @var string
-     */
-    private static string $altrep         = 'altrep';
-
-    /**
-     * @var string
-     */
-    private static string $dir            = 'dir';
-
-    /**
-     * @var string
-     */
-    private static string $delegated_from = 'delegated-from';
-
-    /**
-     * @var string
-     */
-    private static string $delegated_to   = 'delegated-to';
-
-    /**
-     * @var string
-     */
-    private static string $member         = 'member';
-
-    /**
-     * @var string
-     */
-    private static string $sent_by        = 'sent-by';
-
-    /**
-     * @var string
-     */
-    private static string $rsvp           = 'rsvp';
-
-    /**
-     * @var string
-     */
-    private static string $derived         = 'derived';
-
     /**
      * @var string
      */
@@ -451,7 +410,7 @@ class IcalXMLFactory
                     } // end foreach
                     break;
                 case IcalInterface::FREEBUSY :
-                    foreach( $component->{$method}( true ) as $fix => $contents ) {
+                    foreach( $component->{$method}( true ) as $contents ) {
                         self::addXMLchild( $properties, $propName, self::$period, $contents );
                     } // end foreach
                     break;
@@ -850,6 +809,14 @@ class IcalXMLFactory
         static $START        = 'start';
         static $END          = 'end';
         static $SP0          = '';
+        static $altrep       = 'altrep';
+        static $dir          = 'dir';
+        static $delegated_from = 'delegated-from';
+        static $delegated_to = 'delegated-to';
+        static $member       = 'member';
+        static $sent_by      = 'sent-by';
+        static $rsvp         = 'rsvp';
+        static $derived      = 'derived';
         /** create new child node */
         $name  = strtolower( $name );
         $child = $parent->addChild( $name );
@@ -895,10 +862,10 @@ class IcalXMLFactory
                     }
                     $p1 = $parameters->addChild( $pKey );
                     $ptype = match ( $pKey ) {
-                        self::$altrep, self::$dir => self::$uri,
-                        self::$delegated_from, self::$delegated_to, self::$member, self::$sent_by => self::$cal_address,
-                        self::$rsvp, self::$derived => $BOOLEAN,
-                        default => self::$text,
+                        $altrep, $dir   => self::$uri,
+                        $delegated_from, $delegated_to, $member, $sent_by => self::$cal_address,
+                        $rsvp, $derived => $BOOLEAN,
+                        default         => self::$text,
                     }; // end switch
                     if( is_array( $parVal )) {
                         foreach( $parVal as $pV ) {

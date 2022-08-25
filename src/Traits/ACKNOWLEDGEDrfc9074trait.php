@@ -106,7 +106,7 @@ trait ACKNOWLEDGEDrfc9074trait
      * Set calendar component property acknowledged, if empty: 'now'
      *
      * @param null|string|Pc|DateTimeInterface  $value
-     * @param null|mixed[]   $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

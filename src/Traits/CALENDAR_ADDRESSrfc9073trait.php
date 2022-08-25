@@ -102,7 +102,7 @@ trait CALENDAR_ADDRESSrfc9073trait
      * Set calendar component property calendaraddress
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      */

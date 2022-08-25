@@ -55,7 +55,7 @@ trait TZID_ALIAS_OFrfc7808trait
     {
         return MultiProps::format(
             self::TZID_ALIAS_OF,
-            $this->tzidaliasof,
+            $this->tzidaliasof ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -108,8 +108,8 @@ trait TZID_ALIAS_OFrfc7808trait
      * Return array, all calendar component property tzidaliasof
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllTzidaliasof( ? bool $inclParam = false ) : array
     {
@@ -131,7 +131,7 @@ trait TZID_ALIAS_OFrfc7808trait
      * Set calendar component property TZID-ALIAS-OF
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params
+     * @param null|int|array $params
      * @param null|int         $index
      * @return static
      * @since 2.41.36 2022-04-09

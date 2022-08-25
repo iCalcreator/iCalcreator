@@ -49,7 +49,7 @@ use function strtoupper;
 trait X_PROPtrait
 {
     /**
-     * @var null|mixed[] component property X-properties  ( name => value )
+     * @var null|array component property X-properties  ( name => value )
      */
     protected ? array $xprop = [];
 
@@ -191,9 +191,10 @@ trait X_PROPtrait
         }
         $output = [];
         foreach( $this->xprop as $xPropName => $xPropValue ) {
-            $output[] = $inclParam
-                ? [ $xPropName, clone $this->xprop[$xPropName], ]
-                : [ $xPropName, $this->xprop[$xPropName]->value, ];
+            $output[] =  [
+                $xPropName,
+                ( $inclParam ? clone $this->xprop[$xPropName] : $this->xprop[$xPropName]->value )
+            ];
         } // end foreach
         return $output;
     }
@@ -214,7 +215,7 @@ trait X_PROPtrait
      *
      * @param string        $xPropName
      * @param null|int|float|string|Pc  $value
-     * @param null|mixed[]  $params     optional
+     * @param null|array $params     optional
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

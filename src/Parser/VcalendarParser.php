@@ -88,8 +88,6 @@ final class VcalendarParser extends ParserBase
     /**
      * Return rows to parse from string or array
      *
-     * Used by Vcalendar & RegulateTimezoneFactory
-     *
      * @param string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return string[]
      * @throws UnexpectedValueException
@@ -220,7 +218,7 @@ final class VcalendarParser extends ParserBase
                     $this->parse3thisProperties();
                     break 2;
                 case ( in_array( strtoupper( substr( $row, 0, 7 )), $ENDSARR, true )) :
-                    $parser->parse();
+                    $parser->parse(); // i.e. NOT Vcalendar
                     break;
                 case str_starts_with( $row, $BEGIN_VAVAILABILITY ) :
                     $parser = ComponentParser::factory( $this->subject->newVavailability());

@@ -111,7 +111,7 @@ trait RECURRENCE_IDtrait
      * Set calendar component property recurrence-id
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

@@ -131,7 +131,7 @@ class IcalvCardFactory
             try {
                 $res = self::iCal2vCard( $email, $version );
             }
-            catch( InvalidArgumentException $e ) {
+            catch( InvalidArgumentException ) {
                 continue;
             }
             ++$count;

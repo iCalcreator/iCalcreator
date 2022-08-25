@@ -42,17 +42,17 @@ use function str_contains;
  * Format ATTENDEE
  *
  * 1
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.59 - 2022-08-25
  */
 final class Attendee extends PropertyBase
 {
     /**
      * @param string    $propName
-     * @param null|Pc[] $values
+     * @param Pc[]      $values
      * @param bool|null $allowEmpty
      * @return string
      */
-    public static function format( string $propName, ? array $values, ? bool $allowEmpty = true ) : string
+    public static function format( string $propName, array $values, ? bool $allowEmpty = true ) : string
     {
         static $AllKeys = [
             self::CUTYPE,

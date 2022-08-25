@@ -56,7 +56,7 @@ trait IMAGErfc7986trait
     {
         return MultiProps::format(
             self::IMAGE,
-            $this->image,
+            $this->image ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -107,8 +107,8 @@ trait IMAGErfc7986trait
      * Return array, all calendar component property image
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllImage( ? bool $inclParam = false ) : array
     {
@@ -130,7 +130,7 @@ trait IMAGErfc7986trait
      * Set calendar component property image
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[]  $params
+     * @param null|int|array $params
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException

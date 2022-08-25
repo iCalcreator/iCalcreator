@@ -40,7 +40,7 @@ use function sprintf;
 /**
  * TZOFFSETFROM property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.60 2022-08-24
  */
 trait TZOFFSETFROMtrait
 {
@@ -105,25 +105,41 @@ trait TZOFFSETFROMtrait
      * Set calendar component property tzoffsetfrom
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.60 2022-08-24
      */
     public function setTzoffsetfrom( null|string|Pc $value = null, ? array $params = [] ) : static
+    {
+        $this->tzoffsetfrom = $this->conformTzOffset( self::TZOFFSETFROM, $value, $params );
+        return $this;
+    }
+
+    /**
+     * @param string $propName
+     * @param string|Pc|null $value
+     * @param array|null $params
+     * @return Pc
+     * @since 2.41.60 2022-08-24
+     */
+    private function conformTzOffset(
+        string $propName,
+        null|string|Pc $value = null,
+        ? array $params = []
+    ) : Pc
     {
         static $ERR = 'Invalid %s offset value %s';
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
         if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::TZOFFSETFROM );
+            $this->assertEmptyValue( $value->value, $propName );
             $value->setEmpty();
         }
         elseif( ! DateTimeZoneFactory::hasOffset( $value->value )) {
-            throw new InvalidArgumentException( sprintf( $ERR,self::TZOFFSETFROM, $value->value ));
+            throw new InvalidArgumentException( sprintf( $ERR,$propName, $value->value ));
         }
-        $this->tzoffsetfrom = $value->setParams( ParameterFactory::setParams( $params ));
-        return $this;
+        return $value->setParams( ParameterFactory::setParams( $params ));
     }
 }

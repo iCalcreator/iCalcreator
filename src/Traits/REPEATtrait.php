@@ -112,7 +112,7 @@ trait REPEATtrait
      * Default 0 (zero).
      *
      * @param null|int|string|Pc $value
-     * @param null|mixed[]    $params
+     * @param null|array $params
      * @return static
      * @since 2.41.36 2022-04-03
      */

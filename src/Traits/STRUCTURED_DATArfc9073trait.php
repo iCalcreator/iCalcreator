@@ -55,7 +55,7 @@ trait STRUCTURED_DATArfc9073trait
     {
         return MultiProps::format(
             self::STRUCTURED_DATA,
-            $this->structureddata,
+            $this->structureddata ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -106,8 +106,8 @@ trait STRUCTURED_DATArfc9073trait
      * Return array, all calendar component property structureddata
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllStructureddata( ? bool $inclParam = false ) : array
     {
@@ -134,7 +134,7 @@ trait STRUCTURED_DATArfc9073trait
      * and MUST NOT occur more than once
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params   VALUE TEXT/URI
+     * @param null|int|array $params   VALUE TEXT/URI
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException

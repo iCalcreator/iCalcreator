@@ -55,7 +55,7 @@ trait ATTACHtrait
     {
         return MultiProps::format(
             self::ATTACH,
-            $this->attach,
+            $this->attach ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -108,8 +108,8 @@ trait ATTACHtrait
      * Return array, all calendar component property attachs
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllAttach( ? bool $inclParam = false ) : array
     {
@@ -131,7 +131,7 @@ trait ATTACHtrait
      * Set calendar component property attach
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params
+     * @param null|int|array $params
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException

@@ -108,7 +108,7 @@ trait PERCENT_COMPLETEtrait
      * A value of "100" indicates that the to-do has been completed.
      *
      * @param null|int|string|Pc  $value  0 accepted
-     * @param null|mixed[]     $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

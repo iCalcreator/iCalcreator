@@ -52,7 +52,7 @@ class ParameterFactory
      * Trim quoted values, default parameters may be set, if missing
      * Non-string values set to string
      *
-     * @param null|mixed[] $params
+     * @param null|array $params
      * @param null|string[] $defaults
      * @return string[]
      * @since  2022-01-31 2.41.15

@@ -97,7 +97,7 @@ final class Vcalendar extends IcalBase
     /**
      * Constructor for calendar object
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @throws Exception
      * @since 2.41.55 - 2022-08-13
      */
@@ -151,7 +151,7 @@ final class Vcalendar extends IcalBase
     /**
      * Return iCalcreator instance, factory method
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @return self
      * @throws Exception
      * @since  2.18.5 - 2013-08-29
@@ -186,7 +186,7 @@ final class Vcalendar extends IcalBase
      * RECURRENCE-ID *4 (alt. "R-UID")
      * RELATED-TO, URL, UID
      * @param string $propName
-     * @return mixed[]|bool   false on not found propName
+     * @return array|bool   false on not found propName
      * @since  2.40.11 - 2021-01-25
      */
     public function getProperty( string $propName ) : bool | array
@@ -488,7 +488,7 @@ final class Vcalendar extends IcalBase
      * DTSTART MUST be set for every component.
      * No date check.
      *
-     * @param null|int|mixed[]|DateTimeInterface $startY (int) start Year,  default current Year
+     * @param null|int|array|DateTimeInterface $startY (int) start Year,  default current Year
      *                                      ALT. DateTime start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
      * @param null|int|DateTimeInterface $startM (int) start Month, default current Month
@@ -505,7 +505,7 @@ final class Vcalendar extends IcalBase
      * @param bool $split true (default) - one component copy every DAY it occurs during the
      *                                       period (implies flat=false)
      *                                       false          - one occurance of component only in output array
-     * @return bool|mixed[]  array on success, bool false on error
+     * @return bool|array  array on success, bool false on error
      * @throws Exception
      * @since  2.29.16 - 2020-01-24
      */
@@ -580,7 +580,7 @@ final class Vcalendar extends IcalBase
      * return self with (replaced) populated Vtimezone component
      *
      * @param string|null   $timezone valid timezone acceptable by PHP5 DateTimeZone
-     * @param null|mixed[]  $xProp *[x-propName => x-propValue]
+     * @param null|array $xProp *[x-propName => x-propValue]
      * @param null|int|DateTimeInterface $start .. or unix timestamp
      * @param null|int|DateTimeInterface $end .. or unix timestamp
      * @return Vcalendar

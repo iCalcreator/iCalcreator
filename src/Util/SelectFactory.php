@@ -86,7 +86,7 @@ class SelectFactory
      * No check of date.
      *
      * @param Vcalendar $calendar
-     * @param null|int|mixed[]|DateTimeInterface $startY    (int) start Year,  default current Year
+     * @param null|int|array|DateTimeInterface $startY    (int) start Year,  default current Year
      *                                      ALT. (object) DateTimeInterface start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
      * @param null|int|DateTimeInterface $startM    (int) start Month, default current Month
@@ -103,7 +103,7 @@ class SelectFactory
      * @param null|bool $split     true (default) - one component copy every DAY it occurs during the
      *                                              period (implies flat=false)
      *                             false          - one occurance of component only in output array
-     * @return mixed[]|bool    false on select error
+     * @return array|bool    false on select error
      * @throws RuntimeException
      * @throws Exception
      * @since  2.41.45 - 2022-04-27
@@ -503,7 +503,7 @@ class SelectFactory
 
     /**
      * @param CalendarComponent $component
-     * @param mixed[] $result
+     * @param array $result
      * @param DateTimeInterface $date
      * @param null|string $compUID
      * @return void
@@ -528,7 +528,7 @@ class SelectFactory
     }
 
     /**
-     * @param mixed[] $result
+     * @param array $result
      * @return void
      */
     private static function ymdSort( array & $result ) : void
@@ -608,7 +608,7 @@ class SelectFactory
      * Get all EXRULE dates (multiple values allowed)
      *
      * @param CalendarComponent $component
-     * @param mixed[]           $exdateList
+     * @param array $exdateList
      * @param string            $dtStartTz
      * @param UtilDateTime      $compStart
      * @param UtilDateTime      $workStart
@@ -655,7 +655,7 @@ class SelectFactory
      * Get all EXDATE dates (multiple values allowed)
      *
      * @param CalendarComponent $component
-     * @param mixed[]           $exdateList
+     * @param array $exdateList
      * @param string            $dtStartTz
      * @throws Exception
      * @since 2.41.36 - 2022-04-03
@@ -678,13 +678,13 @@ class SelectFactory
      * Update $recurList all RRULE dates (multiple values allowed)
      *
      * @param CalendarComponent $component
-     * @param mixed[]           $recurList
+     * @param array $recurList
      * @param string            $dtStartTz
      * @param UtilDateTime      $compStart
      * @param UtilDateTime      $workStart
      * @param UtilDateTime      $workEnd
      * @param string            $compStartHis
-     * @param mixed[]           $exdateList
+     * @param array $exdateList
      * @param null|DateInterval $compDuration
      * @throws Exception
      * @since 2.41.36 - 2022-04-03
@@ -735,12 +735,12 @@ class SelectFactory
      * Update $recurList with RDATE dates (overwrite if exists)
      *
      * @param CalendarComponent $component
-     * @param mixed[]           $recurList
+     * @param array $recurList
      * @param string            $dtStartTz
      * @param UtilDateTime      $workStart
      * @param UtilDateTime      $fcnEnd
      * @param string            $format
-     * @param mixed[]           $exdateList
+     * @param array $exdateList
      * @param string            $compStartHis
      * @param null|DateInterval $compDuration
      * @throws Exception
@@ -825,8 +825,8 @@ class SelectFactory
     /**
      * Return Ymd-List from YmdHis-keyed array
      *
-     * @param mixed[] $YmdHisArr
-     * @return mixed[]
+     * @param array $YmdHisArr
+     * @return array
      * @since 2.26.2 - 2018-11-15
      */
     private static function getYmdList( array $YmdHisArr ) : array
@@ -995,7 +995,7 @@ class SelectFactory
      * @param UtilDateTime $rEnd
      * @param int          $cnt
      * @param int          $occurenceDays
-     * @param mixed[]      $endHis
+     * @param array $endHis
      * @since 2.26 - 2018-11-10
      */
     private static function setDurationEndTime(
@@ -1028,7 +1028,7 @@ class SelectFactory
      * Update recurr-id-comps properties summary, description and comment if missing
      *
      * @param CalendarComponent $component     (Vevent/Vtodo/Vjournal)
-     * @param mixed[] $recurIdComps
+     * @param array $recurIdComps
      * @since 2.41.36 - 2022-04-03
      */
     private static function updateRecurrIdComps( CalendarComponent $component, array $recurIdComps ) : void
@@ -1075,8 +1075,8 @@ class SelectFactory
      * Return array with selected components values from calendar based on specific property value(-s)
      *
      * @param Vcalendar $calendar
-     * @param mixed[] $selectOptions (string) key => (mixed) value, (key=propertyName)
-     * @return mixed[]
+     * @param array $selectOptions (string) key => (mixed) value, (key=propertyName)
+     * @return array
      * @since 2.40.7 - 2021-11-19
      */
     private static function selectComponents2( Vcalendar $calendar, array $selectOptions ) : array

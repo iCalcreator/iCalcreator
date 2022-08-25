@@ -80,7 +80,7 @@ trait FREEBUSYtrait
     {
         return Freebusy::format(
             self::FREEBUSY,
-            $this->freebusy,
+            $this->freebusy ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -138,8 +138,8 @@ trait FREEBUSYtrait
      * Return array, all calendar component property freebusy
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllFreebusy( ? bool $inclParam = false ) : array
     {
@@ -161,8 +161,8 @@ trait FREEBUSYtrait
      * Set calendar component property freebusy
      *
      * @param null|string|Pc  $fbType
-     * @param null|int|string|DateTimeInterface|mixed[] $fbValues
-     * @param null|mixed[]    $params
+     * @param null|int|string|DateTimeInterface|array $fbValues
+     * @param null|array $params
      * @param null|int        $index
      * @return static
      * @throws Exception
@@ -212,8 +212,8 @@ trait FREEBUSYtrait
     /**
      * Check for single (date-time) values and, if so, put into array
      *
-     * @param string|mixed[] $fbValues
-     * @return string|mixed[]
+     * @param string|array $fbValues
+     * @return string|array
      * @since 2.41.16 2022-08-18
      */
     private static function checkSingleValues( string | array $fbValues ) : string|array
@@ -238,8 +238,8 @@ trait FREEBUSYtrait
      * Marshall freebusy periods
      *
      * @param int $fbix1
-     * @param mixed[] $fbPeriod
-     * @return mixed[]
+     * @param array $fbPeriod
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.41.57 2022-08-17

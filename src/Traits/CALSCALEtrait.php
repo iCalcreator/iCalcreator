@@ -52,7 +52,7 @@ trait CALSCALEtrait
      */
     public function createCalscale() : string
     {
-        return CalMetProVer::format( self::CALSCALE, ( $this->action ?? self::GREGORIAN ));
+        return CalMetProVer::format( self::CALSCALE, ( $this->calscale ?? self::GREGORIAN ));
     }
 
     /**
@@ -76,7 +76,7 @@ trait CALSCALEtrait
     public function getCalscale() : string
     {
         if( empty( $this->calscale )) {
-            $this->calscale =self::GREGORIAN;
+            $this->calscale = self::GREGORIAN;
         }
         return $this->calscale;
     }
@@ -103,7 +103,7 @@ trait CALSCALEtrait
     public function setCalscale( null|string $value = null ) : static
     {
         if( empty( $value )) {
-            $value =self::GREGORIAN;
+            $value = self::GREGORIAN;
         }
         Util::assertString( $value, self::CALSCALE );
         $this->calscale = $value;

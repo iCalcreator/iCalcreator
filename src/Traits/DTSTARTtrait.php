@@ -138,7 +138,7 @@ trait DTSTARTtrait
      * Set calendar component property dtstart
      *
      * @param null|string|Pc|DateTimeInterface  $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

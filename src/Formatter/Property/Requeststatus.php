@@ -35,22 +35,23 @@ use Kigkonsult\Icalcreator\Pc;
  * Format REQUEST_STATUS
  *
  * 1
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.59 - 2022-08-25
  */
 final class Requeststatus extends PropertyBase
 {
     /**
      * @param string $propName
-     * @param bool|Pc[] $values
+     * @param Pc[] $values
      * @param null|bool $allowEmpty
      * @param null|bool|string $lang
      * @return string
      */
     public static function format(
         string $propName,
-        bool|array $values,
+        array $values,
         ? bool $allowEmpty = true,
-        null|bool|string $lang = false    ) : string
+        null|bool|string $lang = false
+    ) : string
     {
         if( empty( $values )) {
             return self::$SP0;

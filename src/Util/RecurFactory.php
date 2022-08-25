@@ -105,11 +105,6 @@ class RecurFactory
     public static string $LCSEC   = 'sec';
 
     /**
-     * @var string
-     */
-    public static string $LCtz    = 'tz';
-
-    /**
      * Static values for recur BYDAY
      *
      * @var string[]
@@ -252,8 +247,8 @@ class RecurFactory
     }
 
     /**
-     * @param mixed[] $input
-     * @return mixed[]
+     * @param array $input
+     * @return array
      * @since  2.41.16 - 2022-01-31
      */
     private static function orderRRuleKeys( array $input ) : array
@@ -334,8 +329,8 @@ class RecurFactory
     /**
      * Ensure RRULE BYDAY array and upper case.. .
      *
-     * @param mixed[] $input
-     * @param mixed[] $output
+     * @param array $input
+     * @param array $output
      * @return void
      * @since  2.29.27 - 2020-09-19
      */
@@ -445,8 +440,8 @@ class RecurFactory
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param mixed[] $result      array to update, array([Y-m-d] => bool)
-     * @param mixed[] $recur       pattern for recurrency (only value part, params ignored)
+     * @param array $result      array to update, array([Y-m-d] => bool)
+     * @param array $recur       pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -542,8 +537,8 @@ class RecurFactory
      *
      * If missing, UNTIL is set 1 year from startdate (emergency break)
      *
-     * @param mixed[] $result              array to update, array([Y-m-d] => bool)
-     * @param mixed[] $recur               pattern for recurrency (only value part, params ignored)
+     * @param array $result              array to update, array([Y-m-d] => bool)
+     * @param array $recur               pattern for recurrency (only value part, params ignored)
      * @param string|DateTime $wDateIn     component start date
      * @param string|DateTime $fcnStartIn  start date
      * @param string|DateTime $fcnEndIn    end date
@@ -975,11 +970,11 @@ class RecurFactory
     /**
      * Checking BYDAY (etc) hits, recur2date help function
      *
-     * @since  2.6.12 - 2011-01-03
-     * @param int|string|mixed[] $BYvalue
-     * @param int   $upValue
+     * @param int|string|array $BYvalue
+     * @param int $upValue
      * @param int   $downValue
      * @return bool
+     *@since  2.6.12 - 2011-01-03
      */
     private static function recurBYcntcheck(
         int | string | array $BYvalue,
@@ -999,7 +994,7 @@ class RecurFactory
      * (re-)Calculate internal index, recur2date help function
      *
      * @param string  $freq
-     * @param mixed[] $date
+     * @param array $date
      * @param int     $wkst
      * @return string
      * @since  2.26 - 2018-11-10
@@ -1028,9 +1023,9 @@ class RecurFactory
     /**
      * Return updated date, array and timpstamp
      *
-     * @param mixed[]      $date     date to step
+     * @param array $date     date to step
      * @param string       $dateYMD  date YMD
-     * @param null|mixed[] $step     default array( Util::$LCDAY => 1 )
+     * @param null|array $step     default array( Util::$LCDAY => 1 )
      * @return void
      */
     private static function stepDate( array & $date, string & $dateYMD, ? array $step = null ) : void
@@ -1088,10 +1083,10 @@ class RecurFactory
     /**
      * Return initiated $dayCnts
      *
-     * @param mixed[] $wDate
-     * @param mixed[] $recur
+     * @param array $wDate
+     * @param array $recur
      * @param int     $wkst
-     * @return mixed[]
+     * @return array
      */
     private static function initDayCnts( array $wDate, array $recur, int $wkst ) : array
     {
@@ -1180,7 +1175,7 @@ class RecurFactory
     /**
      * Return a reformatted input date
      *
-     * @param string|mixed[]|DateTime $inputDate
+     * @param string|array|DateTime $inputDate
      * @return int[]
      * @throws Exception
      * @since  2.29.21 - 2020-01-31

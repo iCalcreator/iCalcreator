@@ -130,7 +130,7 @@ abstract class PropertyBase implements IcalInterface
     /**
      * Return formatted output for calendar component property parameters
      *
-     * @param mixed[]          $inputParams
+     * @param array $inputParams
      * @param null|string[]    $ctrKeys
      * @param null|bool|string $lang  bool false if config lang not found
      * @return string
@@ -219,9 +219,10 @@ abstract class PropertyBase implements IcalInterface
                 unset( $params[self::DERIVED] ); // skip default FALSE for DERIVED
             }
             elseif( self::TRUE !== $params[self::DERIVED] ) {
-                $params[self::DERIVED] = ((bool) $params[self::DERIVED] )
+                $params[self::DERIVED] = (((bool) $params[self::DERIVED] )
                     ? self::TRUE
-                    : self::FALSE;
+                    : self::FALSE
+                );
             }
         } // end if
         if( isset( $params[self::ORDER] )) {
@@ -245,8 +246,8 @@ abstract class PropertyBase implements IcalInterface
      *
      * "-Quotes a value if it contains ':', ';' or ','
      *
-     * @param mixed[] $inputParams
-     * @return mixed[][]
+     * @param array $inputParams
+     * @return array[]
      */
     protected static function quoteParams( array $inputParams ) : array
     {

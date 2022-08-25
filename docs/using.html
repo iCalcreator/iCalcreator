@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.57 manual</title>
+    <title>iCalcreator 2.41.60 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.57">
+<meta name="description" content="using iCalcreator v2.41.60">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.57</p>
+<p class="header">iCalcreator v2.41.60</p>
 <p>
-iCalcreator v2.41.57<br>
+iCalcreator v2.41.60<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -369,12 +369,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.57/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.60/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.57</dt>
+    <dt>v2.41.60</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +383,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.57 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.60 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -513,7 +513,8 @@ Here are update headlines in this version.
     <li>
         GitHub#103 (non-PHP timezones)<br>
         Note Vtimezone::TZID property still accepts any timezone<br>
-        RegulateTimezoneFactory (+RegulateTimezoneFactoryTest) deprecated
+        RegulateTimezoneFactory deprecated<br>
+        code clean up, phpdoc args etc
     </li>
 
 </ul>
@@ -3577,7 +3578,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.57//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.60//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -4090,7 +4091,7 @@ Any trailing characters, will be interpreted as offset/timezone.
 Input string dates with timezone should have a space character between datePart and timezonePart.
 </p>
 <p>
-    As of 2.41.57, GitHub#103, non-PHP complient (ex ms) timezone may be accepted
+    As of 2.41.60, GitHub#103, non-PHP complient (ex ms) timezone may be accepted
     and converted to corr. PHP timezone.
 </p>
 
@@ -11303,7 +11304,7 @@ END:VTIMEZONE
 
 <a id="msTimezone2PHPtz"></a><h4>3.4.6 Review timezones, opt alter to PHP timezone</h4>
 <p>
-    RegulateTimezoneFactory (+RegulateTimezoneFactoryTest) is deprecated due to 2.41.57, GitHub#103 (non-PHP timezones).
+    RegulateTimezoneFactory (+RegulateTimezoneFactoryTest) is deprecated due to 2.41.60, GitHub#103 (non-PHP timezones).
 </p>
 <p>
     The Vcalendar::<a href="#parse_merge">parse</a> or component::<a href="#componentParse">parse</a>
@@ -11485,7 +11486,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.57
+<tr><td>Version  <td>2.41.60
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

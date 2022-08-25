@@ -46,13 +46,13 @@ use function usort;
  * Format RDATE
  *
  * 1
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.50 - 2022-08-25
  */
 final class Rdate extends PropertyBase
 {
     /**
      * @param string $propName
-     * @param bool|Pc[] $values
+     * @param Pc[] $values
      * @param bool|null $allowEmpty
      * @param null|string $compType
      * @return string
@@ -60,7 +60,7 @@ final class Rdate extends PropertyBase
      */
     public static function format(
         string $propName,
-        bool|array $values,
+        array $values,
         ? bool $allowEmpty = true,
         ? string $compType = null
     ) : string

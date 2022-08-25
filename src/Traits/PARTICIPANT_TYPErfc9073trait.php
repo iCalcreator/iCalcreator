@@ -99,7 +99,7 @@ trait PARTICIPANT_TYPErfc9073trait
      * Set calendar component property participanttype
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      */
     public function setParticipanttype( null|string|Pc $value = null, ? array $params = [] ) : static

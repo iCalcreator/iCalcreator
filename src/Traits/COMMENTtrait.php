@@ -56,7 +56,7 @@ trait COMMENTtrait
     {
         return MultiProps::format(
             self::COMMENT,
-            $this->comment,
+            $this->comment ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -110,8 +110,8 @@ trait COMMENTtrait
      * Return array, all calendar component property comment
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllComment( ? bool $inclParam = false ) : array
     {
@@ -133,7 +133,7 @@ trait COMMENTtrait
      * Set calendar component property comment
      *
      * @param null|string|Pc   $value
-     * @param null|int|mixed[] $params
+     * @param null|int|array $params
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException

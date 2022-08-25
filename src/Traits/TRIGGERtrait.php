@@ -137,7 +137,7 @@ trait TRIGGERtrait
      * Set calendar component property trigger
      *
      * @param null|string|Pc|DateTimeInterface|DateInterval $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

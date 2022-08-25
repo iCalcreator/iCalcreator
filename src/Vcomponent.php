@@ -44,7 +44,7 @@ abstract class Vcomponent extends CalendarComponent
      * Constructor for calendar component
      *
      * @overrides
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @throws Exception
      * @since  2.27.6 - 2018-12-28
      */

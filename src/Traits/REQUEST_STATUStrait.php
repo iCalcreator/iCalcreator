@@ -63,7 +63,7 @@ trait REQUEST_STATUStrait
     {
         return Requeststatus::format(
             self::REQUEST_STATUS,
-            $this->requeststatus,
+            $this->requeststatus ?? [],
             $this->getConfig( self::ALLOWEMPTY ),
             $this->getConfig( self::LANGUAGE )
         );
@@ -117,8 +117,8 @@ trait REQUEST_STATUStrait
      * Return array, all calendar component property requeststatus
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllRequeststatus( ? bool $inclParam = false ) : array
     {
@@ -142,7 +142,7 @@ trait REQUEST_STATUStrait
      * @param null|int|float|string|Pc $statCode 1*DIGIT 1*2("." 1*DIGIT)
      * @param null|int|string    $text
      * @param null|string    $extData
-     * @param null|mixed[]   $params
+     * @param null|array $params
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException

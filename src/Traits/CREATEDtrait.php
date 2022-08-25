@@ -109,7 +109,7 @@ trait CREATEDtrait
      * Set calendar component property created, 'now' in UTC if empty
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

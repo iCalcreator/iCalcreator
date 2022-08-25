@@ -106,7 +106,7 @@ trait ACTIONtrait
      * Set calendar component property action
      *
      * @param null|string|Pc   $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

@@ -111,7 +111,7 @@ class DateTimeZoneFactory
      * @param DateTimeZone|string $dateTimeZone
      * @param null|int $from
      * @param null|int $to
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @since  2.27.8 - 2019-01-22
      */
@@ -173,10 +173,7 @@ class DateTimeZoneFactory
         while( true ) {
             $dateX1 = $dateString[$ix];
             switch( true ) {
-                case ctype_digit( $dateX1 ) :
-                    $offset = $dateX1 . $offset;
-                    break;
-                case ( Util::$COLON === $dateX1 ) :
+                case ( ctype_digit( $dateX1 ) || ( Util::$COLON === $dateX1 )) :
                     $offset = $dateX1 . $offset;
                     break;
                 case DateIntervalFactory::hasPlusMinusPrefix( $dateX1 ) :
@@ -248,7 +245,7 @@ class DateTimeZoneFactory
         try {
             $tz = self::factory( $timeZoneString );
         }
-        catch( Exception $e ) {
+        catch( Exception ) {
             return false;
         }
         return empty( $tz->getOffset( DateTimeFactory::factory( null, $timeZoneString )));

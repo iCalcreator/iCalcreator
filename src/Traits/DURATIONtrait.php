@@ -132,7 +132,7 @@ trait DURATIONtrait
      * Set calendar component property duration
      *
      * @param null|string|Pc|DateInterval $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception

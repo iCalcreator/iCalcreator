@@ -102,7 +102,7 @@ trait SOURCErfc7986trait
      * Set calendar component property source
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03

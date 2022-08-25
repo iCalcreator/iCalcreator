@@ -88,7 +88,7 @@ final class Vevent extends V3component
     /**
      * Constructor
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @throws Exception
      * @since  2.41.53 - 2022-08-11
      */
@@ -102,7 +102,7 @@ final class Vevent extends V3component
     /**
      * Return Vevent object instance
      *
-     * @param null|mixed[] $config
+     * @param null|array $config
      * @param null|string|DateTimeInterface $dtstart
      * @param null|string|DateTimeInterface $dtend   one of dtend or duration
      * @param null|string|DateInterval $duration

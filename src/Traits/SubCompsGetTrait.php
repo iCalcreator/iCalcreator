@@ -89,8 +89,8 @@ trait SubCompsGetTrait
      *
      * @param string   $propName
      * @param bool     $multi       if prop may occur multiple times in component
-     * @param mixed[]  $subCompsData
-     * @param mixed[]  $lcArr
+     * @param array $subCompsData
+     * @param array $lcArr
      * @return void
      * @since 2.41.17 - 2022-02-18
      */

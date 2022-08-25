@@ -53,7 +53,7 @@ final class IntProperty extends PropertyBase
             return self::$SP0;
         }
         if(( ! isset( $pc->value ) || ( empty( $pc->value ) && ! is_numeric( $pc->value ))) &&
-            (( self::SEQUENCE !== $propName ) || ( 0 !== $pc->value ))){
+            (( self::SEQUENCE !== $propName ) || ( 0 !== $pc->value ))) {
             return self::createSinglePropEmpty( $propName, $allowEmpty );
         }
         return self::createElement( $propName, self::createParams( $pc->params ), (string) $pc->value );

@@ -107,7 +107,7 @@ trait TZURLtrait
      * in the Internet.
      *
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @since 2.41.36 2022-04-03
      */

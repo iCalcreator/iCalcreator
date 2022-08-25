@@ -57,7 +57,7 @@ trait RELATED_TOtrait
     {
         return MultiProps::format(
             self::RELATED_TO,
-            $this->relatedto,
+            $this->relatedto ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -110,8 +110,8 @@ trait RELATED_TOtrait
      * Return array, all calendar component property relatedto
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllRelatedto( ? bool $inclParam = false ) : array
     {
@@ -133,7 +133,7 @@ trait RELATED_TOtrait
      * Set calendar component property related-to
      *
      * @param null|string|Pc $value
-     * @param null|int|mixed[]   $params
+     * @param null|int|array $params
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException

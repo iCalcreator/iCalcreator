@@ -144,7 +144,7 @@ final class ComponentParser extends ParserBase
         $endTag   = $END . $compType;
         $endFound = false;
         $isParticipantCurrent = $isValarmCurrent = false;
-        foreach( $rows as $lix => $row ) {
+        foreach( $rows as $row ) {
             switch( true ) {
                 case str_starts_with( $row, $beginTag ) :  // begin:<thisComponent>
                     break;
@@ -306,8 +306,8 @@ final class ComponentParser extends ParserBase
     /**
      * Split multiple Attendees MEMBER/DELEGATED-TO/DELEGATED-FROM into array, if found
      *
-     * @param mixed[] $propAttr
-     * @return mixed[]
+     * @param array $propAttr
+     * @return array
      * @since  2.27.11 - 2019-01-04
      */
     public static function splitMultiParams( array $propAttr ) : array
@@ -329,8 +329,8 @@ final class ComponentParser extends ParserBase
      * Return type, value and parameters from parsed (Freebusy) row and propAttr
      *
      * @param string  $row
-     * @param mixed[] $propAttr
-     * @return mixed[]
+     * @param array $propAttr
+     * @return array
      * @since  2.41.54 - 2022-08-09
      */
     private static function parseFreebusy( string $row, array $propAttr ) : array
@@ -363,8 +363,8 @@ final class ComponentParser extends ParserBase
      * Return value and parameters from parsed row and propAttr
      *
      * @param string  $row
-     * @param mixed[] $propAttr
-     * @return mixed[]
+     * @param array $propAttr
+     * @return array
      * @since  2.27.11 - 2019-01-04
      */
     public static function parseRexdate( string $row, array $propAttr ) : array
@@ -390,7 +390,7 @@ final class ComponentParser extends ParserBase
      * Return (array) parsed rexrule string
      *
      * @param string $row
-     * @return mixed[]
+     * @return array
      * @since 2.27.3 - 2018-12-28
      */
     private static function parseRexrule( string $row ) : array
@@ -431,7 +431,7 @@ final class ComponentParser extends ParserBase
      * Return array, day rel pos number (opt) and day name abbr
      *
      * @param string $dayValueBase
-     * @return mixed[]
+     * @return array
      * @since  2.27.16 - 2019-03-03
      */
     private static function updateDayNoAndDayName( string $dayValueBase ) : array

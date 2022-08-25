@@ -65,7 +65,7 @@ trait RDATEtrait
     {
         return Rdate::format(
             self::RDATE,
-            $this->rdate,
+            $this->rdate ?? [],
             $this->getConfig( self::ALLOWEMPTY )
         );
     }
@@ -120,8 +120,8 @@ trait RDATEtrait
      * Return array, all calendar component property rdate
      *
      * @param null|bool   $inclParam
-     * @return Pc[]
-     * @since 2.41.51 2022-08-06
+     * @return array|Pc[]
+     * @since 2.41.58 2022-08-24
      */
     public function getAllRdate( ? bool $inclParam = false ) : array
     {
@@ -142,8 +142,8 @@ trait RDATEtrait
     /**
      * Set calendar component property rdate
      *
-     * @param null|string|Pc|mixed[]|DateTimeInterface $value
-     * @param null|int|mixed[] $params
+     * @param null|string|Pc|array|DateTimeInterface $value
+     * @param null|int|array $params
      * @param null|int         $index
      * @return static
      * @throws Exception
@@ -177,9 +177,9 @@ trait RDATEtrait
     /**
      * Return Rdates is single input
      *
-     * @param string|mixed[]|DateTimeInterface $rDates
+     * @param string|array|DateTimeInterface $rDates
      * @param bool $isPeriod
-     * @return string|mixed[]
+     * @return string|array
      * @throws Exception
      * @throws InvalidArgumentException
      * @since 2.41.57 2022-08-57

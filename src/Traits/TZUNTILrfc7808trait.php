@@ -109,7 +109,7 @@ trait TZUNTILrfc7808trait
      * Set calendar component property TZUNTIL, datetime UTC
      *
      * @param null|string|Pc|DateTimeInterface  $value
-     * @param null|mixed[]   $params
+     * @param null|array $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException

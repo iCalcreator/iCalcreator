@@ -30,10 +30,11 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use InvalidArgumentException;
+use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Vcalendar;
-use Kigkonsult\Icalcreator\CalendarComponent;
+use Kigkonsult\Icalcreator\Vevent;
 
 use function in_array;
 use function method_exists;
@@ -243,7 +244,7 @@ class CalAddressFactory
             try {
                 self::assertCalAddress( $propValue );
             }
-            catch( InvalidArgumentException $e ) {
+            catch( InvalidArgumentException ) {
                 continue;
             }
             if( ! in_array( $propValue, $output, true )) {
@@ -312,7 +313,7 @@ class CalAddressFactory
     /**
      * Return value and parameters cal-addresses from Vcalendar ATTENDEE property
      *
-     * @param CalendarComponent $component  iCalcreator Vcalendar component instance
+     * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
      * @since  2.41.36 - 2022-04-03
      */
@@ -358,7 +359,7 @@ class CalAddressFactory
     /**
      * Return value and parameters cal-addresses from Vcalendar ORGANIZER property
      *
-     * @param CalendarComponent $component  iCalcreator Vcalendar component instance
+     * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
      * @since  2.41.36 - 2022-04-03
      */
@@ -387,7 +388,7 @@ class CalAddressFactory
     /**
      * Return value and parameters cal-addresses from Vcalendar CONTACT property
      *
-     * @param CalendarComponent $component  iCalcreator Vcalendar component instance
+     * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
      * @since  2.29 - 2021-06-19
      */
@@ -405,7 +406,7 @@ class CalAddressFactory
             try {
                 self::assertCalAddress( $value );
             }
-            catch( InvalidArgumentException $e ) {
+            catch( InvalidArgumentException ) {
                 continue;
             }
             if( ! in_array( $value, $output, true )) {

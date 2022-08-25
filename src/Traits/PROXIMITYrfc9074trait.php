@@ -104,7 +104,7 @@ trait PROXIMITYrfc9074trait
      *
      * @since 2.23.12 - 2017-04-22
      * @param null|string|Pc   $value
-     * @param null|mixed[]  $params
+     * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.36 2022-04-03
