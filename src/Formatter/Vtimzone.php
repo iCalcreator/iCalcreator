@@ -76,9 +76,7 @@ final class Vtimzone extends FormatBase
             Property\Dt1Property::format(
                 self::TZUNTIL,
                 $source->getTzuntil( true ),
-                $allowEmpty,
-                false,
-                true
+                $allowEmpty
             ) .
             Property\Xproperty::format(
                 $source->getAllXprop( true ),

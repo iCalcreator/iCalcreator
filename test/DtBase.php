@@ -125,8 +125,6 @@ abstract class DtBase extends TestCase
                     $comp->{$setMethod}( $value, $params );
                     $getValue = $comp->{$getMethod}( true );
 
-// error_log( __METHOD__ . ' #' . $case . '  got  <' . $theComp . '>->' . $propName . ' value IN : ' . var_export( $getValue, true )); // test ###
-
                 } // end else
 
                 if( null !== $value ) {
@@ -197,6 +195,11 @@ abstract class DtBase extends TestCase
                     );
                 }
                 $pcInput = ! $pcInput;
+
+                if( IcalInterface::Z === substr( $expectedString, -1 )) {
+                    $this->parseCalendarTest( $case, $c, $expectedString, $theComp, $propName ); // test ###
+                }
+
             } // end foreach  .. => propName
         } // end foreach  comp => props
 

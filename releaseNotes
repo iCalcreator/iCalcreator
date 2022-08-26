@@ -263,3 +263,5 @@ v3.39   3.4 release candidate
 2.41.58   upd (Traits/) getAll-methods return type
 2.41.59   code clean up, phpdoc args etc
 2.41.60   setTzOffset conform logic
+
+2.41.61   GitHub#104 (TZUNTIL bug)
