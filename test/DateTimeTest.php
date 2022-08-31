@@ -1121,8 +1121,8 @@ class DateTimeTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime, $tz )
         ];
 
-
         // testing MS timezone
+
         [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
         $dateTime  = new DateTime( DATEYmd, DateTimeZoneFactory::factory( $phpTz ));
         $dataArr[] = [

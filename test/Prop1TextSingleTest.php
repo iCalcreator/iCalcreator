@@ -725,11 +725,11 @@ class Prop1TextSingleTest extends DtBase
     }
 
     /**
-     * Test Vevent/Vtodo GEO
+     * Test Vevent/Vtodo GEO (+ geoLocation)
      *
      * @test
      */
-    public function geoLocationTest4() : void
+    public function geoTest4() : void
     {
         $compProps = [
             IcalInterface::VEVENT,
@@ -755,6 +755,12 @@ class Prop1TextSingleTest extends DtBase
                     $latitude,
                     $longitude
                 );
+
+            $this->assertSame(
+                'GEO:+' . $latitude . ';+' . $longitude,
+                trim( $comp->createGeo())
+            );
+
             $getValue = explode( '/', $comp->getGeoLocation());
             $this->assertEquals(
                 $location,
@@ -773,6 +779,22 @@ class Prop1TextSingleTest extends DtBase
                 $tLong,
                 sprintf( self::$ERRFMT, null, 4, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
-        }
+
+            $comp->setgeo( 1.1, 2.2 );
+            $this->assertSame(
+                'GEO:+01.1;+2.2',
+                trim( $comp->createGeo())
+            );
+            $comp->setGeo( 0.0, 0.0 );
+            $this->assertSame(
+                'GEO:00;0',
+                trim( $comp->createGeo())
+            );
+            $comp->setGeo( -0.0, -0.0 );
+            $this->assertSame(
+                'GEO:00;0',
+                trim( $comp->createGeo())
+            );
+        } // end foreach
     }
 }

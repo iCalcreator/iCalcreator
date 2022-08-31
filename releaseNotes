@@ -265,3 +265,5 @@ v3.39   3.4 release candidate
 2.41.60   setTzOffset conform logic
 
 2.41.61   GitHub#104 (TZUNTIL bug)
+
+2.41.62   Geo/Version property (empty-)bug

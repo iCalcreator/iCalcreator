@@ -36,15 +36,15 @@ use function rtrim;
 /**
  * iCalcreator geo support class
  *
- * @since  2.27.4 - 2019-07-02
+ * @since  2.41.62 - 2022-08-28
  */
 class GeoFactory
 {
     /**
      * @var string  GEO vars: output format for geo latitude and longitude (before rtrim) etc
      */
-    public static string $geoLatFmt  = '%09.6f';
-    public static string $geoLongFmt = '%8.6f';
+    public static string $geoLatFmt  = '%s%09.6f';
+    public static string $geoLongFmt = '%s%8.6f';
 
     /**
      * Return formatted geo output
@@ -64,7 +64,7 @@ class GeoFactory
         return
             rtrim(
                 rtrim(
-                    $sign . sprintf( $format, abs( $ll )),
+                    sprintf( $format, $sign, abs( $ll )),
                     Util::$ZERO
                 ),
                 Util::$DOT

@@ -48,7 +48,7 @@ use function substr;
 use function trim;
 
 /**
- * @since 2.41.54 - 2022-08-00
+ * @since 2.41.62 2022-08-29
  */
 final class ComponentParser extends ParserBase
 {
@@ -203,7 +203,7 @@ final class ComponentParser extends ParserBase
      * Parse this properties
      *
      * @return void
-     * @since 2.41.9 2022-01-22
+     * @since 2.41.62 2022-08-29
      * @todo report invalid properties ??
      */
     private function parse3thisProperties() : void
@@ -265,7 +265,7 @@ final class ComponentParser extends ParserBase
                 case self::GEO :
                     $values = explode( self::$SEMIC, $value, 2 );
                     if( 2 > count( $values )) {
-                        $values[1] = null;
+                        $values[0] = $values[1] = null;
                     }
                     $this->subject->{$method}( $values[0], $values[1], $propAttr );
                     break;

@@ -139,6 +139,8 @@ trait REQUEST_STATUStrait
     /**
      * Set calendar component property request-status
      *
+     * Empty statCode/test not allowed
+     *
      * @param null|int|float|string|Pc $statCode 1*DIGIT 1*2("." 1*DIGIT)
      * @param null|int|string    $text
      * @param null|string    $extData

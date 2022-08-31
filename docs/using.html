@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.61 manual</title>
+    <title>iCalcreator 2.41.62 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.61">
+<meta name="description" content="using iCalcreator v2.41.62">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.61</p>
+<p class="header">iCalcreator v2.41.62</p>
 <p>
-iCalcreator v2.41.61<br>
+iCalcreator v2.41.62<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -369,12 +369,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.61/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.62/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.61</dt>
+    <dt>v2.41.62</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +383,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.61 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.62 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -514,7 +514,8 @@ Here are update headlines in this version.
         GitHub#103 (non-PHP timezones)<br>
         Note Vtimezone::TZID property still accepts any timezone<br>
         RegulateTimezoneFactory deprecated<br>
-        code clean up, phpdoc args etc
+        code clean up, phpdoc args etc<br>
+        Geo/Version property (empty-)bug
     </li>
 
 </ul>
@@ -709,7 +710,7 @@ $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
     <dd><a href="#RELATED-TO">3.2.41 RELATED-TO</a>
     <dd><a href="#REPEAT">3.2.42 REPEAT</a>
     <dd><a href="#REQUEST-STATUS">3.2.43 REQUEST-STATUS</a>
-    <dd><a href="#RESOURCE-TYPE">3.2.42 RESOURCE-TYPE</a>
+    <dd><a href="#RESOURCE-TYPE">3.2.44 RESOURCE-TYPE</a>
     <dd><a href="#RESOURCES">3.2.45 RESOURCES</a>
     <dd><a href="#RRULE">3.2.46 RRULE</a>
     <dd><a href="#SEQUENCE">3.2.47 SEQUENCE</a>
@@ -3578,7 +3579,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.61//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.62//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -4105,7 +4106,7 @@ Input string dates with timezone should have a space character between datePart 
     <a href="#VCALENDAR">VCALENDAR</a>
     <a href="#CALSCALE">CALSCALE</a>,
     <a href="#METHOD">METHOD</a> and
-    <a href="#VERSION">VERSION</a>)
+    <a href="#VERSION">VERSION</a>) 
     properties value and parameters
     are stored in a (class) Pc instance,
     changed from a PHP type array to an somewhat restricted ArrayObject extend class, Pc.
@@ -8532,10 +8533,10 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 </p>
 <p class="label">Format</p>
 <p class="format">calendarComponent::setRequeststatus(
-    statcode,
-    statdesc
-  [,extdata/false
-  [,params [,propOrderNo]]]
+    statcode<sup>1</sup>,
+    statdesc<sup>2</sup>
+  [,extdata<sup>3</sup>
+  [,params<sup>4</sup> [,propOrderNo]]]
 )
 </p>
 <p class="comment">statcode<sup>1</sup>   = Hierarchical, numeric return status code (1*DIGIT &quot;.&quot; 1*DIGIT 1*DIGIT)
@@ -8560,7 +8561,7 @@ $vfreebusy-&gt;setRequeststatus(
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#Calendar_component_object_property_function_list">[up]</a>
 
 
-<a id="RESOURCE-TYPE"></a><h3>3.2.42 RESOURCE-TYPE</h3>
+<a id="RESOURCE-TYPE"></a><h3>3.2.44 RESOURCE-TYPE</h3>
 <p class="quotes">RESOURCE-TYPE specifies the type of resource</p>
 <p>As described in</p>
 <dl>
@@ -11486,7 +11487,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.61
+<tr><td>Version  <td>2.41.62
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

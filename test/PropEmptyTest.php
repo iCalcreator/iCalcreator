@@ -228,6 +228,7 @@ class PropEmptyTest extends DtBase
 
         $o10 = $c->newVevent()
             ->setXprop( 'X-12-vevent4-empty' );
+
         $o11 = $o10->newParticipant()
             ->setParticipanttype()
             ->setCalendaraddress()
@@ -251,6 +252,7 @@ class PropEmptyTest extends DtBase
             ->setRelatedto()
             ->setResources()
             ->setXprop( 'X-13-vevent4-participant1-empty' );
+
         $o12 = $o11->newVlocation()
             ->setDescription()
             ->setGeo()
@@ -258,6 +260,7 @@ class PropEmptyTest extends DtBase
             ->setName()
             ->setStructureddata()
             ->setXprop( 'X-14-vevent4-participant1-vlocation1-empty' );
+
         $o13 = $o11->newVresource()
             ->setDescription()
             ->setGeo()
@@ -265,6 +268,7 @@ class PropEmptyTest extends DtBase
             ->setResourcetype()
             ->setStructureddata()
             ->setXprop( 'X-15-vevent4-participant1-vresource1-empty' );
+
         $o14 = $o10->newVlocation()
             ->setDescription()
             ->setGeo()
@@ -272,6 +276,7 @@ class PropEmptyTest extends DtBase
             ->setName()
             ->setStructureddata()
             ->setXprop( 'X-16-vevent4-vlocation1-empty' );
+
         $o15 = $o10->newVresource()
             ->setDescription()
             ->setGeo()

@@ -39,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * GEO property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.62 2022-08-28
  */
 trait GEOtrait
 {
@@ -129,7 +129,7 @@ trait GEOtrait
      * @param null|int|float|string $longitude
      * @param null|array $params
      * @return static
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.62 2022-08-28
      */
     public function setGeo(
         null|int|float|string|Pc $latitude = null,
@@ -137,20 +137,20 @@ trait GEOtrait
         ? array $params = []
     ) : static
     {
-        if( empty( $latitude )) {
-            $this->assertEmptyValue( $latitude, self::GEO );
-            $this->geo = Pc::factory();
-            return $this;
-        }
-        if( $latitude instanceof Pc ) {
-            $value = clone $latitude;
-        }
-        else {
-            $value = Pc::factory(
-                [ self::LATITUDE  => (float) $latitude, self::LONGITUDE => (float) $longitude ],
-                ParameterFactory::setParams( $params )
-            );
-        }
+        switch( true ) {
+            case ( null === $latitude ) :
+                $this->assertEmptyValue( $latitude, self::GEO );
+                $this->geo = Pc::factory();
+                return $this;
+            case ( $latitude instanceof Pc ) :
+                $value = clone $latitude;
+                break;
+            default :
+                $value = Pc::factory(
+                    [ self::LATITUDE  => (float) $latitude, self::LONGITUDE => (float) $longitude ],
+                    ParameterFactory::setParams( $params )
+                );
+        } // end switch
         $this->geo = $value;
         return $this;
     }

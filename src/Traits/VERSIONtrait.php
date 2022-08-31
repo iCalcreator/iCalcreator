@@ -35,7 +35,7 @@ use Kigkonsult\Icalcreator\Formatter\Property\CalMetProVer;
 /**
  * VERSION property functions
  *
- * @since 2.29.14 2019-09-03
+ * @since 2.41.62 2022-08-29
  */
 trait VERSIONtrait
 {
@@ -75,10 +75,14 @@ trait VERSIONtrait
      * @param string $value
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.29.14 2019-09-03
+     * @since 2.41.62 2022-08-29
      */
     public function setVersion( string $value ) : static
     {
+        static $ERRMSG = 'Empty Version value not allowed';
+        if( empty( $value )) {
+            throw new InvalidArgumentException( $ERRMSG );
+        }
         $this->version = $value;
         return $this;
     }
