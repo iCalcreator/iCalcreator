@@ -73,7 +73,7 @@ class ValarmTest extends DtBase
                 $uid,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . $uid
+            Property::formatParams( self::$STCPAR ) . ':' . $uid
         ];
 
         // RELATED-TO
@@ -99,7 +99,7 @@ class ValarmTest extends DtBase
                 $uid,
                 $params
             ),
-            Property::createParams( $params ) . ':' . $uid
+            Property::formatParams( $params ) . ':' . $uid
         ];
 
         // ACKNOWLEDGED
@@ -113,7 +113,7 @@ class ValarmTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) .
+            Property::formatParams( self::$STCPAR ) .
                 $this->getDateTimeAsCreateLongString( $value, IcalInterface::UTC )
         ];
 
@@ -141,7 +141,7 @@ class ValarmTest extends DtBase
 
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . $value
+            Property::formatParams( self::$STCPAR ) . ':' . $value
         ];
 
         // TRIGGER
@@ -167,7 +167,7 @@ class ValarmTest extends DtBase
                 DateIntervalFactory::factory( $value ),
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . $value
+            Property::formatParams( self::$STCPAR ) . ':' . $value
         ];
 
         // DURATION
@@ -193,7 +193,7 @@ class ValarmTest extends DtBase
                 DateIntervalFactory::factory( $value ),
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . $value
+            Property::formatParams( self::$STCPAR ) . ':' . $value
         ];
 
         // REPEAT
@@ -219,7 +219,7 @@ class ValarmTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . $value
+            Property::formatParams( self::$STCPAR ) . ':' . $value
         ];
 
         // ATTACH
@@ -248,7 +248,7 @@ class ValarmTest extends DtBase
             $value,
             $params,
             $getValue,
-            Property::createParams( $params ) . ':' . $value
+            Property::formatParams( $params ) . ':' . $value
         ];
 
         // ATTACH
@@ -264,7 +264,7 @@ class ValarmTest extends DtBase
             $value,
             $params,
             $getValue,
-            Property::createParams( $params ) . ':' . $value
+            Property::formatParams( $params ) . ':' . $value
         ];
 
         // DESCRIPTION
@@ -294,7 +294,7 @@ class ValarmTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams(
+            Property::formatParams(
                 $params,
                 [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ]
             ) . ':' . $value
@@ -322,7 +322,7 @@ class ValarmTest extends DtBase
                 IcalInterface::ARRIVE,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) . ':' . IcalInterface::ARRIVE
+            Property::formatParams( self::$STCPAR ) . ':' . IcalInterface::ARRIVE
         ];
 
         // STYLED-DESCRIPTION
@@ -357,7 +357,7 @@ class ValarmTest extends DtBase
                 $value,
                 $params2
             ),
-            Property::createParams(
+            Property::formatParams(
                 $params2,
                 [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ]
             ) . ':' . $value
@@ -379,7 +379,7 @@ class ValarmTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams(
+            Property::formatParams(
                 $params,
                 [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ]
             ) . ':' . $value
@@ -412,7 +412,7 @@ class ValarmTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams(
+            Property::formatParams(
                 $params,
                 [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ]
             ) . ':' . $value
@@ -477,7 +477,7 @@ class ValarmTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams(
+            Property::formatParams(
                 $params,
                 [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ]
             ) . ':' . $value

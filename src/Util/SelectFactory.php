@@ -34,7 +34,12 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
+use Kigkonsult\Icalcreator\Vavailability;
 use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\Vevent;
+use Kigkonsult\Icalcreator\Vfreebusy;
+use Kigkonsult\Icalcreator\Vjournal;
+use Kigkonsult\Icalcreator\Vtodo;
 use RuntimeException;
 
 use function array_change_key_case;
@@ -502,14 +507,14 @@ class SelectFactory
     }
 
     /**
-     * @param CalendarComponent $component
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param array $result
      * @param DateTimeInterface $date
      * @param null|string $compUID
      * @return void
      */
     private static function nonFlatAppend(
-        CalendarComponent $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         array & $result,
         DateTimeInterface $date,
         ? string $compUID = ''
@@ -607,7 +612,7 @@ class SelectFactory
     /**
      * Get all EXRULE dates (multiple values allowed)
      *
-     * @param CalendarComponent $component
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param array $exdateList
      * @param string            $dtStartTz
      * @param UtilDateTime      $compStart
@@ -615,10 +620,10 @@ class SelectFactory
      * @param UtilDateTime      $workEnd
      * @param string            $compStartHis
      * @throws Exception
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
     private static function getAllEXRULEdates(
-        CalendarComponent $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         array & $exdateList,
         string $dtStartTz,
         UtilDateTime $compStart,
@@ -627,6 +632,9 @@ class SelectFactory
         string $compStartHis
     ) : void
     {
+        if( in_array( $component->getCompType(), [ Vcalendar::VAVAILABILITY, Vcalendar::VFREEBUSY ], true )) {
+            return;
+        }
         if( false !== ( $prop = $component->getExrule( true ))) {
             $isValueDate = $prop->hasParamValue( Vcalendar::DATE );
             if( isset( $prop->value[Vcalendar::UNTIL] ) && ! $isValueDate ) {
@@ -654,18 +662,21 @@ class SelectFactory
     /**
      * Get all EXDATE dates (multiple values allowed)
      *
-     * @param CalendarComponent $component
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param array $exdateList
      * @param string            $dtStartTz
      * @throws Exception
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
     private static function getAllEXDATEdates(
-        CalendarComponent $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         array & $exdateList,
         string $dtStartTz
     ) : void
     {
+        if( in_array( $component->getCompType(), [ Vcalendar::VAVAILABILITY, Vcalendar::VFREEBUSY ], true )) {
+            return;
+        }
         while( false !== ( $prop = $component->getExdate( null, true ))) {
             foreach( $prop->value as $exdate ) {
                 $exdate = UtilDateTime::factory( $exdate, $prop->params, $dtStartTz );
@@ -677,7 +688,7 @@ class SelectFactory
     /**
      * Update $recurList all RRULE dates (multiple values allowed)
      *
-     * @param CalendarComponent $component
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param array $recurList
      * @param string            $dtStartTz
      * @param UtilDateTime      $compStart
@@ -687,10 +698,10 @@ class SelectFactory
      * @param array $exdateList
      * @param null|DateInterval $compDuration
      * @throws Exception
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
     private static function getAllRRULEdates(
-        CalendarComponent $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         array & $recurList,
         string $dtStartTz,
         UtilDateTime $compStart,
@@ -701,6 +712,9 @@ class SelectFactory
         ? DateInterval $compDuration = null
     ) : void
     {
+        if( in_array( $component->getCompType(), [ Vcalendar::VAVAILABILITY, Vcalendar::VFREEBUSY ], true )) {
+            return;
+        }
         $exdateYmdList = self::getYmdList( $exdateList );
         $recurYmdList  = self::getYmdList( $recurList );
         if( false !== ( $prop = $component->getRrule( true ))) {
@@ -734,20 +748,20 @@ class SelectFactory
     /**
      * Update $recurList with RDATE dates (overwrite if exists)
      *
-     * @param CalendarComponent $component
-     * @param array $recurList
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
+     * @param array             $recurList
      * @param string            $dtStartTz
      * @param UtilDateTime      $workStart
      * @param UtilDateTime      $fcnEnd
      * @param string            $format
-     * @param array $exdateList
+     * @param array             $exdateList
      * @param string            $compStartHis
      * @param null|DateInterval $compDuration
      * @throws Exception
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
     private static function getAllRDATEdates(
-        CalendarComponent $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         array & $recurList,
         string $dtStartTz,
         UtilDateTime $workStart,
@@ -758,10 +772,13 @@ class SelectFactory
         ? DateInterval $compDuration = null
     ) : void
     {
+        if( in_array( $component->getCompType(), [ Vcalendar::VAVAILABILITY, Vcalendar::VFREEBUSY ], true )) {
+            return;
+        }
         $exdateYmdList = self::getYmdList( $exdateList );
         $recurYmdList  = self::getYmdList( $recurList );
         while( false !== ( $prop = $component->getRdate( null, true ))) {
-            $rDateFmt = $prop->getParams( Vcalendar::VALUE ) ?? Vcalendar::DATE_TIME;
+            $rDateFmt = $prop->getValueParam() ?? Vcalendar::DATE_TIME;
             // DATE or PERIOD
             foreach( $prop->value as $theRdate ) {
                 if( Vcalendar::PERIOD === $rDateFmt ) {            // all days within PERIOD
@@ -947,33 +964,36 @@ class SelectFactory
     /**
      * Return comp end date(time) from dtend/due/duration properties
      *
-     * @param CalendarComponent $component
+     * @param Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param string            $dtStartTz
      * @return null|UtilDateTime
      * @throws Exception
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
-    private static function getCompEndDate( CalendarComponent $component, string $dtStartTz ) : null | UtilDateTime
+    private static function getCompEndDate(
+        Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
+        string $dtStartTz
+    ) : null | UtilDateTime
     {
         static $MINUS1DAY = '-1 day';
-        $prop = null;
+        $prop     = null;
         $compType = $component->getCompType();
-        $isFreebusyCompType = ( Vcalendar::VFREEBUSY === $compType );
-        $isVtodoCompType    = ( Vcalendar::VTODO === $compType );
-        $isVeventCompType   = ( Vcalendar::VEVENT === $compType );
-        if(( $isVeventCompType || $isFreebusyCompType ) &&
+        $isVavailabilty = ( Vcalendar::VAVAILABILITY === $compType );
+        $isVevent       = ( Vcalendar::VEVENT === $compType );
+        $isVfreebusy    = ( Vcalendar::VFREEBUSY === $compType );
+        if(( $isVavailabilty || $isVevent || $isVfreebusy ) &&
           ( false !== ( $prop = $component->getDtend( true )))) {
             $compEnd = UtilDateTime::factory( $prop->value, $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DTENDEXIST] = true;
         }
         if( empty( $prop ) &&
-            $isVtodoCompType &&
+            ( Vcalendar::VTODO === $compType ) &&
             ( false !== ( $prop = $component->getDue( true )))) {
             $compEnd = UtilDateTime::factory( $prop->value,  $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DUEEXIST] = true;
         }
-        if( empty( $prop ) && // duration in dtend (array) format
-            ( $isVeventCompType || $isVtodoCompType ) &&
+        if( empty( $prop ) && // duration in dtend format
+            ( Vcalendar::VJOURNAL !== $compType ) &&
             ( false !== ( $prop = $component->getDuration( true, true )))) {
             $compEnd = UtilDateTime::factory( $prop->value, $prop->params, $dtStartTz );
             $compEnd->SCbools[self::$DURATIONEXIST] = true;
@@ -1027,16 +1047,19 @@ class SelectFactory
     /**
      * Update recurr-id-comps properties summary, description and comment if missing
      *
-     * @param CalendarComponent $component     (Vevent/Vtodo/Vjournal)
+     * @param Vavailability|Vevent/Vtodo|Vjournal|Vfreebusy $component
      * @param array $recurIdComps
-     * @since 2.41.36 - 2022-04-03
+     * @since 2.41.64 - 2022-09-03
      */
-    private static function updateRecurrIdComps( CalendarComponent $component, array $recurIdComps ) : void
+    private static function updateRecurrIdComps(
+        Vavailability|Vevent|Vtodo|Vjournal|Vfreebusy $component,
+        array $recurIdComps
+    ) : void
     {
         if( empty( $recurIdComps )) {
             return;
         }
-        if( Vcalendar::VFREEBUSY === $component->getCompType()) {
+        if( in_array( $component->getCompType(), [ Vcalendar::VAVAILABILITY, Vcalendar::VFREEBUSY ], true  )) {
             return;
         }
         $summary     = $component->getSummary( true );

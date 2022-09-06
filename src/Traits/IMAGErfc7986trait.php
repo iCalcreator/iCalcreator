@@ -38,7 +38,7 @@ use function sprintf;
 /**
  * IMAGE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @ince 2.41.63 - 2022-09-03
  */
 trait IMAGErfc7986trait
 {
@@ -134,6 +134,7 @@ trait IMAGErfc7986trait
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
+     * @ince 2.41.63 - 2022-09-03
      */
     public function setImage(
         null|string|Pc $value = null,
@@ -148,16 +149,17 @@ trait IMAGErfc7986trait
             self::setMval( $this->image, $value->setEmpty(), $index );
             return $this;
         }
+        $inputValueParam = $value->getValueParam();
         switch( true ) {
             case $value->hasParamKey( self::ENCODING ) :
                 $value->addParamValue( self::BINARY );
                 break;
-            case ! $value->hasParamKey( self::VALUE ) :
+            case empty( $inputValueParam ) :
                 $value->addParamValue( self::URI );
                 break;
-            case ( self::URI === $value->getParams( self::VALUE )) :
+            case ( self::URI === $inputValueParam ) :
                 break;
-            case ( self::BINARY === $value->getParams( self::VALUE )) :
+            case ( self::BINARY === $inputValueParam ) :
                 $value->addParam( self::ENCODING, self::BASE64 );
                 break;
             default :

@@ -117,7 +117,7 @@ trait DUEtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.63 2022-09-03
      */
     public function setDue( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
@@ -132,7 +132,7 @@ trait DUEtrait
         $dtstart = $this->getDtstart( true );
         if( $this->isDtstartSet()) {
             if( $dtstart->hasParamValue()) {
-                $value->addParamValue( $dtstart->getParams( self::VALUE ));
+                $value->addParamValue( $dtstart->getValueParam());
             }
             if( $dtstart->hasParamKey( self::ISLOCALTIME )) {
                 $value->addParam( self::ISLOCALTIME, true );

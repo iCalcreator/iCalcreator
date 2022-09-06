@@ -86,7 +86,7 @@ class IntegerTest extends DtBase
                 0,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) .
+            Property::formatParams( self::$STCPAR ) .
             ':0'
         ];
 
@@ -105,7 +105,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) .
+            Property::formatParams( self::$STCPAR ) .
             ':' . $value
         ];
 
@@ -121,7 +121,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) .
+            Property::formatParams( self::$STCPAR ) .
             ':' . $value
         ];
 
@@ -137,7 +137,7 @@ class IntegerTest extends DtBase
                 $value,
                 self::$STCPAR
             ),
-            Property::createParams( self::$STCPAR ) .
+            Property::formatParams( self::$STCPAR ) .
             ':' . $value
         ];
 

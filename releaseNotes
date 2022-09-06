@@ -267,3 +267,8 @@ v3.39   3.4 release candidate
 2.41.61   GitHub#104 (TZUNTIL bug)
 
 2.41.62   Geo/Version property (empty-)bug
+
+2.41.63   new Pc::getValueParam() method
+          upd Property parameters format logic
+
+2.41.64   SelectFactory method argument typing

@@ -50,10 +50,10 @@ final class Geo extends PropertyBase
     {
         return match( true ) {
             empty( $pc )        => self::$SP0,
-            empty( $pc->value ) => self::createSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::createElement(
+            empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
+            default             => self::renderProperty(
                 self::GEO,
-                self::createParams( $pc->params ),
+                self::formatParams( $pc->params ),
                 GeoFactory::geo2str2( $pc->value[self::LATITUDE], GeoFactory::$geoLatFmt ) .
                 self::$SEMIC .
                 GeoFactory::geo2str2( $pc->value[self::LONGITUDE], GeoFactory::$geoLongFmt )

@@ -46,7 +46,7 @@ use function trim;
 /**
  * iCalcreator attendee support class
  *
- * @since 2022-01-31 2.41.15
+ * @since  2022-09-05 - 2.41.63
  */
 class CalAddressFactory
 {
@@ -424,7 +424,7 @@ class CalAddressFactory
      * @param bool|string $lang  bool false if not config lang found
      * @return string[]
      * @throws InvalidArgumentException
-     * @since  2.39 - 2021-06-17
+     * @since  2022-09-05 - 2.41.63
      */
     public static function inputPrepAttendeeParams(
         array $params,
@@ -440,9 +440,10 @@ class CalAddressFactory
                 continue;
             }
             $params2[$pLabel] = match( $pLabel ) {
+                IcalInterface::EMAIL   => self::prepEmail( $pValue ),
                 IcalInterface::MEMBER, IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM
                                        => self::prepInputMDtDf((array) $pValue ),
-                IcalInterface::EMAIL   => self::prepEmail( $pValue ),
+                IcalInterface::ORDER   => $pValue,
                 IcalInterface::SENT_BY => self::prepSentBy( $pValue ),
                 default                => trim( $pValue, StringFactory::$QQ ),
             }; // end match( $pLabel.. .

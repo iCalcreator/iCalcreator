@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 use Kigkonsult\Icalcreator\IcalInterface;
 
 use function array_change_key_case;
-use function ctype_digit;
 use function in_array;
 use function is_int;
 use function is_string;
@@ -99,9 +98,9 @@ abstract class PropertyBase implements IcalInterface
      * @param null|string $attributes property attributes
      * @param null|string $content    property content
      * @return string
-     * @since  2.22.20 - 2017-01-30
+     * @since 2.41.63 2022-09-05
      */
-    public static function createElement(
+    public static function renderProperty(
         string $label,
         ? string $attributes = null,
         ? string $content = null
@@ -121,10 +120,11 @@ abstract class PropertyBase implements IcalInterface
      * @param string $propName
      * @param null|bool $allowEmpty
      * @return string
+     * @since 2.41.63 2022-09-05
      */
-    protected static function createSinglePropEmpty( string $propName, ? bool $allowEmpty = true ) : string
+    protected static function renderSinglePropEmpty( string $propName, ? bool $allowEmpty = true ) : string
     {
-        return $allowEmpty ? self::createElement( $propName ) : self::$SP0;
+        return $allowEmpty ? self::renderProperty( $propName ) : self::$SP0;
     }
 
     /**
@@ -134,85 +134,50 @@ abstract class PropertyBase implements IcalInterface
      * @param null|string[]    $ctrKeys
      * @param null|bool|string $lang  bool false if config lang not found
      * @return string
-     * @since 2.41.4 2022-01-18
+     * @since 2.41.63 2022-09-05
      */
-    public static function createParams(
+    public static function formatParams(
         array $inputParams,
         ? array $ctrKeys = [],
         null|bool|string $lang = null
     ) : string
     {
-        static $FMTFMTTYPE = ';FMTTYPE=%s%s';
-        static $FMTKEQV    = '%s=%s';
-        static $FMTQTD     = ';%s=%s%s%s';
-        static $FMTCMN     = ';%s=%s';
-        static $KEYGRP1    = [ self::VALUE, self::TZID, self::RANGE, self::RELTYPE ];
-        static $KEYGRP2    = [ self::DIR, self::ALTREP ];
-        static $KEYGRP3    = [ self::SENT_BY, self::DISPLAY, self::FEATURE, self::LABEL ];
+        static $KEYGRP1 = [ self::TZID, self::RANGE, self::RELTYPE ];
+        static $KEYGRP3 = [ self::SENT_BY, self::FEATURE, self::LABEL ];
         if( isset( $inputParams[self::ISLOCALTIME ] )) {
             unset( $inputParams[self::ISLOCALTIME ] );
         }
         if( empty( $inputParams ) && empty( $ctrKeys ) && empty( $lang )) {
             return self::$SP0;
         }
-        $attrLANG       = $attr1 = $attr2 = self::$SP0;
-        $hasCNattrKey   = in_array( self::CN, $ctrKeys, true );
-        $hasLANGattrKey = in_array( self::LANGUAGE, $ctrKeys, true );
-        $CNattrExist    = false;
+        $attrLANG = $output = self::$SP0;
+        $hasLANGctrKey = in_array( self::LANGUAGE, $ctrKeys, true );
+        $CNattrExist   = false;
         [ $params, $xparams ] = self::quoteParams( $inputParams );
-        foreach( $xparams as $paramKey => $paramValue ) {
-            $attr2 .= self::$SEMIC;
-            $attr2 .= ( ctype_digit((string) $paramKey )) // ??
-                ? $paramValue
-                : sprintf( $FMTKEQV, $paramKey, $paramValue );
+        if( isset( $params[self::VALUE] ) && ! in_array( self::VALUE, $ctrKeys, true )) {
+            $output .= self::renderParam( self::VALUE, $params );
+            $output .= self::renderParam( self::ENCODING, $params );
         }
-        if( isset( $params[self::FMTTYPE] ) && // as defined in Section 4.2 of RFC4288
-            ! in_array( self::FMTTYPE, $ctrKeys, true )) { // ATTACH/IMAGE
-            $attr1 .= sprintf( $FMTFMTTYPE, $params[self::FMTTYPE], $attr2 );
-            $attr2 = self::$SP0;
-            unset( $params[self::FMTTYPE] );
-        }
-        if( isset( $params[self::ENCODING] ) &&
-            ! in_array( self::ENCODING, $ctrKeys, true )) {
-            if( ! empty( $attr2 )) {
-                $attr1 .= $attr2;
-                $attr2 = self::$SP0;
-            }
-            $attr1 .= sprintf( $FMTCMN, self::ENCODING, $params[self::ENCODING] );
-            unset( $params[self::ENCODING] );
-        }
-        foreach( $KEYGRP1 as $key ) { // VALUE, TZID, RANGE, RELTYPE
-            if( isset( $params[$key] ) && ! in_array( $key, $ctrKeys, true )) {
-                $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
-                unset( $params[$key] );
+        foreach( $KEYGRP1 as $key ) { // TZID, RANGE, RELTYPE
+            if( ! in_array( $key, $ctrKeys, true )) {
+                $output .= self::renderParam( $key, $params );
             }
         } // end foreach
-        if( isset( $params[self::CN] ) && $hasCNattrKey ) {
-            $attr1      .= sprintf( $FMTCMN, self::CN, $params[self::CN] );
+        if( in_array( self::CN, $ctrKeys, true ) && isset( $params[self::CN] )) {
+            $output .= self::renderParam( self::CN, $params );
             $CNattrExist = true;
-            unset( $params[self::CN] );
         }
-        foreach( $KEYGRP2 as $key ) { // DIR, ALTREP
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
-                $delim  = str_contains( $params[$key], self::$QQ )
-                    ? self::$SP0
-                    : self::$QQ;
-                $attr1 .= sprintf( $FMTQTD, $key, $delim, $params[$key], $delim );
-                unset( $params[$key] );
+        foreach( $KEYGRP3 as $key ) { // SENT_BY, FEATURE, LABEL
+            if( in_array( $key, $ctrKeys, true )) {
+                $output .= self::renderParam( $key, $params );
             }
         } // end foreach
-        foreach( $KEYGRP3 as $key ) { // SENT_BY, DISPLAY, FEATURE, LABEL
-            if( isset( $params[$key] ) && in_array( $key, $ctrKeys, true )) {
-                $attr1 .= sprintf( $FMTCMN, $key, $params[$key] );
-                unset( $params[$key] );
-            }
-        } // end foreach
-        if( isset( $params[self::LANGUAGE] ) && $hasLANGattrKey ) {
-            $attrLANG .= sprintf( $FMTCMN, self::LANGUAGE, $params[self::LANGUAGE] );
-            unset( $params[self::LANGUAGE] );
+        if( $hasLANGctrKey && isset( $params[self::LANGUAGE] )) {
+            $attrLANG .= self::renderParam( $key, $params );
         }
-        elseif(( $CNattrExist || $hasLANGattrKey ) && is_string( $lang ) && ! empty( $lang )) {
-            $attrLANG .= sprintf( $FMTCMN, self::LANGUAGE, $lang );
+        elseif(( $CNattrExist || $hasLANGctrKey ) && is_string( $lang ) && ! empty( $lang )) {
+            $langArr   = [ self::LANGUAGE => $lang ];
+            $attrLANG .= self::renderParam( self::LANGUAGE, $langArr );
         }
         if( isset( $params[self::DERIVED] )) {
             if( self::FALSE === $params[self::DERIVED] ) {
@@ -225,20 +190,49 @@ abstract class PropertyBase implements IcalInterface
                 );
             }
         } // end if
-        if( isset( $params[self::ORDER] )) {
-            if( ! is_int( $params[self::ORDER] )) {
-                $params[self::ORDER] = (int) $params[self::ORDER];
-            }
-            if( 1 > $params[self::ORDER] ) {
-                $params[self::ORDER] = 1;
-            }
-        } // end if
+        if( isset( $params[self::VALUE] )) {
+            $output .= self::renderParam( self::VALUE, $params );
+            $output .= self::renderParam( self::ENCODING, $params );
+        }
+        foreach( $ctrKeys as $ctrKey ) { // ctrKeys in order
+            $output .= self::renderParam( $ctrKey, $params );
+        }
         if( ! empty( $params )) { // accept other or iana-token (Other IANA-registered) parameter types, last
             foreach( $params as $paramKey => $paramValue ) {
-                $attr1 .= sprintf( $FMTCMN, $paramKey, $paramValue );
+                $output .= self::renderParam( $paramKey, $params );
             }
         }
-        return $attr1 . $attrLANG . $attr2;
+        $output .= $attrLANG;
+        foreach( $xparams as $paramKey => $paramValue ) { // x-params last
+            $output .= self::renderParam( $paramKey, $params );
+        }
+        return $output;
+    }
+
+    /**
+     * Return rendered parameter (if exists)
+     *
+     * @param string $paramKey
+     * @param array $params
+     * @return string
+     */
+    protected static function renderParam( string $paramKey, array & $params ) : string
+    {
+        static $DIRALTR = [ self::DIR, self::ALTREP ];
+        static $FMTCMN  = ';%s=%s';
+        static $FMTQTD  = ';%s=%s%s%s';
+        if( ! isset( $params[$paramKey] )) {
+            return self::$SP0;
+        } // end if
+        if( in_array( $paramKey, $DIRALTR, true )) {
+            $delim  = str_contains( $params[$paramKey], self::$QQ ) ? self::$SP0 : self::$QQ;
+            $output = sprintf( $FMTQTD, $paramKey, $delim, $params[$paramKey], $delim );
+        }
+        else {
+            $output = sprintf( $FMTCMN, $paramKey, $params[$paramKey] );
+        }
+        unset( $params[$paramKey] );
+        return $output;
     }
 
     /**
@@ -248,6 +242,7 @@ abstract class PropertyBase implements IcalInterface
      *
      * @param array $inputParams
      * @return array[]
+     * @since 2.41.63 2022-09-05
      */
     protected static function quoteParams( array $inputParams ) : array
     {
@@ -260,17 +255,12 @@ abstract class PropertyBase implements IcalInterface
                 ! in_array( $paramKey, $DFKEYS, true )) { // DISPLAY, FEATURE
                 $paramValue = sprintf( $FMTQ, $paramValue );
             }
-            switch( true ) {
-                case ctype_digit((string) $paramKey ) : // ??
-                    $xparams[] = $paramValue;
-                    break;
-                case self::isXprefixed( $paramKey ) :
-                    $xparams[$paramKey] = $paramValue;
-                    break;
-                default :
-                    $params[$paramKey] = $paramValue;
-                    break;
-            } // end switch
+            if( self::isXprefixed( $paramKey )) {
+                $xparams[$paramKey] = $paramValue;
+            }
+            else {
+                $params[$paramKey] = $paramValue;
+            }
         } // end foreach
         ksort( $xparams, SORT_STRING );
         return [ $params, $xparams ];
@@ -285,17 +275,20 @@ abstract class PropertyBase implements IcalInterface
      *
      * Also ' is encoded into ^' (U+005E, U+0027), NOT rfc6868
      *
-     * @param string $value
+     * @param int|string $value
      * @return string
-     * @since 2022-01-31 2.41.15
+     * @since 2.41.63 - 2022-09-05
      */
-    public static function circumflexQuoteInvoke( string $value ) : string
+    public static function circumflexQuoteInvoke( int|string $value ) : string
     {
         static $CFN        = '^n';
         static $CFCF       = '^^';
         static $CFSQ       = "^'";
         static $CIRCUMFLEX = '^';
         static $NLCHARS    = '\n';
+        if( is_int( $value )) {
+            return (string) $value;
+        }
         $nlCharsExist = str_contains( $value, $NLCHARS );
         $cfCfExist    = str_contains( $value, $CIRCUMFLEX );
         $quotExist    = str_contains( $value, self::$QQ );

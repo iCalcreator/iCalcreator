@@ -75,7 +75,7 @@ class PropXTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams( $params ) . ':' . $value
+            Property::formatParams( $params ) . ':' . $value
         ];
 
         $propName  = 'X-ALARM-CNT';
@@ -99,7 +99,7 @@ class PropXTest extends DtBase
                 $value,
                 $params
             ),
-            Property::createParams( $params ) . ':' . $value
+            Property::formatParams( $params ) . ':' . $value
         ];
 
         return $dataArr;

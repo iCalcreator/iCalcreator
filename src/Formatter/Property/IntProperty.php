@@ -47,15 +47,23 @@ final class IntProperty extends PropertyBase
      * @param bool|null $allowEmpty
      * @return string
      */
-    public static function format( string $propName, null|bool|Pc $pc, ? bool $allowEmpty = true ) : string
+    public static function format(
+        string $propName,
+        null|bool|Pc $pc,
+        ? bool $allowEmpty = true
+    ) : string
     {
         if( empty( $pc )) {
             return self::$SP0;
         }
         if(( ! isset( $pc->value ) || ( empty( $pc->value ) && ! is_numeric( $pc->value ))) &&
             (( self::SEQUENCE !== $propName ) || ( 0 !== $pc->value ))) {
-            return self::createSinglePropEmpty( $propName, $allowEmpty );
+            return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
-        return self::createElement( $propName, self::createParams( $pc->params ), (string) $pc->value );
+        return self::renderProperty(
+            $propName,
+            self::formatParams( $pc->params ),
+            (string) $pc->value
+        );
     }
 }

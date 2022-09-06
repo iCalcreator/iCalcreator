@@ -41,7 +41,7 @@ use function in_array;
  * Format ATTACH, IMAGE
  *
  * 15
- * @since 2.41.59 - 2022-08-25
+ * @ince 2.41.63 - 2022-09-02
  */
 final class MultiProps extends PropertyBase
 {
@@ -69,18 +69,20 @@ final class MultiProps extends PropertyBase
             if( ! empty( $pc->value )) {
                 [ $specKeys2, $lang2 ] = self::getSpeckeys2Lang2(
                     $propName,
-                    $pc->getParams( self::VALUE ),
+                    $pc->getValueParam(),
                     $specKeys,
                     $lang
                 );
-                $output .= self::createElement(
+                $output .= self::renderProperty(
                     $propName,
-                    self::createParams( $pc->params, $specKeys2, $lang2 ),
-                    ( in_array( $propName, $ATTCONFIMG, true ) ? $pc->value : self::strrep( $pc->value ))
+                    self::formatParams( $pc->params, $specKeys2, $lang2 ),
+                    ( in_array( $propName, $ATTCONFIMG, true )
+                        ? $pc->value
+                        : self::strrep( $pc->value ))
                 );
             } // end if
             elseif( $allowEmpty ) {
-                $output .= self::createElement( $propName );
+                $output .= self::renderProperty( $propName );
             }
         } // end foreach
         return $output;
@@ -88,6 +90,9 @@ final class MultiProps extends PropertyBase
 
     /**
      * Init specKeys and lang
+     *
+     * IMAGE has no default valueType (VALUE required)
+     *
      * @param string $propName
      * @param null|bool|string $lang
      * @return array
@@ -104,10 +109,11 @@ final class MultiProps extends PropertyBase
             self::NAME,
             self::RESOURCES
         ];
-        static $noLangProps   = [ self::ATTACH, self::RELATED_TO, self::TZID_ALIAS_OF ];
+        static $ATTACHKEYS    = [ self::VALUE, self::FEATURE ];
         static $CONFPKEYS     = [ self::FEATURE, self::LABEL, self::LANGUAGE ];
-        static $IMAGEPKEYS    = [ self::ALTREP, self::DISPLAY ];
+        static $IMAGEPKEYS    = [ self::FMTTYPE, self::ALTREP, self::DISPLAY ];
         static $STYDESCR1     = [ self::ALTREP, self::LANGUAGE, self::FMTTYPE, self::DERIVED ];
+        static $noLangProps   = [ self::ATTACH, self::RELATED_TO, self::TZID_ALIAS_OF ];
         switch( true ) {
             case ( self::CONFERENCE === $propName ) :
                 $specKeys = $CONFPKEYS;
@@ -125,6 +131,10 @@ final class MultiProps extends PropertyBase
             case in_array( $propName, $altLangProps, true ) :
                 $specKeys = self::$ALTRPLANGARR;
                 break;
+            case ( self::ATTACH === $propName ) :
+                $specKeys = $ATTACHKEYS;
+                $lang = null;
+                break;
             case in_array( $propName, $noLangProps, true ) :
                 $specKeys = [];
                 $lang = null;
@@ -138,11 +148,14 @@ final class MultiProps extends PropertyBase
     /**
      * Finetune specKeys and lang
      *
+     * STRUCTURED_DATA has no default valueType, VALUE required
+     *
      * @param string $propName
      * @param null|string $paramValue
      * @param array $specKeys
      * @param null|bool|string $lang
      * @return array
+     * @ince 2.41.63 - 2022-09-03
      */
     private static function getSpeckeys2Lang2(
         string $propName,
@@ -151,19 +164,26 @@ final class MultiProps extends PropertyBase
         null|bool|string $lang
     ) : array
     {
-        static $STRDTAvalues  = [ self::TEXT, self::BINARY ];
-        static $STRDTATXTBIN  = [ self::FMTTYPE, self::SCHEMA ];
-        static $STYDESCR2     = [ self::ALTREP, self::FMTTYPE, self::DERIVED ];
+        static $STRDTAToU    = [ self::TEXT, self::URI ];
+        static $STRDTATXTURI = [ self::VALUE, self::FMTTYPE, self::SCHEMA ];
+        static $STRDTABIN    = [ self::VALUE, self::ENCODING, self::FMTTYPE, self::SCHEMA];
+        static $STYDESCR1    = [ self::VALUE, self::ALTREP, self::LANGUAGE, self::FMTTYPE, self::DERIVED ];
+        static $STYDESCR2    = [ self::VALUE, self::ALTREP, self::FMTTYPE, self::DERIVED ];
+        $hasValueText        = ( self::TEXT === $paramValue );
         switch( true ) {
-            case (( self::STYLED_DESCRIPTION === $propName ) &&
-                ( self::TEXT !== $paramValue )) :
+            case (( self::STYLED_DESCRIPTION === $propName ) && $hasValueText ) :
+                $specKeys2 = $STYDESCR1;
+                $lang2     = $lang;
+                break;
+            case (( self::STYLED_DESCRIPTION === $propName ) && ! $hasValueText ) :
                 $specKeys2 = $STYDESCR2;
                 $lang2     = null;
                 break;
-            case (( self::STRUCTURED_DATA === $propName ) &&
-                in_array( $paramValue, $STRDTAvalues, true )) :
-                $specKeys2 = $STRDTATXTBIN;
-                $lang2     = null;
+            case ( self::STRUCTURED_DATA === $propName ) :
+                $specKeys2 = ( in_array( $paramValue, $STRDTAToU, true ))
+                    ? $STRDTATXTURI
+                    : $STRDTABIN;
+                $lang2     = $hasValueText ? $lang : null;
                 break;
             default :
                 $specKeys2 = $specKeys;

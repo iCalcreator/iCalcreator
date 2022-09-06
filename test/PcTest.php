@@ -141,6 +141,7 @@ class PcTest extends TestCase
         $pc[Pc::$LCparams] = $propParams2; // i.e. replace
         $this->assertNotSame( $ucKeyArr, $pc[Pc::$LCparams], 'case 43c' );
         $this->assertSame( $propParams2, $pc[Pc::$LCparams], 'case 43f' );
+        $this->assertSame( Vcalendar::DATE_TIME, $pc[Pc::$LCparams][Vcalendar::VALUE], 'case 43g' );
         $pc[Pc::$LCparams] = $ucKeyArr; // i.e. replace back
 
         $currParamKeys = array_keys( $pc[Pc::$LCparams] );
@@ -205,6 +206,7 @@ class PcTest extends TestCase
         $newParams = $pc->getParams();
         $this->assertNotSame( $propParams, $newParams, 'case 73d' );
         $this->assertNotSame( $oldParams, $newParams, 'case 73e' );
+        $this->assertSame( Vcalendar::DATE_TIME, $pc->getValueParam(), 'case 73g' );
         $cmpParams = array_merge( $ucKeyArr, $propParams2 );
         $this->assertSame( $cmpParams, $newParams, 'case 73f' );
 

@@ -221,7 +221,7 @@ class DateIntervalTest2 extends DtBase
             DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval ),
             $params,
             $getValue,
-            Property::createParams( $getValue->params ) .
+            Property::formatParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -273,7 +273,7 @@ class DateIntervalTest2 extends DtBase
             $diPrefix . self::durationArray2string( $dateIntervalArray ),
             $params,
             $getValue,
-            Property::createParams( $getValue->params ) .
+            Property::formatParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
                     DateIntervalFactory::factory(

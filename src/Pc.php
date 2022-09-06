@@ -156,6 +156,16 @@ class Pc extends ArrayObject
     }
 
     /**
+     * Return value of the parameter key VALUE or null
+     *
+     * @return string|null
+     */
+    public function getValueParam() : null|string
+    {
+        return $this->params[self::$paramValueKey] ?? null;
+    }
+
+    /**
      * Return bool true if params has key, opt with spec. value
      *
      * @param string $pKey

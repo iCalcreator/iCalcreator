@@ -42,7 +42,7 @@ use function trim;
 /**
  * iCalcreator iCal parameters support class
  *
- * @since  2022-01-31 2.41.15
+ * @since 2.41.63 2022-09-05
  */
 class ParameterFactory
 {
@@ -55,9 +55,9 @@ class ParameterFactory
      * @param null|array $params
      * @param null|string[] $defaults
      * @return string[]
-     * @since  2022-01-31 2.41.15
+     * @since 2.41.63 2022-09-05
      */
-    public static function setParams( ? array $params = [], ? array $defaults = null ) : array
+    public static function setParams( ? array $params = [], ? array $defaults = [] ) : array
     {
         static $TRUEFALSEARR = [ IcalInterface::TRUE,  IcalInterface::FALSE ];
         static $ONE = '1';
@@ -82,9 +82,16 @@ class ParameterFactory
                         $paramValue = strtoupper( $paramValue );
                     }
                     break;
-                case ( IcalInterface::FEATURE === $paramKey ) :
-                    $paramValue = trim( $paramValue, StringFactory::$QQ ); // accept comma in value
+                case ( IcalInterface::ORDER === $paramKey ) :
+                    if( ! is_int( $paramValue )) {
+                        $paramValue = (int) $paramValue;
+                    }
+                    if( 1 > $paramValue ) {
+                        $paramValue = 1;
+                    }
                     break;
+                case ( IcalInterface::FEATURE === $paramKey ) :
+                    // fall through
                 case is_string( $paramValue ) :
                     $paramValue = trim( $paramValue, StringFactory::$QQ );
                     break;
@@ -99,7 +106,7 @@ class ParameterFactory
                 ? strtoupper( $paramValue )
                 : $paramValue;
         } // end foreach
-        if( is_array( $defaults ) && ! empty( $defaults )) {
+        if( ! empty( $defaults )) {
             foreach( array_change_key_case( $defaults, CASE_UPPER ) as $paramKey => $paramValue ) {
                 if( ! isset( $output[$paramKey] )) {
                     $output[$paramKey] = $paramValue;

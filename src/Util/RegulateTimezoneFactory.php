@@ -801,9 +801,9 @@ class RegulateTimezoneFactory
      */
     private function setOutputiCalRowElements( string $propName, string $value, array $propAttr ) : void
     {
-        $this->outputiCal .= Property::createElement(
+        $this->outputiCal .= Property::renderProperty(
             $propName,
-            Property::createParams( $propAttr ),
+            Property::formatParams( $propAttr ),
             $value
         );
     }

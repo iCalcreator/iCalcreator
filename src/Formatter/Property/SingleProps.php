@@ -59,7 +59,7 @@ final class SingleProps extends PropertyBase
             return self::$SP0;
         }
         if( empty( $pc->value )) {
-            return self::createSinglePropEmpty( $propName, $allowEmpty );
+            return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
         switch( $propName ) {
             case self::SUMMARY :
@@ -73,9 +73,9 @@ final class SingleProps extends PropertyBase
                 $lang     = null;
                 break;
         }
-        return self::createElement(
+        return self::renderProperty(
             $propName,
-            self::createParams( $pc->getParams(), $specKeys, $lang ),
+            self::formatParams( $pc->getParams(), $specKeys, $lang ),
             ( in_array( $propName, $STRRPROPS, true )
                 ? self::strrep( $pc->getValue())
                 : $pc->getValue())

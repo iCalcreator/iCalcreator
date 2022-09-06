@@ -56,10 +56,10 @@ final class DurDates extends PropertyBase
             return self::$SP0;
         }
         if( empty( $pc->value )) {
-            return self::createSinglePropEmpty( $propName, $allowEmpty );
+            return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
-        $strParams = self::createParams( $pc->params );
-        return self::createElement(
+        $strParams = self::formatParams( $pc->params );
+        return self::renderProperty(
                $propName,
                $strParams,
                ( $pc->value instanceof DateInterval

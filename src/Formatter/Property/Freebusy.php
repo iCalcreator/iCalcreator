@@ -65,14 +65,14 @@ final class Freebusy extends PropertyBase
         foreach( $values as $freebusyPart ) { // Pc
             if( empty( $freebusyPart->value )) {
                 if( $allowEmpty ) {
-                    $output .= self::createElement( $propName );
+                    $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
             $params      = $freebusyPart->getParams();
             $attributes  = sprintf( $FMT, $params[self::FBTYPE] ); // always set
             unset( $params[self::FBTYPE] );
-            $attributes .= self::createParams( $params );
+            $attributes .= self::formatParams( $params );
             $cnt         = count( $freebusyPart->value );
             if( 1 < $cnt ) {
                 usort( $freebusyPart->value, $SORTER );
@@ -91,7 +91,7 @@ final class Freebusy extends PropertyBase
                     $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[1] );
                 }
             } // end foreach
-            $output .= self::createElement( $propName, $attributes, $content );
+            $output .= self::renderProperty( $propName, $attributes, $content );
         } // end foreach( $values as $freebusyPart )
         return $output;
     }

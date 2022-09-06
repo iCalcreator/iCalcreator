@@ -61,7 +61,7 @@ use function ucfirst;
 /**
  * iCalcreator XML (rfc6321) support class
  *
- * @since 2.41.32 2022-03-17
+ * @since 2.41.63 2022-09-05
  */
 class IcalXMLFactory
 {
@@ -795,7 +795,7 @@ class IcalXMLFactory
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-03-30
+     * @since 2.41.63 2022-09-05
      */
     private static function addXMLchild(
         SimpleXMLElement $parent,
@@ -814,6 +814,7 @@ class IcalXMLFactory
         static $delegated_from = 'delegated-from';
         static $delegated_to = 'delegated-to';
         static $member       = 'member';
+        static $order        = 'order';
         static $sent_by      = 'sent-by';
         static $rsvp         = 'rsvp';
         static $derived      = 'derived';
@@ -864,16 +865,17 @@ class IcalXMLFactory
                     $ptype = match ( $pKey ) {
                         $altrep, $dir   => self::$uri,
                         $delegated_from, $delegated_to, $member, $sent_by => self::$cal_address,
+                        $order          => self::$integer,
                         $rsvp, $derived => $BOOLEAN,
                         default         => self::$text,
                     }; // end switch
                     if( is_array( $parVal )) {
                         foreach( $parVal as $pV ) {
-                            $p1->addChild( $ptype, htmlspecialchars( $pV ));
+                            $p1->addChild( $ptype, htmlspecialchars((string) $pV ));
                         }
                     }
                     else {
-                        $p1->addChild( $ptype, htmlspecialchars( $parVal ));
+                        $p1->addChild( $ptype, htmlspecialchars((string) $parVal ));
                     }
                 } // end foreach $params
                 break;

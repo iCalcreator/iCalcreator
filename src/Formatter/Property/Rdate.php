@@ -76,7 +76,7 @@ final class Rdate extends PropertyBase
         foreach( $values as $theRdate ) { // Pc
             if( empty( $theRdate->value )) {
                 if( $allowEmpty ) {
-                    $output .= self::createElement( $propName );
+                    $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
@@ -94,7 +94,7 @@ final class Rdate extends PropertyBase
         foreach( $rDates as $theRdate ) { // Pc
             $isValueDate = $theRdate->hasParamValue( self::DATE );
             $isLocalTime = $theRdate->hasParamKey( self::ISLOCALTIME );
-            $attributes  = self::createParams( $theRdate->params );
+            $attributes  = self::formatParams( $theRdate->params );
             $cnt         = count( $theRdate->value );
             $content     = self::$SP0;
             $rno         = 1;
@@ -121,7 +121,7 @@ final class Rdate extends PropertyBase
                 }
                 $rno++;
             } // end foreach( $rDates as $theRdate )
-            $output .= self::createElement( $propName, $attributes, $content );
+            $output .= self::renderProperty( $propName, $attributes, $content );
         } // end foreach(( array_keys( $rDates ))...
         return $output;
     }

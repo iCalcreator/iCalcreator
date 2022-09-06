@@ -30,9 +30,9 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator;
 
 /**
- * iCalcreator Vcomponents base class
+ * iCalcreator VAcomponents base class
  *
- * @since  2.27.6 - 2018-12-28
+ * @since  2.41.53 - 2022-08-11
  */
 abstract class VAcomponent extends Vcomponent
 {

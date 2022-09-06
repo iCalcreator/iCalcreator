@@ -50,10 +50,10 @@ final class Property extends PropertyBase
     {
         return match( true ) {
             empty( $pc )        => self::$SP0,
-            empty( $pc->value ) => self::createSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::createElement(
+            empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
+            default             => self::renderProperty(
                 $propName,
-                self::createParams( $pc->params ),
+                self::formatParams( $pc->params ),
                 $pc->value
             )
         };

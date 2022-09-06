@@ -66,14 +66,14 @@ final class Requeststatus extends PropertyBase
                 if( isset( $pc->value[self::EXTDATA] )) {
                     $content .= self::$SEMIC . self::strrep( $pc->value[self::EXTDATA] );
                 }
-                $output .= self::createElement(
+                $output .= self::renderProperty(
                     $propName,
-                    self::createParams( $pc->params, [ self::LANGUAGE ], $lang ),
+                    self::formatParams( $pc->params, [ self::LANGUAGE ], $lang ),
                     $content
                 );
             }
             elseif( $allowEmpty ) {
-                $output .= self::createElement( $propName );
+                $output .= self::renderProperty( $propName );
             }
         } // end foreach
         return $output;

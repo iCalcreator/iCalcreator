@@ -83,7 +83,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::TRANSP . Property::createParams( $params ) . ':' . $value
+            IcalInterface::TRANSP . Property::formatParams( $params ) . ':' . $value
         ];
 
         // DESCRIPTION
@@ -110,7 +110,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -137,7 +137,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::LOCATION .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -165,7 +165,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::SUMMARY .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -192,7 +192,7 @@ class Prop1TextSingleTest extends DtBase
                 $params
             ),
             IcalInterface::SUMMARY .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -210,7 +210,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::SOURCE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::SOURCE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // URL 1
@@ -235,7 +235,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
         ];
 
         // URL 2
@@ -260,7 +260,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
         ];
 
 
@@ -286,7 +286,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
         ];
 
         // URL 5
@@ -311,7 +311,7 @@ class Prop1TextSingleTest extends DtBase
                 $value2,
                 $params2
             ),
-            IcalInterface::URL . Property::createParams( $params2 ) . ':' . $value2
+            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
         ];
 
         // URL 6
@@ -337,7 +337,7 @@ class Prop1TextSingleTest extends DtBase
                 $params2
             ),
             IcalInterface::URL .
-            Property::createParams( $params2 ) . ':' . $value2
+            Property::formatParams( $params2 ) . ':' . $value2
         ];
 
         // ORGANIZER
@@ -361,7 +361,7 @@ class Prop1TextSingleTest extends DtBase
             $params + [ IcalInterface::EMAIL => 'ildoit1071@example.com' ], // removed, same as value
             $getValue,
             IcalInterface::ORGANIZER .
-            Property::createParams(
+            Property::formatParams(
                 $params,
                 [
                     IcalInterface::CN,
@@ -398,7 +398,7 @@ class Prop1TextSingleTest extends DtBase
             $params,
             $getValue,
             IcalInterface::ORGANIZER .
-            Property::createParams(
+            Property::formatParams(
                 $params2,
                 [
                     IcalInterface::CN,
@@ -430,7 +430,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::KLASS . Property::createParams( $params ) . ':' . $value
+            IcalInterface::KLASS . Property::formatParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -448,7 +448,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::formatParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -466,7 +466,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::formatParams( $params ) . ':' . $value
         ];
 
         // STATUS
@@ -484,7 +484,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STATUS . Property::createParams( $params ) . ':' . $value
+            IcalInterface::STATUS . Property::formatParams( $params ) . ':' . $value
         ];
 
         // GEO
@@ -502,7 +502,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::GEO . Property::createParams( $params ) .
+            IcalInterface::GEO . Property::formatParams( $params ) .
             ':' .
             GeoFactory::geo2str2( $getValue->value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
             Util::$SEMIC .
@@ -525,7 +525,7 @@ class Prop1TextSingleTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::COLOR . Property::createParams( $params ) . ':' . $value
+            IcalInterface::COLOR . Property::formatParams( $params ) . ':' . $value
         ];
 
         // CALENDAR-ADDRESS
@@ -544,7 +544,7 @@ class Prop1TextSingleTest extends DtBase
             $params,
             $getValue,
             IcalInterface::CALENDAR_ADDRESS .
-            Property::createParams( $params ) . ':' . CalAddressFactory::conformCalAddress( $value )
+            Property::formatParams( $params ) . ':' . CalAddressFactory::conformCalAddress( $value )
         ];
 
         // LOCATION-TYPE
@@ -561,7 +561,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::LOCATION_TYPE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::LOCATION_TYPE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // BUSYTYPE
@@ -578,7 +578,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::BUSYTYPE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::BUSYTYPE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // RESOURCE_TYPE
@@ -595,7 +595,7 @@ class Prop1TextSingleTest extends DtBase
                 $value,
                 $params
             ),
-            IcalInterface::RESOURCE_TYPE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::RESOURCE_TYPE . Property::formatParams( $params ) . ':' . $value
         ];
 
         return $dataArr;

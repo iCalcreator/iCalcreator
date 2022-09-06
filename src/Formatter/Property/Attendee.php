@@ -88,13 +88,13 @@ final class Attendee extends PropertyBase
             $attendeePart = clone $values[$aPix]; // Pc
             if( empty( $attendeePart->value )) {
                 if( $allowEmpty ) {
-                    $output .= self::createElement( $propName );
+                    $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
             $content     = $attendeePart->value;
             if( empty( $attendeePart->params )) {
-                $output .= self::createElement( $propName, null, $content );
+                $output .= self::renderProperty( $propName, null, $content );
                 continue;
             }
             $attributes = self::$SP0;
@@ -170,7 +170,7 @@ final class Attendee extends PropertyBase
                     $attributes .= sprintf( $FMTKEYVALUE, $pLabel2, $pValue2 );
                 }
             }
-            $output .= self::createElement( $propName, $attributes, $content );
+            $output .= self::renderProperty( $propName, $attributes, $content );
         } // end foreach( $pc->value as $ax => $attendeePart )
         return $output;
     }

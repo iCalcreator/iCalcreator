@@ -72,14 +72,14 @@ final class Recur extends PropertyBase
             return self::$SP0;
         }
         if( empty( $pc->value )) {
-            return ( $allowEmpty ) ? self::createElement( $propName ) : self::$SP0;
+            return ( $allowEmpty ) ? self::renderProperty( $propName ) : self::$SP0;
         }
         $output      = self::$SP0;
         $isValueDate = $pc->hasParamValue( self::DATE );
         if( ! empty( $pc->params )) {
             $pc = clone $pc;
             $pc->removeParam( self::VALUE );
-            $attributes = self::createParams( $pc->params );
+            $attributes = self::formatParams( $pc->params );
         }
         else {
             $attributes = self::$SP0;
@@ -146,7 +146,7 @@ final class Recur extends PropertyBase
                     break;
             } // end switch( $ruleLabel )
         } // end foreach( $pc->value as $ruleLabel => $ruleValue )
-        $output .= self::createElement( $propName, $attributes,$content1 . $content2 );
+        $output .= self::renderProperty( $propName, $attributes,$content1 . $content2 );
         return $output;
     }
 

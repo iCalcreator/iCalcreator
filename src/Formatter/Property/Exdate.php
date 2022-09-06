@@ -66,7 +66,7 @@ final class Exdate extends PropertyBase
         foreach( $values as $theExdate ) { // Pc
             if( empty( $theExdate->value )) {
                 if( $allowEmpty ) {
-                    $output .= self::createElement( $propName );
+                    $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
@@ -89,9 +89,9 @@ final class Exdate extends PropertyBase
                 );
                 $content .= ( 0 < $eix++ ) ? self::$COMMA . $formatted : $formatted;
             } // end foreach
-            $output .= self::createElement(
+            $output .= self::renderProperty(
                 $propName,
-                self::createParams( $theExdate->params ),
+                self::formatParams( $theExdate->params ),
                 $content
             );
         } // end foreach(( array_keys( $exdates...

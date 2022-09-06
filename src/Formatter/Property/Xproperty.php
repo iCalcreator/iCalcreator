@@ -62,7 +62,7 @@ final class Xproperty extends PropertyBase
             if( ! isset( $xpropPc->value ) ||
                 ( empty( $xpropPc->value ) && ! is_numeric( $xpropPc->value ))) {
                 if( $allowEmpty ) {
-                    $output .= self::createElement( $xpropName );
+                    $output .= self::renderProperty( $xpropName );
                 }
                 continue;
             }
@@ -76,9 +76,9 @@ final class Xproperty extends PropertyBase
             else {
                 $xpropPc->value = self::strrep( $xpropPc->value );
             }
-            $output .= self::createElement(
+            $output .= self::renderProperty(
                 $xpropName,
-                self::createParams( $xpropPc->params, [ self::LANGUAGE ], $lang ),
+                self::formatParams( $xpropPc->params, [ self::LANGUAGE ], $lang ),
                 $xpropPc->value
             );
         } // end foreach

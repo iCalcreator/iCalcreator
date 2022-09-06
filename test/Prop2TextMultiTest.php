@@ -53,7 +53,7 @@ class Prop2TextMultiTest extends DtBase
     /**
      * @var array|string[]
      */
-    private static array $STCPAR   = [ 'X-PARAM' => 'Y-vALuE' ];
+    private static array $STCPAR   = [ IcalInterface::ORDER => 1, 'X-PARAM' => 'Y-vALuE' ];
 
     /**
      * @var string[]
@@ -94,7 +94,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             strtoupper( IcalInterface::CATEGORIES ) .
-            Property::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -123,7 +123,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::COMMENT .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -152,7 +152,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::CONTACT .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -174,7 +174,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-                Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+                Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
                 ':' . $value
         ];
 
@@ -196,13 +196,13 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::RESOURCES .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // ATTENDEE
-        $value  = 'MAILTO:ildoit2061.test@example.com';
-        $params = [
+        $value       = 'MAILTO:ildoit2061.test@example.com';
+        $params      = [
                 IcalInterface::CUTYPE         => IcalInterface::GROUP,
                 IcalInterface::MEMBER         => [
                     'MAILTO:DEV-GROUP1@example.com',
@@ -283,7 +283,7 @@ class Prop2TextMultiTest extends DtBase
         ];
 
         $value     = 'MAILTO:ildoit2063.test@example.com';
-        $params    =  self::$STCPAR;
+        $params    = [ 'X-PARAM' => 'Y-vALuE' ];
         $getValue  = Pc::factory(
             CalAddressFactory::conformCalAddress( $value ),
             $params
@@ -318,7 +318,7 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::RELATED_TO .
-            Property::createParams( $params ) .
+            Property::formatParams( $params ) .
             ':' . $value
         ];
 
@@ -337,7 +337,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::formatParams( $params ) . ':' . $value
         ];
 
         // ATTACH
@@ -355,7 +355,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::formatParams( $params ) . ':' . $value
         ];
 
         // ATTACH
@@ -377,7 +377,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::ATTACH . Property::createParams( $params ) . ':' . $value
+            IcalInterface::ATTACH . Property::formatParams( $params ) . ':' . $value
         ];
 
 
@@ -396,7 +396,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // IMAGE
@@ -418,7 +418,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // IMAGE
@@ -441,7 +441,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::IMAGE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::IMAGE . Property::formatParams( $params ) . ':' . $value
         ];
 
 
@@ -470,7 +470,7 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::REQUEST_STATUS .
-            Property::createParams( $params, [ IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::LANGUAGE ] ) .
             ':' .
             number_format(
                 (float) $value[IcalInterface::STATCODE],
@@ -504,7 +504,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // CONFERENCE
@@ -529,7 +529,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // CONFERENCE
@@ -554,7 +554,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . Property::createParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::formatParams( $params ) . ':' . $value
         ];
 
         // NAME
@@ -576,11 +576,12 @@ class Prop2TextMultiTest extends DtBase
             $params,
             $getValue,
             IcalInterface::NAME .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
         // STRUCTURED-DATA - text
+        $strDtaSpecKeys = [ IcalInterface::FMTTYPE, IcalInterface::SCHEMA, IcalInterface::VALUE ];
         $value   = 'This is a test STRUCTURED-DATA 2501';
         $params  = self::$STCPAR;
         $params2 = [ IcalInterface::VALUE => IcalInterface::TEXT ] + self::$STCPAR;
@@ -602,10 +603,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA . Property::createParams( $params2 ) . ':' . $value
+            IcalInterface::STRUCTURED_DATA . Property::formatParams( $params2, $strDtaSpecKeys ) . ':' . $value
         ];
 
         // STRUCTURED-DATA - uri
+        $strDtaSpecKeys = [ IcalInterface::FMTTYPE, IcalInterface::SCHEMA, IcalInterface::VALUE ];
         $value   = 'https://structured.data.test.org/structured_data2502';
         $params  = [ IcalInterface::VALUE => IcalInterface::URI ] + self::$STCPAR;
         $getValue  = Pc::factory(
@@ -626,10 +628,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA . Property::createParams( $params ) . ':' . $value
+            IcalInterface::STRUCTURED_DATA . Property::formatParams( $params, $strDtaSpecKeys ) . ':' . $value
         ];
 
         // STRUCTURED-DATA - binary
+        $strDtaSpecKeys = [ IcalInterface::FMTTYPE, IcalInterface::SCHEMA, IcalInterface::VALUE, IcalInterface::ENCODING ];
         $value  = 'This is a test BASE64 encoded data 2503==';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::BINARY,
@@ -660,9 +663,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::STRUCTURED_DATA .
-                Property::createParams( $params2, [ IcalInterface::FMTTYPE, IcalInterface::SCHEMA ] ) .
-                ':' . $value
+            IcalInterface::STRUCTURED_DATA . Property::formatParams( $params2, $strDtaSpecKeys ) . ':' . $value
         ];
 
         // STYLED-DESCRIPTION - uri
@@ -694,7 +695,7 @@ class Prop2TextMultiTest extends DtBase
                 $params2
             ),
             IcalInterface::STYLED_DESCRIPTION .
-                Property::createParams( $params2, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] )
+                Property::formatParams( $params2, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] )
                 . ':' . $value
         ];
 
@@ -724,7 +725,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::STYLED_DESCRIPTION .
-                Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+                Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
                 ':' . $value
         ];
 
@@ -746,7 +747,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::DESCRIPTION .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -768,7 +769,7 @@ class Prop2TextMultiTest extends DtBase
                 $params
             ),
             IcalInterface::LOCATION .
-            Property::createParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
+            Property::formatParams( $params, [ IcalInterface::ALTREP, IcalInterface::LANGUAGE ] ) .
             ':' . $value
         ];
 
@@ -798,15 +799,16 @@ class Prop2TextMultiTest extends DtBase
         string $expectedString
     ) : void
     {
+        static $CDIN = [
+            IcalInterface::CATEGORIES,
+            IcalInterface::DESCRIPTION,
+            IcalInterface::IMAGE,
+            IcalInterface::NAME
+        ];
         $c = new Vcalendar();
 
         foreach( array_keys( $propComps ) as $propName ) {
-            if( in_array( $propName, [
-                IcalInterface::CATEGORIES,
-                IcalInterface::DESCRIPTION,
-                IcalInterface::IMAGE,
-                IcalInterface::NAME
-            ], true ) ) {
+            if( in_array( $propName, $CDIN, true )) {
                 $this->propNameTest(
                     $case . '-1',
                     $c,
@@ -837,6 +839,7 @@ class Prop2TextMultiTest extends DtBase
                                                           => $c->newVevent()->{$newMethod}(),
                     default                               => $c->{$newMethod}(),
                 };
+
                 $this->propNameTest(
                     $case . '-2',
                     $comp,
