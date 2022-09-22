@@ -235,7 +235,7 @@ class VcalendarTest extends TestCase
         $v2 = $vcalendar->getComponent( 6 );
         $this->assertEquals( $uid,  $v2->getUid());
 
-        $date = DateTimeFactory::factory( 'now', IcalInterface::UTC );
+        $date = DateTimeFactory::factory( DateTimeFactory::$AT . time(), IcalInterface::UTC );
         $v2->setDtstart( $date );
         $vcalendar->setComponent( $v2, 6 );
         $v2 = $vcalendar->getComponent( 6 );

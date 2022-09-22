@@ -33,6 +33,7 @@ use Kigkonsult\Icalcreator\IcalInterface;
 
 use function array_change_key_case;
 use function in_array;
+use function is_array;
 use function is_int;
 use function is_string;
 use function ord;
@@ -95,20 +96,27 @@ abstract class PropertyBase implements IcalInterface
      * Return formatted output for calendar component property
      *
      * @param string      $label      property name
-     * @param null|string $attributes property attributes
+     * @param null|string|array $attributes property attributes
      * @param null|string $content    property content
      * @return string
-     * @since 2.41.63 2022-09-05
+     * @since 2.41.66 2022-09-07
      */
     public static function renderProperty(
         string $label,
-        ? string $attributes = null,
+        null|string|array $attributes = null,
         ? string $content = null
     ) : string
     {
         $output = strtoupper( $label );
-        if( ! empty( $attributes )) {
-            $output .= trim( $attributes );
+        switch( true ) {
+            case empty( $attributes ) :
+                break;
+            case is_array( $attributes ) :
+                $output .= self::formatParams( $attributes );
+                break;
+            default :
+                $output .= trim( $attributes );
+                break;
         }
         $output .= self::$COLON . trim((string) $content );
         return self::size75( $output );

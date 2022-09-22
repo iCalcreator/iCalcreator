@@ -60,10 +60,6 @@ final class IntProperty extends PropertyBase
             (( self::SEQUENCE !== $propName ) || ( 0 !== $pc->value ))) {
             return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
-        return self::renderProperty(
-            $propName,
-            self::formatParams( $pc->params ),
-            (string) $pc->value
-        );
+        return self::renderProperty( $propName, $pc->params, (string) $pc->value );
     }
 }

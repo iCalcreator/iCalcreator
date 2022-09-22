@@ -46,7 +46,7 @@ use function usort;
  * Format RDATE
  *
  * 1
- * @since 2.41.50 - 2022-08-25
+ * @since 2.41.66 2022-09-07
  */
 final class Rdate extends PropertyBase
 {
@@ -94,7 +94,6 @@ final class Rdate extends PropertyBase
         foreach( $rDates as $theRdate ) { // Pc
             $isValueDate = $theRdate->hasParamValue( self::DATE );
             $isLocalTime = $theRdate->hasParamKey( self::ISLOCALTIME );
-            $attributes  = self::formatParams( $theRdate->params );
             $cnt         = count( $theRdate->value );
             $content     = self::$SP0;
             $rno         = 1;
@@ -121,7 +120,7 @@ final class Rdate extends PropertyBase
                 }
                 $rno++;
             } // end foreach( $rDates as $theRdate )
-            $output .= self::renderProperty( $propName, $attributes, $content );
+            $output .= self::renderProperty( $propName, $theRdate->params, $content );
         } // end foreach(( array_keys( $rDates ))...
         return $output;
     }

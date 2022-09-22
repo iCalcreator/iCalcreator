@@ -45,28 +45,6 @@ use Kigkonsult\Icalcreator\Util\Util;
 class DateIntervalTest3 extends DtBase
 {
     /**
-     * set and restore local timezone from const
-     */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
-
-    /**
      * DateInterval123Provider Generator
      *
      * @param bool $inclYearMonth

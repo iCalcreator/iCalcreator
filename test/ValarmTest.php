@@ -103,14 +103,14 @@ class ValarmTest extends DtBase
         ];
 
         // ACKNOWLEDGED
-        $value     = DateTimeFactory::factory( null, IcalInterface::UTC );
+        $value     = DateTimeFactory::factory( DateTimeFactory::$AT . time(), IcalInterface::UTC );
         $dataArr[] = [
             121,
             IcalInterface::ACKNOWLEDGED,
             $value,
             self::$STCPAR,
             Pc::factory(
-                $value,
+                clone $value,
                 self::$STCPAR
             ),
             Property::formatParams( self::$STCPAR ) .
@@ -528,20 +528,20 @@ class ValarmTest extends DtBase
             }
             $case = $caseIn . '-' . ( 1 + $cix);
             $comp->setXprop( 'x-case', $case )
-                ->setXprop( 'x-time', DateTimeFactory::factory()->format( DateTimeFactory::$YmdHis ));
+                ->setXprop( 'x-time', self::getYmdHisDate());
 
             $a1 = $comp->newValarm()
                 ->setXprop( 'x-case', $case )
-                ->setXprop( 'x-time', DateTimeFactory::factory()->format( DateTimeFactory::$YmdHis ));
+                ->setXprop( 'x-time', self::getYmdHisDate());
 
             if( IcalInterface::DESCRIPTION === $propName ) {
                 $vLocation1 = $a1->newVlocation( 'Office1' )
                     ->setDescription( $value, $params )
-                    ->setXprop( 'x-time', DateTimeFactory::factory()->format( DateTimeFactory::$YmdHis ))
+                    ->setXprop( 'x-time', self::getYmdHisDate())
                     ->setXprop( 'x-case', $case . ' location 1' ); // by-pass test
-                $vLocation2 = $a1->newVlocation( 'Office1' )
+                $vLocation2 = $a1->newVlocation( 'Office2' )
                     ->setDescription( $value, $params )
-                    ->setXprop( 'x-time', DateTimeFactory::factory()->format( DateTimeFactory::$YmdHis ))
+                    ->setXprop( 'x-time', self::getYmdHisDate())
                     ->setXprop( 'x-case', $case . ' location 2' ); // by-pass test
             }
 
@@ -583,7 +583,7 @@ class ValarmTest extends DtBase
                 trim( $actualString ),
                 sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, 'Valarm', $createMethod )
             );
-            if( $propName !== IcalInterface::UID ) { // sort of mandatory
+            if( $propName !== IcalInterface::UID ) { // sort of mandatory....
                 $a1->{$deleteMethod}();
                 $this->assertFalse(
                     $a1->{$isMethod}(),
@@ -646,5 +646,10 @@ class ValarmTest extends DtBase
             );
 
         } // end for
+    }
+
+    private static function getYmdHisDate() : string
+    {
+        return DateTimeFactory::factory()->format( DateTimeFactory::$YmdHis );
     }
 }

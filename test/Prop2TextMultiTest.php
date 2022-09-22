@@ -937,6 +937,15 @@ class Prop2TextMultiTest extends DtBase
             sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
+        if( $getValue->hasParamkey( Vcalendar::ORDER )) {
+            $this->assertSame(
+                1,
+                $getValue->getParams( Vcalendar::ORDER ),
+                sprintf( self::$ERRFMT, null, $case . '-3ParamInt', __FUNCTION__, $instance->getCompType(), $getMethod )
+            );
+        }
+
+
         $createString = str_replace( Util::$CRLF . ' ' , null, $instance->{$createMethod}());
         $createString = str_replace( '\,', ',', $createString );
         $this->assertEquals(

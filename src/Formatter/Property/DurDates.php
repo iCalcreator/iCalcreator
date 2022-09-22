@@ -39,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
  * Format DURATION, REFRESH_INTERVAL, TRIGGER
  *
  * 3
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.66 2022-09-07
  */
 final class DurDates extends PropertyBase
 {
@@ -58,10 +58,9 @@ final class DurDates extends PropertyBase
         if( empty( $pc->value )) {
             return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
-        $strParams = self::formatParams( $pc->params );
         return self::renderProperty(
                $propName,
-               $strParams,
+            $pc->params,
                ( $pc->value instanceof DateInterval
                    ? DateIntervalFactory::dateInterval2String( $pc->value, ( self::TRIGGER === $propName ))
                    : DateTimeFactory::dateTime2Str( $pc->value ))

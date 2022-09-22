@@ -44,28 +44,6 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 class DateTimeTest extends DtBase
 {
     /**
-     * set and restore local timezone from const
-     */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
-
-    /**
      * @var mixed[][]
      */
     private static array $propsCompsProps = [
@@ -117,8 +95,6 @@ class DateTimeTest extends DtBase
      */
     public function dateTimeTest1Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr   = [];
 
         $dateTime  = new DateTime( DATEYmdTHis . ' ' . LTZ );
@@ -375,7 +351,6 @@ class DateTimeTest extends DtBase
      */
     public function dateTimeTest1bProvider() : array
     {
-        date_default_timezone_set( LTZ );
         $dataArr   = [];
 
         foreach( self::$DATECONSTANTFORMTS as $x => $format ) {
@@ -439,8 +414,6 @@ class DateTimeTest extends DtBase
      */
     public function dateTimeTest7Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dateTime = DATEYmdTHis;
@@ -850,8 +823,6 @@ class DateTimeTest extends DtBase
      */
     public function dateTimeTest8Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dateTime = DATEYmd;

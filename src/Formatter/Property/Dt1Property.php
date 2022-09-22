@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
  * Format DTSTART, RECURRENCE_ID and DUE, DTEND (has spec cond on DATE-format)
  *
  * 4
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.66 2022-09-07
  */
 final class Dt1Property extends PropertyBase
 {
@@ -63,7 +63,7 @@ final class Dt1Property extends PropertyBase
             empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
             default             => self::renderProperty(
                 $propName,
-                self::formatParams( $pc->params ),
+                $pc->params,
                 DateTimeFactory::dateTime2Str( $pc->value, $isDate, $isLocalTime )
             )
         };

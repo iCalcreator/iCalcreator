@@ -36,7 +36,7 @@ use Kigkonsult\Icalcreator\Util\GeoFactory;
  * Format GEO
  *
  * 1
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.66 2022-09-07
  */
 final class Geo extends PropertyBase
 {
@@ -53,7 +53,7 @@ final class Geo extends PropertyBase
             empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
             default             => self::renderProperty(
                 self::GEO,
-                self::formatParams( $pc->params ),
+                $pc->params,
                 GeoFactory::geo2str2( $pc->value[self::LATITUDE], GeoFactory::$geoLatFmt ) .
                 self::$SEMIC .
                 GeoFactory::geo2str2( $pc->value[self::LONGITUDE], GeoFactory::$geoLongFmt )

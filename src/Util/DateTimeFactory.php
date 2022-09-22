@@ -34,8 +34,8 @@ use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
-
 use Kigkonsult\Icalcreator\Pc;
+
 use function ctype_alpha;
 use function ctype_digit;
 use function date_default_timezone_get;
@@ -66,6 +66,7 @@ class DateTimeFactory
     public static string $YmdHis       = 'YmdHis';
     public static string $YMDHISe      = 'Y-m-d H:i:s e';
     public static string $NOW          = 'now';
+    public static string $AT           = '@';
 
     /**
      * @var string
@@ -86,10 +87,8 @@ class DateTimeFactory
      */
     public static function factory( ? string $dateTimeString = null, ? string $timeZoneString = null ) : DateTime
     {
-        static $AT      = '@';
-        static $NOW     = 'now';
-        $dateTimeString = $dateTimeString ?? $NOW;
-        if(( $AT === $dateTimeString[0] ) &&
+        $dateTimeString = $dateTimeString ?? self::$NOW;
+        if(( self::$AT === $dateTimeString[0] ) &&
             ctype_digit( substr( $dateTimeString, 1 ))) {
             try {
                 $dateTime = new DateTime( $dateTimeString );
@@ -151,18 +150,15 @@ class DateTimeFactory
     }
 
     /**
-     * Return DateTime
+     * Return DateTime from DateTimeInterface on YmdHis+timezone base
      *
      * @param DateTimeInterface $dateTime
      * @return DateTime
      * @throws Exception
-     * @since 2.39 2021-06-15
+     * @since  2.41.67 - 2022-09-13
      */
     public static function toDateTime( DateTimeInterface $dateTime ) : DateTime
     {
-        if( $dateTime instanceof DateTime ) {
-            return $dateTime;
-        }
         $dtTmp = new DateTime( self::$NOW, $dateTime->getTimezone());
         $dtTmp->setTimestamp( $dateTime->getTimestamp());
         return $dtTmp;

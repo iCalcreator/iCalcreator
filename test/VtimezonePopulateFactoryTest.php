@@ -53,30 +53,6 @@ class VtimezonePopulateFactoryTest extends DtBase
     private static array $STCPAR = [ 'X-Y-Z' => 'VaLuE' ];
 
     /**
-     * set and restore local timezone from const
-     *
-     * @var string|null
-     */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
-
-    /**
      * Testing VtimezonePopulateFactory::process, UTC (using Vcalendar::vtimezonePopulate())
      *
      * @test

@@ -272,3 +272,7 @@ v3.39   3.4 release candidate
           upd Property parameters format logic
 
 2.41.64   SelectFactory method argument typing
+
+2.41.65   upd Pc::getParams() return types
+2.41.66   upd tests and format property output logic
+2.41.67   DateTimeInterface adapt

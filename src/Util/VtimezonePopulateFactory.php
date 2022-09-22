@@ -75,7 +75,6 @@ class VtimezonePopulateFactory
     * @var string  for populate method (and descendents)
     */
     private static string $ABBR    = 'abbr';
-    private static string $AT      = '@';
     private static string $ISDST   = 'isdst';
     private static string $OFFSET  = 'offset';
     private static string $SECONDS = 'seconds';
@@ -331,12 +330,12 @@ class VtimezonePopulateFactory
         $stdIx          = $dlghtIx = -1;
         $backupTrans    = [];
         $dateFromYmd    = DateTimeFactory::setDateTimeTimeZone(
-            DateTimeFactory::factory( self::$AT . $start ),
+            DateTimeFactory::factory( DateTimeFactory::$AT . $start ),
             $timezone
         )
             ->format( DateTimeFactory::$Ymd );
         $dateToYmd      = DateTimeFactory::setDateTimeTimeZone(
-            DateTimeFactory::factory( self::$AT . $end ),
+            DateTimeFactory::factory( DateTimeFactory::$AT . $end ),
             $timezone
         )
             ->format( DateTimeFactory::$Ymd );
@@ -352,14 +351,15 @@ class VtimezonePopulateFactory
                 // previous trans offset will be 'next' trans offsetFrom
                 continue;
             } // end if
-            $transDate    = DateTimeFactory::factory( self::$AT . $trans[self::$TS] );
+            $transDate    = DateTimeFactory::factory( DateTimeFactory::$AT . $trans[self::$TS] );
             $transDateYmd = $transDate->format( self::$YMD );
             if( $transDateYmd < $dateFromYmd ) {
                 // previous trans offset will be 'next' trans offsetFrom
                 $prevOffsetFrom = $trans[self::$OFFSET];
                 // we save it in case we don't find any match
                 $backupTrans    = $trans;
-                $backupTrans[IcalInterface::TZOFFSETFROM] = ( 0 < $tix ) ? $transitions[$tix - 1][self::$OFFSET] : 0;
+                $backupTrans[IcalInterface::TZOFFSETFROM] =
+                    ( 0 < $tix ) ? $transitions[$tix - 1][self::$OFFSET] : 0;
                 continue;
             } // end if
             if(( $transDateYmd > $dateToYmd ) && ( -1 < ( $stdIx + $dlghtIx ))) {
@@ -433,7 +433,7 @@ class VtimezonePopulateFactory
         static $NOW = 'now';
         if( ! empty( $backupTrans )) {
             // we use the last transition (i.e. before startdate) for the tz info
-            $prevDate = DateTimeFactory::factory( self::$AT . $backupTrans[self::$TS] );
+            $prevDate = DateTimeFactory::factory( DateTimeFactory::$AT . $backupTrans[self::$TS] );
             // convert utc date to 'local' date
             $prevDate->modify( $backupTrans[IcalInterface::TZOFFSETFROM] . self::$SECONDS );
             $backupTrans[self::$TIME] = $prevDate;

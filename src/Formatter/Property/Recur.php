@@ -46,7 +46,7 @@ use function usort;
  * Format EXRULE, RRULE
  *
  * 2
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.66 2022-09-07
  */
 final class Recur extends PropertyBase
 {
@@ -79,10 +79,6 @@ final class Recur extends PropertyBase
         if( ! empty( $pc->params )) {
             $pc = clone $pc;
             $pc->removeParam( self::VALUE );
-            $attributes = self::formatParams( $pc->params );
-        }
-        else {
-            $attributes = self::$SP0;
         }
         $content1 = $content2 = null;
         foreach( $pc->value as $ruleLabel => $ruleValue ) {
@@ -146,7 +142,7 @@ final class Recur extends PropertyBase
                     break;
             } // end switch( $ruleLabel )
         } // end foreach( $pc->value as $ruleLabel => $ruleValue )
-        $output .= self::renderProperty( $propName, $attributes,$content1 . $content2 );
+        $output .= self::renderProperty( $propName, $pc->params,$content1 . $content2 );
         return $output;
     }
 

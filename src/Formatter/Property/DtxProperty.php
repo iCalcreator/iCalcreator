@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
  * Format ACKNOWLEDGED, COMPLETED, CREATED, DTSTAMP, LAST_MODIFIED, TZUNTIL
  *
  * 6
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.66 2022-09-07
  */
 final class DtxProperty extends PropertyBase
 {
@@ -55,7 +55,7 @@ final class DtxProperty extends PropertyBase
             empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
             default             => self::renderProperty(
                 $propName,
-                self::formatParams( $pc->params ),
+                $pc->params,
                 DateTimeFactory::dateTime2Str( $pc->value )
             )
         };

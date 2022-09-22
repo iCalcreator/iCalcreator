@@ -43,7 +43,7 @@ use function usort;
  * Format EXDATE
  *
  * 1
- * @since 2.41.59 - 2022-08-25
+ * @since 2.41.66 2022-09-07
  */
 final class Exdate extends PropertyBase
 {
@@ -89,11 +89,7 @@ final class Exdate extends PropertyBase
                 );
                 $content .= ( 0 < $eix++ ) ? self::$COMMA . $formatted : $formatted;
             } // end foreach
-            $output .= self::renderProperty(
-                $propName,
-                self::formatParams( $theExdate->params ),
-                $content
-            );
+            $output .= self::renderProperty( $propName, $theExdate->params, $content );
         } // end foreach(( array_keys( $exdates...
         return $output;
     }

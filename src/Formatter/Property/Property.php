@@ -36,7 +36,7 @@ use Kigkonsult\Icalcreator\Pc;
  *        RESOURCE_TYPE, STATUS, TRANSP, TZOFFSETFROM, TZOFFSETTO, TZURL, URL, UID
  *
  * 16
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.66 2022-09-07
  */
 final class Property extends PropertyBase
 {
@@ -51,11 +51,7 @@ final class Property extends PropertyBase
         return match( true ) {
             empty( $pc )        => self::$SP0,
             empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::renderProperty(
-                $propName,
-                self::formatParams( $pc->params ),
-                $pc->value
-            )
+            default             => self::renderProperty( $propName, $pc->params, $pc->value )
         };
     }
 }

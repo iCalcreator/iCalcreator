@@ -43,29 +43,6 @@ use Kigkonsult\Icalcreator\Util\Util;
  */
 class DateTimeUTCTest extends DtBase
 {
-
-    /**
-     * set and restore local timezone from const
-     */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
-
     /**
      * The recur DATETIME test method , EXRULE + RRULE
      *
@@ -413,8 +390,6 @@ class DateTimeUTCTest extends DtBase
      */
     public function dateTimeUTCTest11Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
@@ -700,8 +675,6 @@ class DateTimeUTCTest extends DtBase
      */
     public function dateTimeUTCTest17Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dateTime = DATEYmdTHis;
@@ -1109,7 +1082,6 @@ class DateTimeUTCTest extends DtBase
      */
     public function dateTimeUTCTest18Provider() : array
     {
-        date_default_timezone_set( LTZ );
 
         $dataArr = [];
 

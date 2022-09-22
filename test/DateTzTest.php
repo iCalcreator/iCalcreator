@@ -41,29 +41,11 @@ use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
  */
 class DateTzTest extends DtBase
 {
-    private   static array  $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
-
     /**
-     * set and restore local timezone from const
+     * @var array|string[]
      */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
+    private
+    static array  $STCPAR = [ 'X-PARAM' => 'Y-vALuE' ];
 
     /**
      * testDATEtz1 provider
@@ -176,8 +158,6 @@ class DateTzTest extends DtBase
      */
     public function dateTzTest2Provider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $params = self::$STCPAR;

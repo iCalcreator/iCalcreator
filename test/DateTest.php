@@ -64,28 +64,6 @@ class DateTest extends DtBase
     ];
 
     /**
-     * set and restore local timezone from const
-     */
-    public static ?string $oldTimeZone = null;
-
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass() : void
-    {
-        self::$oldTimeZone = date_default_timezone_get();
-        date_default_timezone_set( LTZ );
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass() : void
-    {
-        date_default_timezone_set( self::$oldTimeZone );
-    }
-
-    /**
      * Test date isPropSet Methods and properties with no-args set-method (i.e. 'now')
      *
      * @test
@@ -182,8 +160,6 @@ class DateTest extends DtBase
      */
     public function DATEtestProvider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dataArr[] = [ // test set #100 empty
@@ -361,8 +337,6 @@ class DateTest extends DtBase
      */
     public function RexDATEtestProvider() : array
     {
-        date_default_timezone_set( LTZ );
-
         $dataArr = [];
 
         $dateTime  = DateTimeFactory::factory( DATEYmd );
