@@ -34,9 +34,10 @@ use Exception;
 use IntlTimeZone;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
-use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Xml\Formatter as XmlFormatter;
+use Kigkonsult\Icalcreator\Xml\Parser    as XmlParser;
 use PHPUnit\Framework\TestCase;
 use SimpleXMLElement;
 
@@ -49,7 +50,26 @@ abstract class DtBase extends TestCase
 {
     use GetPropMethodNamesTrait;
 
-    protected static string $ERRFMT = "Error %sin case #%s, %s <%s>->%s";
+    protected static function getErrMsg(
+        ? string $spec = null,
+        int|string $case,
+        string $testFcn,
+        ? string $inst = null,
+        ? string $method = null,
+        mixed $inValue = null,
+        mixed $inParams = null
+    )
+    {
+        static $ERRFMT = "Error %s in case #%s, %s <%s>->%s";
+        $output = sprintf( $ERRFMT, ( $spec ?? '' ), $case, $testFcn, $inst, $method );
+        if( ! empty( $inValue )) {
+            $output .= PHP_EOL . '  inValue : ' . str_replace( PHP_EOL, '', var_export( $inValue, true ));
+        }
+        if( ! empty( $inParams )) {
+            $output .= PHP_EOL . ' inParams : ' . str_replace( PHP_EOL, '', var_export( $inParams, true ));
+        }
+        return $output;
+    }
 
     /**
      * The test method, case suffix '-1xx', test prop create-, delete-, get- is- and set-methods
@@ -91,15 +111,15 @@ abstract class DtBase extends TestCase
                     if( ! $firstLastmodifiedLoad ) {
                         $this->assertFalse(
                             $c->{$isMethod}(),
-                            sprintf( self::$ERRFMT, null, $case . '-110', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
-                            . PHP_EOL . $c->createCalendar() // test ###
+                            self::getErrMsg( null, $case . '-110', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod ) .
+                            PHP_EOL . $c->createCalendar() // test ###
                         );
                     }
                     $c->setLastmodified( $value, $params );
                     $firstLastmodifiedLoad = true;
                     $this->assertTrue(
                         $c->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-111', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
+                        self::getErrMsg( null, $case . '-111', __FUNCTION__, Vcalendar::VCALENDAR, $isMethod )
                     );
                 } // end if last-mod...
 
@@ -108,7 +128,7 @@ abstract class DtBase extends TestCase
                 if( $propName !== IcalInterface::DTSTAMP ) {
                     $this->assertFalse(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-112', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-112', __FUNCTION__, $theComp, $isMethod )
                     );
                 }
                 if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true )) {
@@ -130,34 +150,52 @@ abstract class DtBase extends TestCase
                 if( null !== $value ) {
                     $this->assertTrue(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-113', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-113', __FUNCTION__, $theComp, $isMethod )
                     );
                 }
 
                 if( $expectedGet->value instanceof DateTime && $getValue->value instanceof DateTime ) {
-                    $getValue->removeParam( IcalInterface::ISLOCALTIME );
-                    $this->assertEquals(
-                        $expectedGet->params,
-                        $getValue->params,
-                        sprintf( self::$ERRFMT, null, $case . '-114', __FUNCTION__, $theComp, $getMethod )
-                    );
-                    $fmt = match ( true ) {
-                        $expectedGet->hasParamValue( IcalInterface::DATE )
-                                => DateTimeFactory::$Ymd,
-                        $getValue->hasParamkey( IcalInterface::ISLOCALTIME )
-                                => DateTimeFactory::$YmdHis,
-                        default => DateTimeFactory::$YMDHISe,
-                    };
+                    if( $expectedGet->hasParamKey( IcalInterface::TZID ) &&
+                        $getValue->hasParamKey( IcalInterface::TZID )) {
+                        // has same offset (TZID might differ)
+                        $this->assertEquals(
+                            DateTimeFactory::factory(
+                                null,
+                                $expectedGet->getParams( IcalInterface::TZID )
+                            )->getOffset(),
+                            DateTimeFactory::factory(
+                                null,
+                                $getValue->getParams( IcalInterface::TZID )
+                            )->getOffset(),
+                            self::getErrMsg( null, $case . '-114-1', __FUNCTION__, $theComp, $getMethod )
+                        );
+                    }
+                    else {
+                        $getValue->removeParam( IcalInterface::ISLOCALTIME );
+                        $this->assertEquals(
+                            var_export( $expectedGet->params, true ),
+                            var_export( $getValue->params, true ),
+                            self::getErrMsg( null, $case . '-114-2', __FUNCTION__, $theComp, $getMethod, $value, $params )
+                        );
+                    }
+                    $fmt = $expectedGet->hasParamValue( IcalInterface::DATE )
+                        ? DateTimeFactory::$Ymd
+                        : DateTimeFactory::$YmdHis;
                     $this->assertEquals(
                         $expectedGet->value->format( $fmt ),
                         $getValue->value->format( $fmt ),
-                        sprintf( self::$ERRFMT, null, $case . '-115', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( null, $case . '-114-3', __FUNCTION__, $theComp, $getMethod, $value, $params )
                     );
-                } // end if
+                    $this->assertEquals( // in case of diff. timezones but with equal offset
+                        $expectedGet->value->getOffset(),
+                        $getValue->value->getOffset(),
+                        self::getErrMsg( null, $case . '-114-4', __FUNCTION__, $theComp, $getMethod, $value, $params )
+                    );
+                } // end if ..DateTime..
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case . '-116', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg( null, $case . '-116', __FUNCTION__, $theComp, $createMethod )
                 );
                 if( method_exists( $comp, $deleteMethod )) { // Dtstamp/Uid has NO deleteMethod
                     $comp->{$deleteMethod}();
@@ -165,21 +203,21 @@ abstract class DtBase extends TestCase
                 if( IcalInterface::DTSTAMP === $propName ) {
                     $this->assertTrue(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-117', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-117', __FUNCTION__, $theComp, $isMethod )
                     );
                     $this->assertNotFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-118', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( '(after delete) ', $case . '-118', __FUNCTION__, $theComp, $getMethod )
                     );
                 } // end if
                 else {
                     $this->assertFalse(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-119', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-119', __FUNCTION__, $theComp, $isMethod )
                     );
                     $this->assertFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-120', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( '(after delete) ', $case . '-120', __FUNCTION__, $theComp, $getMethod )
                     );
                 } // end else
                 if( $pcInput ) {
@@ -191,7 +229,7 @@ abstract class DtBase extends TestCase
                 if( null !== $value ) {
                     $this->assertTrue(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-121', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-121', __FUNCTION__, $theComp, $isMethod )
                     );
                 }
                 $pcInput = ! $pcInput;
@@ -239,7 +277,7 @@ abstract class DtBase extends TestCase
                 if( IcalInterface::DTSTAMP !== $propName ) {
                     $this->assertFalse(
                         $comp->{$isMethod}(),
-                        sprintf( self::$ERRFMT, null, $case . '-211', __FUNCTION__, $theComp, $isMethod )
+                        self::getErrMsg( null, $case . '-211', __FUNCTION__, $theComp, $isMethod )
                     );
                 }
                 if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true )) {
@@ -259,21 +297,21 @@ abstract class DtBase extends TestCase
                 $this->assertSame(
                     ! empty( $value ),
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-212', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( null, $case . '-212', __FUNCTION__, $theComp, $isMethod )
                        . ', exp ' . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
                 );
                 if( $expectedGet->value instanceof DateTime && $getValue instanceof DateTime ) {
                     $this->assertEquals(
                         $expectedGet->value->format( DateTimeFactory::$YmdHis ),
                         $getValue->format( DateTimeFactory::$YmdHis ),
-                        sprintf( self::$ERRFMT, null, $case . '-213', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( null, $case . '-213', __FUNCTION__, $theComp, $getMethod )
                     );
                 } // end if
                 else {
                     $this->assertEquals(
                         $expectedGet->value ?? '',
                         $getValue,
-                        sprintf( self::$ERRFMT, null, $case . '-214', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( null, $case . '-214', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
 
@@ -315,7 +353,7 @@ abstract class DtBase extends TestCase
                 [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
 
                 if( $pcInput ) {
@@ -328,7 +366,7 @@ abstract class DtBase extends TestCase
                 $this->assertSame(
                     ! empty( $value ),
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1b1', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( null, $case . '-1b1', __FUNCTION__, $theComp, $isMethod )
                          . ', exp ' . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
                 );
 
@@ -337,7 +375,7 @@ abstract class DtBase extends TestCase
                 $this->assertEquals(
                     $expectedGet->params,
                     $getValue->params,
-                    sprintf( self::$ERRFMT, null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
                 if( ! empty( $expectedGet->value )) {
                     $expVal = $expectedGet->value;
@@ -370,24 +408,24 @@ abstract class DtBase extends TestCase
                 $this->assertEquals(
                     $expGet,
                     $getVal,
-                    sprintf( self::$ERRFMT, null, $case . '-1b3', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg( null, $case . '-1b3', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case . '-1b4', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg( null, $case . '-1b4', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 if( IcalInterface::DTSTAMP === $propName ) {
                     $this->assertNotFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-1b5', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( '(after delete) ', $case . '-1b5', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 else {
                     $this->assertFalse(
                         $comp->{$getMethod}(),
-                        sprintf( self::$ERRFMT, '(after delete) ', $case . '-1b6', __FUNCTION__, $theComp, $getMethod )
+                        self::getErrMsg( '(after delete) ', $case . '-1b6', __FUNCTION__, $theComp, $getMethod )
                     );
                 }
                 $comp->{$setMethod}( $value, $params );
@@ -428,7 +466,7 @@ abstract class DtBase extends TestCase
             $createString = str_replace( '\,', ',', $createString );
             $this->assertNotFalse(
                 strpos( $createString, $expectedString ),
-                sprintf( self::$ERRFMT, null, $case . '-31', __FUNCTION__, $theComp ?? '?', $propName ?? '?' )
+                self::getErrMsg( null, $case . '-31', __FUNCTION__, $theComp ?? '?', $propName ?? '?' )
                     . PHP_EOL . $createString . PHP_EOL . $expectedString
             );
         }
@@ -436,7 +474,8 @@ abstract class DtBase extends TestCase
         if( ! empty( $expectedString )) {
 
             $calendarUid = $calendar->getUid();
-            $xml         = IcalXMLFactory::iCal2XML( $calendar );
+            // iCal convert to XML
+            $xml         = XmlFormatter::iCal2XML( $calendar );
 
             $this->assertStringStartsWith( $xmlStartChars, $xml );
             $this->assertNotFalse( strpos( $xml, Vcalendar::iCalcreatorVersion()));
@@ -446,15 +485,15 @@ abstract class DtBase extends TestCase
             }
             catch( Exception $e ) {
                 $this->fail(
-                    sprintf( self::$ERRFMT, null, $case . '-32', __FUNCTION__, $theComp, $propName )
+                    self::getErrMsg( null, $case . '-32', __FUNCTION__, $theComp, $propName )
                 );
             }
 
-            // 'start XML convert to iCal'
-            $c2  = IcalXMLFactory::XML2iCal( $xml );
+            // XML convert to iCal
+            $c2  = XmlParser::XML2iCal( $xml );
             $this->assertTrue(
                 ( $c2 instanceof Vcalendar ),
-                sprintf( self::$ERRFMT, null, $case . '-33', __FUNCTION__, $theComp, $propName )
+                self::getErrMsg( null, $case . '-33', __FUNCTION__, $theComp, $propName )
             );
 
             $c2->setUid( $calendarUid ); // else UID compare error
@@ -463,7 +502,7 @@ abstract class DtBase extends TestCase
             $this->assertEquals(
                 $calendarStr1,
                 $calendarStr2,
-                sprintf( self::$ERRFMT, null, $case . '-34', __FUNCTION__, $theComp, $propName )
+                self::getErrMsg( null, $case . '-34', __FUNCTION__, $theComp, $propName )
                 . PHP_EOL . str_replace( '><', '>' . PHP_EOL . '<', $xml ) . PHP_EOL
             );
         } // end if( ! empty( $expectedString ))
@@ -479,7 +518,7 @@ abstract class DtBase extends TestCase
         $this->assertEquals(
             $calendarStr1,
             $calendarStr3,
-            sprintf( self::$ERRFMT, null, $case . '-35', __FUNCTION__, $theComp, $propName )
+            self::getErrMsg( null, $case . '-35', __FUNCTION__, $theComp, $propName )
         );
         ob_start();
         $calendar3->returnCalendar();
@@ -489,16 +528,16 @@ abstract class DtBase extends TestCase
         $calEnd = 'END:VCALENDAR' . Util::$CRLF;
         $this->assertTrue(
             str_ends_with( $calendarStr1, $calEnd ),
-            sprintf( self::$ERRFMT, null, $case . '-36a', __FUNCTION__, $theComp, $propName )
+            self::getErrMsg( null, $case . '-36a', __FUNCTION__, $theComp, $propName )
         );
         $this->assertTrue(
             str_ends_with( $out3, $calEnd ),
-            sprintf( self::$ERRFMT, null, $case . '-36b', __FUNCTION__, $theComp, $propName )
+            self::getErrMsg( null, $case . '-36b', __FUNCTION__, $theComp, $propName )
         );
         $this->assertEquals(
             strlen( $calendarStr1 ),
             strlen( $out3 ),
-            sprintf( self::$ERRFMT, null, $case . '-36c', __FUNCTION__, $theComp, $propName )
+            self::getErrMsg( null, $case . '-36c', __FUNCTION__, $theComp, $propName )
         );
         $needle = 'Content-Length: ';
         $contentLength = 0;
@@ -519,7 +558,7 @@ abstract class DtBase extends TestCase
         $this->assertEquals(
             $calendarStr1,
             $out3,
-            sprintf( self::$ERRFMT, null, $case . '-36e', __FUNCTION__, $theComp, $propName )
+            self::getErrMsg( null, $case . '-36e', __FUNCTION__, $theComp, $propName )
         );
     }
 
@@ -561,69 +600,92 @@ abstract class DtBase extends TestCase
      * Return a random ms timezone and the corr PHP one
      *
      * @link https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11
+     * @link testSuite/TZMS_iCal_test.php
      * @return string[]
-     * @since  2.41.57 - 2022-08-17
+     * @since  2.41.57 - 2022-10-12
      */
     public static function getRandomMsAndPhpTz() : array
     {
         static $MSTZ = [
-           'Afghanistan Standard Time',
-           'Arab Standard Time',
-           'Arabian Standard Time',
-           'Arabic Standard Time',
-           'Argentina Standard Time',
-           'Atlantic Standard Time',
-           'AUS Eastern Standard Time',
-           'Azerbaijan Standard Time',
-           'Bangladesh Standard Time',
-           'Belarus Standard Time',
-           'Cape Verde Standard Time',
-           'Caucasus Standard Time',
-           'Central America Standard Time',
-           'Central Asia Standard Time',
-           'Central Europe Standard Time',
-           'Central European Standard Time',
-           'Central Pacific Standard Time',
-           'Central Standard Time (Mexico)',
-           'China Standard Time',
-           'E. Africa Standard Time',
-           'E. Europe Standard Time',
-           'E. South America Standard Time',
-           'Eastern Standard Time',
-           'Egypt Standard Time',
-           'Fiji Standard Time',
-           'FLE Standard Time',
-           'Georgian Standard Time',
-           'GMT Standard Time',
-           'Greenwich Standard Time',
-           'GTB Standard Time',
-           'Hawaiian Standard Time',
-           'India Standard Time',
-           'Iran Standard Time',
-           'Israel Standard Time',
-           'Jordan Standard Time',
-           'Korea Standard Time',
-           'Mauritius Standard Time',
-           'Middle East Standard Time',
-           'Montevideo Standard Time',
-           'Morocco Standard Time',
-           'Mountain Standard Time',
-           'Myanmar Standard Time',
-           'Namibia Standard Time',
-           'Nepal Standard Time',
-           'New Zealand Standard Time',
-           'Pacific SA Standard Time',
-           'Pacific Standard Time',
-           'Paraguay Standard Time',
-           'Romance Standard Time',
-           'Russian Standard Time',
-           'SA Eastern Standard Time',
-           'SA Pacific Standard Time',
+            'Afghanistan Standard Time'       => '+04:30',
+            'Arab Standard Time'              => '+03:00',
+            'Arabian Standard Time'           => '+04:00',
+            'Arabic Standard Time'            => '+03:00',
+            'Argentina Standard Time'         => '-03:00',
+            'Atlantic Standard Time'          => '-04:00',
+            'AUS Eastern Standard Time'       => '+10:00',
+            'Azerbaijan Standard Time'        => '+04:00',
+            'Bangladesh Standard Time'        => '+06:00',
+            'Belarus Standard Time'           => '+03:00',
+            'Cape Verde Standard Time'        => '-01:00',
+            'Caucasus Standard Time'          => '+04:00',
+            'Central America Standard Time'   => '-06:00',
+            'Central Asia Standard Time'      => '+06:00',
+            'Central Europe Standard Time'    => '+01:00',
+            'Central European Standard Time'  => '+01:00',
+            'Central Pacific Standard Time'   => '+11:00',
+            'Central Standard Time (Mexico)'  => '-06:00',
+            'China Standard Time'             => '+08:00',
+            'E. Africa Standard Time'         => '+03:00',
+            'E. Europe Standard Time'         => '+02:00',
+            'E. South America Standard Time'  => '-03:00',
+            'Eastern Standard Time'           => '-05:00',
+            'Egypt Standard Time'             => '+02:00',
+            'Fiji Standard Time'              => '+12:00',
+            'FLE Standard Time'               => '+02:00',
+            'Georgian Standard Time'          => '+04:00',
+            'GMT Standard Time'               => '',
+            'Greenland Standard Time'         => '-03:00',
+            'Greenwich Standard Time'         => '',
+            'GTB Standard Time'               => '+02:00',
+            'Hawaiian Standard Time'          => '-10:00',
+            'India Standard Time'             => '+05:30',
+            'Israel Standard Time'            => '+02:00',
+            'Jordan Standard Time'            => '+02:00',
+            'Korea Standard Time'             => '+09:00',
+            'Mauritius Standard Time'         => '+04:00',
+            'Middle East Standard Time'       => '+02:00',
+            'Montevideo Standard Time'        => '-03:00',
+            'Morocco Standard Time'           => '',
+            'Myanmar Standard Time'           => '+06:30',
+            'Namibia Standard Time'           => '+01:00',
+            'Nepal Standard Time'             => '+05:45',
+            'New Zealand Standard Time'       => '+12:00',
+            'Pacific SA Standard Time'        => '-03:00',
+            'Pacific Standard Time'           => '-08:00',
+            'Pakistan Standard Time'          => '+05:00',
+            'Paraguay Standard Time'          => '-04:00',
+            'Romance Standard Time'           => '+01:00',
+            'Russian Standard Time'           => '+03:00',
+            'SA Eastern Standard Time'        => '-03:00',
+            'SA Pacific Standard Time'        => '-05:00',
+            'SA Western Standard Time'        => '-04:00',
+            'Samoa Standard Time'             => '+13:00',
+            'SE Asia Standard Time'           => '+07:00',
+            'Singapore Standard Time'         => '+08:00',
+            'South Africa Standard Time'      => '+02:00',
+            'Sri Lanka Standard Time'         => '+05:30',
+            'Syria Standard Time'             => '+02:00',
+            'Taipei Standard Time'            => '+08:00',
+            'Tokyo Standard Time'             => '+09:00',
+            'Tonga Standard Time'             => '+13:00',
+            'Turkey Standard Time'            => '+02:00',
+            'Ulaanbaatar Standard Time'       => '+08:00',
+            'UTC'                             => '',
+            'UTC-02'                          => '-02:00',
+            'UTC-11'                          => '-11:00',
+            'UTC+12'                          => '+12:00',
+            'Venezuela Standard Time'         => '-04:30',
+            'W. Central Africa Standard Time' => '+01:00',
+            'W. Europe Standard Time'         => '+01:00',
+            'West Asia Standard Time'         => '+05:00',
+            'West Pacific Standard Time'      => '+10:00'
         ];
-        $key    = array_rand( $MSTZ, 1 );
-        $msTz   = $MSTZ[$key];
-        $phpTz  = IntlTimeZone::getIDForWindowsID( $msTz );
-        return [ $msTz, $phpTz ];
+        $msTz   = array_rand( $MSTZ, 1 );
+        return [
+            $msTz,
+            IntlTimeZone::getIDForWindowsID( $msTz )
+        ];
     }
 
     /**

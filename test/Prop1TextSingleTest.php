@@ -213,32 +213,7 @@ class Prop1TextSingleTest extends DtBase
             IcalInterface::SOURCE . Property::formatParams( $params ) . ':' . $value
         ];
 
-        // URL 1
-        $value1  = '%3C01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com%3E';
-        $value2  = '01020175ae0fa363-b7ebfe82-02d0-420a-a8d9-331e43fa1867-000000@eu-west-1.amazonses.com';
-        $params1 = [  IcalInterface::VALUE => 'URI' ]  + self::$STCPAR;
-        $params2 = self::$STCPAR;
-        $dataArr[] = [
-            1061,
-            [
-                IcalInterface::URL => [
-                    IcalInterface::VEVENT,
-                    IcalInterface::VTODO,
-                    IcalInterface::VJOURNAL,
-                    IcalInterface::VFREEBUSY,
-                    IcalInterface::VAVAILABILITY
-                ]
-            ],
-            $value1,
-            $params1,
-            Pc::factory(
-                $value2,
-                $params2
-            ),
-            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
-        ];
-
-        // URL 2
+        // URL - more in urlMessageTest6
         $value1  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
         $value2  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
         $params1 = [  IcalInterface::VALUE => IcalInterface::URI ]  + self::$STCPAR;
@@ -261,83 +236,6 @@ class Prop1TextSingleTest extends DtBase
                 $params2
             ),
             IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
-        ];
-
-
-        // URL 4
-        $value1  = 'message://https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
-        $value2  = 'message://https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
-        $params1 = self::$STCPAR + [  IcalInterface::VALUE => IcalInterface::URI ];
-        $params2 = self::$STCPAR;
-        $dataArr[] = [
-            1064,
-            [
-                IcalInterface::URL => [
-                    IcalInterface::VEVENT,
-                    IcalInterface::VTODO,
-                    IcalInterface::VJOURNAL,
-                    IcalInterface::VFREEBUSY,
-                    IcalInterface::VAVAILABILITY
-                ]
-            ],
-            $value1,
-            $params1,
-            Pc::factory(
-                $value2,
-                $params2
-            ),
-            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
-        ];
-
-        // URL 5
-        $value1  = 'message://%3C1714214488.13907.1453128266311.JavaMail.tomcat%40web-pdfe-f02%3E?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $value2  = 'message://1714214488.13907.1453128266311.JavaMail.tomcat@web-pdfe-f02?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $params1 = self::$STCPAR + [  IcalInterface::VALUE => IcalInterface::URI ];
-        $params2 = self::$STCPAR;
-        $dataArr[] = [
-            1065,
-            [
-                IcalInterface::URL => [
-                    IcalInterface::VEVENT,
-                    IcalInterface::VTODO,
-                    IcalInterface::VJOURNAL,
-                    IcalInterface::VFREEBUSY,
-                    IcalInterface::VAVAILABILITY
-                ]
-            ],
-            $value1,
-            $params1,
-            Pc::factory(
-                $value2,
-                $params2
-            ),
-            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
-        ];
-
-        // URL 6
-        $value1  = 'message://%3C1714214488.13907.1453128266311.JavaMail.tomcat%40web-pdfe-f02%3E?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $value2  = 'message://1714214488.13907.1453128266311.JavaMail.tomcat@web-pdfe-f02?c=1453128266&k1=ticket&k2=1797815930&k3=2016-07-20';
-        $params1 = self::$STCPAR + [  strtolower( IcalInterface::VALUE ) => strtolower( IcalInterface::URI ) ];
-        $params2 = self::$STCPAR;
-        $dataArr[] = [
-            1066,
-            [
-                IcalInterface::URL => [
-                    IcalInterface::VEVENT,
-                    IcalInterface::VTODO,
-                    IcalInterface::VJOURNAL,
-                    IcalInterface::VFREEBUSY,
-                    IcalInterface::VAVAILABILITY
-                ]
-            ],
-            $value1,
-            $params1,
-            Pc::factory(
-                $value2,
-                $params2
-            ),
-            IcalInterface::URL .
-            Property::formatParams( $params2 ) . ':' . $value2
         ];
 
         // ORGANIZER
@@ -659,7 +557,7 @@ class Prop1TextSingleTest extends DtBase
                 [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . '-1', __FUNCTION__, $theComp, $isMethod )
                 );
 
                 if( IcalInterface::GEO === $propName ) {
@@ -676,7 +574,7 @@ class Prop1TextSingleTest extends DtBase
                 }
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
                 );
                 if( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
                     $vevent->newParticipant()->{$newMethod}()->{$setMethod}( $value, $params );
@@ -686,7 +584,7 @@ class Prop1TextSingleTest extends DtBase
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $getMethod ) .
+                    self::getErrMsg(  null, $case . '-3', __FUNCTION__, $theComp, $getMethod ) .
                         ', got : ' . var_export( $getValue, true ) . ', exp : ' . var_export( $expectedGet, true )
                 );
 
@@ -695,17 +593,17 @@ class Prop1TextSingleTest extends DtBase
                 $this->assertEquals(
                     $expectedString,
                     trim( $createString ),
-                    sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
                 );
 
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(is-prop-set) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-6', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(after delete) ', $case . '-6', __FUNCTION__, $theComp, $getMethod )
                 );
 
                 if( IcalInterface::GEO === $propName ) {
@@ -716,7 +614,7 @@ class Prop1TextSingleTest extends DtBase
                 }
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-7', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(is-prop-set) ', $case . '-7', __FUNCTION__, $theComp, $getMethod )
                 );
             } // end foreach
         } // end foreach
@@ -747,7 +645,7 @@ class Prop1TextSingleTest extends DtBase
             $getValue = $comp->getGeoLocation();
             $this->assertEmpty(
                 $getValue,
-                sprintf( self::$ERRFMT, null, 1, __FUNCTION__, $theComp, 'getGeoLocation' )
+                self::getErrMsg(  null, 1, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
 
             $comp->setLocation( $location )
@@ -765,19 +663,19 @@ class Prop1TextSingleTest extends DtBase
             $this->assertEquals(
                 $location,
                 $getValue[0],
-                sprintf( self::$ERRFMT, null, 2, __FUNCTION__, $theComp, 'getGeoLocation' )
+                self::getErrMsg(  null, 2, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
             $tLat = substr( StringFactory::beforeLast('+', $getValue[1] ), 1 );
             $this->assertEquals(
                 $latitude,
                 $tLat,
-                sprintf( self::$ERRFMT, null, 3, __FUNCTION__, $theComp, 'getGeoLocation' )
+                self::getErrMsg(  null, 3, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
             $tLong = substr( str_replace( $tLat, null, $getValue[1] ), 1 );
             $this->assertEquals(
                 $longitude,
                 $tLong,
-                sprintf( self::$ERRFMT, null, 4, __FUNCTION__, $theComp, 'getGeoLocation' )
+                self::getErrMsg(  null, 4, __FUNCTION__, $theComp, 'getGeoLocation' )
             );
 
             $comp->setgeo( 1.1, 2.2 );
@@ -794,6 +692,95 @@ class Prop1TextSingleTest extends DtBase
             $this->assertSame(
                 'GEO:00;0',
                 trim( $comp->createGeo())
+            );
+        } // end foreach
+    }
+
+    /**
+     * Testing parse and set url 'decode' (SOURCE, TZURL ) + URL VALUE= URI:message...
+     *
+     * @test
+     */
+    public function urlMessageTest6() : void
+    {
+
+        $URLs = [
+            'https://1111@eu-west-1.amazonses.com' => 'https://1111@eu-west-1.amazonses.com',
+            '%3C2222@eu-west-2.amazonses.com%3E'   => '2222@eu-west-2.amazonses.com',
+            '%3C3333%40eu-west-3.amazonses.com%3E' => '3333@eu-west-3.amazonses.com',
+            '<4444@eu-west-4.amazonses.com>'       => '4444@eu-west-4.amazonses.com',
+        ];
+
+        $PROPstart = 'SOURCE:';
+        $x = 10;
+        foreach( $URLs as $theUrl => $expUrl) {
+            $calendar  = new Vcalendar();
+            $calendar->parse( $PROPstart . $theUrl );
+            $this->parseCalendarTest( ++$x, $calendar, $expUrl );
+        }
+
+        $x = 20;
+        foreach( $URLs as $theUrl => $expUrl ) {
+            $calendar  = new Vcalendar();
+            $calendar->setSource( $theUrl );
+            $this->parseCalendarTest( ++$x, $calendar, $expUrl );
+        }
+
+        $PROPstart = 'TZURL:';
+        $x = 30;
+        foreach( $URLs as $theUrl => $expUrl ) {
+            $calendar  = new Vcalendar();
+            $calendar->newVtimezone()
+                ->parse( $PROPstart . $theUrl );
+            $this->parseCalendarTest( ++$x, $calendar, $expUrl );
+        }
+
+        $x = 40;
+        foreach( $URLs as $theUrl => $expUrl ) {
+            $calendar  = new Vcalendar();
+            $calendar->newVtimezone()->setTzurl( $theUrl );
+            $this->parseCalendarTest( ++$x, $calendar, $expUrl );
+        }
+
+        $PROPstart = 'URL';
+        $PARAMs1 = [
+            ':',
+            ';VALUE=URI:message:',
+            ';VALUE=\'URI:message\':',
+            ';VALUE="URI:message":',
+        ];
+
+        $x = 60;
+        foreach( $URLs as $theUrl => $expUrl) {
+            foreach( $PARAMs1 as $y => $theParam ) {
+                $calendar  = new Vcalendar();
+                $calendar->newVevent()
+                    ->parse( $PROPstart . $theParam . $theUrl );
+                $this->parseCalendarTest( ( ++$x . '-' . $y ), $calendar, $expUrl );
+            } // end foreach
+        } // end foreach
+
+        $x       = 60;
+        $PARAMs2 = [
+            [],
+            self::$STCPAR,
+            [ Vcalendar::VALUE => 'URI:message' ],
+            self::$STCPAR + [ Vcalendar::VALUE => 'URI:message' ],
+            [ Vcalendar::VALUE => '\'URI:message\'' ],
+            self::$STCPAR + [ Vcalendar::VALUE => '\'URI:message\'' ],
+            [ Vcalendar::VALUE => '"URI:message"' ],
+            self::$STCPAR + [ Vcalendar::VALUE => '"URI:message"' ],
+        ];
+        $theUrl = reset( $URLs );
+        foreach( $PARAMs2 as $theParam ) {
+            $calendar  = new Vcalendar();
+            $calendar->newVevent()
+                ->setUrl( $theUrl, $theParam );
+            unset( $theParam[Vcalendar::VALUE] );
+            $this->parseCalendarTest(
+                ( ++$x . '-' . $y ),
+                $calendar,
+                'URL' . Property::formatParams( $theParam ) . ':' . $theUrl
             );
         } // end foreach
     }

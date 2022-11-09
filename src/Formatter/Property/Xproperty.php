@@ -29,8 +29,6 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
-use Kigkonsult\Icalcreator\Pc;
-
 use function is_array;
 use function is_numeric;
 

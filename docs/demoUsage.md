@@ -5,9 +5,9 @@
 ``` php
 <?php
 
-use Kigkonsult\Icalcreator\Vcalendar;
 use DateTime;
 use DateTimezone;
+use Kigkonsult\Icalcreator\Vcalendar;
 
     // create a new calendar
 $vcalendar = Vcalendar::factory( [ Vcalendar::UNIQUE_ID => "kigkonsult.se", ] )
@@ -156,7 +156,7 @@ And the content of the ```$vcalendarString``` :
 ```
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.27.16//
+PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.70//
 METHOD:PUBLISH
 X-WR-CALNAME:Calendar Sample
 X-WR-CALDESC:This is a demo calendar

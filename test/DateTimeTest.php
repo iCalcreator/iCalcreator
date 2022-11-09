@@ -703,47 +703,15 @@ class DateTimeTest extends DtBase
         [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
         $dateTime  = DATEYmdTHis . ' ' . $msTz;
         $dateTime2 = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime2->setTimezone( DateTimeZoneFactory::factory( TZ2 ));
         $dataArr[] = [
             7112,
             $dateTime,
-            [ IcalInterface::TZID => TZ2 ],
+            [], // [ IcalInterface::TZID => $phpTz ],
             Pc::factory(
                 $dateTime2,
-                [ IcalInterface::TZID => TZ2 ]
+                [ IcalInterface::TZID => $phpTz ]
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, TZ2 )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime  = DATEYmdTHis . ' ' . $msTz;
-        $dateTime2 = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime2->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
-        $dataArr[] = [
-            7113,
-            $dateTime,
-            [ IcalInterface::TZID => IcalInterface::UTC ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime  = DATEYmdTHis . ' ' . $msTz;
-        $dateTime2 = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime2->setTimezone( DateTimeZoneFactory::factory( OFFSET ));
-        $tz        = $dateTime2->getTimezone()->getName();
-        $dataArr[] = [
-            7114,
-            $dateTime,
-            [ IcalInterface::TZID => OFFSET ],
-            Pc::factory(
-                $dateTime2,
-                [ IcalInterface::TZID => $tz ]
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, $tz )
+            $this->getDateTimeAsCreateLongString( $dateTime2, $phpTz )
         ];
 
         return $dataArr;
@@ -1105,50 +1073,6 @@ class DateTimeTest extends DtBase
                 [ IcalInterface::TZID => $phpTz, ]
             ),
             $this->getDateTimeAsCreateLongString( $dateTime, $phpTz )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime = new DateTime( DATEYmd, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime->setTimezone( DateTimeZoneFactory::factory( TZ2 ));
-        $dataArr[] = [
-            8112,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => TZ2 ],
-            Pc::factory(
-                $dateTime,
-                [ IcalInterface::TZID => TZ2 ]
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime, TZ2 )
-        ];
-
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime = new DateTime( DATEYmd, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
-        $dataArr[] = [
-            8113,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => IcalInterface::UTC ],
-            Pc::factory(
-                $dateTime,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime = new DateTime( DATEYmd, DateTimeZoneFactory::factory( $phpTz ));
-        $dateTime->setTimezone( DateTimeZoneFactory::factory( OFFSET ));
-        $tz       = $dateTime->getTimezone()->getName();
-        $dataArr[] = [
-            8114,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => OFFSET ],
-            Pc::factory(
-                $dateTime,
-                [ IcalInterface::TZID => $tz ]
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime, $tz )
         ];
 
         return $dataArr;

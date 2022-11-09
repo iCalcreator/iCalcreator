@@ -81,7 +81,7 @@ class RexdateFactory
             }
         }
         foreach( $exdates as $eix => $theExdate ) {
-            $wDate     = match ( true ) {
+            $wDate     = match( true ) {
                 $theExdate instanceof DateTimeInterface => DateTimeFactory::conformDateTime(
                     DateTimeFactory::toDateTime( $theExdate ),
                     $isValueDate,

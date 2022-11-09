@@ -39,14 +39,13 @@ use Kigkonsult\Icalcreator\Util\RexdateFactory;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function count;
-use function in_array;
 use function is_array;
 use function reset;
 
 /**
  * RDATE property functions
  *
- * @since 2.41.44 2022-04-27
+ * @since 2.41.68 2022-10-03
  */
 trait RDATEtrait
 {
@@ -60,13 +59,15 @@ trait RDATEtrait
      *
      * @return string
      * @throws Exception
+     * @since 2.41.68 2022-10-03
      */
     public function createRdate() : string
     {
         return Rdate::format(
             self::RDATE,
             $this->rdate ?? [],
-            $this->getConfig( self::ALLOWEMPTY )
+            $this->getConfig( self::ALLOWEMPTY ),
+            $this->getCompType()
         );
     }
 
@@ -167,7 +168,7 @@ trait RDATEtrait
             $value->value,
             $value->hasParamValue( self::PERIOD )
         );
-        if( in_array( $this->getCompType(), Vcalendar::$TZCOMPS, true )) {
+        if( Vcalendar::isTzComp( $this->getCompType() )) {
             $value->addParam( self::ISLOCALTIME, true );
         }
         self::setMval( $this->rdate, RexdateFactory::prepInputRdate( $value ), $index );

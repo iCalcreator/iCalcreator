@@ -53,7 +53,7 @@ use function utf8_encode;
 /**
  * iCalcreator http support class
  *
- * @since 2.40.11 2022-01-15
+ * @since  2.47.68 - 2022-09-26
  */
 class HttpFactory
 {
@@ -143,7 +143,7 @@ class HttpFactory
      * @param string $url
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.27.3 - 2018-12-28
+     * @since  2.47.68 - 2022-09-26
      */
     public static function assertUrl( string $url ) : void
     {
@@ -154,24 +154,17 @@ class HttpFactory
         $url2 = str_contains( $url, $UC )
             ? str_replace( $UC, Util::$MINUS, $url )
             : $url;
-        $no   = 0;
-        do {
-            if( false !== filter_var( $url2, FILTER_VALIDATE_URL )) {
-                break;
-            }
-            if( empty( parse_url( $url2, PHP_URL_SCHEME )) &&
-                ( false !== filter_var( $HTTP . $url2, FILTER_VALIDATE_URL ))) {
-                break;
-            }
-            $no = 1;
-            if( 0 !== strcasecmp( $URN, substr( $url, 0, 3 ))) {
-                $no = 2;
-            }
-            break;
-        } while( true );
-        if( ! empty( $no )) {
-            throw new InvalidArgumentException( sprintf( $MSG, $no, $url ));
-        }
+        switch( true ) {
+            case ( false !== filter_var( $url2, FILTER_VALIDATE_URL )) :
+                return;
+            case ( empty( parse_url( $url2, PHP_URL_SCHEME )) &&
+                ( false !== filter_var( $HTTP . $url2, FILTER_VALIDATE_URL ))) :
+                return;
+            case ( 0 !== strcasecmp( $URN, substr( $url, 0, 3 ))) :
+                throw new InvalidArgumentException( sprintf( $MSG, 2, $url ));
+            default :
+                throw new InvalidArgumentException( sprintf( $MSG, 1, $url ));
+        } // end switch
     }
 
     /**
@@ -186,7 +179,7 @@ class HttpFactory
     public static function urlSet( ? Pc & $propValue, Pc $value ) : void
     {
         if( ! empty( $value->value )) {
-            StringFactory::checkFixUriValue( $value->value );
+            StringFactory::checkFixUrlDecode( $value->value );
             self::assertUrl( $value->value );
             $value->removeParam(IcalInterface::VALUE );
         }

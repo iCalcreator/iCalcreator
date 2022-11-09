@@ -414,7 +414,7 @@ class RegulateTimezoneFactory
                         $currTzId      = null;
                         $currTzIdFound = true;  // NO process of STANDARD/DAYLIGHT offset
                     }
-                    catch( InvalidArgumentException $e ) {
+                    catch( InvalidArgumentException ) {
                         $valueNew = null;       // DO process of STANDARD/DAYLIGHT offset
                     }
                     break;

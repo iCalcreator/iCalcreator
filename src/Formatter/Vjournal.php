@@ -37,7 +37,7 @@ use function strtoupper;
 use function sprintf;
 
 /**
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.68 2022-10-03
  */
 final class Vjournal extends FormatBase
 {
@@ -161,7 +161,8 @@ final class Vjournal extends FormatBase
             Property\Rdate::format(
                 self::RDATE,
                 $source->getAllRdate( true ),
-                $allowEmpty
+                $allowEmpty,
+                $source->getCompType()
             ) .
             Property\Requeststatus::format(
                 self::REQUEST_STATUS,

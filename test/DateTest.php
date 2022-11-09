@@ -493,19 +493,19 @@ class DateTest extends DtBase
                 [ , , $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-1', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( __FUNCTION__, $case . '-1', __FUNCTION__, $theComp, $isMethod )
                 );
                 $comp->{$setMethod}( $value, $params );
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( __FUNCTION__, $case . '-2', __FUNCTION__, $theComp, $isMethod )
                 );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, __FUNCTION__ . ' ', $case . '-3', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg( __FUNCTION__, $case . '-3', __FUNCTION__, $theComp, $getMethod )
                     . PHP_EOL . 'expectedGet : ' . var_export( $expectedGet, true )
                     . PHP_EOL . 'getValue    : ' . var_export( $getValue, true )
                 );

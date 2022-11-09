@@ -276,3 +276,7 @@ v3.39   3.4 release candidate
 2.41.65   upd Pc::getParams() return types
 2.41.66   upd tests and format property output logic
 2.41.67   DateTimeInterface adapt
+
+2.41.68   more code clean up, methods args etc
+2.41.69   Util/IcalXMLFactory split up in Xml/Formatter+Parser
+2.41.70   more 2.41.57 (timezones)

@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
+use DateTime;
 use DateTimeZone;
 use Exception;
 use IntlTimeZone;
@@ -42,6 +43,8 @@ use function sprintf;
 use function str_replace;
 use function strlen;
 use function substr;
+use function strtolower;
+use function timezone_name_from_abbr;
 use function trim;
 
 /**
@@ -55,52 +58,77 @@ class DateTimeZoneFactory
     /**
      * @var string[]
      */
-    public static array $UTCARR = [ 'Z', IcalInterface::UTC, IcalInterface::GMT ];
+    public static array $UTCARR = [ IcalInterface::Z, IcalInterface::UTC, IcalInterface::GMT ];
+
+    /**
+     * @param string $tzString
+     * @return bool
+     */
+    public static function isUtcTz( string $tzString ) : bool
+    {
+        return in_array( $tzString, self::$UTCARR, true );
+    }
 
     /**
      * Return new DateTimeZone object instance
      *
      * @param string $tzString
+     * @param null|string $ymdHisString
      * @return DateTimeZone
      * @throws InvalidArgumentException
-     * @since  2.27.8 - 2019-01-12
+     * @since  2.41.70 - 2022-10-19
      */
-    public static function factory( string $tzString ) : DateTimeZone
+    public static function factory( string $tzString, ? string $ymdHisString = null ) : DateTimeZone
     {
-        return self::assertDateTimeZone( $tzString );
+        return self::assertDateTimeZone( $tzString, $ymdHisString );
     }
 
     /**
      * Assert DateTimeZoneString
      *
      * @param string $tzString
+     * @param null|string $ymdHisString
      * @return DateTimeZone
      * @throws InvalidArgumentException
-     * @since  2.41.57 - 2022-08-19
+     * @since  2.41.70 - 2022-10-19
      */
-    public static function assertDateTimeZone( string $tzString ) : DateTimeZone
+    public static function assertDateTimeZone( string $tzString, ? string $ymdHisString = null ) : DateTimeZone
     {
-        static $ERR = 'Invalid DateTimeZone \'%s\'';
+        static $ERR  = 'Invalid DateTimeZone \'%s\'';
+        static $ERR2 = 'Invalid DateTime \'%s %s\' (%s)';
         if( empty( $tzString ) && ( 0 !== (int) $tzString)) {
             throw new InvalidArgumentException( sprintf( $ERR, $tzString ));
         }
         if( self::hasOffset( $tzString )) {
             $tzString = self::getTimeZoneNameFromOffset( $tzString );
         }
-        elseif( in_array( $tzString, self::$UTCARR, true )) {
+        elseif( self::isUtcTz( $tzString )) {
             $tzString = IcalInterface::UTC;
         }
         try {
             $timeZone = new DateTimeZone( $tzString );
+            if( strtolower( $tzString ) !== strtolower( $timeZone->getName())) {
+                throw new Exception( sprintf( $ERR, $tzString )); // some ms timezone may still be accepted!!
+            }
         }
         catch( Exception $e ) {
             if( false === ( $tzString2 = IntlTimeZone::getIDForWindowsID( $tzString ))) {
                 throw new InvalidArgumentException( sprintf( $ERR, $tzString ), $e->getCode(), $e );
             }
-            if( in_array( $tzString2, self::$UTCARR, true )) {
+            if( self::isUtcTz( $tzString2 )) {
                 $tzString2 = IcalInterface::UTC;
             }
             $timeZone = new DateTimeZone( $tzString2 );
+            try {
+                if( ! empty( $ymdHisString ) && // force UTC on empty offset
+                    empty( $timeZone->getOffset( new DateTime( $ymdHisString, $timeZone )))) {
+                    $timeZone = new DateTimeZone( IcalInterface::UTC );
+                }
+            }
+            catch( Exception $e ) {
+                throw new InvalidArgumentException(
+                    sprintf( $ERR2, $ymdHisString, $timeZone->getName(), $tzString ), $e->getCode(), $e );
+            }
         }
         return $timeZone;
     }
@@ -141,10 +169,10 @@ class DateTimeZoneFactory
         static $UTCOFFSET = '+00:00';
         static $ERR       = 'Offset \'%s\' (%+d seconds) don\'t match any timezone';
         if( $UTCOFFSET === $offset ) {
-            return self::$UTCARR[1];
+            return IcalInterface::UTC;
         }
         $seconds = self::offsetToSeconds( $offset );
-        $res     =  timezone_name_from_abbr( Util::$SP0, $seconds );
+        $res     = timezone_name_from_abbr( Util::$SP0, $seconds );
         if( false === $res ) {
             $res = timezone_name_from_abbr( Util::$SP0, $seconds, 0 );
         }
@@ -229,7 +257,7 @@ class DateTimeZoneFactory
      * @param null|string $timeZoneString
      * @return bool
      * @throws Exception
-     * @since  2.27.8 - 2019-01-21
+     * @since  2.41.70 - 2022-10-19
      */
     public static function isUTCtimeZone( ? string $timeZoneString ) : bool
     {
@@ -242,8 +270,15 @@ class DateTimeZoneFactory
             }
             return ( empty((int) $timeZoneString ));
         }
+        $timeZoneString = trim( $timeZoneString );
+        if( self::isUtcTz( $timeZoneString )) {
+            return true;
+        }
         try {
-            $tz = self::factory( $timeZoneString );
+            $tz = new DateTimeZone( $timeZoneString );
+            if( strtolower( $timeZoneString ) !== strtolower( $tz->getName())) {
+                throw new Exception(); // ms timezone still accepted!!
+            }
         }
         catch( Exception ) {
             return false;
@@ -252,7 +287,7 @@ class DateTimeZoneFactory
     }
 
     /**
-     * Return seconds based on an offset, [+/-]HHmm[ss], used when correcting UTC to localtime or v.v.
+     * Return seconds based on an offset, [+/-]HHmm[ss], used when altering UTC to localtime or v.v.
      *
      * @param string $offset
      * @return int

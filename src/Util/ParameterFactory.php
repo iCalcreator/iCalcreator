@@ -42,7 +42,7 @@ use function trim;
 /**
  * iCalcreator iCal parameters support class
  *
- * @since 2.41.63 2022-09-05
+ * @since 2.41.68 2022-10-02
  */
 class ParameterFactory
 {
@@ -55,12 +55,11 @@ class ParameterFactory
      * @param null|array $params
      * @param null|string[] $defaults
      * @return string[]
-     * @since 2.41.63 2022-09-05
+     * @since 2.41.68 2022-10-02
      */
     public static function setParams( ? array $params = [], ? array $defaults = [] ) : array
     {
         static $TRUEFALSEARR = [ IcalInterface::TRUE,  IcalInterface::FALSE ];
-        static $ONE = '1';
         if( empty( $params ) && empty( $defaults )) {
             return [];
         }
@@ -70,8 +69,7 @@ class ParameterFactory
             switch( true ) {
                 case is_array( $paramValue ) :
                     foreach( $paramValue as $pkey => $pValue ) {
-                        $output[$paramKey][$pkey] =
-                            trim( trim( $pValue ), StringFactory::$QQ );
+                        $output[$paramKey][$pkey] = self::conformValue( $pValue );
                     }
                     continue 2;
                 case ( IcalInterface::DERIVED === $paramKey ) :
@@ -90,16 +88,8 @@ class ParameterFactory
                         $paramValue = 1;
                     }
                     break;
-                case ( IcalInterface::FEATURE === $paramKey ) :
-                    // fall through
-                case is_string( $paramValue ) :
-                    $paramValue = trim( $paramValue, StringFactory::$QQ );
-                    break;
-                case is_bool( $paramValue ) :
-                    $paramValue = $paramValue ? $ONE : Util::$ZERO;
-                    break;
                 default :
-                    $paramValue = (string) $paramValue;
+                    $paramValue = self::conformValue( $paramValue );
                     break;
             } // end switch
             $output[$paramKey] = ( IcalInterface::VALUE === $paramKey )
@@ -114,6 +104,24 @@ class ParameterFactory
             }
         }
         return $output;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     * @since 2.41.68 2022-10-02
+     */
+    private static function conformValue ( mixed $value ) : string
+    {
+        static $ONE = '1';
+        switch( true ) {
+            case is_string( $value ) :
+                return trim( $value, StringFactory::$QQ );
+            case is_bool( $value ) :
+                return $value ? $ONE : Util::$ZERO;
+            default :
+                return (string) $value;
+        } // end switch
     }
 
     private static string $CIRCUMFLEX = '^';

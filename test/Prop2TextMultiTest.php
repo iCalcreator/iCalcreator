@@ -508,7 +508,7 @@ class Prop2TextMultiTest extends DtBase
         ];
 
         // CONFERENCE
-        $value  = 'https://video-chat.example.test.com/;group-id=1234';
+        $value  = 'https://video-chat.example.test.com/group-id=1234';
         $params = [
                 IcalInterface::VALUE    => IcalInterface::URI,
                 IcalInterface::FEATURE  => IcalInterface::AUDIO . ',' . IcalInterface::VIDEO,
@@ -518,6 +518,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params
         );
+        $specKeys  = [ IcalInterface::FEATURE, IcalInterface::LABEL, IcalInterface::LANGUAGE ];
         $dataArr[] = [
             2122,
             [
@@ -529,11 +530,11 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . Property::formatParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::formatParams( $params, $specKeys ) . ':' . $value
         ];
 
         // CONFERENCE
-        $value  = 'https://video-chat.example.test.com/;group-id=1234';
+        $value  = 'https://video-chat.example.test.com/group-id=1234';
         $params = [
                 IcalInterface::VALUE   => IcalInterface::URI,
                 IcalInterface::FEATURE => IcalInterface::VIDEO,
@@ -554,7 +555,7 @@ class Prop2TextMultiTest extends DtBase
             $value,
             $params,
             $getValue,
-            IcalInterface::CONFERENCE . Property::formatParams( $params ) . ':' . $value
+            IcalInterface::CONFERENCE . Property::formatParams( $params, $specKeys ) . ':' . $value
         ];
 
         // NAME
@@ -805,6 +806,7 @@ class Prop2TextMultiTest extends DtBase
             IcalInterface::IMAGE,
             IcalInterface::NAME
         ];
+        static $PAVLVR = [ IcalInterface::PARTICIPANT, IcalInterface::VLOCATION, IcalInterface::VRESOURCE ];
         $c = new Vcalendar();
 
         foreach( array_keys( $propComps ) as $propName ) {
@@ -834,10 +836,9 @@ class Prop2TextMultiTest extends DtBase
                 }
                 $newMethod = 'new' . $theComp;
                 $comp = match ( true ) {
-                    IcalInterface::AVAILABLE === $theComp => $c->newVavailability()->{$newMethod}(),
-                    in_array( $theComp, [ IcalInterface::PARTICIPANT, IcalInterface::VLOCATION, IcalInterface::VRESOURCE ], true )
-                                                          => $c->newVevent()->{$newMethod}(),
-                    default                               => $c->{$newMethod}(),
+                    ( IcalInterface::AVAILABLE === $theComp ) => $c->newVavailability()->{$newMethod}(),
+                    in_array( $theComp, $PAVLVR, true )  => $c->newVevent()->{$newMethod}(),
+                    default                                   => $c->{$newMethod}(),
                 };
 
                 $this->propNameTest(
@@ -856,7 +857,7 @@ class Prop2TextMultiTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-25', __FUNCTION__, 'Vcalendar', 'createComponent' )
+            self::getErrMsg(  null, $case . '-25', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $c2 = new Vcalendar();
@@ -864,19 +865,19 @@ class Prop2TextMultiTest extends DtBase
         $this->assertEquals(
             $calendar1,
             $c2->createCalendar(),
-            sprintf( self::$ERRFMT, null, $case . '-26', __FUNCTION__, 'Vcalendar', 'parse, create and compare' )
+            self::getErrMsg(  null, $case . '-26', __FUNCTION__, 'Vcalendar', 'parse, create and compare' )
         );
 
         if( IcalInterface::DESCRIPTION === $propName ) {
             $this->assertFalse(
                 $c->isNameSet(),
-                sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-27', __FUNCTION__, $c->getCompType(), 'isNamSet' )
+                self::getErrMsg(  '(is-prop-set) ', $case . '-27', __FUNCTION__, $c->getCompType(), 'isNamSet' )
             );
             $c->setName( $value, $params );
             $c->setName( $value, $params );
             $this->assertTrue(
                 $c->isNameSet(),
-                sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-28', __FUNCTION__, $c->getCompType(), 'isNamSet' )
+                self::getErrMsg(  '(is-prop-set) ', $case . '-28', __FUNCTION__, $c->getCompType(), 'isNamSet' )
             );
         } // end DESCRIPTION
         $this->parseCalendarTest( $case, $c, $expectedString );
@@ -911,7 +912,7 @@ class Prop2TextMultiTest extends DtBase
         [ $createMethod, $deleteMethod, , $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
         $this->assertFalse(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $instance->getCompType(), $isMethod )
+            self::getErrMsg(  null, $case . '-1', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {
@@ -927,46 +928,46 @@ class Prop2TextMultiTest extends DtBase
         }
         $this->assertTrue(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $instance->getCompType(), $isMethod )
+            self::getErrMsg(  null, $case . '-2', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
 
         $getValue = $instance->{$getMethod}( null, true );
         $this->assertEquals(
             $expectedGet,
             $getValue,
-            sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $instance->getCompType(), $getMethod )
+            self::getErrMsg(  null, $case . '-3', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
+        // parameter ORDER test
         if( $getValue->hasParamkey( Vcalendar::ORDER )) {
             $this->assertSame(
                 1,
                 $getValue->getParams( Vcalendar::ORDER ),
-                sprintf( self::$ERRFMT, null, $case . '-3ParamInt', __FUNCTION__, $instance->getCompType(), $getMethod )
+                self::getErrMsg(  null, $case . '-3ParamInt', __FUNCTION__, $instance->getCompType(), $getMethod )
             );
         }
-
 
         $createString = str_replace( Util::$CRLF . ' ' , null, $instance->{$createMethod}());
         $createString = str_replace( '\,', ',', $createString );
         $this->assertEquals(
             $expectedString,
             trim( $createString ),
-            sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $instance->getCompType(), $createMethod )
+            self::getErrMsg(  null, $case . '-4', __FUNCTION__, $instance->getCompType(), $createMethod )
         );
 
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-5a', __FUNCTION__, $instance->getCompType(), $getMethod )
+            self::getErrMsg(  '(after delete) ', $case . '-5a', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-5b', __FUNCTION__, $instance->getCompType(), $getMethod )
+            self::getErrMsg(  '(after delete) ', $case . '-5b', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
         $this->assertFalse(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-5c', __FUNCTION__, $instance->getCompType(), $getMethod )
+            self::getErrMsg(  '(is-prop-set) ', $case . '-5c', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {
@@ -993,18 +994,18 @@ class Prop2TextMultiTest extends DtBase
         }
         $this->assertTrue(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-6a', __FUNCTION__, $instance->getCompType(), $isMethod )
+            self::getErrMsg(  '(is-prop-set) ', $case . '-6a', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
 
         $instance->{$deleteMethod}();
         $instance->{$deleteMethod}();
         $this->assertFalse(
             $instance->{$isMethod}(),
-            sprintf( self::$ERRFMT, '(is-prop-set) ', $case . '-6b', __FUNCTION__, $instance->getCompType(), $isMethod )
+            self::getErrMsg(  '(is-prop-set) ', $case . '-6b', __FUNCTION__, $instance->getCompType(), $isMethod )
         );
         $this->assertFalse(
             $instance->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-6c', __FUNCTION__, $instance->getCompType(), $getMethod )
+            self::getErrMsg(  '(after delete) ', $case . '-6c', __FUNCTION__, $instance->getCompType(), $getMethod )
         );
 
         if( IcalInterface::REQUEST_STATUS === $propName ) {
@@ -1131,7 +1132,7 @@ class Prop2TextMultiTest extends DtBase
             $this->assertStringContainsString(
                 $TEST . $x,
                 $testValue,
-                sprintf( self::$ERRFMT, '', $case . '-1', __FUNCTION__, $instance->getCompType(), $foreachName ) .
+                self::getErrMsg(  '', $case . '-1', __FUNCTION__, $instance->getCompType(), $foreachName ) .
                  PHP_EOL . var_export( $instance->{$foreachName}(), true )
             );
         }
@@ -1140,7 +1141,7 @@ class Prop2TextMultiTest extends DtBase
             $this->assertStringContainsString(
                 $TEST . $x,
                 $testValue,
-                sprintf( self::$ERRFMT, '', $case . '-2', __FUNCTION__, $instance->getCompType(), $foreachName ) .
+                self::getErrMsg(  '', $case . '-2', __FUNCTION__, $instance->getCompType(), $foreachName ) .
                 PHP_EOL . var_export( $instance->{$foreachName}( true ), true )
             );
         }

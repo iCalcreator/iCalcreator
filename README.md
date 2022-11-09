@@ -3,11 +3,11 @@
 is the PHP class package managing
 
 > iCal calendar information
+<br><br>[rfc5545] - Internet Calendaring and Scheduling Core Object Specification (iCalendar) 
 
 | |supporting|
 |---|---|
 |[rfc2445]|Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
-|[rfc5545]|Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
 |[rfc5870]|A Uniform Resource Identifier for Geographic Locations ('geo' URI)|
 |[rfc6321]|xCal: The XML Format for iCalendar|
 |[rfc6868]|Parameter Value Encoding in iCalendar and vCard|
@@ -41,13 +41,14 @@ For iCal json (JSCalendar, [rfc8984]) export and import, use [github.com/PhpJsCa
 
 ###### Builds
 
-v2.41.64 - v2.42 pre-release
+v2.41.70 - v2.42 pre-release
 
 v2.40 - stable PHP8
 
 v2.39 - PHP7
 
-Asserting PHP compability using [PHPCompatibility] and [PHPStan].
+To support the development, maintenance and test process 
+[PHPCompatibility], [PHPStan] and [php-arguments-detector] are included..
 
 ###### Support
 
@@ -89,6 +90,7 @@ iCalcreator is licensed under the LGPLv3 License.
 [paypal.me/kigkonsult]:https://paypal.me/kigkonsult
 [PHPCompatibility]:https://github.com/PHPCompatibility/PHPCompatibility
 [PHPStan]:https://github.com/phpstan/phpstan
+[php-arguments-detector]:https://github.com/DeGraciaMathieu/php-arguments-detector
 [rfc2445]:https://www.rfc-editor.org/info/rfc2445
 [rfc5545]:https://www.rfc-editor.org/info/rfc5545
 [rfc5870]:https://www.rfc-editor.org/info/rfc5870

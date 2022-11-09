@@ -36,25 +36,20 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use UnexpectedValueException;
 
-use function explode;
-use function in_array;
 use function is_array;
 use function ksort;
 use function method_exists;
 use function str_contains;
-use function strtolower;
-use function trim;
-use function ucfirst;
 
 /**
  *  Parent class for calendar components
  *
- * @since  2.41.54 - 2022-08-09
+ * @since 2.41.68 2022-10-08
  */
 abstract class CalendarComponent extends IcalBase
 {
     /**
-     * @var array  component sort params
+     * @var array  component sort keyss
      */
     public array $srtk = [];
 
@@ -62,16 +57,6 @@ abstract class CalendarComponent extends IcalBase
      * @var string component number
      */
     public string $cno = '';
-
-    /**
-     * @var string
-     */
-    protected static string $FMTBEGIN      = "BEGIN:%s\r\n";
-
-    /**
-     * @var string
-     */
-    protected static string $FMTEND        = "END:%s\r\n";
 
     /**
      * @var string
@@ -88,9 +73,7 @@ abstract class CalendarComponent extends IcalBase
     {
         static $objectNo = 0;
         $class           = static::class;
-        $this->compType  = ucfirst(
-            strtolower( StringFactory::afterLast( StringFactory::$BS2, $class  ))
-        );
+        $this->compType  = StringFactory::compTypeFromClass( $class  );
         $this->cno       = $class::$compSgn . ++$objectNo;
         $this->setConfig( $config ?? [] );
     }
@@ -104,14 +87,14 @@ abstract class CalendarComponent extends IcalBase
      * @param string $propName
      * @param array $output incremented result array
      * @return void
-     * @since  2.29.17 - 2020-01-25
+     * @since 2.41.68 2022-10-08
      */
     public function getProperties( string $propName, array & $output ) : void
     {
         if( empty( $output )) {
             $output = [];
         }
-        if( ! in_array( $propName, self::$MPROPS1, true )) {
+        if( ! self::isMultiProp1( $propName )) {
             return;
         }
         $method = StringFactory::getGetMethodName( $propName );
@@ -125,54 +108,18 @@ abstract class CalendarComponent extends IcalBase
             if( is_array( $content )) {
                 foreach( $content as $part ) {
                     if( str_contains( $part, Util::$COMMA )) {
-                        $part = explode( Util::$COMMA, $part );
-                        foreach( $part as $contentPart ) {
-                            $contentPart = trim( $contentPart );
-                            if( ! empty( $contentPart )) {
-                                if( ! isset( $output[$contentPart] )) {
-                                    $output[$contentPart] = 1;
-                                }
-                                else {
-                                    ++$output[$contentPart];
-                                }
-                            }
-                        } // end foreach
-                    }
+                        StringFactory::commaSplitCount( $part, $output );
+                    } // end if
                     else {
-                        $part = trim( $part );
-                        if( ! isset( $output[$part] )) {
-                            $output[$part] = 1;
-                        }
-                        else {
-                            ++$output[$part];
-                        }
-                    }
+                        StringFactory::stringCount( $part, $output );
+                    } // end else
                 } // end foreach
             } // end if( is_array( $content ))
             elseif( str_contains( $content, Util::$COMMA )) {
-                $content = explode( Util::$COMMA, $content );
-                foreach( $content as $contentPart ) {
-                    $contentPart = trim( $contentPart );
-                    if( ! empty( $contentPart )) {
-                        if( ! isset( $output[$contentPart] )) {
-                            $output[$contentPart] = 1;
-                        }
-                        else {
-                            ++$output[$contentPart];
-                        }
-                    }
-                } // end foreach
-            } // end elseif( false !== strpos( $content, Util::$COMMA ))
+                StringFactory::commaSplitCount( $content, $output );
+            }
             else {
-                $content = trim( $content );
-                if( ! empty( $content )) {
-                    if( ! isset( $output[$content] )) {
-                        $output[$content] = 1;
-                    }
-                    else {
-                        ++$output[$content];
-                    }
-                }
+                StringFactory::stringCount( $content, $output );
             }
         } // end while
         ksort( $output );

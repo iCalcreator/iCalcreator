@@ -54,7 +54,7 @@ use function var_export;
  * iCalcreator DateTime support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since 2.40.11 2022-01-15
+ * @since 2.47.68 2022-09-25
  */
 class DateTimeFactory
 {
@@ -136,7 +136,7 @@ class DateTimeFactory
                 ? new DateTime( $dateTimeString )
                 : new DateTime(
                     $dateTimeString,
-                    DateTimeZoneFactory::factory( $timeZoneString )
+                    DateTimeZoneFactory::factory( $timeZoneString, $dateTimeString )
                 );
         }
         catch( Exception $e ) {
@@ -172,21 +172,13 @@ class DateTimeFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.47.68 2022-09-25
      */
     public static function setDate( Pc $value, ? bool $forceUTC = false ) : Pc
     {
         $isValueDate = $value->hasParamValue( IcalInterface::DATE );
-        $paramTZid   = $value->getParams( IcalInterface::TZID ) ?? Util::$SP0;
+        $paramTZid   = self::getParamTZid( $value );
         $isLocalTime = $value->hasParamKey( IcalInterface::ISLOCALTIME );
-        if( ! empty( $paramTZid )) {
-            if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
-                $paramTZid = DateTimeZoneFactory::getTimeZoneNameFromOffset( $paramTZid );
-            }
-            else {
-                DateTimeZoneFactory::assertDateTimeZone( $paramTZid );
-            }
-        } // end if
         switch( true ) {
             case ( $value->value instanceof DateTimeInterface ) :
                 $dateTime = self::conformDateTime(
@@ -226,6 +218,28 @@ class DateTimeFactory
             ( $forceUTC ? IcalInterface::UTC : $paramTZid )
         );
         return $value;
+    }
+
+    /**
+     * Return parameter TZid or ''
+     *
+     * @param Pc $pc property content
+     * @return string
+     * @since 2.47.68 2022-09-25
+     */
+    private static function getParamTZid( Pc $pc ) : string
+    {
+        if( ! $pc->hasParamKey( IcalInterface::TZID )) {
+            return Util::$SP0;
+        }
+        $paramTZid     = $pc->getParams( IcalInterface::TZID );
+        if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
+            $paramTZid = DateTimeZoneFactory::getTimeZoneNameFromOffset( $paramTZid );
+        }
+        else {
+            DateTimeZoneFactory::assertDateTimeZone( $paramTZid );
+        }
+        return $paramTZid;
     }
 
     /**
@@ -342,7 +356,7 @@ class DateTimeFactory
      * @param string $string
      * @return array  [<datePart>, <timezonePart>]
      * @throws Exception
-     * @since  2.41.57 - 2022-08-19
+     * @since  2.41.70 - 2022-10-19
      */
     public static function splitIntoDateStrAndTimezone( string $string ) : array
     {
@@ -380,6 +394,14 @@ class DateTimeFactory
         if( DateTimeZoneFactory::isUTCtimeZone( trim( substr( $string, -3 )))) {
             return [ trim( substr( $string, 0, -3 )), IcalInterface::UTC ];
         }
+        // check for ms 'UTC-02', 'UTC+11', 'UTC+12'
+        if( in_array( substr( $string, -6 ), [ 'UTC-02', 'UTC-11', 'UTC+12' ] )) {
+            return [
+                trim( substr( $string, 0, -6 )),
+                substr( $string, -6 )
+            ];
+        }
+
         // timezone is always after a digit and, hopefully, a space-delim
         $pos = strlen( $string ) - 1;
         while( true ) {
@@ -538,12 +560,12 @@ class DateTimeFactory
     {
         $tz      = trim((string) $tz );
         switch( true ) {
-            case ( empty( $tz )) :
+            case empty( $tz ) :
                 break;
-            case ( DateTimeZoneFactory::isUTCtimeZone( $tz )) :
+            case DateTimeZoneFactory::isUTCtimeZone( $tz ) :
                 $tz = IcalInterface::UTC;
                 break;
-            case ( DateTimeZoneFactory::hasOffset( $tz )) :
+            case DateTimeZoneFactory::hasOffset( $tz ) :
                 $tz  = DateTimeZoneFactory::getTimeZoneNameFromOffset( $tz );
                 break;
         } // end switch

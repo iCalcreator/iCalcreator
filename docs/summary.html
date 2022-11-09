@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.67 summary</title>
+    <title>iCalcreator 2.41.70 summary</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
     <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
     <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-    <meta name="description" content="iCalcreator v2.41.67 summary">
+    <meta name="description" content="iCalcreator v2.41.70 summary">
     <style type="text/css">
         * {
             FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -143,9 +143,9 @@
 </head>
 <body>
 <a name="top"></a>
-<p class="header">iCalcreator v2.41.67</p>
+<p class="header">iCalcreator v2.41.70</p>
 <p>
-    iCalcreator v2.41.67<br>
+    iCalcreator v2.41.70<br>
     Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
     <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
     <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -205,11 +205,12 @@
     For iCalcreator 2.40 version (and later), <em>PHP</em> version &gt;= 8.0 is required,
     version v2.39 <em>PHP</em>7+.
 
-    To assert PHP compability
-    <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>
-    and
+    To support the development, maintenance and test process
+    <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>,
     <a href="https://github.com/phpstan/phpstan" title="PHPStan">PHPStan</a>
-    are used.
+    and
+    <a href="https://github.com/DeGraciaMathieu/php-arguments-detector" title="php-arguments-detector">php-arguments-detector</a>
+    are included.
 </p>
 
 <h4>iCal</h4>
@@ -316,7 +317,7 @@ complete manual and review and explore iCalcreator usage.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.67/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.70/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>
@@ -324,7 +325,7 @@ complete manual and review and explore iCalcreator usage.
 </p>
 
 <p>
-iCalcreator 2.41.67 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.70 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 
@@ -339,7 +340,8 @@ properties, config keys etc in (src/)IcalInterface.
 
 <h2>CREATE</h2>
 
-<p class="example">&lt;?php
+<p class="example">
+&lt;?php
 
 use Kigkonsult\Icalcreator\Vcalendar;
 use DateTime;
@@ -504,7 +506,10 @@ $vcalendar-&gt;parse( $iCalContent );
 <p>
 Here using <a href="https://github.com/iCalcreator/UrlRsrc" target="_blank" title="download UrlRsrc">UrlRsrc</a> to download an internet (URL) resource.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+&lt;?php
+
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Http\UrlRsrc;
 
         // <span class="comment">set Your unique id, </span>
@@ -523,10 +528,11 @@ $vcalendar-&gt;parse( $iCalContent );
 <p>
 How to convert an XML resource  to an Vcalendar class instance.
 </p>
-<p class="example">&lt;?php
+<p class="example">
+&lt;?php
 
 use Kigkonsult\Icalcreator\Vcalendar;
-use Kigkonsult\Icalcreator\Util\IcalXMLFactory;
+use Kigkonsult\Icalcreator\Xml\Parser as XmlParser;
 
         // <span class="comment">set Your unique id, </span>
         // <span class="comment">site info for the Vcalendar PRODID property</span>
@@ -535,19 +541,19 @@ $config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
         // <span class="comment">use a local or remote xCal file</span>
 $filename = &quot;xmlfile.xml&quot;;
 
-        // <span class="comment">get XML contents from file</span>
+        // <span class="comment">get string XML contents from file</span>
 $iCalContent = file_get_contents( $filename );
 
-    // <span class="comment">parse the XML contents to Vcalendar class instance</span>
+    // <span class="comment">parse the string XML contents to Vcalendar class instance</span>
 try {
-    $calendar = IcalXMLFactory::XML2iCal( $iCalContent, $config );
+    $calendar = XmlParser::XML2iCal( $iCalContent, $config );
 }
 catch( Exception $e ) {
     exit( &quot;XML parse error&quot; );
 }
         // <span class="comment">continue process (edit, parse, select) $calendar</span>
-...
-...
+.. .
+.. .
 </p>
 
 
@@ -555,7 +561,8 @@ catch( Exception $e ) {
 <p>
 (setup)
 </p>
-<p class="example">&lt;?php
+<p class="example">
+&lt;?php
 
 use Kigkonsult\Icalcreator\Vcalendar;
 
@@ -579,6 +586,7 @@ $calendar-&gt;parse( $iCalContent )
 Get and set values
 </p>
 <p class="example">
+.. .
         // <span class="comment">read events, one by one</span>
 foreach( $calendar-&gt;getComponents( Vcalendar::VEVENT ) as $vevent ) {
 
@@ -592,7 +600,7 @@ foreach( $calendar-&gt;getComponents( Vcalendar::VEVENT ) as $vevent ) {
     if( false != ( $description = $vevent-&gt;getDescription())) {
 
         // <span class="comment">edit the description</span>
-    ...
+    .. .
 
         // <span class="comment">update/replace the description</span>
         $vevent-&gt;setDescription( $description );
@@ -621,6 +629,7 @@ foreach( $calendar-&gt;getComponents( Vcalendar::VEVENT ) as $vevent ) {
 </p>
 <h4>Ex. calendar date based select</h4>
 <p class="example">
+.. .
         // <span class="comment">select components occurring today</span>
         // <span class="comment">(including components with recurrence pattern)</span>
 $eventArray = $calendar-&gt;selectComponents();
@@ -655,7 +664,7 @@ foreach( $eventArray as $year =&gt; $yearArray) {
 (setup as above)
 </p>
 <p class="example">
-
+.. .
         // <span class="comment">fetch specific property from calendar perspective</span>
         // <span class="comment">(unique) values and occurrences : </span>
         // <span class="comment">ATTENDEE, CATEGORIES, CONTACT,</span>
@@ -679,6 +688,7 @@ by combining the "LOCATION" and "GEO" property values (only if "GEO" is set).
 (setup as above)
 </p>
 <p class="example">
+.. .
         // <span class="comment">selects components</span>
         // <span class="comment">based on specific property value(-s)</span>
         // <span class="comment">ATTENDEE, CATEGORIES, CONTACT,</span>
@@ -700,7 +710,8 @@ foreach( $specComps as $component ) {
     Get calendar as string
 </p>
 
-<p class="example">...
+<p class="example">
+.. .
 $calendarStr = $calendar-&gt;createCalendar();
 
 </p>
@@ -710,7 +721,8 @@ $calendarStr = $calendar-&gt;createCalendar();
 <p>
     Redirect calendar file to browser.
 </p>
-<p class="example">...
+<p class="example">
+.. .
 $calendar-&gt;returnCalendar();
 exit;
 
@@ -720,7 +732,8 @@ exit;
 <p>
     Save calendar to file.
 </p>
-<p class="example">...
+<p class="example">
+.. .
         // <span class="comment">Get calendar as string</span>
 $calendarStr = $calendar-&gt;createCalendar();
 
@@ -733,8 +746,9 @@ file_put_contents( &quot;calendar.ics&quot;, $calendarStr );
 <p>
     Create well-formed XML, rfc6321 (as string) from a Vcalendar class instance.
 </p>
-<p class="example">...
-$xmlstr = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $calendar);
+<p class="example">
+.. .
+$xmlstr = Kigkonsult\Icalcreator\Xml\Formatter::iCal2XML( $calendar);
 
 </p>
 
@@ -742,8 +756,18 @@ $xmlstr = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $calendar);
 <p>
     Create a json string from a Vcalendar class instance.
 </p>
-<p class="example">...
-$xmlstr = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $calendar);
+<p>
+    You can export and import
+    (<a href="https://tools.ietf.org/html/rfc8984" title="Download rfc8984" target="_blank">rfc8984</a>)
+    iCal json using
+    <a href="https://github.com/iCalcreator/PhpJsCalendar" title="PhpJsCalendar" target="_blank">PhpJsCalendar</a>
+</p>
+<p>
+    or.. .
+</p>
+<p class="example">
+.. .
+$xmlstr = Kigkonsult\Icalcreator\Xml\Formatter::iCal2XML( $calendar);
 $json   = json_encode( simplexml_load_string( $xmlstr ));
 
 </p>
@@ -766,7 +790,7 @@ $json   = json_encode( simplexml_load_string( $xmlstr ));
     <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
     <tr><td>Link     <td>https://kigkonsult.se
     <tr><td>Package  <td>iCalcreator
-    <tr><td>Version  <td>2.41.67
+    <tr><td>Version  <td>2.41.70
     <tr><td class="top">License  <td>
         Subject matter of licence is the software iCalcreator.<br>
         The above copyright, link, package and version notices,<br>

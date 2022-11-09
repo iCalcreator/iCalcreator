@@ -46,7 +46,7 @@ use function strcmp;
 /**
  * iCalcreator SortFactory class
  *
- * @since 2.29.17 2020-01-25
+ * @since 2.41.68 2022-10-03
  */
 class SortFactory
 {
@@ -99,7 +99,7 @@ class SortFactory
      *
      * @param CalendarComponent $c valendar component
      * @param null|string       $sortArg
-     * @since 2.41.13 2022-02-01
+     * @since 2.41.68 2022-10-03
      */
     public static function setSortArgs( CalendarComponent $c, ? string $sortArg = null ) : void
     {
@@ -116,7 +116,7 @@ class SortFactory
             self::setSortDefaultArgs( $c );
             return;
         }
-        if( in_array( $sortArg, Vcalendar::$MPROPS1, true )) { // all string
+        if( Vcalendar::isMultiProp1( $sortArg )) { // all string
             $propValues = [];
             $c->getProperties( $sortArg, $propValues );
             if( ! empty( $propValues )) {

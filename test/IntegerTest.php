@@ -180,7 +180,7 @@ class IntegerTest extends DtBase
                 }
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '1 ', $case, __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  '1 ', $case, __FUNCTION__, $theComp, $isMethod )
                 );
                 try {
                     $comp->{$setMethod}( $value, $params );
@@ -200,7 +200,7 @@ class IntegerTest extends DtBase
                     ((( IcalInterface::SEQUENCE === $propName ) || // empty input updates seq.
                         ( ! empty( $value ) || (( null !== $value ) && ( 0 === $value ))))),
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '2 ', $case, __FUNCTION__, $theComp, $isMethod ) . ' ' . var_export( $value, true )
+                    self::getErrMsg(  '2 ', $case, __FUNCTION__, $theComp, $isMethod, $value )
                 );
                 $getValue = $comp->{$getMethod}( true );
                 if(( empty( $getValue->value ) && IcalInterface::SEQUENCE === $propName )) {
@@ -210,21 +210,21 @@ class IntegerTest extends DtBase
                 $this->assertEquals(
                     $expectedGet,
                     $getValue,
-                    sprintf( self::$ERRFMT, '3 ', $case, __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '3 ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     strtoupper( $propName ) . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, '4 ', $case, __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  '4 ', $case, __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, '5 (after delete) ', $case, __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  '5 (after delete) ', $case, __FUNCTION__, $theComp, $isMethod )
                 );
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, ' 6 (after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  ' 6 (after delete) ', $case, __FUNCTION__, $theComp, $getMethod )
                 );
 
                 if( $pcInput ) {

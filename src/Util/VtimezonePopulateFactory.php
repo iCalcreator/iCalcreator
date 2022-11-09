@@ -32,8 +32,8 @@ namespace Kigkonsult\Icalcreator\Util;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Vcalendar;
+use Kigkonsult\Icalcreator\Vtimezone;
 
 use function array_keys;
 use function count;
@@ -93,7 +93,7 @@ class VtimezonePopulateFactory
     /**
      * Return calendar with Vtimezone(s) and Standard/Daylight components
      *
-     * Used timezone : 1. arg timezone  2. Xprops timezone 3. UTC
+     * Used timezone from 1. xProps arg 2-3. calendar/vtimezone X-prop X_WR_TIMEZONE/X-LIC-LOCATION, 4. UTC
      * start/end : 1. start/end args  2. first/last found DTSTART and recalculated using vars above
      * Will remove any previously set Vtimezones
      *
@@ -118,7 +118,7 @@ class VtimezonePopulateFactory
         $timezone = empty( $timezone )
             ? [ self::getTimezone( $calendar, $xProp ) ]
             : (array) $timezone;
-        while( false !== $calendar->deleteComponent( IcalInterface::VTIMEZONE )) {} // remove all Vtimezones
+        while( false !== $calendar->deleteComponent( Vcalendar::VTIMEZONE )) {} // remove all Vtimezones
         foreach( $timezone as $theTimezone ) {
             DateTimeZoneFactory::assertDateTimeZone( $theTimezone );
             self::processSingleTimezone( $calendar, $theTimezone, $xProp, $start, $end );
@@ -131,7 +131,7 @@ class VtimezonePopulateFactory
      *
      * @param Vcalendar $calendar
      * @param string $timezone
-     * @param null|string[] $xProp
+     * @param null|string[] $xProps
      * @param int|DateTimeInterface|null $start
      * @param int|DateTimeInterface|null $end
      * @return void
@@ -140,27 +140,19 @@ class VtimezonePopulateFactory
      * @since 2.41.10 2022-01-26
      */
     public static function processSingleTimezone(
-        Vcalendar $calendar,
-        string $timezone,
-        ? array $xProp = [],
+        Vcalendar                  $calendar,
+        string                     $timezone,
+        ? array                    $xProps = [],
         null|int|DateTimeInterface $start = null,
         null|int|DateTimeInterface $end = null
     ) : void
     {
         $foundTrans = [];
         if( ! DateTimeZoneFactory::isUTCtimeZone( $timezone )) {
-            [ $start, $end ] =
-                self::ensureStartAndEnd( $calendar, $timezone, $start, $end );
-            $foundTrans = self::findTransitions( $timezone, $start, $end );
+            [ $start, $end ] = self::ensureStartAndEnd( $calendar, $timezone, $start, $end );
+            $foundTrans      = self::findTransitions( $timezone, $start, $end );
         }
-        $timezoneComp = $calendar->newVtimezone( $timezone );
-        if( ! empty( $xProp )) {
-            foreach( $xProp as $xPropName => $xPropValue ) {
-                if( StringFactory::isXprefixed( $xPropName )) {
-                    $timezoneComp->setXprop( $xPropName, $xPropValue );
-                }
-            }
-        } // end if
+        $timezoneComp = self::getTimezoneComp( $calendar, $timezone, $xProps );
         foreach( $foundTrans as $trans ) {
             if(( 1 === count( $trans )) && isset( $trans[self::$TIME] )) {
                 // last, contains DateTime for 'next' transition, i.e. transtion valid until
@@ -175,13 +167,13 @@ class VtimezonePopulateFactory
             if( ! empty( $trans[self::$ABBR] )) {
                 $subComp->setTzname( $trans[self::$ABBR] );
             }
-            if( isset( $trans[IcalInterface::TZOFFSETFROM] )) {
-                $subComp->setTzoffsetfrom( DateTimeZoneFactory::secondsToOffset( $trans[IcalInterface::TZOFFSETFROM] ));
+            if( isset( $trans[Vcalendar::TZOFFSETFROM] )) {
+                $subComp->setTzoffsetfrom( DateTimeZoneFactory::secondsToOffset( $trans[Vcalendar::TZOFFSETFROM] ));
             }
             $subComp->setTzoffsetto( DateTimeZoneFactory::secondsToOffset( $trans[self::$OFFSET] ));
-            if( isset( $trans[IcalInterface::RDATE] )) {
-                foreach( $trans[IcalInterface::RDATE] as $rDate ) {
-                    // single RDATEs, each with single date
+            if( isset( $trans[Vcalendar::RDATE] )) {
+                foreach( $trans[Vcalendar::RDATE] as $rDate ) {
+                    // RDATEs, each with s single date
                     $subComp->setRdate( $rDate );
                 }
             }
@@ -189,35 +181,53 @@ class VtimezonePopulateFactory
     }
 
     /**
-     * Return timezone from 1. xProps arg 2. calendar/vtimezone X-prop X_WR_TIMEZONE/X-LIC-LOCATION, 4. UTC
+     * @param Vcalendar $calendar
+     * @param string $timezone
+     * @param null|string[] $xProps
+     * @return Vtimezone
+     */
+    private static function getTimezoneComp( Vcalendar $calendar, string $timezone, ? array $xProps = [] ) : Vtimezone
+    {
+        $timezoneComp = $calendar->newVtimezone( $timezone );
+        if( ! empty( $xProps )) {
+            foreach( $xProps as $xPropName => $xPropValue ) {
+                if( StringFactory::isXprefixed( $xPropName )) {
+                    $timezoneComp->setXprop( $xPropName, $xPropValue );
+                }
+            }
+        } // end if
+        return $timezoneComp;
+    }
+
+    /**
+     * Return timezone from 1. xProps arg 2-3. calendar/vtimezone X-prop X_WR_TIMEZONE/X-LIC-LOCATION, 4. UTC
      *
      * @param Vcalendar     $calendar iCalcreator calendar instance
-     * @param null|string[] $xProp    *[x-propName => x-propValue]
+     * @param null|string[] $xProps    *[x-propName => x-propValue]
      * @return string
-     * @since 2.41.10 2022-01-26
+     * @since 2.47.68 2022-09-25
      */
-    private static function getTimezone( Vcalendar $calendar, ? array $xProp = [] ) : string
+    private static function getTimezone( Vcalendar $calendar, ? array $xProps = [] ) : string
     {
-        $xProp2 = $calendar->getXprop( IcalInterface::X_WR_TIMEZONE );
         switch( true ) {
-            case Util::issetAndNotEmpty( $xProp, IcalInterface::X_WR_TIMEZONE ) :
-                $timezone = $xProp[IcalInterface::X_WR_TIMEZONE];
+            case Util::issetAndNotEmpty( $xProps, Vcalendar::X_WR_TIMEZONE ) :
+                $timezone = $xProps[Vcalendar::X_WR_TIMEZONE];
                 break;
-            case Util::issetAndNotEmpty( $xProp, IcalInterface::X_LIC_LOCATION ) :
-                $timezone = $xProp[IcalInterface::X_LIC_LOCATION];
+            case Util::issetAndNotEmpty( $xProps, Vcalendar::X_LIC_LOCATION ) :
+                $timezone = $xProps[Vcalendar::X_LIC_LOCATION];
                 break;
-            case ( false !== $xProp2 ) :
-                $timezone = $xProp2[1];
+            case $calendar->isXpropSet( Vcalendar::X_WR_TIMEZONE ) :
+                $timezone = $calendar->getXprop( Vcalendar::X_WR_TIMEZONE )[1];
                 break;
-            case ( false !== ( $comp = $calendar->getComponent( IcalInterface::VTIMEZONE ))) :
+            case ( false !== ( $comp = $calendar->getComponent( Vcalendar::VTIMEZONE ))) :
                 $calendar->resetCompCounter();
-                if( false !== ( $xProp3 = $comp->getXprop( IcalInterface::X_LIC_LOCATION ))) {
+                if( false !== ( $xProp3 = $comp->getXprop( Vcalendar::X_LIC_LOCATION ))) {
                     $timezone = $xProp3[1];
                     break;
                 }
                 // fall through
             default :
-                return IcalInterface::UTC;
+                return Vcalendar::UTC;
         } // end switch
         return $timezone;
     }
@@ -290,7 +300,7 @@ class VtimezonePopulateFactory
     {
         static $FMTBEFORE          = '-%d days';
         static $FMTAFTER           = '+%d days';
-        $dtstartArr = array_keys( $calendar->getProperty( IcalInterface::DTSTART ));
+        $dtstartArr = array_keys( $calendar->getProperty( Vcalendar::DTSTART ));
         switch( true ) {
             case ( empty( $dtstartArr )) :
                 $start = DateTimeFactory::factory( null, $timezone );
@@ -312,7 +322,7 @@ class VtimezonePopulateFactory
     }
 
     /**
-     * Return (prep'd) datetimezone transitions within start and en plus one for TZUNIL
+     * Return (prep'd) datetimezone transitions within start and end plus one for TZUNIL
      *
      * @param string $timezone
      * @param int    $start
@@ -329,16 +339,8 @@ class VtimezonePopulateFactory
         $prevOffsetFrom = 0;
         $stdIx          = $dlghtIx = -1;
         $backupTrans    = [];
-        $dateFromYmd    = DateTimeFactory::setDateTimeTimeZone(
-            DateTimeFactory::factory( DateTimeFactory::$AT . $start ),
-            $timezone
-        )
-            ->format( DateTimeFactory::$Ymd );
-        $dateToYmd      = DateTimeFactory::setDateTimeTimeZone(
-            DateTimeFactory::factory( DateTimeFactory::$AT . $end ),
-            $timezone
-        )
-            ->format( DateTimeFactory::$Ymd );
+        $dateFromYmd    = self::getYmdFromTimestamp( $start, $timezone );
+        $dateToYmd      = self::getYmdFromTimestamp( $end, $timezone );
         // extend search-args to assure we start/end at daylight shifts
         $start -= ( 3600 * 24 * 275 );
         $end   += ( 3600 * 24 * ( 185 * 2 )); // need one after end to get TZUNTIL
@@ -358,7 +360,7 @@ class VtimezonePopulateFactory
                 $prevOffsetFrom = $trans[self::$OFFSET];
                 // we save it in case we don't find any match
                 $backupTrans    = $trans;
-                $backupTrans[IcalInterface::TZOFFSETFROM] =
+                $backupTrans[Vcalendar::TZOFFSETFROM] =
                     ( 0 < $tix ) ? $transitions[$tix - 1][self::$OFFSET] : 0;
                 continue;
             } // end if
@@ -370,34 +372,51 @@ class VtimezonePopulateFactory
             }
             if( ! empty( $prevOffsetFrom ) || ( 0 == $prevOffsetFrom )) {
                 // set previous offsetto as offsetFrom
-                $trans[IcalInterface::TZOFFSETFROM] = $prevOffsetFrom;
+                $trans[Vcalendar::TZOFFSETFROM] = $prevOffsetFrom;
                 // convert utc time to local time
-                $transDate->modify( $trans[IcalInterface::TZOFFSETFROM] . self::$SECONDS );
+                $transDate->modify( $trans[Vcalendar::TZOFFSETFROM] . self::$SECONDS );
                 $trans[self::$TIME] = $transDate;
             } // end if
             $prevOffsetFrom = $trans[self::$OFFSET];
             if( true !== $trans[self::$ISDST] ) {
                 // standard timezone, build RDATEs (in date order)
                 if(( -1 < $stdIx ) && self::matchTrans( $foundTrans[$stdIx], $trans )) {
-                    $foundTrans[$stdIx][IcalInterface::RDATE][] = clone $trans[self::$TIME];
+                    $foundTrans[$stdIx][Vcalendar::RDATE][] = clone $trans[self::$TIME];
                     continue;
                 }
                 $stdIx = $tix;
-            } // end standard timezone
+            } // end if, standard timezone
             else {
                 // daylight timezone, build RDATEs (in date order)
                 if(( -1 < $dlghtIx ) && self::matchTrans( $foundTrans[$dlghtIx], $trans )) {
-                    $foundTrans[$dlghtIx][IcalInterface::RDATE][] = clone $trans[self::$TIME];
+                    $foundTrans[$dlghtIx][Vcalendar::RDATE][] = clone $trans[self::$TIME];
                     continue;
                 }
                 $dlghtIx = $tix;
-            } // end daylight timezone
+            } // end else, daylight timezone
             $foundTrans[$tix] = $trans;
         } // end foreach( $transitions as $tix => $trans )
         if( empty( $foundTrans )) {
             $foundTrans[0] = self::buildTrans( $backupTrans, $timezone );
         }
         return $foundTrans;
+    }
+
+    /**
+     * Return string Ymd from timestamp and timezone
+     *
+     * @param int $timestamp
+     * @param string $timezone
+     * @return string
+     * @throws Exception
+     */
+    private static function getYmdFromTimestamp( int $timestamp, string $timezone ) : string
+    {
+        return DateTimeFactory::setDateTimeTimeZone(
+            DateTimeFactory::factory( DateTimeFactory::$AT . $timestamp ),
+            $timezone
+        )
+            ->format( DateTimeFactory::$Ymd );
     }
 
     /**
@@ -411,9 +430,9 @@ class VtimezonePopulateFactory
     private static function matchTrans( array $foundTrans, array $trans ) : bool
     {
         return
-            ( isset( $foundTrans[IcalInterface::TZOFFSETFROM] ) &&
+            ( isset( $foundTrans[Vcalendar::TZOFFSETFROM] ) &&
                 ( $foundTrans[self::$ABBR]   === $trans[self::$ABBR] ) &&
-                ( $foundTrans[IcalInterface::TZOFFSETFROM] === $trans[IcalInterface::TZOFFSETFROM] ) &&
+                ( $foundTrans[Vcalendar::TZOFFSETFROM] === $trans[Vcalendar::TZOFFSETFROM] ) &&
                 ( $foundTrans[self::$OFFSET] === $trans[self::$OFFSET] )
             );
     }
@@ -435,7 +454,7 @@ class VtimezonePopulateFactory
             // we use the last transition (i.e. before startdate) for the tz info
             $prevDate = DateTimeFactory::factory( DateTimeFactory::$AT . $backupTrans[self::$TS] );
             // convert utc date to 'local' date
-            $prevDate->modify( $backupTrans[IcalInterface::TZOFFSETFROM] . self::$SECONDS );
+            $prevDate->modify( $backupTrans[Vcalendar::TZOFFSETFROM] . self::$SECONDS );
             $backupTrans[self::$TIME] = $prevDate;
         } // end if( $backupTrans )
         else {
@@ -443,8 +462,8 @@ class VtimezonePopulateFactory
             $prevDate    = DateTimeFactory::factory( $NOW, $timezone );
             $backupTrans = [
                 self::$TIME             => $prevDate,
-                self::$OFFSET           => $prevDate->format( IcalInterface::Z ),
-                IcalInterface::TZOFFSETFROM => $prevDate->format( IcalInterface::Z ),
+                self::$OFFSET           => $prevDate->format( Vcalendar::Z ),
+                Vcalendar::TZOFFSETFROM => $prevDate->format( Vcalendar::Z ),
                 self::$ISDST            => false,
             ];
         }

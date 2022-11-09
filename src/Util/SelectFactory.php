@@ -914,7 +914,7 @@ class SelectFactory
      *
      * @param null|string|string[] $cType
      * @return string[]
-     * @since 2.27.18 - 2019-04-07
+     * @since 2.47.68 - 2022-10-03
      */
     private static function assertComponentTypes( null | array | string $cType = null ) : array
     {
@@ -926,7 +926,7 @@ class SelectFactory
         }
         foreach( $cType as & $theType ) {
             $theType     = ucfirst( strtolower( $theType ));
-            if( ! in_array( $theType, Vcalendar::$VCOMPS, true )) {
+            if( ! Vcalendar::isVcalendarVcomp( $theType )) {
                 $theType = Vcalendar::VEVENT;
             }
         }
@@ -964,14 +964,14 @@ class SelectFactory
     /**
      * Return comp end date(time) from dtend/due/duration properties
      *
-     * @param Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
+     * @param CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component
      * @param string            $dtStartTz
      * @return null|UtilDateTime
      * @throws Exception
      * @since 2.41.64 - 2022-09-03
      */
     private static function getCompEndDate(
-        Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
+        CalendarComponent|Vavailability|Vevent|Vfreebusy|Vjournal|Vtodo $component,
         string $dtStartTz
     ) : null | UtilDateTime
     {
@@ -1047,12 +1047,12 @@ class SelectFactory
     /**
      * Update recurr-id-comps properties summary, description and comment if missing
      *
-     * @param Vavailability|Vevent/Vtodo|Vjournal|Vfreebusy $component
+     * @param CalendarComponent|Vavailability|Vevent/Vtodo|Vjournal|Vfreebusy $component
      * @param array $recurIdComps
      * @since 2.41.64 - 2022-09-03
      */
     private static function updateRecurrIdComps(
-        Vavailability|Vevent|Vtodo|Vjournal|Vfreebusy $component,
+        CalendarComponent|Vavailability|Vevent|Vtodo|Vjournal|Vfreebusy $component,
         array $recurIdComps
     ) : void
     {
@@ -1100,7 +1100,7 @@ class SelectFactory
      * @param Vcalendar $calendar
      * @param array $selectOptions (string) key => (mixed) value, (key=propertyName)
      * @return array
-     * @since 2.40.7 - 2021-11-19
+     * @since  2.47.68 - 2022-10-03
      */
     private static function selectComponents2( Vcalendar $calendar, array $selectOptions ) : array
     {
@@ -1110,12 +1110,12 @@ class SelectFactory
             if( empty( $component3 )) {
                 continue;
             }
-            if( ! in_array( $component3->getCompType(), Vcalendar::$VCOMPS, true )) {
+            if( ! Vcalendar::isVcalendarVcomp( $component3->getCompType())) {
                 continue;
             }
             $uid = $component3->getUid();
             foreach( $selectOptions as $propName => $propValue ) {
-                if( ! in_array( $propName, Vcalendar::$SELSORTPROPS, true )) {
+                if( ! Vcalendar::isSelectSortProp( $propName )) {
                     continue;
                 }
                 if( ! is_array( $propValue )) {
@@ -1125,7 +1125,7 @@ class SelectFactory
                     $output[$uid][] = $component3;
                     continue;
                 }
-                if( in_array( $propName, Vcalendar::$MPROPS1, true )) {
+                if( Vcalendar::isMultiProp1( $propName )) {
                     $propValues = [];
                     $component3->getProperties( $propName, $propValues );
                     $propValues = array_keys( $propValues );

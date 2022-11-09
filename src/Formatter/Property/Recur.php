@@ -46,7 +46,7 @@ use function usort;
  * Format EXRULE, RRULE
  *
  * 2
- * @since 2.41.66 2022-09-07
+ * @since 2.41.68 2022-10-27
  */
 final class Recur extends PropertyBase
 {
@@ -58,96 +58,100 @@ final class Recur extends PropertyBase
      * @throws Exception
      */
     public static function format(
-        string  $propName,
+        string $propName,
         null|bool|Pc $pc,
-        ? bool  $allowEmpty = true
+        ? bool $allowEmpty = true
     ) : string
     {
-        static $FMTRSCALEEQ      = 'RSCALE=%s';
-        static $FMTFREQEQ        = 'FREQ=%s';
-        static $FMTDEFAULTEQ     = ';%s=%s';
-        static $FMTOTHEREQ       = ';%s=';
-        static $RECURBYDAYSORTER = [ __CLASS__, 'recurBydaySort' ];
         if( empty( $pc )) {
             return self::$SP0;
         }
         if( empty( $pc->value )) {
-            return ( $allowEmpty ) ? self::renderProperty( $propName ) : self::$SP0;
+            return $allowEmpty ? self::renderProperty( $propName ) : self::$SP0;
         }
-        $output      = self::$SP0;
+        $isValueDate = self::getIsValueDate( $pc );
+        $content1 = $content2 = self::$SP0;
+        foreach( $pc->value as $ruleLabel => $ruleValue ) {
+            $ruleLabel = strtoupper( $ruleLabel );
+            switch( $ruleLabel ) {
+                case self::RSCALE : // fall through
+                case self::FREQ :
+                    $content1 .= self::renderString( $ruleLabel, $ruleValue );
+                    break;
+                case self::UNTIL :
+                    $ruleValue = DateTimeFactory::dateTime2Str( $ruleValue, $isValueDate ); // fall through
+                case self::COUNT :    // fall through
+                case self::INTERVAL : // fall through
+                case self::WKST :     // fall through
+                    $content2 .= self::renderString( $ruleLabel, (string) $ruleValue );
+                    break;
+                case self::BYDAY :
+                    $content2 .= self::renderByday( $ruleValue );
+                    break;
+                default : // BYSECOND/BYMINUTE/BYHOUR/BYMONTHDAY/BYYEARDAY/BYWEEKNO/BYMONTH/BYSETPOS...
+                    $content2 .= self::renderDefault( $ruleLabel, $ruleValue );
+                    break;
+            } // end switch( $ruleLabel )
+        } // end foreach( $pc->value as $ruleLabel => $ruleValue )
+        return self::renderProperty( $propName, $pc->params,$content1 . $content2 );
+    }
+
+    /**
+     * @param Pc $pc
+     * @return bool
+     */
+    private static function getIsValueDate( Pc $pc ) : bool
+    {
         $isValueDate = $pc->hasParamValue( self::DATE );
         if( ! empty( $pc->params )) {
             $pc = clone $pc;
             $pc->removeParam( self::VALUE );
         }
-        $content1 = $content2 = null;
-        foreach( $pc->value as $ruleLabel => $ruleValue ) {
-            $ruleLabel = strtoupper( $ruleLabel );
-            switch( $ruleLabel ) {
-                case self::RSCALE :
-                    $content1 .= sprintf( $FMTRSCALEEQ, $ruleValue );
-                    break;
-                case self::FREQ :
-                    if( ! empty( $content1 )) {
-                        $content1 .= self::$SEMIC;
-                    }
-                    $content1 .= sprintf( $FMTFREQEQ, $ruleValue );
-                    break;
-                case self::UNTIL :
-                    $content2 .= sprintf(
-                        $FMTDEFAULTEQ,
-                        self::UNTIL,
-                        DateTimeFactory::dateTime2Str( $ruleValue, $isValueDate )
-                    );
-                    break;
-                case self::COUNT :
-                case self::INTERVAL :
-                case self::WKST :
-                    $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
-                    break;
-                case self::BYDAY :
-                    $byday = [ self::$SP0 ];
-                    $bx    = 0;
-                    foreach( $ruleValue as $bydayPart ) {
-                        if( ! empty( $byday[$bx] ) &&   // new day
-                            ! ctype_digit( substr( $byday[$bx], -1 ))) {
-                            $byday[++$bx] = self::$SP0;
-                        }
-                        if( ! is_array( $bydayPart )) {  // day without rel pos number
-                            $byday[$bx] .= $bydayPart;
-                        }
-                        else {                          // day with rel pos number
-                            foreach( $bydayPart as $bydayPart2 ) {
-                                $byday[$bx] .= $bydayPart2;
-                            }
-                        }
-                    } // end foreach( $ruleValue as $bydayPart )
-                    if( 1 < count( $byday )) {
-                        usort( $byday, $RECURBYDAYSORTER );
-                    }
-                    $content2 .= sprintf(
-                        $FMTDEFAULTEQ,
-                        self::BYDAY,
-                        implode( self::$COMMA, $byday )
-                    );
-                    break;
-                default : // BYSECOND/BYMINUTE/BYHOUR/BYMONTHDAY/BYYEARDAY/BYWEEKNO/BYMONTH/BYSETPOS...
-                    if( is_array( $ruleValue )) {
-                        $content2 .= sprintf( $FMTOTHEREQ, $ruleLabel );
-                        $content2 .= implode( self::$COMMA, $ruleValue );
-                    }
-                    else {
-                        $content2 .= sprintf( $FMTDEFAULTEQ, $ruleLabel, $ruleValue );
-                    }
-                    break;
-            } // end switch( $ruleLabel )
-        } // end foreach( $pc->value as $ruleLabel => $ruleValue )
-        $output .= self::renderProperty( $propName, $pc->params,$content1 . $content2 );
-        return $output;
+        return $isValueDate;
     }
 
     /**
-     * Sort recur dates
+     * @param string $ruleLabel
+     * @param string $ruleValue
+     * @return string
+     */
+    private static function renderString( string $ruleLabel, string $ruleValue ) : string
+    {
+        static $FMT = ';%s=%s';
+        return sprintf( $FMT, $ruleLabel, $ruleValue );
+    }
+
+    /**
+     * @param array $ruleValue
+     * @return string
+     */
+    private static function renderByday( array $ruleValue ) : string
+    {
+        static $RECURBYDAYSORTER = [ __CLASS__, 'recurBydaySort' ];
+        $byday = [ self::$SP0 ];
+        $bx    = 0;
+        foreach( $ruleValue as $bydayPart ) {
+            if( ! empty( $byday[$bx] ) &&   // new day
+                ! ctype_digit( substr( $byday[$bx], -1 ))) {
+                $byday[++$bx] = self::$SP0;
+            }
+            if( ! is_array( $bydayPart )) {  // day without rel pos number
+                $byday[$bx] .= $bydayPart;
+            }
+            else {                          // day with rel pos number
+                foreach( $bydayPart as $bydayPart2 ) {
+                    $byday[$bx] .= $bydayPart2;
+                }
+            }
+        } // end foreach( $ruleValue as $bydayPart )
+        if( 1 < count( $byday )) {
+            usort( $byday, $RECURBYDAYSORTER );
+        }
+        return self::renderString( self::BYDAY, implode( self::$COMMA, $byday ));
+    }
+
+    /**
+     * Sort recur BYDAYs
      *
      * @param string $byDayA
      * @param string $byDayB
@@ -167,5 +171,18 @@ final class Recur extends PropertyBase
         return ( $days[substr( $byDayA, -2 )] < $days[substr( $byDayB, -2 )] )
             ? -1
             : 1;
+    }
+
+    /**
+     * @param string $ruleLabel
+     * @param int|string|array $ruleValue
+     * @return string
+     */
+    private static function renderDefault( string $ruleLabel, int|string|array $ruleValue ) : string
+    {
+        return self::renderString(
+            $ruleLabel,
+            ( is_array( $ruleValue ) ? implode( self::$COMMA, $ruleValue ) : ( string) $ruleValue )
+        );
     }
 }

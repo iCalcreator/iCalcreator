@@ -81,7 +81,7 @@ class DateTimeUTCTest extends DtBase
 
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-1", __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg( null, $case . "-r{$x2}-1", __FUNCTION__, $theComp, $isMethod )
                 );
                 $recurSet = [
                     IcalInterface::FREQ       => IcalInterface::YEARLY,
@@ -107,7 +107,7 @@ class DateTimeUTCTest extends DtBase
                 $pcInput = ! $pcInput;
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-2", __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . "-r{$x2}-2", __FUNCTION__, $theComp, $isMethod )
                 );
 
                 $getValue = $comp->{$getMethod}( true );
@@ -115,17 +115,17 @@ class DateTimeUTCTest extends DtBase
                 $this->assertEquals(
                     $expectedGet->value,
                     $getValue->value[IcalInterface::UNTIL],
-                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-3", __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . "-r{$x2}-3", __FUNCTION__, $theComp, $getMethod, $value, $params )
                 );
                 $this->assertEquals(
                     substr( $expectedString, 1 ),
                     trim( StringFactory::between( 'UNTIL=', ';INTERVAL', $comp->{$createMethod}())),
-                    sprintf( self::$ERRFMT, null, $case . "-r{$x2}-4", __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  null, $case . "-r{$x2}-4", __FUNCTION__, $theComp, $createMethod, $value, $params )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . "-r{$x2}-5", __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(after delete) ', $case . "-r{$x2}-5", __FUNCTION__, $theComp, $getMethod )
                 );
                 $comp->{$setMethod}( $recurSet );
             } // edn foreach
@@ -138,7 +138,7 @@ class DateTimeUTCTest extends DtBase
         }
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-r-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
+            self::getErrMsg(  null, $case . '-r-6', __FUNCTION__, 'Vcalendar', 'createCalendar' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -173,13 +173,13 @@ class DateTimeUTCTest extends DtBase
                 [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . '-1', __FUNCTION__, $theComp, $isMethod )
                 );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
                 $comp->{$setMethod}( IcalInterface::BUSY, [$value, $value] );
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
                 );
 
                 $getValue = $comp->{$getMethod}( null, true );
@@ -189,17 +189,17 @@ class DateTimeUTCTest extends DtBase
                 $this->assertEquals(
                     $expectedGet->value,
                     $getValue->value[0][0] ?? '',
-                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-3', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     substr( $expectedString, 1 ),
                     trim( StringFactory::between( IcalInterface::BUSY . ':', '/', $comp->{$createMethod}())),
-                    sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
                 );
                 if( $pcInput ) {
                     $comp->{$setMethod}(
@@ -220,7 +220,7 @@ class DateTimeUTCTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
+            self::getErrMsg(  null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -255,30 +255,30 @@ class DateTimeUTCTest extends DtBase
                 [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
                 );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
                 $comp->{$setMethod}( IcalInterface::BUSY, [ $value, 'P1D' ] );
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $getMethod )
                 );
 
                 $getValue = $comp->{$getMethod}( null, true );
                 $this->assertEquals(
                     $expectedGet->value,
                     $getValue->value[0][0],
-                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-3', __FUNCTION__, $theComp, $getMethod )
                 );
                 $this->assertEquals(
                     substr( $expectedString, 1 ),
                     trim( StringFactory::between( IcalInterface::BUSY . ':', '/', $comp->{$createMethod}())),
-                    sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
                 );
                 if( $pcInput ) {
                     $comp->{$setMethod}(
@@ -299,7 +299,7 @@ class DateTimeUTCTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
+            self::getErrMsg(  null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -335,30 +335,30 @@ class DateTimeUTCTest extends DtBase
                 [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
                 $this->assertFalse(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-1', __FUNCTION__, $theComp, $getMethod )
                 );
                 // error_log( __FUNCTION__ . ' #' . $case . ' <' . $theComp . '>->' . $propName . ' value : ' . var_export( $value, true )); // test ###
                 $comp->{$setMethod}( $value, [ IcalInterface::VALUE => IcalInterface::DATE_TIME] );
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    sprintf( self::$ERRFMT, null, $case . '-2', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $getMethod )
                 );
 
                 $getValue = $comp->{$getMethod}( true );
                 $this->assertEquals(
                     $expectedGet->value,
                     $getValue->value,
-                    sprintf( self::$ERRFMT, null, $case . '-3', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  null, $case . '-3', __FUNCTION__, $theComp, $getMethod, $value, $params )
                 );
                 $this->assertEquals(
                     strtoupper( $propName ) . ';VALUE=DATE-TIME' . $expectedString,
                     trim( $comp->{$createMethod}() ),
-                    sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
+                    self::getErrMsg(  null, $case . '-4', __FUNCTION__, $theComp, $createMethod )
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
                     $comp->{$getMethod}(),
-                    sprintf( self::$ERRFMT, '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
+                    self::getErrMsg(  '(after delete) ', $case . '-5', __FUNCTION__, $theComp, $getMethod )
                 );
                 if( $pcInput ) {
                     $comp->{$setMethod}(
@@ -376,7 +376,7 @@ class DateTimeUTCTest extends DtBase
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
-            sprintf( self::$ERRFMT, null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createComponent' )
+            self::getErrMsg(  null, $case . '-6', __FUNCTION__, 'Vcalendar', 'createCalendar' )
         );
 
         $this->parseCalendarTest( $case, $calendar1, $expectedString );
@@ -900,48 +900,6 @@ class DateTimeUTCTest extends DtBase
             $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
         ];
 
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            17112,
-            $dateTime . ' ' . $msTz,
-            [ IcalInterface::TZID => TZ2 ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            17113,
-            $dateTime . ' ' . $msTz,
-            [ IcalInterface::TZID => IcalInterface::UTC ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            17114,
-            $dateTime . ' ' . $msTz,
-            [ IcalInterface::TZID => OFFSET ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
         return $dataArr;
     }
 
@@ -1293,61 +1251,19 @@ class DateTimeUTCTest extends DtBase
         ];
 
 
-        // testing MS timezone
+        // testing MS timezone to UTC
         [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
+        $dateTime = DateTimeFactory::factory( DATEYmd, $phpTz );
+        $dateTime = DateTimeFactory::setDateTimeTimeZone( $dateTime, IcalInterface::UTC );
         $dataArr[] = [
             18108,
             DATEYmd . ' ' . $msTz,
             [],
             Pc::factory(
-                $dateTime2,
+                $dateTime,
                 []
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            18112,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => TZ2 ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            18113,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => IcalInterface::UTC ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
-        ];
-
-        [ $msTz, $phpTz ] = self::getRandomMsAndPhpTz();
-        $dateTime2 = DateTimeFactory::factory( $dateTime, $phpTz );
-        $dateTime2 = DateTimeFactory::setDateTimeTimeZone( $dateTime2, IcalInterface::UTC );
-        $dataArr[] = [
-            18114,
-            DATEYmd . ' ' . $msTz,
-            [ IcalInterface::TZID => OFFSET ],
-            Pc::factory(
-                $dateTime2,
-                []
-            ),
-            $this->getDateTimeAsCreateLongString( $dateTime2, IcalInterface::UTC )
+            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
         ];
 
         return $dataArr;

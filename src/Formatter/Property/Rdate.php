@@ -38,7 +38,6 @@ use Kigkonsult\Icalcreator\Util\SortFactory;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function count;
-use function in_array;
 use function is_array;
 use function usort;
 
@@ -46,7 +45,7 @@ use function usort;
  * Format RDATE
  *
  * 1
- * @since 2.41.66 2022-09-07
+ * @since 2.41.68 2022-10-26
  */
 final class Rdate extends PropertyBase
 {
@@ -70,7 +69,7 @@ final class Rdate extends PropertyBase
         if( empty( $values )) {
             return self::$SP0;
         }
-        $utcTime      = in_array( $compType, Vcalendar::$TZCOMPS, true );
+        $utcTime      = Vcalendar::isTzComp( $compType );
         $output       = self::$SP0;
         $rDates       = [];
         foreach( $values as $theRdate ) { // Pc
@@ -92,29 +91,16 @@ final class Rdate extends PropertyBase
             usort( $rDates, $SORTER2 );
         }
         foreach( $rDates as $theRdate ) { // Pc
-            $isValueDate = $theRdate->hasParamValue( self::DATE );
+            $isPeriod    = $theRdate->hasParamValue( self::PERIOD );
+            $isValueDate = $theRdate->hasParamValue( self::DATE ); // i.e. NOT datetime
             $isLocalTime = $theRdate->hasParamKey( self::ISLOCALTIME );
             $cnt         = count( $theRdate->value );
             $content     = self::$SP0;
             $rno         = 1;
             foreach( $theRdate->value as $rdatePart ) {
-                if( is_array( $rdatePart ) && $theRdate->hasParamValue( self::PERIOD )) {
-                    // PERIOD part 1
-                    $contentPart  = DateTimeFactory::dateTime2Str( $rdatePart[0], $isValueDate, $isLocalTime );
-                    $contentPart .= '/';
-                    // PERIOD part 2
-                    if( $rdatePart[1] instanceof DateInterval ) {
-                        $contentPart .= DateIntervalFactory::dateInterval2String( $rdatePart[1] );
-                    }
-                    else { // date-time
-                        $contentPart .= DateTimeFactory::dateTime2Str( $rdatePart[1], $isValueDate, $isLocalTime );
-                    }
-
-                } // PERIOD end
-                else { // SINGLE date start
-                    $contentPart = DateTimeFactory::dateTime2Str( $rdatePart, $isValueDate, $isLocalTime );
-                }
-                $content .= $contentPart;
+                $content .= ( is_array( $rdatePart ) && $isPeriod )
+                    ? self::getPeriod( $rdatePart, $isValueDate, $isLocalTime ) // is period
+                    : DateTimeFactory::dateTime2Str( $rdatePart, $isValueDate, $isLocalTime ); // is date[time]
                 if( $rno < $cnt ) {
                     $content .= self::$COMMA;
                 }
@@ -123,5 +109,25 @@ final class Rdate extends PropertyBase
             $output .= self::renderProperty( $propName, $theRdate->params, $content );
         } // end foreach(( array_keys( $rDates ))...
         return $output;
+    }
+
+    /**
+     * @param array $rdatePart
+     * @param bool $isValueDate
+     * @param bool $isLocalTime
+     * @return string
+     * @throws Exception
+     */
+    private static function getPeriod( array $rdatePart, bool $isValueDate, bool $isLocalTime ) : string
+    {
+        static $S = '/';
+        // PERIOD, part 1
+        $period  = DateTimeFactory::dateTime2Str( $rdatePart[0], $isValueDate, $isLocalTime );
+        $period .= $S;
+        // PERIOD, part 2
+        $period .= ( $rdatePart[1] instanceof DateInterval )
+            ? DateIntervalFactory::dateInterval2String( $rdatePart[1] )
+            : DateTimeFactory::dateTime2Str( $rdatePart[1], $isValueDate, $isLocalTime ); // date-time
+        return $period;
     }
 }

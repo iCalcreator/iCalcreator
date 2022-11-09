@@ -33,6 +33,7 @@ use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
+use Kigkonsult\Icalcreator\Vcalendar;
 use function count;
 use function ctype_alpha;
 use function explode;
@@ -48,7 +49,7 @@ use function substr;
 use function trim;
 
 /**
- * @since 2.41.62 2022-08-29
+ * @since 2.41.68 2022-10-23
  */
 final class ComponentParser extends ParserBase
 {
@@ -203,11 +204,19 @@ final class ComponentParser extends ParserBase
      * Parse this properties
      *
      * @return void
-     * @since 2.41.62 2022-08-29
+     * @since 2.41.68 2022-10-23
      * @todo report invalid properties ??
      */
     private function parse3thisProperties() : void
     {
+        static $STRUNREPPROPS = [
+            self::CATEGORIES, self::COMMENT, self::CONTACT, self::DESCRIPTION,
+            self::LOCATION, self::PROXIMITY, self::RESOURCES, self::STRUCTURED_DATA,
+            self::STYLED_DESCRIPTION, self::SUMMARY,
+            self::ACTION, self::BUSYTYPE, self::KLASS, self::RELATED_TO, self::STATUS,
+            self::TRANSP, self::TZID, self::TZID_ALIAS_OF, self::TZNAME, self::UID,
+        ];
+        static $STRUNREPPROP  = 'STRUNREPPROP';
         if( empty( $this->unparsed )) {
             return;
         }
@@ -232,30 +241,18 @@ final class ComponentParser extends ParserBase
             }
             /* call set<Propname>(.. . */
             $method = StringFactory::getSetMethodName( $propName );
+            if( in_array( $propName, $STRUNREPPROPS, true )) {
+                $propName = $STRUNREPPROP;
+            }
             switch( $propName ) {
                 case self::ATTENDEE :
-                    $this->subject->{$method}( $value, self::splitMultiParams( $propAttr ));
+                    $this->subject->{$method}( $value, self::processAtendeeParams( $propAttr ));
                     break;
-                case self::CATEGORIES :   // fall through // i.e. self::$TEXTPROPS above
-                case self::COMMENT :      // fall through
-                case self::CONTACT :      // fall through
-                case self::DESCRIPTION :  // fall through
-                case self::LOCATION :     // fall through
-                case self::PROXIMITY :    // fall through
-                case self::RESOURCES :    // fall through
-                case self::STRUCTURED_DATA :    // dito
-                case self::STYLED_DESCRIPTION : // dito
-                case self::SUMMARY :
+                case $STRUNREPPROP :
                     $this->subject->{$method}( StringFactory::strunrep( $value ), $propAttr );
                     break;
                 case self::REQUEST_STATUS :
-                    $values    = explode( self::$SEMIC, $value, 3 );
-                    $values[1] = ( isset( $values[1] ))
-                        ? StringFactory::strunrep( $values[1] )
-                        : null;
-                    $values[2] = ( isset( $values[2] ))
-                        ? StringFactory::strunrep( $values[2] )
-                        : null;
+                    $values = self::parseRequestStatus( $value );
                     $this->subject->{$method}( $values[0], $values[1], $values[2], $propAttr );
                     break;
                 case self::FREEBUSY :
@@ -263,17 +260,11 @@ final class ComponentParser extends ParserBase
                     $this->subject->{$method}( $fbtype, $values, $propAttr );
                     break;
                 case self::GEO :
-                    $values = explode( self::$SEMIC, $value, 2 );
-                    if( 2 > count( $values )) {
-                        $values[0] = $values[1] = null;
-                    }
+                    $values = self::parseGeo( $value );
                     $this->subject->{$method}( $values[0], $values[1], $propAttr );
                     break;
                 case self::EXDATE :
-                    $values = ( empty( $value ))
-                        ? null
-                        : explode( self::$COMMA, $value );
-                    $this->subject->{$method}( $values, $propAttr );
+                    $this->subject->{$method}( self::parseExdate( $value ), $propAttr );
                     break;
                 case self::RDATE :
                     [ $values, $propAttr ] = self::parseRexdate( $value, $propAttr );
@@ -281,20 +272,8 @@ final class ComponentParser extends ParserBase
                     break;
                 case self::EXRULE :     // fall through
                 case self::RRULE :
-                    $recur  = self::parseRexrule( $value );
-                    $this->subject->{$method}( $recur, $propAttr );
+                    $this->subject->{$method}( self::parseRexrule( $value ), $propAttr );
                     break;
-                case self::ACTION :         // fall through
-                case self::BUSYTYPE :       // dito
-                case self::KLASS :          // fall through
-                case self::RELATED_TO :     // fall through
-                case self::STATUS :         // fall through
-                case self::TRANSP :         // fall through
-                case self::TZID :           // fall through
-                case self::TZID_ALIAS_OF :  // fall through
-                case self::TZNAME :         // fall through
-                case self::UID :
-                    $value = StringFactory::strunrep( $value ); // fall through
                 default:
                     $this->subject->{$method}( $value, $propAttr );
                     break;
@@ -310,7 +289,7 @@ final class ComponentParser extends ParserBase
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    public static function splitMultiParams( array $propAttr ) : array
+    private static function processAtendeeParams( array $propAttr ) : array
     {
         static $ParamArrayKeys = [ self::MEMBER, self::DELEGATED_TO, self::DELEGATED_FROM ];
         foreach( $propAttr as $pix => $attr ) {
@@ -323,6 +302,25 @@ final class ComponentParser extends ParserBase
             }
         }
         return $propAttr;
+    }
+
+    /**
+     * Return Request-Status value array
+     *
+     * @param string $value
+     * @return array
+     * @since  2.41.68 - 2022-19-24
+     */
+    private static function parseRequestStatus( string $value ) : array
+    {
+        $values    = explode( self::$SEMIC, $value, 3 );
+        $values[1] = ( isset( $values[1] ))
+            ? StringFactory::strunrep( $values[1] )
+            : null;
+        $values[2] = ( isset( $values[2] ))
+            ? StringFactory::strunrep( $values[2] )
+            : null;
+        return $values;
     }
 
     /**
@@ -358,6 +356,33 @@ final class ComponentParser extends ParserBase
         return [ $fbtype, $values, $propAttr, ];
     }
 
+    /**
+     * Return Geo value array
+     *
+     * @param string $value
+     * @return array
+     * @since  2.41.68 - 2022-19-24
+     */
+    private static function parseGeo( string $value ) : array
+    {
+        $values = explode( self::$SEMIC, $value, 2 );
+        if( 2 > count( $values )) {
+            $values[0] = $values[1] = null;
+        }
+        return $values;
+    }
+
+    /**
+     * Return Exdate value
+     *
+     * @param string $value
+     * @return null|array
+     * @since  2.41.68 - 2022-19-24
+     */
+    private static function parseExdate( string $value ) : mixed
+    {
+        return  empty( $value ) ? null : explode( self::$COMMA, $value );
+    }
 
     /**
      * Return value and parameters from parsed row and propAttr
@@ -367,7 +392,7 @@ final class ComponentParser extends ParserBase
      * @return array
      * @since  2.27.11 - 2019-01-04
      */
-    public static function parseRexdate( string $row, array $propAttr ) : array
+    private static function parseRexdate( string $row, array $propAttr ) : array
     {
         static $SS = '/';
         if( empty( $row )) {

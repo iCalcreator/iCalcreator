@@ -39,7 +39,6 @@ use function random_bytes;
 use function rtrim;
 use function sprintf;
 use function str_contains;
-use function str_ireplace;
 use function str_replace;
 use function strlen;
 use function stripos;
@@ -47,11 +46,12 @@ use function strpos;
 use function strrev;
 use function strtolower;
 use function substr;
+use function ucfirst;
 
 /**
  * iCalcreator string support class
  *
- * @since  2.41.49 - 2022-05-02
+ * @since  2.41.68 - 2022-10-21
  */
 class StringFactory
 {
@@ -70,29 +70,43 @@ class StringFactory
      *
      * @param  string $row
      * @return string[]   propName and the trailing part of the row
-     * @since  2.29.11 - 2019-08-26
+     * @since  2.41.68 - 2022-10-21
      */
     public static function getPropName( string $row ) : array
     {
-        $sclnPos = strpos( $row, Util::$SEMIC );
-        $clnPos  = strpos( $row, Util::$COLON );
+        return self::splitByFirstSQorColon( $row );
+    }
+
+    /**
+     * Return array, string splitted by first found semicolon or colon, split-char excluded
+     *
+     * No one found return [ string, null ]
+     *
+     * @param string $string
+     * @return array
+     * @since  2.41.68 - 2022-10-21
+     */
+    public static function splitByFirstSQorColon( string $string ) : array
+    {
+        $sclnPos = strpos( $string, Util::$SEMIC ); // first found
+        $clnPos  = strpos( $string, Util::$COLON ); // first found
         switch( true ) {
-            case (( false === $sclnPos ) && ( false === $clnPos )) : // no params and no value
-                return [ $row, Util::$SP0 ];
-            case (( false !== $sclnPos ) && ( false === $clnPos )) : // param exist and NO value ??
-                $propName = self::before( Util::$SEMIC, $row );
+            case (( false === $sclnPos ) && ( false === $clnPos )) : // no one found
+                return [ $string, Util::$SP0 ];
+            case (( false !== $sclnPos ) && ( false === $clnPos )) : // split by semicolon
+                $firstPart = strstr( $string, Util::$SEMIC, true );
                 break;
-            case (( false === $sclnPos ) && ( false !== $clnPos )) : // no params
-                $propName = self::before( Util::$COLON, $row  );
+            case (( false === $sclnPos ) && ( false !== $clnPos )) : // split by colon
+                $firstPart = strstr( $string, Util::$COLON, true  );
                 break;
-            case ( $sclnPos < $clnPos ) :                            // param(s) and value ??
-                $propName = self::before( Util::$SEMIC, $row );
+            case ( $sclnPos < $clnPos ) :                            // split by semicolon
+                $firstPart = strstr( $string, Util::$SEMIC, true );
                 break;
-            default : // ie $sclnPos > $clnPos                       // no params
-                $propName = self::before( Util::$COLON, $row );
+            default : // ie $sclnPos > $clnPos                       // split by colon
+                $firstPart = strstr( $string, Util::$COLON, true );
                 break;
         } // end switch
-        return [ $propName, self::after( $propName, $row  ) ];
+        return [ $firstPart, self::after( $firstPart, $string  ) ];
     }
 
     /**
@@ -123,38 +137,29 @@ class StringFactory
     }
 
     /**
-     * Fix opt value prefix 'VALUE=URI:message:' also (opt un-urldecoded) '<'|'>'|'@'
+     * Fix opt un-urlencoded) '<'|'>'|'@' in a SOURCE, TZURL or URL
      *
      * orginating from any Apple device
      *
      * @param string $line
-     * @since  2.30.3 - 2021-02-14
+     * @since  2.41.68 - 2022-10-22
      */
-    public static function checkFixUriValue( string & $line ) : void
+    public static function checkFixUrlDecode( string & $line ) : void
     {
-        static $VEQU     = ';VALUE=URI';
-        static $VEQUmq   = ';VALUE="URI:message"';
-        static $VEQUm    = ';VALUE=URI:message';
         static $PFCHARS1 = '%3C';
         static $SFCHARS1 = '%3E';
         static $PFCHARS2 = '<';
         static $SFCHARS2 = '>';
-        static $SCHAR31 = '%40';
-        static $SCHAR32 = '@';
-        if( false !== stripos( $line, $VEQUm )) {
-            $line = str_replace( $VEQUm, $VEQUmq, $line );
-        }
-        elseif( false !== stripos( $line, $VEQU )) {
-            $line = str_ireplace( $VEQU, Util::$SP0, $line );
-        }
-        if(( str_contains( $line, $PFCHARS1 )) && ( str_contains( $line, $SFCHARS1 ))) {
-            $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line );
+        static $SCHAR31  = '%40';
+        static $SCHAR32  = '@';
+        if(( false !== stripos( $line, $PFCHARS1 )) && ( false !== stripos( $line, $SFCHARS1 ))) {
+            $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line ); // rem url-dec
         }
         elseif(( str_contains( $line, $PFCHARS2 )) && ( str_contains( $line, $SFCHARS2 ))) {
-            $line = str_replace( [ $PFCHARS2, $SFCHARS2 ], Util::$SP0, $line );
+            $line = str_replace( [ $PFCHARS2, $SFCHARS2 ], Util::$SP0, $line ); // rem <>
         }
         if( str_contains( $line, $SCHAR31 )) {
-            $line = str_replace( $SCHAR31, $SCHAR32, $line );
+            $line = str_replace( $SCHAR31, $SCHAR32, $line ); // repl with @
         }
     }
 
@@ -301,6 +306,7 @@ class StringFactory
      * @param string $needle2
      * @param string $haystack
      * @return string
+     * @since 2.41.68  2022-10-21
      */
     public static function between( string $needle1, string $needle2, string $haystack ) : string
     {
@@ -309,8 +315,8 @@ class StringFactory
         return match( true ) {
             ! $exists1 && ! $exists2 => self::$SP0,
             $exists1 && ! $exists2   => self::after( $needle1, $haystack ),
-            ! $exists1 && $exists2   => self::before( $needle2, $haystack ),
-            default                  => self::before( $needle2, self::after( $needle1, $haystack ) ),
+            ! $exists1 && $exists2   => strstr( $haystack, $needle2, true ),
+            default                  => strstr( self::after( $needle1, $haystack ),  $needle2, true ),
         }; // end switch
     }
 
@@ -466,5 +472,51 @@ class StringFactory
     {
         static $FMT = 'set%s';
         return self::getMethodName( $FMT, $propName );
+    }
+
+    /**
+     * Counts (unique) strings
+     *
+     * @param null|string $string
+     * @param array $output
+     * @return void
+     */
+    public static function stringCount( ?string $string, array & $output ) : void
+    {
+        $content = trim( $string );
+        if( ! empty( $content ) ) {
+            if( ! isset( $output[$content] ) ) {
+                $output[$content] = 1;
+            }
+            else {
+                ++$output[$content];
+            }
+        }
+    }
+
+    /**
+     * Counts (unique) comma separated parts in string
+     *
+     * @param string $string
+     * @param array $output
+     * @return void
+     */
+    public static function commaSplitCount( string $string, array & $output ) : void
+    {
+        $content = explode( Util::$COMMA, $string );
+        foreach( $content as $contentPart ) {
+            self::stringCount( $contentPart, $output );
+        }
+    }
+
+    /**
+     * Return (rendered) compType from FQCN
+     *
+     * @param string $class
+     * @return string
+     */
+    public static function compTypeFromClass( string $class ) : string
+    {
+        return ucfirst( strtolower( self::afterLast( self::$BS2, $class  )));
     }
 }

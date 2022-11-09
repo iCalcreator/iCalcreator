@@ -132,21 +132,6 @@ class StringfuncTest extends TestCase
     /**
      * @test
      */
-    public function beforeTest() : void
-    {
-        $this->assertSame(
-            '',
-            StringFactory::before( 'needle', 'haystack' )
-        );
-        $this->assertSame(
-            'haystackbefore',
-            StringFactory::before( 'needle', 'haystackbeforeneedle' )
-        );
-    }
-
-    /**
-     * @test
-     */
     public function beforeLastTest() : void
     {
         $this->assertSame(

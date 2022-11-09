@@ -66,7 +66,7 @@ use function usort;
 /**
  * Vcalendar class
  *
- * @since  2.41.54 - 2022-08-09
+ * @since 2.41.68 2022-10-03
  */
 final class Vcalendar extends IcalBase
 {
@@ -187,7 +187,7 @@ final class Vcalendar extends IcalBase
      * RELATED-TO, URL, UID
      * @param string $propName
      * @return array|bool   false on not found propName
-     * @since  2.40.11 - 2021-01-25
+     * @since 2.41.68 2022-10-03
      */
     public function getProperty( string $propName ) : bool | array
     {
@@ -217,11 +217,11 @@ final class Vcalendar extends IcalBase
         $content = null;
         foreach( array_keys( $this->components ) as $cix ) {
             switch( true ) {
-                case ( ! in_array( $this->components[$cix]->getCompType(), self::$VCOMPS, true )) :
+                case ( ! self::isVcalendarVcomp( $this->components[$cix]->getCompType() )) :
                     continue 2;
                 case ( ! property_exists( $this->components[$cix], StringFactory::getInternalPropName( $propName ))) :
                     continue 2;
-                case ( in_array( $propName, self::$MPROPS1, true )) :
+                case self::isMultiProp1( $propName ) :
                     $this->components[$cix]->getProperties( $propName, $output );
                     continue 2;
                 case (( 3 < strlen( $propName )) &&
@@ -445,13 +445,13 @@ final class Vcalendar extends IcalBase
      * @param CalendarComponent $component
      * @return self
      * @throws InvalidArgumentException
-     * @since  2.27.3 - 2018-12-28
+     * @since  2.47.68 - 2022-10-03
      */
     public function replaceComponent( CalendarComponent $component ) : self
     {
         static $ERRMSG1 = 'Invalid component type \'%s\' or Vtimezone with no TZID';
         static $ERRMSG2 = 'Vtimezone with tzid \'%s\' not found, found \'%s\'';
-        if( in_array( $component->getCompType(), self::$VCOMPS, true )) {
+        if( self::isVcalendarVcomp( $component->getCompType())) {
             return $this->setComponent( $component, $component->getUid());
         }
         if(( self::VTIMEZONE !== $component->getCompType()) ||
@@ -538,7 +538,7 @@ final class Vcalendar extends IcalBase
      *
      * @param string|null $sortArg
      * @return self
-     * @since  2.40.11 - 2022-01-25
+     * @since  2.47.68 - 2022-10-03
      */
     public function sort( ? string $sortArg = null ) : self
     {
@@ -549,7 +549,7 @@ final class Vcalendar extends IcalBase
         if( ! is_null( $sortArg )) {
             $sortArg = strtoupper( $sortArg );
             if(( self::DTSTAMP !== $sortArg ) &&
-                ! in_array( $sortArg, self::$SELSORTPROPS, true )) {
+                ! self::isSelectSortProp( $sortArg )) {
                 $sortArg = null;
             }
         }
@@ -559,6 +559,24 @@ final class Vcalendar extends IcalBase
         usort( $this->components, $SORTER );
         return $this;
     }
+
+    /**
+     * Return bool true if prop is a iCal component select/sort property
+     * @param string $propName
+     * @return bool
+     * @usedby IcalBase::isFoundInCompsProps(), self::sort(), SelectFactory::selectComponents2()
+     * @since  2.47.68 - 2022-10-03
+     */
+    public static function isSelectSortProp( string $propName ) : bool
+    {
+        static $SELSORTPROPS = [
+            self::ATTENDEE, self::CATEGORIES, self::CONTACT, self::LOCATION,
+            self::ORGANIZER, self::PRIORITY, self::RELATED_TO, self::RESOURCES,
+            self::STATUS, self::SUMMARY, self::UID, self::URL,
+        ];
+        return in_array( $propName, $SELSORTPROPS, true );
+    }
+
 
     /**
      * Parse iCal text/file into Vcalendar, components, properties and parameters

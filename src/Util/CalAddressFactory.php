@@ -40,13 +40,14 @@ use function in_array;
 use function method_exists;
 use function sprintf;
 use function strcasecmp;
+use function strstr;
 use function substr;
 use function trim;
 
 /**
  * iCalcreator attendee support class
  *
- * @since  2022-09-05 - 2.41.63
+ * @since 2.41.68 - 2022-10-21
  */
 class CalAddressFactory
 {
@@ -68,12 +69,12 @@ class CalAddressFactory
     private static string $AT          = '@';
 
     /**
-     * Assert cal-address (i.e. MAILTO.prefixed)
+     * Assert cal-address (i.e. MAILTO-prefixed)
      *
      * @param string $calAddress
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.27.8 - 2019-03-18
+     * @since  2.41.68 - 2022-10-21
      */
     public static function assertCalAddress( string $calAddress ) : void
     {
@@ -84,7 +85,7 @@ class CalAddressFactory
             throw new InvalidArgumentException( sprintf( $ERRMSG, $calAddress ));
         }
         $domain = StringFactory::after( self::$AT, $calAddress );
-        if( !str_contains( StringFactory::before( self::$AT, $calAddress ), $DOT )) {
+        if( ! str_contains( strstr( $calAddress, self::$AT, true ), $DOT )) {
             $namePart    = self::extractNamepartFromEmail( $calAddress );
             $testAddress = $XDOT . $namePart . self::$AT . $domain;
         }
@@ -169,14 +170,14 @@ class CalAddressFactory
      *
      * @param string $email
      * @return string
-     * @since  2.27.8 - 2019-03-20
+     * @since  2.41.68 - 2022-10-21
      */
     public static function extractNamepartFromEmail( string $email ) : string
     {
         if( self::hasMailtoPrefix( $email )) {
-            return StringFactory::before( self::$AT, substr( $email, 7 ));
+            return strstr( substr( $email, 7 ), self::$AT, true );
         }
-        return StringFactory::before( self::$AT, $email );
+        return strstr( $email, self::$AT, true );
     }
 
     /**
@@ -224,7 +225,7 @@ class CalAddressFactory
      * @param Vcalendar $calendar  iCalcreator Vcalendar instance
      * @param string    $propName
      * @return string[]
-     * @since  2.27.8 - 2019-03-18
+     * @since  2.27.68 - 2022-10-21
      */
     public static function getCalAdressValuesFromProperty(
         Vcalendar $calendar,
@@ -239,7 +240,7 @@ class CalAddressFactory
         foreach((array) $propValues as $propValue => $counts ) {
             $propValue = self::removeMailtoPrefix( $propValue );
             if( str_contains( $propValue, Util::$COMMA )) {
-                $propValue = StringFactory::before( Util::$COMMA, $propValue );
+                $propValue = strstr( $propValue, Util::$COMMA, true );
             }
             try {
                 self::assertCalAddress( $propValue );
@@ -400,8 +401,8 @@ class CalAddressFactory
                 continue;
             }
             $value =
-                (str_contains( $propValue->value, Util::$COMMA ))
-                    ? StringFactory::before( Util::$COMMA, $propValue->value )
+                str_contains( $propValue->value, Util::$COMMA )
+                    ? strstr( $propValue->value, Util::$COMMA, true )
                     : $propValue->value;
             try {
                 self::assertCalAddress( $value );

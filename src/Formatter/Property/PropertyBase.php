@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 use Kigkonsult\Icalcreator\IcalInterface;
 
 use function array_change_key_case;
+use function array_keys;
 use function in_array;
 use function is_array;
 use function is_int;
@@ -43,7 +44,7 @@ use function str_replace;
 use function strlen;
 
 /**
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.68 - 2022-10-03
  */
 abstract class PropertyBase implements IcalInterface
 {
@@ -142,7 +143,7 @@ abstract class PropertyBase implements IcalInterface
      * @param null|string[]    $ctrKeys
      * @param null|bool|string $lang  bool false if config lang not found
      * @return string
-     * @since 2.41.63 2022-09-05
+     * @since 2.41.68 2022-10-23
      */
     public static function formatParams(
         array $inputParams,
@@ -150,101 +151,54 @@ abstract class PropertyBase implements IcalInterface
         null|bool|string $lang = null
     ) : string
     {
+        static $VALENC  = [ self::VALUE, self::ENCODING ];
         static $KEYGRP1 = [ self::TZID, self::RANGE, self::RELTYPE ];
         static $KEYGRP3 = [ self::SENT_BY, self::FEATURE, self::LABEL ];
-        if( isset( $inputParams[self::ISLOCALTIME ] )) {
-            unset( $inputParams[self::ISLOCALTIME ] );
-        }
+        unset( $inputParams[self::ISLOCALTIME ] );
         if( empty( $inputParams ) && empty( $ctrKeys ) && empty( $lang )) {
             return self::$SP0;
         }
-        $attrLANG = $output = self::$SP0;
-        $hasLANGctrKey = in_array( self::LANGUAGE, $ctrKeys, true );
-        $CNattrExist   = false;
+        $attrLANG = $output   = self::$SP0;
+        $hasLANGctrKey        = in_array( self::LANGUAGE, $ctrKeys, true );
+        $CNattrExist          = false;
         [ $params, $xparams ] = self::quoteParams( $inputParams );
         if( isset( $params[self::VALUE] ) && ! in_array( self::VALUE, $ctrKeys, true )) {
-            $output .= self::renderParam( self::VALUE, $params );
-            $output .= self::renderParam( self::ENCODING, $params );
+            $output .= self::renderKeyGroup( $VALENC, $VALENC, $params ); // VALUE+ENCODING
         }
-        foreach( $KEYGRP1 as $key ) { // TZID, RANGE, RELTYPE
-            if( ! in_array( $key, $ctrKeys, true )) {
-                $output .= self::renderParam( $key, $params );
-            }
-        } // end foreach
-        if( in_array( self::CN, $ctrKeys, true ) && isset( $params[self::CN] )) {
+        $output .= self::renderKeyGroup( $KEYGRP1, $ctrKeys, $params ); // TZID, RANGE, RELTYPE
+        if( isset( $params[self::CN] ) && in_array( self::CN, $ctrKeys, true )) {
             $output .= self::renderParam( self::CN, $params );
             $CNattrExist = true;
         }
-        foreach( $KEYGRP3 as $key ) { // SENT_BY, FEATURE, LABEL
-            if( in_array( $key, $ctrKeys, true )) {
-                $output .= self::renderParam( $key, $params );
-            }
-        } // end foreach
+        $output .= self::renderKeyGroup( $KEYGRP3, $ctrKeys, $params ); // SENT_BY, FEATURE, LABEL
         if( $hasLANGctrKey && isset( $params[self::LANGUAGE] )) {
-            $attrLANG .= self::renderParam( $key, $params );
+            $attrLANG .= self::renderParam( self::LANGUAGE, $params );
         }
         elseif(( $CNattrExist || $hasLANGctrKey ) && is_string( $lang ) && ! empty( $lang )) {
             $langArr   = [ self::LANGUAGE => $lang ];
             $attrLANG .= self::renderParam( self::LANGUAGE, $langArr );
         }
-        if( isset( $params[self::DERIVED] )) {
-            if( self::FALSE === $params[self::DERIVED] ) {
-                unset( $params[self::DERIVED] ); // skip default FALSE for DERIVED
-            }
-            elseif( self::TRUE !== $params[self::DERIVED] ) {
-                $params[self::DERIVED] = (((bool) $params[self::DERIVED] )
-                    ? self::TRUE
-                    : self::FALSE
-                );
-            }
-        } // end if
         if( isset( $params[self::VALUE] )) {
-            $output .= self::renderParam( self::VALUE, $params );
-            $output .= self::renderParam( self::ENCODING, $params );
+            $output .= self::renderKeyGroup( $VALENC, $VALENC, $params ); // VALUE+ENCODING
         }
-        foreach( $ctrKeys as $ctrKey ) { // ctrKeys in order
-            $output .= self::renderParam( $ctrKey, $params );
+        if( isset( $params[self::DERIVED] ) && ( self::FALSE === $params[self::DERIVED] )) {
+            unset( $params[self::DERIVED] ); // skip default FALSE for DERIVED
         }
+        $output .= self::renderKeyGroup( $ctrKeys, $ctrKeys, $params ); // ctrKeys in order
         if( ! empty( $params )) { // accept other or iana-token (Other IANA-registered) parameter types, last
-            foreach( $params as $paramKey => $paramValue ) {
-                $output .= self::renderParam( $paramKey, $params );
-            }
+            $paramKeys = array_keys( $params );
+            $output   .= self::renderKeyGroup( $paramKeys, $paramKeys, $params );
         }
         $output .= $attrLANG;
-        foreach( $xparams as $paramKey => $paramValue ) { // x-params last
-            $output .= self::renderParam( $paramKey, $params );
+        if( ! empty( $xparams )) { // x-params last
+            $paramKeys = array_keys( $xparams );
+            $output   .= self::renderKeyGroup( $paramKeys, $paramKeys, $xparams );
         }
         return $output;
     }
 
     /**
-     * Return rendered parameter (if exists)
-     *
-     * @param string $paramKey
-     * @param array $params
-     * @return string
-     */
-    protected static function renderParam( string $paramKey, array & $params ) : string
-    {
-        static $DIRALTR = [ self::DIR, self::ALTREP ];
-        static $FMTCMN  = ';%s=%s';
-        static $FMTQTD  = ';%s=%s%s%s';
-        if( ! isset( $params[$paramKey] )) {
-            return self::$SP0;
-        } // end if
-        if( in_array( $paramKey, $DIRALTR, true )) {
-            $delim  = str_contains( $params[$paramKey], self::$QQ ) ? self::$SP0 : self::$QQ;
-            $output = sprintf( $FMTQTD, $paramKey, $delim, $params[$paramKey], $delim );
-        }
-        else {
-            $output = sprintf( $FMTCMN, $paramKey, $params[$paramKey] );
-        }
-        unset( $params[$paramKey] );
-        return $output;
-    }
-
-    /**
-     * Return parameter with opt. quoted parameter value
+     * Return parameters+x-params with opt. quoted parameter value
      *
      * "-Quotes a value if it contains ':', ';' or ','
      *
@@ -310,6 +264,51 @@ abstract class PropertyBase implements IcalInterface
             $value = str_replace( self::$QQ, $CFSQ, $value );
         }
         return $value;
+    }
+
+    /**
+     * Return rendered parameter (if exists)
+     *
+     * @param string $paramKey
+     * @param array $params
+     * @return string
+     */
+    protected static function renderParam( string $paramKey, array & $params ) : string
+    {
+        static $DIRALTR = [ self::DIR, self::ALTREP ];
+        static $FMTCMN  = ';%s=%s';
+        static $FMTQTD  = ';%s=%s%s%s';
+        if( ! isset( $params[$paramKey] )) {
+            return self::$SP0;
+        }
+        if( in_array( $paramKey, $DIRALTR, true )) {
+            $delim  = str_contains( $params[$paramKey], self::$QQ ) ? self::$SP0 : self::$QQ;
+            $output = sprintf( $FMTQTD, $paramKey, $delim, $params[$paramKey], $delim );
+        }
+        else {
+            $output = sprintf( $FMTCMN, $paramKey, $params[$paramKey] );
+        }
+        unset( $params[$paramKey] );
+        return $output;
+    }
+
+    /**
+     * Return rendered parameter (if exists)
+     *
+     * @param array $keyGroup   keys to probe
+     * @param array $ctrKeys    probe list
+     * @param array $params
+     * @return string
+     */
+    protected static function renderKeyGroup( array $keyGroup, array $ctrKeys, array & $params ) : string
+    {
+        $output = self::$SP0;
+        foreach( $keyGroup as $key ) {
+            if( in_array( $key, $ctrKeys, true )) {
+                $output .= self::renderParam( $key, $params );
+            }
+        } // end foreach
+        return $output;
     }
 
     /**

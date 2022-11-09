@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.67' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.70' );
 }
 
 /**
@@ -67,7 +67,7 @@ if( ! defined( 'ICALCREATOR_VERSION' )) {
  *
  * Properties and methods shared by Vcalendar and CalendarComponents
  *
- * @since 2.41.56 2022-08-14
+ * @since 2.41.68 2022-10-03
  */
 abstract class IcalBase implements IcalInterface
 {
@@ -83,7 +83,6 @@ abstract class IcalBase implements IcalInterface
 
     /**
      * @var string[]  iCal V*-component collection, subcomps to Vclendar
-     * @usedby IcalBase+Vcalendar+SelectFactory
      */
     public static array $VCOMPS   = [
         self::VAVAILABILITY,
@@ -94,128 +93,140 @@ abstract class IcalBase implements IcalInterface
     ];
 
     /**
-     * @var string[]  iCal timezone component collection
-     * @usedby DTSTARTtrait+RexdateFactory
+     * @param string $compName
+     * @return bool
+     * @since 2.41.68 2022-10-03
+     * @usedby IcalBase,Vcalendar,SelectFactory
      */
-    public static array $TZCOMPS  = [
-        self::VTIMEZONE,
-        self::STANDARD,
-        self::DAYLIGHT
-    ];
-
-    /**
-     * ICal component collection, all but Vtimzones subcombs
-     *
-     * On update here, upd also IcalXMLFactory::XMLgetComps $ALLCOMPS list
-     *
-     * @var string[]  iCal component collection, all but Vtimzones subcombs
-     */
-    protected static array $CALCOMPS = [
-        self::AVAILABLE,
-        self::PARTICIPANT,
-        self::VALARM,
-        self::VAVAILABILITY,
-        self::VEVENT,
-        self::VFREEBUSY,
-        self::VJOURNAL,
-        self::VLOCATION,
-        self::VRESOURCE,
-        self::VTIMEZONE,
-        self::VTODO,
-    ];
-
-    /**
-     * @var string[]  iCal sub-component collection with uid
-     */
-    protected static array $UIDCOMPS = [
-        self::AVAILABLE,
-        self::PARTICIPANT,
-        self::VALARM,
-        self::VAVAILABILITY,
-        Vcalendar::VCALENDAR,
-        self::VEVENT,
-        self::VFREEBUSY,
-        self::VJOURNAL,
-        self::VLOCATION,
-        self::VRESOURCE,
-        self::VTODO,
-    ];
-
-    /**
-     * @var string[]  iCal component multiple property sub-collection
-     * @usedby CalendarComponent + Vcalendar + SelectFactory + SortFactory
-     */
-    public static array $MPROPS1    = [
-        self::ATTENDEE, self::CATEGORIES, self::CONTACT,
-        self::RELATED_TO, self::RESOURCES,
-    ];
-
-    /**
-     * @var string[]  iCal component multiple property collection
-     * @since 2.41.3 2022-01-17
-     * @usedby IcalBase
-     */
-    protected static array $MPROPS2    = [
-        self::ATTACH, self::ATTENDEE, self::CATEGORIES,
-        self::COMMENT, self::CONFERENCE, self::CONTACT, self::DESCRIPTION,
-        self::EXDATE, self::FREEBUSY, self::IMAGE, self::LOCATION, self::NAME,
-        self::RDATE, self::RELATED_TO, self::REQUEST_STATUS, self::RESOURCES,
-        self::STRUCTURED_DATA, self::STYLED_DESCRIPTION,
-        self::TZID_ALIAS_OF, self::TZNAME, self::X_PROP,
-    ];
-
-    public static function isMultiProp( string $propName ) : bool
+    public static function isVcalendarVcomp( string $compName ) : bool
     {
-        return in_array( $propName, self::$MPROPS2, true );
+        return in_array( $compName, self::$VCOMPS, true );
     }
 
     /**
-     * @var string[]  iCal component select property collection
-     * @usedby Vcalendar + SelectFactory
-     * @since 2.41.13 2022-02-01
-     */
-    public static array $SELSORTPROPS = [
-        self::ATTENDEE, self::CATEGORIES, self::CONTACT, self::LOCATION,
-        self::ORGANIZER, self::PRIORITY, self::RELATED_TO, self::RESOURCES,
-        self::STATUS, self::SUMMARY, self::UID, self::URL,
-    ];
-
-    /**
-     * @var string[]  iCal component date-property collection
-     */
-    protected static array $DATEPROPS  = [
-        self::ACKNOWLEDGED, self::COMPLETED, self::CREATED,
-        self::DTEND, self::DTSTAMP, self::DTSTART, self::DUE,
-        self::LAST_MODIFIED, self::RECURRENCE_ID, self::TZUNTIL
-    ];
-
-    /**
-     * @var string[]  iCal component TEXT properties that may contain '\\', ',', ';'
-     * @usedby Vcalendar + CalendarComponent
+     * iCal timezone component collection
      *
-     * the others are
-     *    ACTION, CLASS, COLOR, RELATED-TO,
-     *    PARTICIPANT_TYPE, REQUEST-STATUS, RESOURCE_TYPE
-     *    STATUS, TRANSP, TZID, TZID_ALIAS_OF, TZNAME, UID
+     * @param null|string $compName
+     * @return bool
+     * @usedby DTSTARTtrait,Rdatetrait,RexdateFactory
+     * @since 2.41.68 2022-10-03
      */
-    protected static array $TEXTPROPS = [
-        self::CATEGORIES,
-        self::COMMENT,
-        self::CONTACT,
-        self::DESCRIPTION,
-        self::LOCATION,
-        self::LOCATION_TYPE,
-        self::NAME,
-        self::RESOURCES,
-        self::STRUCTURED_DATA,
-        self::STYLED_DESCRIPTION,
-        self::SUMMARY,
-    ];
+    public static function isTzComp( ? string $compName ) : bool
+    {
+        static $TZCOMPS = [
+            self::VTIMEZONE,
+            self::STANDARD,
+            self::DAYLIGHT
+        ];
+        return in_array( $compName, $TZCOMPS, true );
+    }
+    /**
+     * Return bool true if compName is a ICal component (all but Vtimzones subcombs)
+     *
+     * On update here, upd also IcalXMLFactory::XMLgetComps $ALLCOMPS list
+     *
+     * @param $compName
+     * @return bool
+     * @since 2.41.68 2022-10-03
+     */
+    protected static function isCalendarSubComp( string $compName ) : bool
+    {
+        static $CALCOMPS = [
+            self::AVAILABLE,
+            self::PARTICIPANT,
+            self::VALARM,
+            self::VAVAILABILITY,
+            self::VEVENT,
+            self::VFREEBUSY,
+            self::VJOURNAL,
+            self::VLOCATION,
+            self::VRESOURCE,
+            self::VTIMEZONE,
+            self::VTODO,
+        ];
+        return in_array( $compName, $CALCOMPS, true );
+    }
 
     /**
-     * @var string[]
+     * Return bool true if component has the UID property
+     * @param IcalBase $component
+     * @return bool
+     * @since 2.47.68 2022-10-01
      */
-    protected static array $ALTRPLANGARR  = [ self::ALTREP, self::LANGUAGE ];
+    protected static function hasUid( IcalBase $component ) : bool
+    {
+        static $UIDCOMPS = [
+            self::AVAILABLE,
+            self::PARTICIPANT,
+            self::VALARM,
+            self::VAVAILABILITY,
+            Vcalendar::VCALENDAR,
+            self::VEVENT,
+            self::VFREEBUSY,
+            self::VJOURNAL,
+            self::VLOCATION,
+            self::VRESOURCE,
+            self::VTODO,
+        ];
+        return in_array( $component->getCompType(), $UIDCOMPS, true );
+    }
+
+    /**
+     * Return bool true if prop is a iCal component multiple 'text property
+
+     * @param string $propName
+     * @return bool
+     * @since 2.41.68 2022-10-03
+     * @usedby IcalBase::isFoundInCompsProps, CalendarComponent::getProperties, Vcalendar:.getProperty,
+     *         SelectFactory::selectComponents2, SortFactory::setSortArgs
+     */
+    public static function isMultiProp1( string $propName ) : bool
+    {
+        static $MPROPS1 = [
+            self::ATTENDEE, self::CATEGORIES, self::CONTACT,
+            self::RELATED_TO, self::RESOURCES,
+        ];
+        return in_array( $propName, $MPROPS1, true );
+    }
+
+    /**
+     * Return bool true if prop is a iCal component multiple property
+     *
+     * @param string $propName
+     * @return bool
+     * @since 2.41.68 2022-10-03
+     * @usedby Icalbase::getpropInfo(), IcalXMLFactory::compProps2Xml()
+     */
+    public static function isMultiProp( string $propName ) : bool
+    {
+        static $MPROPS2 = [
+            self::ATTACH, self::ATTENDEE, self::CATEGORIES,
+            self::COMMENT, self::CONFERENCE, self::CONTACT, self::DESCRIPTION,
+            self::EXDATE, self::FREEBUSY, self::IMAGE, self::LOCATION, self::NAME,
+            self::RDATE, self::RELATED_TO, self::REQUEST_STATUS, self::RESOURCES,
+            self::STRUCTURED_DATA, self::STYLED_DESCRIPTION,
+            self::TZID_ALIAS_OF, self::TZNAME, self::X_PROP,
+        ];
+        return in_array( $propName, $MPROPS2, true );
+    }
+
+    /**
+     * Return bool true if prop is a iCal component date-property
+     *
+     * @param string $propName
+     * @return bool
+     * @since 2.41.68 2022-10-03
+     * @uedby self::isFoundInCompsProps()
+     */
+    protected static function isDateProp( string $propName ) : bool
+    {
+        static $DATEPROPS = [
+            self::ACKNOWLEDGED, self::COMPLETED, self::CREATED,
+            self::DTEND, self::DTSTAMP, self::DTSTART, self::DUE,
+            self::LAST_MODIFIED, self::RECURRENCE_ID, self::TZUNTIL
+        ];
+        return in_array( $propName, $DATEPROPS, true );
+    }
 
     /**
      * @var array container for sub-components
@@ -340,7 +351,7 @@ abstract class IcalBase implements IcalInterface
      *
      * @param null|string $config
      * @return mixed   bool false on not found or empty
-     * @since 2.41.2 2022-01-16
+     * @since 2.47.68 2022-10-01
      */
     public function getConfig( ? string $config = null ) : mixed
     {
@@ -353,7 +364,7 @@ abstract class IcalBase implements IcalInterface
             $this->config[self::ALLOWEMPTY] = true;
         }
         if( ! isset( $this->config[self::UNIQUE_ID] )) {
-            $this->config[self::UNIQUE_ID] = Util::$SP0;
+            $this->config[self::UNIQUE_ID] = self::$SP0;
         }
         if( empty( $config )) {
             $output                      = [];
@@ -384,7 +395,7 @@ abstract class IcalBase implements IcalInterface
                         }
                         $info[$cix][$LCORDNO] = $cix + 1;
                         $info[$cix][$LCTYPE]  = $this->components[$cix]->getCompType();
-                        if( in_array( $this->components[$cix]->getCompType(), self::$UIDCOMPS, true )) {
+                        if( self::hasUid( $this->components[$cix] )) {
                             $info[$cix][$LCUID] = $this->components[$cix]->getUid();
                         }
                         $info[$cix][$LCPROPS] = $this->components[$cix]->getConfig( self::PROPINFO );
@@ -433,7 +444,7 @@ abstract class IcalBase implements IcalInterface
             switch( true ) {
                 case ( ! property_exists( $this, $propName2 )) :
                     break;
-                case ( empty( $this->{$propName2} )) :
+                case empty( $this->{$propName2} ) :
                     break;
                 case ( self::X_PROP === $propName ) :
                     foreach( array_keys( $this->{$propName2}) as $propName3 ) {
@@ -578,7 +589,7 @@ abstract class IcalBase implements IcalInterface
      * @param null|int|string|string[] $arg1 ordno/component type/component uid, array[ *[propertyName => propertyValue] ]
      * @param null|int        $arg2 ordno if arg1 = component type
      * @return bool|CalendarComponent  (false on error)
-     * @since  2.41.6 - 2022-01-19
+     * @since 2.41.68 2022-10-03
      * @todo throw InvalidArgumentException on unknown component
      */
     public function getComponent(
@@ -595,68 +606,28 @@ abstract class IcalBase implements IcalInterface
         switch( true ) {
             case empty( $arg1 ) : // first or next in component chain
                 $argType = self::$INDEX;
-                if( isset( $this->compix[self::$INDEX] )) {
-                    ++$this->compix[self::$INDEX];
-                }
-                else {
-                    $this->compix[self::$INDEX] = 1;
-                }
-                $index = $this->compix[self::$INDEX];
+                $index   = $this->getCompixIndex( self::$INDEX );
                 break;
             case is_array( $arg1 ) : // [ *[propertyName => propertyValue] ]
-                $key = implode( Util::$MINUS, array_keys( $arg1 ));
-                if( isset( $this->compix[$key] )) {
-                    ++$this->compix[$key];
-                }
-                else {
-                    $this->compix[$key] = 1;
-                }
-                $index = $this->compix[$key];
+                $key   = implode( Util::$MINUS, array_keys( $arg1 ));
+                $index = $this->getCompixIndex( $key );
                 break;
             case ctype_digit((string) $arg1 ) : // specific component in chain
                 $argType      = self::$INDEX;
                 $index        = (int) $arg1;
                 $this->compix = [];
                 break;
-            case in_array((string) $arg1, self::$CALCOMPS, true ) : // all but Vtimzones subcombs
-                $argType      = $arg1;
-                if( null === $arg2 ) {
-                    if( isset( $this->compix[$argType] )) {
-                        ++$this->compix[$argType];
-                    }
-                    else {
-                        $this->compix[$argType] = 1;
-                    }
-                    $index = $this->compix[$argType];
-                }
-                elseif( ctype_digit((string) $arg2 )) {
-                    $index = $arg2;
-                }
+            case self::isCalendarSubComp((string) $arg1 ) : // all but Vtimzones subcombs
+                $argType = $arg1;
+                $index   = $this->getCompixIndex( $arg1, $arg2 );
                 break;
-            case ( ! in_array( $this->getCompType(), self::$UIDCOMPS, true )) :// comps without uid
+            case ( ! self::hasUid( $this )) : // comps without uid
                 $arg1    = null;
                 $argType = self::$INDEX;
-                if( isset( $this->compix[self::$INDEX] )) { // search for first/next
-                    ++$this->compix[self::$INDEX];
-                }
-                else {
-                    $this->compix[self::$INDEX] = 1;
-                }
-                $index = $this->compix[self::$INDEX];
+                $index   = $this->getCompixIndex( self::$INDEX );
                 break;
             case is_string( $arg1 ) : // assume UID as 1st argument
-                if( null === $arg2 ) {
-                    if( isset( $this->compix[$arg1] )) {
-                        ++$this->compix[$arg1];
-                    }
-                    else {
-                        $this->compix[$arg1] = 1;
-                    }
-                    $index = $this->compix[$arg1];
-                }
-                elseif( ctype_digit((string) $arg2 )) {
-                    $index = $arg2;
-                }
+                $index = $this->getCompixIndex( $arg1, $arg2 );
                 break;
         } // end switch( true )
         if( 0 < $index ) {
@@ -704,12 +675,35 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
+     * @param string $arg1
+     * @param null|int|string $arg2
+     * @return int
+     * @since 2.41.62 2022-09-26
+     */
+    protected function getCompixIndex( string $arg1, null|int|string $arg2 = null ) : int
+    {
+        if( null === $arg2 ) {
+            if( isset( $this->compix[$arg1] )) {
+                ++$this->compix[$arg1];
+            }
+            else {
+                $this->compix[$arg1] = 1;
+            }
+            return $this->compix[$arg1];
+        } // end if
+        if( ctype_digit((string) $arg2 )) {
+            return $arg2;
+        }
+        return -1;
+    }
+
+    /**
      * Return bool true on argList values found in any component property
      *
      * @param CalendarComponent $component
      * @param string[]          $argList
      * @return bool
-     * @since  2.41.52 - 2022-08-06
+     * @since  2.47.68 - 2022-10-03
      */
     protected static function isFoundInCompsProps(
         CalendarComponent $component,
@@ -721,12 +715,12 @@ abstract class IcalBase implements IcalInterface
                 $propValue = CalAddressFactory::conformCalAddress( $propValue );
             }
             switch( true ) {
-                case ( ! in_array( $propName, self::$DATEPROPS, true ) &&
-                    ! in_array( $propName, self::$SELSORTPROPS, true )) :
+                case ( ! self::isDateProp( $propName ) &&
+                    ! Vcalendar::isSelectSortProp( $propName )) :
                     continue 2;
                 case ( ! property_exists( $component, StringFactory::getInternalPropName( $propName ))) :
                     continue 2;
-                case ( in_array( $propName, self::$MPROPS1, true )) : // multiple occurrence
+                case self::isMultiProp1( $propName ) : // 'text' multiple occurrence
                     $propValues = [];
                     $component->getProperties( $propName, $propValues );
                     if( array_key_exists( $propValue, $propValues )) {
@@ -747,7 +741,7 @@ abstract class IcalBase implements IcalInterface
                         return true;
                     }
                     continue 2;
-                case ( in_array( $propName, self::$DATEPROPS, true )) :
+                case ( self::isDateProp( $propName )) :
                     $fmt       = ( 9 > strlen( $propValue ))
                         ? DateTimeFactory::$Ymd
                         : DateTimeFactory::$YmdHis;
@@ -782,7 +776,7 @@ abstract class IcalBase implements IcalInterface
      * @param null|int          $arg2      ordno if arg1 = component type
      * @throws InvalidArgumentException
      * @return static
-     * @since 2.41.33 2022-03-28
+     * @since 2.41.68 2022-10-03
      */
     public function setComponent(
         CalendarComponent $component,
@@ -791,8 +785,7 @@ abstract class IcalBase implements IcalInterface
     ) : static
     {
         $component->setConfig( $this->getConfig(), false, true );
-        $compType = $component->getCompType();
-        if( in_array( $compType, self::$TZCOMPS )) {
+        if( self::isTzComp( $component->getCompType())) {
             array_unshift( $this->components, clone $component );
             return $this;
         }
@@ -806,7 +799,7 @@ abstract class IcalBase implements IcalInterface
             $argType = self::$INDEX;
             $index   = (int) $arg1 - 1;
         }
-        elseif( in_array((string) $arg1, self::$CALCOMPS, true )) { // all but Vtimzones subcombs
+        elseif( self::isCalendarSubComp((string) $arg1 )) { // all but Vtimzones subcombs
             $argType = ucfirst( strtolower( $arg1 ));
             $index   = ( ctype_digit((string) $arg2 )) ? ((int) $arg2 ) - 1 : 0;
         }
@@ -830,7 +823,7 @@ abstract class IcalBase implements IcalInterface
                 $cix2sC++;
             }
             elseif( ! $argType &&
-                in_array( $this->components[$cix]->getCompType(), self::$UIDCOMPS, true ) &&
+                self::hasUid( $this->components[$cix] ) &&
                 ( $arg1 === $this->components[$cix]->getUid())) { // UID insert/replace
                 $this->components[$cix] = clone $component;
                 return $this;
@@ -852,8 +845,7 @@ abstract class IcalBase implements IcalInterface
      * @param int|string $arg1 ordno / component type / component uid
      * @param null|int   $arg2 ordno if arg1 = component type
      * @return bool  true on success, false on not found (last one deleted)
-     * @since 2.41.11 2022-01-25
-     * @todo   Exception mgnt on unknown component
+     * @since 2.41.68 2022-10-03
      */
     public function deleteComponent( int|string $arg1, null|int $arg2 = null ) : bool
     {
@@ -867,7 +859,7 @@ abstract class IcalBase implements IcalInterface
         }
         elseif( property_exists( $this, StringFactory::getInternalPropName( self::PRODID ))) {
             $cmpArg = ucfirst( strtolower( $arg1 ));
-            if( in_array( $cmpArg, self::$VCOMPS, true ) || // subcomps to Vcalendar
+            if( self::isVcalendarVcomp( $cmpArg ) || // subcomps to Vcalendar
                 ( 0 === strcasecmp( $cmpArg, self::VTIMEZONE ))) {
                 $argType = ucfirst( strtolower( $arg1 ) );
                 $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
@@ -896,7 +888,7 @@ abstract class IcalBase implements IcalInterface
                 $cix2dC++;
             }
             elseif( ! $argType &&
-                in_array( $this->components[$cix]->getCompType(), self::$UIDCOMPS, true ) &&
+                self::hasUid( $this->components[$cix] ) &&
                 ( $arg1 === $this->components[$cix]->getUid())) {
                 unset( $this->components[$cix] );
                 $remove = true;
@@ -917,7 +909,7 @@ abstract class IcalBase implements IcalInterface
      * @param CalendarComponent $subComp
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.40.11 - 2022-01-26
+     * @since  2.47.68 - 2022-10-03
      */
     protected static function assertComponents(
         IcalBase $comp,
@@ -938,7 +930,7 @@ abstract class IcalBase implements IcalInterface
         $type    = $comp->getCompType();
         $subType = $subComp->getCompType();
         if(( Vcalendar::VCALENDAR === $type ) &&
-            (( self::VTIMEZONE === $subType ) || in_array( $subType, self::$VCOMPS, true ))) {
+            (( self::VTIMEZONE === $subType ) || self::isVcalendarVcomp( $subType ))) {
             return;
         }
         if(( ! isset( $SUBS[$type] ) || ! in_array( $subType, $SUBS[$type], true ))) {

@@ -69,6 +69,7 @@
             <file>test/PropXTest.php</file>
             <file>test/PropEmptyTest.php</file>
             <file>test/ParseTest.php</file>
+            <file>test/PropSortTest.php</file>
             <file>test/StringfuncTest.php</file>
         </testsuite>
         <testsuite name="Valarm property Tests">
@@ -100,6 +101,7 @@
             <directory>./src</directory>
         </include>
         <exclude>
+            <file>./src/Util/IcalXMLFactory.php</file>
             <file>./src/Util/RegulateTimezoneFactory.php</file>
         </exclude>
         <!-- Require the PHP Xdebug (2.7.0 or later) and tokenizer extensions-->

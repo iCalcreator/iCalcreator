@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.67 manual</title>
+    <title>iCalcreator 2.41.70 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult, All rights reserved">
 <meta name="copyright"   content="2007-2022 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.67">
+<meta name="description" content="using iCalcreator v2.41.70">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.67</p>
+<p class="header">iCalcreator v2.41.70</p>
 <p>
-iCalcreator v2.41.67<br>
+iCalcreator v2.41.70<br>
 Copyright &copy; 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -217,11 +217,12 @@ iCalcreator features create, parse, edit and select <strong>calendar</strong> an
 For iCalcreator 2.40 version (and later), <em>PHP</em> version &gt;= 8.0 is required,
 version v2.39 <em>PHP</em>7+.
 
-To assert PHP compability
-    <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>
-    and
+    To support the development, maintenance and test process
+    <a href="https://github.com/PHPCompatibility/PHPCompatibility" title="PHPCompatibility">PHPCompatibility</a>,
     <a href="https://github.com/phpstan/phpstan" title="PHPStan">PHPStan</a>
-are used.
+    and
+    <a href="https://github.com/DeGraciaMathieu/php-arguments-detector" title="php-arguments-detector">php-arguments-detector</a>
+    are included.
 </p>
 <br>
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a>
@@ -369,12 +370,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.67/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.70/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.67</dt>
+    <dt>v2.41.70</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -383,7 +384,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.67 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.70 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -527,6 +528,13 @@ Here are update headlines in this version.
         DateTimeInterface adapt
     </li>
 
+    <li>
+        upd Pc::getParams() return types<br>
+        upd tests and format property output logic<br>
+        DateTimeInterface adapt<br>
+        Util/IcalXMLFactory split up in Xml/Formatter+Parser
+    </li>
+
 </ul>
 
 
@@ -573,7 +581,8 @@ A strong recommendation is also to set config <a href="#Unique_id">unique_id</a>
 to ensure accurate setting of PRODID property.
 Also setting &quot;X-WR-TIMEZONE&quot; (below) is to recommend.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
@@ -754,7 +763,7 @@ $vcalendar-&gt;setMethod( Vcalendar::PUBLISH )
 
 <br>
 <a href="#TimezoneXMLjsonvCard">4 XML, json and vCard support</a><br>
-<a href="#XMLhelpers">4.3 iCalcreator and iCalXMLFactory class</a><br>
+<a href="#XMLhelpers">4.3 iCalcreator and (RFC6321) XML</a><br>
 <a href="#iCal2XML">4.3.1 iCal2XML</a><br>
 <a href="#XML2iCal">4.3.2 XML2iCal</a><br>
 <a href="#iCal2jSon">4.4 iCalcreator and json export</a><br>
@@ -1611,7 +1620,8 @@ Throws InvalidArgumentException on (set)config error.
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $config    = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 $vcalendar = new Vcalendar( $config );
@@ -1623,7 +1633,8 @@ The <strong>calendar</strong> PRODID property (based on the configuration <a hre
     are AUTOMATICALLY generated in iCalcreator at instance creation.
 </p>
 <p class="label">Example 2</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $tz        = &quot;Europe/Stockholm&quot;
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -1653,7 +1664,8 @@ Throws InvalidArgumentException on (set)config error.
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = Vcalendar::factory( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] )
     -&gt;setMethod( "PUBLIC" );
@@ -1686,7 +1698,8 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 *) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1713,7 +1726,8 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 *) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1735,7 +1749,8 @@ Throws InvalidArgumentException on (set)config error.
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -1773,7 +1788,8 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 *) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1801,7 +1817,8 @@ summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 *) dtend and duration MUST NOT occur in the same <a href="#VEVENT">VEVENT</a>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1823,7 +1840,8 @@ $vcalendar-&gt;setComponent( $vtodo );
     config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vtodo;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -1855,7 +1873,8 @@ dtstart  = property <a href="#DTSTART">DTSTART</a> string|DateTimeInterface valu
 summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1877,7 +1896,8 @@ dtstart  = property <a href="#DTSTART">DTSTART</a> string|DateTimeInterface valu
 summary  = property <a href="#SUMMARY">SUMMARY</a> string value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1899,7 +1919,8 @@ $vcalendar-&gt;setComponent( $vjournal );
     config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vjournal;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -1936,7 +1957,8 @@ dtstart  = property <a href="#DTSTART">DTSTART</a>  string|DateTimeInterface val
 dtend    = property <a href="#DTEND">DTEND</a>   string|DateTimeInterface value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -1962,7 +1984,8 @@ dtstart  = property <a href="#DTSTART">DTSTART</a>  string|DateTimeInterface val
 dtend    = property <a href="#DTEND">DTEND</a>   string|DateTimeInterface value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $config    =[ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 $vcalendar = new Vcalendar( $config );
@@ -1985,7 +2008,8 @@ $vcalendar-&gt;setComponent( $vfreebusy );
     config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vfreebusy;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -2019,7 +2043,8 @@ trigger = property <a href="#TRIGGER">TRIGGER</a> string|DateInterval|DateTimeIn
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2052,7 +2077,8 @@ action  = property <a href="#ACTION">ACTION</a> string value
 trigger = property <a href="#TRIGGER">TRIGGER</a> string|DateInterval|DateTimeInterface value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Valarm;
 
@@ -2082,7 +2108,8 @@ Throws InvalidArgumentException on (set)config error.
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Valarm;
 
@@ -2132,7 +2159,8 @@ duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2160,7 +2188,8 @@ duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2183,7 +2212,8 @@ $vcalendar-&gt;setComponent( $vavailability );
     config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vavailability;
 
 $vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -2227,7 +2257,8 @@ duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2253,7 +2284,8 @@ duration = property <a href="#DURATION">DURATION</a> string|DateInterval value *
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar     = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2277,7 +2309,8 @@ $vcalendar-&gt;setComponent( $vavailability );
     config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vavailability;
 use Kigkonsult\Icalcreator\Available;
 
@@ -2325,7 +2358,8 @@ calendaraddress = property <a href="#CALENDAR-ADDRESS">CALENDAR-ADDRESS</a> stri
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2349,7 +2383,8 @@ calendaraddress = property <a href="#CALENDAR-ADDRESS">CALENDAR-ADDRESS</a> stri
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2370,7 +2405,8 @@ $vevent-&gt;setComponent( $participant );
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Participant;
 
@@ -2419,7 +2455,8 @@ name         = property <a href="#NAME">NAME</a> string value
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2443,7 +2480,8 @@ name         = property <a href="#NAME">NAME</a> string value
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2464,7 +2502,8 @@ $vevent-&gt;setComponent( $vlocation );
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Vlocation;
 
@@ -2513,7 +2552,8 @@ name         = property <a href="#NAME">NAME</a> string value
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2537,7 +2577,8 @@ name         = property <a href="#NAME">NAME</a> string value
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2558,7 +2599,8 @@ $vevent-&gt;setComponent( $vresource );
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Vresource;
 
@@ -2602,12 +2644,13 @@ To ease up usage, constant Kigkonsult\Icalcreator\Vcalendar::VTIMEZONE is availa
     tzid = property <a href="#TZID">TZID</a> string value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
-    $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
+$vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
-    $vtimezone = $vcalendar-&gt;newVtimezone( &quot;Europe/Stockholm&quot;);
-    .. .
+$vtimezone = $vcalendar-&gt;newVtimezone( &quot;Europe/Stockholm&quot;);
+.. .
 
 </p>
 
@@ -2621,7 +2664,8 @@ config = array, review <a href="#iCalcreator_configuration_methods">configuratio
 tzid   = property <a href="#TZID">TZID</a> string value
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2639,7 +2683,8 @@ $vcalendar-&gt;setComponent( $vtimezone );
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vtimezone;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -2673,7 +2718,8 @@ are available.
 <p class="format">Vtimezone::newStandard()</p>
 <p class="format">Vtimezone::newDaylight()</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -2695,7 +2741,8 @@ $daylight  = $vtimezone-&gt;newDaylight();
 config = array, review <a href="#iCalcreator_configuration_methods">configuration</a> options.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vtimezone;
 use Kigkonsult\Icalcreator\Standard;
 use Kigkonsult\Icalcreator\Daylight;
@@ -2757,7 +2804,8 @@ $vcalendar-&gt;deleteCalscale();
 <p class="label">Format</p>
 <p class="format">Vcalendar::getCalscale()</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -2777,7 +2825,8 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="format">Vcalendar::setCalscale()</p>
 <p class="comment">value = (string) calscale value</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $config    = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 $vcalendar = new Vcalendar( $config );
@@ -2834,7 +2883,8 @@ $vcalendar-&gt;deleteMethod();
 <p class="label">Format</p>
 <p class="format">Vcalendar::getMethod();</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $vcalendar-&gt;parse();
@@ -2853,7 +2903,8 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="format">Vcalendar::setMethod( value )</p>
 <p class="comment">value = (string) method value</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $vcalendar-&gt;setMethod( Vcalendar::PUBLISH );
@@ -2888,7 +2939,8 @@ $str = $vcalendar-&gt;createVersion();
 <p class="label">Format</p>
 <p class="format">Vcalendar::getVersion()</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -2911,7 +2963,8 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 <p class="format">Vcalendar::setVersion( version )</p>
 <p class="comment">version = (string) iCal version</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ] );
 $vcalendar-&gt;setVersion(&quot;2.0&quot; );
@@ -2943,7 +2996,8 @@ componentSuborderNumber = (int) order number</p>
 <p>Remove component with <a href="#UID">UID</a>. N.B <a href="#UID">UID</a> is NOT set for <a href="#VALARM">ALARM</a> / <a href="#VTIMEZONE">TIMEZONE</a> components.</p>
 <p class="format">Vcalendar::deleteComponent( <a href="#UID">UID</a> )</p>
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -2955,7 +3009,8 @@ $vcalendar-&gt;deleteComponent( &quot;20070803T194810CEST-0123U3PXiX@kigkonsult.
 </p>
 <p class="label">Example 2</p>
 <p>Deleting all components, using format 2 without order number.</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -2982,7 +3037,8 @@ Bool false is returned if no component exists or at end-of-components invoking t
 <p>Get next component, until end-of-components.</p>
 <p class="format">Vcalendar::getComponent()</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -2997,7 +3053,8 @@ while( $comp = $vcalendar-&gt;getComponent()) {
 <p class="format">Vcalendar::getComponent( orderNumber )</p>
 <p class="comment">orderNumber = (int) order number</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3017,7 +3074,8 @@ get specific component with component type and suborder number (1st=1, 2nd=2).
 <p class="comment">componentType           = (string) component type
 componentSuborderNumber = (int) order number</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3036,7 +3094,8 @@ May be used when trying to find (base) component and corresponding <a href="#REC
 </p>
 <p class="format">Vcalendar::getComponent( <a href="#UID">UID</a> )</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3102,7 +3161,8 @@ propertyData = (string) unique property value (strict case),
                date format &quot;YYYYMMDD&quot; (if any side is DATE, only dates are used),
                datetime format &quot;YYYYMMDDTHHMMSS&quot;</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3123,7 +3183,8 @@ while( $comp  = $vcalendar-&gt;getComponent( [ Vcalendar::RESOURCES =&gt; &quot;
 
 <p class="label">Example</p>
 <p>Return all Vevents</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3329,7 +3390,8 @@ combinations                          (defaults in upper case)
 If flat is set to false, output array is sorted in 'Y-m-d h-i-s' asc. order.
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3401,7 +3463,8 @@ propertyName  : (string) above (any case)
 propertyValue : (string) value / (array) ( *[ (string) value] )
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3474,7 +3537,8 @@ If <a href="#UID">UID</a> is not found, component is inserted last in chain.
 <p class="format">Vcalendar::setComponent( component, <a href="#UID">UID</a> )</p>
 <p class="comment">component = (object) Vcalendar component instance</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3527,7 +3591,8 @@ The method returns the class instance (static).
 </p>
 
 <p class="label">parse example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
     // <span class="comment">set Your unique id, </span>
     // <span class="comment">site info for the Vcalendar PRODID property</span>
@@ -3545,7 +3610,8 @@ $vcalendar-&gt;parse( $iCalContent );
 <p>
 PHP <span class="example">file_get_contents</span> may work on external resources.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
     // <span class="comment">set Your unique id, </span>
     // <span class="comment">site info for the Vcalendar PRODID property</span>
@@ -3563,7 +3629,8 @@ $vcalendar-&gt;parse( $iCalContent );
 <p>
 Here using <a href="https://github.com/iCalcreator/UrlRsrc" target="_blank" title="download UrlRsrc">UrlRsrc</a> to download an internet (URL) resource.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Http\UrlRsrc;
 
     // <span class="comment">set Your unique id, </span>
@@ -3582,13 +3649,14 @@ $vcalendar-&gt;parse( $iCalContent );
 <p>
 Parse an array with iCal formatted rows.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.67//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.70//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -3607,7 +3675,8 @@ $vcalendar-&gt;parse( $str );
 <p>
 Parse two iCal files into one.
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -3647,7 +3716,8 @@ Redirect the Vcalendar instance content to user browser.
 Filename, addressed to browser, is automatically generated if missing or not set,
 the filename will look like it is set using<br>
 </p>
-<p class="example">$filename = date( &quot;YmdHis&quot; ).&quot;.ics&quot;</p>
+<p class="example">
+$filename = date( &quot;YmdHis&quot; ).&quot;.ics&quot;</p>
 <p>
 The method do not stop PHP script (exit), returns (bool) true on success.
 </p>
@@ -3662,7 +3732,8 @@ cdType     = (bool) true: (default) Content-Disposition: attachment
                     false: Content-Disposition: inline
 fileName   = (string) returned file Name</p>
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -3681,7 +3752,8 @@ $vcalendar-&gt;returnCalendar();
 exit;
 </p>
 <p class="label">Example 2</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3721,7 +3793,8 @@ Sub-components, if exists, ex.<a href="#VALARM">ALARM</a>, are not sorted.
 </p>
 <p class="format">Vcalendar::sort()</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -3853,10 +3926,11 @@ Note, to ease up usage, you will find convenient constants for config keys etc i
 <p class="format">Vcalendar::getConfig( [ key ] )</p>
 <p class="comment">key = (string) config key</p>
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
- .. .
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
+.. .
 $uniqueId = $vcalendar-&gt;getConfig( Vcalendar::UNIQUE_ID );
- .. .
+.. .
 </p>
 <p class="label">Example 2</p>
 <p class="example">
@@ -3879,7 +3953,8 @@ $config = $vcalendar-&gt;getConfig();
 key    = (string) config key
 value  = (mixed) config value</p>
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -3890,14 +3965,16 @@ $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quo
 key    = (string) config key
 value  = (mixed) config value</p>
 <p class="label">Example 2</p>
-<p class="example">use Kigkonsult\Icalcreator\Vevent;
+<p class="example">
+use Kigkonsult\Icalcreator\Vevent;
 
 $config = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
 $vevent = new Vevent( $config );
 
 </p>
 <p class="label">Example 3</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 
 .. .
@@ -3921,7 +3998,8 @@ If using a <a href="#vevent_constr">component factory method</a>, configuration 
 key    = (string) config key
 value  = (mixed) config value</p>
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar();
 $config    = [
@@ -3936,7 +4014,8 @@ $vcalendar-&gt;setConfig( $config );
 <p class="comment">key    = (string) config key
 value  = (mixed) config value</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar();
 $vcalendar-&gt;setConfig( Vcalendar::UNIQUE_ID, &quot;kigkonsult.se&quot; );
@@ -3985,7 +4064,8 @@ There is a convenient config key constant available: Vcalendar::COMPSINFO.
 </p>
 
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -4081,7 +4161,7 @@ the UTC designator, appended to the time value.
 For example, the following represents January 19, 1998, at 0700 UTC:
 </p>
 <p class="quotes">DTSTART:19980119T070000Z</p>
-<p class="quotes">The <a href="#TZID">TZID</a> property parameter MUST <b>NOT</b> be applied to DATE-TIME properties
+<p class="quotes">The TZID property parameter MUST <b>NOT</b> be applied to DATE-TIME properties
 whose time values are specified in UTC timezone.
 </p>
 
@@ -4090,7 +4170,7 @@ Due to a limitation in <em>PHP</em> date functions (on 32 bit systems),
 a date (ex. while setting <a href="#DTSTART">DTSTART</a> property)
 before 1970 or after GMT may force a <em>PHP</em> date function to generate an error or set date to &quot;January 1 1970&quot;.
 </p>
-<p class="comment">Recommended string date(time) formats:
+<p class="comment">string date(time) formats:
     &quot;20110625&quot;,            &quot;2011-06-25&quot;,          &quot;2011/06/26&quot;
     &quot;20110625051015&quot;,      &quot;20110625 051015&quot;
     &quot;20110625T051015&quot;,     &quot;20110625t051015&quot;
@@ -4101,8 +4181,15 @@ Any trailing characters, will be interpreted as offset/timezone.
 Input string dates with timezone should have a space character between datePart and timezonePart.
 </p>
 <p>
-    As of 2.41.60, GitHub#103, non-PHP complient (ex ms) timezone may be accepted
-    and converted to corr. PHP timezone.
+    If a DateTime instance used as (date[time]) property input (to recommend),
+    opt. param TZID (timezone) should match
+    or not be set at all.
+</p>
+<p>
+    As of 2.41.60, GitHub#103,
+    using a non-PHP complient (ex ms) timezone in a date property string value input
+    or in a TZID parameter
+    may be accepted and converted to a corr. PHP timezone but may result in an unpredictable one.
 </p>
 
 <br>
@@ -8026,7 +8113,8 @@ propOrderNo   = (int) order number             // <span class="comment">1=1st, 2
 <p class="label">Example</p>
 See rules in detail in <a href="https://tools.ietf.org/html/rfc5545" title="RFC5545" target="_blank">RFC5545</a>
  &quot;Internet Calendaring and Scheduling Core Object Specification (iCalendar)&quot;.<br>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 try {
     $vevent = $vcalendar-&gt;newVevent()
@@ -8246,7 +8334,7 @@ $vtodo-&gt;deleteRelatedto()
 <p class="label">Example 2</p>
 <p>Delete RELATED-TO property no 2.</p>
 <p class="example">
-  $vjournal-&gt;deleteRelatedto( 2 );
+$vjournal-&gt;deleteRelatedto( 2 );
 
 </p>
 <p class="label">Example 3</p>
@@ -10136,7 +10224,8 @@ The method throws InvalidArgumentException on empty value and config ALLOWEMPTY 
 xparams<sup>2</sup> = (array)( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -10269,7 +10358,8 @@ xparams     = (string) key =&gt; (string) value // <span class="comment">key pre
 propOrderNo = (int) order number             // <span class="comment">1=1st, 2=2nd etc</span>
 lang<sup>*</sup>       = as defined in [RFC5546]</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -10355,7 +10445,8 @@ and on invalid offset value.
 xparams<sup>2</sup>      = (array) ( *[ /string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -10440,7 +10531,8 @@ and on invalid offset value.
 xparams<sup>2</sup>    = array( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -10556,7 +10648,8 @@ $isPropSet = $vtimezone-&gt;isTzurlSet();
 xparams<sup>2</sup> = array( *[ (string) key =&gt; (string) value ] ) // <span class="comment">key prefix &quot;X-&quot;</span>
 </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 
@@ -10619,7 +10712,8 @@ The property (is OPTIONAL and) MUST NOT occur more than once in
     Note, NO deleteUid() method, use setUid() to recreate.
 </p>
 <p class="label">Example</p>
-<p class="example">UID:5FC53010-1267-4F8E-BC28-1D7AE55A7C99</p>
+<p class="example">
+UID:5FC53010-1267-4F8E-BC28-1D7AE55A7C99</p>
 <p>
     UID may be required when importing iCal formatted information into some <strong>calendar</strong> software (MS etc.),
     as well as (<strong>calendar</strong>) properties <a href="#X-PROPERTY">x-properties</a> "X-WR-CALNAME",
@@ -10923,7 +11017,8 @@ Get (next) x-property value.
 <p class="comment">Get propOrderNo X-property</p>
 
 <p class="label">Example 1</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -10937,7 +11032,8 @@ if( $vcalendar-&gt;isXpropSet( Vcalendar::X_WR_TIMEZONE )) {
 </p>
 
 <p class="label">Example 2</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -10951,7 +11047,8 @@ while( $xprop = $vcalendar-&gt;getXprop )) {
 
 
 <p class="label">Example 3</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -10963,7 +11060,8 @@ if( $xprop = $vcalendar-&gt;getXprop( &quot;X-ABC-MMSUBJ&quot; )) {
 </p>
 
 <p class="label">Example 4</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -11093,7 +11191,8 @@ and order 1 alt. suborder number.</p>
 N.B <a href="#UID">UID</a> is NOT set for <a href="#VALARM">ALARM</a> / <a href="#VTIMEZONE">timezone</a> components.</p>
 <p class="label">Example 1</p>
 <p>Delete first subcomponent.</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -11104,7 +11203,8 @@ $comp1-&gt;deleteComponent( 1 );
 </p>
 <p class="label">Example 2</p>
 <p>Delete all subcomponents.</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot;, ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -11138,7 +11238,8 @@ alt. component with component type and suborder number (1st=1, 2nd=2..).</p>
 <p class="comment">Get component with <a href="#UID">UID</a>.
 N.B <a href="#UID">UID</a> is NOT set for <a href="#VALARM">ALARM</a> / <a href="#VTIMEZONE">timezone</a> components.</p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -11160,7 +11261,8 @@ while( $subComp = $comp1-&gt;getComponent()) {
 
 <p class="label">Example</p>
 <p>Return all Valarms</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $iCalContent = file_get_contents( &quot;calendar.ics&quot; );
@@ -11195,7 +11297,8 @@ componentSuborderNumber = (int) component suborder number</p>
 <p class="comment">Replace component with component type and component order number.
 if orderNumber is not found, component is inserted last in chain. </p>
 <p class="label">Example</p>
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use Kigkonsult\Icalcreator\Valarm;
 
@@ -11259,7 +11362,8 @@ to       = DateTimeInterface | (int) timestamp, period end date<sup>**</sup>
 </p>
 <p class="label">Example</p>
 Using the Util/VtimezonePopulateFactory::process (static) method.
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Util\VtimezonePopulateFactory;
 
 $calendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
@@ -11273,7 +11377,8 @@ $calendar = VtimezonePopulateFactory::process( $calendar, $timezone );
 </p>
 <p class="label">Example 2</p>
 Using the shortcut The Vcalendar::<a href="#valendarVtimezonePopulate">vtimezonePopulate</a>() method.
-<p class="example">use Kigkonsult\Icalcreator\Vcalendar;
+<p class="example">
+use Kigkonsult\Icalcreator\Vcalendar;
 
 $calendar = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ] );
 $timezone = 'Europe/Stockholm';
@@ -11341,7 +11446,8 @@ END:VTIMEZONE
 <p class="label">Format</p>
 <p class="format">RegulateTimezoneFactory::process( iCalData )</p>
 <p class="comment">iCalData = string|array $iCal strict rfc5545 formatted calendar</p>
-<p class="example">use Kigkonsult\Icalcreator\Util\RegulateTimezoneFactory;
+<p class="example">
+use Kigkonsult\Icalcreator\Util\RegulateTimezoneFactory;
 
 $iCalStringToParse = RegulateTimezoneFactory::process( $iCalInput );
 
@@ -11358,7 +11464,8 @@ $iCalStringToParse = RegulateTimezoneFactory::process( $iCalInput );
 <p>
     or (as object oriented style example)
 </p>
-<p class="example">use Kigkonsult\Icalcreator\Util\RegulateTimezoneFactory;
+<p class="example">
+use Kigkonsult\Icalcreator\Util\RegulateTimezoneFactory;
 
 $iCalStringToParse =
     RegulateTimezoneFactory::factory( $iCalInput )
@@ -11374,37 +11481,48 @@ $iCalStringToParse =
 
 <a id="TimezoneXMLjsonvCard"></a><h1>4 XML, json and vCard support</h1>
 
-<a id="XMLhelpers"></a><h3>4.3 iCalcreator and iCalXMLFactory class</h3>
+<a id="XMLhelpers"></a><h3>4.3 iCalcreator and (rfc6321) XML</h3>
 <p>
-The IcalXMLFactory class methods converts iCal into XML and parses XML into iCal.
-XML is defined by [RFC6321], &quot;xCal: The XML Format for <strong>iCalendar</strong>&quot;.
+    Ical XML is defined by <a href="https://tools.ietf.org/html/rfc6321" title="Download rfc6321" target="_blank">rfc6321</a>,
+    &quot;xCal: The XML Format for <strong>iCalendar</strong>&quot;.
 </p>
 <a id="iCal2XML"></a><h4>4.3.1 iCal2XML</h4>
-<p>The (static) iCal2XML method converts an Vcalendar instance to XML.</p>
+<p>The (static) XML\Formatter::iCal2XML method converts an Vcalendar instance to XML.</p>
 <p>
 The iCal2XML method uses the SimpleXML extension (and &quot;libxml&quot; <em>PHP</em> extension).
 </p>
 <p>An rfc6321 XML string is returned.</p>
 <p class="label">Format</p>
-<p class="format">IcalXMLFactory::iCal2XML( iCalobj )</p>
+<p class="format">XML\Formatter::iCal2XML( iCalobj )</p>
 <p class="comment">iCalobj = (object) Vcalendar instance</p>
 <p class="example">
-$xmlString = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $vcalendar );
+use Kigkonsult\Icalcreator\Xml\Formatter as XmlFormatter;
+
+$xmlString = XmlFormatter::iCal2XML( $vcalendar );
 
 </p>
 <br>
 
 <a id="XML2iCal"></a><h4>4.3.2 XML2iCal</h4>
 <p>
-    The (static) method accepts a well-formed (rfc6321) XML string as argument.
+    The (static) Xml\Parser::XML2iCal method accepts a well-formed (rfc6321) XML string as argument.
 </p>
 <p>
     On success, an Vcalendar instance is returned, on error false.
 </p>
 <p class="label">Format</p>
-<p class="format">IcalXMLFactory::XML2iCal( xmlstr [, config] )</p>
+<p class="format">Xml\Parser::XML2iCal( xmlstr [, config] )</p>
 <p class="comment">xmlstr  = (string) rfc6321 XML
-config  = (array)  iCalcreator config array (opt)</p>
+config  = (array)  iCalcreator config array (opt)
+</p>
+<p class="example">
+use Kigkonsult\Icalcreator\Xml\Parser as XmlParser;
+
+$config    = [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&quot; ];
+
+$vcalendar = XmlParser::XML2iCal( $xlmString, $config );
+
+</p>
 <br>
 
 <a href="#INDEX">[index]</a> <a href="#top">[top]</a> <a href="#TimezoneXMLjsonvCard">[up]</a>
@@ -11420,12 +11538,14 @@ config  = (array)  iCalcreator config array (opt)</p>
 </p>
 
 <p>
-You can also export iCal (XML) as json using a Vcalendar instance
-<a href="#iCal2XML">IcalXMLFactory::iCal2XML()</a> (above),
+You can also export iCal (XML) as json using a Vcalendar instance,
+Xml\Formatter::<a href="#iCal2XML">iCal2XML()</a> (above),
 simplexml_load_string and json_encode as follows:
 </p>
 <p class="example">
-$xml  = Kigkonsult\Icalcreator\Util\IcalXMLFactory::iCal2XML( $vcalendar );
+use Kigkonsult\Icalcreator\Xml\Formatter as XmlFormatter;
+
+$xml  = XmlFormatter::iCal2XML( $vcalendar );
 $json = json_encode( simplexml_load_string( $xml ));
 
 </p>
@@ -11496,7 +11616,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.67
+<tr><td>Version  <td>2.41.70
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

@@ -38,14 +38,23 @@ use Kigkonsult\Icalcreator\Vcalendar;
 
 use function bin2hex;
 use function count;
+use function ctype_digit;
 use function explode;
 use function in_array;
 use function rtrim;
 use function sprintf;
 use function str_replace;
+use function strlen;
+use function strpos;
+use function strstr;
+use function stristr;
+use function strtolower;
+use function strtoupper;
+use function substr;
+use function substr_count;
 
 /**
- * @since 2.41.54 - 2022-08-00
+ * @since 2.41.70 2022-10-21
  */
 abstract class ParserBase implements IcalInterface
 {
@@ -142,6 +151,9 @@ abstract class ParserBase implements IcalInterface
         return $instance;
     }
 
+    protected static string $EQ  = '=';
+    protected static string $QQ  = '"';
+
     /**
      * Return array property value and attributes
      *
@@ -151,44 +163,132 @@ abstract class ParserBase implements IcalInterface
      * @param string      $line     property content
      * @param null|string $propName
      * @return array   [ value, [ *( propAttrKey => propAttrValue) ] ]
-     * @since  2.30.3 - 2021-02-14
+     * @since 2.41.70 2022-10-21
      */
     public static function splitContent( string $line, ?string $propName = null ) : array
     {
-        static $CSS = '://';
-        static $EQ  = '=';
-        static $QQ  = '"';
-        static $URIprops = [ self::SOURCE, self::URL, self::TZURL ];
         $clnPos = strpos( $line, self::$COLON );
         if( ( false === $clnPos )) {
-            return [ $line, [] ]; // no params
+            return [ $line, [] ]; // no params and no colon (empty property)
         }
         if( 0 === $clnPos ) { // no params,  most frequent
             return [ substr( $line, 1 ), [] ];
         }
-        if( ! empty( $propName ) && in_array( strtoupper( $propName ), $URIprops, true )) {
-            StringFactory::checkFixUriValue( $line );
+        if( self::checkSingleParam( $line )) { // one (simpler) param
+            return self::processSingleParam( $line );
         }
-        if( self::checkSingleParam( $line )) { // one param
-            $param = StringFactory::between( Util::$SEMIC, Util::$COLON, $line );
-            return [
-                StringFactory::after( self::$COLON, $line ),
-                [
-                    StringFactory::before( $EQ, $param ) =>
-                        trim( StringFactory::after( $EQ, $param ), $QQ )
-                ]
-            ];
-        } // end if
+        if( self::mayHaveUriParam( $propName )) {
+            StringFactory::checkFixUrlDecode( $line );
+            $line = self::checkFixUriMessage( $line );
+        }
         /* more than one param here (or a tricky one...) */
-        $attr         = [];
-        $attrix       = -1;
-        $WithinQuotes = false;
+        $attr = [];
+        $line = self::extractTextParams( $line, $attr ); // simpler (text) ones
+        $line = self::extractMultiParams( $line, $attr );
+        return [ $line, self::processAttributes( $attr) ];
+    }
+
+    /**
+     * Return bool true if propName may a URI VALUE parameter
+     *
+     * @param string|null $propName
+     * @return bool
+     */
+    protected static function mayHaveUriParam( ? string $propName ) : bool
+    {
+        static $URIprops = [ self::SOURCE, self::URL, self::TZURL ];
+        return ( ! empty( $propName ) &&
+            in_array( strtoupper( $propName ), $URIprops, true ));
+    }
+
+    /**
+     * Remove opt 'VALUE=URI:message:'
+     *
+     * orginating from any Apple device
+     *
+     * @param string $line
+     * @return string
+     * @since 2.41.68 2022-10-22
+     */
+    protected static function checkFixUriMessage( string $line ) : string
+    {
+        static $Um        = 'URI:message';
+        static $SQVEQUm   = ';VALUE=URI:message';
+        static $SQVEQUmq  = ';VALUE=\'URI:message\'';
+        static $SQVEQUmqq = ';VALUE="URI:message"';
+        switch( true ) {
+            case ( false === stripos( $line, $Um )) :
+                return $line;
+            case ( false !== stripos( $line, $SQVEQUm )) :  // no quote
+                return str_ireplace( $SQVEQUm, Util::$SP0, $line );
+            case ( false !== stripos( $line, $SQVEQUmq )) :  // single quote
+                return str_ireplace( $SQVEQUmq, Util::$SP0, $line );
+            case ( false !== stripos( $line, $SQVEQUmqq )) : // double quote
+                return str_ireplace( $SQVEQUmqq, Util::$SP0, $line );
+        } // end switch
+        return $line;
+    }
+
+    /**
+     * Extract and remove opt (simpler) TEXT parameters from line and upd attr array
+     *
+     * @param string $line
+     * @param array $attr
+     * @return string
+     * @since 2.41.70 2022-10-20
+     */
+    protected static function extractTextParams( string $line, array & $attr ) : string
+    {
+        static $searchKeyArr = [
+            'CUTYPE=',
+            'ENCODING=',
+            'FMTTYPE=',
+            'FBTYPE=',
+            'LANGUAGE=',
+            'ORDER=',
+            'PARTSTAT=',
+            'RELATED=',
+            'RELTYPE=',
+            'ROLE=',
+            'VALUE=',
+            'TZID='
+        ];
+        foreach( $searchKeyArr as $needle ) {
+            $search = self::$SEMIC . $needle;
+            if( false === strpos( $line, $search )) {
+                continue;
+            }
+            $line1  = stristr( $line, $search, true );
+            $temp   = StringFactory::after( $search, $line );
+            [ $attrValue, $rightPart ] = StringFactory::splitByFirstSQorColon( $temp );
+            $attr[] = $needle . $attrValue;
+            $line   = $line1 . $rightPart;
+        } // end foreach
+        return $line;
+    }
+
+    /**
+     * Extract and remove multi parameters from line and upd attr array
+     *
+     * @param string $line
+     * @param array $attr
+     * @return string
+     * @since 2.41.70 2022-10-21
+     */
+    protected static function extractMultiParams( string $line, array & $attr ) : string
+    {
+        static $CSS   = '://';
+        if( self::$COLON === $line[0] ) { // no params found
+            return substr( $line, 1 );
+        }
+        $attrix       = count( $attr ) - 1;
+        $withinQuotes = false;
         $len          = strlen( $line );
         $cix          = 0;
         while( $cix < $len ) {
             $str1 = $line[$cix];
             $cix1 = $cix + 1;
-            if( ! $WithinQuotes &&
+            if( ! $withinQuotes &&
                 ( self::$COLON === $str1 ) &&
                 ( $CSS !== substr( $line, $cix, 3 )) && // '://'
                 ! self::colonIsPrefixedByProtocol( $line, $cix ) &&
@@ -196,28 +296,19 @@ abstract class ParserBase implements IcalInterface
                 $line = substr( $line, $cix1 );
                 break;
             }
-            if( $QQ === $str1 ) { // '"'
-                $WithinQuotes = ! $WithinQuotes;
+            if( self::$QQ === $str1 ) { // '"'
+                $withinQuotes = ! $withinQuotes;
             }
             if( self::$SEMIC === $str1 ) { // ';'
                 ++$attrix;
-                $attr[$attrix] = self::$SP0; // initiate
+                $attr[$attrix] = self::$SP0; // initiate new param
             }
             else {
                 $attr[$attrix] .= $str1;
             }
             ++$cix;
         } // end while...
-        /* make attributes in array format */
-        $propAttr = [];
-        foreach( $attr as $attribute ) {
-            if( ! str_contains( $attribute, $EQ )) {
-                continue;// skip empty? attributes
-            }
-            $attrSplit               = explode( $EQ, $attribute, 2 );
-            $propAttr[$attrSplit[0]] = $attrSplit[1];
-        }
-        return [ $line, $propAttr ];
+        return $line;
     }
 
     /**
@@ -254,13 +345,31 @@ abstract class ParserBase implements IcalInterface
      * @return bool
      * @since  2.30.3 - 2021-02-14
      */
-    public static function checkSingleParam( string $line ) : bool
+    protected static function checkSingleParam( string $line ) : bool
     {
-        if( ! str_starts_with( $line, Util::$SEMIC )) {
+        if( Util::$SEMIC !== $line[0] ) {
             return false;
         }
-        return ( ( 1 === substr_count( $line, Util::$SEMIC )) &&
+        return (( 1 === substr_count( $line, Util::$SEMIC )) &&
             ( 1 === substr_count( $line, Util::$COLON )));
+    }
+
+    /**
+     * Return array, property content and single param array
+     *
+     * @param string $line
+     * @return array
+     */
+    protected static function processSingleParam( string $line ) : array
+    {
+        $param = StringFactory::between( Util::$SEMIC, Util::$COLON, $line );
+        return [
+            StringFactory::after( self::$COLON, $line ),
+            [
+                strstr( $param, self::$EQ, true ) =>
+                    trim( StringFactory::after( self::$EQ, $param ), self::$QQ )
+            ]
+        ];
     }
 
     /**
@@ -283,6 +392,25 @@ abstract class ParserBase implements IcalInterface
             ( in_array( substr( $line, $cix - 5, 6 ), self::$PROTO5, true )) ||
             ( in_array( substr( $line, $cix - 6, 7 ), self::$PROTO6, true )) ||
             ( in_array( substr( $line, $cix - 7, 8 ), self::$PROTO7, true )));
+    }
+
+    /**
+     * Return attributes in array format, i.e. split key and value
+     *
+     * @param string[] $attr
+     * @return array
+     */
+    protected static function processAttributes( array $attr ) : array
+    {
+        $propAttr = [];
+        foreach( $attr as $attribute ) {
+            if( false === strpos( $attribute, self::$EQ )) {
+                continue;// skip empty? attributes
+            }
+            $attrSplit               = explode( self::$EQ, $attribute, 2 );
+            $propAttr[$attrSplit[0]] = $attrSplit[1];
+        }
+        return $propAttr;
     }
 
     /**

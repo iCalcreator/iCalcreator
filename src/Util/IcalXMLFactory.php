@@ -52,6 +52,7 @@ use function str_starts_with;
 use function strcasecmp;
 use function stripos;
 use function strlen;
+use function strstr;
 use function strtolower;
 use function strtoupper;
 use function substr;
@@ -61,6 +62,7 @@ use function ucfirst;
 /**
  * iCalcreator XML (rfc6321) support class
  *
+ * @deprecated
  * @since 2.41.63 2022-09-05
  */
 class IcalXMLFactory
@@ -349,7 +351,7 @@ class IcalXMLFactory
         /** prepare to fix components with properties/subComponents */
         $componentsXml = $VcalendarXml->addChild( self::$components );
         /** fix component properties */
-        while( false !== ( $component = $calendar->getComponent())) {
+        foreach( $calendar->getComponents() as $component ) {
             self::compProps2Xml(
                 $component,
                 $componentsXml->addChild( strtolower( $component->getCompType())),
@@ -606,10 +608,10 @@ class IcalXMLFactory
             } // end switch( $propName )
         } // end foreach( $props as $pix => $propName )
         /** fix subComponent properties, if any */
-        while( false !== ( $subcomp = $component->getComponent())) {
+        foreach( $component->getComponents() as $subComp ) {
             self::compProps2Xml(
-                $subcomp,
-                $parentXml->addChild( strtolower( $subcomp->getCompType())),
+                $subComp,
+                $parentXml->addChild( strtolower( $subComp->getCompType())),
                 $langCal
             );
         }
@@ -845,7 +847,7 @@ class IcalXMLFactory
                         if( str_contains( $parVal, Util::$COLON )) {
                             $p1   = $parameters->addChild( strtolower( $pKey ));
                             $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
-                            $type = strtolower( StringFactory::before( Util::$COLON, $parVal ));
+                            $type = strtolower( strstr( $parVal, Util::$COLON, true ));
                         }
                         elseif( 0 !== strcasecmp( $type, $parVal )) {
                             $type = strtolower( $parVal );
@@ -1007,7 +1009,8 @@ class IcalXMLFactory
             case self::$rstatus :
                 $child->addChild(
                     self::$code,
-                    number_format((float) $value[IcalInterface::STATCODE], 2, Util::$DOT, $SP0 ));
+                    number_format((float) $value[IcalInterface::STATCODE], 2, Util::$DOT, $SP0 )
+                );
                 $child->addChild(
                     self::$description,
                     htmlspecialchars( $value[IcalInterface::STATDESC] )

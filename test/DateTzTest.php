@@ -120,20 +120,20 @@ class DateTzTest extends DtBase
         [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
         $this->assertFalse(
             $v->{$isMethod}(),
-            sprintf( self::$ERRFMT, null, $case . '-11', __FUNCTION__, 'Vtimezone', $isMethod )
+            self::getErrMsg( null, $case . '-11', __FUNCTION__, 'Vtimezone', $isMethod )
         );
 
         $v->{$setMethod}( $value, $params );
         $this->assertTrue(
             $v->{$isMethod}(),
-            sprintf( self::$ERRFMT, null, $case . '-12', __FUNCTION__, 'Vtimezone', $isMethod )
+            self::getErrMsg( null, $case . '-12', __FUNCTION__, 'Vtimezone', $isMethod )
         );
 
         $getValue = $v->{$getMethod}( true );
         $this->assertEquals(
             $expectedGet,
             $getValue,
-            sprintf( self::$ERRFMT, null, $case . '-13', __FUNCTION__, 'Vtimezone', $getMethod )
+            self::getErrMsg( null, $case . '-13', __FUNCTION__, 'Vtimezone', $getMethod )
         );
         $this->assertEquals(
             strtoupper( $propName ) . $expectedString,
@@ -143,7 +143,7 @@ class DateTzTest extends DtBase
         $v->{$deleteMethod}();
         $this->assertFalse(
             $v->{$getMethod}(),
-            sprintf( self::$ERRFMT, '(after delete) ', $case . '-14', __FUNCTION__, 'Vtimezone', $getMethod )
+            self::getErrMsg( '(after delete) ', $case . '-14', __FUNCTION__, 'Vtimezone', $getMethod )
         );
         $v->{$setMethod}( $value, $params );
 
@@ -479,14 +479,14 @@ class DateTzTest extends DtBase
             [ $createMethod, $deleteMethod, $getMethod, $isMethod, $setMethod ] = self::getPropMethodnames( $propName );
             $this->assertFalse(
                 $comp->{$isMethod}(),
-                sprintf( self::$ERRFMT, null, $case . '-21', __FUNCTION__, $theComp, $isMethod )
+                self::getErrMsg( null, $case . '-21', __FUNCTION__, $theComp, $isMethod )
             );
 
             $comp->{$setMethod}( $value, $params );
             $this->assertSame(
                 ! empty( $value ),
                 $comp->{$isMethod}(),
-                sprintf( self::$ERRFMT, null, $case . '-22', __FUNCTION__, $theComp, $isMethod )
+                self::getErrMsg( null, $case . '-22', __FUNCTION__, $theComp, $isMethod )
                     . ", exp " . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
             );
 
@@ -503,17 +503,17 @@ class DateTzTest extends DtBase
             $this->assertEquals(
                 $expectedGet,
                 $getValue,
-                sprintf( self::$ERRFMT, null, $case . '-23', __FUNCTION__, $theComp, $getMethod )
+                self::getErrMsg( null, $case . '-23', __FUNCTION__, $theComp, $getMethod )
             );
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,
                 trim( $comp->{$createMethod}()),
-                sprintf( self::$ERRFMT, null, $case . '-24', __FUNCTION__, $theComp, $getMethod )
+                self::getErrMsg( null, $case . '-24', __FUNCTION__, $theComp, $getMethod )
             );
             $comp->{$deleteMethod}();
             $this->assertFalse(
                 $comp->{$getMethod}(),
-                sprintf( self::$ERRFMT, '(after delete) ', $case . '-25', __FUNCTION__, $theComp, $getMethod )
+                self::getErrMsg( '(after delete) ', $case . '-25', __FUNCTION__, $theComp, $getMethod )
             );
             $comp->{$setMethod}( $value, $params );
         } // end foreach

@@ -40,7 +40,17 @@ class Prop3Comp2PropTest extends TestCase
     /**
      * @var string
      */
-    private static string $ERRFMT   = "Error %sin case #%s, %s <%s>->%s";
+    private static function getErrMsg(
+        ? string $spec = null,
+        int|string $case,
+        string $testFcn,
+        ? string $inst = null,
+        ? string $method = null
+    )
+    {
+        static $ERRFMT = "Error %s in case #%s, %s <%s>->%s";
+        return sprintf( $ERRFMT, ( $spec ?? '' ), $case, $testFcn, $inst, $method );
+    }
 
     /**
      * Test Vevent::vresourceNames2Resources() etc
@@ -60,38 +70,38 @@ class Prop3Comp2PropTest extends TestCase
 
         $this->assertTrue(
             $vresource->isNameSet(),
-            sprintf( self::$ERRFMT, null, $case . '-11-1-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
+            self::getErrMsg( null, $case . '-11-1-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
         );
         $this->assertSame(
             $resourceName,
             $vresource->getName(),
-            sprintf( self::$ERRFMT, null, $case . '-11-2-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
+            self::getErrMsg( null, $case . '-11-2-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
         );
         $vresource->deleteName();
         $this->assertfalse(
             $vresource->isNameSet(),
-            sprintf( self::$ERRFMT, null, $case . '-11-3-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
+            self::getErrMsg( null, $case . '-11-3-name', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
         );
         $vresource->setName( $resourceName );
 
         $this->assertTrue(
             $vresource->isResourcetypeSet(),
-            sprintf( self::$ERRFMT, null, $case . '-11-4-type', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
+            self::getErrMsg( null, $case . '-11-4-type', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::NAME )
         );
         $this->assertSame(
             $resourceType,
             $vresource->getResourcetype(),
-            sprintf( self::$ERRFMT, null, $case . '-11-5-type', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::RESOURCE_TYPE )
+            self::getErrMsg( null, $case . '-11-5-type', __FUNCTION__, IcalInterface::VRESOURCE, IcalInterface::RESOURCE_TYPE )
         );
 
         $this->assertFalse(
             $event->isResourcesSet(),
-            sprintf( self::$ERRFMT, null, $case . '-11-6-resurces', __FUNCTION__, IcalInterface::VEVENT, IcalInterface::RESOURCES )
+            self::getErrMsg( null, $case . '-11-6-resurces', __FUNCTION__, IcalInterface::VEVENT, IcalInterface::RESOURCES )
         );
         $event->vresourceNames2Resources();
         $this->assertTrue(
             $event->isResourcesSet(),
-            sprintf( self::$ERRFMT, null, $case . '-11-7-resurces', __FUNCTION__, IcalInterface::VEVENT, IcalInterface::RESOURCES )
+            self::getErrMsg( null, $case . '-11-7-resurces', __FUNCTION__, IcalInterface::VEVENT, IcalInterface::RESOURCES )
         );
 
         $resource = $event->getResources( null, true );
@@ -99,17 +109,17 @@ class Prop3Comp2PropTest extends TestCase
         $this->assertSame(
             $resourceName,
             $resource->getValue(),
-            sprintf( self::$ERRFMT, null, $case . '-11-8-name', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources name' )
+            self::getErrMsg( null, $case . '-11-8-name', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources name' )
         );
         $this->assertSame(
             $resourceType,
             $resource->getParams( IcalInterface::X_RESOURCE_TYPE ),
-            sprintf( self::$ERRFMT, null, $case . '-11-9-type', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources type' )
+            self::getErrMsg( null, $case . '-11-9-type', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources type' )
         );
         $this->assertSame(
             $vresource->getUid(),
             $resource->getParams( IcalInterface::X_VRESOURCEID ),
-            sprintf( self::$ERRFMT, null, $case . '-11-10-uid', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources uid' )
+            self::getErrMsg( null, $case . '-11-10-uid', __FUNCTION__, IcalInterface::VEVENT, 'vresourceNames2Resources uid' )
         );
     }
 
@@ -131,40 +141,40 @@ class Prop3Comp2PropTest extends TestCase
 
         $this->assertFalse(
             $event->isLocationSet(),
-            sprintf( self::$ERRFMT, null, $case . '-12-1-resurces', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-1-resurces', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
         $event->vlocationNames2Location();
         $this->assertTrue(
             $event->isLocationSet(),
-            sprintf( self::$ERRFMT, null, $case . '-12-2-resurces', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-2-resurces', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
         $location     = $event->getLocation( null, true );
         $this->assertEquals(
             $locationName,
             $location->value,
-            sprintf( self::$ERRFMT, null, $case . '-12-3', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-3', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
         $this->assertTrue(
             $location->hasXparamKey( IcalInterface::X_VLOCATIONID ),
-            sprintf( self::$ERRFMT, null, $case . '-12-4', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-4', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
         $this->assertEquals(
             $vlocation->getUid(),
             $location->getParams( IcalInterface::X_VLOCATIONID ),
-            sprintf( self::$ERRFMT, null, $case . '-12-5', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-5', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
         $this->assertTrue(
             $location->hasXparamKey( IcalInterface::X_LOCATION_TYPE ),
-            sprintf( self::$ERRFMT, null, $case . '-12-6', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-6', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
         $this->assertEquals(
             $locationType,
             $location->getParams( IcalInterface::X_LOCATION_TYPE ),
-            sprintf( self::$ERRFMT, null, $case . '-12-7', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-12-7', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
     }
 
@@ -185,39 +195,39 @@ class Prop3Comp2PropTest extends TestCase
 
         $this->assertFalse(
             $event->isAttendeeSet(),
-            sprintf( self::$ERRFMT, null, $case . '-13-1-attendee', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-13-1-attendee', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
         $event->participants2Attendees();
         $this->assertTrue(
             $event->isAttendeeSet(),
-            sprintf( self::$ERRFMT, null, $case . '-13-2-attendee', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-13-2-attendee', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
         $attendee = $event->getAttendee( null, true );
         $this->assertEquals(
             $calendarAddress,
             $attendee->value,
-            sprintf( self::$ERRFMT, null, $case . '-13-2', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
+            self::getErrMsg( null, $case . '-13-2', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
         );
 
         $this->assertTrue(
             $attendee->hasXparamKey( IcalInterface::X_PARTICIPANTID ),
-            sprintf( self::$ERRFMT, null, $case . '-13-3', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
+            self::getErrMsg( null, $case . '-13-3', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
         );
         $this->assertEquals(
             $participant->getUid(),
             $attendee->getParams( IcalInterface::X_PARTICIPANTID ),
-            sprintf( self::$ERRFMT, null, $case . '-13-4', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
+            self::getErrMsg( null, $case . '-13-4', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
         );
 
         $this->assertTrue(
             $attendee->hasXparamKey( IcalInterface::X_PARTICIPANT_TYPE ),
-            sprintf( self::$ERRFMT, null, $case . '-13-5', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-13-5', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
         $this->assertEquals(
             IcalInterface::PARTICIPANT_TYPE,
             $attendee->getParams( IcalInterface::X_PARTICIPANT_TYPE ),
-            sprintf( self::$ERRFMT, null, $case . '-13-6', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
+            self::getErrMsg( null, $case . '-13-6', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
     }
 }

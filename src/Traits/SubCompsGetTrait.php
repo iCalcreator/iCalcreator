@@ -46,7 +46,7 @@ trait SubCompsGetTrait
      * @param string $xPropTypeName
      * @param string|string[] $xParamTypeRef
      * @return array[]
-     * @since 2.41.34 - 2022-03-28
+     * @since 2.41.68 - 2022-10-24
      */
     protected function getSubCompsDetailType(
         string $compType,
@@ -63,23 +63,22 @@ trait SubCompsGetTrait
             if( $compType !== $this->components[$cix]->getCompType()) {
                 continue;
             }
-            if(( false === ( $content = $this->components[$cix]->{$method1}( true ))) ||
-                empty( $content->value )) {
+            if(( false === ( $pc = $this->components[$cix]->{$method1}( true ))) ||
+                empty( $pc->value )) {
                 continue;
             }
-            $value   = $content->value;
-            $lcValue = mb_strtolower( $value );
+            $lcValue = mb_strtolower( $pc->value );
             if( in_array( $lcValue, $lcArr, true )) { // no dupl.
                 continue;
             }
-            $vSubValues[$value] = $content->params;
-            $vSubValues[$value][$xParamRefId]  = $this->components[$cix]->getUID();
+            $vSubValues[$pc->value] = $pc->params;
+            $vSubValues[$pc->value][$xParamRefId]  = $this->components[$cix]->getUID();
             if( false !== ( $type = $this->components[$cix]->{$method2}())) {
                 foreach((array) $xParamTypeRef as $pKey ) {
-                    $vSubValues[$value][$pKey] = $type;
+                    $vSubValues[$pc->value][$pKey] = $type;
                 }
             }
-            $lcArr[$value] = $lcValue;
+            $lcArr[$pc->value] = $lcValue;
         } // end foreach
         return [ $vSubValues, $lcArr ];
     }
@@ -92,7 +91,7 @@ trait SubCompsGetTrait
      * @param array $subCompsData
      * @param array $lcArr
      * @return void
-     * @since 2.41.17 - 2022-02-18
+     * @since 2.41.68 - 2022-10-24
      */
     protected function comPropUpdFromSub( string $propName, bool $multi, array $subCompsData, array $lcArr ) : void
     {
@@ -100,9 +99,8 @@ trait SubCompsGetTrait
         $method       = StringFactory::getGetMethodName( $propName );
         $compPropData = [];
         while( false !== ( $content = $this->{$method}( null, true ))) {
-            $value = $content->value;
-            if( ! empty( $value )) {
-                $compPropData[$value] = $content->params;
+            if( ! empty( $content->value )) {
+                $compPropData[$content->value] = $content->params;
             }
             if( ! $multi ) {
                 break; // the only one is found
@@ -129,11 +127,9 @@ trait SubCompsGetTrait
             } // end if
         } // end foreach
         if( $update ) {
-            // remove all
             $method = StringFactory::getDeleteMethodName( $propName );
-            while( false !== $this->{$method}()) {}
-            // force write back
-            $subCompsData = array_merge( $subCompsData, $compPropData );
+            while( false !== $this->{$method}()) {} // remove all
+            $subCompsData = array_merge( $subCompsData, $compPropData ); // force write back
         }
         // create new properties from subdata
         if( ! empty( $subCompsData )) {

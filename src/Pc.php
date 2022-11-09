@@ -9,7 +9,7 @@ use ArrayObject;
  *
  * @property mixed value
  * @property array params
- * @ince 2.41.65 - 2022-09-07
+ * @since 2.41.65 - 2022-09-07
  */
 class Pc extends ArrayObject
 {
@@ -143,10 +143,10 @@ class Pc extends ArrayObject
      *
      * @param null|string $pKey   parameter key
      * @param bool $asXparamKey   only if not empty pKey, opt do X-prefix pkey
-     * @return mixed
-     * @ince 2.41.65 - 2022-09-07
+     * @return null|int|string|array
+     * @ince 2.41.68 - 2022-10-02
      */
-    public function getParams( ? string $pKey = null, ? bool $asXparamKey = false ) : mixed
+    public function getParams( ? string $pKey = null, ? bool $asXparamKey = false ) : null|int|string|array
     {
         if( null === $pKey ) {
             return $this->params;

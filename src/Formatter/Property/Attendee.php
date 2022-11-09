@@ -47,6 +47,11 @@ use function str_contains;
 final class Attendee extends PropertyBase
 {
     /**
+     * @var string
+     */
+    private static string $FMT     = ';%s=%s';
+
+    /**
      * @param string    $propName
      * @param Pc[]      $values
      * @param bool|null $allowEmpty
@@ -55,31 +60,13 @@ final class Attendee extends PropertyBase
     public static function format( string $propName, array $values, ? bool $allowEmpty = true ) : string
     {
         static $AllKeys = [
-            self::CUTYPE,
-            self::MEMBER,
-            self::ROLE,
-            self::PARTSTAT,
-            self::RSVP,
-            self::DELEGATED_TO,
-            self::DELEGATED_FROM,
-            self::SENT_BY,
-            self::EMAIL,
-            self::DIR,
-            self::CN,
-            self::LANGUAGE
-        ];
-        static $ParamArrayKeys = [
-            self::MEMBER,
-            self::DELEGATED_TO,
-            self::DELEGATED_FROM,
+            self::CUTYPE, self::MEMBER, self::ROLE, self::PARTSTAT, self::RSVP, self::DELEGATED_TO,
+            self::DELEGATED_FROM, self::SENT_BY, self::EMAIL, self::DIR, self::CN, self::LANGUAGE
         ];
         static $KEYGRP1 = [ self::ROLE, self::PARTSTAT, self::RSVP ];
         static $KEYGRP2 = [ self::DELEGATED_TO, self::DELEGATED_FROM ];
         static $KEYGRP3 = [ self::SENT_BY, self::EMAIL ];
         static $KEYGRP4 = [ self::CN, self::LANGUAGE ];
-        static $QQ      = '"';
-        static $FMTKEYVALUE = ';%s=%s';
-        static $FMTDIREQ    = ';%s=%s%s%s';
         if( empty( $values )) {
             return self::$SP0;
         }
@@ -97,69 +84,40 @@ final class Attendee extends PropertyBase
                 $output .= self::renderProperty( $propName, null, $content );
                 continue;
             }
+            $aParams = self::fixOptQuotesForParamValue( $attendeePart->params );
             $attributes = self::$SP0;
-            foreach( $attendeePart->params as $pLabel2 => $pValue2 ) { // fix (opt) quotes
-                if( is_array( $pValue2 ) || in_array( $pLabel2, $ParamArrayKeys, true )) {
-                    continue;
-                } // all but DELEGATED-FROM, DELEGATED-TO, MEMBER
-                $attendeePart->params[$pLabel2] = self::circumflexQuoteInvoke( $pValue2 );
-                if( self::hasColonOrSemicOrComma( $pValue2 )) {
-                    $attendeePart->params[$pLabel2] = self::getQuotedItem( $pValue2 );
-                }
-            } // end foreach
             /* set attendee parameters in (almost) rfc2445 order */
-            if( isset( $attendeePart->params[self::CUTYPE] )) {
-                $attributes .= sprintf(
-                    $FMTKEYVALUE,
-                    self::CUTYPE,
-                    $attendeePart->params[self::CUTYPE]
-                );
+            if( isset( $aParams[self::CUTYPE] )) {
+                $attributes .= sprintf( self::$FMT, self::CUTYPE, $aParams[self::CUTYPE] );
             }
-            if( isset( $attendeePart->params[self::MEMBER] )) {
-                $attributes .= sprintf(
-                    $FMTKEYVALUE,
-                    self::MEMBER,
-                    self::getQuotedListItems( $attendeePart->params[self::MEMBER] )
-                );
+            if( isset( $aParams[self::MEMBER] )) {
+                $attributes .= self::renderQuotedListItems( self::MEMBER, $aParams[self::MEMBER] );
             }
             foreach( $KEYGRP1 as $key ) { // ROLE, PARTSTAT, RSVP
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
+                if( isset( $aParams[$key] )) {
+                    $attributes .= sprintf( self::$FMT, $key, $aParams[$key] );
                 }
             } // end foreach
             foreach( $KEYGRP2 as $key ) { // DELEGATED_TO, DELEGATED_FROM
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf(
-                        $FMTKEYVALUE,
-                        $key,
-                        self::getQuotedListItems( $attendeePart->params[$key] )
-                    );
+                if( isset( $aParams[$key] )) {
+                    $attributes .= self::renderQuotedListItems( $key, $aParams[$key] );
                 }
             } // end foreach
             foreach( $KEYGRP3 as $key ) { // SENT_BY, EMAIL
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
+                if( isset( $aParams[$key] )) {
+                    $attributes .= sprintf( self::$FMT, $key, $aParams[$key] );
                 }
             } // end foreach
-            if( isset( $attendeePart->params[self::DIR] )) {
-                $delim = str_contains( $attendeePart->params[self::DIR], $QQ )
-                    ? self::$SP0
-                    : $QQ;
-                $attributes .= sprintf(
-                    $FMTDIREQ,
-                    self::DIR,
-                    $delim,
-                    $attendeePart->params[self::DIR],
-                    $delim
-                );
+            if( isset( $aParams[self::DIR] )) {
+                $attributes .= self::renderDirParam( $aParams[self::DIR] );
             }
             foreach( $KEYGRP4 as $key ) { // CN, LANGUAGE
-                if( isset( $attendeePart->params[$key] )) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $key, $attendeePart->params[$key] );
+                if( isset( $aParams[$key] )) {
+                    $attributes .= sprintf( self::$FMT, $key, $aParams[$key] );
                 }
             } // end foreach
             $xParams = [];
-            foreach( $attendeePart->params as $pLabel2 => $pValue2 ) {
+            foreach( $aParams as $pLabel2 => $pValue2 ) {
                 if( ! in_array( $pLabel2, $AllKeys, true )) {
                     $xParams[$pLabel2] = $pValue2;
                 }
@@ -167,11 +125,39 @@ final class Attendee extends PropertyBase
             if( ! empty( $xParams )) {
                 ksort( $xParams, SORT_STRING );
                 foreach( $xParams as $pLabel2 => $pValue2 ) {
-                    $attributes .= sprintf( $FMTKEYVALUE, $pLabel2, $pValue2 );
+                    $attributes .= sprintf( self::$FMT, $pLabel2, $pValue2 );
                 }
             }
             $output .= self::renderProperty( $propName, $attributes, $content );
         } // end foreach( $pc->value as $ax => $attendeePart )
+        return $output;
+    }
+
+    /**
+     * Fix opt quoted param values, all but DELEGATED-FROM, DELEGATED-TO, MEMBER
+     *
+     * @param array $aParams
+     * @return array
+     * @since  2.41.68 - 2019-10-24
+     */
+    private static function fixOptQuotesForParamValue( array $aParams ) : array
+    {
+        static $ParamArrayKeys = [
+            self::MEMBER,
+            self::DELEGATED_TO,
+            self::DELEGATED_FROM,
+        ];
+        $output = [];
+        foreach( $aParams as $pLabel2 => $pValue2 ) { // fix (opt) quotes
+            if( is_array( $pValue2 ) || in_array( $pLabel2, $ParamArrayKeys, true )) {
+                $output[$pLabel2] = $pValue2;
+                continue;
+            }
+            $pValue3 = self::circumflexQuoteInvoke( $pValue2 );
+            $output[$pLabel2] = self::hasColonOrSemicOrComma( $pValue3 )
+                ? self::getQuotedItem( $pValue3 )
+                : $pValue3;
+        } // end foreach
         return $output;
     }
 
@@ -189,17 +175,35 @@ final class Attendee extends PropertyBase
     }
 
     /**
-     * Return string of comma-separated quoted array members
+     * Return string. attrbute with comma-separated quoted array members
      *
+     * @param string $pLabel
      * @param string[] $list
      * @return string
      * @since  2.27.11 - 2019-01-03
      */
-    private static function getQuotedListItems( array $list ) : string
+    private static function renderQuotedListItems( string $pLabel, array $list ) : string
     {
         foreach( $list as & $v ) {
             $v = self::getQuotedItem( $v );
         }
-        return implode( self::$COMMA, $list );
+        return sprintf(
+            self::$FMT,
+            $pLabel,
+            implode( self::$COMMA, $list )
+        );
+    }
+
+    /**
+     * Return rendered DIR param
+     * @param string $dir
+     * @return string
+     */
+    private static function renderDirParam( string $dir ) : string
+    {
+        static $QQ       = '"';
+        static $FMTDIREQ = ';%s=%s%s%s';
+        $delim = str_contains( $dir, $QQ ) ? self::$SP0 : $QQ;
+        return sprintf( $FMTDIREQ, self::DIR, $delim, $dir, $delim );
     }
 }

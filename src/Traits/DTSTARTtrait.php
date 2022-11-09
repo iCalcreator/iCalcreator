@@ -39,12 +39,10 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\VAcomponent;
 
-use function in_array;
-
 /**
  * DTSTART property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.68 2022-10-03
  */
 trait DTSTARTtrait
 {
@@ -142,7 +140,7 @@ trait DTSTARTtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.68 2022-10-03
      */
     public function setDtstart( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
@@ -158,9 +156,9 @@ trait DTSTARTtrait
             case ( $this instanceof VAcomponent ) :
                 $value->addParamValue( self::DATE_TIME ); // req, rfc7953
                 break;
-            case ( in_array( $compType, self::$TZCOMPS, true )) :
+            case self::isTzComp( $compType ) :
                 $value->addParam( self::ISLOCALTIME, true );
-                $value->addParamValue( self::DATE_TIME ); // req
+                $value->addParamValue( self::DATE_TIME ); // required
                 break;
             default :
                 $value->addParamValue( self::DATE_TIME, false );

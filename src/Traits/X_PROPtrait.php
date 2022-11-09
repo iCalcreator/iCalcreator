@@ -37,7 +37,6 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function count;
-use function is_array;
 use function sprintf;
 use function strtoupper;
 
@@ -238,9 +237,6 @@ trait X_PROPtrait
             $value->hasParamValue( self::TEXT )) {
             $value->value = Util::assertString( $value->value, $xPropName );
             $value->value = StringFactory::trimTrailNL( $value->value );
-        }
-        if( ! is_array( $this->xprop )) {
-            $this->xprop = [];
         }
         $this->xprop[$xPropName] = $value;
         return $this;

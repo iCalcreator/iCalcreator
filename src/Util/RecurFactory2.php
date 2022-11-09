@@ -622,7 +622,7 @@ class RecurFactory2
     ) : array
     {
         static $TOPREVDAY = '-1 day';
-        [ $wDate, $wDateYmd, $fcnStartYmd, $endYmd ] =
+        [ $wDate, $wDateYmd, , $endYmd ] = // $fcnStartYmd
             self::getRecurSimpleBase( $recur, $wDateIn, $fcnStartIn, $fcnEndIn );
         if( $wDateYmd > $endYmd ) {
             return [];
@@ -820,7 +820,7 @@ class RecurFactory2
         null|string|DateTime $fcnEndIn = null
     ) : array
     {
-        [ $wDate, $wDateYmd, $fcnStartYmd, $endYmd ] =
+        [ $wDate, $wDateYmd, , $endYmd ] = // $fcnStartYmd
             self::getRecurSimpleBase( $recur, $wDateIn, $fcnStartIn, $fcnEndIn );
         if( $wDateYmd > $endYmd ) {
             return [];
@@ -854,11 +854,9 @@ class RecurFactory2
             }
             $day       = 1;
             $currMonth = $month;
-//            $x         = 0;
         } // end if
         else {
             $day = (int) $wDate->format( self::$LCJ );
-//            $x         = 1;
         }
         $plusXmonth = $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCMONTH;
         $x          = 1;
