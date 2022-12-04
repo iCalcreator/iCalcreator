@@ -31,13 +31,13 @@
  *
  * iCalcreator package autoloader
  *
- * @since  2.41.68 - 2022-10-24
+ * @since  2.41.71 - 2022-11-28
  */
 
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.70' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.71' );
 
 /**
  * load iCalcreator src and support classes and Traits

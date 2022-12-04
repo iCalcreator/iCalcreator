@@ -5,31 +5,28 @@ is the PHP class package managing
 > iCal calendar information
 <br><br>[rfc5545] - Internet Calendaring and Scheduling Core Object Specification (iCalendar) 
 
-| |supporting|
-|---|---|
-|[rfc2445]|Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
-|[rfc5870]|A Uniform Resource Identifier for Geographic Locations ('geo' URI)|
-|[rfc6321]|xCal: The XML Format for iCalendar|
-|[rfc6868]|Parameter Value Encoding in iCalendar and vCard|
-|[rfc7529]|Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)|
-|[rfc7808]|Time Zone Data Distribution Service|
-|[rfc7953]|Calendar Availability|
-|[rfc7986]|New Properties for iCalendar|
-|[rfc9073]|Event Publishing Extensions to iCalendar|
-|[rfc9074]|VALARM Extensions for iCalendar|
+__supporting__<br>
+[rfc2445] - Internet Calendaring and Scheduling Core Object Specification (iCalendar)<br>
+[rfc5870] - A Uniform Resource Identifier for Geographic Locations ('geo' URI)<br>
+[rfc6321] - xCal: The XML Format for iCalendar<br>
+[rfc6868] - Parameter Value Encoding in iCalendar and vCard<br>
+[rfc7529] - Non-Gregorian Recurrence Rules in the Internet Calendaring and Scheduling Core Object Specification (iCalendar)<br>
+[rfc7808] - Time Zone Data Distribution Service<br>
+[rfc7953] - Calendar Availability<br>
+[rfc7986] - New Properties for iCalendar<br>
+[rfc9073] - Event Publishing Extensions to iCalendar<br>
+[rfc9074] - VALARM Extensions for iCalendar<br>
 
 operating on calendar and
 calendar event, todo, journal, freebusy, participant, location, resource, availability and timezone data.
 
 ~~~~~~~~
-
 iCalcreator supports systems like
 
 * calendars
 * CMS
 * project management systems
 * other applications...
-
 ~~~~~~~~
 
 Please review 
@@ -41,14 +38,14 @@ For iCal json (JSCalendar, [rfc8984]) export and import, use [github.com/PhpJsCa
 
 ###### Builds
 
-v2.41.70 - v2.42 pre-release
+v2.41.71 - v2.42 pre-release
 
 v2.40 - stable PHP8
 
 v2.39 - PHP7
 
 To support the development, maintenance and test process 
-[PHPCompatibility], [PHPStan] and [php-arguments-detector] are included..
+[PHPCompatibility], [PHPStan] and [php-arguments-detector] are included.
 
 ###### Support
 
@@ -57,8 +54,8 @@ For support use [github.com/iCalcreator]. Non-emergence support issues are, unle
 
 ###### Sponsorship
 
-Donation using [paypal.me/kigkonsult] are appreciated.
-For invoice, please e-mail</a>.
+Donations using _[buy me a coffee]_ or _[paypal me]_ are appreciated.
+For invoice, please e-mail.
 
 ###### Installation
 
@@ -84,6 +81,8 @@ In your composer.json:
 
 iCalcreator is licensed under the LGPLv3 License.
 
+[buy me a coffee]:https://www.buymeacoffee.com/kigkonsult
+[paypal me]:https://paypal.me/kigkonsult
 [demo]:docs/demoUsage.md
 [github.com/iCalcreator]:https://github.com/iCalcreator/iCalcreator/issues
 [github.com/PhpJsCalendar]:https://github.com/iCalcreator/PhpJsCalendar

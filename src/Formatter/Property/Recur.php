@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\Util;
 
 use function count;
 use function ctype_digit;
@@ -46,7 +47,7 @@ use function usort;
  * Format EXRULE, RRULE
  *
  * 2
- * @since 2.41.68 2022-10-27
+ * @since 2.41.71 2022-11-28
  */
 final class Recur extends PropertyBase
 {
@@ -69,17 +70,17 @@ final class Recur extends PropertyBase
         if( empty( $pc->value )) {
             return $allowEmpty ? self::renderProperty( $propName ) : self::$SP0;
         }
-        $isValueDate = self::getIsValueDate( $pc );
         $content1 = $content2 = self::$SP0;
+        $first    = true;
         foreach( $pc->value as $ruleLabel => $ruleValue ) {
             $ruleLabel = strtoupper( $ruleLabel );
             switch( $ruleLabel ) {
                 case self::RSCALE : // fall through
                 case self::FREQ :
-                    $content1 .= self::renderString( $ruleLabel, $ruleValue );
+                    $content1 .= self::renderFirst( $ruleLabel, $ruleValue, $first );
                     break;
                 case self::UNTIL :
-                    $ruleValue = DateTimeFactory::dateTime2Str( $ruleValue, $isValueDate ); // fall through
+                    $ruleValue = DateTimeFactory::dateTime2Str( $ruleValue, self::getIsValueDate( $pc )); // fall through
                 case self::COUNT :    // fall through
                 case self::INTERVAL : // fall through
                 case self::WKST :     // fall through
@@ -108,6 +109,20 @@ final class Recur extends PropertyBase
             $pc->removeParam( self::VALUE );
         }
         return $isValueDate;
+    }
+
+    /**
+     * @param string $ruleLabel
+     * @param string $ruleValue
+     * @param bool $first
+     * @return string
+     */
+    private static function renderFirst( string $ruleLabel, string $ruleValue, bool & $first ) : string
+    {
+        static $FMT = '%s%s=%s';
+        $output = sprintf( $FMT, ( $first ? Util::$SP0 : Util::$SEMIC ), $ruleLabel, $ruleValue );
+        $first  = false;
+        return $output;
     }
 
     /**

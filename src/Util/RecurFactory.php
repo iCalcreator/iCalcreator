@@ -49,9 +49,12 @@ use function end;
 use function explode;
 use function in_array;
 use function is_array;
+use function is_int;
 use function is_string;
 use function ksort;
 use function mktime;
+use function reset;
+use function sort;
 use function sprintf;
 use function strcasecmp;
 use function strtoupper;
@@ -60,7 +63,7 @@ use function var_export;
 /**
  * iCalcreator recur support class
  *
- * @since  2.41.16 - 2022-01-31
+ * @since  2.41.71 - 2022-12-02
  */
 class RecurFactory
 {
@@ -249,7 +252,7 @@ class RecurFactory
     /**
      * @param array $input
      * @return array
-     * @since  2.41.16 - 2022-01-31
+     * @since  2.41.71 - 2022-11-29
      */
     private static function orderRRuleKeys( array $input ) : array
     {
@@ -293,8 +296,8 @@ class RecurFactory
                 $output[$rKey1] = $input[$rKey1];
             }
         }
-        if( isset( $input[IcalInterface::BYDAY] )) {
-            self::orderRRuleBydayKey( $input, $output );
+        if( array_key_exists( IcalInterface::BYDAY, $input )) { // catch a null Byday value
+            self::orderRRuleBydays( $input[IcalInterface::BYDAY], $output );
         }
         foreach( $RKEYS2 as $rKey2 ) {
             if( isset( $input[$rKey2] )) {
@@ -329,74 +332,193 @@ class RecurFactory
     /**
      * Ensure RRULE BYDAY array and upper case.. .
      *
-     * @param array $input
+     * @param mixed $rruleByday
      * @param array $output
      * @return void
-     * @since  2.29.27 - 2020-09-19
+     * @since  2.41.71 - 2022-12-02
      */
-    private static function orderRRuleBydayKey( array $input, array & $output ) : void
+    private static function orderRRuleBydays( mixed $rruleByday, array & $output ) : void
     {
-        if( empty( $input[IcalInterface::BYDAY] )) {
-            // results in error
-            $output[IcalInterface::BYDAY] = [];
-            return;
-        }
-        if( ! is_array( $input[IcalInterface::BYDAY] )) {
-            // single day
-            $output[IcalInterface::BYDAY] = [
-                IcalInterface::DAY => strtoupper( $input[IcalInterface::BYDAY] ),
-            ];
-            return;
-        }
-        $cntStr = $cntNum = 0;
-        foreach( $input[IcalInterface::BYDAY] as $BYDAYv ) {
-            if( is_array( $BYDAYv )) {
+        switch( true ) {
+            case empty( $rruleByday ) : // results in error
+                $output[IcalInterface::BYDAY] = [];
+                return;
+            case is_array( $rruleByday ) :
+                self::removeEmpty( $rruleByday );
+                if( self::hasIntElementsOnly( $rruleByday )) { // results in error
+                    $output[IcalInterface::BYDAY] = [ $rruleByday ];
+                    return;
+                }
                 break;
+            case is_string( $rruleByday  ) :
+                $output[IcalInterface::BYDAY] = [
+                    IcalInterface::DAY => strtoupper( $rruleByday ),
+                ];
+                return;
+            default : // results in error
+                $output[IcalInterface::BYDAY] = [ $rruleByday ];
+                return;
+        } // end switch
+        self::orderRRuleBydaysCheck1( $rruleByday ); // check if rruleByday is byDay group
+        foreach( $rruleByday as $BYDAYv ) {
+            if( ! self::orderRRuleBydaysCheck2( $BYDAYv )) { // Check count elements, strings and integers
+                $output[IcalInterface::BYDAY] = [ $rruleByday ];
+                return;
+            }
+        } // end foreach
+        self::orderRRuleBydaysShape( $rruleByday, $output );
+    }
+
+    /**
+     * @param array $array
+     * @return void
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function removeEmpty( array $array ) : void
+    {
+        foreach( $array as $x => $v ) {
+            if( empty( $v )) {
+                unset( $array[$x] );
+            }
+        }
+    }
+
+    /**
+     * Check if rruleByday is one or more byDay groups
+     *
+     * @param array $rruleByday
+     * @return void
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function orderRRuleBydaysCheck1( array & $rruleByday ) : void
+    {
+        if( self::hasStringElementsOnly( $rruleByday )) { // split on days
+            $byDayGroup = [];
+            foreach( $rruleByday as $BYDAYv ) {
+                $byDayGroup[] = [ IcalInterface::DAY => $BYDAYv ];
+            }
+            $rruleByday = $byDayGroup;
+            return;
+        }
+        foreach( $rruleByday as $BYDAYx => $BYDAYv ) {
+            switch( true ) {
+                case ( is_string( $BYDAYx ) &&
+                    ( 0 === strcasecmp( IcalInterface::DAY, $BYDAYx ) ) &&
+                    is_string( $BYDAYv ) ) :
+                    $rruleByday = [ $rruleByday ]; // day found, set as byDay group
+                    break 2;
+                case ( is_int( $BYDAYx ) && is_string( $BYDAYv )) : // opt. day found, set all as a byDay group
+                    $byDayGroup = [];
+                    foreach( $rruleByday as $BYDAYv2 ) {
+                        if( $BYDAYv === $BYDAYv2 ) {
+                            $byDayGroup[IcalInterface::DAY] = $BYDAYv2;
+                        }
+                        elseif( is_int( $BYDAYv2 ) ) {
+                            $byDayGroup[] = $BYDAYv2;
+                        }
+                    } // end foreach
+                    $rruleByday = [ $byDayGroup ];
+                    break 2;
+                case ( is_int( $BYDAYx ) && is_int( $BYDAYv )) : // a day rel.pos.
+                    break;
+                case ( ! is_array( $BYDAYv )) :
+                    $rruleByday[$BYDAYx] = [ $BYDAYv ];
+                    break;
+            } // end switch
+        } // end foreach
+    }
+
+    /**
+     * @param array $array
+     * @return bool
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function hasStringElementsOnly( array $array ) : bool
+    {
+        foreach( $array as $element ) {
+            if( ! is_string( $element ) || ! ctype_alpha( $element )) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param array $array
+     * @return bool
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function hasIntElementsOnly( array $array ) : bool
+    {
+        foreach( $array as $element ) {
+            if( ! is_int( $element ) || ( $element != (int) $element )) { // note !=
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check count elements, strings and integers
+     *
+     * @param array $rruleByday
+     * @return bool
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function orderRRuleBydaysCheck2( array $rruleByday ) : bool
+    {
+        $cntElems = count( $rruleByday );
+        $cntStr = $cntNum = 0;
+        foreach( $rruleByday as $BYDAYv ) {
+            if( empty( $BYDAYv )) {
+                $cntElems--;
+                continue;
             }
             if( is_string( $BYDAYv ) && ctype_alpha( $BYDAYv )) {
                 ++$cntStr;
                 continue;
             }
-            if( empty( $BYDAYv )) {
-                $input[IcalInterface::BYDAY] = [ Util::$SP0 ];
-                ++$cntStr;
-                continue;
-            }
             ++$cntNum;
         } // end foreach
-        if(( 1 === $cntStr ) || ( 1 < $cntNum )) { // single day OR invalid format...
-            $input[IcalInterface::BYDAY] = [ $input[IcalInterface::BYDAY] ];
-        }
-        elseif( 1 < $cntStr ) { // split (single) days
-            $days = [];
-            foreach( $input[IcalInterface::BYDAY] as $BYDAYv ) {
-                $days[] = [ IcalInterface::DAY => $BYDAYv ];
-            }
-            $input[IcalInterface::BYDAY] = $days;
-        }
-        foreach( $input[IcalInterface::BYDAY] as $BYDAYx => $BYDAYv ) {
+        return ! (( 1 > $cntElems ) || // all error
+            ( 2 < $cntElems ) ||
+            ( 1 !== $cntStr ) ||
+            ( 1 < $cntNum ));
+    }
+
+    /**
+     * Shape outut byDay groups
+     *
+     * @param array $rruleByday
+     * @param array $output
+     * @return void
+     * @since  2.41.71 - 2022-12-02
+     */
+    private static function orderRRuleBydaysShape( array $rruleByday, array & $output ) : void
+    {
+        $outIx = -1;
+        foreach( $rruleByday as $BYDAYv ) {
             $nIx = 0;
+            $outIx++;
             foreach( $BYDAYv as $BYDAYx2 => $BYDAYv2 ) {
                 switch( true ) {
                     case ( is_string( $BYDAYx2 ) &&
-                        ( 0 === strcasecmp( IcalInterface::DAY, $BYDAYx2 ))) :
-                        // day abbr with key
-                        $output[IcalInterface::BYDAY][$BYDAYx][$BYDAYx2] = strtoupper( $BYDAYv2 );
+                        ( 0 === strcasecmp( IcalInterface::DAY, $BYDAYx2 )) &&
+                        is_string( $BYDAYv2 )) : // day abbr with key
+                        // fall through
+                    case ( is_string( $BYDAYv2 ) && ctype_alpha( $BYDAYv2 )) : // day abbr without key, set key
+                        $output[IcalInterface::BYDAY][$outIx][IcalInterface::DAY] = strtoupper( $BYDAYv2 );
                         break;
-                    case ( is_string( $BYDAYv2 ) && ctype_alpha( $BYDAYv2 )) :
-                        // day abbr without key, set key
-                        $output[IcalInterface::BYDAY][$BYDAYx][IcalInterface::DAY] = strtoupper( $BYDAYv2 );
-                        break;
-                    default :
-                        // rel pos day number. force key from 0 (1++ results in error)
-                        $output[IcalInterface::BYDAY][$BYDAYx][$nIx++] = $BYDAYv2;
+                    default : // rel pos day number. force key from 0 (1++ results in error)
+                        $output[IcalInterface::BYDAY][$outIx][$nIx++] = $BYDAYv2;
                         break;
                 } // end switch
             } // end foreach
-            ksort( $output[IcalInterface::BYDAY][$BYDAYx], SORT_NATURAL );
+            ksort( $output[IcalInterface::BYDAY][$outIx], SORT_NATURAL );
         } // end foreach
         ksort( $output[IcalInterface::BYDAY], SORT_NATURAL );
     }
+
 
     /**
      * Return UID[] where RRULE(/EXRULE) RECUR RSCALE exists and is NOT GREGORIAN (or similar)
@@ -660,11 +782,7 @@ class RecurFactory
         }
         $intervalArr = [];
         if( 1 < $recur[IcalInterface::INTERVAL] ) {
-            $intervalIx  = self::recurIntervalIx(
-                $recur[IcalInterface::FREQ],
-                $wDate,
-                $wkst
-            );
+            $intervalIx  = self::recurIntervalIx( $recur[IcalInterface::FREQ], $wDate, $wkst );
             $intervalArr = [ $intervalIx => 0 ];
         }
         if( isset( $recur[IcalInterface::BYSETPOS] )) { // save start date + weekno
@@ -678,7 +796,7 @@ class RecurFactory
             if( $recurFreqIsYearly ) {
                 // start from beginning of year
                 $wDate[self::$LCMONTH] = $wDate[self::$LCDAY] = 1;
-                $wDateYMD              = sprintf(
+                $wDateYMD = sprintf(
                     self::$YMDs,
                     $wDate[self::$LCYEAR],
                     $wDate[self::$LCMONTH],
@@ -687,10 +805,9 @@ class RecurFactory
                 // make sure to count last year
                 self::stepDate( $fcnEnd, $fcnEndYMD, [ self::$LCYEAR => 1 ] );
             }
-            elseif( $recurFreqIsMonthly ) {
-                // start from beginning of month
+            elseif( $recurFreqIsMonthly ) { // start from beginning of month
                 $wDate[self::$LCDAY] = 1;
-                $wDateYMD            = sprintf(
+                $wDateYMD = sprintf(
                     self::$YMDs,
                     $wDate[self::$LCYEAR],
                     $wDate[self::$LCMONTH],
