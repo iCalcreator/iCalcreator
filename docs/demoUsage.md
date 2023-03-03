@@ -41,7 +41,7 @@ $event1 = $vcalendar->newVevent()
             new DateTimezone( 'Europe/Stockholm' )
         )
     )
-    >setDtend(
+    ->setDtend(
         new DateTime(
             '20190421T100000',
             new DateTimezone( 'Europe/Stockholm' )
@@ -59,7 +59,7 @@ $event1 = $vcalendar->newVevent()
         [
             new DateTime(
                 '20190609T090000',
-                new DateTimezone( 'Europe/Stockholm'
+                new DateTimezone( 'Europe/Stockholm' )
             ),
             new DateTime(
                 '20190609T110000',
@@ -142,7 +142,7 @@ $event2 = $vcalendar->newVevent()
         )
     ->setDuration( 'PT2H' )
     // add alarm (copy from event1)
-    >setComponent( $event1->getComponent( Vcalendar::VALARM ));
+    ->setComponent( $event1->getComponent( Vcalendar::VALARM ));
 
 $vcalendarString =
     // apply appropriate Vtimezone with Standard/DayLight components
