@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,6 +36,7 @@ use IntlTimeZone;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
 
+use function _PHPStan_3bfe2e67c\RingCentral\Psr7\str;
 use function ctype_digit;
 use function floor;
 use function in_array;
@@ -108,7 +109,7 @@ class DateTimeZoneFactory
         try {
             $timeZone = new DateTimeZone( $tzString );
             if( strtolower( $tzString ) !== strtolower( $timeZone->getName())) {
-                throw new Exception( sprintf( $ERR, $tzString )); // some ms timezone may still be accepted!!
+                throw new InvalidArgumentException( sprintf( $ERR, $tzString )); // some ms timezone may still be accepted!!
             }
         }
         catch( Exception $e ) {
@@ -255,11 +256,16 @@ class DateTimeZoneFactory
      * Return bool true if UTC timezone
      *
      * @param null|string $timeZoneString
+     * @param null|string $dateTimeString    A date/time string
      * @return bool
      * @throws Exception
-     * @since  2.41.70 - 2022-10-19
+     * @since  2.41.73 - 2023-03-15
+     * @todo SPl Exception??
      */
-    public static function isUTCtimeZone( ? string $timeZoneString ) : bool
+    public static function isUTCtimeZone(
+        ? string $timeZoneString = null,
+        ? string $dateTimeString = null
+    ) : bool
     {
         if( empty( $timeZoneString )) {
             return false;
@@ -276,14 +282,14 @@ class DateTimeZoneFactory
         }
         try {
             $tz = new DateTimeZone( $timeZoneString );
-            if( strtolower( $timeZoneString ) !== strtolower( $tz->getName())) {
+            if( 0 !== strcasecmp( $timeZoneString, $tz->getName() )) {
                 throw new Exception(); // ms timezone still accepted!!
             }
         }
         catch( Exception ) {
             return false;
         }
-        return empty( $tz->getOffset( DateTimeFactory::factory( null, $timeZoneString )));
+        return empty( $tz->getOffset( DateTimeFactory::factory( $dateTimeString, $timeZoneString )));
     }
 
     /**

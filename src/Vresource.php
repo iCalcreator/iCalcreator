@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -59,7 +59,7 @@ final class Vresource extends CalendarComponent
     /**
      * Constructor
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @throws Exception
      * @since  2.41.53 - 2022-08-11
      */
@@ -72,7 +72,7 @@ final class Vresource extends CalendarComponent
     /**
      * Return Vresource object instance
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @param null|string $resourceType property RESOURCE-TYPE value
      * @param null|string $name property NAME value
      * @return Vresource

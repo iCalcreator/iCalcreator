@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -261,7 +261,7 @@ trait TRIGGERtrait
      * @param Pc   $value
      * @return static
      * @throws Exception
-     * @since  2.29.2 - 2019-06-28
+     * @since  2.41.73 - 2023-03-15
      */
     private function setTriggerStringDateValue( Pc $value ) : static
     {
@@ -273,7 +273,10 @@ trait TRIGGERtrait
             self::UTC,
             true
         );
-        if( ! DateTimeZoneFactory::isUTCtimeZone( $value->value->getTimezone()->getName())) {
+        if( ! DateTimeZoneFactory::isUTCtimeZone(
+            $value->value->getTimezone()->getName(),
+            $value->value->format( DateTimeFactory::$YmdTHis ))
+        ) {
             $value->value = DateTimeFactory::setDateTimeTimeZone(
                 $value->value,
                 self::UTC

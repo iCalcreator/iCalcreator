@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,7 +33,6 @@ use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
-use Kigkonsult\Icalcreator\Vcalendar;
 use function count;
 use function ctype_alpha;
 use function explode;
@@ -246,7 +245,7 @@ final class ComponentParser extends ParserBase
             }
             switch( $propName ) {
                 case self::ATTENDEE :
-                    $this->subject->{$method}( $value, self::processAtendeeParams( $propAttr ));
+                    $this->subject->{$method}( $value, self::processAttendeeParams( $propAttr ));
                     break;
                 case $STRUNREPPROP :
                     $this->subject->{$method}( StringFactory::strunrep( $value ), $propAttr );
@@ -285,18 +284,18 @@ final class ComponentParser extends ParserBase
     /**
      * Split multiple Attendees MEMBER/DELEGATED-TO/DELEGATED-FROM into array, if found
      *
-     * @param array $propAttr
-     * @return array
+     * @param string[]|string[][] $propAttr
+     * @return string[]|string[][]
      * @since  2.27.11 - 2019-01-04
      */
-    private static function processAtendeeParams( array $propAttr ) : array
+    private static function processAttendeeParams( array $propAttr ) : array
     {
         static $ParamArrayKeys = [ self::MEMBER, self::DELEGATED_TO, self::DELEGATED_FROM ];
         foreach( $propAttr as $pix => $attr ) {
             if( ! in_array( strtoupper( $pix ), $ParamArrayKeys, true )) {
                 continue;
             }
-            $attr2 = explode( self::$COMMA, $attr );
+            $attr2 = explode( self::$COMMA, (string) $attr );
             if( 1 < count( $attr2 )) {
                 $propAttr[$pix] = $attr2;
             }
@@ -308,7 +307,7 @@ final class ComponentParser extends ParserBase
      * Return Request-Status value array
      *
      * @param string $value
-     * @return array
+     * @return string[]
      * @since  2.41.68 - 2022-19-24
      */
     private static function parseRequestStatus( string $value ) : array
@@ -327,8 +326,8 @@ final class ComponentParser extends ParserBase
      * Return type, value and parameters from parsed (Freebusy) row and propAttr
      *
      * @param string  $row
-     * @param array $propAttr
-     * @return array
+     * @param string[] $propAttr
+     * @return string[]|string[][]
      * @since  2.41.54 - 2022-08-09
      */
     private static function parseFreebusy( string $row, array $propAttr ) : array
@@ -360,7 +359,7 @@ final class ComponentParser extends ParserBase
      * Return Geo value array
      *
      * @param string $value
-     * @return array
+     * @return string[]
      * @since  2.41.68 - 2022-19-24
      */
     private static function parseGeo( string $value ) : array
@@ -376,10 +375,10 @@ final class ComponentParser extends ParserBase
      * Return Exdate value
      *
      * @param string $value
-     * @return null|array
+     * @return null|string[]
      * @since  2.41.68 - 2022-19-24
      */
-    private static function parseExdate( string $value ) : mixed
+    private static function parseExdate( string $value ) : ?array
     {
         return  empty( $value ) ? null : explode( self::$COMMA, $value );
     }
@@ -388,8 +387,8 @@ final class ComponentParser extends ParserBase
      * Return value and parameters from parsed row and propAttr
      *
      * @param string  $row
-     * @param array $propAttr
-     * @return array
+     * @param string[] $propAttr
+     * @return string[]
      * @since  2.27.11 - 2019-01-04
      */
     private static function parseRexdate( string $row, array $propAttr ) : array
@@ -415,7 +414,7 @@ final class ComponentParser extends ParserBase
      * Return (array) parsed rexrule string
      *
      * @param string $row
-     * @return array
+     * @return string[]|string[][]
      * @since 2.27.3 - 2018-12-28
      */
     private static function parseRexrule( string $row ) : array
@@ -429,8 +428,8 @@ final class ComponentParser extends ParserBase
             } // ;-char in end position ???
             $value3    = explode( $EQ, $value2, 2 );
             $ruleLabel = strtoupper( $value3[0] );
+            $value4    = explode( self::$COMMA, $value3[1] );
             if( self::BYDAY === $ruleLabel ) {
-                $value4 = explode( self::$COMMA, $value3[1] );
                 if( 1 < count( $value4 )) {
                     foreach( $value4 as $v5ix => $value5 ) {
                         $value4[$v5ix] = self::updateDayNoAndDayName( trim( $value5 ));
@@ -442,7 +441,6 @@ final class ComponentParser extends ParserBase
                 $recur[$ruleLabel] = $value4;
             } // end if
             else {
-                $value4 = explode( self::$COMMA, $value3[1] );
                 if( 1 < count( $value4 )) {
                     $value3[1] = $value4;
                 }
@@ -456,7 +454,7 @@ final class ComponentParser extends ParserBase
      * Return array, day rel pos number (opt) and day name abbr
      *
      * @param string $dayValueBase
-     * @return array
+     * @return string[]
      * @since  2.27.16 - 2019-03-03
      */
     private static function updateDayNoAndDayName( string $dayValueBase ) : array

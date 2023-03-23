@@ -46,6 +46,10 @@
     "funding": [
         {
             "type": "other",
+            "url": "https://www.buymeacoffee.com/kigkonsult"
+        },
+        {
+            "type": "other",
             "url": "https://paypal.me/kigkonsult"
         }
     ],

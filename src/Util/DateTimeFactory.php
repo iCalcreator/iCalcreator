@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -83,36 +83,34 @@ class DateTimeFactory
      * @return DateTime
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since  2.40.11 - 2022-01-27
+     * @since  2.41.73 - 2023-03-15
      */
     public static function factory( ? string $dateTimeString = null, ? string $timeZoneString = null ) : DateTime
     {
         $dateTimeString = $dateTimeString ?? self::$NOW;
         if(( self::$AT === $dateTimeString[0] ) &&
             ctype_digit( substr( $dateTimeString, 1 ))) {
-            try {
-                $dateTime = new DateTime( $dateTimeString );
-                $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
-                if( ! empty( $timeZoneString ) &&
-                    ! DateTimeZoneFactory::isUTCtimeZone( $timeZoneString )) {
-                    try {
-                        $dateTime->setTimezone(
-                            DateTimeZoneFactory::factory( $timeZoneString )
-                        );
-                    }
-                    catch( Exception $e ) {
-                        throw new InvalidArgumentException(
-                            sprintf( self::$ERR3, $timeZoneString ),
-                            1234,
-                            $e
-                        );
-                    }
+            $dateTime = new DateTime( $dateTimeString );
+            $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
+            if( ! empty( $timeZoneString ) &&
+                ! DateTimeZoneFactory::isUTCtimeZone(
+                    $timeZoneString,
+                    $dateTime->format( self::$YmdTHis )
+                )) {
+                try {
+                    $dateTime->setTimezone(
+                        DateTimeZoneFactory::factory( $timeZoneString )
+                    );
                 }
-                return $dateTime;
+                catch( Exception $e ) {
+                    throw new InvalidArgumentException(
+                        sprintf( self::$ERR3, $timeZoneString ),
+                        1234,
+                        $e
+                     );
+                }
             }
-            catch( InvalidArgumentException | Exception $e ) {
-                throw $e;
-            }
+            return $dateTime;
         } // end if @
         return self::assertDateTimeString( $dateTimeString, $timeZoneString );
     }
@@ -401,7 +399,6 @@ class DateTimeFactory
                 substr( $string, -6 )
             ];
         }
-
         // timezone is always after a digit and, hopefully, a space-delim
         $pos = strlen( $string ) - 1;
         while( true ) {
@@ -474,7 +471,7 @@ class DateTimeFactory
      * @return string
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.29.21 - 2020-01-31
+     * @since  2.41.73 - 2023-03-15
      * @usedby RexdateFactory::getPeriod()/prepInputRdate() + <dateProp>::get<dateProp>()
      */
     public static function dateTime2Str(
@@ -493,7 +490,7 @@ class DateTimeFactory
         $fmt    = ( $isDATE ?? false ) ? self::$Ymd : self::$YmdTHis;
         $output = $dateTime->format( $fmt );
         if( ! ( $isDATE ?? false ) && ! ( $isLocalTime ?? false ) &&
-            DateTimeZoneFactory::isUTCtimeZone( $dateTime->getTimezone()->getName())) {
+            DateTimeZoneFactory::isUTCtimeZone(  $dateTime->getTimezone()->getName(), $output )) {
             $output .= DateTimeZoneFactory::$UTCARR[0];
         }
         return $output;
@@ -548,10 +545,8 @@ class DateTimeFactory
      * @return DateTime
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.27.8 - 2019-01-12
-     */
-    /**
      * @throws Exception
+     * @since  2.41.73 - 2023-03-15
      */
     private static function getDateTimeFromDateString(
         string $dateString,
@@ -562,20 +557,14 @@ class DateTimeFactory
         switch( true ) {
             case empty( $tz ) :
                 break;
-            case DateTimeZoneFactory::isUTCtimeZone( $tz ) :
+            case DateTimeZoneFactory::isUTCtimeZone( $tz, $dateString ) :
                 $tz = IcalInterface::UTC;
                 break;
             case DateTimeZoneFactory::hasOffset( $tz ) :
                 $tz  = DateTimeZoneFactory::getTimeZoneNameFromOffset( $tz );
                 break;
         } // end switch
-        try {
-            $dateTime = self::factory( $dateString, $tz );
-        }
-        catch( InvalidArgumentException | Exception $e ) {
-            throw $e;
-        }
-        return $dateTime;
+        return self::factory( $dateString, $tz );
     }
 
     /**
@@ -586,7 +575,7 @@ class DateTimeFactory
      * @return DateTime
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.41.57 - 2022-08-20
+     * @since  2.41.73 - 2023-03-15
      */
     public static function setDateTimeTimeZone(
         DateTimeInterface $dateTime,
@@ -600,9 +589,10 @@ class DateTimeFactory
         if( DateTimeZoneFactory::hasOffset( $tz )) {
             $tz = DateTimeZoneFactory::getTimeZoneNameFromOffset( $tz );
         }
-        $currTz = $dateTime->getTimezone()->getName();
-        if( DateTimeZoneFactory::isUTCtimeZone( $currTz ) &&
-            DateTimeZoneFactory::isUTCtimeZone( $tz )) {
+        $currTz   = $dateTime->getTimezone()->getName();
+        $currDate = $dateTime->format( self::$YmdTHis );
+        if( DateTimeZoneFactory::isUTCtimeZone( $currTz, $currDate ) &&
+            DateTimeZoneFactory::isUTCtimeZone( $tz, $currDate )) {
             return $dateTime->setTimezone( DateTimeZoneFactory::factory( IcalInterface::UTC ));
         }
         if( 0 === strcasecmp( $currTz, $tz )) { // same

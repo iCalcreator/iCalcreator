@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -128,7 +128,7 @@ trait DESCRIPTIONtrait
      * Return array, all calendar component property description
      *
      * @param null|bool   $inclParam
-     * @return array|Pc[]
+     * @return Pc[]
      * @since 2.41.58 2022-08-24
      */
     public function getAllDescription( ? bool $inclParam = false ) : array

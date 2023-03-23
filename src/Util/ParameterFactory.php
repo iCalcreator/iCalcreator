@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -114,14 +114,11 @@ class ParameterFactory
     private static function conformValue ( mixed $value ) : string
     {
         static $ONE = '1';
-        switch( true ) {
-            case is_string( $value ) :
-                return trim( $value, StringFactory::$QQ );
-            case is_bool( $value ) :
-                return $value ? $ONE : Util::$ZERO;
-            default :
-                return (string) $value;
-        } // end switch
+        return match ( true ) {
+            is_string( $value ) => trim( $value, StringFactory::$QQ ),
+            is_bool( $value ) => $value ? $ONE : Util::$ZERO,
+            default => (string)$value,
+        }; // end switch
     }
 
     private static string $CIRCUMFLEX = '^';

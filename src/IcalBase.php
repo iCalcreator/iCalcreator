@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.71' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.74' );
 }
 
 /**
@@ -93,6 +93,8 @@ abstract class IcalBase implements IcalInterface
     ];
 
     /**
+     * Return bool true if compName is one of VAVAILABILITY, VEVENT, VTODO, VJOURNAL, VFREEBUSY
+     *
      * @param string $compName
      * @return bool
      * @since 2.41.68 2022-10-03
@@ -125,7 +127,7 @@ abstract class IcalBase implements IcalInterface
      *
      * On update here, upd also IcalXMLFactory::XMLgetComps $ALLCOMPS list
      *
-     * @param $compName
+     * @param string $compName
      * @return bool
      * @since 2.41.68 2022-10-03
      */
@@ -229,12 +231,12 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
-     * @var array container for sub-components
+     * @var CalendarComponent[] container for sub-components
      */
     protected array $components = [];
 
     /**
-     * @var array $config configuration with defaults
+     * @var mixed[] $config configuration with defaults
      */
     protected array $config = [
         self::ALLOWEMPTY => true,
@@ -416,7 +418,7 @@ abstract class IcalBase implements IcalInterface
     /**
      * Return array( propertyName => count )
      *
-     * @return array
+     * @return mixed[]
      * @since 2.41.51 2022-08-09
      */
     protected function getpropInfo() : array
@@ -464,15 +466,15 @@ abstract class IcalBase implements IcalInterface
     /**
      * Set Vcalendar/component config
      *
-     * @param string|array $config
-     * @param null|bool|string|array $value
-     * @param bool                     $softUpdate
+     * @param string|string[] $config
+     * @param null|bool|string|mixed[] $value
+     * @param bool            $softUpdate
      * @return static
      * @throws InvalidArgumentException
      * @since  2.40.11 - 2022-01-25
      */
     public function setConfig(
-        string | array $config,
+        string|array $config,
         null|bool|string|array $value = null,
         ? bool $softUpdate = false
     ) : static
@@ -495,14 +497,14 @@ abstract class IcalBase implements IcalInterface
                 break;
             case ( self::LANGUAGE === $key ) :
                 // set language for calendar component as defined in [RFC 1766]
-                $value  = trim( $value );
+                $value  = trim((string) $value );
                 if( empty( $this->config[self::LANGUAGE] ) || ! $softUpdate ) { // ??
                     $this->config[self::LANGUAGE] = $value;
                 }
                 $subCfg = [ self::LANGUAGE => $value ];
                 break;
             case ( self::UNIQUE_ID === $key ) :
-                $value  = trim( $value );
+                $value  = trim((string) $value );
                 $this->config[self::UNIQUE_ID] = $value;
                 $subCfg = [ self::UNIQUE_ID => $value ];
                 break;
@@ -647,7 +649,7 @@ abstract class IcalBase implements IcalInterface
                 case (( self::$INDEX === $argType ) && ( $index === $cix )) :
                     return clone $this->components[$cix];
                 case ( ! empty( $argType ) &&
-                    ( 0 === strcasecmp( $argType, $this->components[$cix]->getCompType()))) :
+                    ( 0 === strcasecmp((string) $argType, $this->components[$cix]->getCompType()))) :
                     if( $index === $cix1gC ) {
                         return clone $this->components[$cix];
                     }
@@ -692,7 +694,7 @@ abstract class IcalBase implements IcalInterface
             return $this->compix[$arg1];
         } // end if
         if( ctype_digit((string) $arg2 )) {
-            return $arg2;
+            return (int) $arg2;
         }
         return -1;
     }
@@ -755,7 +757,7 @@ abstract class IcalBase implements IcalInterface
                     break;
             } // end switch
             foreach( $value as $part ) {
-                $part = ( is_string( $part ) && (str_contains( $part, Util::$COMMA )))
+                $part = ( is_string( $part ) && ( str_contains( $part, Util::$COMMA )))
                     ? explode( Util::$COMMA, $part )
                     : [ $part ];
                 foreach( $part as $subPart ) {
@@ -800,7 +802,7 @@ abstract class IcalBase implements IcalInterface
             $index   = (int) $arg1 - 1;
         }
         elseif( self::isCalendarSubComp((string) $arg1 )) { // all but Vtimzones subcombs
-            $argType = ucfirst( strtolower( $arg1 ));
+            $argType = ucfirst( strtolower((string) $arg1 ));
             $index   = ( ctype_digit((string) $arg2 )) ? ((int) $arg2 ) - 1 : 0;
         }
         // else if arg1 is set, arg1 must be an UID
@@ -858,11 +860,11 @@ abstract class IcalBase implements IcalInterface
             $index   = (int)$arg1 - 1;
         }
         elseif( property_exists( $this, StringFactory::getInternalPropName( self::PRODID ))) {
-            $cmpArg = ucfirst( strtolower( $arg1 ));
+            $cmpArg = ucfirst( strtolower((string) $arg1 ));
             if( self::isVcalendarVcomp( $cmpArg ) || // subcomps to Vcalendar
                 ( 0 === strcasecmp( $cmpArg, self::VTIMEZONE ))) {
-                $argType = ucfirst( strtolower( $arg1 ) );
-                $index   = ( ! empty( $arg2 ) && ctype_digit((string) $arg2 ))
+                $argType = $cmpArg;
+                $index   = ( $arg2 !== null && ctype_digit((string) $arg2 ))
                     ? ( $arg2 - 1 )
                     : 0;
             }

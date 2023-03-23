@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -180,7 +180,7 @@ class VcalendarTest extends TestCase
         );
         $this->assertEquals(
             strtoupper( $propName ) . $expectedString,
-            trim( $vcalendar->{$createMethod}() ),
+            trim( $vcalendar->{$createMethod}()),
             sprintf( self::$ERRFMT, null, $case . '-4', __FUNCTION__, Vcalendar::VCALENDAR, $createMethod )
         );
 
@@ -241,7 +241,7 @@ class VcalendarTest extends TestCase
         $v2 = $vcalendar->getComponent( 6 );
         $this->assertEquals( $date, $v2->getDtstart());
 
-        $vcalendar->deleteComponent( 6, false );
+        $vcalendar->deleteComponent( 6 );
         $this->assertFalse( $vcalendar->getComponent( 6 ));
         $this->assertFalse( $vcalendar->getComponent());
 
@@ -494,11 +494,13 @@ class VcalendarTest extends TestCase
         // check fetch on type and order number
         $v1 = $vcalendar->getComponent( IcalInterface::VTODO, 1 );
         $v2 = $vcalendar->getComponent( IcalInterface::VTODO, 2 );
-        $this->assertFalse( $vcalendar->getComponent( IcalInterface::VTODO, 3 ) );
+        $this->assertFalse( $vcalendar->getComponent( IcalInterface::VTODO, 3 ));
 
         // check number of components
         $this->assertSame(
-            30, $vcalendar->countComponents(), 'deleteComponent-error 6, has ' . $vcalendar->countComponents()
+            30, 
+            $vcalendar->countComponents(), 
+            'deleteComponent-error 6, has ' . $vcalendar->countComponents()
         );
 
         for( $x = 18; $x <= 1; $x-- ) {
@@ -507,22 +509,26 @@ class VcalendarTest extends TestCase
                 'deleteComponent-error 7 on #' . $x
             );
         }
-        while( $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ) ) {
+//      while( $vcalendar->deleteComponent(  IcalInterface::VEVENT, false )) {
+        while( $vcalendar->deleteComponent(  IcalInterface::VEVENT )) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ),
+//          $vcalendar->deleteComponent(  IcalInterface::VEVENT, false ),
+            $vcalendar->deleteComponent(  IcalInterface::VEVENT ),
             'deleteComponent-error 8'
         );
         $this->assertSame(
-            2, $vcalendar->countComponents(), 'deleteComponent-error 9, has ' . $vcalendar->countComponents()
+            2, 
+            $vcalendar->countComponents(), 
+            'deleteComponent-error 9, has ' . $vcalendar->countComponents()
         );
 
-        while( $vcalendar->deleteComponent(  IcalInterface::VTODO, false ) ) {
+        while( $vcalendar->deleteComponent(  IcalInterface::VTODO )) {
             continue;
         }
         $this->assertFalse(
-            $vcalendar->deleteComponent(  IcalInterface::VTODO, false ),
+            $vcalendar->deleteComponent(  IcalInterface::VTODO ),
             'deleteComponent-error 10'
         );
         $this->assertSame(

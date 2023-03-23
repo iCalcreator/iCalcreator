@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -84,8 +84,8 @@ final class Attendee extends PropertyBase
                 $output .= self::renderProperty( $propName, null, $content );
                 continue;
             }
-            $aParams = self::fixOptQuotesForParamValue( $attendeePart->params );
-            $attributes = self::$SP0;
+            $aParams     = self::fixOptQuotesForParamValue( $attendeePart->params );
+            $attributes  = self::$SP0;
             /* set attendee parameters in (almost) rfc2445 order */
             if( isset( $aParams[self::CUTYPE] )) {
                 $attributes .= sprintf( self::$FMT, self::CUTYPE, $aParams[self::CUTYPE] );
@@ -136,8 +136,8 @@ final class Attendee extends PropertyBase
     /**
      * Fix opt quoted param values, all but DELEGATED-FROM, DELEGATED-TO, MEMBER
      *
-     * @param array $aParams
-     * @return array
+     * @param string[]|string[][] $aParams
+     * @return string[]|string[][]
      * @since  2.41.68 - 2019-10-24
      */
     private static function fixOptQuotesForParamValue( array $aParams ) : array

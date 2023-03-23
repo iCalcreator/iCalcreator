@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -137,7 +137,7 @@ class VtimezonePopulateFactory
      * @return void
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.10 2022-01-26
+     * @since 2.41.73 2023-03-15
      */
     public static function processSingleTimezone(
         Vcalendar                  $calendar,
@@ -148,8 +148,9 @@ class VtimezonePopulateFactory
     ) : void
     {
         $foundTrans = [];
-        if( ! DateTimeZoneFactory::isUTCtimeZone( $timezone )) {
-            [ $start, $end ] = self::ensureStartAndEnd( $calendar, $timezone, $start, $end );
+        $dtstartArr = self::getDtstartsArr( $calendar );
+        if( ! DateTimeZoneFactory::isUTCtimeZone( $timezone, (string) $dtstartArr[0] )) {
+            [ $start, $end ] = self::ensureStartAndEnd( $timezone, $dtstartArr, $start, $end );
             $foundTrans      = self::findTransitions( $timezone, $start, $end );
         }
         $timezoneComp = self::getTimezoneComp( $calendar, $timezone, $xProps );
@@ -233,38 +234,38 @@ class VtimezonePopulateFactory
     }
 
     /**
-     * Return valid (ymd-)from/tom
+     * Return valid (ymd-)from/tom as timestamps
      *
-     * @param Vcalendar     $calendar
      * @param string        $timezone  valid timezone acceptable by PHP5 DateTimeZone
+     * @param int[]         $dtstartArr
      * @param null|int|DateTimeInterface  $start    .. or unix timestamp
      * @param null|int|DateTimeInterface  $end      .. or unix timestamp
      * @return int[]
      * @throws  InvalidArgumentException
      * @throws  Exception
-     * @since  2.27.15 - 2019-03-21
+     * @since  2.41.73 - 2023-03-25
      */
     private static function ensureStartAndEnd(
-        Vcalendar $calendar,
         string $timezone,
+        array $dtstartArr,
         null|int|DateTimeInterface $start = null,
         null|int|DateTimeInterface $end = null
     ) : array
     {
-        static $ERRMSG             = 'Date are not in order: %d - %d';
+        static $ERRMSG = 'Date are not in order: %d - %d';
         $startTs = self::getArgInSeconds( $start);
         $endTs   = self::getArgInSeconds( $end );
         switch( true ) {
-            case ( ! empty( $startTs ) && ! empty( $endTs )) :
+            case (( null !== $startTs ) && ( null !== $endTs )) :
                 break;
-            case ( ! empty( $startTs )) : //  set to = +18 month (i.e 548 days)
+            case ( null !== $startTs ) : //  set to = +18 month (i.e 548 days)
                 $endTs = (int) $startTs + ( 3600 * 24 * self::$NUMBEROFDAYSAFTER );
                 break;
-            case ( ! empty( $endTs )) :  // set from = -12 month (i.e 365 days)
+            case ( null !== $endTs ) :  // set from = -12 month (i.e 365 days)
                 $startTs = (int) $endTs - ( 3600 * 24 * self::$NUMBEROFDAYSBEFORE );
                 break;
             default :
-                [ $startTs, $endTs ] = self::getStartEndFromDtstarts( $calendar, $timezone );
+                [ $startTs, $endTs ] = self::getStartEndFromDtstarts( $timezone, $dtstartArr );
                 break;
         } // end switch
         if( $startTs > $endTs ) {
@@ -291,30 +292,41 @@ class VtimezonePopulateFactory
     }
 
     /**
+     * Return array (Ymd), all Dtstarts from calendar components, if none found [ 'now' ]
+     *
      * @param Vcalendar $calendar
+     * @return int[]|string[]
+     * @throws Exception
+     * @since  2.41.73 - 2023-03-25
+     */
+    private static function getDtstartsArr( Vcalendar $calendar ) : array
+    {
+        $dtstartArr = array_keys( $calendar->getProperty( Vcalendar::DTSTART ));
+        if( empty( $dtstartArr )) {
+            $dtstartArr = [ date( self::$YMD ) ];
+        }
+        return $dtstartArr;
+    }
+
+    /**
      * @param string $timezone
+     * @param int[] $dtstartArr
      * @return int[]
      * @throws Exception
+     * @since  2.41.73 - 2023-03-25
      */
-    private static function getStartEndFromDtstarts( Vcalendar $calendar, string $timezone ) : array
+    private static function getStartEndFromDtstarts( string $timezone, array $dtstartArr ) : array
     {
-        static $FMTBEFORE          = '-%d days';
-        static $FMTAFTER           = '+%d days';
-        $dtstartArr = array_keys( $calendar->getProperty( Vcalendar::DTSTART ));
-        switch( true ) {
-            case ( empty( $dtstartArr )) :
-                $start = DateTimeFactory::factory( null, $timezone );
-                $end   = ( clone $start );
-                break;
-            case ( 1 === count( $dtstartArr )) :
-                $start = DateTimeFactory::factory((string) reset( $dtstartArr ), $timezone );
-                $end   = ( clone $start );
-                break;
-            default :
-                $start = DateTimeFactory::factory((string) reset( $dtstartArr ), $timezone );
-                $end   = DateTimeFactory::factory((string) end( $dtstartArr ), $timezone );
-                break;
-        } // end switch
+        static $FMTBEFORE = '-%d days';
+        static $FMTAFTER  = '+%d days';
+        if( 1 === count( $dtstartArr )) {
+            $start = DateTimeFactory::factory((string) reset( $dtstartArr ), $timezone );
+            $end   = ( clone $start );
+        }
+        else {
+            $start = DateTimeFactory::factory((string) reset( $dtstartArr ), $timezone );
+            $end   = DateTimeFactory::factory((string) end( $dtstartArr ), $timezone );
+        }
         return [
             $start->modify( sprintf( $FMTBEFORE, self::$NUMBEROFDAYSBEFORE ))->getTimestamp(),
             $end->modify(   sprintf( $FMTAFTER,  self::$NUMBEROFDAYSAFTER ))->getTimestamp()
@@ -327,7 +339,7 @@ class VtimezonePopulateFactory
      * @param string $timezone
      * @param int    $start
      * @param int    $end
-     * @return array
+     * @return mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.41.1 2022-01-15
@@ -422,8 +434,8 @@ class VtimezonePopulateFactory
     /**
      * Return bool true if foundTrans matches trans
      *
-     * @param array $foundTrans
-     * @param array $trans
+     * @param mixed[] $foundTrans
+     * @param mixed[] $trans
      * @return bool
      * @since  2.27.15 - 2019-02-23
      */
@@ -440,9 +452,9 @@ class VtimezonePopulateFactory
     /**
      * Return (array) build 'found'-trans
      *
-     * @param array $backupTrans
-     * @param string   $timezone
-     * @return array
+     * @param array   $backupTrans
+     * @param string  $timezone
+     * @return mixed[]
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.27.15 - 2019-02-23

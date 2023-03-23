@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -137,7 +137,7 @@ final class Recur extends PropertyBase
     }
 
     /**
-     * @param array $ruleValue
+     * @param string[]|string[][] $ruleValue
      * @return string
      */
     private static function renderByday( array $ruleValue ) : string
@@ -190,7 +190,7 @@ final class Recur extends PropertyBase
 
     /**
      * @param string $ruleLabel
-     * @param int|string|array $ruleValue
+     * @param int|string|string[] $ruleValue
      * @return string
      */
     private static function renderDefault( string $ruleLabel, int|string|array $ruleValue ) : string

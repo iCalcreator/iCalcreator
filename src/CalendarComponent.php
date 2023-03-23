@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -49,7 +49,7 @@ use function str_contains;
 abstract class CalendarComponent extends IcalBase
 {
     /**
-     * @var array  component sort keyss
+     * @var string[]  component sort keys
      */
     public array $srtk = [];
 
@@ -66,7 +66,7 @@ abstract class CalendarComponent extends IcalBase
     /**
      * Constructor for calendar component
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @since  2.27.14 - 2019-07-03
      */
     public function __construct( ? array $config = [] )

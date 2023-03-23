@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -97,7 +97,7 @@ abstract class PropertyBase implements IcalInterface
      * Return formatted output for calendar component property
      *
      * @param string      $label      property name
-     * @param null|string|array $attributes property attributes
+     * @param null|string|string[] $attributes property attributes
      * @param null|string $content    property content
      * @return string
      * @since 2.41.66 2022-09-07
@@ -139,7 +139,7 @@ abstract class PropertyBase implements IcalInterface
     /**
      * Return formatted output for calendar component property parameters
      *
-     * @param array $inputParams
+     * @param string[]|string[][] $inputParams
      * @param null|string[]    $ctrKeys
      * @param null|bool|string $lang  bool false if config lang not found
      * @return string
@@ -157,6 +157,9 @@ abstract class PropertyBase implements IcalInterface
         unset( $inputParams[self::ISLOCALTIME ] );
         if( empty( $inputParams ) && empty( $ctrKeys ) && empty( $lang )) {
             return self::$SP0;
+        }
+        if( empty( $ctrKeys )) {
+            $ctrKeys = [];
         }
         $attrLANG = $output   = self::$SP0;
         $hasLANGctrKey        = in_array( self::LANGUAGE, $ctrKeys, true );
@@ -202,8 +205,8 @@ abstract class PropertyBase implements IcalInterface
      *
      * "-Quotes a value if it contains ':', ';' or ','
      *
-     * @param array $inputParams
-     * @return array[]
+     * @param string[] $inputParams
+     * @return string[][]
      * @since 2.41.63 2022-09-05
      */
     protected static function quoteParams( array $inputParams ) : array
@@ -270,7 +273,7 @@ abstract class PropertyBase implements IcalInterface
      * Return rendered parameter (if exists)
      *
      * @param string $paramKey
-     * @param array $params
+     * @param string[] $params
      * @return string
      */
     protected static function renderParam( string $paramKey, array & $params ) : string
@@ -295,9 +298,9 @@ abstract class PropertyBase implements IcalInterface
     /**
      * Return rendered parameter (if exists)
      *
-     * @param array $keyGroup   keys to probe
-     * @param array $ctrKeys    probe list
-     * @param array $params
+     * @param string[] $keyGroup   keys to probe
+     * @param string[] $ctrKeys    probe list
+     * @param string[] $params
      * @return string
      */
     protected static function renderKeyGroup( array $keyGroup, array $ctrKeys, array & $params ) : string

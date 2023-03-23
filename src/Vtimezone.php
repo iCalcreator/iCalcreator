@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -59,7 +59,7 @@ final class Vtimezone extends CalendarComponent
     /**
      * Return Vtimezone object instance
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @param null|string $tzid
      * @return Vtimezone
      * @since  2.41.53 - 2022-08-08
@@ -176,8 +176,9 @@ final class Vtimezone extends CalendarComponent
      */
     public function newStandard() : Standard
     {
-        array_unshift( $this->components, new Standard( $this->getConfig()));
-        return $this->components[0];
+        $standard = new Standard( $this->getConfig());
+        array_unshift( $this->components, $standard );
+        return $standard;
     }
 
     /**
@@ -191,7 +192,8 @@ final class Vtimezone extends CalendarComponent
         $ix = ( empty( $this->components ))
             ? 0
             : (int) key( array_slice( $this->components, -1, 1, true )) + 1;
-        $this->components[$ix] = new Daylight( $this->getConfig());
-        return $this->components[$ix];
+        $daylight = new Daylight( $this->getConfig());
+        $this->components[$ix] = $daylight;
+        return $daylight;
     }
 }

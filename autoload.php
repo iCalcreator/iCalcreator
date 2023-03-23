@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,13 +31,13 @@
  *
  * iCalcreator package autoloader
  *
- * @since  2.41.71 - 2022-11-28
+ * @since  2.41.74 - 2023-03-15
  */
 
 /**
  *         Do NOT alter or remove the constant!!
  */
-define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.71' );
+define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.74' );
 
 /**
  * load iCalcreator src and support classes and Traits

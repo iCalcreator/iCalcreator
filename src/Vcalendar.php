@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -97,7 +97,7 @@ final class Vcalendar extends IcalBase
     /**
      * Constructor for calendar object
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @throws Exception
      * @since 2.41.55 - 2022-08-13
      */
@@ -151,7 +151,7 @@ final class Vcalendar extends IcalBase
     /**
      * Return iCalcreator instance, factory method
      *
-     * @param null|array $config
+     * @param null|string[] $config
      * @return self
      * @throws Exception
      * @since  2.18.5 - 2013-08-29
@@ -186,7 +186,7 @@ final class Vcalendar extends IcalBase
      * RECURRENCE-ID *4 (alt. "R-UID")
      * RELATED-TO, URL, UID
      * @param string $propName
-     * @return array|bool   false on not found propName
+     * @return mixed[]|bool   false on not found propName
      * @since 2.41.68 2022-10-03
      */
     public function getProperty( string $propName ) : bool | array
@@ -428,7 +428,8 @@ final class Vcalendar extends IcalBase
             $others[] = clone $this->components[$cix];
         } // end foreach
         $vtix              = count( $vTimezones );
-        $vTimezones[$vtix] = Vtimezone::factory( $this->getConfig(), $tzid );
+        $vTimezone         = Vtimezone::factory( $this->getConfig(), $tzid );
+        $vTimezones[$vtix] = $vTimezone;
         $this->components  = [];
         foreach( array_keys( $vTimezones ) as $cix ) {
             $this->components[] = $vTimezones[$cix];
@@ -436,7 +437,7 @@ final class Vcalendar extends IcalBase
         foreach( array_keys( $others ) as $cix ) {
             $this->components[] = $others[$cix];
         }
-        return $this->components[$vtix];
+        return $vTimezone;
     }
 
     /**
@@ -488,8 +489,8 @@ final class Vcalendar extends IcalBase
      * DTSTART MUST be set for every component.
      * No date check.
      *
-     * @param null|int|array|DateTimeInterface $startY (int) start Year,  default current Year
-     *                                      ALT. DateTime start date
+     * @param null|int|mixed[]|DateTimeInterface $startY (int) start Year,  default current Year
+     *                                      ALT. DateTime, start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
      * @param null|int|DateTimeInterface $startM (int) start Month, default current Month
      *                                      ALT. DateTime end date
@@ -505,7 +506,7 @@ final class Vcalendar extends IcalBase
      * @param bool $split true (default) - one component copy every DAY it occurs during the
      *                                       period (implies flat=false)
      *                                       false          - one occurance of component only in output array
-     * @return bool|array  array on success, bool false on error
+     * @return bool|mixed[]  array on success, bool false on error
      * @throws Exception
      * @since  2.29.16 - 2020-01-24
      */
@@ -598,7 +599,7 @@ final class Vcalendar extends IcalBase
      * return self with (replaced) populated Vtimezone component
      *
      * @param string|null   $timezone valid timezone acceptable by PHP5 DateTimeZone
-     * @param null|array $xProp *[x-propName => x-propValue]
+     * @param null|string[] $xProp *[x-propName => x-propValue]
      * @param null|int|DateTimeInterface $start .. or unix timestamp
      * @param null|int|DateTimeInterface $end .. or unix timestamp
      * @return Vcalendar

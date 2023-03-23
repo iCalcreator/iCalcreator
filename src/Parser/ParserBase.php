@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -233,7 +233,7 @@ abstract class ParserBase implements IcalInterface
      * Extract and remove opt (simpler) TEXT parameters from line and upd attr array
      *
      * @param string $line
-     * @param array $attr
+     * @param string[] $attr
      * @return string
      * @since 2.41.70 2022-10-20
      */
@@ -255,7 +255,7 @@ abstract class ParserBase implements IcalInterface
         ];
         foreach( $searchKeyArr as $needle ) {
             $search = self::$SEMIC . $needle;
-            if( false === strpos( $line, $search )) {
+            if( ! str_contains( $line, $search )) {
                 continue;
             }
             $line1  = stristr( $line, $search, true );
@@ -271,7 +271,7 @@ abstract class ParserBase implements IcalInterface
      * Extract and remove multi parameters from line and upd attr array
      *
      * @param string $line
-     * @param array $attr
+     * @param string[] $attr
      * @return string
      * @since 2.41.70 2022-10-21
      */
@@ -398,16 +398,16 @@ abstract class ParserBase implements IcalInterface
      * Return attributes in array format, i.e. split key and value
      *
      * @param string[] $attr
-     * @return array
+     * @return string[]
      */
     protected static function processAttributes( array $attr ) : array
     {
         $propAttr = [];
         foreach( $attr as $attribute ) {
-            if( false === strpos( $attribute, self::$EQ )) {
+            if( ! str_contains( $attribute, self::$EQ ) ) {
                 continue;// skip empty? attributes
             }
-            $attrSplit               = explode( self::$EQ, $attribute, 2 );
+            $attrSplit = explode( self::$EQ, $attribute, 2 );
             $propAttr[$attrSplit[0]] = $attrSplit[1];
         }
         return $propAttr;

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -200,8 +200,8 @@ class SortFactory
     /**
      * Sort callback function for freebusy and rdate, sort single property
      *
-     * @param array|DateTime $a
-     * @param array|DateTime $b
+     * @param DateTime|DateTime[] $a
+     * @param DateTime|DateTime[] $b
      * @return int
      * @since 2.29.2 2019-06-23
      */
@@ -242,7 +242,7 @@ class SortFactory
     /**
      * Return sortValue from RDATE value
      *
-     * @param array|DateTime $v
+     * @param DateTime|DateTime[] $v
      * @return string
      * @since 2.29.2 2019-06-23
      */

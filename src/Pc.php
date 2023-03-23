@@ -7,8 +7,6 @@ use ArrayObject;
 /**
  * Property Contents
  *
- * @property mixed value
- * @property array params
  * @since 2.41.65 - 2022-09-07
  */
 class Pc extends ArrayObject
@@ -42,7 +40,7 @@ class Pc extends ArrayObject
      * Class constructor
      *
      * @overrides
-     * @param array $array         ignored
+     * @param array $array           ignored
      * @param int $flags             ignored
      * @param string $iteratorClass  ArrayIterator
      */
@@ -55,7 +53,7 @@ class Pc extends ArrayObject
      * Class factory method
      *
      * @param mixed|null $value
-     * @param array|null $params
+     * @param null|string[] $params
      * @return Pc
      */
     public static function factory( mixed $value = null, ? array $params = [] ) : Pc
@@ -71,7 +69,7 @@ class Pc extends ArrayObject
     }
 
     /**
-     * Inherited 'closed' methods
+     * Inherited but 'closed' methods
      */
     public function exchangeArray( mixed $array ) : array { return $this->getArrayCopy(); }
     public function setFlags( mixed $flags ) : void {}
@@ -143,7 +141,7 @@ class Pc extends ArrayObject
      *
      * @param null|string $pKey   parameter key
      * @param bool $asXparamKey   only if not empty pKey, opt do X-prefix pkey
-     * @return null|int|string|array
+     * @return null|int|string|string[]
      * @ince 2.41.68 - 2022-10-02
      */
     public function getParams( ? string $pKey = null, ? bool $asXparamKey = false ) : null|int|string|array
@@ -288,7 +286,7 @@ class Pc extends ArrayObject
     /**
      * Set parameter X-key/value array, default overwrite (key always set to uppercase )
      *
-     * @param array $params
+     * @param string[] $params
      * @param null|bool $overwrite
      * @return Pc
      */

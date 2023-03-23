@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2022 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -601,12 +601,12 @@ final class Formatter extends XmlBase
     /**
      * Add XML (rfc6321) cal-address children to SimpleXMLelement
      *
-     * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
-     * @param string           $name    new element node name
-     * @param Pc[]             $contents new subelement contents
+     * @param SimpleXMLElement $parent a SimpleXMLelement class instance
+     * @param string $name new element node name
+     * @param Pc[] $contents new subelement contents
+     * @param bool|string $lang
      * @return void
      * @throws Exception
-     * @throws InvalidArgumentException
      * @since 2.41.69 2022-11-02
      */
     private static function addXMLchildCalAddress(
@@ -645,7 +645,7 @@ final class Formatter extends XmlBase
      *
      * @param SimpleXMLElement $parent  a SimpleXMLelement class instance
      * @param string           $name    new element node name
-     * @param Pc               $contents new subelement content
+     * @param Pc               $content new subelement content
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
