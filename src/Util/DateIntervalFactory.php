@@ -283,23 +283,11 @@ class DateIntervalFactory
      */
     public static function conformDateInterval( DateInterval $dateInterval ) : DateInterval
     {
-        $dateIntervalArr = (array) $dateInterval;
-        if( 60 <= $dateIntervalArr[self::$s] ) {
-            $dateIntervalArr[self::$i] +=
-                (int) floor( $dateIntervalArr[self::$s] / 60 );
-            $dateIntervalArr[self::$s] %= 60;
-        }
-        if( 60 <= $dateIntervalArr[self::$i] ) {
-            $dateIntervalArr[self::$h] +=
-                (int) floor( $dateIntervalArr[self::$i] / 60 );
-            $dateIntervalArr[self::$i] %= 60;
-        }
-        if( 24 <= $dateIntervalArr[self::$h] ) {
-            $dateIntervalArr[self::$d] +=
-                (int) floor( $dateIntervalArr[self::$h] / 24 );
-            $dateIntervalArr[self::$h] %= 24;
-        }
-        return self::DateIntervalArr2DateInterval( $dateIntervalArr );
+        $zero = new DateTime("@0");
+        $target = new DateTime("@0");
+        $target->add($dateInterval);
+
+        return $zero->diff($target);
     }
 
     /**
@@ -367,23 +355,5 @@ class DateIntervalFactory
     {
         static $PLS = 's';
         return ( 1 < $number ) ? $PLS : Util::$SP0;
-    }
-
-    /**
-     * Get DateInterval from (DateInterval) array
-     *
-     * @param array $dateIntervalArr
-     * @return DateInterval
-     * @throws Exception  on DateInterval create error
-     * @since  2.27.2 - 2018-12-21
-     */
-    public static function DateIntervalArr2DateInterval( array $dateIntervalArr ) : DateInterval
-    {
-        static $P0D = 'P0D';
-        $dateInterval = new DateInterval( $P0D );
-        foreach( $dateIntervalArr as $key => $value ) {
-            $dateInterval->{$key} = $value;
-        }
-        return $dateInterval;
     }
 }
