@@ -79,10 +79,10 @@ class SortFactory
             if( empty( $b->srtk[$k] )) {
                 return 1;
             }
-            $aKey = ctype_digit( $a->srtk[$k] )
+            $aKey = ctype_digit( (string) $a->srtk[$k] )
                 ? str_pad((string) $a->srtk[$k], 20, '0', STR_PAD_LEFT )
                 : (string) $a->srtk[$k];
-            $bKey = ctype_digit( $b->srtk[$k] )
+            $bKey = ctype_digit( (string) $b->srtk[$k] )
                 ? str_pad((string) $b->srtk[$k], 20, '0', STR_PAD_LEFT )
                 : (string)$b->srtk[$k];
             $sortStat = strcmp( $aKey, $bKey );
