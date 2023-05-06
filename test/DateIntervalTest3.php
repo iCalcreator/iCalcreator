@@ -166,9 +166,11 @@ class DateIntervalTest3 extends DtBase
     public static function DateInterval101112ProviderDateInterval( array $input, int $cnt ) : array
     {
         $cnt += 10000;
-        $dateInterval   = (array) DateIntervalFactory::factory(
-            self::durationArray2string( $input )
-        );
+        $durationStr  = self::durationArray2string( $input );
+        if( 'P12M' === $durationStr ) {
+            $durationStr = 'P1Y';
+        }
+        $dateInterval   = (array) DateIntervalFactory::factory( $durationStr );
         $diInput        = DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval );
         $diString       = DateIntervalFactory::dateInterval2String(
             DateIntervalFactory::conformDateInterval(
@@ -227,9 +229,12 @@ class DateIntervalTest3 extends DtBase
     public static function DateInterval101112ProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $cnt += 12000;
-        $dateInterval   = (array) DateIntervalFactory::factory(
-            self::durationArray2string( $input )
-        );
+        $durationStr  = self::durationArray2string( $input );
+        if( 'P12M' === $durationStr ) {
+            $durationStr = 'P1Y';
+        }
+        $dateInterval   = (array) DateIntervalFactory::factory( $durationStr );
+
         $diString       = DateIntervalFactory::dateInterval2String(
             DateIntervalFactory::conformDateInterval(
                 DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval )
@@ -517,7 +522,14 @@ class DateIntervalTest3 extends DtBase
                     $expGet->value[1][0]   = $expGet->value[1][0]->format( $YmdHis );
                     $getValue->value[0][0] = $getValue->value[0][0]->format( $YmdHis );
                     $getValue->value[1][0] = $getValue->value[1][0]->format( $YmdHis );
-                }
+                    if( isset( $expGet->value[0][1] ) &&
+                        ( $expGet->value[0][1] instanceof \DateInterval )) {
+                        $expGet->value[0][1]   = DateIntervalFactory::dateInterval2String( $expGet->value[0][1] );
+                        $expGet->value[1][1]   = DateIntervalFactory::dateInterval2String( $expGet->value[1][1] );
+                        $getValue->value[0][1] = DateIntervalFactory::dateInterval2String( $getValue->value[0][1] );
+                        $getValue->value[1][1] = DateIntervalFactory::dateInterval2String( $getValue->value[1][1] );
+                    }
+                } // end if
 
                 $this->assertEquals(
                     $expGet,
@@ -529,7 +541,7 @@ class DateIntervalTest3 extends DtBase
                 $expectedString .= ',' . StringFactory::afterLast( ':', $expectedString );
                 $this->assertEquals(
                     $propName . $expectedString,
-                    str_replace( ["\r\n", ' '], null, $comp->{$createMethod}()),
+                    str_replace( ["\r\n", ' '], '', $comp->{$createMethod}()),
                     "Error in case #$case-34, " . __FUNCTION__. " <$theComp>->{$createMethod}"
                 );
                 $comp->{$deleteMethod}();

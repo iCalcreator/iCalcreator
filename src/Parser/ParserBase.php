@@ -480,7 +480,7 @@ abstract class ParserBase implements IcalInterface
         for( $i = 0; $i < $cnt; $i++ ) {
             $line = rtrim( $rows[$i], Util::$CRLF );
             $i1 = $i + 1;
-            while(( $i < $cnt ) && isset( $rows[$i1] ) &&
+            while( ( $i < $cnt ) &&
                 ! empty( $rows[$i1] ) &&
                 in_array( $rows[$i1][0], $CHARs )) {
                 ++$i;

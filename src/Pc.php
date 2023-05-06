@@ -40,11 +40,15 @@ class Pc extends ArrayObject
      * Class constructor
      *
      * @overrides
-     * @param array $array           ignored
-     * @param int $flags             ignored
-     * @param string $iteratorClass  ArrayIterator
+     * @param null|array $array           ignored
+     * @param null|int $flags             ignored
+     * @param null|string $iteratorClass  ArrayIterator
      */
-    public function __construct( $array = [], $flags = 0, $iteratorClass = 'ArrayIterator' )
+    public function __construct(
+        ? array $array = [],
+        ? int $flags = 0,
+        ? string $iteratorClass = 'ArrayIterator'
+    )
     {
         parent::__construct( self::$propTmpl, ArrayObject::ARRAY_AS_PROPS, self::$iteratorTmpl );
     }

@@ -185,8 +185,9 @@ final class Vcalendar extends IcalBase
      * ATTENDEE*, CONTACT, ORGANIZER*   *:prefixed by "protocol" like "mailto:....
      * RECURRENCE-ID *4 (alt. "R-UID")
      * RELATED-TO, URL, UID
+     *
      * @param string $propName
-     * @return mixed[]|bool   false on not found propName
+     * @return array|bool   false on not found propName
      * @since 2.41.68 2022-10-03
      */
     public function getProperty( string $propName ) : bool | array
@@ -489,24 +490,24 @@ final class Vcalendar extends IcalBase
      * DTSTART MUST be set for every component.
      * No date check.
      *
-     * @param null|int|mixed[]|DateTimeInterface $startY (int) start Year,  default current Year
+     * @param null|int|array|DateTimeInterface $startY (int) start Year,  default current Year
      *                                      ALT. DateTime, start date
      *                                      ALT. array selectOptions ( *[ <propName> => <uniqueValue> ] )
-     * @param null|int|DateTimeInterface $startM (int) start Month, default current Month
+     * @param null|int|DateTimeInterface       $startM (int) start Month, default current Month
      *                                      ALT. DateTime end date
-     * @param null|int $startD start Day,   default current Day
-     * @param null|int $endY end   Year,  default $startY
-     * @param null|int $endM end   Month, default $startM
-     * @param null|int $endD end   Day,   default $startD
-     * @param null|string|string[] $cType calendar component type(-s), default false=all else string/array type(-s)
-     * @param bool $flat false (default) => output : array[Year][Month][Day][]
+     * @param null|int                         $startD start Day,   default current Day
+     * @param null|int                         $endY end   Year,  default $startY
+     * @param null|int                         $endM end   Month, default $startM
+     * @param null|int                         $endD end   Day,   default $startD
+     * @param null|string|string[]             $cType calendar component type(-s), default false=all else string/array type(-s)
+     * @param bool                             $flat false (default) => output : array[Year][Month][Day][]
      *                                       true            => output : array[] (ignores split)
-     * @param bool $any true (default) - select component(-s) that occurs within period
+     * @param bool                             $any true (default) - select component(-s) that occurs within period
      *                                       false          - only component(-s) that starts within period
-     * @param bool $split true (default) - one component copy every DAY it occurs during the
+     * @param bool                             $split true (default) - one component copy every DAY it occurs during the
      *                                       period (implies flat=false)
      *                                       false          - one occurance of component only in output array
-     * @return bool|mixed[]  array on success, bool false on error
+     * @return bool|array  array on success, bool false on error
      * @throws Exception
      * @since  2.29.16 - 2020-01-24
      */

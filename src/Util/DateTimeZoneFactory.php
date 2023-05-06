@@ -35,8 +35,8 @@ use Exception;
 use IntlTimeZone;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
+use RuntimeException;
 
-use function _PHPStan_3bfe2e67c\RingCentral\Psr7\str;
 use function ctype_digit;
 use function floor;
 use function in_array;
@@ -57,9 +57,23 @@ class DateTimeZoneFactory
 {
 
     /**
+     * UTC variants, 'Z' first !!
+     *
      * @var string[]
      */
-    public static array $UTCARR = [ IcalInterface::Z, IcalInterface::UTC, IcalInterface::GMT ];
+    public static array $UTCARR = [
+        IcalInterface::Z,
+        'Etc/GMT',
+        'Etc/GMT+0',
+        'Etc/GMT-0',
+        'Etc/GMT0',
+        'Etc/Greenwich',
+        'Etc/UCT',
+        'Etc/Universal',
+        'Etc/Zulu',
+        IcalInterface::GMT,
+        IcalInterface::UTC
+    ];
 
     /**
      * @param string $tzString
@@ -73,10 +87,10 @@ class DateTimeZoneFactory
     /**
      * Return new DateTimeZone object instance
      *
-     * @param string $tzString
+     * @param string      $tzString
      * @param null|string $ymdHisString
      * @return DateTimeZone
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|Exception
      * @since  2.41.70 - 2022-10-19
      */
     public static function factory( string $tzString, ? string $ymdHisString = null ) : DateTimeZone
@@ -85,12 +99,12 @@ class DateTimeZoneFactory
     }
 
     /**
-     * Assert DateTimeZoneString
+     * Assert DateTimeZoneString, return DateTimeZone
      *
-     * @param string $tzString
+     * @param string      $tzString
      * @param null|string $ymdHisString
      * @return DateTimeZone
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|Exception
      * @since  2.41.70 - 2022-10-19
      */
     public static function assertDateTimeZone( string $tzString, ? string $ymdHisString = null ) : DateTimeZone
@@ -193,7 +207,7 @@ class DateTimeZoneFactory
      *
      * @param string $dateString
      * @return string
-0     */
+     */
     public static function getOffset( string $dateString ) : string
     {
         $dateString = trim( $dateString );
@@ -258,7 +272,7 @@ class DateTimeZoneFactory
      * @param null|string $timeZoneString
      * @param null|string $dateTimeString    A date/time string
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException|Exception
      * @since  2.41.73 - 2023-03-15
      * @todo SPl Exception??
      */
@@ -283,7 +297,7 @@ class DateTimeZoneFactory
         try {
             $tz = new DateTimeZone( $timeZoneString );
             if( 0 !== strcasecmp( $timeZoneString, $tz->getName() )) {
-                throw new Exception(); // ms timezone still accepted!!
+                throw new RuntimeException(); // ms timezone still accepted!!
             }
         }
         catch( Exception ) {

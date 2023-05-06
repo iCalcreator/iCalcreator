@@ -276,7 +276,6 @@ final class VcalendarParser extends ParserBase
             self::URL,
         ];
         if( ! isset( $this->unparsed ) ||
-            ! is_array( $this->unparsed ) ||
             ( 1 > count( $this->unparsed ))) {
             return;
         }

@@ -316,9 +316,9 @@ class CalAddressFactory
      *
      * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
-     * @since  2.41.36 - 2022-04-03
+     * @since  2.41.76 - 2023-04-29
      */
-    public static function getCalAdressesAllFromAttendee( CalendarComponent $component ) : array
+    public static function getCalAdressesAllFromAttendee( CalendarComponent|Vevent $component ) : array
     {
         $output = [];
         foreach( $component->getAllAttendee( true ) as $propValue ) {
@@ -334,10 +334,9 @@ class CalAddressFactory
                     case IcalInterface::MEMBER:       // fall through
                     case IcalInterface::DELEGATED_TO: // fall through
                     case IcalInterface::DELEGATED_FROM:
-                        $params2[$pLabel] = [];
                         foreach( $pValue as $pValue2 ) {
                             $pValue2 = self::removeMailtoPrefix( trim( $pValue2, StringFactory::$QQ ));
-                            if( !in_array( $pValue2, $output, true )) {
+                            if( ! in_array( $pValue2, $output, true )) {
                                 $output[] = $pValue2;
                             }
                         } // end foreach
@@ -364,7 +363,7 @@ class CalAddressFactory
      * @return string[]
      * @since  2.41.36 - 2022-04-03
      */
-    public static function getCalAdressesAllFromOrganizer( CalendarComponent $component ) : array
+    public static function getCalAdressesAllFromOrganizer( CalendarComponent|Vevent $component ) : array
     {
         if(( false === ( $propValue = $component->getOrganizer( true ))) ||
             empty( $propValue )) {
@@ -393,7 +392,7 @@ class CalAddressFactory
      * @return string[]
      * @since  2.29 - 2021-06-19
      */
-    public static function getCalAdressesAllFromContact( CalendarComponent $component ) : array
+    public static function getCalAdressesAllFromContact( CalendarComponent|Vevent $component ) : array
     {
         $output = [];
         foreach( $component->getAllContact( true ) as $propValue ) {

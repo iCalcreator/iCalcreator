@@ -570,9 +570,17 @@ class ValarmTest extends DtBase
             $getValue = ( in_array( $propName, $MULTIPROPS, true ))
                 ? $a1->{$getMethod}( null, true )
                 : $a1->{$getMethod}( true );
+            if( $expectedGet->value instanceof \DateInterval ) {
+                $exp3 = DateIntervalFactory::dateInterval2String( $expectedGet->value );
+                $act3 = DateIntervalFactory::dateInterval2String( $getValue->value );
+            }
+            else {
+                $exp3 = $expectedGet->value;
+                $act3 = $getValue->value;
+            }
             $this->assertEquals(
-                $expectedGet,
-                $getValue,
+                $exp3,
+                $act3,
                 self::getErrMsg(  null, $case . '-3', __FUNCTION__, IcalInterface::VALARM, $getMethod )
             );
             $actualString = $a1->{$createMethod}();

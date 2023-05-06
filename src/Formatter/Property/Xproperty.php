@@ -40,8 +40,8 @@ use function is_numeric;
 final class Xproperty extends PropertyBase
 {
     /**
-     * @param mixed[] $values  [ *( propname, Pc ) ]
-     * @param null|bool $allowEmpty
+     * @param array            $values  [ *( propname, Pc ) ]
+     * @param null|bool        $allowEmpty
      * @param null|bool|string $lang
      * @return string
      */

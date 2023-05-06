@@ -97,7 +97,7 @@ trait CALSCALEtrait
      *
      * @param null|string $value
      * @return static
-     * @throws InvalidArgumentException;
+     * @throws InvalidArgumentException
      * @since  2.29.14 - 2019-09-03
      */
     public function setCalscale( null|string $value = null ) : static

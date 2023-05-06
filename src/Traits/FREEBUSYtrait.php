@@ -186,7 +186,8 @@ trait FREEBUSYtrait
         }
         else {
             $fbType = ( empty( $fbType )) ? self::BUSY : strtoupper( $fbType );
-            if( ! in_array( $fbType, self::$FREEBUSYKEYS ) && ! StringFactory::isXprefixed( $fbType )) {
+            if( ! in_array( $fbType, self::$FREEBUSYKEYS, true ) &&
+                ! StringFactory::isXprefixed( $fbType )) {
                 $fbType = self::BUSY;
             }
             $value  = Pc::factory( $fbValues, ParameterFactory::setParams( $params ))

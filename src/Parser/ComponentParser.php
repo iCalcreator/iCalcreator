@@ -32,6 +32,7 @@ namespace Kigkonsult\Icalcreator\Parser;
 use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\Util\StringFactory;
+use RuntimeException;
 
 use function count;
 use function ctype_alpha;
@@ -54,13 +55,18 @@ final class ComponentParser extends ParserBase
 {
     /**
      * @inheritDoc
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function parse( null|array|string $unParsedText = null ) : CalendarComponent
     {
-        $rows = $this->parse1prepInput( $unParsedText );
-        if( ! empty( $rows )) {
-            $this->parse2intoComps( $rows );
+        try {
+            $rows = $this->parse1prepInput( $unParsedText );
+            if( ! empty( $rows ) ) {
+                $this->parse2intoComps( $rows );
+            }
+        }
+        catch( Exception $e ) {
+            throw new RuntimeException( $e->getMessage(), $e->getCode(), $e );
         }
         return $this->subject;
     }

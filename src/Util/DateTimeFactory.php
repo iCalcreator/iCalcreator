@@ -176,6 +176,9 @@ class DateTimeFactory
     {
         $isValueDate = $value->hasParamValue( IcalInterface::DATE );
         $paramTZid   = self::getParamTZid( $value );
+        if( DateTimeZoneFactory::isUtcTz( $paramTZid )) {
+            $paramTZid = IcalInterface::UTC;
+        }
         $isLocalTime = $value->hasParamKey( IcalInterface::ISLOCALTIME );
         switch( true ) {
             case ( $value->value instanceof DateTimeInterface ) :
@@ -223,6 +226,7 @@ class DateTimeFactory
      *
      * @param Pc $pc property content
      * @return string
+     * @throws Exception
      * @since 2.47.68 2022-09-25
      */
     private static function getParamTZid( Pc $pc ) : string
@@ -284,7 +288,7 @@ class DateTimeFactory
      * @return DateTime
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since  2.29.1 - 2019-06-26
+     * @since  2.41.76 - 2023-05-02
      */
     public static function conformStringDate(
         string $input,
@@ -545,8 +549,10 @@ class DateTimeFactory
      * @return DateTime
      * @throws Exception
      * @throws InvalidArgumentException
-     * @throws Exception
      * @since  2.41.73 - 2023-03-15
+     */
+    /**
+     * @throws Exception
      */
     private static function getDateTimeFromDateString(
         string $dateString,

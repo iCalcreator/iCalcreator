@@ -800,7 +800,7 @@ final class Formatter extends XmlBase
                 // fall through
             default :
                 $parameters = $child->addChild( self::$PARAMETERS );
-                foreach( $subData->getParams() as $pKey => $parVal ) {
+                foreach((array) $subData->getParams() as $pKey => $parVal ) {
                     if( IcalInterface::VALUE === $pKey ) {
                         if( str_contains( $parVal, Util::$COLON )) {
                             $p1   = $parameters->addChild( strtolower( $pKey ));

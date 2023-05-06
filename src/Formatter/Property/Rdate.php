@@ -112,9 +112,9 @@ final class Rdate extends PropertyBase
     }
 
     /**
-     * @param mixed[] $rdatePart
-     * @param bool $isValueDate
-     * @param bool $isLocalTime
+     * @param array $rdatePart
+     * @param bool  $isValueDate
+     * @param bool  $isLocalTime
      * @return string
      * @throws Exception
      */

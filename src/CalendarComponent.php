@@ -131,7 +131,6 @@ abstract class CalendarComponent extends IcalBase
      * @param null|string|string[] $unParsedText strict rfc2445 formatted, single property string or array of strings
      * @return static
      * @throws Exception
-     * @throws UnexpectedValueException;
      * @since  2.41.54 - 2022-08-09
      * @// todo report invalid properties, Exception.. ??
      */

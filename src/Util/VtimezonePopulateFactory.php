@@ -259,10 +259,10 @@ class VtimezonePopulateFactory
             case (( null !== $startTs ) && ( null !== $endTs )) :
                 break;
             case ( null !== $startTs ) : //  set to = +18 month (i.e 548 days)
-                $endTs = (int) $startTs + ( 3600 * 24 * self::$NUMBEROFDAYSAFTER );
+                $endTs = $startTs + ( 3600 * 24 * self::$NUMBEROFDAYSAFTER );
                 break;
             case ( null !== $endTs ) :  // set from = -12 month (i.e 365 days)
-                $startTs = (int) $endTs - ( 3600 * 24 * self::$NUMBEROFDAYSBEFORE );
+                $startTs = $endTs - ( 3600 * 24 * self::$NUMBEROFDAYSBEFORE );
                 break;
             default :
                 [ $startTs, $endTs ] = self::getStartEndFromDtstarts( $timezone, $dtstartArr );
@@ -339,7 +339,7 @@ class VtimezonePopulateFactory
      * @param string $timezone
      * @param int    $start
      * @param int    $end
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since 2.41.1 2022-01-15
@@ -434,8 +434,8 @@ class VtimezonePopulateFactory
     /**
      * Return bool true if foundTrans matches trans
      *
-     * @param mixed[] $foundTrans
-     * @param mixed[] $trans
+     * @param array $foundTrans
+     * @param array $trans
      * @return bool
      * @since  2.27.15 - 2019-02-23
      */
@@ -454,7 +454,7 @@ class VtimezonePopulateFactory
      *
      * @param array   $backupTrans
      * @param string  $timezone
-     * @return mixed[]
+     * @return array
      * @throws InvalidArgumentException
      * @throws Exception
      * @since  2.27.15 - 2019-02-23

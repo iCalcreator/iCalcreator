@@ -279,27 +279,17 @@ class DateIntervalFactory
      * @param DateInterval $dateInterval
      * @return DateInterval
      * @throws Exception  on DateInterval create error
-     * @since  2.27.14 - 2019-03-09
+     * @since  2.41.75 - 2023-04-29
      */
     public static function conformDateInterval( DateInterval $dateInterval ) : DateInterval
     {
-        $dateIntervalArr = (array) $dateInterval;
-        if( 60 <= $dateIntervalArr[self::$s] ) {
-            $dateIntervalArr[self::$i] +=
-                (int) floor( $dateIntervalArr[self::$s] / 60 );
-            $dateIntervalArr[self::$s] %= 60;
-        }
-        if( 60 <= $dateIntervalArr[self::$i] ) {
-            $dateIntervalArr[self::$h] +=
-                (int) floor( $dateIntervalArr[self::$i] / 60 );
-            $dateIntervalArr[self::$i] %= 60;
-        }
-        if( 24 <= $dateIntervalArr[self::$h] ) {
-            $dateIntervalArr[self::$d] +=
-                (int) floor( $dateIntervalArr[self::$h] / 24 );
-            $dateIntervalArr[self::$h] %= 24;
-        }
-        return self::DateIntervalArr2DateInterval( $dateIntervalArr );
+        $ZERO   = '@0';
+        $base   = new DateTime( $ZERO );
+        $target = new DateTime( $ZERO );
+        $target->add( $dateInterval );
+        $output = $base->diff( $target );
+        $output->days = false;
+        return $output;
     }
 
     /**

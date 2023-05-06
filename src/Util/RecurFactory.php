@@ -451,7 +451,7 @@ class RecurFactory
     private static function hasIntElementsOnly( array $array ) : bool
     {
         foreach( $array as $element ) {
-            if( ! is_int( $element ) || ( $element != (int) $element )) { // note !=
+            if( ! is_int( $element ) || ((int) $element != $element )) { // note !=
                 return false;
             }
         }
@@ -995,9 +995,9 @@ class RecurFactory
                 }
                 else { // ! isset( $recur[Vcalendar::BYSETPOS] )
                     if( checkdate(
-                        (int) $wDate[self::$LCMONTH],
-                        (int) $wDate[self::$LCDAY],
-                        (int) $wDate[self::$LCYEAR] )) {
+                        $wDate[self::$LCMONTH],
+                        $wDate[self::$LCDAY],
+                        $wDate[self::$LCYEAR] )) {
                         /* update result array if BYSETPOS is not set */
                         $recurCount++;
                         if( $fcnStartYMD <= $wDateYMD ) { // only output within period
@@ -1100,7 +1100,8 @@ class RecurFactory
     ) : bool
     {
         if( is_array( $BYvalue ) &&
-            ( in_array( $upValue, $BYvalue ) || in_array( $downValue, $BYvalue )) // no third arg tue
+            ( in_array( $upValue, $BYvalue ) ||
+                in_array( $downValue, $BYvalue )) // no third arg tue
         ) {
             return true;
         }

@@ -164,9 +164,20 @@ class DateIntervalTest2 extends DtBase
      */
     public static function dateInterval678TestProviderDateInterval( array $dateIntervalArray, int $cnt ) : array
     {
-        $dateInterval = (array) DateIntervalFactory::factory(
-            self::durationArray2string( $dateIntervalArray )
-        );
+        $durationStr  = self::durationArray2string( $dateIntervalArray );
+        switch( $durationStr ) {
+            case 'P12M' :
+                $durationStr = 'P1Y';
+                break;
+            case '+P12M' :
+                $durationStr = '+P1Y';
+                break;
+            case '-P12M' :
+                $durationStr = '-P1Y';
+                break;
+        } // end switch
+        $dateInterval = (array) DateIntervalFactory::factory( $durationStr );
+
         $getValue = DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval );
         $params   = [];
         $s      = array_rand( [ IcalInterface::START => 1, IcalInterface::END => 2] );
@@ -246,17 +257,27 @@ class DateIntervalTest2 extends DtBase
         if( isset( $params[IcalInterface::RELATED] ) && ( IcalInterface::START === $params[IcalInterface::RELATED] )) { // remove default
             $getValue->removeParam( IcalInterface::RELATED );
         }
+        $durationStr  = self::durationArray2string( $dateIntervalArray );
+        switch( $durationStr ) {
+            case 'P12M' :
+                $durationStr = 'P1Y';
+                break;
+            case '+P12M' :
+                $durationStr = '+P1Y';
+                break;
+            case '-P12M' :
+                $durationStr = '-P1Y';
+                break;
+        } // end switch
         return [
             ( 8000 + $cnt ) . $s . $s1 . $b,
-            $diPrefix . self::durationArray2string( $dateIntervalArray ),
+            $diPrefix . $durationStr,
             $params,
             $getValue,
             Property::formatParams( $getValue->params ) .
             ':' . $diPrefix . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
-                    DateIntervalFactory::factory(
-                        self::durationArray2string( $dateIntervalArray )
-                    )
+                    DateIntervalFactory::factory( $durationStr )
                 )
             ),
         ];
@@ -349,9 +370,24 @@ class DateIntervalTest2 extends DtBase
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+                $comp3Str = DateIntervalFactory::dateInterval2String( $expectedGet->value, true );
+                switch( $comp3Str ) {
+                    case 'P12M' :
+                        $comp3Str = 'P1Y';
+                        break;
+                    case '+P12M' :
+                        $comp3Str = '+P1Y';
+                        break;
+                    case '-P12M' :
+                        $comp3Str = '-P1Y';
+                        break;
+                } // end switch
+                $comp3Exp = $comp3Str . ' ' . var_export( $expectedGet->params, true );
+                $comp3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
+                    ' ' . var_export( $getValue->params, true );
                 $this->assertEquals(
-                    $expectedGet,
-                    $getValue,
+                    $comp3Exp,
+                    $comp3act,
                     "get error in case #$case-3, <$theComp>->{$getMethod}"
                 );
 

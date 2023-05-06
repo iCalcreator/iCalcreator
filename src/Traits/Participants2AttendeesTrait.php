@@ -46,7 +46,7 @@ trait Participants2AttendeesTrait
      */
     public function participants2Attendees() : static
     {
-        if( ! in_array( $this->getCompType(), Vcalendar::$VCOMBS )) {
+        if( ! in_array( $this->getCompType(), Vcalendar::$VCOMBS, true )) {
             return $this;
         }
         [ $participants, $lcArr ] = $this->getSubCompsDetailType(

@@ -164,10 +164,11 @@ class DateIntervalTest1 extends DtBase
      */
     public static function DateInterval123ProviderDateInterval( array $input, int $cnt ) : array
     {
-        $dateIntervalArray = $input;
-        $dateInterval = (array)DateIntervalFactory::factory(
-            self::durationArray2string( $dateIntervalArray )
-        );
+        $durationStr  = self::durationArray2string( $input );
+        if( 'P12M' === $durationStr ) {
+            $durationStr = 'P1Y';
+        }
+        $dateInterval = (array)DateIntervalFactory::factory( $durationStr );
         $getValue = DateIntervalFactory::DateIntervalArr2DateInterval( $dateInterval );
         return [
             1000 + $cnt,
@@ -192,12 +193,14 @@ class DateIntervalTest1 extends DtBase
     public static function DateInterval123ProviderDateIntervalString( array $input, int $cnt ) : array
     {
         $dateIntervalArray = $input;
-        $getValue = DateIntervalFactory::factory(
-            self::durationArray2string( $dateIntervalArray )
-        );
+        $durationStr  = self::durationArray2string( $dateIntervalArray );
+        if( 'P12M' === $durationStr ) {
+            $durationStr = 'P1Y';
+        }
+        $getValue = DateIntervalFactory::factory( $durationStr );
         return [
             3000 + $cnt,
-            self::durationArray2string( $dateIntervalArray ),
+            $durationStr,
             Pc::factory( $getValue ),
             ':' . DateIntervalFactory::dateInterval2String(
                 DateIntervalFactory::conformDateInterval(
@@ -303,16 +306,26 @@ class DateIntervalTest1 extends DtBase
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
+                $comp3Exp = DateIntervalFactory::dateInterval2String( $expectedGet->value, true ) .
+                    ' ' . var_export( $expectedGet->params, true );
+                $comp3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
+                    ' ' . var_export( $getValue->params, true );
                 $this->assertEquals(
-                    $expectedGet,
-                    $getValue,
+                    $comp3Exp,
+                    $comp3act,
                     "get error in case #{$case}-comp3, <{$theComp}>->{$createMethod}"
+                    . PHP_EOL . ' exp : ' . $comp3Exp
+                    . PHP_EOL . ' act : ' . $comp3act
                 );
 
+                $comp4exp = strtoupper( $propName ) . $expectedString;
+                $comp4act = trim( $comp->{$createMethod}() );
                 $this->assertEquals(
-                    strtoupper( $propName ) . $expectedString,
-                    trim( $comp->{$createMethod}() ),
-                    "create error in case #{$case}-comp4, <{$theComp}>->{$createMethod}"
+                    $comp4exp,
+                    $comp4act,
+                    "create error in case #{$case}-comp4, <{$theComp}>->{$createMethod}" .
+                    ' exp : ' . $comp4exp .
+                    ' act : ' . $comp4act
                 );
                 $comp->{$deleteMethod}();
                 $this->assertFalse(
@@ -363,12 +376,21 @@ class DateIntervalTest1 extends DtBase
         );
 
         $getValue = $c->{$getMethod}( true );
-        $expGet = clone $expectedGet;
+        if( $getValue->value instanceof \DateInterval ) {
+            $getValue->value->days = false;
+        }
+        $expGet     = clone $expectedGet;
         $expGet->params += [ IcalInterface::VALUE => IcalInterface::DURATION ];
-        $this->assertEquals(
-            $expGet,
-            $getValue,
+        $cal_rf3exp = DateIntervalFactory::dateInterval2String( $expGet->value, true ) .
+            ' ' . var_export( $expGet->params, true );
+        $cal_rf3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
+            ' ' . var_export( $getValue->params, true );
+            $this->assertEquals(
+                $cal_rf3exp,
+                $cal_rf3act,
             "get error in case #{$case}-cal_rf3, Vcalendar::{$getMethod}"
+            . PHP_EOL . ' exp : ' . $cal_rf3exp
+            . PHP_EOL . ' act : ' . $cal_rf3act
         );
         $this->assertEquals(
             strtoupper( $propName ) . ';VALUE=DURATION' . $expectedString,

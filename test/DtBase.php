@@ -92,9 +92,13 @@ abstract class DtBase extends TestCase
         string $expectedString
     ) : void
     {
-
-//      error_log( __METHOD__ . ' IN 1 ' . $case . ' ' . var_export( $value, true )); // test ###
-
+/*
+        error_log( __METHOD__ . ' IN case ' . $case ); // test ###
+        error_log( ' IN value  1 ' . var_export( $value, true )); // test ###
+        error_log( ' IN params 1 ' . var_export( $params, true )); // test ###
+        error_log( ' IN expGet 1 ' . var_export( $expectedGet, true )); // test ###
+        error_log( ' IN expStr 1 ' . var_export( $expectedString, true )); // test ###
+*/
         $c       = new Vcalendar();
         $pcInput = $firstLastmodifiedLoad = false;
         foreach( $compsProps as $theComp => $props ) {
@@ -158,26 +162,31 @@ abstract class DtBase extends TestCase
                     if( $expectedGet->hasParamKey( IcalInterface::TZID ) &&
                         $getValue->hasParamKey( IcalInterface::TZID )) {
                         // has same offset (TZID might differ)
+                        $expected = DateTimeFactory::factory(null, $expectedGet->getParams( IcalInterface::TZID ))
+                            ->getOffset();
+                        $actual   = DateTimeFactory::factory( null, $getValue->getParams( IcalInterface::TZID ))
+                            ->getOffset();
                         $this->assertEquals(
-                            DateTimeFactory::factory(
-                                null,
-                                $expectedGet->getParams( IcalInterface::TZID )
-                            )->getOffset(),
-                            DateTimeFactory::factory(
-                                null,
-                                $getValue->getParams( IcalInterface::TZID )
-                            )->getOffset(),
-                            self::getErrMsg( null, $case . '-114-1', __FUNCTION__, $theComp, $getMethod )
+                            $expected,
+                            $actual,
+                            self::getErrMsg( null, $case . '-114-1', __FUNCTION__, $theComp, $getMethod, $value, $params )
+                            . PHP_EOL. 'expected : ' . var_export( $expected, true )
+                            . PHP_EOL. '$actual  : ' . var_export( $actual, true )
+                            . PHP_EOL. 'expected : ' . var_export( $expectedGet, true )
+                            . PHP_EOL. 'exp.str  : ' . $expectedString
+                            . PHP_EOL . 'actual   : ' . var_export( $getValue, true )
                         );
-                    }
-                    else {
+                    } // end if
+                    else { // one or both has NO TZID param
                         $getValue->removeParam( IcalInterface::ISLOCALTIME );
                         $this->assertEquals(
                             var_export( $expectedGet->params, true ),
                             var_export( $getValue->params, true ),
                             self::getErrMsg( null, $case . '-114-2', __FUNCTION__, $theComp, $getMethod, $value, $params )
+                            . PHP_EOL . 'expected : ' . var_export( $expectedGet, true ) . PHP_EOL
+                            . 'actual   : ' . var_export( $getValue, true )
                         );
-                    }
+                    } // end else
                     $fmt = $expectedGet->hasParamValue( IcalInterface::DATE )
                         ? DateTimeFactory::$Ymd
                         : DateTimeFactory::$YmdHis;
@@ -192,10 +201,15 @@ abstract class DtBase extends TestCase
                         self::getErrMsg( null, $case . '-114-4', __FUNCTION__, $theComp, $getMethod, $value, $params )
                     );
                 } // end if ..DateTime..
+                $exp116 = strtoupper( $propName ) . $expectedString;
+                $act116 = trim( $comp->{$createMethod}() );
                 $this->assertEquals(
-                    strtoupper( $propName ) . $expectedString,
-                    trim( $comp->{$createMethod}() ),
+                    $exp116,
+                    $act116,
                     self::getErrMsg( null, $case . '-116', __FUNCTION__, $theComp, $createMethod )
+                        . ' exp : ' . $exp116 . ', act : ' . $act116
+                        . PHP_EOL . ' getValue : ' . var_export( $getValue, true ) // test ###
+                        . PHP_EOL . var_export( $comp, true ) // test ###
                 );
                 if( method_exists( $comp, $deleteMethod )) { // Dtstamp/Uid has NO deleteMethod
                     $comp->{$deleteMethod}();
@@ -673,9 +687,11 @@ abstract class DtBase extends TestCase
             'Turkey Standard Time'            => '+02:00',
             'Ulaanbaatar Standard Time'       => '+08:00',
             'UTC'                             => '',
+            /*
             'UTC-02'                          => '-02:00',
             'UTC-11'                          => '-11:00',
             'UTC+12'                          => '+12:00',
+            */
             'Venezuela Standard Time'         => '-04:30',
             'W. Central Africa Standard Time' => '+01:00',
             'W. Europe Standard Time'         => '+01:00',

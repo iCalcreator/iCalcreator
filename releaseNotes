@@ -286,3 +286,6 @@ v3.39   3.4 release candidate
 2.41.73   timezone bug, Github #106,
           The isUTCtimeZone method does not work properly all the time
 2.41.74   demo bug, Github #107
+
+2.41.75   DateInterval bug, github #109
+2.41.76   github #110, code clean up, phpdoc, args etc

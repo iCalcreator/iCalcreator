@@ -169,7 +169,7 @@ class UtilDateTime extends DateTime
      * @return string
      * @since  2.21.7 - 2015-03-07
      */
-    public function format( $format ) : string
+    public function format( string $format ) : string
     {
         if( empty( $format ) && is_string( $this->dateFormat )) {
             $format = (string) $this->dateFormat;
@@ -186,7 +186,7 @@ class UtilDateTime extends DateTime
      * @return self
      * @throws Exception
      * @throws RuntimeException
-     * @since  2.40.0 - 2021-12-02
+     * @since  2.41.76 - 2023-04-29
      */
     public static function factory(
         DateTimeInterface $date,
@@ -222,7 +222,7 @@ class UtilDateTime extends DateTime
                     $e
                 );
             }
-            if( false == $iCaldateTime->setTimezone( $timeZone )) {
+            if( ! $iCaldateTime->setTimezone( $timeZone ) ) {
                 throw new RuntimeException(  // -- #3
                     sprintf( $MSG4, 6, $dtstartTz )
                 );

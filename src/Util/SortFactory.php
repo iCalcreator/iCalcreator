@@ -79,12 +79,12 @@ class SortFactory
             if( empty( $b->srtk[$k] )) {
                 return 1;
             }
-            $aKey = ctype_digit( $a->srtk[$k] )
+            $aKey = ctype_digit((string) $a->srtk[$k] )
                 ? str_pad((string) $a->srtk[$k], 20, '0', STR_PAD_LEFT )
-                : (string) $a->srtk[$k];
-            $bKey = ctype_digit( $b->srtk[$k] )
+                : $a->srtk[$k];
+            $bKey = ctype_digit((string) $b->srtk[$k] )
                 ? str_pad((string) $b->srtk[$k], 20, '0', STR_PAD_LEFT )
-                : (string)$b->srtk[$k];
+                : $b->srtk[$k];
             $sortStat = strcmp( $aKey, $bKey );
             if( 0 === $sortStat ) {
                 continue;
@@ -211,13 +211,13 @@ class SortFactory
         if( $a instanceof DateTime ) {
             $as = $a->format( DateTimeFactory::$YmdTHis);
         }
-        elseif( is_array( $a ) && ( $a[0] instanceof DateTime )) {
+        elseif( $a[0] instanceof DateTime ) {
             $as = $a[0]->format( DateTimeFactory::$YmdTHis);
         }
         if( $b instanceof DateTime ) {
             $bs = $b->format( DateTimeFactory::$YmdTHis);
         }
-        elseif( is_array( $b ) && ( $b[0] instanceof DateTime )) {
+        elseif( $b[0] instanceof DateTime ) {
             $bs = $b[0]->format( DateTimeFactory::$YmdTHis);
         }
         return strcmp( $as, $bs );
@@ -251,7 +251,7 @@ class SortFactory
         if( $v instanceof DateTime ) {
             return $v->format( DateTimeFactory::$YmdTHis);
         }
-        if( is_array( $v ) && ( $v[0] instanceof DateTime )) {
+        if( ( $v[0] instanceof DateTime ) ) {
             return $v[0]->format( DateTimeFactory::$YmdTHis);
         }
         if( is_array( $v[0] ) && ( $v[0][0] instanceof DateTime )) {

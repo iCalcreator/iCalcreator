@@ -107,14 +107,14 @@ trait EXRULEtrait
     /**
      * Set calendar component property exrule
      *
-     * @param null|array $exruleset
+     * @param null|array|Pc $exruleset
      * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.76 2023-04-29
      */
-    public function setExrule( ? array $exruleset = null, ? array $params = [] ) : static
+    public function setExrule( null|array|Pc $exruleset = null, ? array $params = [] ) : static
     {
         $value = ( $exruleset instanceof Pc )
             ? clone $exruleset
