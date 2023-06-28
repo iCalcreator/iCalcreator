@@ -455,7 +455,8 @@ class VcalendarTest extends TestCase
             $v = $vcalendar->getComponent( [ $propName => $testValues[1] ] );
             $this->assertNotFalse(
                 $v,
-                'getComponent not-found-error 1 for #' . $testValues[0] . ' : ' . $propName
+                'getComponent not-found-error 1 for #' . $testValues[0] . ' : ' . $propName . ', search: ' . $testValues[1]
+//               . ', has ' . PHP_EOL . $vcalendar->createCalendar()
             );
             // check test case number
             $ordNo = $v->getComment();
@@ -498,8 +499,8 @@ class VcalendarTest extends TestCase
 
         // check number of components
         $this->assertSame(
-            30, 
-            $vcalendar->countComponents(), 
+            30,
+            $vcalendar->countComponents(),
             'deleteComponent-error 6, has ' . $vcalendar->countComponents()
         );
 
@@ -519,8 +520,8 @@ class VcalendarTest extends TestCase
             'deleteComponent-error 8'
         );
         $this->assertSame(
-            2, 
-            $vcalendar->countComponents(), 
+            2,
+            $vcalendar->countComponents(),
             'deleteComponent-error 9, has ' . $vcalendar->countComponents()
         );
 

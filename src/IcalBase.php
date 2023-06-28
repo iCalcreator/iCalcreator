@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.76' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.80' );
 }
 
 /**
@@ -131,7 +131,7 @@ abstract class IcalBase implements IcalInterface
      * @return bool
      * @since 2.41.68 2022-10-03
      */
-    protected static function isCalendarSubComp( string $compName ) : bool
+    public static function isCalendarSubComp( string $compName ) : bool
     {
         static $CALCOMPS = [
             self::AVAILABLE,
@@ -151,6 +151,7 @@ abstract class IcalBase implements IcalInterface
 
     /**
      * Return bool true if component has the UID property
+     *
      * @param IcalBase $component
      * @return bool
      * @since 2.47.68 2022-10-01
@@ -663,7 +664,9 @@ abstract class IcalBase implements IcalInterface
                         ++$cix1gC;
                     }
                     break;
-                case ( ! $argType && ( $arg1 === $this->components[$cix]->getUid())) :
+                case ( ! $argType &&
+                    self::hasUid( $this->components[$cix] ) &&
+                    ( $arg1 === $this->components[$cix]->getUid())) :
                     if( $index === $cix1gC ) {
                         return clone $this->components[$cix];
                     }
@@ -713,7 +716,7 @@ abstract class IcalBase implements IcalInterface
     ) : bool
     {
         foreach( $argList as $propName => $propValue ) {
-            if( in_array( $propName, [ self::ATTENDEE, self::CONTACT, self::ORGANIZER ], true ) ) {
+            if( in_array( $propName, [ self::ATTENDEE, self::CONTACT, self::ORGANIZER ], true )) {
                 $propValue = CalAddressFactory::conformCalAddress( $propValue );
             }
             switch( true ) {
@@ -737,7 +740,7 @@ abstract class IcalBase implements IcalInterface
             if( false === ( $value = $component->{$method}())) { // single occurrence
                 continue; // missing/empty property
             }
-            switch( true ) {
+                switch( true ) {
                 case ( self::SUMMARY === $propName ) : // exists in (any case)
                     if( false !== stripos( $value, $propValue )) {
                         return true;

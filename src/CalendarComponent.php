@@ -34,7 +34,6 @@ use Kigkonsult\Icalcreator\Traits\MvalTrait;
 use Kigkonsult\Icalcreator\Parser\ComponentParser;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use UnexpectedValueException;
 
 use function is_array;
 use function ksort;

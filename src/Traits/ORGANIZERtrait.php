@@ -39,7 +39,7 @@ use InvalidArgumentException;
 /**
  * ORGANIZER property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.80 2023-06-27
  */
 trait ORGANIZERtrait
 {
@@ -108,7 +108,7 @@ trait ORGANIZERtrait
      * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.80 2023-06-27
       */
     public function setOrganizer( null|string|Pc $value = null, ? array $params = [] ) : static
     {
@@ -121,9 +121,14 @@ trait ORGANIZERtrait
         }
         else {
             Util::assertString( $value->value, self::ORGANIZER );
-            $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
-            CalAddressFactory::assertCalAddress( $value->value );
-            CalAddressFactory::sameValueAndEMAILparam( $value );
+            if( ! CalAddressFactory::hasProtocolPrefix( $value->value )) {
+                $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
+            }
+            if( CalAddressFactory::hasMailtoPrefix( $value->value )) {
+                $value->value = CalAddressFactory::conformCalAddress( $value->value );
+                CalAddressFactory::assertCalAddress( $value->value );
+                CalAddressFactory::sameValueAndEMAILparam( $value );
+            }
         }
         $this->organizer = $value;
         if( $this->organizer->hasParamKey( self::EMAIL )) {

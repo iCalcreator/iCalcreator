@@ -155,7 +155,7 @@ class DateTimeZoneFactory
      * @param null|int $from
      * @param null|int $to
      * @return array
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|Exception
      * @since  2.27.8 - 2019-01-22
      */
     public static function getDateTimeZoneTransitions(

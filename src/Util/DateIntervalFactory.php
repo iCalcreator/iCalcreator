@@ -279,16 +279,19 @@ class DateIntervalFactory
      * @param DateInterval $dateInterval
      * @return DateInterval
      * @throws Exception  on DateInterval create error
-     * @since  2.41.75 - 2023-04-29
+     * @since  2.41.78 - 2023-06-27
      */
     public static function conformDateInterval( DateInterval $dateInterval ) : DateInterval
     {
         $ZERO   = '@0';
+        $DAYS   = 'days';
         $base   = new DateTime( $ZERO );
         $target = new DateTime( $ZERO );
         $target->add( $dateInterval );
         $output = $base->diff( $target );
-        $output->days = false;
+        if( property_exists( $output, $DAYS )) {
+            $output->days = false;
+        }
         return $output;
     }
 

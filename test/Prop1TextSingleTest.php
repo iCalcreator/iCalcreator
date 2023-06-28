@@ -239,7 +239,7 @@ class Prop1TextSingleTest extends DtBase
         ];
 
         // ORGANIZER
-        $value  = 'MAILTO:ildoit1071@example.com';
+        $value  = 'mailto:ildoit1071@example.com';
         $params = [
                 IcalInterface::CN             => 'John Doe',
                 IcalInterface::DIR            => 'ldap://example.com:6666/o=ABC%20Industries,c=US???(cn=Jim%20Dolittle)',
@@ -307,6 +307,37 @@ class Prop1TextSingleTest extends DtBase
             ) .
             ':' . 'mailto:' . $value
         ];
+
+        // issue 112 : 2.41.80
+        $value  = 'http://messes.info/communaute/av/84/jonquieres';
+        $params = [
+                IcalInterface::CN => 'Paroisse : église de Jonquières (Saint Mapalice)'
+            ] + self::$STCPAR;
+        $getValue  = Pc::factory(
+            CalAddressFactory::conformCalAddress( $value ),
+            $params
+        );
+        $dataArr[] = [
+            1073,
+            [
+                IcalInterface::ORGANIZER => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL ]
+            ],
+            $value,
+            $params,
+            $getValue,
+            IcalInterface::ORGANIZER .
+            Property::formatParams(
+                $params,
+                [
+                    IcalInterface::CN,
+                    IcalInterface::DIR,
+                    IcalInterface::SENT_BY,
+                    IcalInterface::LANGUAGE
+                ]
+            ) .
+            ':' . $value
+        ];
+
 
         // CLASS
         $value  = IcalInterface::CONFIDENTIAL;

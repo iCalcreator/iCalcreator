@@ -32,10 +32,10 @@ namespace Kigkonsult\Icalcreator\Parser;
 use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Vcalendar;
-
 use function bin2hex;
 use function count;
 use function ctype_digit;
@@ -44,10 +44,10 @@ use function in_array;
 use function rtrim;
 use function sprintf;
 use function str_replace;
+use function stristr;
 use function strlen;
 use function strpos;
 use function strstr;
-use function stristr;
 use function strtolower;
 use function strtoupper;
 use function substr;
@@ -82,26 +82,6 @@ abstract class ParserBase implements IcalInterface
      * @var string
      */
     protected static string $SP0   = '';
-
-    /**
-     * Protocols
-     *
-     * @var string[]
-     */
-    public static array $PROTO3 = [ 'cid:', 'sms:', 'tel:', 'urn:' ];
-
-    /**
-     * @var string[]  dito
-     */
-    public static array $PROTO5 = [ 'https:' ];
-    /**
-     * @var string[]  dito
-     */
-    public static array $PROTO6 = [ 'mailto:', 'telnet:' ];
-    /**
-     * @var string[]  dito
-     */
-    public static array $PROTO7 = [ 'message:' ];
 
     /**
      * @var string[]  iCal component TEXT properties that may contain '\\', ',', ';'
@@ -387,11 +367,11 @@ abstract class ParserBase implements IcalInterface
         static $MSTZ = [ 'utc-', 'utc+', 'gmt-', 'gmt+' ];
         $line = strtolower( $line );
         return ( ( in_array( substr( $line, $cix - 6, 4 ), $MSTZ )) || // ?? -6
-            ( in_array( substr( $line, $cix - 3, 4 ), self::$PROTO3, true )) ||
-            ( in_array( substr( $line, $cix - 4, 5 ), StringFactory::$PROTO4, true )) ||
-            ( in_array( substr( $line, $cix - 5, 6 ), self::$PROTO5, true )) ||
-            ( in_array( substr( $line, $cix - 6, 7 ), self::$PROTO6, true )) ||
-            ( in_array( substr( $line, $cix - 7, 8 ), self::$PROTO7, true )));
+            ( in_array( substr( $line, $cix - 3, 4 ), CalAddressFactory::$PROTO3, true )) ||
+            ( in_array( substr( $line, $cix - 4, 5 ), CalAddressFactory::$PROTO4, true )) ||
+            ( in_array( substr( $line, $cix - 5, 6 ), CalAddressFactory::$PROTO5, true )) ||
+            ( in_array( substr( $line, $cix - 6, 7 ), CalAddressFactory::$PROTO6, true )) ||
+            ( in_array( substr( $line, $cix - 7, 8 ), CalAddressFactory::$PROTO7, true )));
     }
 
     /**

@@ -30,7 +30,6 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use Exception;
-
 use function bin2hex;
 use function explode;
 use function floor;
@@ -40,8 +39,8 @@ use function rtrim;
 use function sprintf;
 use function str_contains;
 use function str_replace;
-use function strlen;
 use function stripos;
+use function strlen;
 use function strpos;
 use function strrev;
 use function strtolower;
@@ -164,14 +163,6 @@ class StringFactory
     }
 
     // 'fax:' removed
-
-    /**
-     * @var string[]  dito
-     */
-    public static array $PROTO4 = [
-        'crid:', 'news:', 'pres:',
-        ':http:'
-    ];
 
     /**
      * Replace '\\', '\,', '\;' by '\', ',', ';'
