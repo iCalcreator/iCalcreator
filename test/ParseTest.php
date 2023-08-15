@@ -135,6 +135,7 @@ class ParseTest extends DtBase
      * parseCalendarTest provider
      *
      * @return mixed[]
+     * @since 2.41.81 2023-08-14
      */
     public function parseCalendarTestProvider() : array
     {
@@ -156,7 +157,7 @@ class ParseTest extends DtBase
             "BEGIN:VTIMEZONE\r\n" .
             "TZID:America/New_York\r\n" .
             "TZURL;x-a=first;VALUE=uri:message//:https://www.masked.de/account/subscriptio\r\n" .
-            " n/delivery/8878/%3Fweek=2021-W03\r\n" .
+            " n/delivery/8878/%3Fweek=2021-W03\r\n \r\n" .
             "BEGIN:STANDARD\r\n" .
             "DTSTART:20070101T020000\r\n" .
             "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;\r\n" .
@@ -190,7 +191,7 @@ class ParseTest extends DtBase
             "LAST-MODIFIED:20190315T211012Z\r\n" .
             "SEQUENCE:1\r\n" .
             "URL;x-a=first;VALUE=uri:message//:https://www.masked.de/account/subscription/\r\n" .
-            " delivery/8878/%3Fweek=2021-W03\r\n" .
+            " delivery/8878/%3Fweek=2021-W03\r\n \r\n" .
             "BEGIN:VALARM\r\n" .
             "ACTION:DISPLAY\r\n" .
             "DESCRIPTION:Reminder\r\n" .
@@ -410,7 +411,7 @@ class ParseTest extends DtBase
             "BEGIN:VLOCATION\r\n" .
             "UID:123456-abcdef-98765432\r\n" .
             "NAME:Office1\r\n" .
-            "URL:geo:40.443,-79.945;u=10\r\n" .
+            "URL:geo:40.443,-79.945;u=10\r\n\r\n" .
             "END:VLOCATION\r\n" .
             "BEGIN:VLOCATION\r\n" .
             "UID:987654-ghijkl-1234567890\r\n" .

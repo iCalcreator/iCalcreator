@@ -28,12 +28,12 @@
 -->
 <html lang="en">
 <head>
-    <title>iCalcreator 2.41.80 manual</title>
+    <title>iCalcreator 2.41.81 manual</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <meta name="author"      content="Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved">
 <meta name="copyright"   content="2007-2023 Kjell-Inge Gustafsson, kigkonsult">
 <meta name="keywords"    content="ical, calendar, calender, xcal, xml, icalender, rfc2445, rfc5545, vcalender, php, create">
-<meta name="description" content="using iCalcreator v2.41.80">
+<meta name="description" content="using iCalcreator v2.41.81">
 <style>
 * {
   FONT-FAMILY     : "Bitstream Vera Sans", Helvetica, "Lucida Grande","Lucida Sans Unicode", Lucida, Arial, Geneva, sans-serif;
@@ -153,9 +153,9 @@ sup {
 </head>
 <body>
 <a id="top"></a>
-<p class="header">iCalcreator v2.41.80</p>
+<p class="header">iCalcreator v2.41.81</p>
 <p>
-iCalcreator v2.41.80<br>
+iCalcreator v2.41.81<br>
 Copyright &copy; 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved.<br>
 <a href="#Copyright_and_Licence">Copyright_and_Licence</a><br>
 <a href="https://kigkonsult.se" title="kigkonsult.se" target="_blank">kigkonsult.se</a><br>
@@ -370,12 +370,12 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 <dt>Or
 <dd> include the (download) iCalcreator folder to your include-path
 <dd>Add
-<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.80/autoload.php&quot;;</span>
+<dd><span class="format">require_once &quot;[path/]iCalcreator-2.41.81/autoload.php&quot;;</span>
 <dd>to your <em>PHP</em>-script.
 </dl>
 <p>Builds :</p>
 <dl>
-    <dt>v2.41.80</dt>
+    <dt>v2.41.81</dt>
     <dd>v2.42 pre-release</dd>
     <dt>v2.40</dt>
     <dd>stable PHP8</dd>
@@ -384,7 +384,7 @@ For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
 </dl>
 
 <p>
-iCalcreator 2.41.80 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
+iCalcreator 2.41.81 is using namespace &quot;Kigkonsult\Icalcreator&quot;.
 </p>
 
 <br>
@@ -551,6 +551,10 @@ Here are update headlines in this version.
     <li>
         Github#109, DateIntervalFactory<br>
         Github#112, non-mailto Organizer, Util/ORGANIZERtrait<br>
+    </li>
+
+    <li>
+        Github#113, URL/TZURL/SOURCE rtrim<br>
     </li>
 
 </ul>
@@ -3674,7 +3678,7 @@ $vcalendar   = new Vcalendar( [ Vcalendar::UNIQUE_ID =&gt; &quot;kigkonsult.se&q
 
 $str       = [
     &quot;BEGIN:VCALENDAR&quot;,
-    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.80//&quot;,
+    &quot;PRODID:-//kigkonsult.se//NONSGML kigkonsult.se iCalcreator 2.41.81//&quot;,
     &quot;VERSION:2.0&quot;,
     &quot;BEGIN:VEVENT&quot;,
     &quot;DTSTART:20101224T190000Z&quot;,
@@ -11634,7 +11638,7 @@ Return vCard(s) string.
 <tr><td>Copyright<td>(c) 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
 <tr><td>Link     <td>https://kigkonsult.se
 <tr><td>Package  <td>iCalcreator
-<tr><td>Version  <td>2.41.80
+<tr><td>Version  <td>2.41.81
 <tr><td class="top">License
     <td>
     Subject matter of licence is the software iCalcreator.<br>

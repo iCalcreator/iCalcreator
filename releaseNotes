@@ -293,3 +293,5 @@ v3.39   3.4 release candidate
 2.41.78   DateInterval bug, github #109
 2.41.79   github #112, Sequence (int) trim, Util
 2.41.80   github #112, non-mailto Organizer, ORGANIZERtrait
+
+2.41.81   github #113, trait URL/TZURL/SOURCE rtrim

@@ -44,7 +44,7 @@ use function substr;
 /**
  * URL property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.81 2023-08-14
  */
 trait URLtrait
 {
@@ -120,16 +120,17 @@ trait URLtrait
      * @param null|array $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.81 2023-08-14
      */
     public function setUrl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $value->value = rtrim((string) $value->value );
         if( empty( $value->value )) {
             $this->assertEmptyValue( $value->value, self::URL );
-            $this->url = Pc::factory( self::$SP0 );
+            $this->url = $value->setEmpty();
         }
         elseif( 0 === stripos( $value->value, self::GEO )) {
             $value->value = strtolower( self::GEO ) . substr( $value->value, 3 );

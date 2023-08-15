@@ -196,7 +196,7 @@ class Prop1TextSingleTest extends DtBase
             ':' . $value
         ];
 
-        // SOURCE
+        // SOURCE  - more in urlMessageTest6
         $value  = 'http://example.com/pub/calendars/jsmith/mytime.ics';
         $params = []  + self::$STCPAR;
         $dataArr[] = [
@@ -213,6 +213,24 @@ class Prop1TextSingleTest extends DtBase
             IcalInterface::SOURCE . Property::formatParams( $params ) . ':' . $value
         ];
 
+        $value1 = 'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980
+   ';
+        $value2 = 'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980';
+        $params = []  + self::$STCPAR;
+        $dataArr[] = [
+            1053,
+            [
+                IcalInterface::SOURCE => [ IcalInterface::VEVENT, IcalInterface::VTODO, IcalInterface::VJOURNAL, IcalInterface::VFREEBUSY ]
+            ],
+            $value1,
+            $params,
+            Pc::factory(
+                $value2,
+                $params
+            ),
+            IcalInterface::SOURCE . Property::formatParams( $params ) . ':' . $value2
+        ];
+
         // URL - more in urlMessageTest6
         $value1  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
         $value2  = 'https://www.masked.de/account/subscription/delivery/8878/%3Fweek=2021-W03';
@@ -220,6 +238,31 @@ class Prop1TextSingleTest extends DtBase
         $params2 = self::$STCPAR;
         $dataArr[] = [
             1062,
+            [
+                IcalInterface::URL => [
+                    IcalInterface::VEVENT,
+                    IcalInterface::VTODO,
+                    IcalInterface::VJOURNAL,
+                    IcalInterface::VFREEBUSY,
+                    IcalInterface::VAVAILABILITY
+                ]
+            ],
+            $value1,
+            $params1,
+            Pc::factory(
+                $value2,
+                $params2
+            ),
+            IcalInterface::URL . Property::formatParams( $params2 ) . ':' . $value2
+        ];
+
+        $value1  = 'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980
+   ';
+        $value2  = 'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980';
+        $params1 = [  IcalInterface::VALUE => IcalInterface::URI ]  + self::$STCPAR;
+        $params2 = self::$STCPAR;
+        $dataArr[] = [
+            1063,
             [
                 IcalInterface::URL => [
                     IcalInterface::VEVENT,
@@ -596,7 +639,7 @@ class Prop1TextSingleTest extends DtBase
                 }
                 if( IcalInterface::GEO !== $propName ) {
                     if( $pcInput ) {
-                        $comp->{$setMethod}( Pc::factory( $value, $params ) );
+                        $comp->{$setMethod}( Pc::factory( $value, $params ));
                     }
                     else {
                         $comp->{$setMethod}( $value, $params );
@@ -728,9 +771,10 @@ class Prop1TextSingleTest extends DtBase
     }
 
     /**
-     * Testing parse and set url 'decode' (SOURCE, TZURL ) + URL VALUE= URI:message...
+     * Testing parse and set url 'decode' (SOURCE, TZURL ) + URL VALUE= URI:message... AND trailing eol (+space etc)
      *
      * @test
+     * @since 2.41.81 2023-08-14
      */
     public function urlMessageTest6() : void
     {
@@ -740,6 +784,8 @@ class Prop1TextSingleTest extends DtBase
             '%3C2222@eu-west-2.amazonses.com%3E'   => '2222@eu-west-2.amazonses.com',
             '%3C3333%40eu-west-3.amazonses.com%3E' => '3333@eu-west-3.amazonses.com',
             '<4444@eu-west-4.amazonses.com>'       => '4444@eu-west-4.amazonses.com',
+            'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980
+'                                                  => 'https://www.poirier-au-loup.fr/Cafe-tricot?id_evenement=980'
         ];
 
         $PROPstart = 'SOURCE:';

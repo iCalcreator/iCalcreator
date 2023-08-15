@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\ParameterFactory;
 /**
  * TZURL property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.81 2023-08-14
  */
 trait TZURLtrait
 {
@@ -109,13 +109,14 @@ trait TZURLtrait
      * @param null|string|Pc   $value
      * @param null|array $params
      * @return static
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.81 2023-08-14
      */
     public function setTzurl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
         $value = ( $value instanceof Pc )
             ? clone $value
             : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $value->value = rtrim((string) $value->value );
         if( empty( $value->value )) {
             $this->assertEmptyValue( $value->value, self::TZURL );
             $this->tzurl = $value->setEmpty();
