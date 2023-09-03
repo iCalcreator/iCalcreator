@@ -43,7 +43,7 @@ use function trim;
  * iCalcreator DateInterval utility/support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since 2.40.11 2022-01-15
+ * @since  2.41.82 - 2023-09-01
  */
 class DateIntervalFactory
 {
@@ -279,20 +279,15 @@ class DateIntervalFactory
      * @param DateInterval $dateInterval
      * @return DateInterval
      * @throws Exception  on DateInterval create error
-     * @since  2.41.78 - 2023-06-27
+     * @since  2.41.82 - 2023-09-01
      */
     public static function conformDateInterval( DateInterval $dateInterval ) : DateInterval
     {
         $ZERO   = '@0';
-        $DAYS   = 'days';
         $base   = new DateTime( $ZERO );
         $target = new DateTime( $ZERO );
         $target->add( $dateInterval );
-        $output = $base->diff( $target );
-        if( property_exists( $output, $DAYS )) {
-            $output->days = false;
-        }
-        return $output;
+        return $base->diff( $target );
     }
 
     /**

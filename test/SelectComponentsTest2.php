@@ -31,13 +31,14 @@ namespace Kigkonsult\Icalcreator;
 
 use DateTime;
 use DateTimeZone;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 class SelectComponentsTest2 extends TestCase
 {
     /**
      * @return mixed[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function SelectComponentsTest21Provider() : array
     {

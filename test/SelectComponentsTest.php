@@ -39,19 +39,29 @@ use PHPUnit\Framework\TestCase;
  *
  * Testing exceptions in DateIntervalFactory
  *
- * @since  2.27.18 - 2019-04-09
+ * @since  2.41.83 - 2023-09-03
  */
 class SelectComponentsTest extends TestCase
 {
+    private static string $TIMEZONE1 = 'Europe/Stockholm';
+    private static string $TIMEZONE2 = 'US/Pacific';
+    private static string $TIMEZONE3 = 'Asia/Vladivostok';
+
+
     /**
      * Vevent calendar sub-provider
      *
      * demoUsage.md calendar
      *
+     * @param string null|string $timezone
      * @throws Exception
+     * @since  2.41.83 - 2023-09-03
      */
-    public static function veventCalendarSubProvider() : Vcalendar
+    public static function veventCalendarSubProvider( ? string $timezone  = null ) : Vcalendar
     {
+        if( null === $timezone ) {
+            $timezone = self::$TIMEZONE1;
+        }
         // create a new calendar
         $vcalendar = Vcalendar::factory( [ IcalInterface::UNIQUE_ID => "kigkonsult.se", ] )
             // with calendaring info
@@ -75,8 +85,8 @@ class SelectComponentsTest extends TestCase
 
         // create a new event with dtstart, dtend and summary
         $event1 = $vcalendar->newVevent(
-            new DateTime( '20190421T090000', new DateTimeZone( 'Europe/Stockholm' )),
-            new DateTime( '20190421T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190421T090000', new DateTimeZone( $timezone )),
+            new DateTime( '20190421T100000', new DateTimeZone( $timezone )),
             null.
             'Scheduled meeting with six occurrences'
         )
@@ -102,11 +112,11 @@ class SelectComponentsTest extends TestCase
                 [
                     new DateTime(
                         '20190609T090000',
-                        new DateTimeZone( 'Europe/Stockholm' )
+                        new DateTimeZone( $timezone )
                     ),
                     new DateTime(
                         '20190609T110000',
-                        new DateTimeZone( 'Europe/Stockholm' )
+                        new DateTimeZone( $timezone )
                     ),
                 ],
                 [ IcalInterface::VALUE => IcalInterface::PERIOD ]
@@ -115,7 +125,7 @@ class SelectComponentsTest extends TestCase
             ->setExdate(
                 new DateTime(
                     '2019-05-12 09:00:00',
-                    new DateTimeZone( 'Europe/Stockholm' )
+                    new DateTimeZone( $timezone )
                 )
             )
             // organizer, chair  and some participants
@@ -177,7 +187,7 @@ class SelectComponentsTest extends TestCase
         // alter day and time for one event in recurrence set
         // the altered day and time with duration
         $event2 = $vcalendar->newVevent(
-            new DateTime( '20190504T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190504T100000', new DateTimeZone( $timezone )),
             null,
             'PT2H'
         )
@@ -187,7 +197,7 @@ class SelectComponentsTest extends TestCase
             ->setUid( $event1->getUid() )
             ->setSequence( 2 )
             // pointer to event in the recurrence set
-            ->setRecurrenceid( '20190505T090000 Europe/Stockholm' )
+            ->setRecurrenceid( '20190505T090000 ' . $timezone )
             // reason text
             ->setDescription(
                 'Altered day and time for event 2019-05-05',
@@ -205,12 +215,18 @@ class SelectComponentsTest extends TestCase
 
     /**
      * Vtodo calendar sub-provider
+     *
+     * @param string null|string $timezone
      * @throws Exception
+     * @since  2.41.83 - 2023-09-03
      */
-    public static function vtodoCalendarSubProvider() : Vcalendar
+    public static function vtodoCalendarSubProvider( ? string $timezone = null ) : Vcalendar
     {
+        if( null === $timezone ) {
+            $timezone = self::$TIMEZONE1;
+        }
         // create a new calendar
-        $vcalendar = Vcalendar::factory( [ IcalInterface::UNIQUE_ID => "kigkonsult.se", ] )
+        $vcalendar = Vcalendar::factory( [ IcalInterface::UNIQUE_ID => $timezone, ] )
             // with calendaring info
             ->setMethod( IcalInterface::PUBLISH )
             ->setXprop(
@@ -232,8 +248,8 @@ class SelectComponentsTest extends TestCase
 
         // create a new todo
         $todo1 = $vcalendar->newVtodo(
-            new DateTime( '20190421T090000', new DateTimeZone( 'Europe/Stockholm' )),
-            new DateTime( '20190421T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190421T090000', new DateTimeZone( $timezone )),
+            new DateTime( '20190421T100000', new DateTimeZone( $timezone )),
             null,
             'Scheduled meeting with six occurrences'
         )
@@ -259,11 +275,11 @@ class SelectComponentsTest extends TestCase
                 [
                     new DateTime(
                         '20190609T090000',
-                        new DateTimeZone( 'Europe/Stockholm' )
+                        new DateTimeZone( $timezone )
                     ),
                     new DateTime(
                         '20190609T110000',
-                        new DateTimeZone( 'Europe/Stockholm' )
+                        new DateTimeZone( $timezone )
                     ),
                 ],
                 [ IcalInterface::VALUE => IcalInterface::PERIOD ]
@@ -272,7 +288,7 @@ class SelectComponentsTest extends TestCase
             ->setExdate(
                 new DateTime(
                     '2019-05-12 09:00:00',
-                    new DateTimeZone( 'Europe/Stockholm' )
+                    new DateTimeZone( $timezone )
                 )
             )
             // organizer, chair  and some participants
@@ -328,7 +344,7 @@ class SelectComponentsTest extends TestCase
         // alter day and time for one todo in recurrence set
         // the altered day and time with duration
         $event2 = $vcalendar->newVtodo(
-            new DateTime( '20190504T100000', new DateTimeZone( 'Europe/Stockholm' )),
+            new DateTime( '20190504T100000', new DateTimeZone( $timezone )),
             null,
             'PT2H'
         )
@@ -337,7 +353,7 @@ class SelectComponentsTest extends TestCase
             ->setUid( $todo1->getUid() )
             ->setSequence( 2 )
             // pointer to event in the recurrence set
-            ->setRecurrenceid( '20190505T090000 Europe/Stockholm' )
+            ->setRecurrenceid( '20190505T090000 ' . $timezone )
             // reason text
             ->setDescription(
                 'Altered day and time for event 2019-05-05',
@@ -358,49 +374,61 @@ class SelectComponentsTest extends TestCase
      *
      * @return mixed[]
      * @throws Exception
+     * @since  2.41.83 - 2023-09-03
      */
     public function SelectCompTestProvider() : array
     {
-        $veventCalendar = self::veventCalendarSubProvider();
-        $todoCalendar   = self::vtodoCalendarSubProvider();
-
         $dataArr = [];
 
-        $dataArr[] = [
-            11,
-            clone $veventCalendar,
-            null
-        ];
+        $prefix = 0;
+        foreach( [ self::$TIMEZONE1, self::$TIMEZONE2, self::$TIMEZONE3 ] as $timezone ) {
+            $prefix += 100;
 
-        $dataArr[] = [
-            12,
-            clone $veventCalendar,
-            strtolower( IcalInterface::VEVENT )
-        ];
+            $veventCalendar = self::veventCalendarSubProvider( $timezone );
+            $todoCalendar = self::vtodoCalendarSubProvider( $timezone );
 
-        $dataArr[] = [
-            13,
-            clone $veventCalendar,
-            [ strtolower( IcalInterface::VEVENT ), strtolower( IcalInterface::VTODO ) ]
-        ];
+            $dataArr[] = [
+                $prefix + 11,
+                clone $veventCalendar,
+                $timezone,
+                null
+            ];
 
-        $dataArr[] = [
-            21,
-            clone $todoCalendar,
-            null
-        ];
+            $dataArr[] = [
+                $prefix + 12,
+                clone $veventCalendar,
+                $timezone,
+                strtolower( IcalInterface::VEVENT )
+            ];
 
-        $dataArr[] = [
-            22,
-            clone $todoCalendar,
-            strtolower( IcalInterface::VTODO )
-        ];
+            $dataArr[] = [
+                $prefix + 13,
+                clone $veventCalendar,
+                $timezone,
+                [ strtolower( IcalInterface::VEVENT ), strtolower( IcalInterface::VTODO ) ]
+            ];
 
-        $dataArr[] = [
-            23,
-            clone $todoCalendar,
-            [ strtolower( IcalInterface::VEVENT ), strtolower( IcalInterface::VTODO ) ]
-        ];
+            $dataArr[] = [
+                $prefix + 21,
+                clone $todoCalendar,
+                $timezone,
+                null
+            ];
+
+            $dataArr[] = [
+                $prefix + 22,
+                clone $todoCalendar,
+                $timezone,
+                strtolower( IcalInterface::VTODO )
+            ];
+
+            $dataArr[] = [
+                $prefix + 23,
+                clone $todoCalendar,
+                $timezone,
+                [ strtolower( IcalInterface::VEVENT ), strtolower( IcalInterface::VTODO ) ]
+            ];
+        }
 
         return $dataArr;
     }
@@ -410,18 +438,25 @@ class SelectComponentsTest extends TestCase
      *
      * @test
      * @dataProvider SelectCompTestProvider
-     * @param int $case
-     * @param Vcalendar    $vcalendar
+     * @param int       $case
+     * @param Vcalendar $vcalendar
+     * @param string    $timezone
      * @param mixed[]|string|null $compType
      * @throws Exception
+     * @since  2.41.83 - 2023-09-03
      */
-    public function SelectCompTest( int $case, Vcalendar $vcalendar, array | string $compType = null ) : void
+    public function SelectCompTest(
+        int $case,
+        Vcalendar $vcalendar,
+        string $timezone,
+        array | string $compType = null
+    ) : void
     {
         static $FMTerr = 'error in case#%d-%d, date %d-%d-%d';
 
         $selectComponents = $vcalendar->selectComponents(
-            new DateTime( '20190421T000000', new DateTimeZone( 'Europe/Stockholm' )),
-            new DateTime( '20190630T000000', new DateTimeZone( 'Europe/Stockholm' ))
+            new DateTime( '20190421T000000', new DateTimeZone( $timezone )),
+            new DateTime( '20190630T000000', new DateTimeZone( $timezone ))
             ,null, null, null, null,
             $compType
         );
@@ -441,7 +476,7 @@ class SelectComponentsTest extends TestCase
         );
 
         $this->assertEquals(
-            '2019-04-21 09:00:00 Europe/Stockholm',
+            '2019-04-21 09:00:00 ' . $timezone,
             $selectComponents[2019][4][21][0]->getXprop( IcalInterface::X_CURRENT_DTSTART )[1],
             sprintf( $FMTerr, $case, 11, 2019, 4, 21 )
         );
@@ -449,7 +484,7 @@ class SelectComponentsTest extends TestCase
             $value = $selectComponents[2019][4][21][0]->getXprop( IcalInterface::X_CURRENT_DUE );
         }
         $this->assertEquals(
-            '2019-04-21 10:00:00 Europe/Stockholm',
+            '2019-04-21 10:00:00 ' . $timezone,
             $value[1],
             sprintf( $FMTerr, $case, 12, 2019, 4, 21 )
         );
@@ -462,7 +497,7 @@ class SelectComponentsTest extends TestCase
             sprintf( $FMTerr, $case, 13, 2019, 4, 28 )
         );
         $this->assertEquals(
-            '2019-04-28 09:00:00 Europe/Stockholm',
+            '2019-04-28 09:00:00 ' . $timezone,
             $selectComponents[2019][4][28][0]->getXprop( IcalInterface::X_CURRENT_DTSTART )[1],
             sprintf( $FMTerr, $case, 14, 2019, 4, 28 )
         );
@@ -470,7 +505,7 @@ class SelectComponentsTest extends TestCase
             $value = $selectComponents[2019][4][28][0]->getXprop( IcalInterface::X_CURRENT_DUE );
         }
         $this->assertEquals(
-            '2019-04-28 10:00:00 Europe/Stockholm',
+            '2019-04-28 10:00:00 ' . $timezone,
             $value[1],
             sprintf( $FMTerr, $case, 15, 2019, 4, 28 )
         );
@@ -483,7 +518,7 @@ class SelectComponentsTest extends TestCase
             sprintf( $FMTerr, $case, 16, 2019, 5, 4 )
         );
         $this->assertEquals(
-            '2019-05-04 10:00:00 Europe/Stockholm',
+            '2019-05-04 10:00:00 ' . $timezone,
             $selectComponents[2019][5][4][0]->getXprop( IcalInterface::X_CURRENT_DTSTART )[1],
             sprintf( $FMTerr, $case, 17, 2019, 5, 4 )
         );
@@ -491,7 +526,7 @@ class SelectComponentsTest extends TestCase
             $value = $selectComponents[2019][5][4][0]->getXprop( IcalInterface::X_CURRENT_DUE );
         }
         $this->assertEquals(
-            '2019-05-04 12:00:00 Europe/Stockholm',
+            '2019-05-04 12:00:00 ' . $timezone,
             $value[1],
             sprintf( $FMTerr, $case, 18, 2019, 5, 4 )
         );
@@ -504,7 +539,7 @@ class SelectComponentsTest extends TestCase
             sprintf( $FMTerr, $case, 19, 2019, 5, 19 )
         );
         $this->assertEquals(
-            '2019-05-19 09:00:00 Europe/Stockholm',
+            '2019-05-19 09:00:00 ' . $timezone,
             $selectComponents[2019][5][19][0]->getXprop( IcalInterface::X_CURRENT_DTSTART )[1],
             sprintf( $FMTerr, $case, 20, 2019, 5, 19 )
         );
@@ -512,7 +547,7 @@ class SelectComponentsTest extends TestCase
             $value = $selectComponents[2019][5][19][0]->getXprop( IcalInterface::X_CURRENT_DUE );
         }
         $this->assertEquals(
-            '2019-05-19 10:00:00 Europe/Stockholm',
+            '2019-05-19 10:00:00 ' . $timezone,
             $value[1],
             sprintf( $FMTerr, $case, 21, 2019, 5, 19 )
         );
@@ -525,7 +560,7 @@ class SelectComponentsTest extends TestCase
             sprintf( $FMTerr, $case, 22, 2019, 6, 9 )
         );
         $this->assertEquals(
-            '2019-06-09 09:00:00 Europe/Stockholm',
+            '2019-06-09 09:00:00 ' . $timezone,
             $selectComponents[2019][6][9][0]->getXprop( IcalInterface::X_CURRENT_DTSTART )[1],
             sprintf( $FMTerr, $case, 23, 2019, 6, 9 )
         );
@@ -533,7 +568,7 @@ class SelectComponentsTest extends TestCase
             $value = $selectComponents[2019][6][9][0]->getXprop( IcalInterface::X_CURRENT_DUE );
         }
         $this->assertEquals(
-            '2019-06-09 11:00:00 Europe/Stockholm',
+            '2019-06-09 11:00:00 ' . $timezone,
             $value[1],
             sprintf( $FMTerr, $case, 24, 2019, 6, 9 )
         );

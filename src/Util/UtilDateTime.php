@@ -46,7 +46,7 @@ use function substr;
 /**
  * iCalcreator DateTime support class
  *
- * @since  2.40.0 - 2021-12-02
+ * @since  2.41.83 - 2023-09-02
  */
 class UtilDateTime extends DateTime
 {
@@ -186,7 +186,7 @@ class UtilDateTime extends DateTime
      * @return self
      * @throws Exception
      * @throws RuntimeException
-     * @since  2.41.76 - 2023-04-29
+     * @since  2.41.83 - 2023-09-02
      */
     public static function factory(
         DateTimeInterface $date,
@@ -198,13 +198,15 @@ class UtilDateTime extends DateTime
         static $MSG1   = '#%d Can\'t create DateTimeZone from \'%s\'';
         static $MSG2   = '#%d Can\'t create (to-)DateTime : \'%s\'';
         static $MSG4   = '#%s Can\'t set DateTimeZone \'%s\'';
-
-        $YmdHise = $date->format( DateTimeFactory::$YMDHISe );
+        static $E      = 'e';
         try {
-            $iCaldateTime = new UtilDateTime( $YmdHise );
+            $iCaldateTime = new UtilDateTime(
+                $date->format( DateTimeFactory::$YmdHis ),
+                DateTimeZoneFactory::factory( $date->format( $E ))
+            );
         }
         catch( Exception $e ) {
-            throw new RuntimeException( sprintf( $MSG2, 3, $YmdHise ), $e->getCode(), $e ); // -- #1
+            throw new RuntimeException( sprintf( $MSG2, 3, DateTimeFactory::$YMDHISe ), $e->getCode(), $e );
         }
         if( IcalInterface::Z === $dtstartTz ) {
             $dtstartTz = IcalInterface::UTC;
@@ -228,7 +230,8 @@ class UtilDateTime extends DateTime
                 );
             }
         } // end if
-        if( isset( $params[IcalInterface::VALUE] ) && ( IcalInterface::DATE === $params[IcalInterface::VALUE] )) {
+        if( isset( $params[IcalInterface::VALUE] ) &&
+            ( IcalInterface::DATE === $params[IcalInterface::VALUE] )) {
             $iCaldateTime->dateFormat = $Y_M_D;
             $iCaldateTime->key        = $iCaldateTime->format( DateTimeFactory::$Ymd );
         }

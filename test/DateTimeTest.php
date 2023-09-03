@@ -39,7 +39,7 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 /**
  * class DateTimeTest, testing DTSTART, DTEND, DUE, RECURRENCE_ID, (single) EXDATE + RDATE
  *
- * @since  2.29.16 - 2020-01-24
+ * @since  2.41.83 - 2023-09-02
  */
 class DateTimeTest extends DtBase
 {
@@ -273,6 +273,24 @@ class DateTimeTest extends DtBase
             ),
             $this->getDateTimeAsCreateLongString( $dateTime, $tz )
         ];
+
+        // 2.41.83, github 114,   DTSTART;TZID=US/Pacific:20170408T120000
+        $dateTime = new DateTimeImmutable(
+            '20170408T120000',
+            DateTimeZoneFactory::factory( 'US/Pacific' )
+        );
+        $tz = $dateTime->getTimezone()->getName();
+        $dataArr[] = [
+            24183,
+            $dateTime,
+            [ IcalInterface::TZID => $tz ],
+            Pc::factory(
+                clone $dateTime,
+                [ IcalInterface::TZID => $tz ]
+            ),
+            $this->getDateTimeAsCreateLongString( $dateTime, $tz )
+        ];
+
 
         return $dataArr;
     }
