@@ -46,7 +46,7 @@ class Exception4Test extends TestCase
      *
      * @return mixed[]
      */
-    public function DateIntervalFactoryTestProvider() : array
+    public static function DateIntervalFactoryTestProvider() : array
     {
         $dataArr = [];
 

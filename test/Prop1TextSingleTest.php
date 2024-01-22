@@ -65,7 +65,7 @@ class Prop1TextSingleTest extends DtBase
      *
      * @return mixed[]
      */
-    public function textSingleTest1Provider() : array
+    public static function textSingleTest1Provider() : array
     {
         $dataArr = [];
 
@@ -476,9 +476,9 @@ class Prop1TextSingleTest extends DtBase
             $getValue,
             IcalInterface::GEO . Property::formatParams( $params ) .
             ':' .
-            GeoFactory::geo2str2( $getValue->value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
-            Util::$SEMIC .
-            GeoFactory::geo2str2( $getValue->value[IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
+            GeoFactory::geo2str2( $value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt ) .
+            StringFactory::$SEMIC .
+            GeoFactory::geo2str2( $value[IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
 
         ];
 
@@ -637,7 +637,7 @@ class Prop1TextSingleTest extends DtBase
                 if( IcalInterface::GEO === $propName ) {
                     $comp->{$setMethod}( $value[IcalInterface::LATITUDE], $value[IcalInterface::LONGITUDE], $params );
                 }
-                if( IcalInterface::GEO !== $propName ) {
+                else {
                     if( $pcInput ) {
                         $comp->{$setMethod}( Pc::factory( $value, $params ));
                     }
@@ -648,7 +648,8 @@ class Prop1TextSingleTest extends DtBase
                 }
                 $this->assertTrue(
                     $comp->{$isMethod}(),
-                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $isMethod )
+                    self::getErrMsg(  null, $case . '-2', __FUNCTION__, $theComp, $isMethod ) .
+                        PHP_EOL . ' value: ' . $value
                 );
                 if( IcalInterface::LOCATION_TYPE === $propName ) {  // passive by-pass test
                     $vevent->newParticipant()->{$newMethod}()->{$setMethod}( $value, $params );

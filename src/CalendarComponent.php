@@ -33,7 +33,6 @@ use Exception;
 use Kigkonsult\Icalcreator\Traits\MvalTrait;
 use Kigkonsult\Icalcreator\Parser\ComponentParser;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 
 use function is_array;
 use function ksort;
@@ -106,7 +105,7 @@ abstract class CalendarComponent extends IcalBase
             }
             if( is_array( $content )) {
                 foreach( $content as $part ) {
-                    if( str_contains( $part, Util::$COMMA )) {
+                    if( str_contains( $part, StringFactory::$COMMA )) {
                         StringFactory::commaSplitCount( $part, $output );
                     } // end if
                     else {
@@ -114,7 +113,7 @@ abstract class CalendarComponent extends IcalBase
                     } // end else
                 } // end foreach
             } // end if( is_array( $content ))
-            elseif( str_contains( $content, Util::$COMMA )) {
+            elseif( str_contains( $content, StringFactory::$COMMA )) {
                 StringFactory::commaSplitCount( $content, $output );
             }
             else {

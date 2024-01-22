@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,9 +33,9 @@ use Exception;
 use Kigkonsult\Icalcreator\CalendarComponent;
 use Kigkonsult\Icalcreator\IcalInterface;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
-use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\StringFactory as SF;
 use Kigkonsult\Icalcreator\Vcalendar;
+
 use function bin2hex;
 use function count;
 use function ctype_digit;
@@ -54,7 +54,7 @@ use function substr;
 use function substr_count;
 
 /**
- * @since 2.41.70 2022-10-21
+ * @since 2.41.88 2024-01-17
  */
 abstract class ParserBase implements IcalInterface
 {
@@ -158,7 +158,7 @@ abstract class ParserBase implements IcalInterface
             return self::processSingleParam( $line );
         }
         if( self::mayHaveUriParam( $propName )) {
-            StringFactory::checkFixUrlDecode( $line );
+            SF::checkFixUrlDecode( $line );
             $line = self::checkFixUriMessage( $line );
         }
         /* more than one param here (or a tricky one...) */
@@ -188,7 +188,7 @@ abstract class ParserBase implements IcalInterface
      *
      * @param string $line
      * @return string
-     * @since 2.41.68 2022-10-22
+     * @since 2.41.88 2024-01-17
      */
     protected static function checkFixUriMessage( string $line ) : string
     {
@@ -196,17 +196,16 @@ abstract class ParserBase implements IcalInterface
         static $SQVEQUm   = ';VALUE=URI:message';
         static $SQVEQUmq  = ';VALUE=\'URI:message\'';
         static $SQVEQUmqq = ';VALUE="URI:message"';
-        switch( true ) {
-            case ( false === stripos( $line, $Um )) :
-                return $line;
-            case ( false !== stripos( $line, $SQVEQUm )) :  // no quote
-                return str_ireplace( $SQVEQUm, Util::$SP0, $line );
-            case ( false !== stripos( $line, $SQVEQUmq )) :  // single quote
-                return str_ireplace( $SQVEQUmq, Util::$SP0, $line );
-            case ( false !== stripos( $line, $SQVEQUmqq )) : // double quote
-                return str_ireplace( $SQVEQUmqq, Util::$SP0, $line );
-        } // end switch
-        return $line;
+        return match( true ) {
+            ( false === stripos( $line, $Um )) => $line,
+            ( false !== stripos( $line, $SQVEQUm )) =>  // no quote
+                str_ireplace( $SQVEQUm, SF::$SP0, $line ),
+            ( false !== stripos( $line, $SQVEQUmq )) =>  // single quote
+                str_ireplace( $SQVEQUmq, SF::$SP0, $line ),
+            ( false !== stripos( $line, $SQVEQUmqq )) => // double quote
+                str_ireplace( $SQVEQUmqq, SF::$SP0, $line ),
+            default => $line
+        }; // end match
     }
 
     /**
@@ -239,8 +238,8 @@ abstract class ParserBase implements IcalInterface
                 continue;
             }
             $line1  = stristr( $line, $search, true );
-            $temp   = StringFactory::after( $search, $line );
-            [ $attrValue, $rightPart ] = StringFactory::splitByFirstSQorColon( $temp );
+            $temp   = SF::after( $search, $line );
+            [ $attrValue, $rightPart ] = SF::splitByFirstSQorColon( $temp );
             $attr[] = $needle . $attrValue;
             $line   = $line1 . $rightPart;
         } // end foreach
@@ -308,7 +307,7 @@ abstract class ParserBase implements IcalInterface
                 $hasDigit = true;
                 continue;
             }
-            if( $hasDigit && ( Util::$SLASH === $str1 )) {
+            if( $hasDigit && ( SF::$SLASH === $str1 )) {
                 return true;
             }
             break;
@@ -327,11 +326,11 @@ abstract class ParserBase implements IcalInterface
      */
     protected static function checkSingleParam( string $line ) : bool
     {
-        if( Util::$SEMIC !== $line[0] ) {
+        if( SF::$SEMIC !== $line[0] ) {
             return false;
         }
-        return (( 1 === substr_count( $line, Util::$SEMIC )) &&
-            ( 1 === substr_count( $line, Util::$COLON )));
+        return (( 1 === substr_count( $line, SF::$SEMIC )) &&
+            ( 1 === substr_count( $line, SF::$COLON )));
     }
 
     /**
@@ -342,12 +341,12 @@ abstract class ParserBase implements IcalInterface
      */
     protected static function processSingleParam( string $line ) : array
     {
-        $param = StringFactory::between( Util::$SEMIC, Util::$COLON, $line );
+        $param = SF::between( SF::$SEMIC, SF::$COLON, $line );
         return [
-            StringFactory::after( self::$COLON, $line ),
+            SF::after( self::$COLON, $line ),
             [
                 strstr( $param, self::$EQ, true ) =>
-                    trim( StringFactory::after( self::$EQ, $param ), self::$QQ )
+                    trim( SF::after( self::$EQ, $param ), self::$QQ )
             ]
         ];
     }
@@ -458,13 +457,13 @@ abstract class ParserBase implements IcalInterface
         $output = [];
         $cnt    = count( $rows );
         for( $i = 0; $i < $cnt; $i++ ) {
-            $line = rtrim( $rows[$i], Util::$CRLF );
+            $line = rtrim( $rows[$i], SF::$CRLF );
             $i1 = $i + 1;
             while( ( $i < $cnt ) &&
                 ! empty( $rows[$i1] ) &&
                 in_array( $rows[$i1][0], $CHARs )) {
                 ++$i;
-                $line .= rtrim( substr( $rows[$i], 1 ), Util::$CRLF );
+                $line .= rtrim( substr( $rows[$i], 1 ), SF::$CRLF );
                 $i1 = $i + 1;
             } // end while
             $output[] = $line;
@@ -494,18 +493,18 @@ abstract class ParserBase implements IcalInterface
         static $CRLFexts   = [ "\r\n ", "\r\n\t" ];
         /* fix dummy line separator etc */
         if( empty( $BASEDELIM )) {
-            $BASEDELIM  = bin2hex( StringFactory::getRandChars( 16 ));
+            $BASEDELIM  = bin2hex( SF::getRandChars( 16 ));
             $BASEDELIMs = $BASEDELIM . $BASEDELIM;
-            $EMPTYROW   = sprintf( $FMT, $BASEDELIM, Util::$SP0 );
+            $EMPTYROW   = sprintf( $FMT, $BASEDELIM, SF::$SP0 );
         }
         /* fix eol chars */
         $text = str_replace( $CRLFs, $BASEDELIM, $text );
         /* fix empty lines */
         $text = str_replace( $BASEDELIMs, $EMPTYROW, $text );
         /* fix line folding */
-        $text = str_replace( $BASEDELIM, Util::$CRLF, $text );
-        $text = str_replace( $CRLFexts, Util::$SP0, $text );
+        $text = str_replace( $BASEDELIM, SF::$CRLF, $text );
+        $text = str_replace( $CRLFexts, SF::$SP0, $text );
         /* split in component/property lines */
-        return explode( Util::$CRLF, $text );
+        return explode( SF::$CRLF, $text );
     }
 }

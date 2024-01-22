@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -41,7 +41,7 @@ use Kigkonsult\Icalcreator\Util\Util;
  *
  * DESCRIPTION may occur multiply times i Vcalendar and Vjournal, once otherwise
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait DESCRIPTIONtrait
 {
@@ -168,7 +168,7 @@ trait DESCRIPTIONtrait
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-11
+     * @since 2.41.85 2024-01-18
      */
     public function setDescription(
         null|string|Pc $value = null,
@@ -176,19 +176,20 @@ trait DESCRIPTIONtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::DESCRIPTION );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::DESCRIPTION );
+            $pc->setEmpty();
         }
         else{
-            $value->value = Util::assertString( $value->value, self::DESCRIPTION );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pcValue = Util::assertString( $pcValue, self::DESCRIPTION );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
         if( self::isDescriptionSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        self::setMval( $this->description, $value, $index );
+        self::setMval( $this->description, $pc, $index );
         return $this;
     }
 }

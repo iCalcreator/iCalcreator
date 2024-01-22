@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,12 +36,11 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * DUE property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait DUEtrait
 {
@@ -88,60 +87,64 @@ trait DUEtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|DateTime|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getDue( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->due )) {
             return false;
         }
-        return $inclParam ? clone $this->due : $this->due->value;
+        return $inclParam ? clone $this->due : $this->due->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isDueSet() : bool
     {
-        return ! empty( $this->due->value );
+        return self::isPropSet( $this->due );
     }
 
     /**
      * Set calendar component property due
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.63 2022-09-03
+     * @since 2.41.85 2024-01-18
      */
     public function setDue( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::DUE );
-            $this->due = $value->setEmpty();
+        $pc = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::DUE );
+            $this->due = $pc->setEmpty();
             return $this;
         }
-        $dtstart = $this->getDtstart( true );
-        if( $this->isDtstartSet()) {
+        $dtstart      = $this->getDtstart( true );
+        $isDtstartSet = $this->isDtstartSet();
+        if( $isDtstartSet ) {
             if( $dtstart->hasParamValue()) {
-                $value->addParamValue( $dtstart->getValueParam());
+                $pc->addParamValue( $dtstart->getValueParam());
             }
-            if( $dtstart->hasParamKey( self::ISLOCALTIME )) {
-                $value->addParam( self::ISLOCALTIME, true );
+            if( $dtstart->hasParamIsLocalTime()) {
+                $pc->addParam( self::ISLOCALTIME, true );
             }
         }
-        $value->addParamValue( self::DATE_TIME, false );
-        $this->due = DateTimeFactory::setDate( $value );
-        if( $this->isDtstartSet()) {
-            DateTimeFactory::assertDatesAreInSequence( $dtstart->value, $this->due->value, self::DUE );
+        $pc->addParamValue( self::DATE_TIME, false );
+        $this->due = DateTimeFactory::setDate( $pc );
+        if( $isDtstartSet ) {
+            DateTimeFactory::assertDatesAreInSequence(
+                $dtstart->getValue(),
+                $this->due->getValue(),
+                self::DUE
+            );
         }
         return $this;
     }

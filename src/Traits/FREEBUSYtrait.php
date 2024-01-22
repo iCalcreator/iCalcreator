@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,6 @@ use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 use function count;
 use function in_array;
@@ -50,7 +49,7 @@ use function var_export;
 /**
  * FREEBUSY property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait FREEBUSYtrait
 {
@@ -162,12 +161,12 @@ trait FREEBUSYtrait
      *
      * @param null|string|Pc  $fbType
      * @param null|int|string|DateTimeInterface|array $fbValues
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @param null|int        $index
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      * @todo Applications MUST treat x-name and iana-token(?) values they don't recognize
      *       the same way as they would the BUSY value.
      */
@@ -179,7 +178,7 @@ trait FREEBUSYtrait
     ) : static
     {
         if( $fbType instanceof Pc ) {
-            $value    = clone $fbType;
+            $pc        = clone $fbType;
             if( is_int( $fbValues )) {
                 $index = $fbValues;
             }
@@ -190,23 +189,25 @@ trait FREEBUSYtrait
                 ! StringFactory::isXprefixed( $fbType )) {
                 $fbType = self::BUSY;
             }
-            $value  = Pc::factory( $fbValues, ParameterFactory::setParams( $params ))
+            $pc = Pc::factory( $fbValues, $params )
                 ->addParam( self::FBTYPE, $fbType );
         }
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::FREEBUSY );
-            self::setMval( $this->freebusy, $value->setEmpty(), $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::FREEBUSY );
+            self::setMval( $this->freebusy, $pc->setEmpty(), $index );
             return $this;
         }
-        $value->addParam( self::FBTYPE, self::BUSY, false ); // req
-        $input        = self::checkSingleValues( $value->value );
-        $value->value = [];
+        $pc->addParam( self::FBTYPE, self::BUSY, false ); // req
+        $input  = self::checkSingleValues( $pcValue );
+        $value2 = [];
         foreach( $input as $fbix1 => $fbPeriod ) {     // periods => period
             if( ! empty( $fbPeriod )) {
-                $value->value[] = self::marshallFreebusyPeriod( $fbix1, $fbPeriod );
+                $value2[] = self::marshallFreebusyPeriod( $fbix1, $fbPeriod );
             }
         }
-        self::setMval( $this->freebusy, $value, $index );
+        $pc->setValue( $value2 );
+        self::setMval( $this->freebusy, $pc, $index );
         return $this;
     }
 

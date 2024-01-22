@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,14 +31,14 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * PERCENT-COMPLETE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait PERCENT_COMPLETEtrait
 {
@@ -78,55 +78,53 @@ trait PERCENT_COMPLETEtrait
      *
      * @param null|bool   $inclParam
      * @return bool|int|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getPercentcomplete( ? bool $inclParam = false ) : bool | int | string | Pc
     {
         if( empty( $this->percentcomplete )) {
             return false;
         }
-        return $inclParam ? clone $this->percentcomplete : $this->percentcomplete->value;
+        return $inclParam ? clone $this->percentcomplete : $this->percentcomplete->getValue();
     }
 
     /**
      * Return bool true if set
      *
      * @return bool
-     * @since 2.41.43 2022-04-15
+     * @since 2.41.88 2024-01-19
      */
     public function isPercentcompleteSet() : bool
     {
-        return ( ! empty( $this->percentcomplete->value ) ||
-            (( null !== $this->percentcomplete ) && ( 0 === $this->percentcomplete->value )));
+        return self::isIntPropSet( $this->percentcomplete );
     }
 
     /**
      * Set calendar component property percent-complete
      *
-     * .. a positive integer between 0 and
-     * 100.  A value of "0" indicates the to-do has not yet been started.
+     * A positive integer between 0 and 100.
+     * A value of "0" indicates the to-do has not yet been started.
      * A value of "100" indicates that the to-do has been completed.
      *
      * @param null|int|string|Pc  $value  0 accepted
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setPercentcomplete( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if(( $value->value === null ) || ( Util::$SP0 === $value->value )) {
-            $this->assertEmptyValue( $value->value, self::PERCENT_COMPLETE );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue() ?: null;
+        if(( null === $pcValue ) || ( StringFactory::$SP0 === $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::PERCENT_COMPLETE );
+            $pc->setEmpty();
         }
         else {
-            Util::assertInteger( $value->value, self::PERCENT_COMPLETE, 0, 100 );
-            $value->value = (int) $value->value;
+            Util::assertInteger( $pcValue, self::PERCENT_COMPLETE, 0, 100 );
+            $pc->setValue((int) $pcValue );
         }
-        $this->percentcomplete = $value;
+        $this->percentcomplete = $pc;
         return $this;
     }
 }

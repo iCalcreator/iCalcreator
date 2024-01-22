@@ -38,7 +38,7 @@ For iCal json (JSCalendar, [rfc8984]) export and import, use [github.com/PhpJsCa
 
 ###### Builds
 
-v2.41.83 - v2.42 pre-release
+v2.41.x - v2.42 pre-release
 
 v2.40 - stable PHP8
 

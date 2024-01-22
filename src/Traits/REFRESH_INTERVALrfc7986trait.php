@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -35,13 +35,12 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\DurDates;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * REFRESH_INTERVAL property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait REFRESH_INTERVALrfc7986trait
 {
@@ -83,58 +82,59 @@ trait REFRESH_INTERVALrfc7986trait
      * @param null|bool   $inclParam
      * @return bool|string|DateInterval|Pc
      * @throws Exception
-     * @since 2.41.48 2022-04-29
+     * @since 2.41.85 2024-01-18
      */
     public function getRefreshinterval( ? bool $inclParam = false ) : DateInterval | bool | string | Pc
     {
         if( empty( $this->refreshinterval )) {
             return false;
         }
-        return $inclParam ? clone $this->refreshinterval : $this->refreshinterval->value;
+        return $inclParam ? clone $this->refreshinterval : $this->refreshinterval->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.48 2022-04-29
+     * @since 2.41.88 2024-01-19
      */
     public function isRefreshintervalSet() : bool
     {
-        return ! empty( $this->refreshinterval->value );
+        return self::isPropSet( $this->refreshinterval );
     }
 
     /**
      * Set calendar component property refresh_interval, VALUE DURATION required
      *
      * @param null|string|DateInterval|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.56 2022-08-14
+     * @since 2.41.85 2024-01-19
      */
     public function setRefreshinterval( null|string|DateInterval|Pc $value = null, ? array $params = [] ) : static
     {
         static $FMTERR = 'Invalid %s value';
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params, [ self::VALUE => self::DURATION ] ));
+        $pc      = Pc::factory( $value, $params );
+        if( ! $pc->hasParamValue( self::DURATION )) {
+            $pc->addParamValue( self::DURATION ); // req
+        }
+        $pcValue = $pc->getValue();
         switch( true ) {
-            case ( empty( $value->value )) :
-                $this->assertEmptyValue( $value->value, self::REFRESH_INTERVAL );
-                $this->refreshinterval = $value->setEmpty();
+            case ( empty( $pcValue )) :
+                $this->assertEmptyValue( $pcValue, self::REFRESH_INTERVAL );
+                $this->refreshinterval = $pc->setEmpty();
                 return $this;
-            case( $value->value instanceof DateInterval ) :
-                $value->value = DateIntervalFactory::conformDateInterval( $value->value );
+            case( $pcValue instanceof DateInterval ) :
+                $pc->setValue( DateIntervalFactory::conformDateInterval( $pcValue ));
                 break;
-            case DateIntervalFactory::isStringAndDuration( $value->value ) :
-                $value2 = StringFactory::trimTrailNL( $value->value );
+            case DateIntervalFactory::isStringAndDuration( $pcValue ) :
+                $value2 = StringFactory::trimTrailNL( $pcValue );
                 $value2 = DateIntervalFactory::removePlusMinusPrefix( $value2 ); // can only be positive
                 try {
                     $dateInterval = new DateInterval( $value2 );
-                    $value->value =
-                        DateIntervalFactory::conformDateInterval( $dateInterval );
+                    $pc->setValue( DateIntervalFactory::conformDateInterval( $dateInterval ));
                 }
                 catch( Exception $e ) {
                     throw new InvalidArgumentException( $e->getMessage(), $e->getCode(), $e );
@@ -145,7 +145,7 @@ trait REFRESH_INTERVALrfc7986trait
                     sprintf( $FMTERR, self::REFRESH_INTERVAL )
                 );
         } // end switch
-        $this->refreshinterval = $value->addParam( self::VALUE, self::DURATION );
+        $this->refreshinterval = $pc->addParam( self::VALUE, self::DURATION );
         return $this;
     }
 }

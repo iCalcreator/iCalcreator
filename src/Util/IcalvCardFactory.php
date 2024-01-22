@@ -93,7 +93,7 @@ class IcalvCardFactory
         $vCard  .= sprintf( $FMTVERSION, $version );
         $vCard  .= sprintf( $FMTPRODID, ICALCREATOR_VERSION );
         $vCard  .= self::getVcardN( $names, $version );
-        $vCard  .= sprintf( $FMTFN, implode( Util::$SP1, $names ));
+        $vCard  .= sprintf( $FMTFN, implode( StringFactory::$SP1, $names ));
         $vCard  .= sprintf( $FMTEMAIL, CalAddressFactory::removeMailtoPrefix( $email ));
         $vCard  .= sprintf( $FMTREV, gmdate( $YMDTHISZ ));
         $vCard  .= $ENDVCARD;
@@ -125,7 +125,7 @@ class IcalvCardFactory
         $hits   = ( true === $inclParam )
             ? CalAddressFactory::getCalAdressesAllFromProperty( $calendar )
             : CalAddressFactory::getCalAddresses( $calendar ); // not from params, value only
-        $output = Util::$SP0;
+        $output = StringFactory::$SP0;
         $count  = 0;
         foreach( $hits as $email ) {
             try {
@@ -169,8 +169,8 @@ class IcalvCardFactory
             case ( ctype_upper( $name ) || ctype_lower( $name )) :
                 $nameParts = [ $name ];
                 break;
-            case ( str_contains( $name, Util::$DOT )) :
-                $nameParts = explode( Util::$DOT, $name );
+            case ( str_contains( $name, StringFactory::$DOT )) :
+                $nameParts = explode( StringFactory::$DOT, $name );
                 foreach( $nameParts as $k => $part ) {
                     $nameParts[$k] = ucfirst( $part );
                 }
@@ -183,7 +183,7 @@ class IcalvCardFactory
                 while( $x < $len ) {
                     if( ctype_upper( $name[$x] )) {
                         ++$k;
-                        $nameParts[$k] = Util::$SP0;
+                        $nameParts[$k] = StringFactory::$SP0;
                     }
                     $nameParts[$k] .= $name[$x];
                     $x++;

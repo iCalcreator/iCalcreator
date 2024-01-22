@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use Kigkonsult\Icalcreator\Util\Util;
@@ -41,7 +40,7 @@ use function strtoupper;
 /**
  * ACTION property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait ACTIONtrait
 {
@@ -88,50 +87,50 @@ trait ACTIONtrait
         if( empty( $this->action )) {
             return false;
         }
-        return $inclParam ? clone $this->action : $this->action->value;
+        return $inclParam ? clone $this->action : $this->action->getValue();
     }
 
     /**
      * Return bool true if set (ignore 'empty' property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isActionSet() : bool
     {
-        return ! empty( $this->action->value );
+        return self::isPropSet( $this->action );
+
     }
 
     /**
      * Set calendar component property action
      *
      * @param null|string|Pc   $value "AUDIO" / "DISPLAY" / "EMAIL" / "PROCEDURE"  / iana-token / x-name ??
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setAction( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $pc = Pc::factory( $value, $params );
         static $STDVALUES = [
             self::AUDIO,
             self::DISPLAY,
             self::EMAIL,
             self::PROCEDURE  // deprecated in rfc5545
         ];
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::ACTION );
-            $value->value  = self::$SP0;
-            $value->removeParam();
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::ACTION );
+            $pc->setEmpty()
+                ->removeParam();
         }
-        elseif( ! in_array( $value->value, $STDVALUES, true )) {
-            $value->value = Util::assertString( $value->value, self::ACTION );
-            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
+        elseif( ! in_array( $pcValue, $STDVALUES, true )) {
+            $pcValue  = Util::assertString( $pcValue, self::ACTION );
+            $pc->setValue( strtoupper( StringFactory::trimTrailNL( $pcValue )));
         }
-        $this->action  = $value;
+        $this->action = $pc;
         return $this;
     }
 }

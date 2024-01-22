@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -30,12 +30,13 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format REQUEST_STATUS
  *
  * 1
- * @since 2.41.59 - 2022-08-25
+ * @since 2.41.88 - 2024-01-18
  */
 final class Requeststatus extends PropertyBase
 {
@@ -54,21 +55,22 @@ final class Requeststatus extends PropertyBase
     ) : string
     {
         if( empty( $values )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        $output   = self::$SP0;
+        $output   = StringFactory::$SP0;
         foreach( $values as $pc ) {
-            if( ! empty( $pc->value )) {
+            $pcValue = $pc->getValue();
+            if( ! empty( $pcValue )) {
                 $content =
-                    $pc->value[self::STATCODE] .
-                    self::$SEMIC .
-                    self::strrep( $pc->value[self::STATDESC] );
-                if( isset( $pc->value[self::EXTDATA] )) {
-                    $content .= self::$SEMIC . self::strrep( $pc->value[self::EXTDATA] );
+                    $pcValue[self::STATCODE] .
+                    StringFactory::$SEMIC .
+                    self::strrep( $pcValue[self::STATDESC] );
+                if( isset( $pcValue[self::EXTDATA] )) {
+                    $content .= StringFactory::$SEMIC . self::strrep( $pcValue[self::EXTDATA] );
                 }
                 $output .= self::renderProperty(
                     $propName,
-                    self::formatParams( $pc->params, [ self::LANGUAGE ], $lang ),
+                    self::formatParams((array) $pc->getParams(), [ self::LANGUAGE ], $lang ),
                     $content
                 );
             }

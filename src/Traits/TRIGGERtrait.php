@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeZoneFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 use function strtoupper;
@@ -61,7 +61,7 @@ use function substr;
 /**
  * TRIGGER property functions
  *
- * @since 2.41.56 2022-08-15
+ * @since 2.41.85 2024-01-18
  */
 trait TRIGGERtrait
 {
@@ -112,36 +112,36 @@ trait TRIGGERtrait
      * @param null|bool   $inclParam
      * @return bool|string|DateTimeInterface|DateInterval|Pc
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getTrigger( ? bool $inclParam = false ) :bool|string|DateInterval|DateTimeInterface|Pc
     {
         if( empty( $this->trigger )) {
             return false;
         }
-        return $inclParam ? clone $this->trigger : $this->trigger->value;
+        return $inclParam ? clone $this->trigger : $this->trigger->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isTriggerSet() : bool
     {
-        return ! empty( $this->trigger->value );
+        return self::isPropSet( $this->trigger );
     }
 
     /**
      * Set calendar component property trigger
      *
      * @param null|string|Pc|DateTimeInterface|DateInterval $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.56 2022-08-15
+     * @since 2.41.85 2024-01-18
      * @todo ?? "If the trigger is set relative to START, then the "DTSTART"
      *        property MUST be present in the associated "VEVENT" or "VTODO"
      *        calendar component.  If an alarm is specified for an event with
@@ -158,39 +158,37 @@ trait TRIGGERtrait
     ) : static
     {
         static $FMTERRPROPFMT = 'Invalid %s input format (%s)';
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
             $this->assertEmptyValue( self::$SP0, self::TRIGGER );
-            $this->trigger = $value->setEmpty();
+            $this->trigger = $pc->setEmpty();
             return $this;
         }
-        $isParamsDateTimeSet = $value->hasParamValue( self::DATE_TIME );
-        $value->addParamValue( self::DURATION, false ); // default
-        if( $value->hasParamKey( self::RELATED )) {
-            $value->addParam( self::RELATED, strtoupper( $value->getParams( self::RELATED )));
+        $isParamsDateTimeSet = $pc->hasParamValue( self::DATE_TIME );
+        $pc->addParamValue( self::DURATION, false ); // default
+        if( $pc->hasParamKey( self::RELATED )) {
+            $pc->addParam( self::RELATED, strtoupper( $pc->getParams( self::RELATED )));
         } // end if
         switch( true ) {
             // duration DateInterval
-            case ( ! $isParamsDateTimeSet && ( $value->value instanceof DateInterval )) :
-                return $this->setTriggerDateIntervalValue( $value );
+            case ( ! $isParamsDateTimeSet && ( $pcValue instanceof DateInterval )) :
+                return $this->setTriggerDateIntervalValue( $pc );
             // datetime DateTimeInterface
-            case ( $value->value instanceof DateTimeInterface ) :
-                $value->addParamValue( self::DATE_TIME ); // force date-time...
+            case ( $pcValue instanceof DateTimeInterface ) :
+                $pc->addParamValue( self::DATE_TIME ); // force date-time...
                 return $this->setTriggerDateTimeValue(
-                    $value->setValue( DateTimeFactory::toDateTime( $value->value ))
+                    $pc->setValue( DateTimeFactory::toDateTime( $pcValue ))
                 );
             // duration in a string
-            case ( ! $isParamsDateTimeSet && DateIntervalFactory::isStringAndDuration( $value->value )) :
-                return $this->setTriggerStringDurationValue( $value );
+            case ( ! $isParamsDateTimeSet && DateIntervalFactory::isStringAndDuration( $pcValue )) :
+                return $this->setTriggerStringDurationValue( $pc );
             // date in a string
-            case( $isParamsDateTimeSet &&
-                DateTimeFactory::isStringAndDate( $value->value )) :
-                return $this->setTriggerStringDateValue( $value );
+            case( $isParamsDateTimeSet && DateTimeFactory::isStringAndDate( $pcValue )) :
+                return $this->setTriggerStringDateValue( $pc );
         } // end switch
         throw new InvalidArgumentException(
-            sprintf( $FMTERRPROPFMT, self::TRIGGER, var_export( $value->value, true ))
+            sprintf( $FMTERRPROPFMT, self::TRIGGER, var_export( $pcValue, true ))
         );
     }
 
@@ -200,11 +198,11 @@ trait TRIGGERtrait
      * @param Pc $value
      * @return static
      * @throws Exception
-     * @since  2.40 - 2021-10-04
+     * @since 2.41.85 2024-01-18
      */
     private function setTriggerDateIntervalValue( Pc $value ) : static
     {
-        $dateInterval = DateIntervalFactory::conformDateInterval( $value->value );
+        $dateInterval = DateIntervalFactory::conformDateInterval( $value->getValue());
         if( true !== self::isDurationRelatedEnd( $value->params )) {
             $value->removeParam(self::RELATED ); // remove default
         }
@@ -219,13 +217,13 @@ trait TRIGGERtrait
      * @param Pc $value
      * @return static
      * @throws Exception
-     * @since  2.29.2 - 2019-06-28
+     * @since 2.41.85 2024-01-18
      */
     private function setTriggerDateTimeValue( Pc $value ) : static
     {
         $value->removeParam( self::RELATED ); // n.a. for date-time
         $this->trigger = $value->setValue(
-            DateTimeFactory::setDateTimeTimeZone( $value->value, self::UTC )
+            DateTimeFactory::setDateTimeTimeZone( $value->getValue(), self::UTC )
         );
         return $this;
     }
@@ -236,18 +234,19 @@ trait TRIGGERtrait
      * @param Pc  $value
      * @return static
      * @throws Exception
-     * @since  2.40 - 2021-10-04
+     * @since 2.41.85 2024-01-18
      */
     private function setTriggerStringDurationValue( Pc $value ) : static
     {
-        $before = ( Util::$MINUS === $value->value[0] );
-        if( DateIntervalFactory::$P !== $value->value[0] ) {
-            $value->value = substr( $value->value, 1 );
+        $pcValue = $value->getValue();
+        $before  = ( StringFactory::$MINUS === $pcValue[0] );
+        if( DateIntervalFactory::$P !== $pcValue[0] ) {
+            $pcValue = substr( $pcValue, 1 );
         }
-        $dateInterval1 = new DateInterval( $value->value );
+        $dateInterval1 = new DateInterval( $pcValue );
         $dateInterval1->invert = ( $before ) ? 1 : 0;
         $dateInterval  = DateIntervalFactory::conformDateInterval( $dateInterval1 );
-        if( true !== self::isDurationRelatedEnd( $value->params )) {
+        if( true !== self::isDurationRelatedEnd( $value->getParams())) {
             $value->removeParam( self::RELATED ); // remove default
         }
         $value->removeParam( self::VALUE ); // remove default
@@ -261,29 +260,26 @@ trait TRIGGERtrait
      * @param Pc   $value
      * @return static
      * @throws Exception
-     * @since  2.41.73 - 2023-03-15
+     * @since 2.41.85 2024-01-18
      */
     private function setTriggerStringDateValue( Pc $value ) : static
     {
         [ $dateStr, $timezonePart ] =
-            DateTimeFactory::splitIntoDateStrAndTimezone( $value->value );
-        $value->value = DateTimeFactory::getDateTimeWithTimezoneFromString(
+            DateTimeFactory::splitIntoDateStrAndTimezone( $value->getValue());
+        $tmpDate = DateTimeFactory::getDateTimeWithTimezoneFromString(
             $dateStr,
             $timezonePart,
             self::UTC,
             true
         );
         if( ! DateTimeZoneFactory::isUTCtimeZone(
-            $value->value->getTimezone()->getName(),
-            $value->value->format( DateTimeFactory::$YmdTHis ))
+            $tmpDate->getTimezone()->getName(),
+            $tmpDate->format( DateTimeFactory::$YmdTHis ))
         ) {
-            $value->value = DateTimeFactory::setDateTimeTimeZone(
-                $value->value,
-                self::UTC
-            );
+            $tmpDate = DateTimeFactory::setDateTimeTimeZone( $tmpDate, self::UTC );
         }
         $value->removeParam(self::RELATED ); // n.a. for date-time
-        $this->trigger = $value;
+        $this->trigger = $value->setValue( $tmpDate );
         return $this;
     }
 

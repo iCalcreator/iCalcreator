@@ -66,7 +66,7 @@ class Prop2TextMultiTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function textMultiProvider() : array
+    public static function textMultiProvider() : array
     {
 
         $dataArr = [];
@@ -241,7 +241,7 @@ class Prop2TextMultiTest extends DtBase
             }
         } // end foreach
         $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue2 ], true ));
-        $expectedString = str_replace( Util::$CRLF . ' ' , '', $expectedString);
+        $expectedString = str_replace( StringFactory::$CRLF . ' ' , '', $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
             2061,
@@ -269,7 +269,7 @@ class Prop2TextMultiTest extends DtBase
         $getValue2->params[IcalInterface::DELEGATED_TO]   = [ 'mailto:bob2062@example.com' ];
         $getValue2->params[IcalInterface::DELEGATED_FROM] = [ 'mailto:jane2062@example.com' ];
         $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue2 ], true ));
-        $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
+        $expectedString = str_replace( self::$EOLCHARS , '', $expectedString );
         $expectedString = str_replace( '\,', ',', $expectedString );
         $dataArr[] = [
             2062,
@@ -288,16 +288,17 @@ class Prop2TextMultiTest extends DtBase
             CalAddressFactory::conformCalAddress( $value ),
             $params
         );
-        $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue ], true ));
-        $expectedString = str_replace( self::$EOLCHARS , null, $expectedString);
-        $expectedString = str_replace( '\,', ',', $expectedString );
+        $expectedString  = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue ], true ));
+        $expectedString  = str_replace( self::$EOLCHARS , '', $expectedString );
+        $expectedString  = str_replace( '\,', ',', $expectedString );
+        $params[IcalInterface::EMAIL] = 'ildoit2063Later@example.com'; // will be skipped IN Freebusy
         $dataArr[] = [
             2063,
             [
                 IcalInterface::ATTENDEE => [ IcalInterface::VFREEBUSY ] // , Vcalendar::VFREEBUSY
             ],
             $value,
-            $params + [ IcalInterface::EMAIL => 'ildoit2063-2@example.com' ], // will be skipped
+            $params,
             $getValue,
             $expectedString
         ];
@@ -475,7 +476,7 @@ class Prop2TextMultiTest extends DtBase
             number_format(
                 (float) $value[IcalInterface::STATCODE],
                 2,
-                Util::$DOT,
+                StringFactory::$DOT,
                 null
             ) . ';' .
             Property::strrep( $value[IcalInterface::STATDESC] ) . ';' .
@@ -828,12 +829,12 @@ class Prop2TextMultiTest extends DtBase
         foreach( $propComps as $propName => $theComps ) {
             foreach( $theComps as $theComp ) {
                 if( IcalInterface::ATTENDEE === $propName ) {
-                    $expectedGet->params = CalAddressFactory::inputPrepAttendeeParams(
-                        $expectedGet->params,
+                    CalAddressFactory::inputPrepAttendeeParams(
+                        $expectedGet,
                         $theComp,
                         ''
                     );
-                }
+                } // end if
                 $newMethod = 'new' . $theComp;
                 $comp = match ( true ) {
                     ( IcalInterface::AVAILABLE === $theComp ) => $c->newVavailability()->{$newMethod}(),
@@ -853,7 +854,7 @@ class Prop2TextMultiTest extends DtBase
             } // end foreach
         } // end foreach
         $calendar1    = $c->createCalendar();
-        $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], null, $calendar1 );
+        $createString = str_replace( [ StringFactory::$CRLF . ' ', StringFactory::$CRLF ], null, $calendar1 );
         $createString = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),
@@ -942,12 +943,12 @@ class Prop2TextMultiTest extends DtBase
         if( $getValue->hasParamkey( Vcalendar::ORDER )) {
             $this->assertSame(
                 1,
-                $getValue->getParams( Vcalendar::ORDER ),
+                (int) $getValue->getParams( Vcalendar::ORDER ),
                 self::getErrMsg(  null, $case . '-3ParamInt', __FUNCTION__, $instance->getCompType(), $getMethod )
             );
         }
 
-        $createString = str_replace( Util::$CRLF . ' ' , null, $instance->{$createMethod}());
+        $createString = str_replace( StringFactory::$CRLF . ' ' , null, $instance->{$createMethod}());
         $createString = str_replace( '\,', ',', $createString );
         $this->assertEquals(
             $expectedString,

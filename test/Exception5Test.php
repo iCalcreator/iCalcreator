@@ -46,7 +46,7 @@ class Exception5Test extends TestCase
      *
      * @return mixed[]
      */
-    public function integerTestProvider() : array
+    public static function integerTestProvider() : array
     {
         $dataArr = [];
 

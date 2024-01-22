@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,13 +31,13 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * REPEAT property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait REPEATtrait
 {
@@ -80,7 +80,7 @@ trait REPEATtrait
      *
      * @param null|bool   $inclParam
      * @return bool|int|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getRepeat( ? bool $inclParam = false ) : bool | int | string | Pc
     {
@@ -88,48 +88,46 @@ trait REPEATtrait
             return false;
         }
         if( ! $this->repeat->isset()) {
-            $this->repeat->value = self::$SP0;
+            $this->repeat->setValue( self::$SP0 );
         }
-        return $inclParam ? clone $this->repeat : $this->repeat->value;
+        return $inclParam ? clone $this->repeat : $this->repeat->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isRepeatSet() : bool
     {
-        return ( ! empty( $this->repeat->value ) ||
-            (( null !== $this->repeat ) && ( 0 === $this->repeat->value )));
+        return self::isIntPropSet( $this->repeat );
     }
 
     /**
      * Set calendar component property repeat
      *
-     * .. defines the number of times an alarm should be repeated after its initial trigger.
+     * defines the number of times an alarm should be repeated after its initial trigger.
      * Default 0 (zero).
      *
      * @param null|int|string|Pc $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setRepeat( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
-            $this->assertEmptyValue( $value->value, self::REPEAT );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue() ?: null;
+        if(( null === $pcValue ) || ( StringFactory::$SP0 === $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::REPEAT );
+            $pc->setEmpty();
         }
         else {
-            Util::assertInteger( $value->value, self::REPEAT, 0 );
-            $value->value = (int) $value->value;
+            Util::assertInteger( $pcValue, self::REPEAT, 0 );
+            $pc->setValue((int) $pcValue );
         }
-        $this->repeat = $value;
+        $this->repeat = $pc;
         return $this;
     }
 }

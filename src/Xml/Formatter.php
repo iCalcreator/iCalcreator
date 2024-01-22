@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,16 +40,16 @@ use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Vcalendar;
 use Kigkonsult\Icalcreator\Vevent;
 use SimpleXMLElement;
 
 use function array_change_key_case;
+use function count;
 use function htmlspecialchars;
 use function implode;
+use function in_array;
 use function is_array;
-use function number_format;
 use function sprintf;
 use function strcasecmp;
 use function strlen;
@@ -61,7 +61,7 @@ use function substr;
 /**
  * iCalcreator XML (rfc6321) formatter class
  *
- * @since 2.41.69 2022-10-21
+ * @since 2.41.88 2024-01-17
  */
 final class Formatter extends XmlBase
 {
@@ -96,6 +96,11 @@ final class Formatter extends XmlBase
         IcalInterface::CATEGORIES,
         IcalInterface::IMAGE
     ];
+
+    /**
+     * @var string
+     */
+    private static string $boolean        = 'boolean';
 
     /**
      * @var string
@@ -166,26 +171,6 @@ final class Formatter extends XmlBase
     /**
      * @var string
      */
-    private static string $freq       = 'freq';
-
-    /**
-     * @var string
-     */
-    private static string $count      = 'count';
-
-    /**
-     * @var string
-     */
-    private static string $interval   = 'interval';
-
-    /**
-     * @var string
-     */
-    private static string $wkst       = 'wkst';
-
-    /**
-     * @var string
-     */
     public static string $XMLstart =
         '<?xml version="1.0" encoding="utf-8"?><icalendar xmlns="urn:ietf:params:xml:ns:icalendar-2.0"><!-- kigkonsult.se %s, iCal2XMl (rfc6321), %s --></icalendar>';
 
@@ -205,19 +190,16 @@ final class Formatter extends XmlBase
         $xml       = new SimpleXMLElement(
             sprintf( self::$XMLstart, ICALCREATOR_VERSION, gmdate( $YMDTHISZ ))
         );
-        $vCalendarXml = $xml->addChild( self::$Vcalendar );
+        $vCalendarXml = self::addSubChild( $xml, self::$Vcalendar );
         $langCal      = $calendar->getConfig( IcalInterface::LANGUAGE );
         // fix calendar properties
         self::calendarProps2Xml( $calendar, $vCalendarXml, $langCal );
         // prepare to fix components with properties/subComponents
-        $componentsXml = $vCalendarXml->addChild( self::$components );
+        $componentsXml = self::addSubChild( $vCalendarXml, self::$components );
         // fix component properties
         foreach( $calendar->getComponents() as $component ) {
-            self::componentProps2Xml(
-                $component,
-                $componentsXml->addChild( strtolower( $component->getCompType())),
-                $langCal
-            );
+            $componentChild = self::addSubChild( $componentsXml, strtolower( $component->getCompType()));
+            self::componentProps2Xml( $component, $componentChild, $langCal );
         } // end foreach
         return $xml->asXML();
     }
@@ -237,7 +219,7 @@ final class Formatter extends XmlBase
         bool | string $langCal
     ) : void
     {
-        $properties = $vCalendarXml->addChild( self::$properties );
+        $properties = self::addSubChild( $vCalendarXml, self::$properties );
         foreach( self::$calProps as $propName ) {
             $method = StringFactory::getGetMethodName( $propName );
             if( false !== ( $content = $calendar->{$method}())) {
@@ -249,23 +231,17 @@ final class Formatter extends XmlBase
             if( false === ( $content = $calendar->{$getMethod}( true ))) {
                 continue;
             }
-            switch( strtoupper( $propName )) {
-                case IcalInterface::UID :   // fall through
-                case IcalInterface::COLOR :
-                    self::addXMLchildText( $properties, $propName, $content );
-                    break;
-                case IcalInterface::LAST_MODIFIED :
-                    unset( $content->params[IcalInterface::VALUE] );
-                    self::addXMLchildDateTime( $properties, $propName, $content );
-                    break;
-                case IcalInterface::SOURCE : // fall through
-                case IcalInterface::URL :
-                    self::addXMLchildUri( $properties, $propName, $content );
-                    break;
-                case IcalInterface::REFRESH_INTERVAL :
-                    self::addXMLchildDuration( $properties, $propName, $content );
-                    break;
-            } // end switch
+            match( strtoupper( $propName )) {
+                IcalInterface::UID, IcalInterface::COLOR =>
+                    self::addXMLchildText( $properties, $propName, $content ),
+                IcalInterface::LAST_MODIFIED =>
+                    self::addXMLchildDateTime( $properties, $propName, $content, true ),
+                IcalInterface::SOURCE, IcalInterface::URL =>
+                    self::addXMLchildUri( $properties, $propName, $content ),
+                IcalInterface::REFRESH_INTERVAL =>
+                    self::addXMLchildDuration( $properties, $propName, $content ),
+                default => null
+            }; // end match
         } // end foreach
         foreach( self::$calPropsrfc7986Multi as $propName ) {
             $method = StringFactory::getGetAllMethodName( $propName );
@@ -294,7 +270,8 @@ final class Formatter extends XmlBase
      * @param SimpleXMLElement $parentXml
      * @param bool|string $langCal
      * @throws Exception
-     * @since 2.41.69 2022-10-04
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
      */
     private static function componentProps2Xml(
         CalendarComponent|Vevent $component,
@@ -303,208 +280,413 @@ final class Formatter extends XmlBase
     ) : void
     {
         $compName   = $component->getCompType();
-        $properties = $parentXml->addChild( self::$properties );
+        $properties = self::addSubChild( $parentXml, self::$properties );
         $langComp   = $component->getConfig( IcalInterface::LANGUAGE );
+        $lang       = ( $langComp ?: $langCal );
         $props      = $component->getConfig( IcalInterface::SETPROPERTYNAMES );
         foreach( $props as $propName ) {
+            if( StringFactory::isXprefixed( $propName )) {
+                $content = $component->getXprop( $propName, null, true );
+                self::addXMLchild( $properties, $content[0], self::$unknown, $content[1] );
+                continue;
+            }
             $method = Vcalendar::isMultiProp( $propName )
                 ? StringFactory::getGetAllMethodName( $propName )
                 : StringFactory::getGetMethodName( $propName );
-            switch( strtoupper( $propName )) {
-                case IcalInterface::ATTACH :          // may occur multiple times
-                case IcalInterface::IMAGE :
-                    self::addXMLchildBinaryUriArr( $properties, $propName, $component->{$method}( true )); // array
-                    break;
-                case IcalInterface::ATTENDEE :        // may occur multiple times
-                    self::addXMLchildCalAddress(
-                        $properties,
-                        $propName,
-                        $component->{$method}( true ),
-                        ( $langComp ?: $langCal )
-                    );
-                    break;
-                case IcalInterface::EXDATE :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        if( self::hasValueDateSet( $content )) {
-                            self::addXMLchildDate( $properties, $propName, $content );
-                            continue;
-                        }
-                        self::addXMLchildDateTime( $properties, $propName, $content );
-                    } // end foreach
-                    break;
-                case IcalInterface::FREEBUSY :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        self::addXMLchild( $properties, $propName, self::$period, $content );
-                    } // end foreach
-                    break;
-                case IcalInterface::REQUEST_STATUS :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        self::addLanguage( $content, $langComp, $langCal );
-                        self::addXMLchild( $properties, $propName, self::$rstatus, $content );
-                    } // end foreach
-                    break;
-                case IcalInterface::RDATE :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        $type = self::getRdateValueType( $content );
-                        self::addXMLchild( $properties, $propName, $type, $content );
-                    } // end foreach
-                    break;
-                case IcalInterface::DESCRIPTION : // fall through, multiple in VCALENDAR/VJOURNAL, single elsewere
-                case IcalInterface::LOCATION :    // multiple in PARTICIPANT, single elsewere
-                    foreach( $component->{$method}( true ) as $content ) {
-                        self::addXMLchildText( $properties, $propName, $content, ( $langComp ?: $langCal ));
-                        if(( IcalInterface::DESCRIPTION === $propName ) &&
-                            $component::isDescriptionSingleProp( $compName )) {
-                            break;
-                        }
-                        if(( IcalInterface::LOCATION === $propName ) &&
-                            $component::isLocationSingleProp( $compName )) {
-                            break;
-                        }
-                    } // end foreach
-                    break;
-                case IcalInterface::STYLED_DESCRIPTION :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        if( $content->hasParamValue( IcalInterface::URI )) {
-                            self::addXMLchildUri( $properties, $propName, $content );
-                            continue;
-                        }
-                        self::addXMLchildText( $properties, $propName, $content, ( $langComp ?: $langCal ));
-                    } // end foreach
-                    break;
-                case IcalInterface::CATEGORIES :    // fall through
-                case IcalInterface::COMMENT :       // fall through
-                case IcalInterface::CONTACT :       // fall through  // single in VFREEBUSY, multiple elsewhere
-                case IcalInterface::NAME :          // dito, multi i Vcalendar, single in Vlocation/Vresource (here)
-                case IcalInterface::TZID_ALIAS_OF : // fall through
-                case IcalInterface::TZNAME :        // fall through
-                case IcalInterface::RESOURCES :     // fall through
-                case IcalInterface::RELATED_TO :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        if( $propName !== IcalInterface::RELATED_TO ) {
-                            self::addLanguage( $content, $langComp, $langCal );
-                        }
-                        self::addXMLchildText( $properties, $propName, $content );
-                        if(( IcalInterface::NAME === $propName ) ||
-                            (( IcalInterface::CONTACT === $propName ) &&
-                                $component::isContactSingleProp( $compName ))) {
-                            break;
-                        }
-                    } // end foreach
-                    break;
-                case IcalInterface::ACKNOWLEDGED :    // fall through
-                case IcalInterface::CREATED :         // fall through
-                case IcalInterface::COMPLETED :       // fall through
-                case IcalInterface::DTSTAMP :         // fall through
-                case IcalInterface::LAST_MODIFIED :   // fall through
-                case IcalInterface::DTSTART :         // fall through
-                case IcalInterface::DTEND :           // fall through
-                case IcalInterface::DUE :             // fall through
-                case IcalInterface::RECURRENCE_ID :   // fall through
-                case IcalInterface::TZUNTIL :         // fall through
-                    $content = $component->{$method}( true );
-                    if( self::hasValueDateSet( $content )) {
-                        self::addXMLchildDate( $properties, $propName, $content );
-                        break;
-                    }
-                    self::addXMLchildDateTime( $properties, $propName, $content );
-                    break;
-                case IcalInterface::DURATION :
-                    self::addXMLchildDuration( $properties, $propName, $component->{$method}( true ));
-                    break;
-                case IcalInterface::EXRULE :
-                case IcalInterface::RRULE :
-                    self::addXMLchildRecur( $properties, $propName, $component->{$method}( true ));
-                    break;
-                case IcalInterface::LOCATION_TYPE : // fall through
-                case IcalInterface::SUMMARY :   // fall through
-                case IcalInterface::ACTION :    // fall through
-                case IcalInterface::BUSYTYPE :  // dito
-                case IcalInterface::KLASS :     // fall through
-                case IcalInterface::COLOR :     // fall through
-                case IcalInterface::PROXIMITY : // fall through
-                case IcalInterface::PARTICIPANT_TYPE : // dito
-                case IcalInterface::RESOURCE_TYPE :    // dito
-                case IcalInterface::STATUS :    // fall through
-                case IcalInterface::TRANSP :    // fall through
-                case IcalInterface::TZID :      // fall through
-                case IcalInterface::UID :
-                    $content = $component->{$method}( true );
-                    static $LOCTSUM = [ IcalInterface::LOCATION_TYPE, IcalInterface::SUMMARY ];
-                    if( in_array( $propName, $LOCTSUM, true )) {
-                        self::addLanguage( $content, $langComp, $langCal );
-                    }
-                    self::addXMLchildText( $properties, $propName, $content );
-                    break;
-                case IcalInterface::GEO :
-                    self::addXMLchild(
-                        $properties,
-                        $propName,
-                        strtolower( IcalInterface::GEO ),
-                        $component->{$method}( true )
-                    );
-                    break;
-                case IcalInterface::CALENDAR_ADDRESS : // fall through
-                case IcalInterface::ORGANIZER :
-                    self::addXMLchildCalAddress(
-                        $properties,
-                        $propName,
-                        [ $component->{$method}( true ) ],
-                        ( $langComp ?: $langCal )
-                    );
-                    break;
-                case IcalInterface::PERCENT_COMPLETE : // fall through
-                case IcalInterface::PRIORITY :         // fall through
-                case IcalInterface::REPEAT :           // fall through
-                case IcalInterface::SEQUENCE :
-                    self::addXMLchildInteger( $properties, $propName, $component->{$method}( true ));
-                    break;
-                case IcalInterface::STRUCTURED_DATA :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        if( $content->hasParamValue( IcalInterface::TEXT )) {
-                            self::addXMLchildText( $properties, $propName, $content );
-                            continue;
-                        }
-                        self::addXMLchildBinaryUri( $properties, $propName, $content );
-                    } // end foreach
-                    break;
-                case IcalInterface::CONFERENCE :
-                    foreach( $component->{$method}( true ) as $content ) {
-                        self::addXMLchildUri( $properties, $propName, $content );
-                    }
-                    break;
-                case IcalInterface::TRIGGER :
-                    $content = $component->{$method}( true );
-                    if( $content->value instanceof DateInterval ) {
-                        self::addXMLchildDuration( $properties, $propName, $content );
-                        break;
-                    }
-                    self::addXMLchildDateTime( $properties, $propName, $content );
-                    break;
-                case IcalInterface::TZOFFSETFROM : // fall through
-                case IcalInterface::TZOFFSETTO :
-                    self::addXMLchild( $properties, $propName, self::$utc_offset, $component->{$method}( true ));
-                    break;
-                case IcalInterface::TZURL :       // fall through
-                case IcalInterface::URL :
-                    self::addXMLchildUri( $properties, $propName, $component->{$method}( true ));
-                    break;
-                default :
-                    if( StringFactory::isXprefixed( $propName )) {
-                        $content = $component->getXprop( $propName, null, true );
-                        self::addXMLchild( $properties, $content[0], self::$unknown, $content[1] );
-                    }
-                    break;
-            } // end switch( $propName )
+            $data   = $component->{$method}( true );
+            match( strtoupper( $propName )) {
+                IcalInterface::ATTACH,           // may occur multiple times
+                IcalInterface::IMAGE =>
+                    self::addXMLchildBinaryUriArr( $properties, $propName, $data ), // array
+                IcalInterface::ATTENDEE =>        // may occur multiple times
+                    self::addXMLchildCalAddress( $properties, $propName, $data, $langComp ),
+                IcalInterface::EXDATE =>
+                    self::addXMLchildExdate( $properties, $propName, $data ),
+                IcalInterface::FREEBUSY =>
+                    self::addXMLchildFreebusy( $properties, $propName, $data ),
+                IcalInterface::REQUEST_STATUS =>
+                    self::addXMLchildReqStat( $properties, $propName, $data, $langComp, $langCal ),
+                IcalInterface::RDATE =>
+                    self::addXMLchildRdate( $properties, $propName, $data),
+                IcalInterface::DESCRIPTION,   // multiple in VCALENDAR/VJOURNAL, single elsewere
+                IcalInterface::LOCATION =>    // multiple in PARTICIPANT, single elsewere
+                    self::addXMLchildDescrLoc( $component, $properties, $propName, $data, $lang, $compName ),
+                IcalInterface::STYLED_DESCRIPTION =>
+                    self::addXMLchildStlDescr( $properties, $propName, $data, $lang ),
+                IcalInterface::CATEGORIES, IcalInterface::COMMENT,
+                IcalInterface::CONTACT,       //   // single in VFREEBUSY, multiple elsewhere
+                IcalInterface::NAME,          // dito, multi i Vcalendar, single in Vlocation/Vresource (here)
+                IcalInterface::TZID_ALIAS_OF, IcalInterface::TZNAME,
+                IcalInterface::RESOURCES, IcalInterface::RELATED_TO =>
+                    self::addXMLchildGroup1( $component, $properties, $propName, $data, $langComp, $langCal, $compName ),
+                IcalInterface::ACKNOWLEDGED, IcalInterface::CREATED, IcalInterface::COMPLETED,
+                IcalInterface::DTSTAMP, IcalInterface::LAST_MODIFIED,
+                IcalInterface::DTSTART, IcalInterface::DTEND, IcalInterface::DUE,
+                IcalInterface::RECURRENCE_ID, IcalInterface::TZUNTIL =>
+                    self::addXMLchildGroup2( $properties, $propName, $data ),
+                IcalInterface::DURATION  =>
+                    self::addXMLchildDuration( $properties, $propName, $data ),
+                IcalInterface::EXRULE, IcalInterface::RRULE =>
+                    self::addXMLchildRecur( $properties, $propName, $data ),
+                IcalInterface::LOCATION_TYPE, IcalInterface::SUMMARY, IcalInterface::ACTION,
+                IcalInterface::BUSYTYPE, IcalInterface::KLASS, IcalInterface::COLOR,
+                IcalInterface::PROXIMITY, IcalInterface::PARTICIPANT_TYPE, IcalInterface::RESOURCE_TYPE,
+                IcalInterface::STATUS, IcalInterface::TRANSP, IcalInterface::TZID, IcalInterface::UID =>
+                    self::addXMLchildGroup3( $properties, $propName, $data, $langComp, $langCal ),
+                IcalInterface::GEO =>
+                    self::addXMLchild( $properties, $propName, strtolower( IcalInterface::GEO ), $data ),
+                IcalInterface::CALENDAR_ADDRESS, IcalInterface::ORGANIZER =>
+                    self::addXMLchildCalAddress( $properties, $propName, [ $data ], $lang ),
+                IcalInterface::PERCENT_COMPLETE, IcalInterface::PRIORITY,
+                IcalInterface::REPEAT, IcalInterface::SEQUENCE =>
+                    self::addXMLchildInteger( $properties, $propName, $data ),
+                IcalInterface::STRUCTURED_DATA =>
+                    self::addXMLchildStrData( $properties, $propName, $data ),
+                IcalInterface::CONFERENCE =>
+                    self::addXMLchildConferens( $properties, $propName, $data ),
+                IcalInterface::TRIGGER =>
+                    self::addXMLchildTrigger( $properties, $propName, $data ),
+                IcalInterface::TZOFFSETFROM, IcalInterface::TZOFFSETTO =>
+                    self::addXMLchild( $properties, $propName, self::$utc_offset, $data ),
+                IcalInterface::TZURL, IcalInterface::URL =>
+                    self::addXMLchildUri( $properties, $propName, $data ),
+                default => null
+            }; // end match( $propName )
         } // end foreach( $props as $pix => $propName )
         // fix subComponent properties, if any
         foreach( $component->getComponents() as $subComp ) {
-            self::componentProps2Xml(
-                $subComp,
-                $parentXml->addChild( strtolower( $subComp->getCompType())),
-                $langCal
-            );
+            $subCompChild =self::addSubChild(  $parentXml, strtolower( $subComp->getCompType()));
+            self::componentProps2Xml( $subComp, $subCompChild, $langCal );
         } // end foreach
+    }
+
+    /**
+     * Manage Exdate
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildExdate(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data
+    ) : void
+    {
+        foreach( $data as $content ) {
+            if( self::hasValueDateSet( $content )) {
+                self::addXMLchildDate( $properties, $propName, $content );
+                continue;
+            }
+            self::addXMLchildDateTime( $properties, $propName, $content );
+        } // end foreach
+    }
+
+    /**
+     * Manage FREEBUSY
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildFreebusy(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data
+    ) : void
+    {
+        foreach( $data as $content ) {
+            self::addXMLchild( $properties, $propName, self::$period, $content );
+        } // end foreach
+    }
+
+    /**
+     * Manage REQUEST_STATUS
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @param bool | string $langComp
+     * @param bool | string $langCal
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildReqStat(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data,
+        bool | string $langComp,
+        bool | string $langCal
+    ) : void
+    {
+        foreach( $data as $content ) {
+            self::addLanguage( $content, $langComp, $langCal );
+            self::addXMLchild( $properties, $propName, self::$rstatus, $content );
+        } // end foreach
+    }
+
+    /**
+     * Manage Rdate
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildRdate(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data
+    ) : void
+    {
+        foreach( $data as $content ) {
+            $type = self::getRdateValueType( $content );
+            self::addXMLchild( $properties, $propName, $type, $content );
+        } // end foreach
+    }
+
+    /**
+     * Manage DESCRIPTION+LOCATION
+     *
+     * @param CalendarComponent|Vevent $component
+     * @param SimpleXMLElement $properties
+     * @param string      $propName
+     * @param array       $data
+     * @param bool|string $lang
+     * @param string      $compName
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildDescrLoc(
+        CalendarComponent|Vevent $component,
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data,
+        bool|string $lang,
+        string $compName
+    ) : void
+    {
+        foreach( $data as $content ) {
+            self::addXMLchildText( $properties, $propName, $content, $lang );
+            if(( IcalInterface::DESCRIPTION === $propName ) &&
+                $component::isDescriptionSingleProp( $compName )) {
+                break;
+            }
+            if(( IcalInterface::LOCATION === $propName ) &&
+                $component::isLocationSingleProp( $compName )) {
+                break;
+            }
+        } // end foreach
+    }
+
+    /**
+     * Manage STYLED_DESCRIPTION
+     *
+     * @param SimpleXMLElement $properties
+     * @param string      $propName
+     * @param array       $data
+     * @param bool|string $lang
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildStlDescr(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data,
+        bool|string $lang
+    ) : void
+    {
+        foreach( $data as $content ) {
+            if( $content->hasParamValue( IcalInterface::URI )) {
+                self::addXMLchildUri( $properties, $propName, $content );
+                continue;
+            }
+            self::addXMLchildText( $properties, $propName, $content, $lang );
+        } // end foreach
+    }
+
+    /**
+     * Manage CATEGORIES+COMMENT+CONTACT+NAME+TZID_ALIAS_OF+TZNAME+RESOURCES+RELATED_TO
+     *
+     * @param CalendarComponent|Vevent $component
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @param bool | string $langComp
+     * @param bool | string $langCal
+     * @param string $compName
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildGroup1(
+        CalendarComponent|Vevent $component,
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data,
+        bool | string $langComp,
+        bool | string $langCal,
+        string $compName
+    ) : void
+    {
+        foreach( $data as $content ) {
+            if( $propName !== IcalInterface::RELATED_TO ) {
+                self::addLanguage( $content, $langComp, $langCal );
+            }
+            self::addXMLchildText( $properties, $propName, $content );
+            if( ( IcalInterface::NAME === $propName ) ||
+                ( ( IcalInterface::CONTACT === $propName ) &&
+                    $component::isContactSingleProp( $compName ) ) ) {
+                break;
+            }
+        } // end foreach
+    }
+
+    /**
+     * Manage ACKNOWLEDGED+CREATED+COMPLETED+DTSTAMP+LAST_MODIFIED+DTSTART+DTEND+DUE+RECURRENCE_IDTZUNTIL
+     *
+     * @param SimpleXMLElement $properties
+     * @param string $propName
+     * @param Pc     $content
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildGroup2(
+        SimpleXMLElement $properties,
+        string $propName,
+        Pc $content
+    ) : void
+    {
+        if( self::hasValueDateSet( $content )) {
+            self::addXMLchildDate( $properties, $propName, $content );
+        }
+        else {
+            self::addXMLchildDateTime( $properties, $propName, $content );
+        }
+    }
+
+    /**
+     * Manage group3 of properties
+     *
+     * LOCATION_TYPE+SUMMARY+ACTION+BUSYTYPE+KLASS+COLOR+PROXIMITY+PARTICIPANT_TYPE+
+     * RESOURCE_TYPE+STATUS+TRANSP+TZID+UID :
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param Pc               $content
+     * @param bool | string    $langCal
+     * @param bool | string    $langComp
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildGroup3(
+        SimpleXMLElement $properties,
+        string $propName,
+        Pc $content,
+        bool | string $langComp,
+        bool | string $langCal
+    ) : void
+    {
+        static $LOCTSUM = [ IcalInterface::LOCATION_TYPE, IcalInterface::SUMMARY ];
+        if( in_array( $propName, $LOCTSUM, true )) {
+            self::addLanguage( $content, $langComp, $langCal );
+        }
+        self::addXMLchildText( $properties, $propName, $content );
+    }
+
+    /**
+     * Manage STRUCTURED_DATA
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildStrData(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data
+    ) : void
+    {
+        foreach( $data as $content ) {
+            if( $content->hasParamValue( IcalInterface::TEXT )) {
+                self::addXMLchildText( $properties, $propName, $content );
+                continue;
+            }
+            self::addXMLchildBinaryUri( $properties, $propName, $content );
+        } // end foreach
+    }
+
+    /**
+     * Manage CONFERENCE
+     *
+     * @param SimpleXMLElement $properties
+     * @param string           $propName
+     * @param array            $data
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildConferens(
+        SimpleXMLElement $properties,
+        string $propName,
+        array $data
+    ) : void
+    {
+        foreach( $data as $content ) {
+            self::addXMLchildUri( $properties, $propName, $content );
+        }
+    }
+
+    /**
+     * Manage TRIGGER
+     *
+     * @param SimpleXMLElement $properties
+     * @param string $propName
+     * @param Pc     $content
+     * @return void
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @since 2.41.88 2024-01-16
+     */
+    private static function addXMLchildTrigger(
+        SimpleXMLElement $properties,
+        string $propName,
+        Pc $content
+    ) : void
+    {
+        if( $content->getValue() instanceof DateInterval ) {
+            self::addXMLchildDuration( $properties, $propName, $content );
+        }
+        else {
+            self::addXMLchildDateTime( $properties, $propName, $content );
+        }
     }
 
     /**
@@ -514,20 +696,18 @@ final class Formatter extends XmlBase
      * @param bool|string $langComp
      * @param bool|string $langCal
      * @return void
-     * @since 2.41.69 2022-10-05
+     * @since 2.41.88 2024-01-17
      */
     private static function addLanguage( Pc $content, bool | string $langComp, bool | string $langCal ) : void
     {
-        switch( true ) {
-            case $content->hasParamKey( IcalInterface::LANGUAGE ) :
-                break;
-            case ( ! empty( $langComp )) :
-                $content->addParam( IcalInterface::LANGUAGE, $langComp );
-                break;
-            case ( ! empty( $langCal )) :
-                $content->addParam( IcalInterface::LANGUAGE, $langCal );
-                break;
-        } // end switch
+        match( true ) {
+            $content->hasParamKey( IcalInterface::LANGUAGE ) => null,
+            ( ! empty( $langComp )) =>
+                $content->addParam( IcalInterface::LANGUAGE, $langComp ),
+            ( ! empty( $langCal )) =>
+                $content->addParam( IcalInterface::LANGUAGE, $langCal ),
+            default => null,
+        }; // end match
     }
 
     /**
@@ -550,10 +730,10 @@ final class Formatter extends XmlBase
     private static function getRdateValueType( Pc $content ) : string
     {
         $type     = self::$date_time;
-        if( $content->hasParamKey( IcalInterface::VALUE, IcalInterface::DATE )) {
+        if( $content->hasParamValue( IcalInterface::DATE )) {
             $type = self::$date;
         }
-        elseif( $content->hasParamKey( IcalInterface::VALUE, IcalInterface::PERIOD )) {
+        elseif( $content->hasParamValue( IcalInterface::PERIOD )) {
             $type = self::$period;
         } // end if
         $content->removeParam( IcalInterface::VALUE );
@@ -651,8 +831,16 @@ final class Formatter extends XmlBase
      * @throws InvalidArgumentException
      * @since 2.41.69 2022-10-04
      */
-    private static function addXMLchildDateTime( SimpleXMLElement $parent, string $name, Pc $content ) : void
+    private static function addXMLchildDateTime(
+        SimpleXMLElement $parent,
+        string $name,
+        Pc $content,
+        ? bool $skipValue = false
+    ) : void
     {
+        if( $skipValue ) {
+            $content->removeParam(IcalInterface::VALUE );
+        }
         self::addXMLchild( $parent, $name, self::$date_time, $content );
     }
 
@@ -737,11 +925,11 @@ final class Formatter extends XmlBase
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.69 2022-10-04
+     * @since 2.41.88 - 2024-01-18
      */
     private static function addXMLchildUri( SimpleXMLElement $parent, string $name, Pc $content ) : void
     {
-        $content->value = htmlentities( $content->value );
+        $content->setValue( htmlentities( $content->getValue()));
         self::addXMLchild( $parent, $name, self::$uri, $content );
     }
 
@@ -755,7 +943,7 @@ final class Formatter extends XmlBase
      * @return void
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.69 2022-10-04
+     * @since 2.41.88 - 2024-01-18
      */
     private static function addXMLchild(
         SimpleXMLElement $parent,
@@ -764,11 +952,46 @@ final class Formatter extends XmlBase
         Pc $subData
     ) : void
     {
-        static $BOOLEAN      = 'boolean';
-        static $UNTIL        = 'until';
-        static $START        = 'start';
-        static $END          = 'end';
-        static $SP0          = '';
+        /** create new child node */
+        $name  = strtolower( $name );
+        $child = self::addSubChild( $parent, $name );
+        $value = $subData->getValue();
+        if( empty( $value ) && ( StringFactory::$ZERO !== (string) $value )) {
+            self::addSubChild( $child, $type );
+            return;
+        }
+        $recurDateIsSet = false;
+        $isLocalTime    = $subData->hasParamIsLocalTime();
+        $params         = (array) $subData->getParams();
+        $isOneParm      = ( 1 === count( $params ));
+        switch( true ) {
+            case ( empty( $params ) || ( $isOneParm && $isLocalTime )) :
+                break;
+            case ( self::$recur === $type ) :
+                $recurDateIsSet = $subData->hasParamValue( IcalInterface::DATE );
+                if( $isOneParm && $subData->hasParamValue()) {
+                    break;
+                }
+                $subData->removeParam( IcalInterface::VALUE );
+                // fall through
+            default :
+                $parameters = self::addSubChild( $child, self::$PARAMETERS );
+                self::addXMLchildParams( $parameters, $type, $params );
+                break;
+        } // end switch
+        /** store content dep. on type */
+        self::addXMLchildForType( $child, $type, $subData->getValue(), $isLocalTime, $recurDateIsSet );
+    }
+
+    /**
+     * @param SimpleXMLElement $parameters
+     * @param string           $type
+     * @param array            $params
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildParams( SimpleXMLElement $parameters, string $type, array $params ) : void
+    {
         static $altrep       = 'altrep';
         static $dir          = 'dir';
         static $delegated_from = 'delegated-from';
@@ -778,242 +1001,382 @@ final class Formatter extends XmlBase
         static $sent_by      = 'sent-by';
         static $rsvp         = 'rsvp';
         static $derived      = 'derived';
-        /** create new child node */
-        $name  = strtolower( $name );
-        $child = $parent->addChild( $name );
-        if( empty( $subData->value ) && ( Util::$ZERO !== (string) $subData->value )) {
-            $child->addChild( $type );
+        foreach( $params as $pKey => $parVal ) {
+            if( IcalInterface::VALUE === $pKey ) {
+                if( str_contains( $parVal, StringFactory::$COLON )) {
+                    $p1   = self::addSubChild( $parameters, strtolower( $pKey ));
+                    self::addSubChild( $p1, self::$unknown, htmlspecialchars( $parVal ));
+                    $type = strtolower( strstr( $parVal, StringFactory::$COLON, true ));
+                }
+                elseif( 0 !== strcasecmp( $type, $parVal )) {
+                    $type = strtolower( $parVal );
+                }
+                continue;
+            } // end if VALUE
+            if( IcalInterface::ISLOCALTIME === $pKey ) {
+                continue;
+            }
+            $pKey = strtolower( $pKey );
+            if( StringFactory::isXprefixed( $pKey )) {
+                $p1 = self::addSubChild( $parameters, $pKey );
+                self::addSubChild( $p1, self::$unknown, htmlspecialchars( $parVal ));
+                continue;
+            }
+            $p1 = self::addSubChild( $parameters, $pKey );
+            $ptype = match ( $pKey ) {
+                $altrep, $dir   => self::$uri,
+                $delegated_from, $delegated_to, $member, $sent_by => self::$cal_address,
+                $order          => self::$integer,
+                $rsvp, $derived => self::$boolean,
+                default         => self::$text,
+            }; // end match
+            if( is_array( $parVal )) {
+                foreach( $parVal as $pV ) {
+                    self::addSubChild( $p1, $ptype, htmlspecialchars((string) $pV ));
+                }
+            }
+            else {
+                self::addSubChild( $p1, $ptype, htmlspecialchars((string) $parVal ));
+            }
+        } // end foreach $params
+    }
+
+    /**
+     * @param SimpleXMLElement $child
+     * @param string $type
+     * @param mixed $value
+     * @param bool $isLocalTime
+     * @param bool $recurDateIsSet
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForType(
+        SimpleXMLElement $child,
+        string $type,
+        mixed $value,
+        bool $isLocalTime,
+        bool $recurDateIsSet
+    ) : void
+    {
+        match( $type ) {
+            self::$boolean, self::$time => null,
+            self::$binary, self::$uri, self::$cal_address =>
+               self::addSubChild( $child, $type, $value ),
+            self::$date =>
+                self::addXMLchildForTypeDate( $child, $type, $value ),
+            self::$date_time =>
+                self::addXMLchildForTypeDateTime( $child, $type, $value, $isLocalTime ),
+            strtolower( IcalInterface::DURATION ) =>
+                self::addSubChild( $child, $type, DateIntervalFactory::dateInterval2String( $value, true )),
+            strtolower( IcalInterface::GEO ) =>
+                self::addXMLchildForTypeGeo( $child, $value ),
+            self::$integer =>
+                self::addSubChild( $child, $type, (string) $value ),
+            self::$period =>
+                self::addXMLchildForTypePeriod( $child, $type, $value, $isLocalTime ),
+            self::$recur =>
+                self::addXMLchildForTypeRecur( $child, $value, $recurDateIsSet ),
+            self::$rstatus =>
+                self::addXMLchildForTypeRstatus( $child, $value ),
+            self::$text =>
+                self::addXMLchildForTypeText( $child, $type, $value ),
+            self::$utc_offset =>
+                self::addXMLchildForTypeUtcOffset( $child, $type, $value ),
+            default => // also self::$unknown
+                self::addXMLchildForTypeUnknowDefault( $child, $value ),
+        }; // end match
+    }
+
+    /**
+     * Manage date type
+     *
+     * @param SimpleXMLElement $child
+     * @param string           $type
+     * @param mixed            $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeDate( SimpleXMLElement $child, string $type, mixed $value ) : void
+    {
+        if( $value instanceof DateTime ) {
+            $value = [ $value ];
+        }
+        foreach( $value as $date ) {
+            self::addSubChild( $child, $type, DateTimeFactory::dateTime2Str( $date, true ));
+        }
+    }
+
+    /**
+     * Manage date-time type
+     *
+     * @param SimpleXMLElement $child
+     * @param string           $type
+     * @param mixed            $value
+     * @param bool $isLocalTime
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeDateTime(
+        SimpleXMLElement $child,
+        string $type,
+        mixed $value,
+        bool $isLocalTime
+    ) : void
+    {
+        if( $value instanceof DateTime ) {
+            $value = [ $value ];
+        }
+        foreach( $value as $dt ) {
+            self::addSubChild( $child, $type, DateTimeFactory::dateTime2Str( $dt, false, $isLocalTime ));
+        } // end foreach
+    }
+
+    /**
+     * Manage geo type
+     *
+     * @param SimpleXMLElement $child
+     * @param mixed            $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeGeo( SimpleXMLElement $child, mixed $value ) : void
+    {
+        if( ! empty( $value )) {
+            self::addSubChild(
+                $child,
+                IcalInterface::LATITUDE,
+                GeoFactory::geo2str2( $value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt )
+            );
+            self::addSubChild(
+                $child,
+                IcalInterface::LONGITUDE,
+                GeoFactory::geo2str2( $value[IcalInterface::LONGITUDE], GeoFactory::$geoLatFmt )
+            );
+        } // end if
+    }
+
+    /**
+     * Manage period type
+     *
+     * @param SimpleXMLElement $child
+     * @param string $type
+     * @param mixed  $value
+     * @param bool   $isLocalTime
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypePeriod(
+        SimpleXMLElement $child,
+        string $type,
+        mixed $value,
+        bool $isLocalTime
+    ) : void
+    {
+        static $START = 'start';
+        static $END   = 'end';
+        if( ! is_array( $value )) {
             return;
         }
-        $recurDateIsSet = false;
-        $isLocalTime    = $subData->hasParamKey(IcalInterface::ISLOCALTIME );
-        $isOneParm      = ( 1 === count( $subData->params ));
-        switch( true ) {
-            case ( empty( $subData->params ) || ( $isOneParm && $isLocalTime )) :
-                break;
-            case ( self::$recur === $type ) :
-                $recurDateIsSet = $subData->hasParamValue( IcalInterface::DATE );
-                if( $isOneParm && $subData->hasParamKey( IcalInterface::VALUE )) {
-                    break;
-                }
-                $subData->removeParam( IcalInterface::VALUE );
-                // fall through
-            default :
-                $parameters = $child->addChild( self::$PARAMETERS );
-                foreach((array) $subData->getParams() as $pKey => $parVal ) {
-                    if( IcalInterface::VALUE === $pKey ) {
-                        if( str_contains( $parVal, Util::$COLON )) {
-                            $p1   = $parameters->addChild( strtolower( $pKey ));
-                            $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
-                            $type = strtolower( strstr( $parVal, Util::$COLON, true ));
-                        }
-                        elseif( 0 !== strcasecmp( $type, $parVal )) {
-                            $type = strtolower( $parVal );
-                        }
-                        continue;
-                    } // end if VALUE
-                    if( IcalInterface::ISLOCALTIME === $pKey ) {
-                        continue;
-                    }
-                    $pKey = strtolower( $pKey );
-                    if( StringFactory::isXprefixed( $pKey )) {
-                        $p1 = $parameters->addChild( $pKey );
-                        $p1->addChild( self::$unknown, htmlspecialchars( $parVal ));
-                        continue;
-                    }
-                    $p1 = $parameters->addChild( $pKey );
-                    $ptype = match ( $pKey ) {
-                        $altrep, $dir   => self::$uri,
-                        $delegated_from, $delegated_to, $member, $sent_by => self::$cal_address,
-                        $order          => self::$integer,
-                        $rsvp, $derived => $BOOLEAN,
-                        default         => self::$text,
-                    }; // end switch
-                    if( is_array( $parVal )) {
-                        foreach( $parVal as $pV ) {
-                            $p1->addChild( $ptype, htmlspecialchars((string) $pV ));
-                        }
-                    }
-                    else {
-                        $p1->addChild( $ptype, htmlspecialchars((string) $parVal ));
-                    }
-                } // end foreach $params
-                break;
-        } // end switch
-        /** store content on type */
-        $value = $subData->value;
-        switch( $type ) {
-            case self::$binary :
-                $child->addChild( $type, $value );
-                break;
-            case $BOOLEAN :
-                break;
-            case self::$cal_address :
-                $child->addChild( $type, $value );
-                break;
-            case self::$date :
-                if( $value instanceof DateTime ) {
-                    $value = [ $value ];
-                }
-                foreach( $value as $date ) {
-                    $child->addChild( $type, DateTimeFactory::dateTime2Str( $date, true ));
-                }
-                break;
-            case self::$date_time :
-                if( $value instanceof DateTime ) {
-                    $value = [ $value ];
-                }
-                foreach( $value as $dt ) {
-                    $child->addChild( $type, DateTimeFactory::dateTime2Str( $dt, false, $isLocalTime ));
-                } // end foreach
-                break;
-            case strtolower( IcalInterface::DURATION ) :
-                $child->addChild(
-                    $type,
-                    DateIntervalFactory::dateInterval2String( $value, true )
+        foreach( $value as $period ) {
+            $v1  = self::addSubChild( $child, $type );
+            $str = DateTimeFactory::dateTime2Str( $period[0], false, $isLocalTime );
+            self::addSubChild( $v1, $START, $str );
+            if( $period[1] instanceof DateInterval ) {
+                self::addSubChild(
+                    $v1,
+                    strtolower( IcalInterface::DURATION ),
+                    DateIntervalFactory::dateInterval2String( $period[1] )
                 );
-                break;
-            case strtolower( IcalInterface::GEO ) :
-                if( ! empty( $value )) {
-                    $child->addChild(
-                        IcalInterface::LATITUDE,
-                        GeoFactory::geo2str2( $value[IcalInterface::LATITUDE], GeoFactory::$geoLatFmt )
-                    );
-                    $child->addChild(
-                        IcalInterface::LONGITUDE,
-                        GeoFactory::geo2str2( $value[IcalInterface::LONGITUDE], GeoFactory::$geoLongFmt )
-                    );
-                }
-                break;
-            case self::$integer :
-                $child->addChild( $type, (string) $value );
-                break;
-            case self::$period :
-                if( ! is_array( $value )) {
-                    break;
-                }
-                foreach( $value as $period ) {
-                    $v1  = $child->addChild( $type );
-                    $str = DateTimeFactory::dateTime2Str( $period[0], false, $isLocalTime );
-                    $v1->addChild( $START, $str );
-                    if( $period[1] instanceof DateInterval ) {
-                        $v1->addChild(
-                            strtolower( IcalInterface::DURATION ),
-                            DateIntervalFactory::dateInterval2String( $period[1] )
-                        );
-                    }
-                    elseif( $period[1] instanceof DateTime ) {
-                        $str = DateTimeFactory::dateTime2Str( $period[1], false, $isLocalTime );
-                        $v1->addChild( $END, $str );
-                    }
-                } // end foreach
-                break;
-            case self::$recur :
-                $value = array_change_key_case( $value );
-                foreach( $value as $ruleLabel => $ruleValue ) {
-                    switch( $ruleLabel ) {
-                        case $UNTIL :
-                            $child->addChild(
-                                $ruleLabel,
-                                DateTimeFactory::dateTime2Str( $ruleValue, $recurDateIsSet )
-                            );
-                            break;
-                        case self::$bysecond :
-                        case self::$byminute :
-                        case self::$byhour :
-                        case self::$bymonthday :
-                        case self::$byyearday :
-                        case self::$byweekno :
-                        case self::$bymonth :
-                        case self::$bysetpos :
-                            if( is_array( $ruleValue )) {
-                                foreach( $ruleValue as $valuePart ) {
-                                    $child->addChild( $ruleLabel, (string) $valuePart );
-                                }
-                            }
-                            else {
-                                $child->addChild( $ruleLabel, $ruleValue );
-                            }
-                            break;
-                        case self::$byday :
-                            if( isset( $ruleValue[IcalInterface::DAY] )) {
-                                $str  = $ruleValue[0] ?? Util::$SP0;
-                                $str .= $ruleValue[IcalInterface::DAY];
-                                $child->addChild( $ruleLabel, $str );
-                            }
-                            else {
-                                foreach( $ruleValue as $valuePart ) {
-                                    if( isset( $valuePart[IcalInterface::DAY] )) {
-                                        $str  = $valuePart[0] ?? Util::$SP0;
-                                        $str .= $valuePart[IcalInterface::DAY];
-                                        $child->addChild( $ruleLabel, $str );
-                                    }
-                                    else {
-                                        $child->addChild( $ruleLabel, $valuePart );
-                                    }
-                                } // end foreach
-                            }
-                            break;
-                        case self::$freq :
-                        case self::$count :
-                        case self::$interval :
-                        case self::$wkst :
-                        default:
-                            $child->addChild( $ruleLabel, (string) $ruleValue );
-                            break;
-                    } // end switch( $ruleLabel )
-                } // end foreach( $value as $ruleLabel => $ruleValue )
-                break;
-            case self::$rstatus :
-                $child->addChild(
-                    self::$code,
-                    number_format((float) $value[IcalInterface::STATCODE], 2, Util::$DOT, $SP0 ));
-                $child->addChild(
-                    self::$description,
-                    htmlspecialchars( $value[IcalInterface::STATDESC] )
-                );
-                if( isset( $value[IcalInterface::EXTDATA] )) {
-                    $child->addChild(
-                        self::$data,
-                        htmlspecialchars( $value[IcalInterface::EXTDATA] )
-                    );
-                }
-                break;
-            case self::$text :
-                if( ! is_array( $value )) {
-                    $value = [ $value ];
-                }
-                foreach( $value as $part ) {
-                    $child->addChild( $type, htmlspecialchars( $part ));
-                }
-                break;
-            case self::$time :
-                break;
-            case self::$uri :
-                $child->addChild( $type, $value );
-                break;
-            case self::$utc_offset :
-                if( DateIntervalFactory::hasPlusMinusPrefix( $value )) {
-                    $str   = $value[0];
-                    $value = substr( $value, 1 );
+            }
+            elseif( $period[1] instanceof DateTime ) {
+                $str = DateTimeFactory::dateTime2Str( $period[1], false, $isLocalTime );
+                self::addSubChild( $v1, $END, $str );
+            }
+        } // end foreach
+    }
+
+    /**
+     * Manage recur type
+     *
+     * @param SimpleXMLElement $child
+     * @param mixed  $value
+     * @param bool   $recurDateIsSet
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeRecur(
+        SimpleXMLElement $child,
+        mixed $value,
+        bool $recurDateIsSet
+    ) : void
+    {
+        static $UNTIL = 'until';
+        $value        = array_change_key_case( $value );
+        foreach( $value as $ruleLabel => $ruleValue ) {
+            match( $ruleLabel ) {
+                $UNTIL =>
+                    self::addSubChild( $child, $ruleLabel, DateTimeFactory::dateTime2Str( $ruleValue, $recurDateIsSet )),
+                self::$bysecond, self::$byminute, self::$byhour,
+                self::$bymonthday, self::$byyearday, self::$byweekno, self::$bymonth, self::$bysetpos =>
+                    self::addXMLchildForTypeRecurGroup1( $child, $ruleLabel, $ruleValue ),
+                self::$byday =>
+                    self::addXMLchildForTypeRecurByDay( $child, $ruleLabel, $ruleValue ),
+                default => // self::$freq, self::$count, self::$interval, self::$wkst
+                    self::addSubChild( $child, $ruleLabel, (string) $ruleValue ),
+            }; // end match( $ruleLabel )
+        } // end foreach( $value as $ruleLabel => $ruleValue )
+    }
+
+    /**
+     * @param SimpleXMLElement $child
+     * @param string           $ruleLabel
+     * @param mixed            $ruleValue
+     * @return void
+     * @throws Exception
+     */
+     private static function addXMLchildForTypeRecurGroup1(
+         SimpleXMLElement $child,
+         string $ruleLabel,
+         mixed $ruleValue
+     ) : void
+     {
+         if( is_array( $ruleValue )) {
+             foreach( $ruleValue as $valuePart ) {
+                 self::addSubChild( $child, $ruleLabel, (string) $valuePart );
+             }
+         }
+         else {
+             self::addSubChild( $child, $ruleLabel, $ruleValue );
+         }
+    }
+
+    /**
+     * @param SimpleXMLElement $child
+     * @param string           $ruleLabel
+     * @param mixed            $ruleValue
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeRecurByDay(
+        SimpleXMLElement $child,
+        string $ruleLabel,
+        mixed $ruleValue
+    ) : void
+    {
+        if( isset( $ruleValue[IcalInterface::DAY] )) {
+            $str  = $ruleValue[0] ?? StringFactory::$SP0;
+            $str .= $ruleValue[IcalInterface::DAY];
+            self::addSubChild( $child, $ruleLabel, $str );
+        }
+        else {
+            foreach( $ruleValue as $valuePart ) {
+                if( isset( $valuePart[IcalInterface::DAY] )) {
+                    $str  = $valuePart[0] ?? StringFactory::$SP0;
+                    $str .= $valuePart[IcalInterface::DAY];
+                    self::addSubChild( $child, $ruleLabel, $str );
                 }
                 else {
-                    $str = Util::$PLUS;
+                    self::addSubChild( $child, $ruleLabel, $valuePart );
                 }
-                $str .= substr( $value, 0, 2 ) .
-                    Util::$COLON . substr( $value, 2, 2 );
-                if( 4 < strlen( $value )) {
-                    $str .= Util::$COLON . substr( $value, 4 );
-                }
-                $child->addChild( $type, $str );
-                break;
-            case self::$unknown : // fall through
-            default:
-                if( is_array( $value )) {
-                    $value = implode( $value );
-                }
-                $child->addChild( self::$unknown, htmlspecialchars( $value ));
-                break;
-        } // end switch
+            } // end foreach
+        }
+    }
+
+    /**
+     * Manage rstatus type
+     *
+     * @param SimpleXMLElement $child
+     * @param mixed            $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeRstatus( SimpleXMLElement $child, mixed $value ) : void
+    {
+        self::addSubChild(
+            $child,
+            self::$code,
+            StringFactory::numberFormat( $value[IcalInterface::STATCODE] )
+        );
+        self::addSubChild( $child, self::$description, htmlspecialchars( $value[IcalInterface::STATDESC] ));
+        if( isset( $value[IcalInterface::EXTDATA] )) {
+            self::addSubChild( $child, self::$data, htmlspecialchars( $value[IcalInterface::EXTDATA] ));
+        }
+    }
+
+    /**
+     * Manage text type
+     *
+     * @param SimpleXMLElement $child
+     * @param string $type
+     * @param mixed  $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeText( SimpleXMLElement $child, string $type, mixed $value ) : void
+    {
+        if( ! is_array( $value )) {
+            $value = [ $value ];
+        }
+        foreach( $value as $part ) {
+            self::addSubChild( $child, $type, htmlspecialchars( $part ) );
+        }
+    }
+
+    /**
+     * Manage utc_offset type
+     *
+     * @param SimpleXMLElement $child
+     * @param string $type
+     * @param mixed  $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeUtcOffset( SimpleXMLElement $child, string $type, mixed $value ) : void
+    {
+        if( DateIntervalFactory::hasPlusMinusPrefix( $value )) {
+            $str   = $value[0];
+            $value = substr( $value, 1 );
+        }
+        else {
+            $str = StringFactory::$PLUS;
+        }
+        $str .= substr( $value, 0, 2 ) .
+            StringFactory::$COLON . substr( $value, 2, 2 );
+        if( 4 < strlen( $value )) {
+            $str .= StringFactory::$COLON . substr( $value, 4 );
+        }
+        self::addSubChild( $child, $type, $str );
+    }
+
+    /**
+     * Manage unknown and default type
+     *
+     * @param SimpleXMLElement $child
+     * @param mixed  $value
+     * @return void
+     * @throws Exception
+     */
+    private static function addXMLchildForTypeUnknowDefault( SimpleXMLElement $child, mixed $value ) : void
+    {
+        if( is_array( $value )) {
+            $value = implode( $value );
+        }
+        self::addSubChild( $child, self::$unknown, htmlspecialchars( $value ));
+    }
+
+    /**
+     * @param SimpleXMLElement $child
+     * @param string           $name
+     * @param null|string      $value
+     * @return SimpleXMLElement
+     * @throws Exception
+     */
+    private static function addSubChild( SimpleXMLElement $child, string $name, ? string $value = null ) : SimpleXMLElement
+    {
+        $subChild = $child->addChild( $name, $value );
+        if( null === $subChild ) {
+            throw new Exception( 'Can\'t add XML child ' . $name );
+        }
+        return $subChild;
     }
 }

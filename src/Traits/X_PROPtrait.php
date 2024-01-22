@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,7 +33,6 @@ use Kigkonsult\Icalcreator\Formatter\Property\Xproperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function count;
@@ -43,7 +42,7 @@ use function strtoupper;
 /**
  * X-property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait X_PROPtrait
 {
@@ -131,7 +130,7 @@ trait X_PROPtrait
      * @param null|int    $currPropIx    specific property in case of multiply occurrence
      * @param null|bool   $inclParam
      * @return bool|array  [ propName, string/Pc ]
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getXprop(
         ? string $propName = null,
@@ -154,7 +153,7 @@ trait X_PROPtrait
             }
             return $inclParam
                 ? [ $propName, clone $this->xprop[$propName], ]
-                : [ $propName, $this->xprop[$propName]->value, ];
+                : [ $propName, $this->xprop[$propName]->getValue(), ];
         }
         //  $propName == self::X_PROP i.e. any
         if( null === $currPropIx ) {
@@ -168,7 +167,7 @@ trait X_PROPtrait
             if( $currPropIx === $xpropNo ) {
                 return $inclParam
                     ? [ $xpropName2, clone $this->xprop[$xpropName2], ]
-                    : [ $xpropName2, $this->xprop[$xpropName2]->value, ];
+                    : [ $xpropName2, $this->xprop[$xpropName2]->getValue(), ];
             }
             $xpropNo++;
         } // end foreach
@@ -181,7 +180,7 @@ trait X_PROPtrait
      *
      * @param null|bool   $inclParam
      * @return array   [ *( xPropName, Pc/value ) ]
-     * @since 2.41.51 2022-08-09
+     * @since 2.41.85 2024-01-18
      */
     public function getAllXprop( ? bool $inclParam = false ) : array
     {
@@ -192,7 +191,7 @@ trait X_PROPtrait
         foreach( $this->xprop as $xPropName => $xPropValue ) {
             $output[] =  [
                 $xPropName,
-                ( $inclParam ? clone $this->xprop[$xPropName] : $this->xprop[$xPropName]->value )
+                ( $inclParam ? clone $this->xprop[$xPropName] : $this->xprop[$xPropName]->getValue())
             ];
         } // end foreach
         return $output;
@@ -206,7 +205,7 @@ trait X_PROPtrait
      */
     public function isXpropSet( ? string $xPropName = null ) : bool
     {
-        return empty( $xPropName ) ? ( ! empty( $this->xprop )) : ! empty( $this->xprop[$xPropName] );
+        return empty( $xPropName ) ? ( ! empty( $this->xprop )) : ( ! empty( $this->xprop[$xPropName] ));
     }
 
     /**
@@ -214,10 +213,10 @@ trait X_PROPtrait
      *
      * @param string        $xPropName
      * @param null|int|float|string|Pc  $value
-     * @param null|array $params     optional
+     * @param null|mixed[] $params     optional
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setXprop( string $xPropName, null|int|float|string|Pc $value = null, ? array $params = [] ) : static
     {
@@ -226,19 +225,18 @@ trait X_PROPtrait
             throw new InvalidArgumentException( sprintf( $MSG, $xPropName ));
         }
         $xPropName = strtoupper( $xPropName );
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( null === $value->value ) {
-            $this->assertEmptyValue( $value->value, $xPropName );
-            $value->setEmpty();
+        $pc        = Pc::factory( $value, $params );
+        $pcValue   = $pc->getValue();
+        if( null === $pcValue ) {
+            $this->assertEmptyValue( $pcValue, $xPropName );
+            $pc->setEmpty();
         }
-        if( ! $value->hasParamKey( self::VALUE ) ||
-            $value->hasParamValue( self::TEXT )) {
-            $value->value = Util::assertString( $value->value, $xPropName );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+        if( ! $pc->hasParamValue() ||
+            $pc->hasParamValue( self::TEXT )) {
+            $pcValue = Util::assertString( $pcValue, $xPropName );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
-        $this->xprop[$xPropName] = $value;
+        $this->xprop[$xPropName] = $pc;
         return $this;
     }
 }

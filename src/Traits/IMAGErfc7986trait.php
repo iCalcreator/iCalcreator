@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use function sprintf;
 /**
  * IMAGE property functions
  *
- * @ince 2.41.63 - 2022-09-03
+ * @since 2.41.85 2024-01-18
  */
 trait IMAGErfc7986trait
 {
@@ -134,7 +134,7 @@ trait IMAGErfc7986trait
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
-     * @ince 2.41.63 - 2022-09-03
+     * @since 2.41.85 2024-01-18
      */
     public function setImage(
         null|string|Pc $value = null,
@@ -143,32 +143,33 @@ trait IMAGErfc7986trait
     ) : static
     {
         static $FMTERR2 = 'Unknown parameter VALUE %s';
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::IMAGE );
-            self::setMval( $this->image, $value->setEmpty(), $index );
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::IMAGE );
+            self::setMval( $this->image, $pc->setEmpty(), $index );
             return $this;
         }
-        $inputValueParam = $value->getValueParam();
+        $inputValueParam = $pc->getValueParam();
         switch( true ) {
-            case $value->hasParamKey( self::ENCODING ) :
-                $value->addParamValue( self::BINARY );
+            case $pc->hasParamKey( self::ENCODING ) :
+                $pc->addParamValue( self::BINARY );
                 break;
             case empty( $inputValueParam ) :
-                $value->addParamValue( self::URI );
+                $pc->addParamValue( self::URI );
                 break;
             case ( self::URI === $inputValueParam ) :
                 break;
             case ( self::BINARY === $inputValueParam ) :
-                $value->addParam( self::ENCODING, self::BASE64 );
+                $pc->addParam( self::ENCODING, self::BASE64 );
                 break;
             default :
                 throw new InvalidArgumentException(
-                    sprintf( $FMTERR2, $value->getParams( self::VALUE ))
+                    sprintf( $FMTERR2, $pc->getParams( self::VALUE ))
                 );
         } // end switch
-        $value->removeParam(self::DISPLAY,self::BADGE ); // remove defaults
-        self::setMval( $this->image, $value, $index );
+        $pc->removeParam(self::DISPLAY,self::BADGE ); // remove defaults
+        self::setMval( $this->image, $pc, $index );
         return $this;
     }
 }

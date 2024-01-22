@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,13 +33,12 @@ use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * TZID property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait TZIDtrait
 {
@@ -79,25 +78,25 @@ trait TZIDtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getTzid( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzid )) {
             return false;
         }
-        return $inclParam ? clone $this->tzid : $this->tzid->value;
+        return $inclParam ? clone $this->tzid : $this->tzid->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isTzidSet() : bool
     {
-        return ! empty( $this->tzid->value );
+        return self::isPropSet( $this->tzid );
     }
 
     /**
@@ -105,25 +104,24 @@ trait TZIDtrait
      *
      * @since 2.23.12 - 2017-04-22
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setTzid( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::TZID );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::TZID );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::TZID );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pcValue = Util::assertString( $pcValue, self::TZID );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
-        $this->tzid = $value->setParams( ParameterFactory::setParams( $params ));
+        $this->tzid = $pc;
         return $this;
     }
 }

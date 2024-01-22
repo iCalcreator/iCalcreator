@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * ATTENDEE property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait ATTENDEEtrait
 {
@@ -136,7 +136,7 @@ trait ATTENDEEtrait
      * @param null|int       $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     public function setAttendee(
         null|string|Pc $value = null,
@@ -144,23 +144,25 @@ trait ATTENDEEtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::ATTENDEE );
-            $value->setEmpty();
+        $pc = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::ATTENDEE );
+            $pc->setEmpty();
         }
         else {
-            $value->value = Util::assertString( $value->value, self::ATTENDEE );
-            $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
-            CalAddressFactory::assertCalAddress( $value->value );
-            CalAddressFactory::sameValueAndEMAILparam( $value );
-            $value->params = CalAddressFactory::inputPrepAttendeeParams(
-                $value->params,
+            $pcValue = Util::assertString( $pcValue, self::ATTENDEE );
+            $pcValue = CalAddressFactory::conformCalAddress( $pcValue, true );
+            CalAddressFactory::assertCalAddress( $pcValue );
+            $pc->setValue( $pcValue );
+            CalAddressFactory::sameValueAndEMAILparam( $pc );
+            CalAddressFactory::inputPrepAttendeeParams(
+                $pc,
                 $this->getCompType(),
                 $this->getConfig( self::LANGUAGE )
             );
         }
-        self::setMval( $this->attendee, $value, $index );
+        self::setMval( $this->attendee, $pc, $index );
         return $this;
     }
 }

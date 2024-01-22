@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,13 +36,12 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\DurDates;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * DURATION property functions
  *
- * @since 2.41.56 2022-08-15
+ * @since 2.41.85 2024-01-18
  */
 trait DURATIONtrait
 {
@@ -86,7 +85,7 @@ trait DURATIONtrait
      * @param null|bool   $specform
      * @return bool|string|DateInterval|DateTime|Pc
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getDuration(
         ? bool $inclParam = false,
@@ -96,47 +95,47 @@ trait DURATIONtrait
         if( empty( $this->duration )) {
             return false;
         }
-        if( empty( $this->duration->value )) {
-            return $inclParam ? clone $this->duration : $this->duration->value;
+        $pcValue  = $this->duration->getValue();
+        if( empty( $pcValue )) {
+            return $inclParam ? clone $this->duration : $pcValue;
         }
-        $value  = $this->duration->value;
-        $params = $this->duration->params;
-        if( $specform && ! empty( $this->dtstart )) {
+        $pcParams = $this->duration->params;
+        if( $specform && $this->isDtstartSet()) {
             $dtStart = $this->dtstart;
-            $dtValue = clone $dtStart->value;
-            DateIntervalFactory::modifyDateTimeFromDateInterval( $dtValue, $value );
-            $value   = $dtValue;
+            $dtValue = clone $dtStart->getValue();
+            DateIntervalFactory::modifyDateTimeFromDateInterval( $dtValue, $pcValue );
+            $pcValue = $dtValue;
             if( $inclParam && $dtStart->hasParamKey( self::TZID )) {
                 foreach( $dtStart->params as $k =>$v ) {
-                    $params[$k] = $v;
+                    $pcParams[$k] = $v;
                 }
             }
         }
         return $inclParam
-            ? Pc::factory( $value, $params )
-            : $value;
+            ? Pc::factory( $pcValue, $pcParams )
+            : $pcValue;
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isDurationSet() : bool
     {
-        return ! empty( $this->duration->value );
+        return self::isPropSet( $this->duration );
     }
 
     /**
      * Set calendar component property duration
      *
      * @param null|string|Pc|DateInterval $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.56 2022-08-15
+     * @since 2.41.85 2024-01-18
      * @todo "When the "DURATION" property relates to a
      *        "DTSTART" property that is specified as a DATE value, then the
      *        "DURATION" property MUST be specified as a "dur-day" or "dur-week"
@@ -145,23 +144,22 @@ trait DURATIONtrait
     public function setDuration( null|string|DateInterval|Pc $value = null, ? array $params = [] ) : static
     {
         static $FMTERRPROPFMT = 'Invalid %s input format (%s)';
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
         switch( true ) {
-            case empty( $value->value ) :
-                $this->assertEmptyValue( $value->value, self::DURATION );
-                $this->duration = $value->setEmpty();
+            case empty( $pcValue ) :
+                $this->assertEmptyValue( $pcValue, self::DURATION );
+                $this->duration = $pc->setEmpty();
                 return $this;
-            case( $value->value instanceof DateInterval ) :
-                $value->value = DateIntervalFactory::conformDateInterval( $value->value );
+            case( $pcValue instanceof DateInterval ) :
+                $pc->setValue( DateIntervalFactory::conformDateInterval( $pcValue ));
                 break;
-            case DateIntervalFactory::isStringAndDuration( $value->value ) :
-                $value2 = StringFactory::trimTrailNL( $value->value );
+            case DateIntervalFactory::isStringAndDuration( $pcValue ) :
+                $value2 = StringFactory::trimTrailNL( $pcValue );
                 $value2 = DateIntervalFactory::removePlusMinusPrefix( $value2 ); // can only be positive
                 try {
                     $dateInterval = new DateInterval( $value2 );
-                    $value->value = DateIntervalFactory::conformDateInterval( $dateInterval );
+                    $pc->setValue( DateIntervalFactory::conformDateInterval( $dateInterval ));
                 }
                 catch( Exception $e ) {
                     throw new InvalidArgumentException( $e->getMessage(), $e->getCode(), $e );
@@ -169,10 +167,10 @@ trait DURATIONtrait
                 break;
             default :
                 throw new InvalidArgumentException(
-                    sprintf( $FMTERRPROPFMT, self::DURATION, var_export( $value->value, true ))
+                    sprintf( $FMTERRPROPFMT, self::DURATION, var_export( $pcValue, true ))
                 );
         } // end switch
-        $this->duration = $value;
+        $this->duration = $pc;
         return $this;
     }
 }

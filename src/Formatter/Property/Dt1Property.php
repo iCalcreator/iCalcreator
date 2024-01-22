@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,12 +32,13 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format DTSTART, RECURRENCE_ID and DUE, DTEND (has spec cond on DATE-format)
  *
  * 4
- * @since 2.41.66 2022-09-07
+ * @since 2.41.88 2024-01-18
  */
 final class Dt1Property extends PropertyBase
 {
@@ -58,15 +59,17 @@ final class Dt1Property extends PropertyBase
         ? bool $isLocalTime = false
     ) : string
     {
-        return match( true ) {
-            empty( $pc )        => self::$SP0,
-            empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::renderProperty(
+        if( empty( $pc )) {
+            return StringFactory::$SP0;
+        }
+        $pcValue = $pc->getValue();
+        return empty( $pcValue )
+            ? self::renderSinglePropEmpty( $propName, $allowEmpty )
+            : self::renderProperty(
                 $propName,
-                $pc->params,
-                DateTimeFactory::dateTime2Str( $pc->value, $isDate, $isLocalTime )
-            )
-        };
+                $pc->getParams(),
+                DateTimeFactory::dateTime2Str( $pcValue, $isDate, $isLocalTime )
+            );
     }
 
     /**
@@ -85,6 +88,6 @@ final class Dt1Property extends PropertyBase
 
     public static function getIsLocalTime( null | bool | Pc $dtDate ) : bool
     {
-        return ( ! empty( $dtDate ) && $dtDate->hasParamKey( self::ISLOCALTIME ) );
+        return ( ! empty( $dtDate ) && $dtDate->hasParamIsLocalTime());
     }
 }

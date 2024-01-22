@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,13 +32,12 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * LOCATION-TYPE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait LOCATIONTYPErfc9073trait
 {
@@ -77,24 +76,25 @@ trait LOCATIONTYPErfc9073trait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
+     * @since 2.41.85 2024-01-18
      */
     public function getLocationtype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->locationtype )) {
             return false;
         }
-        return $inclParam ? clone $this->locationtype : $this->locationtype->value;
+        return $inclParam ? clone $this->locationtype : $this->locationtype->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isLocationtypeSet() : bool
     {
-        return ! empty( $this->locationtype->value );
+        return self::isPropSet( $this->locationtype );
     }
 
     /**
@@ -104,23 +104,23 @@ trait LOCATIONTYPErfc9073trait
      * New location types SHOULD be registered in the manner laid down in Section 5 of [RFC4589].
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
+     * @since 2.41.85 2024-01-18
      */
     public function setLocationtype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::LOCATION_TYPE );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::LOCATION_TYPE );
+            $pc->setEmpty();
         }
         else {
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
-        $this->locationtype = $value;
+        $this->locationtype = $pc;
         return $this;
     }
 }

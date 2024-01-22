@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,7 +40,7 @@ use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 /**
  * LAST-MODIFIED property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait LAST_MODIFIEDtrait
 {
@@ -83,50 +83,48 @@ trait LAST_MODIFIEDtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|DateTime|Pc
-     * @since 2.29.9 2019-08-05
+     * @since 2.41.85 2024-01-18
      */
     public function getLastmodified( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->lastmodified )) {
             return false;
         }
-        return $inclParam ? clone $this->lastmodified : $this->lastmodified->value;
+        return $inclParam ? clone $this->lastmodified : $this->lastmodified->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isLastmodifiedSet() : bool
     {
-        return ! empty( $this->lastmodified->value );
+        return self::isPropSet( $this->lastmodified );
     }
 
     /**
      * Set calendar component property last-modified
      *
      * @param null|string|Pc|DateTimeInterface  $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.29.16 2020-01-24
+     * @since 2.41.85 2024-01-18
      */
     public function setLastmodified(
         null | string | Pc | DateTimeInterface $value = null,
         ? array $params = []
     ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, $params );
-        $value->addParamValue(self::DATE_TIME ); // req
-        $this->lastmodified = empty( $value->value )
-            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
+        $pc = Pc::factory( $value, $params );
+        $pc->addParamValue(self::DATE_TIME ); // req
+        $this->lastmodified = empty( $pc->getValue())
+            ? $pc->setValue( DateTimeFactory::factory( null, self::UTC ))
                 ->removeParam( self::VALUE )
-            : DateTimeFactory::setDate( $value, true );
+            : DateTimeFactory::setDate( $pc, true );
         return $this;
     }
 }

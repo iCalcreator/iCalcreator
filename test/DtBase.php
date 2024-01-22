@@ -52,8 +52,8 @@ abstract class DtBase extends TestCase
 
     protected static function getErrMsg(
         ? string $spec = null,
-        int|string $case,
-        string $testFcn,
+        null|int|string $case = null,
+        ? string $testFcn = null,
         ? string $inst = null,
         ? string $method = null,
         mixed $inValue = null,
@@ -138,8 +138,8 @@ abstract class DtBase extends TestCase
                 if( in_array( $propName, [ IcalInterface::EXDATE, IcalInterface::RDATE ], true )) {
                     $comp->{$setMethod}( [ $value ], $params );
                     $getValue = $comp->{$getMethod}( null, true );
-                    if( ! empty( $getValue->value )) {
-                        $getValue->value = reset( $getValue->value );
+                    if( ! empty( $getValue->getValue() )) {
+                        $getValue->setValue( reset( $getValue->getValue()));
                     }
                 }
                 else {
@@ -158,7 +158,7 @@ abstract class DtBase extends TestCase
                     );
                 }
 
-                if( $expectedGet->value instanceof DateTime && $getValue->value instanceof DateTime ) {
+                if( $expectedGet->getValue() instanceof DateTime && $getValue->getValue() instanceof DateTime ) {
                     if( $expectedGet->hasParamKey( IcalInterface::TZID ) &&
                         $getValue->hasParamKey( IcalInterface::TZID )) {
                         // has same offset (TZID might differ)
@@ -191,13 +191,13 @@ abstract class DtBase extends TestCase
                         ? DateTimeFactory::$Ymd
                         : DateTimeFactory::$YmdHis;
                     $this->assertEquals(
-                        $expectedGet->value->format( $fmt ),
-                        $getValue->value->format( $fmt ),
+                        $expectedGet->getValue()->format( $fmt ),
+                        $getValue->getValue()->format( $fmt ),
                         self::getErrMsg( null, $case . '-114-3', __FUNCTION__, $theComp, $getMethod, $value, $params )
                     );
                     $this->assertEquals( // in case of diff. timezones but with equal offset
-                        $expectedGet->value->getOffset(),
-                        $getValue->value->getOffset(),
+                        $expectedGet->getValue()->getOffset(),
+                        $getValue->getValue()->getOffset(),
                         self::getErrMsg( null, $case . '-114-4', __FUNCTION__, $theComp, $getMethod, $value, $params )
                     );
                 } // end if ..DateTime..
@@ -308,22 +308,24 @@ abstract class DtBase extends TestCase
                     $comp->{$setMethod}( $value, $params );
                     $getValue = $comp->{$getMethod}();
                 } // end else
+                $result = $comp->{$isMethod}();
+
                 $this->assertSame(
                     ! empty( $value ),
-                    $comp->{$isMethod}(),
+                    $result,
                     self::getErrMsg( null, $case . '-212', __FUNCTION__, $theComp, $isMethod )
-                       . ', exp ' . empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE
+                       . ', exp ' . ( empty( $value ) ? Vcalendar::FALSE : Vcalendar::TRUE )
                 );
-                if( $expectedGet->value instanceof DateTime && $getValue instanceof DateTime ) {
+                if( $expectedGet->getValue() instanceof DateTime && $getValue instanceof DateTime ) {
                     $this->assertEquals(
-                        $expectedGet->value->format( DateTimeFactory::$YmdHis ),
+                        $expectedGet->getValue()->format( DateTimeFactory::$YmdHis ),
                         $getValue->format( DateTimeFactory::$YmdHis ),
                         self::getErrMsg( null, $case . '-213', __FUNCTION__, $theComp, $getMethod )
                     );
                 } // end if
                 else {
                     $this->assertEquals(
-                        $expectedGet->value ?? '',
+                        $expectedGet->getValue() ?? '',
                         $getValue,
                         self::getErrMsg( null, $case . '-214', __FUNCTION__, $theComp, $getMethod )
                     );
@@ -391,8 +393,8 @@ abstract class DtBase extends TestCase
                     $getValue->params,
                     self::getErrMsg( null, $case . '-1b2', __FUNCTION__, $theComp, $isMethod )
                 );
-                if( ! empty( $expectedGet->value )) {
-                    $expVal = $expectedGet->value;
+                if( ! empty( $expectedGet->getValue() )) {
+                    $expVal = $expectedGet->getValue();
 
                     switch( true ) {
                         case $expectedGet->hasParamValue(IcalInterface::DATE ) :
@@ -409,7 +411,7 @@ abstract class DtBase extends TestCase
                         $expVal = reset( $expVal );
                     }
                     $expGet = $expVal->format( $fmt );
-                    $getVal = reset( $getValue->value );
+                    $getVal = reset( $getValue->getValue() );
                     while( is_array( $getVal ) && ! $getVal instanceof DateTime ) { // exDate/Rdate
                         $getVal = reset( $getVal );
                     }
@@ -476,7 +478,7 @@ abstract class DtBase extends TestCase
         $calendarStr1 = $calendar->createCalendar();
 
         if( ! empty( $expectedString )) {
-            $createString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], Util::$SP0, $calendarStr1 );
+            $createString = str_replace( [ StringFactory::$CRLF . ' ', StringFactory::$CRLF ], StringFactory::$SP0, $calendarStr1 );
             $createString = str_replace( '\,', ',', $createString );
             $this->assertNotFalse(
                 strpos( $createString, $expectedString ),
@@ -539,7 +541,7 @@ abstract class DtBase extends TestCase
         $hdrs = PHP_SAPI === 'cli' ? xdebug_get_headers() : headers_list();
         $out3 = ob_get_clean();
 
-        $calEnd = 'END:VCALENDAR' . Util::$CRLF;
+        $calEnd = 'END:VCALENDAR' . StringFactory::$CRLF;
         $this->assertTrue(
             str_ends_with( $calendarStr1, $calEnd ),
             self::getErrMsg( null, $case . '-36a', __FUNCTION__, $theComp, $propName )
@@ -583,12 +585,12 @@ abstract class DtBase extends TestCase
      * @param string|null $tz
      * @return string
      */
-    public function getDateTimeAsCreateLongString( DateTimeInterface $dateTime, string $tz = null ) : string
+    public static function getDateTimeAsCreateLongString( DateTimeInterface $dateTime, string $tz = null ) : string
     {
         static $FMT1   = ';TZID=%s:';
         $ymdHis        = $dateTime->format( DateTimeFactory::$YmdTHis );
         $isUTCtimeZone = ( ! ( empty( $tz ) ) && DateTimeZoneFactory::isUTCtimeZone( $tz, $ymdHis ));
-        $output        = ( empty( $tz ) || $isUTCtimeZone ) ? Util::$COLON : sprintf( $FMT1, $tz );
+        $output        = ( empty( $tz ) || $isUTCtimeZone ) ? StringFactory::$COLON : sprintf( $FMT1, $tz );
         $output       .= $ymdHis;
         if( $isUTCtimeZone ) {
             $output   .= 'Z';
@@ -603,7 +605,7 @@ abstract class DtBase extends TestCase
      * @param bool $prefix
      * @return string
      */
-    public function getDateTimeAsCreateShortString( DateTimeInterface $dateTime, bool $prefix = true ) : string
+    public static function getDateTimeAsCreateShortString( DateTimeInterface $dateTime, bool $prefix = true ) : string
     {
         static $FMT1 = ';VALUE=DATE:%d';
         static $FMT2 = ':%d';

@@ -287,7 +287,7 @@ class DateIntervalTest3 extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function DateInterval101112Provider() : array
+    public static function DateInterval101112Provider() : array
     {
 
         $dataArr = [];
@@ -350,15 +350,15 @@ class DateIntervalTest3 extends DtBase
                 );
 
                 $getValue = $comp->{$getMethod}( null, true );
-                if( isset( $expectedGet->value[0] ) && // Freebusy
-                    ( $expectedGet->value[0] instanceof DateTimeInterface )) {
-                    $exp = $expectedGet->value[0]->format( 'YmdHis' );
-                    $act = $getValue->value[0][0]->format( 'YmdHis' );
+                if( isset( $expectedGet->getValue()[0] ) && // Freebusy
+                    ( $expectedGet->getValue()[0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet->getValue()[0]->format( 'YmdHis' );
+                    $act = $getValue->getValue()[0][0]->format( 'YmdHis' );
                 }
-                elseif( isset( $expectedGet->value[0][0] ) && // Freebusy ??
-                    ( $expectedGet->value[0][0] instanceof DateTimeInterface )) {
-                    $exp = $expectedGet->value[0][0]->format( 'YmdHis' );
-                    $act = $getValue->value[0][0]->format( 'YmdHis' );
+                elseif( isset( $expectedGet->getValue()[0][0] ) && // Freebusy ??
+                    ( $expectedGet->getValue()[0][0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet->getValue()[0][0]->format( 'YmdHis' );
+                    $act = $getValue->getValue()[0][0]->format( 'YmdHis' );
                 }
                 else {
                     $exp = clone $expectedGet;
@@ -430,15 +430,15 @@ class DateIntervalTest3 extends DtBase
 
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
-                if( isset( $expectedGet->value[0] ) && // Freebusy
-                    ( $expectedGet->value[0] instanceof DateTimeInterface )) {
-                    $exp = $expectedGet->value[0]->format( 'YmddHis' );
-                    $act = $getValue->value[0][0]->format( 'YmddHis' );
+                if( isset( $expectedGet->getValue()[0] ) && // Freebusy
+                    ( $expectedGet->getValue()[0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet->getValue()[0]->format( 'YmddHis' );
+                    $act = $getValue->getValue()[0][0]->format( 'YmddHis' );
                 }
-                elseif( isset( $expectedGet->value[0][0] ) && // Freebusy ??
-                    ( $expectedGet->value[0][0] instanceof DateTimeInterface )) {
-                    $exp = $expectedGet->value[0][0]->format( 'YmddHis' );
-                    $act = $getValue->value[0][0]->format( 'YmddHis' );
+                elseif( isset( $expectedGet->getValue()[0][0] ) && // Freebusy ??
+                    ( $expectedGet->getValue()[0][0] instanceof DateTimeInterface )) {
+                    $exp = $expectedGet->getValue()[0][0]->format( 'YmddHis' );
+                    $act = $getValue->getValue()[0][0]->format( 'YmddHis' );
                 }
                 else {
                     $exp = $expectedGet;
@@ -513,28 +513,35 @@ class DateIntervalTest3 extends DtBase
                 $getValue = $comp->{$getMethod}( null, true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 $expGet = clone $expectedGet;
-                $tmp = $expGet->value;
-                $expGet->value = [ $tmp, $tmp ];
+                $tmp    = $expGet->getValue();
+                $expGet->setValue( [ $tmp, $tmp ] );
 
-                if( isset( $expGet->value[0][0] ) && // Freebusy
-                    ( $expGet->value[0][0] instanceof DateTimeInterface )) {
-                    $expGet->value[0][0]   = $expGet->value[0][0]->format( $YmdHis );
-                    $expGet->value[1][0]   = $expGet->value[1][0]->format( $YmdHis );
-                    $getValue->value[0][0] = $getValue->value[0][0]->format( $YmdHis );
-                    $getValue->value[1][0] = $getValue->value[1][0]->format( $YmdHis );
-                    if( isset( $expGet->value[0][1] ) &&
-                        ( $expGet->value[0][1] instanceof \DateInterval )) {
-                        $expGet->value[0][1]   = DateIntervalFactory::dateInterval2String( $expGet->value[0][1] );
-                        $expGet->value[1][1]   = DateIntervalFactory::dateInterval2String( $expGet->value[1][1] );
-                        $getValue->value[0][1] = DateIntervalFactory::dateInterval2String( $getValue->value[0][1] );
-                        $getValue->value[1][1] = DateIntervalFactory::dateInterval2String( $getValue->value[1][1] );
+                if( isset( $expGet->getValue()[0][0] ) && // Freebusy
+                    ( $expGet->getValue()[0][0] instanceof DateTimeInterface )) {
+                    $expGetValue       = $expGet->getValue();
+                    $expGetValue[0][0] = $expGet->getValue()[0][0]->format( $YmdHis );
+                    $expGetValue[1][0] = $expGet->getValue()[1][0]->format( $YmdHis );
+                    $expGet->setValue( $expGetValue );
+                    $getValueTmp       = $getValue->getValue();
+                    $getValueTmp[0][0] = $getValue->getValue()[0][0]->format( $YmdHis );
+                    $getValueTmp[1][0] = $getValue->getValue()[1][0]->format( $YmdHis );
+                    $getValue->setValue( $getValueTmp );
+                    if( isset( $expGet->getValue()[0][1] ) &&
+                        ( $expGet->getValue()[0][1] instanceof \DateInterval )) {
+                        $expGetValue       = $expGet->getValue();
+                        $expGetValue[0][1] = DateIntervalFactory::dateInterval2String( $expGet->getValue()[0][1] );
+                        $expGetValue[1][1] = DateIntervalFactory::dateInterval2String( $expGet->getValue()[1][1] );
+                        $expGet->setValue( $expGetValue );
+                        $getValueTmp       = $getValue->getValue();
+                        $getValueTmp[0][1] = DateIntervalFactory::dateInterval2String( $getValue->getValue()[0][1] );
+                        $getValueTmp[1][1] = DateIntervalFactory::dateInterval2String( $getValue->getValue()[1][1] );
+                        $getValue->setValue( $getValueTmp );
                     }
                 } // end if
-
                 $this->assertEquals(
                     $expGet,
                     $getValue,
-                    "Error in case #$case-33, " . __FUNCTION__ . " <$theComp>->{$getMethod}"
+                    'Error in case #' . $case . '-33, ' . __FUNCTION__ . ' <$theComp>->{$getMethod}'
                     . PHP_EOL . ' expGet' . var_export( $expGet, true)
                     . PHP_EOL . ' getValue' . var_export( $getValue, true)
                 );

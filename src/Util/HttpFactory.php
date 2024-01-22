@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -53,7 +53,7 @@ use function utf8_encode;
 /**
  * iCalcreator http support class
  *
- * @since  2.47.68 - 2022-09-26
+ * @since 2.41.88 - 2024-01-18
  */
 class HttpFactory
 {
@@ -143,7 +143,7 @@ class HttpFactory
      * @param string $url
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.47.68 - 2022-09-26
+     * @since  2.41.68 - 2022-09-26
      */
     public static function assertUrl( string $url ) : void
     {
@@ -152,7 +152,7 @@ class HttpFactory
         static $HTTP = 'http://';
         static $MSG  = 'URL validity error #%d, \'%s\'';
         $url2 = str_contains( $url, $UC )
-            ? str_replace( $UC, Util::$MINUS, $url )
+            ? str_replace( $UC, StringFactory::$MINUS, $url )
             : $url;
         switch( true ) {
             case ( false !== filter_var( $url2, FILTER_VALIDATE_URL )) :
@@ -174,13 +174,15 @@ class HttpFactory
      * @param Pc       $value
      * @return void
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 - 2024-01-18
      */
     public static function urlSet( ? Pc & $propValue, Pc $value ) : void
     {
-        if( ! empty( $value->value )) {
-            StringFactory::checkFixUrlDecode( $value->value );
-            self::assertUrl( $value->value );
+        $pcValue = $value->getValue();
+        if( ! empty( $pcValue )) {
+            StringFactory::checkFixUrlDecode( $pcValue );
+            self::assertUrl( $pcValue );
+            $value->setValue( $pcValue );
             $value->removeParam(IcalInterface::VALUE );
         }
         $propValue = $value;

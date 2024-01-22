@@ -123,7 +123,7 @@ class UtilDateTime extends DateTime
     {
         static $H_I_S = 'H:i:s';
         $res = [];
-        foreach( explode( Util::$COLON, $this->format( $H_I_S )) as $t ) {
+        foreach( explode( StringFactory::$COLON, $this->format( $H_I_S )) as $t ) {
             $res[] = (int) $t;
         }
         return $res;

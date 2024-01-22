@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,14 +31,13 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
  * COLOR property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  * @see https://www.w3.org/TR/css-color-3/#svg-color
  */
 trait COLORrfc7986trait
@@ -80,49 +79,48 @@ trait COLORrfc7986trait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getColor( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->color )) {
             return false;
         }
-        return $inclParam ? clone $this->color : $this->color->value;
+        return $inclParam ? clone $this->color : $this->color->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isColorSet() : bool
     {
-        return ! empty( $this->color->value );
+        return self::isPropSet( $this->color );
     }
 
     /**
      * Set calendar component property color
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setColor( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::COLOR );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::COLOR );
+            $pc->setEmpty();
         }
         else {
-            $value->value = Util::assertString( $value->value, self::COLOR );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pcValue = Util::assertString( $pcValue, self::COLOR );
+            $pc->setValue(StringFactory::trimTrailNL( $pcValue ));
         }
-        $this->color = $value;
+        $this->color = $pc;
         return $this;
     }
 }

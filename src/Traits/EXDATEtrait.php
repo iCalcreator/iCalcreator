@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,7 +40,7 @@ use Kigkonsult\Icalcreator\Util\RexdateFactory;
 /**
  * EXDATE property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait EXDATEtrait
 {
@@ -142,7 +142,7 @@ trait EXDATEtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.46 2022-04-27
+     * @since 2.41.85 2024-01-18
      */
     public function setExdate(
         null|string|array|DateTimeInterface|Pc $value = null,
@@ -150,16 +150,17 @@ trait EXDATEtrait
         ? int $index = null
     ) : static
     {
-        $value        = self::marshallInputMval( $value, $params, $index );
-        $value->value = self::checkSingleExdates( $value->value );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::EXDATE );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::EXDATE );
+            $pc->setEmpty();
         }
         else {
-            $value = RexdateFactory::prepInputExdate( $value );
+            $pc->setValue( self::checkSingleExdates( $pcValue ));
+            $pc = RexdateFactory::prepInputExdate( $pc );
         }
-        self::setMval( $this->exdate, $value, $index );
+        self::setMval( $this->exdate, $pc, $index );
         return $this;
     }
 

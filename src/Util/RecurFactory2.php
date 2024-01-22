@@ -858,7 +858,7 @@ class RecurFactory2
         else {
             $day = (int) $wDate->format( self::$LCJ );
         }
-        $plusXmonth = $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCMONTH;
+        $plusXmonth = $recur[IcalInterface::INTERVAL] . StringFactory::$SP0 . RecurFactory::$LCMONTH;
         $x          = 1;
         while( $x <= $count ) {
             if( $month !== $currMonth ) {
@@ -972,15 +972,15 @@ class RecurFactory2
         $byMonthList = self::getRecurByMonth( $recur, $hasByMonth );
         if( $hasByMonth ) {
             while( ! self::inList( $month, $byMonthList )) {
-                $wDate->modify( 1 . Util::$SP0 . RecurFactory::$LCMONTH );
+                $wDate->modify( 1 . StringFactory::$SP0 . RecurFactory::$LCMONTH );
                 $year  = (int) $wDate->format( self::$UCY );
                 $month = (int) $wDate->format( self::$LCM );
             } // end while
         } // end if
         $day      = 1;
         $modifier = $isYearly
-            ? $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCYEAR
-            : $recur[IcalInterface::INTERVAL] . Util::$SP0 . RecurFactory::$LCMONTH;
+            ? $recur[IcalInterface::INTERVAL] . StringFactory::$SP0 . RecurFactory::$LCYEAR
+            : $recur[IcalInterface::INTERVAL] . StringFactory::$SP0 . RecurFactory::$LCMONTH;
         $weekDaysInMonth = self::getRecurByDaysInMonth( $recur[IcalInterface::BYDAY], $year, $month );
         $recurLimits = [];
         if( $hasBSP ) {

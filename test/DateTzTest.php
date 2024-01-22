@@ -52,7 +52,7 @@ class DateTzTest extends DtBase
      *
      * @return mixed[]
      */
-    public function dateTzTest1Provider() : array
+    public static function dateTzTest1Provider() : array
     {
         $dataArr = [];
 
@@ -156,7 +156,7 @@ class DateTzTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function dateTzTest2Provider() : array
+    public static function dateTzTest2Provider() : array
     {
         $dataArr = [];
 
@@ -185,7 +185,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmd );
@@ -200,7 +200,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmd );
@@ -215,7 +215,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -231,7 +231,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmdTHis );
@@ -245,7 +245,7 @@ class DateTzTest extends DtBase
                 self::$STCPAR
             ),
             Property::formatParams( self::$STCPAR ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmdTHis );
@@ -260,7 +260,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -276,7 +276,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -292,7 +292,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmdTHis, DateTimeZoneFactory::factory( LTZ ));
@@ -307,7 +307,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -323,7 +323,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmdTHis . ' ' . IcalInterface::UTC );
@@ -338,7 +338,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
         $dateTime  = new DateTime( DATEYmdTHis . ' ' . IcalInterface::UTC );
@@ -353,7 +353,7 @@ class DateTzTest extends DtBase
                 $params
             ),
             Property::formatParams( $params ) .
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -467,8 +467,8 @@ class DateTzTest extends DtBase
             IcalInterface::STANDARD,
             IcalInterface::DAYLIGHT
         ];
-        if( $expectedGet->value instanceof DateTime ) {
-            $expectedGet->value = $expectedGet->value->format( DateTimeFactory::$YmdTHis );
+        if( $expectedGet->getValue() instanceof DateTime ) {
+            $expectedGet->setValue( $expectedGet->getValue()->format( DateTimeFactory::$YmdTHis ));
         }
         $c = new Vcalendar();
         $v = $c->newVtimezone();
@@ -496,8 +496,8 @@ class DateTzTest extends DtBase
             else {
                 $getValue = $comp->{$getMethod}( true );
                 unset( $getValue->  params[IcalInterface::ISLOCALTIME] );
-                if( $getValue->value instanceof DateTime ) {
-                    $getValue->value = $getValue->value->format( DateTimeFactory::$YmdTHis );
+                if( $getValue->getValue() instanceof DateTime ) {
+                    $getValue->setValue( $getValue->getValue()->format( DateTimeFactory::$YmdTHis ));
                 }
             }
             $this->assertEquals(

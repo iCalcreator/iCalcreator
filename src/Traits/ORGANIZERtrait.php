@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,14 +32,13 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use InvalidArgumentException;
 
 /**
  * ORGANIZER property functions
  *
- * @since 2.41.80 2023-06-27
+ * @since 2.41.85 2024-01-18
  */
 trait ORGANIZERtrait
 {
@@ -80,69 +79,69 @@ trait ORGANIZERtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getOrganizer( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->organizer )) {
             return false;
         }
-        return $inclParam ? clone $this->organizer : $this->organizer->value;
+        return $inclParam ? clone $this->organizer : $this->organizer->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isOrganizerSet() : bool
     {
-        return ! empty( $this->organizer->value );
+        return self::isPropSet( $this->organizer );
     }
 
     /**
      * Set calendar component property organizer
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.80 2023-06-27
-      */
+     * @since 2.41.85 2024-01-18
+     */
     public function setOrganizer( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::ORGANIZER );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::ORGANIZER );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::ORGANIZER );
-            if( ! CalAddressFactory::hasProtocolPrefix( $value->value )) {
-                $value->value = CalAddressFactory::conformCalAddress( $value->value, true );
+            Util::assertString( $pcValue, self::ORGANIZER );
+            if( ! CalAddressFactory::hasProtocolPrefix( $pcValue )) {
+                $pc->setValue( CalAddressFactory::conformCalAddress( $pcValue, true ));
             }
-            if( CalAddressFactory::hasMailtoPrefix( $value->value )) {
-                $value->value = CalAddressFactory::conformCalAddress( $value->value );
-                CalAddressFactory::assertCalAddress( $value->value );
-                CalAddressFactory::sameValueAndEMAILparam( $value );
+            elseif( CalAddressFactory::hasMailtoPrefix( $pcValue )) {
+                $pcValue = CalAddressFactory::conformCalAddress( $pcValue );
+                CalAddressFactory::assertCalAddress( $pcValue );
+                $pc->setValue( $pcValue );
+                CalAddressFactory::sameValueAndEMAILparam( $pc );
             }
         }
-        $this->organizer = $value;
-        if( $this->organizer->hasParamKey( self::EMAIL )) {
-            $this->organizer->addParam(
+        if( $pc->hasParamKey( self::EMAIL )) {
+            $pc->addParam(
                 self::EMAIL,
-                CalAddressFactory::prepEmail( $this->organizer->getParams( self::EMAIL ))
+                CalAddressFactory::prepEmail( $pc->getParams( self::EMAIL ))
             );
         } // end if
-        if( $this->organizer->hasParamKey( self::SENT_BY )) {
-            $this->organizer->addParam(
+        if( $pc->hasParamKey( self::SENT_BY )) {
+            $pc->addParam(
                 self::SENT_BY,
-                CalAddressFactory::prepSentBy( $this->organizer->getParams( self::SENT_BY ))
+                CalAddressFactory::prepSentBy( $pc->getParams( self::SENT_BY ))
             );
         } // end if
+        $this->organizer = $pc;
         return $this;
     }
 }

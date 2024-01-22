@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -40,7 +40,7 @@ use Kigkonsult\Icalcreator\Vcalendar;
  *
  * NAME may occur multiply times in Vcalendar but once in Vlocation/Vresource
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait NAMErfc7986trait
 {
@@ -166,22 +166,23 @@ trait NAMErfc7986trait
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-11
+     * @since 2.41.85 2024-01-18
      */
     public function setName( null|string|Pc $value = null, null|int|array $params = [], ? int $index = null ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::NAME );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::NAME );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::NAME );
+            Util::assertString( $pcValue, self::NAME );
         }
         if( self::isNameSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        self::setMval( $this->name, $value, $index );
+        self::setMval( $this->name, $pc, $index );
         return $this;
     }
 }

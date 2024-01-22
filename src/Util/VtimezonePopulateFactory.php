@@ -206,7 +206,7 @@ class VtimezonePopulateFactory
      * @param Vcalendar     $calendar iCalcreator calendar instance
      * @param null|string[] $xProps    *[x-propName => x-propValue]
      * @return string
-     * @since 2.47.68 2022-09-25
+     * @since 2.41.68 - 2022-09-25
      */
     private static function getTimezone( Vcalendar $calendar, ? array $xProps = [] ) : string
     {
@@ -243,7 +243,7 @@ class VtimezonePopulateFactory
      * @return int[]
      * @throws  InvalidArgumentException
      * @throws  Exception
-     * @since  2.41.73 - 2023-03-25
+     * @since  2.41.88 - 2024-01-17
      */
     private static function ensureStartAndEnd(
         string $timezone,
@@ -255,19 +255,15 @@ class VtimezonePopulateFactory
         static $ERRMSG = 'Date are not in order: %d - %d';
         $startTs = self::getArgInSeconds( $start);
         $endTs   = self::getArgInSeconds( $end );
-        switch( true ) {
-            case (( null !== $startTs ) && ( null !== $endTs )) :
-                break;
-            case ( null !== $startTs ) : //  set to = +18 month (i.e 548 days)
-                $endTs = $startTs + ( 3600 * 24 * self::$NUMBEROFDAYSAFTER );
-                break;
-            case ( null !== $endTs ) :  // set from = -12 month (i.e 365 days)
-                $startTs = $endTs - ( 3600 * 24 * self::$NUMBEROFDAYSBEFORE );
-                break;
-            default :
-                [ $startTs, $endTs ] = self::getStartEndFromDtstarts( $timezone, $dtstartArr );
-                break;
-        } // end switch
+        match( true ) {
+            (( null !== $startTs ) && ( null !== $endTs )) => null,
+            ( null !== $startTs ) => //  set to = +18 month (i.e 548 days)
+                $endTs = $startTs + ( 3600 * 24 * self::$NUMBEROFDAYSAFTER ),
+            ( null !== $endTs ) =>  // set from = -12 month (i.e 365 days)
+                $startTs = $endTs - ( 3600 * 24 * self::$NUMBEROFDAYSBEFORE ),
+            default =>
+                [ $startTs, $endTs ] = self::getStartEndFromDtstarts( $timezone, $dtstartArr ),
+        }; // end match
         if( $startTs > $endTs ) {
             throw new InvalidArgumentException( sprintf( $ERRMSG, $start, $end ));
         }

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * CONFERENCE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait CONFERENCErfc7986trait
 {
@@ -135,6 +135,7 @@ trait CONFERENCErfc7986trait
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
+     * @since 2.41.85 2024-01-18
      * @todo fix featureparam - AUDIO, CHAT, FEED, MODERATOR, PHONE, SCREEN, VIDEO, x-name, iana-token ??
      * @todo fix labelparam   - LABEL ??
      */
@@ -144,17 +145,18 @@ trait CONFERENCErfc7986trait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::CONFERENCE );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::CONFERENCE );
+            $pc->setEmpty();
         }
         else {
-            $value->value = Util::assertString( $value->value, self::CONFERENCE );
-            $value->value = StringFactory::trimTrailNL( $value->value );
-            $value->addParamValue( self::URI, false ); // VALUE required
+            $pcValue = Util::assertString( $pcValue, self::CONFERENCE );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
+            $pc->addParamValue( self::URI, false ); // VALUE required
         }
-         self::setMval( $this->conference, $value, $index );
+         self::setMval( $this->conference, $pc, $index );
         return $this;
     }
 }

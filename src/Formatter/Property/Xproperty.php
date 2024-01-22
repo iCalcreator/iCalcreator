@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -29,13 +29,14 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function is_array;
 use function is_numeric;
 
 /**
  * Format X-properties
  *
- * @since 2.41.59 2022-08-25
+ * @since 2.41.88 2024-01-18
  */
 final class Xproperty extends PropertyBase
 {
@@ -44,6 +45,7 @@ final class Xproperty extends PropertyBase
      * @param null|bool        $allowEmpty
      * @param null|bool|string $lang
      * @return string
+     * @since 2.41.88 2024-01-18
      */
     public static function format(
         array $values,
@@ -51,33 +53,33 @@ final class Xproperty extends PropertyBase
         null|bool|string $lang = false
     ) : string
     {
+        $output = StringFactory::$SP0;
         if( empty( $values )) {
-            return self::$SP0;
+            return $output;
         }
-        $output = self::$SP0;
         foreach( $values as $xpropBase ) {
             [ $xpropName, $xpropPc ] = $xpropBase;
-            if( ! isset( $xpropPc->value ) ||
-                ( empty( $xpropPc->value ) && ! is_numeric( $xpropPc->value ))) {
+            $xpropPcValue = $xpropPc->getValue();
+            if( ! $xpropPc->isset() ||
+                ( empty( $xpropPcValue ) && ! is_numeric( $xpropPcValue ))) {
                 if( $allowEmpty ) {
                     $output .= self::renderProperty( $xpropName );
                 }
                 continue;
             }
-            if( is_array( $xpropPc->value )) {
-                foreach( $xpropPc->value as $pix => $theXpart ) {
-                    $xpropPc->value[$pix] =
-                        self::strrep( $theXpart );
+            if( is_array( $xpropPcValue )) {
+                foreach( $xpropPcValue as $pix => $theXpart ) {
+                    $xpropPcValue[$pix] = self::strrep( $theXpart );
                 }
-                $xpropPc->value = implode( self::$COMMA, $xpropPc->value );
+                $xpropPcValue = implode( StringFactory::$COMMA, $xpropPcValue );
             }
             else {
-                $xpropPc->value = self::strrep( $xpropPc->value );
+                $xpropPcValue = self::strrep( $xpropPcValue );
             }
             $output .= self::renderProperty(
                 $xpropName,
                 self::formatParams( $xpropPc->params, [ self::LANGUAGE ], $lang ),
-                $xpropPc->value
+                $xpropPcValue
             );
         } // end foreach
         return $output;

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\StringFactory;
  *
  * LOCATION may occur multiply times i Participant, once otherwise
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait LOCATIONtrait
 {
@@ -163,7 +163,7 @@ trait LOCATIONtrait
      * @param null|int|array $params
      * @param null|int          $index  if NOT comp PARTICIPANT : 1
      * @return static
-     * @since 2.41.36 2022-04-11
+     * @since 2.41.85 2024-01-18
      */
     public function setLocation(
         null|string|Pc $value = null,
@@ -171,18 +171,19 @@ trait LOCATIONtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::LOCATION );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::LOCATION );
+            $pc->setEmpty();
         }
         else {
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
         if( self::isLocationSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        self::setMval( $this->location, $value, $index );
+        self::setMval( $this->location, $pc, $index );
         return $this;
     }
 }

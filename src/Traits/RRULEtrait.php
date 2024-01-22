@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,13 +33,12 @@ use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\Recur;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
 
 /**
  * RRULE property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait RRULEtrait
 {
@@ -83,52 +82,51 @@ trait RRULEtrait
      *
      * @param null|bool   $inclParam
      * @return bool|array|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getRrule( ? bool $inclParam = false ) : bool | array | Pc
     {
         if( empty( $this->rrule )) {
             return false;
         }
-        return $inclParam ? clone $this->rrule : $this->rrule->value;
+        return $inclParam ? clone $this->rrule : $this->rrule->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.38 2024-01-19
      */
     public function isRruleSet() : bool
     {
-        return ! empty( $this->rrule->value );
+        return self::isPropSet( $this->rrule );
     }
 
     /**
      * Set calendar component property rrule
      *
      * @param null|array|Pc  $rruleset  string[]
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setRrule( null|array|Pc $rruleset = null, ? array $params = [] ) : static
     {
-        $value = ( $rruleset instanceof Pc )
-            ? clone $rruleset
-            : Pc::factory( $rruleset, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::RRULE );
-            $value->setEmpty();
+        $pc      = Pc::factory( $rruleset, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::RRULE );
+            $pc->setEmpty();
         }
-        else {
+        elseif( $this->isDtstartSet()) {
             foreach( $this->getDtstartParams() as $k => $v ) {
-                $value->addParam( $k, $v );
+                $pc->addParam( $k, $v );
             }
         }
-        $this->rrule = RecurFactory::setRexrule( $value );
+        $this->rrule = RecurFactory::setRexrule( $pc );
         return $this;
     }
 }

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,12 +36,11 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * DTSTAMP property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait DTSTAMPtrait
 {
@@ -74,11 +73,11 @@ trait DTSTAMPtrait
      * @return DateTime|Pc
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.53 2022-08-11
+     * @since 2.41.85 2024-01-18
      */
     public function getDtstamp( ? bool $inclParam = false ) : DateTime | Pc
     {
-        return $inclParam ? clone $this->dtstamp : $this->dtstamp->value;
+        return $inclParam ? clone $this->dtstamp : $this->dtstamp->getValue();
     }
 
     /**
@@ -96,22 +95,21 @@ trait DTSTAMPtrait
      * Set calendar component property dtstamp
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setDtstamp( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->addParamValue( self::DATE_TIME ); // req
-        $this->dtstamp = empty( $value->value )
-            ? $value->setValue( self::getUtcDateTimePc()->value )
+        $pc = Pc::factory( $value, $params );
+        $pc->addParamValue( self::DATE_TIME ); // req
+
+        $this->dtstamp = empty( $pc->getValue())
+            ? $pc->setValue( self::getUtcDateTimePc()->getValue())
                 ->removeParam( self::VALUE )
-            : DateTimeFactory::setDate( $value, true );
+            : DateTimeFactory::setDate( $pc, true );
         return $this;
     }
 

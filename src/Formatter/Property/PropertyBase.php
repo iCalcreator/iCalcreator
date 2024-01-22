@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\IcalInterface;
+use Kigkonsult\Icalcreator\Util\StringFactory as SF;
 
 use function array_change_key_case;
 use function array_keys;
@@ -52,46 +53,6 @@ abstract class PropertyBase implements IcalInterface
      * @var string[]
      */
     protected static array $ALTRPLANGARR  = [ self::ALTREP, self::LANGUAGE ];
-
-    /**
-     * @var string
-     */
-    protected static string $BS2   = '\\';
-
-    /**
-     * @var string
-     */
-    protected static string $COLON = ':';
-
-    /**
-     * @var string
-     */
-    protected static string $COMMA = ',';
-
-    /**
-     * @var string
-     */
-    protected static string $CRLF  = "\r\n";
-
-    /**
-     * @var string
-     */
-    protected static string $QQ    = '"';
-
-    /**
-     * @var string
-     */
-    protected static string $SEMIC = ';';
-
-    /**
-     * @var string
-     */
-    protected static string $SLASH = '/';
-
-    /**
-     * @var string
-     */
-    protected static string $SP0   = '';
 
     /**
      * Return formatted output for calendar component property
@@ -119,7 +80,7 @@ abstract class PropertyBase implements IcalInterface
                 $output .= trim( $attributes );
                 break;
         }
-        $output .= self::$COLON . trim((string) $content );
+        $output .= SF::$COLON . trim((string) $content );
         return self::size75( $output );
     }
 
@@ -133,7 +94,7 @@ abstract class PropertyBase implements IcalInterface
      */
     protected static function renderSinglePropEmpty( string $propName, ? bool $allowEmpty = true ) : string
     {
-        return $allowEmpty ? self::renderProperty( $propName ) : self::$SP0;
+        return $allowEmpty ? self::renderProperty( $propName ) : SF::$SP0;
     }
 
     /**
@@ -156,12 +117,12 @@ abstract class PropertyBase implements IcalInterface
         static $KEYGRP3 = [ self::SENT_BY, self::FEATURE, self::LABEL ];
         unset( $inputParams[self::ISLOCALTIME ] );
         if( empty( $inputParams ) && empty( $ctrKeys ) && empty( $lang )) {
-            return self::$SP0;
+            return SF::$SP0;
         }
         if( empty( $ctrKeys )) {
             $ctrKeys = [];
         }
-        $attrLANG = $output   = self::$SP0;
+        $attrLANG = $output   = SF::$SP0;
         $hasLANGctrKey        = in_array( self::LANGUAGE, $ctrKeys, true );
         $CNattrExist          = false;
         [ $params, $xparams ] = self::quoteParams( $inputParams );
@@ -256,7 +217,7 @@ abstract class PropertyBase implements IcalInterface
         }
         $nlCharsExist = str_contains( $value, $NLCHARS );
         $cfCfExist    = str_contains( $value, $CIRCUMFLEX );
-        $quotExist    = str_contains( $value, self::$QQ );
+        $quotExist    = str_contains( $value, SF::$QQ );
         if( $nlCharsExist ) {
             $value = str_replace( $NLCHARS, $CFN, $value );
         }
@@ -264,7 +225,7 @@ abstract class PropertyBase implements IcalInterface
             $value = str_replace( $CIRCUMFLEX, $CFCF, $value );
         }
         if( $quotExist ) {
-            $value = str_replace( self::$QQ, $CFSQ, $value );
+            $value = str_replace( SF::$QQ, $CFSQ, $value );
         }
         return $value;
     }
@@ -282,10 +243,10 @@ abstract class PropertyBase implements IcalInterface
         static $FMTCMN  = ';%s=%s';
         static $FMTQTD  = ';%s=%s%s%s';
         if( ! isset( $params[$paramKey] )) {
-            return self::$SP0;
+            return SF::$SP0;
         }
         if( in_array( $paramKey, $DIRALTR, true )) {
-            $delim  = str_contains( $params[$paramKey], self::$QQ ) ? self::$SP0 : self::$QQ;
+            $delim  = str_contains( $params[$paramKey], SF::$QQ ) ? SF::$SP0 : SF::$QQ;
             $output = sprintf( $FMTQTD, $paramKey, $delim, $params[$paramKey], $delim );
         }
         else {
@@ -305,7 +266,7 @@ abstract class PropertyBase implements IcalInterface
      */
     protected static function renderKeyGroup( array $keyGroup, array $ctrKeys, array & $params ) : string
     {
-        $output = self::$SP0;
+        $output = SF::$SP0;
         foreach( $keyGroup as $key ) {
             if( in_array( $key, $ctrKeys, true )) {
                 $output .= self::renderParam( $key, $params );
@@ -323,9 +284,9 @@ abstract class PropertyBase implements IcalInterface
     protected static function hasColonOrSemicOrComma( mixed $string ): bool
     {
         return ( is_string( $string ) &&
-            ( str_contains( $string,  self::$COLON ) ||
-                str_contains( $string, self::$SEMIC ) ||
-                str_contains( $string, self::$COMMA )));
+            ( str_contains( $string,  SF::$COLON ) ||
+                str_contains( $string, SF::$SEMIC ) ||
+                str_contains( $string, SF::$COMMA )));
     }
 
     /**
@@ -347,40 +308,40 @@ abstract class PropertyBase implements IcalInterface
         $pos    = 0;
         // replace single (solo-)backslash by double ones
         while( $pos < $strLen ) {
-            if( false === ( $pos = strpos( $string, self::$BS2, $pos ))) {
+            if( false === ( $pos = strpos( $string, SF::$BS2, $pos ))) {
                 break;
             }
             if( ! in_array( $string[$pos], $SPECCHAR )) {
                 $string = substr( $string, 0, $pos ) .
-                    self::$BS2 . substr( $string, ( $pos + 1 ));
+                    SF::$BS2 . substr( $string, ( $pos + 1 ));
                 ++$pos;
             }
             ++$pos;
         } // end while
         // replace double quote by single ones
-        if( str_contains( $string, self::$QQ )) {
-            $string = str_replace( self::$QQ, $SQ, $string );
+        if( str_contains( $string, SF::$QQ )) {
+            $string = str_replace( SF::$QQ, $SQ, $string );
         }
         // replace comma by backslash+comma but skip any previously set of backslash+comma
         // replace semicolon by backslash+semicolon but skip any previously set of backslash+semicolon
-        foreach( [ self::$COMMA, self::$SEMIC ] as $char ) {
+        foreach( [ SF::$COMMA, SF::$SEMIC ] as $char ) {
             $offset = 0;
             while( false !== ( $pos = strpos( $string, $char, $offset ))) {
-                if(( 0 < $pos ) && ( self::$BS2 !== substr( $string, ( $pos - 1 )))) {
+                if(( 0 < $pos ) && ( SF::$BS2 !== substr( $string, ( $pos - 1 )))) {
                     $string = substr( $string, 0, $pos ) .
-                        self::$BS2 . substr( $string, $pos );
+                        SF::$BS2 . substr( $string, $pos );
                 }
                 $offset = $pos + 2;
             } // end while
             $string = str_replace(
-                self::$BS2 . self::$BS2 . $char,
-                self::$BS2 . $char,
+                SF::$BS2 . SF::$BS2 . $char,
+                SF::$BS2 . $char,
                 $string
             );
         }
         // replace "\r\n" by '\n'
-        if( str_contains( $string, self::$CRLF )) {
-            $string = str_replace( self::$CRLF, $BSLCN, $string );
+        if( str_contains( $string, SF::$CRLF )) {
+            $string = str_replace( SF::$CRLF, $BSLCN, $string );
         }
         // or replace "\r" by '\n'
         elseif( str_contains( $string, $QBSLCR )) {
@@ -395,7 +356,7 @@ abstract class PropertyBase implements IcalInterface
             $string = str_replace( $BSUCN, $BSLCN, $string );
         }
         // replace "\r\n" by '\n'
-        return str_replace( self::$CRLF, $BSLCN, $string );
+        return str_replace( SF::$CRLF, $BSLCN, $string );
     }
 
     /**
@@ -440,28 +401,28 @@ abstract class PropertyBase implements IcalInterface
         static $SP1     = ' ';
         $tmp    = $string;
         $inLen  = strlen( $tmp );
-        $string = self::$SP0;
+        $string = SF::$SP0;
         $outLen = $x = 0;
         while( true ) {
             $x1 = $x + 1;
             if( $inLen <= $x ) {
-                $string .= self::$CRLF; // loop breakes here
+                $string .= SF::$CRLF; // loop breakes here
                 break;
             }
             if(( 74 <= $outLen ) &&
-                ( self::$BS2 === $tmp[$x]) && // '\\'
+                ( SF::$BS2 === $tmp[$x]) && // '\\'
                 (( $LCN === $tmp[$x1]) ||
                     ( $UCN === $tmp[$x1]))) {
-                $string .= self::$CRLF . $SPBSLCN; // don't break lines inside '\n'
+                $string .= SF::$CRLF . $SPBSLCN; // don't break lines inside '\n'
                 $x      += 2;
                 if( $inLen < $x ) {
-                    $string .= self::$CRLF;
+                    $string .= SF::$CRLF;
                     break; // or here...
                 }
                 $outLen = 3;
             }
             elseif( 75 <= $outLen ) {
-                $string .= self::$CRLF;
+                $string .= SF::$CRLF;
                 if( $inLen === $x ) {
                     break; // or here..
                 }

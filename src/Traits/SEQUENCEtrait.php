@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,13 +31,13 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\Formatter\Property\IntProperty;
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * SEQUENCE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait SEQUENCEtrait
 {
@@ -77,26 +77,25 @@ trait SEQUENCEtrait
      *
      * @param null|bool   $inclParam
      * @return bool|int|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getSequence( ? bool $inclParam = false ) : bool | int | string | Pc
     {
         if( null === $this->sequence ) {
             return false;
         }
-        return $inclParam ? clone $this->sequence : $this->sequence->value;
+        return $inclParam ? clone $this->sequence : $this->sequence->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.43 2022-04-15
+     * @since 2.41.88 2024-01-19
      */
     public function isSequenceSet() : bool
     {
-        return ( ! empty( $this->sequence->value ) ||
-            (( null !== $this->sequence ) && ( 0 === $this->sequence->value )));
+        return self::isIntPropSet( $this->sequence );
     }
 
     /**
@@ -108,26 +107,23 @@ trait SEQUENCEtrait
      * Init 0 (zero)
      *
      * @param null|int|string|Pc $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setSequence( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if(( $value->value === null ) || ( $value->value === self::$SP0 )) {
-            $value->value = ( isset( $this->sequence->value ) &&
-                ( -1 < $this->sequence->value ))
-                ? (int) $this->sequence->value + 1
-                : 0;
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue() ?: null;
+        if(( null === $pcValue ) || ( StringFactory::$SP0 === $pcValue )) {
+            $prev = $this->isSequenceSet() ? (int) $this->getSequence() : -1;
+            $pc->setValue(( -1 < $prev ) ? $prev + 1 : 0 );
         }
         else {
-            Util::assertInteger( $value->value, self::SEQUENCE, 0 );
-            $value->value = (int) $value->value;
+            Util::assertInteger( $pcValue, self::SEQUENCE, 0 );
+            $pc->setValue((int) $pcValue );
         }
-        $this->sequence = $value;
+        $this->sequence = $pc;
         return $this;
     }
 }

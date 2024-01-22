@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -63,7 +63,7 @@ use function var_export;
 /**
  * iCalcreator recur support class
  *
- * @since  2.41.71 - 2022-12-02
+ * @since 2.41.88 - 2024-01-18
  */
 class RecurFactory
 {
@@ -187,21 +187,22 @@ class RecurFactory
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @since 2.41.57 2022-08-17
+     * @since 2.41.88 - 2024-01-18
      * @todo "The BYSECOND, BYMINUTE and BYHOUR rule parts MUST NOT be specified
      *        when the associated "DTSTART" property has a DATE value type."
      */
     public static function setRexrule( Pc $rexrule ) : Pc
     {
-        static $ERR    = 'Invalid input date \'%s\'';
-        if( empty( $rexrule->value )) {
+        static $ERR  = 'Invalid input date \'%s\'';
+        $pcValue     = $rexrule->getValue();
+        if( empty( $pcValue )) {
             return $rexrule;
         }
-        $input          = [];
-        $isValueDate    = $rexrule->hasParamValue( IcalInterface::DATE );
-        $paramTZid      = $rexrule->getParams( IcalInterface::TZID );
-        $rexrule->value = array_change_key_case( $rexrule->value, CASE_UPPER );
-        foreach( $rexrule->value as $ruleLabel => $ruleValue ) {
+        $input       = [];
+        $isValueDate = $rexrule->hasParamValue( IcalInterface::DATE );
+        $paramTZid   = $rexrule->getParams( IcalInterface::TZID );
+        $pcValue = array_change_key_case( $pcValue, CASE_UPPER );
+        foreach( $pcValue as $ruleLabel => $ruleValue ) {
             switch( true ) {
                 case ( IcalInterface::UNTIL !== $ruleLabel ) :
                     $input[$ruleLabel] = $ruleValue;
@@ -309,7 +310,7 @@ class RecurFactory
                 continue;
             }
             if( is_string( $output[$rKey3] )) {
-                $temp = explode( Util::$COMMA, $output[$rKey3] );
+                $temp = explode( StringFactory::$COMMA, $output[$rKey3] );
                 if( 1 === count( $temp )) {
                     $output[$rKey3] = reset( $temp );
                 }
@@ -944,14 +945,14 @@ class RecurFactory
                             if( $recurFreqIsMonthly ||
                                 isset( $recur[IcalInterface::BYMONTH] )) {
                                 $dayNumberSw = self::recurBYcntcheck(
-                                    $byDayValue[Util::$ZERO],
+                                    $byDayValue[StringFactory::$ZERO],
                                     $dayCnts[$m][$d][self::$MONTHDAYNO_UP],
                                     $dayCnts[$m][$d][self::$MONTHDAYNO_DOWN]
                                 );
                             }
                             elseif( $recurFreqIsYearly ) {
                                 $dayNumberSw = self::recurBYcntcheck(
-                                    $byDayValue[Util::$ZERO],
+                                    $byDayValue[StringFactory::$ZERO],
                                     $dayCnts[$m][$d][self::$YEARDAYNO_UP],
                                     $dayCnts[$m][$d][self::$YEARDAYNO_DOWN]
                                 );
@@ -1122,7 +1123,7 @@ class RecurFactory
         /* create interval index */
         $intervalIx = match( $freq ) {
             IcalInterface::YEARLY  => $date[self::$LCYEAR],
-            IcalInterface::MONTHLY => $date[self::$LCYEAR] . Util::$MINUS . $date[self::$LCMONTH],
+            IcalInterface::MONTHLY => $date[self::$LCYEAR] . StringFactory::$MINUS . $date[self::$LCMONTH],
             IcalInterface::WEEKLY  => self::getWeekNumber(
                 $wkst,
                 $date[self::$LCMONTH],
@@ -1130,11 +1131,11 @@ class RecurFactory
                 $date[self::$LCYEAR]
             ),
             default => $date[self::$LCYEAR] .
-                Util::$MINUS .
+                StringFactory::$MINUS .
                 $date[self::$LCMONTH] .
-                Util::$MINUS .
+                StringFactory::$MINUS .
                 $date[self::$LCDAY],
-        }; // end switch
+        }; // end match
         return (string) $intervalIx;
     }
 

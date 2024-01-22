@@ -162,10 +162,18 @@ class PcTest extends TestCase
         $pc[Pc::$LCparams][$xKey2] = $xValue2;
         $this->assertSame( $xValue2, $pc[Pc::$LCparams][$xKey2], 'case 47c' );
         $this->assertNull( $pc[Pc::$LCparams][strtoupper( $xKey2 )] ?? null, 'case 47d' );
+
+        $pc->setEmpty();
+        $pc[Pc::$LCparams][Vcalendar::VALUE] = Vcalendar::DATE_TIME;
+        $pc[Pc::$LCparams][Vcalendar::ISLOCALTIME] = true;
+        $exp = [ Vcalendar::VALUE => Vcalendar::DATE_TIME, Vcalendar::ISLOCALTIME => true ];
+        $this->assertSame( $pc[Pc::$LCparams], $exp,'case 49b' );
     }
 
     /**
      * Test with Pc properties and methods
+     *
+     * Just to assure access to public Pc properties value/params, NOT used anywhere
      *
      * @test
      */
@@ -191,7 +199,6 @@ class PcTest extends TestCase
         $pc->value = $propValue2;
         $this->assertSame( $propValue2, $pc->getValue(), 'case 72c' );
         $this->assertSame( $propValue2, $pc->value, 'case 72d' );
-
 
         $this->assertNotSame( $propParams, $pc->getParams(), 'case 73a' );
         $ucKeyArr = [];
@@ -251,6 +258,9 @@ class PcTest extends TestCase
         $this->assertSame( [], $pc->getParams(), 'case 78f' );
 
         $pc->addParam( Vcalendar::VALUE, Vcalendar::DATE_TIME );
-        $this->assertTrue( $pc->hasParamValue( Vcalendar::DATE_TIME ), 'case 79' );
+        $this->assertTrue( $pc->hasParamValue( Vcalendar::DATE_TIME ), 'case 79a' );
+
+        $pc->addParam( Vcalendar::ISLOCALTIME, true );
+        $this->assertTrue( $pc->hasParamIsLocalTime(), 'case 79b' );
     }
 }

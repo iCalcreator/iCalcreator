@@ -28,7 +28,6 @@
  */
 namespace Kigkonsult\Icalcreator;
 
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use PHPUnit\Framework\TestCase;
 use Kigkonsult\Icalcreator\Util\RexdateFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
@@ -49,7 +48,7 @@ class Exception3Test extends TestCase
      * @return mixed[]
      * @throws Exception
      */
-    public function Provider1() : array
+    public static function provider1() : array
     {
         $dataArr = [];
 
@@ -98,7 +97,7 @@ class Exception3Test extends TestCase
      * Testing RexdateFactory::prepInputExdate
      *
      * @test
-     * @dataProvider Provider1
+     * @dataProvider provider1
      *
      * @param int     $case
      * @param mixed   $value
@@ -108,7 +107,7 @@ class Exception3Test extends TestCase
     {
         $ok = false;
         try {
-            $result = RexdateFactory::prepInputExdate( Pc::factory( $value, ParameterFactory::setParams( $params )));
+            $result = RexdateFactory::prepInputExdate( Pc::factory( $value, $params ));
         }
         catch ( Exception $e ) {
             $ok = true;
@@ -121,7 +120,7 @@ class Exception3Test extends TestCase
      * Testing RexdateFactory::prepInputRdate
      *
      * @test
-     * @dataProvider Provider1
+     * @dataProvider provider1
      *
      * @param int     $case
      * @param mixed   $value
@@ -131,7 +130,7 @@ class Exception3Test extends TestCase
     {
         $ok = false;
         try {
-            $result = RexdateFactory::prepInputRdate( Pc::factory( $value, ParameterFactory::setParams( $params )));
+            $result = RexdateFactory::prepInputRdate( Pc::factory( $value, $params ));
         }
         catch( Exception $e ) {
             $ok = true;

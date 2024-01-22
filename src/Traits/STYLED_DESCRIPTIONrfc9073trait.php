@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * STYLED-DESCRIPTION property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait STYLED_DESCRIPTIONrfc9073trait
 {
@@ -142,6 +142,7 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
+     * @since 2.41.85 2024-01-18
      */
     public function setStyleddescription(
         null|string|Pc $value = null,
@@ -149,23 +150,24 @@ trait STYLED_DESCRIPTIONrfc9073trait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::STYLED_DESCRIPTION );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::STYLED_DESCRIPTION );
+            $pc->setEmpty();
         }
         else {
-            $value->value  = Util::assertString( $value->value, self::STYLED_DESCRIPTION );
-            $value->addParamValue( self::TEXT, false ); // must have one
-            if( ! $value->hasParamKey( self::VALUE, self::TEXT )) { // text may have but URI not...
-                $value->removeParam( self::ALTREP );
-                $value->removeParam( self::LANGUAGE );
+            $pc->setValue( Util::assertString( $pcValue, self::STYLED_DESCRIPTION ));
+            $pc->addParamValue( self::TEXT, false ); // must have one
+            if( ! $pc->hasParamValue( self::TEXT )) { // text may have but URI not...
+                $pc->removeParam( self::ALTREP );
+                $pc->removeParam( self::LANGUAGE );
             }
-            if( ! $value->hasParamKey( self::DERIVED )) {
-                $value->addParam( self::DERIVED, self::FALSE ); // default
+            if( ! $pc->hasParamKey( self::DERIVED )) {
+                $pc->addParam( self::DERIVED, self::FALSE ); // default
             }
         }
-        self::setMval( $this->styleddescription, $value, $index );
+        self::setMval( $this->styleddescription, $pc, $index );
         return $this;
     }
 }

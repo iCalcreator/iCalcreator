@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -54,7 +54,7 @@ use function var_export;
  * iCalcreator DateTime support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since 2.47.68 2022-09-25
+ * @since 2.41.88 - 2024-01-18
  */
 class DateTimeFactory
 {
@@ -170,7 +170,7 @@ class DateTimeFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.47.68 2022-09-25
+     * @since 2.41.88 - 2024-01-18
      */
     public static function setDate( Pc $value, ? bool $forceUTC = false ) : Pc
     {
@@ -179,20 +179,21 @@ class DateTimeFactory
         if( DateTimeZoneFactory::isUtcTz( $paramTZid )) {
             $paramTZid = IcalInterface::UTC;
         }
-        $isLocalTime = $value->hasParamKey( IcalInterface::ISLOCALTIME );
+        $isLocalTime = $value->hasParamIsLocalTime();
+        $pcValue     = $value->getValue();
         switch( true ) {
-            case ( $value->value instanceof DateTimeInterface ) :
+            case ( $pcValue instanceof DateTimeInterface ) :
                 $dateTime = self::conformDateTime(
-                    self::toDateTime( $value->value ),
+                    self::toDateTime( $pcValue ),
                     $isValueDate,
                     $forceUTC,
                     $paramTZid
                 );
                 break;
-            case self::isStringAndDate( $value->value ) :
+            case self::isStringAndDate( $pcValue ) :
                 // string ex. "2006-08-03 10:12:18 [[[+/-]1234[56]] / timezone]"
                 $dateTime = self::conformStringDate(
-                    $value->value,
+                    $pcValue,
                     $isValueDate,
                     $forceUTC,
                     $isLocalTime,
@@ -206,8 +207,8 @@ class DateTimeFactory
                 throw new InvalidArgumentException(
                     sprintf(
                         self::$ERR4,
-                        var_export( $value->value, true ),
-                        var_export( $value->params, true )
+                        var_export( $pcValue, true ),
+                        var_export( $value->getParams(), true )
                     )
                 );
         } // end switch
@@ -227,12 +228,12 @@ class DateTimeFactory
      * @param Pc $pc property content
      * @return string
      * @throws Exception
-     * @since 2.47.68 2022-09-25
+     * @since 2.41.68 - 2022-09-25
      */
     private static function getParamTZid( Pc $pc ) : string
     {
         if( ! $pc->hasParamKey( IcalInterface::TZID )) {
-            return Util::$SP0;
+            return StringFactory::$SP0;
         }
         $paramTZid     = $pc->getParams( IcalInterface::TZID );
         if( DateTimeZoneFactory::hasOffset( $paramTZid )) {
@@ -270,7 +271,7 @@ class DateTimeFactory
                 $input->getTimezone()->getName()
             ),
             default => $input,
-        }; // end switch
+        }; // end match
         if( empty( $paramTZid )) {
             $paramTZid = $dateTime->getTimezone()->getName();
         }
@@ -362,7 +363,13 @@ class DateTimeFactory
      */
     public static function splitIntoDateStrAndTimezone( string $string ) : array
     {
-        $string = self::concatIcalDateStr( trim( $string ));
+        static $MSUTCREL = [ 'UTC-02', 'UTC-11', 'UTC+12' ];
+        static $EtcUTC   = 'Etc/UTC';
+        $string = trim( $string );
+        if( str_ends_with( strtoupper( $string ), strtoupper( $EtcUTC ))) {
+            return [ rtrim( substr( $string, 0, -7 )), IcalInterface::UTC ];
+        }
+        $string = self::concatIcalDateStr( $string );
         if(( DateTimeZoneFactory::$UTCARR[0] === substr( $string, -1 )) &&
             ( ctype_digit( substr( $string, -3, 2 )))) { // nnZ
             return [ substr( $string, 0, -1 ), IcalInterface::UTC ]; // Z
@@ -390,14 +397,14 @@ class DateTimeFactory
             return [ $string2, $tz ];
         } // end if
         // if no space found then no trailing timezone
-        if( false === strrpos( $string, Util::$SP1 )) {
+        if( false === strrpos( $string, StringFactory::$SP1 )) {
             return [ $string, null ];
         }
         if( DateTimeZoneFactory::isUTCtimeZone( trim( substr( $string, -3 )))) {
             return [ trim( substr( $string, 0, -3 )), IcalInterface::UTC ];
         }
         // check for ms 'UTC-02', 'UTC+11', 'UTC+12'
-        if( in_array( substr( $string, -6 ), [ 'UTC-02', 'UTC-11', 'UTC+12' ] )) {
+        if( in_array( substr( $string, -6 ), $MSUTCREL )) {
             return [
                 trim( substr( $string, 0, -6 )),
                 substr( $string, -6 )
@@ -636,7 +643,7 @@ class DateTimeFactory
         }
         $string = trim( $string );
         if(( false !== strtotime( $string )) &&
-            (( 8 <= strlen( $string )) || ( false === strrpos( $string, Util::$SP1 )))) {
+            (( 8 <= strlen( $string )) || ( false === strrpos( $string, StringFactory::$SP1 )))) {
             return true;
         }
         // date(time)-part is a valid strtotime string, the trailing chars may be a timezone or offset
@@ -705,9 +712,9 @@ class DateTimeFactory
         $strLen = strlen( $string );
         if(( 10 === $strLen ) &&
             ctype_digit( substr( $string, 0, 4 )) &&
-            ( Util::$MINUS === $string[4] ) &&
+            ( StringFactory::$MINUS === $string[4] ) &&
             ctype_digit( substr( $string, 5, 2 )) &&
-            ( Util::$MINUS === $string[7] ) &&
+            ( StringFactory::$MINUS === $string[7] ) &&
             ctype_digit( substr( $string, 8, 2 ))) {
             return substr( $string, 0, 4 ) .
                 substr( $string, 5, 2 ) .
@@ -715,15 +722,15 @@ class DateTimeFactory
         } // end if 10
         if(( 19 === $strLen ) &&
             ctype_digit( substr( $string, 0, 4 )) &&
-            ( Util::$MINUS === $string[4] ) &&
+            ( StringFactory::$MINUS === $string[4] ) &&
             ctype_digit( substr( $string, 5, 2 )) &&
-            ( Util::$MINUS === $string[7] ) &&
+            ( StringFactory::$MINUS === $string[7] ) &&
             ctype_digit( substr( $string, 8, 2 )) &&
             ( empty( $string[10] ) || in_array( $string[10], self::$Tarr, true )) &&
             ctype_digit( substr( $string, 11, 2 )) &&
-            ( Util::$COLON === $string[13] ) &&
+            ( StringFactory::$COLON === $string[13] ) &&
             ctype_digit( substr( $string, 14, 2 )) &&
-            ( Util::$COLON === $string[16] ) &&
+            ( StringFactory::$COLON === $string[16] ) &&
             ctype_digit( substr( $string, 17, 2 ))) {
             return substr( $string, 0, 4 ) .
                 substr( $string, 5, 2 ) .

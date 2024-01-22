@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -30,13 +30,14 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format ACTION, BUSYTYPE, CALENDAR_ADDRESS, KLASS, COLOR, LOCATION_TYPE, PARTICIPANT_TYPE, PROXIMITY,
  *        RESOURCE_TYPE, STATUS, TRANSP, TZOFFSETFROM, TZOFFSETTO, TZURL, URL, UID
  *
  * 16
- * @since 2.41.66 2022-09-07
+ * @since 2.41.88 2024-01-18
  */
 final class Property extends PropertyBase
 {
@@ -48,10 +49,12 @@ final class Property extends PropertyBase
      */
     public static function format( string $propName, null|bool|Pc $pc, ? bool $allowEmpty = true ) : string
     {
-        return match( true ) {
-            empty( $pc )        => self::$SP0,
-            empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::renderProperty( $propName, $pc->params, $pc->value )
-        };
+        if( empty( $pc )) {
+            return StringFactory::$SP0;
+        }
+        $pcValue = $pc->getValue();
+        return empty( $pcValue )
+            ? self::renderSinglePropEmpty( $propName, $allowEmpty )
+            : self::renderProperty( $propName, (array) $pc->getParams(), $pcValue );
     }
 }

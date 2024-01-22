@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *           The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * TZNAME property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait TZNAMEtrait
 {
@@ -137,7 +137,7 @@ trait TZNAMEtrait
      * @param null|int        $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     public function setTzname(
         null|string|Pc $value = null,
@@ -145,16 +145,17 @@ trait TZNAMEtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::TZNAME );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::TZNAME );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::TZNAME );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pcValue = Util::assertString( $pcValue, self::TZNAME );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
-         self::setMval( $this->tzname, $value, $index );
+         self::setMval( $this->tzname, $pc, $index );
         return $this;
     }
 }

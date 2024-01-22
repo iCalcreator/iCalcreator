@@ -56,18 +56,18 @@ class GeoFactory
     public static function geo2str2( float $ll, string $format ) : string
     {
         if( 0.0 < $ll ) {
-            $sign = Util::$PLUS;
+            $sign = StringFactory::$PLUS;
         }
         else {
-            $sign = ( 0.0 > $ll ) ? Util::$MINUS : null;
+            $sign = ( 0.0 > $ll ) ? StringFactory::$MINUS : null;
         }
         return
             rtrim(
                 rtrim(
                     sprintf( $format, $sign, abs( $ll )),
-                    Util::$ZERO
+                    StringFactory::$ZERO
                 ),
-                Util::$DOT
+                StringFactory::$DOT
             );
     }
 }

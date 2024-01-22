@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -34,6 +34,7 @@ use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function count;
 use function reset;
 use function strcmp;
@@ -43,7 +44,7 @@ use function usort;
  * Format EXDATE
  *
  * 1
- * @since 2.41.66 2022-09-07
+ * @since 2.41.88 2024-01-18
  */
 final class Exdate extends PropertyBase
 {
@@ -53,25 +54,28 @@ final class Exdate extends PropertyBase
      * @param bool|null $allowEmpty
      * @return string
      * @throws Exception
+     * @since 2.41.88 2024-01-18
      */
     public static function format( string $propName, array $values, ? bool $allowEmpty = true ) : string
     {
         static $SORTER1 = [ __CLASS__, 'sortExdate1', ];
         static $SORTER2 = [ __CLASS__, 'sortExdate2', ];
         if( empty( $values )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        $output  = self::$SP0;
+        $output  = StringFactory::$SP0;
         $exdates = [];
         foreach( $values as $theExdate ) { // Pc
-            if( empty( $theExdate->value )) {
+            $theExdateValue = $theExdate->getValue();
+            if( empty( $theExdateValue )) {
                 if( $allowEmpty ) {
                     $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
-            if( 1 < count( $theExdate->value )) {
-                usort( $theExdate->value, $SORTER1 );
+            if( 1 < count( $theExdateValue )) {
+                usort( $theExdateValue, $SORTER1 );
+                $theExdate->setValue( $theExdateValue );
             }
             $exdates[] = $theExdate;
         } // end foreach
@@ -80,16 +84,16 @@ final class Exdate extends PropertyBase
         }
         $eix = 0;
         foreach( $exdates as $theExdate ) { // Pc
-            $content = self::$SP0;
-            foreach( $theExdate->value as $exDatePart ) {
+            $content = StringFactory::$SP0;
+            foreach( $theExdate->getValue() as $exDatePart ) {
                 $formatted = DateTimeFactory::dateTime2Str(
                     $exDatePart,
                     $theExdate->hasParamValue(self::DATE ),
-                    $theExdate->hasParamKey( self::ISLOCALTIME )
+                    $theExdate->hasParamIsLocalTime()
                 );
-                $content .= ( 0 < $eix++ ) ? self::$COMMA . $formatted : $formatted;
+                $content .= ( 0 < $eix++ ) ? StringFactory::$COMMA . $formatted : $formatted;
             } // end foreach
-            $output .= self::renderProperty( $propName, $theExdate->params, $content );
+            $output .= self::renderProperty( $propName, (array) $theExdate->getParams(), $content );
         } // end foreach(( array_keys( $exdates...
         return $output;
     }
@@ -120,8 +124,10 @@ final class Exdate extends PropertyBase
      */
     public static function sortExdate2( Pc $a, Pc $b ) : int
     {
-        $a1 = reset( $a->value );
-        $b1 = reset( $b->value );
+        $pcValue = $a->getValue();
+        $a1 = reset( $pcValue );
+        $pcValue = $b->getValue();
+        $b1 = reset( $pcValue );
         return strcmp(
             $a1->format( DateTimeFactory::$YmdTHis ),
             $b1->format( DateTimeFactory::$YmdTHis )

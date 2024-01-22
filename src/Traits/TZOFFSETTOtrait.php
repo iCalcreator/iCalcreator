@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,7 +36,7 @@ use Kigkonsult\Icalcreator\Pc;
 /**
  * TZOFFSETTO property functions
  *
- * @since 2.41.60 2022-08-24
+ * @since 2.41.85 2024-01-18
  */
 trait TZOFFSETTOtrait
 {
@@ -76,32 +76,32 @@ trait TZOFFSETTOtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getTzoffsetto( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzoffsetto )) {
             return false;
         }
-        return $inclParam ? clone $this->tzoffsetto : $this->tzoffsetto->value;
+        return $inclParam ? clone $this->tzoffsetto : $this->tzoffsetto->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isTzoffsettoSet() : bool
     {
-        return ! empty( $this->tzoffsetto->value );
+        return self::isPropSet( $this->tzoffsetto );
     }
 
     /**
      * Set calendar component property tzoffsetto
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @since 2.41.60 2022-08-24

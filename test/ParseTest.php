@@ -29,6 +29,7 @@
 namespace Kigkonsult\Icalcreator;
 
 use Exception;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use UnexpectedValueException;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -46,7 +47,7 @@ class ParseTest extends DtBase
      *
      * @return mixed[]
      */
-    public function parseExceptionsTestProvider() : array
+    public static function parseExceptionsTestProvider() : array
     {
 
         $dataArr = [];
@@ -137,7 +138,7 @@ class ParseTest extends DtBase
      * @return mixed[]
      * @since 2.41.81 2023-08-14
      */
-    public function parseCalendarTestProvider() : array
+    public static function parseCalendarTestProvider() : array
     {
 
         $dataArr = [];
@@ -459,7 +460,7 @@ class ParseTest extends DtBase
     public function parseCalendarTest2( int $case, string $value, string $expectedvalue ) : void
     {
         $calendar = new Vcalendar();
-        $calendar->parse( explode( Util::$CRLF, $value ));
+        $calendar->parse( explode( StringFactory::$CRLF, $value ));
 
         $this->parseCalendarTest( $case, $calendar, $expectedvalue );
     }
@@ -477,7 +478,7 @@ class ParseTest extends DtBase
     public function parseCalendarTest3( int $case, string $value, string $expectedvalue ) : void
     {
         $calendar = new Vcalendar();
-        $calendar->parse( explode( Util::$CRLF, $value ));
+        $calendar->parse( explode( StringFactory::$CRLF, $value ));
 
         $this->assertSame(
             $calendar->createCalendar(),
@@ -490,7 +491,7 @@ class ParseTest extends DtBase
      *
      * @return mixed[]
      */
-    public function parseCompTestProvider() : array
+    public static function parseCompTestProvider() : array
     {
         $dataArr = [];
 
@@ -629,12 +630,12 @@ class ParseTest extends DtBase
             $this->parseCalendarTest( $case . '-a', $calendar, $value[1] ?? $value[0] );
 
             $vevent = $calendar->newVevent();
-            $vevent->parse( implode( Util::$CRLF, $value ));
+            $vevent->parse( implode( StringFactory::$CRLF, $value ));
             $this->parseCalendarTest( $case . '-s', $calendar, $value[1] ?? $value[0] );
         }
         else {
             $vevent = $calendar->newVevent();
-            $vevent->parse( explode( Util::$CRLF, $value ));
+            $vevent->parse( explode( StringFactory::$CRLF, $value ));
             $this->parseCalendarTest( $case . '-a', $calendar, $value );
 
             $vevent = $calendar->newVevent();
@@ -649,7 +650,7 @@ class ParseTest extends DtBase
      *
      * @return mixed[]
      */
-    public function parseCompPortnrTestProvider() : array
+    public static function parseCompPortnrTestProvider() : array
     {
         $dataArr = [];
 

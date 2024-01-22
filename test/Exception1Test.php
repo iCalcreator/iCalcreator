@@ -47,7 +47,7 @@ class Exception1Test extends TestCase
      *
      * @return mixed[]
      */
-    public function DateTimeFactoryFactoryTestProvider() : array
+    public static function DateTimeFactoryFactoryTestProvider() : array
     {
         $dataArr = [];
 
@@ -118,7 +118,7 @@ class Exception1Test extends TestCase
      * DateTimeFactoryGetYmdFromTimestampTest provider
      * @throws Exception
      */
-    public function DateTimeFactoryGetYmdFromTimestampTestProvider() : array
+    public static function DateTimeFactoryGetYmdFromTimestampTestProvider() : array
     {
         $dataArr = [];
 
@@ -172,7 +172,7 @@ class Exception1Test extends TestCase
      * @return mixed[]
      * @throws Exception
      */
-    public function DateTimeFactorySetDateTestProvider() : array
+    public static function DateTimeFactorySetDateTestProvider() : array
     {
         $dataArr = [];
 

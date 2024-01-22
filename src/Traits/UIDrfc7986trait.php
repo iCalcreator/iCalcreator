@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,7 +33,6 @@ use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -46,7 +45,7 @@ use function vsprintf;
 /**
  * UID property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait UIDrfc7986trait
 {
@@ -78,11 +77,11 @@ s     */
      * @param null|bool $inclParam
      * @return string|Pc
      * @throws Exception
-     * @since 2.41.53 2022-08-11
+     * @since 2.41.85 2024-01-18
      */
     public function getUid( ? bool $inclParam = false ) : string | Pc
     {
-        return $inclParam ? clone $this->uid : $this->uid->value;
+        return $inclParam ? clone $this->uid : $this->uid->getValue();
     }
 
     /**
@@ -119,24 +118,23 @@ s     */
      *
      * If empty input, male one
      * @param null|int|string|Pc $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setUid( null|int|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value ) && ( Util::$ZERO !== (string) $value->value )) {
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue ) && ( StringFactory::$ZERO !== (string) $pcValue )) {
             $this->uid = self::makeUid();
             return $this;
         } // no allowEmpty check here !!!!
-        $value->value = Util::assertString( $value->value, self::UID );
-        $value->value = StringFactory::trimTrailNL( $value->value );
-        $this->uid = $value;
+        $pcValue   = Util::assertString( $pcValue, self::UID );
+        $pcValue   = StringFactory::trimTrailNL( $pcValue );
+        $this->uid = $pc->setValue( $pcValue );
         return $this;
     }
 }

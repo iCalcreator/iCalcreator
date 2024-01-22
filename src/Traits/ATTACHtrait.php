@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * ATTACH property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait ATTACHtrait
 {
@@ -135,19 +135,20 @@ trait ATTACHtrait
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     public function setAttach( null|string|Pc $value = null, null|int|array $params = [], ? int $index = null) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::ATTACH );
-            $value->setEmpty();
+        $pc = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::ATTACH );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::ATTACH );
+            Util::assertString( $pcValue, self::ATTACH );
         }
-        self::setMval( $this->attach, $value, $index );
+        self::setMval( $this->attach, $pc, $index );
         return $this;
     }
 }

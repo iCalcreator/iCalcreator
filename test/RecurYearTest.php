@@ -46,7 +46,7 @@ class RecurYearTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurYearlyTest111xProvider() : array
+    public static function recurYearlyTest111xProvider() : array
     {
         $dataArr = [];
         $dataSetNo = 0;
@@ -119,7 +119,7 @@ class RecurYearTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurYearlyTest23Provider() : array
+    public static function recurYearlyTest23Provider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -253,7 +253,7 @@ class RecurYearTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurYearlyTest23eProvider() : array
+    public static function recurYearlyTest23eProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -394,7 +394,7 @@ class RecurYearTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurYearlyTest23lProvider() : array
+    public static function recurYearlyTest23lProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -532,7 +532,7 @@ class RecurYearTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurYearlyTest2XProvider() : array
+    public static function recurYearlyTest2XProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;

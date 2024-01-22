@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,12 +31,13 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format GEO
  *
  * 1
- * @since 2.41.66 2022-09-07
+ * @since 2.41.88 2024-01-18
  */
 final class Geo extends PropertyBase
 {
@@ -45,19 +46,22 @@ final class Geo extends PropertyBase
      * @param null|bool|Pc $pc
      * @param bool|null $allowEmpty
      * @return string
+     * @since 2.41.88 2024-01-18
      */
     public static function format( string $propName, null|bool|Pc $pc, ? bool $allowEmpty = true ) : string
     {
-        return match( true ) {
-            empty( $pc )        => self::$SP0,
-            empty( $pc->value ) => self::renderSinglePropEmpty( $propName, $allowEmpty ),
-            default             => self::renderProperty(
+        if( empty( $pc )) {
+            return StringFactory::$SP0;
+        }
+        $pcValue = $pc->getValue();
+        return empty( $pcValue )
+            ? self::renderSinglePropEmpty( $propName, $allowEmpty )
+            : self::renderProperty(
                 self::GEO,
-                $pc->params,
-                GeoFactory::geo2str2( $pc->value[self::LATITUDE], GeoFactory::$geoLatFmt ) .
-                self::$SEMIC .
-                GeoFactory::geo2str2( $pc->value[self::LONGITUDE], GeoFactory::$geoLongFmt )
-            )
-        };
+                (array) $pc->getParams(),
+                GeoFactory::geo2str2( $pcValue[self::LATITUDE], GeoFactory::$geoLatFmt ) .
+                StringFactory::$SEMIC .
+                GeoFactory::geo2str2( $pcValue[self::LONGITUDE], GeoFactory::$geoLongFmt )
+            );
     }
 }

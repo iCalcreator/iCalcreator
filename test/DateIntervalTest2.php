@@ -33,6 +33,7 @@ use Exception;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -117,7 +118,7 @@ class DateIntervalTest2 extends DtBase
             ! isset( $duration[RecurFactory::$LCHOUR] )  &&
             ! isset( $duration[RecurFactory::$LCMIN] )   &&
             ! isset( $duration[RecurFactory::$LCSEC] )) {
-            return Util::$SP0;
+            return StringFactory::$SP0;
         }
         if( Util::issetAndNotEmpty( $duration, RecurFactory::$LCWEEK )) {
             return DateIntervalFactory::$P . $duration[RecurFactory::$LCWEEK] . $W;
@@ -289,7 +290,7 @@ class DateIntervalTest2 extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function dateInterval678TestProvider() : array
+    public static function dateInterval678TestProvider() : array
     {
         $dataArr = [];
 
@@ -328,11 +329,11 @@ class DateIntervalTest2 extends DtBase
      * @param string $expectedString
      * @throws Exception
      */
-    public function dateInterval678Test( 
-        int | string $case, 
-        mixed $value, 
-        array $params, 
-        pc $expectedGet, 
+    public function dateInterval678Test(
+        int | string $case,
+        mixed $value,
+        array $params,
+        pc $expectedGet,
         string $expectedString
     ) : void
     {
@@ -370,7 +371,7 @@ class DateIntervalTest2 extends DtBase
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
                 /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                $comp3Str = DateIntervalFactory::dateInterval2String( $expectedGet->value, true );
+                $comp3Str = DateIntervalFactory::dateInterval2String( $expectedGet->getValue(), true );
                 switch( $comp3Str ) {
                     case 'P12M' :
                         $comp3Str = 'P1Y';
@@ -383,7 +384,7 @@ class DateIntervalTest2 extends DtBase
                         break;
                 } // end switch
                 $comp3Exp = $comp3Str . ' ' . var_export( $expectedGet->params, true );
-                $comp3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
+                $comp3act = DateIntervalFactory::dateInterval2String( $getValue->getValue(), true ) .
                     ' ' . var_export( $getValue->params, true );
                 $this->assertEquals(
                     $comp3Exp,

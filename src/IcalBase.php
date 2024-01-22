@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function define;
@@ -45,6 +44,7 @@ use function ctype_digit;
 use function get_object_vars;
 use function in_array;
 use function is_array;
+use function is_int;
 use function is_object;
 use function key;
 use function ksort;
@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.83' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.90' );
 }
 
 /**
@@ -154,7 +154,7 @@ abstract class IcalBase implements IcalInterface
      *
      * @param IcalBase $component
      * @return bool
-     * @since 2.47.68 2022-10-01
+     * @since 2.41.68 - 2022-10-01
      */
     protected static function hasUid( IcalBase $component ) : bool
     {
@@ -237,7 +237,7 @@ abstract class IcalBase implements IcalInterface
     protected array $components = [];
 
     /**
-     * @var array $config configuration with defaults
+     * @var bool[]|string[] $config configuration with defaults
      */
     protected array $config = [
         self::ALLOWEMPTY => true,
@@ -289,7 +289,6 @@ abstract class IcalBase implements IcalInterface
                     }
                     unset( $attr_array_value );
                 }
-                unset( $attr_array_value );
             }// end else
         } // end foreach
         $this->compix    = [];
@@ -352,17 +351,14 @@ abstract class IcalBase implements IcalInterface
     /**
      * Return Vcalendar/component config value, false on not found
      *
+     * For language, in calendar component as defined in [RFC 1766]
+     *
      * @param null|string $config
      * @return mixed   bool false on not found or empty
-     * @since 2.47.68 2022-10-01
+     * @since 2.41.88 2024-01-17
      */
     public function getConfig( ? string $config = null ) : mixed
     {
-        static $LCORDNO = 'ordno';
-        static $LCTYPE  = 'type';
-        static $LCUID   = 'uid';
-        static $LCPROPS = 'props';
-        static $LCSUB   = 'sub';
         if( ! isset( $this->config[self::ALLOWEMPTY] )) { // default
             $this->config[self::ALLOWEMPTY] = true;
         }
@@ -378,42 +374,44 @@ abstract class IcalBase implements IcalInterface
             $output[self::UNIQUE_ID]     = $this->getConfig( self::UNIQUE_ID );
             return $output;
         }
-        switch( strtoupper( $config )) {
-            case self::ALLOWEMPTY:
-                return $this->config[self::ALLOWEMPTY];
-            case self::UNIQUE_ID:
-                return $this->config[self::UNIQUE_ID];
-            case self::LANGUAGE: // get language for calendar component as defined in [RFC 1766]
-                if( isset( $this->config[self::LANGUAGE] )) {
-                    return $this->config[self::LANGUAGE];
+        return match( strtoupper( $config )) {
+            self::ALLOWEMPTY => $this->config[self::ALLOWEMPTY],
+            self::UNIQUE_ID  => $this->config[self::UNIQUE_ID],
+            self::LANGUAGE   => ( $this->config[self::LANGUAGE] ?? false ),
+            self::COMPSINFO  => $this->getConfigCompsInfo(),
+            self::PROPINFO   => $this->getpropInfo(),
+            self::SETPROPERTYNAMES => array_keys( $this->getConfig( self::PROPINFO )),
+            default          => false,
+        }; // end match
+    }
+
+    /**
+     * @return int[]|string[]
+     */
+    protected function getConfigCompsInfo() : array
+    {
+        static $LCORDNO = 'ordno';
+        static $LCTYPE  = 'type';
+        static $LCUID   = 'uid';
+        static $LCPROPS = 'props';
+        static $LCSUB   = 'sub';
+        $this->compix = [];
+        $info = [];
+        if( ! empty( $this->components )) {
+            foreach( array_keys( $this->components ) as $cix ) {
+                if( empty( $this->components[$cix] )) {
+                    continue;
                 }
-                break;
-            case self::COMPSINFO:
-                $this->compix = [];
-                $info = [];
-                if( ! empty( $this->components )) {
-                    foreach( array_keys( $this->components ) as $cix ) {
-                        if( empty( $this->components[$cix] )) {
-                            continue;
-                        }
-                        $info[$cix][$LCORDNO] = $cix + 1;
-                        $info[$cix][$LCTYPE]  = $this->components[$cix]->getCompType();
-                        if( self::hasUid( $this->components[$cix] )) {
-                            $info[$cix][$LCUID] = $this->components[$cix]->getUid();
-                        }
-                        $info[$cix][$LCPROPS] = $this->components[$cix]->getConfig( self::PROPINFO );
-                        $info[$cix][$LCSUB]   = $this->components[$cix]->getConfig( self::COMPSINFO );
-                    } // end foreach
-                } // end if
-                return $info;
-            case self::PROPINFO:
-                return $this->getpropInfo();
-            case self::SETPROPERTYNAMES:
-                return array_keys( $this->getConfig( self::PROPINFO ));
-            default :
-                break;
-        } // end switch
-        return false;
+                $info[$cix][$LCORDNO] = $cix + 1;
+                $info[$cix][$LCTYPE]  = $this->components[$cix]->getCompType();
+                if( self::hasUid( $this->components[$cix] )) {
+                    $info[$cix][$LCUID] = $this->components[$cix]->getUid();
+                }
+                $info[$cix][$LCPROPS] = $this->components[$cix]->getConfig( self::PROPINFO );
+                $info[$cix][$LCSUB]   = $this->components[$cix]->getConfig( self::COMPSINFO );
+            } // end foreach
+        } // end if
+        return $info;
     }
 
     /**
@@ -446,7 +444,6 @@ abstract class IcalBase implements IcalInterface
             $propName2 = StringFactory::getInternalPropName( $propName );
             switch( true ) {
                 case ( ! property_exists( $this, $propName2 )) :
-                    break;
                 case empty( $this->{$propName2} ) :
                     break;
                 case ( self::X_PROP === $propName ) :
@@ -468,7 +465,7 @@ abstract class IcalBase implements IcalInterface
      * Set Vcalendar/component config
      *
      * @param string|string[]        $config
-     * @param null|bool|string|array $value
+     * @param null|bool|string|mixed[] $value
      * @param bool                   $softUpdate
      * @return static
      * @throws InvalidArgumentException
@@ -542,6 +539,29 @@ abstract class IcalBase implements IcalInterface
     }
 
     /**
+     * @param null|Pc $pc
+     * @return bool
+     * @since  2.41.88 - 2024-01-19
+     */
+    protected static function isPropSet( ? Pc $pc ) : bool
+    {
+        return ( ! empty( $pc ) && ! empty( $pc->getValue()));
+    }
+
+    /**
+     * @param null|Pc $pc
+     * @return bool
+     * @since  2.41.88 - 2024-01-19
+     */
+    protected static function isIntPropSet( ? Pc $pc ) : bool
+    {
+        if( empty( $pc )) {
+            return false;
+        }
+        return is_int( $pc->getValue());
+    }
+
+    /**
      * Return number of components
      *
      * @return int
@@ -612,7 +632,7 @@ abstract class IcalBase implements IcalInterface
                 $index   = $this->getCompixIndex( self::$INDEX );
                 break;
             case is_array( $arg1 ) : // [ *[propertyName => propertyValue] ]
-                $key   = implode( Util::$MINUS, array_keys( $arg1 ));
+                $key   = implode( StringFactory::$MINUS, array_keys( $arg1 ));
                 $index = $this->getCompixIndex( $key );
                 break;
             case ctype_digit((string) $arg1 ) : // specific component in chain
@@ -740,7 +760,7 @@ abstract class IcalBase implements IcalInterface
             if( false === ( $value = $component->{$method}())) { // single occurrence
                 continue; // missing/empty property
             }
-                switch( true ) {
+            switch( true ) {
                 case ( self::SUMMARY === $propName ) : // exists in (any case)
                     if( false !== stripos( $value, $propValue )) {
                         return true;
@@ -760,8 +780,8 @@ abstract class IcalBase implements IcalInterface
                     break;
             } // end switch
             foreach( $value as $part ) {
-                $part = ( is_string( $part ) && ( str_contains( $part, Util::$COMMA )))
-                    ? explode( Util::$COMMA, $part )
+                $part = ( is_string( $part ) && ( str_contains( $part, StringFactory::$COMMA )))
+                    ? explode( StringFactory::$COMMA, $part )
                     : [ $part ];
                 if( in_array( $propValue, $part )) {  // note no true
                     return true;
@@ -912,7 +932,7 @@ abstract class IcalBase implements IcalInterface
      * @param CalendarComponent $subComp
      * @return void
      * @throws InvalidArgumentException
-     * @since  2.47.68 - 2022-10-03
+     * @since  2.41.68 - 2022-10-03
      */
     protected static function assertComponents(
         IcalBase $comp,

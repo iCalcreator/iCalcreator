@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,12 +36,11 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * COMPLETED property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait COMPLETEDtrait
 {
@@ -84,52 +83,51 @@ trait COMPLETEDtrait
      *
      * @param null|bool  $inclParam
      * @return bool|string|DateTime|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getCompleted( ? bool $inclParam = false ) : DateTime | bool | string | Pc
     {
         if( empty( $this->completed )) {
             return false;
         }
-        return $inclParam ? clone $this->completed : $this->completed->value;
+        return $inclParam ? clone $this->completed : $this->completed->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isCompletedSet() : bool
     {
-        return ! empty( $this->completed->value );
+        return self::isPropSet( $this->completed );
     }
 
     /**
      * Set calendar component property completed
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setCompleted( null|string|DateTimeInterface|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::COMPLETED );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::COMPLETED );
+            $pc->setEmpty();
         }
         else {
-            $value->addParamValue( self::DATE_TIME ); // req.
-            $value = DateTimeFactory::setDate( $value, true ); // $forceUTC
+            $pc->addParamValue( self::DATE_TIME ); // req.
+            $pc = DateTimeFactory::setDate( $pc, true ); // $forceUTC
 
         }
-        $this->completed = $value;
+        $this->completed = $pc;
         return $this;
     }
 }

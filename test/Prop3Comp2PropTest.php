@@ -42,8 +42,8 @@ class Prop3Comp2PropTest extends TestCase
      */
     private static function getErrMsg(
         ? string $spec = null,
-        int|string $case,
-        string $testFcn,
+        null|int|string $case = null,
+        null|string $testFcn = null,
         ? string $inst = null,
         ? string $method = null
     )
@@ -153,7 +153,7 @@ class Prop3Comp2PropTest extends TestCase
         $location     = $event->getLocation( null, true );
         $this->assertEquals(
             $locationName,
-            $location->value,
+            $location->getValue(),
             self::getErrMsg( null, $case . '-12-3', __FUNCTION__, IcalInterface::VEVENT, 'vlocationNames2Location' )
         );
 
@@ -206,7 +206,7 @@ class Prop3Comp2PropTest extends TestCase
         $attendee = $event->getAttendee( null, true );
         $this->assertEquals(
             $calendarAddress,
-            $attendee->value,
+            $attendee->getValue(),
             self::getErrMsg( null, $case . '-13-2', __FUNCTION__, IcalInterface::VEVENT, 'participants2Attendees' )
         );
 

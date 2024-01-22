@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,12 +32,11 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * RESOURCE_TYPE property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait RESOURCE_TYPErfc9073trait
 {
@@ -76,46 +75,47 @@ trait RESOURCE_TYPErfc9073trait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
+     * @since 2.41.85 2024-01-18
      */
     public function getResourcetype( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->resourcetype )) {
             return false;
         }
-        return $inclParam ? clone $this->resourcetype : $this->resourcetype->value;
+        return $inclParam ? clone $this->resourcetype : $this->resourcetype->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isResourcetypeSet() : bool
     {
-        return ! empty( $this->resourcetype->value );
+        return self::isPropSet( $this->resourcetype );
     }
 
     /**
      * Set calendar component property resourcetype
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
+     * @since 2.41.85 2024-01-18
      */
     public function setResourcetype( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::RESOURCE_TYPE );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::RESOURCE_TYPE );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::RESOURCE_TYPE );
+            Util::assertString( $pcValue, self::RESOURCE_TYPE );
         }
-        $this->resourcetype = $value;
+        $this->resourcetype = $pc;
         return $this;
     }
 }

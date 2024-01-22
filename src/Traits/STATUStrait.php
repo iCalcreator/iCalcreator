@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,7 +33,6 @@ use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function strtoupper;
@@ -41,7 +40,7 @@ use function strtoupper;
 /**
  * STATUS property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait STATUStrait
 {
@@ -81,35 +80,35 @@ trait STATUStrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getStatus( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->status )) {
             return false;
         }
-        return $inclParam ? clone $this->status : $this->status->value;
+        return $inclParam ? clone $this->status : $this->status->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isStatusSet() : bool
     {
-        return ! empty( $this->status->value );
+        return self::isPropSet( $this->status );
     }
 
     /**
      * Set calendar component property status
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setStatus( null|string|Pc $value = null, ? array $params = [] ) : static
     {
@@ -129,29 +128,28 @@ trait STATUStrait
             self::DRAFT,
             self::F_NAL,
         ];
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( ! empty( $value->value )) {
-            Util::assertString( $value->value, self::SOURCE );
-            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( ! empty( $pcValue )) {
+            Util::assertString( $pcValue, self::SOURCE );
+            $pc->setValue( strtoupper( StringFactory::trimTrailNL( $pcValue )));
         }
         switch( true ) {
-            case ( empty( $value->value )) :
-                $this->assertEmptyValue( $value->value, self::STATUS );
-                $value->setEmpty();
+            case ( empty( $pcValue )) :
+                $this->assertEmptyValue( $pcValue, self::STATUS );
+                $pc->setEmpty();
                 break;
             case (self::VEVENT === $this->getCompType()) :
-                Util::assertInEnumeration( $value->value, $ALLOWED_VEVENT, self::STATUS );
+                Util::assertInEnumeration( $pcValue, $ALLOWED_VEVENT, self::STATUS );
                 break;
             case (self::VTODO === $this->getCompType()) :
-                Util::assertInEnumeration( $value->value, $ALLOWED_VTODO, self::STATUS );
+                Util::assertInEnumeration( $pcValue, $ALLOWED_VTODO, self::STATUS );
                 break;
             case (self::VJOURNAL === $this->getCompType()) :
-                Util::assertInEnumeration( $value->value, $ALLOWED_VJOURNAL, self::STATUS );
+                Util::assertInEnumeration( $pcValue, $ALLOWED_VJOURNAL, self::STATUS );
                 break;
         } // end switch
-        $this->status = $value;
+        $this->status = $pc;
         return $this;
     }
 }

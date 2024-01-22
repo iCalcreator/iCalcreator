@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,14 +32,12 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\Geo;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\GeoFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * GEO property functions
  *
- * @since 2.41.62 2022-08-28
+ * @since 2.41.85 2024-01-18
  */
 trait GEOtrait
 {
@@ -79,25 +77,25 @@ trait GEOtrait
      *
      * @param null|bool   $inclParam
      * @return bool|array|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getGeo( ? bool $inclParam = false ) : bool | array | Pc
     {
         if( empty( $this->geo )) {
             return false;
         }
-        return $inclParam ? clone $this->geo : $this->geo->value;
+        return $inclParam ? clone $this->geo : $this->geo->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isGeoSet() : bool
     {
-        return ! empty( $this->geo->value );
+        return self::isPropSet( $this->geo );
     }
 
     /**
@@ -116,10 +114,36 @@ trait GEOtrait
             return false;
         }
         $loc     = $this->getLocation();
-        $content = ( empty( $loc )) ? self::$SP0 : $loc . Util::$SLASH;
+        $content = ( empty( $loc )) ? self::$SP0 : $loc . StringFactory::$SLASH;
         return $content .
             GeoFactory::geo2str2( $geo[self::LATITUDE], GeoFactory::$geoLatFmt ) .
             GeoFactory::geo2str2( $geo[self::LONGITUDE], GeoFactory::$geoLongFmt);
+    }
+
+    /**
+     * Return array ( <lat>, <long> ) on valid input OR null-array
+     *
+     * @param string|array $input
+     * @return array|null[]
+     * @since 2.41.88 2024-01-21
+     */
+    public static function extractGeoLatLong( string|array $input ) : array
+    {
+        static $nullArr = [ null, null ];
+        if( is_string( $input )) {
+            return match ( true ) {
+                empty( $input ), ! str_contains( $input, StringFactory::$SEMIC )
+                        => $nullArr,
+                default => explode( StringFactory::$SEMIC, $input, 2 ),
+            };
+        }
+        return match( true ) {
+            ( 2 !== count( $input )) => $nullArr,
+            ( ! empty( $input[0] ) && ! empty( $input[1] )) => $input,
+            ( ! empty( $input[self::LATITUDE] ) && ! empty( $input[self::LONGITUDE] )) =>
+            [ $input[self::LATITUDE], $input[self::LONGITUDE] ],
+            default => $nullArr
+        };
     }
 
     /**
@@ -127,9 +151,9 @@ trait GEOtrait
      *
      * @param null|int|float|string|Pc $latitude
      * @param null|int|float|string $longitude
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
-     * @since 2.41.62 2022-08-28
+     * @since 2.41.85 2024-01-18
      */
     public function setGeo(
         null|int|float|string|Pc $latitude = null,
@@ -143,15 +167,15 @@ trait GEOtrait
                 $this->geo = Pc::factory();
                 return $this;
             case ( $latitude instanceof Pc ) :
-                $value = clone $latitude;
+                $pc = clone $latitude;
                 break;
             default :
-                $value = Pc::factory(
+                $pc = Pc::factory(
                     [ self::LATITUDE  => (float) $latitude, self::LONGITUDE => (float) $longitude ],
-                    ParameterFactory::setParams( $params )
+                    $params
                 );
         } // end switch
-        $this->geo = $value;
+        $this->geo = $pc;
         return $this;
     }
 }

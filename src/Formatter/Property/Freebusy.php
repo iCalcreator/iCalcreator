@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,6 +36,7 @@ use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\SortFactory;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function sprintf;
 use function usort;
 
@@ -43,7 +44,7 @@ use function usort;
  * Format FREEBUSY
  *
  * 1
- * @since 2.41.59 - 2022-08-25
+ * @since 2.41.88 - 2024-01-18
  */
 final class Freebusy extends PropertyBase
 {
@@ -53,37 +54,39 @@ final class Freebusy extends PropertyBase
      * @param bool|null $allowEmpty
      * @return string
      * @throws Exception
+     * @since 2.41.88 - 2024-01-18
      */
     public static function format( string $propName, array $values , ? bool $allowEmpty = true ) : string
     {
         static $FMT    = ';FBTYPE=%s';
         static $SORTER = [ SortFactory::class, 'sortRdate1' ];
         if( empty( $values )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        $output = self::$SP0;
+        $output = StringFactory::$SP0;
         foreach( $values as $freebusyPart ) { // Pc
-            if( empty( $freebusyPart->value )) {
+            $freebusyPartValue = $freebusyPart->getValue();
+            if( empty( $freebusyPartValue )) {
                 if( $allowEmpty ) {
                     $output .= self::renderProperty( $propName );
                 }
                 continue;
             }
-            $params      = $freebusyPart->getParams();
+            $params      = (array) $freebusyPart->getParams();
             $attributes  = sprintf( $FMT, $params[self::FBTYPE] ); // always set
             unset( $params[self::FBTYPE] );
             $attributes .= self::formatParams( $params );
-            $cnt         = count( $freebusyPart->value );
+            $cnt         = count( $freebusyPartValue );
             if( 1 < $cnt ) {
-                usort( $freebusyPart->value, $SORTER );
+                usort( $freebusyPartValue, $SORTER );
             }
-            $content      = self::$SP0;
-            foreach( $freebusyPart->value as $freebusyPeriod ) {
+            $content      = StringFactory::$SP0;
+            foreach( $freebusyPartValue as $freebusyPeriod ) {
                 if( ! empty( $content )) {
-                    $content .= self::$COMMA;
+                    $content .= StringFactory::$COMMA;
                 }
                 $content .= DateTimeFactory::dateTime2Str( $freebusyPeriod[0] );
-                $content .= self::$SLASH;
+                $content .= StringFactory::$SLASH;
                 if( $freebusyPeriod[1] instanceof DateInterval ) {  // period with duration
                     $content .= DateIntervalFactory::dateInterval2String( $freebusyPeriod[1] );
                 }

@@ -158,7 +158,7 @@ class DateTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function DATEtestProvider() : array
+    public static function DATEtestProvider() : array
     {
         $dataArr = [];
 
@@ -179,7 +179,7 @@ class DateTest extends DtBase
                 clone $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime )
+            self::getDateTimeAsCreateShortString( $dateTime )
         ];
 
         $dateTime  = DateTimeFactory::factory( DATEYmdTHis );
@@ -191,7 +191,7 @@ class DateTest extends DtBase
                 clone $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime )
+            self::getDateTimeAsCreateShortString( $dateTime )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
@@ -203,7 +203,7 @@ class DateTest extends DtBase
                 clone $dateTime,
                 [ IcalInterface::TZID => LTZ ]
             ),
-            $this->getDateTimeAsCreateLongString( clone $dateTime, LTZ)
+            self::getDateTimeAsCreateLongString( clone $dateTime, LTZ)
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmd );
@@ -215,7 +215,7 @@ class DateTest extends DtBase
                 $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime )
+            self::getDateTimeAsCreateShortString( $dateTime )
         ];
 
 
@@ -228,7 +228,7 @@ class DateTest extends DtBase
                 $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime )
+            self::getDateTimeAsCreateShortString( $dateTime )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
@@ -240,7 +240,7 @@ class DateTest extends DtBase
                 $dateTime,
                 []
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime )
+            self::getDateTimeAsCreateLongString( $dateTime )
         ];
 
 
@@ -253,7 +253,7 @@ class DateTest extends DtBase
                 $dateTime,
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime )
+            self::getDateTimeAsCreateShortString( $dateTime )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
@@ -265,7 +265,7 @@ class DateTest extends DtBase
                 $dateTime,
                 []
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
+            self::getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC )
         ];
 
         $dateTime  = DateTimeFactory::factory( '20160305' );
@@ -278,7 +278,7 @@ class DateTest extends DtBase
                     clone $dateTime,
                     [ IcalInterface::VALUE => IcalInterface::DATE ]
                 ),
-                $this->getDateTimeAsCreateShortString( $dateTime )
+                self::getDateTimeAsCreateShortString( $dateTime )
             ];
             $dateTime->modify( '-1 day ' );
         } // end for
@@ -293,7 +293,7 @@ class DateTest extends DtBase
                     clone $dateTime,
                     [ IcalInterface::VALUE => IcalInterface::DATE ]
                 ),
-                $this->getDateTimeAsCreateShortString( $dateTime )
+                self::getDateTimeAsCreateShortString( $dateTime )
             ];
         } // end for
 
@@ -321,9 +321,11 @@ class DateTest extends DtBase
         string $expectedString
     ) : void
     {
-//      error_log( __FUNCTION__ . ' start #' . $case .
-//          ' value : ' . var_export( $value, true ) .
-//          ' params : ' . var_export( $params, true )); // test ###
+
+      echo __FUNCTION__ . ' start #' . $case .
+          ' value : ' . var_export( $value, true ) .
+          ' params : ' . var_export( $params, true ) . PHP_EOL; // test ###
+
         $this->thePropTest( $case, self::$compsProps, $value, $params, $expectedGet, $expectedString );
         $this->propGetNoParamsTest( $case, self::$compsProps, $value, $params, $expectedGet );
         $this->exdateRdateSpecTest( $case, self::$compsProps2, $value, $params, $expectedGet, $expectedString );
@@ -335,7 +337,7 @@ class DateTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function RexDATEtestProvider() : array
+    public static function RexDATEtestProvider() : array
     {
         $dataArr = [];
 
@@ -348,7 +350,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( clone $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            self::getDateTimeAsCreateShortString( clone $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
         ];
 
         $dateTime  = DateTimeFactory::factory( DATEYmdTHis );
@@ -360,7 +362,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            self::getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis . ' ' . LTZ );
@@ -372,7 +374,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 [ IcalInterface::TZID => LTZ ]
             ),
-            $this->getDateTimeAsCreateLongString( clone $dateTime, LTZ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
+            self::getDateTimeAsCreateLongString( clone $dateTime, LTZ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
         ];
 
         $dateTime  = DateTimeFactory::factory( DATEYmd );
@@ -385,7 +387,7 @@ class DateTest extends DtBase
                 [ (clone $dateTime2), (clone $dateTime2) ],
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            self::getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
         ];
 
 
@@ -399,7 +401,7 @@ class DateTest extends DtBase
                 [ (clone $dateTime2), (clone $dateTime2) ],
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            self::getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
@@ -411,7 +413,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 [ IcalInterface::ISLOCALTIME => true ]
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
+            self::getDateTimeAsCreateLongString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$YmdTHis )
         ];
 
 
@@ -424,7 +426,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 [ IcalInterface::VALUE => IcalInterface::DATE ]
             ),
-            $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+            self::getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
         ];
 
         $dateTime = DateTimeFactory::factory( DATEYmdTHis, IcalInterface::UTC );
@@ -436,7 +438,7 @@ class DateTest extends DtBase
                 [ clone $dateTime, clone $dateTime ],
                 []
             ),
-            $this->getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC ) .
+            self::getDateTimeAsCreateLongString( $dateTime, IcalInterface::UTC ) .
             ',' . $dateTime->format( DateTimeFactory::$YmdTHis ) . 'Z'
         ];
 
@@ -451,7 +453,7 @@ class DateTest extends DtBase
                     [ (clone $dateTime2), (clone $dateTime2) ],
                     [ IcalInterface::VALUE => IcalInterface::DATE ]
                 ),
-                $this->getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
+                self::getDateTimeAsCreateShortString( $dateTime ) . ',' . $dateTime->format( DateTimeFactory::$Ymd )
             ];
             $dateTime->modify( '-1 day ' );
         } // end for

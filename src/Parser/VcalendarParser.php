@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Parser;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Vcalendar;
 use UnexpectedValueException;
 
@@ -99,7 +98,7 @@ final class VcalendarParser extends ParserBase
         static $ERR10 = 'Only %d rows in calendar content :%s';
         $arrParse = false;
         if( is_array( $unParsedText )) {
-            $rows     = implode( self::$NLCHARS . Util::$CRLF, $unParsedText );
+            $rows     = implode( self::$NLCHARS . StringFactory::$CRLF, $unParsedText );
             $arrParse = true;
         }
         else { // string
@@ -114,7 +113,7 @@ final class VcalendarParser extends ParserBase
         }
         if( empty( $rows )) { /* err 9 */
             throw new UnexpectedValueException(
-                sprintf( $ERR10, 9, Util::$SP0 )
+                sprintf( $ERR10, 9, StringFactory::$SP0 )
             );
         }
         /* skip leading (empty/invalid) lines (and remove leading BOM chars etc) */

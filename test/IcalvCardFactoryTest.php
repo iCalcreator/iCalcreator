@@ -52,7 +52,7 @@ class IcalvCardFactoryTest extends TestCase
      * @return mixed[]
      * @throws Exception
      */
-    public function IcalvCardTestProvider() : array
+    public static function IcalvCardTestProvider() : array
     {
         $dataArr = [];
 
@@ -101,7 +101,7 @@ class IcalvCardFactoryTest extends TestCase
      * Testing IcalvCardFactory::iCal2vCards (+iCal2vCard+...)
      *
      * @test
-     * @dataProvider IcalvCardTestProvider'
+     * @dataProvider IcalvCardTestProvider
      * @param int $case
      * @param Vcalendar $vcalendar
      * @param null|string $version

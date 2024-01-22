@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -29,6 +29,7 @@
 declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function sprintf;
 
 /**
@@ -47,6 +48,6 @@ final class CalMetProVer extends PropertyBase
     public static function format( string $propName, null|bool|string $value ) : string
     {
         static $FMTICAL = "%s:%s\r\n";
-        return empty( $value ) ? self::$SP0 : sprintf( $FMTICAL, $propName, $value );
+        return empty( $value ) ? StringFactory::$SP0 : sprintf( $FMTICAL, $propName, $value );
     }
 }

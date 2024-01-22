@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 use InvalidArgumentException;
@@ -44,7 +43,7 @@ use function substr;
 /**
  * URL property functions
  *
- * @since 2.41.81 2023-08-14
+ * @since 2.41.85 2024-01-18
  */
 trait URLtrait
 {
@@ -84,25 +83,25 @@ trait URLtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getUrl( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->url )) {
             return false;
         }
-        return $inclParam ? clone $this->url : $this->url->value;
+        return $inclParam ? clone $this->url : $this->url->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isUrlSet() : bool
     {
-        return ! empty( $this->url->value );
+        return self::isPropSet( $this->url );
     }
 
     /**
@@ -117,29 +116,27 @@ trait URLtrait
      *  Ex. 'URL:geo:40.443,-79.945;u=10'
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.81 2023-08-14
+     * @since 2.41.85 2024-01-18
      */
     public function setUrl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->value = rtrim((string) $value->value );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::URL );
-            $this->url = $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = rtrim((string) $pc->getValue());
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::URL );
+            $this->url = $pc->setEmpty();
         }
-        elseif( 0 === stripos( $value->value, self::GEO )) {
-            $value->value = strtolower( self::GEO ) . substr( $value->value, 3 );
-            $this->url = $value->setValue( StringFactory::trimTrailNL( $value->value ))
+        elseif( 0 === stripos( $pcValue, self::GEO )) {
+            $pcValue = strtolower( self::GEO ) . substr( $pcValue, 3 );
+            $this->url = $pc->setValue( StringFactory::trimTrailNL( $pcValue ))
                 ->removeParam(self::VALUE );
         }
         else {
-            Util::assertString( $value->value, self::URL );
-            HttpFactory::urlSet( $this->url, $value );
+            $pcValue = Util::assertString( $pcValue, self::URL );
+            HttpFactory::urlSet( $this->url, $pc->setValue( $pcValue ));
         }
         return $this;
     }

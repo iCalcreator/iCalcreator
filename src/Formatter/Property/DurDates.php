@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -34,12 +34,13 @@ use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format DURATION, REFRESH_INTERVAL, TRIGGER
  *
  * 3
- * @since 2.41.66 2022-09-07
+ * @since 2.41.88 2024-01-18
  */
 final class DurDates extends PropertyBase
 {
@@ -49,21 +50,23 @@ final class DurDates extends PropertyBase
      * @param bool|null $allowEmpty
      * @return string
      * @throws Exception
+     * @since 2.41.88 2024-01-18
      */
     public static function format( string $propName, null|bool|Pc $pc, ? bool $allowEmpty = true ) : string
     {
         if( empty( $pc )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        if( empty( $pc->value )) {
-            return self::renderSinglePropEmpty( $propName, $allowEmpty );
-        }
-        return self::renderProperty(
-               $propName,
-            $pc->params,
-               ( $pc->value instanceof DateInterval
-                   ? DateIntervalFactory::dateInterval2String( $pc->value, ( self::TRIGGER === $propName ))
-                   : DateTimeFactory::dateTime2Str( $pc->value ))
-        );
+        $pcValue = $pc->getValue();
+        return empty( $pcValue )
+            ? self::renderSinglePropEmpty( $propName, $allowEmpty )
+            : self::renderProperty(
+                $propName,
+                $pc->getParams(),
+                (( $pcValue instanceof DateInterval )
+                    ? DateIntervalFactory::dateInterval2String( $pcValue, ( self::TRIGGER === $propName ))
+                    : DateTimeFactory::dateTime2Str( $pcValue )
+                )
+            );
     }
 }

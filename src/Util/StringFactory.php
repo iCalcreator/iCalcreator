@@ -57,12 +57,67 @@ class StringFactory
     /**
      * @var string
      */
-    public static string $BS2 = '\\';
+    public static string $BS2   = '\\';
 
     /**
      * @var string
      */
-    public static string $QQ  = '"';
+    public static string $COLON = ':';
+
+    /**
+     * @var string
+     */
+    public static string $COMMA = ',';
+
+    /**
+     * @var string
+     */
+    public static string $CRLF  = "\r\n";
+
+    /**
+     * @var string
+     */
+    public static string $DOT           = '.';
+
+    /**
+     * @var string
+     */
+    public static string $MINUS         = '-';
+
+    /**
+     * @var string
+     */
+    public static string $PLUS          = '+';
+
+    /**
+     * @var string
+     */
+    public static string $QQ    = '"';
+
+    /**
+     * @var string
+     */
+    public static string $SEMIC = ';';
+
+    /**
+     * @var string
+     */
+    public static string $SLASH = '/';
+
+    /**
+     * @var string
+     */
+    public static string $SP0   = '';
+
+    /**
+     * @var string
+     */
+    public static string $SP1           = ' ';
+
+    /**
+     * @var string
+     */
+    public static string $ZERO          = '0';
 
     /**
      * Return array property name and (params+)value from (string) row
@@ -77,7 +132,7 @@ class StringFactory
     }
 
     /**
-     * Return array, string splitted by first found semicolon or colon, split-char excluded
+     * Return array, string split by first found semicolon or colon, split-char excluded
      *
      * No one found return [ string, null ]
      *
@@ -87,22 +142,22 @@ class StringFactory
      */
     public static function splitByFirstSQorColon( string $string ) : array
     {
-        $sclnPos = strpos( $string, Util::$SEMIC ); // first found
-        $clnPos  = strpos( $string, Util::$COLON ); // first found
+        $sclnPos = strpos( $string, self::$SEMIC ); // first found
+        $clnPos  = strpos( $string, StringFactory::$COLON ); // first found
         switch( true ) {
             case (( false === $sclnPos ) && ( false === $clnPos )) : // no one found
-                return [ $string, Util::$SP0 ];
+                return [ $string, self::$SP0 ];
             case (( false !== $sclnPos ) && ( false === $clnPos )) : // split by semicolon
-                $firstPart = strstr( $string, Util::$SEMIC, true );
+                $firstPart = strstr( $string, self::$SEMIC, true );
                 break;
             case (( false === $sclnPos ) && ( false !== $clnPos )) : // split by colon
-                $firstPart = strstr( $string, Util::$COLON, true  );
+                $firstPart = strstr( $string, StringFactory::$COLON, true  );
                 break;
             case ( $sclnPos < $clnPos ) :                            // split by semicolon
-                $firstPart = strstr( $string, Util::$SEMIC, true );
+                $firstPart = strstr( $string, self::$SEMIC, true );
                 break;
             default : // ie $sclnPos > $clnPos                       // split by colon
-                $firstPart = strstr( $string, Util::$COLON, true );
+                $firstPart = strstr( $string, StringFactory::$COLON, true );
                 break;
         } // end switch
         return [ $firstPart, self::after( $firstPart, $string  ) ];
@@ -152,10 +207,10 @@ class StringFactory
         static $SCHAR31  = '%40';
         static $SCHAR32  = '@';
         if(( false !== stripos( $line, $PFCHARS1 )) && ( false !== stripos( $line, $SFCHARS1 ))) {
-            $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], Util::$SP0, $line ); // rem url-dec
+            $line = str_replace( [ $PFCHARS1, $SFCHARS1 ], self::$SP0, $line ); // rem url-dec
         }
         elseif(( str_contains( $line, $PFCHARS2 )) && ( str_contains( $line, $SFCHARS2 ))) {
-            $line = str_replace( [ $PFCHARS2, $SFCHARS2 ], Util::$SP0, $line ); // rem <>
+            $line = str_replace( [ $PFCHARS2, $SFCHARS2 ], self::$SP0, $line ); // rem <>
         }
         if( str_contains( $line, $SCHAR31 )) {
             $line = str_replace( $SCHAR31, $SCHAR32, $line ); // repl with @
@@ -177,8 +232,8 @@ class StringFactory
         static $BSCOMMA = '\,';
         static $BSSEMIC = '\;';
         $string = str_replace( $BS4, self::$BS2, $string );
-        $string = str_replace( $BSCOMMA, Util::$COMMA, $string );
-        return str_replace( $BSSEMIC, Util::$SEMIC, $string );
+        $string = str_replace( $BSCOMMA, self::$COMMA, $string );
+        return str_replace( $BSSEMIC, self::$SEMIC, $string );
     }
 
     /**
@@ -200,11 +255,6 @@ class StringFactory
     /**
      * @link https://php.net/manual/en/function.substr.php#112707
      */
-
-    /**
-     * @var string
-     */
-    private static string $SP0 = '';
 
     /**
      * Return substring after first found needle in haystack
@@ -308,7 +358,7 @@ class StringFactory
             $exists1 && ! $exists2   => self::after( $needle1, $haystack ),
             ! $exists1 && $exists2   => strstr( $haystack, $needle2, true ),
             default                  => strstr( self::after( $needle1, $haystack ),  $needle2, true ),
-        }; // end switch
+        }; // end match
     }
 
     /**
@@ -355,6 +405,22 @@ class StringFactory
     }
 
     /**
+     * Return formatted float value with two decimals
+     *
+     * @param null|int|float|string $value
+     * @return string
+     */
+    public static function numberFormat( null|int|float|string $value ) : string
+    {
+        return number_format(
+            (float) $value,
+            2,
+            self::$DOT,
+            self::$SP0
+        );
+    }
+
+    /**
      * Component properties method name utility methods
      */
 
@@ -368,8 +434,8 @@ class StringFactory
     public static function getInternalPropName( string $propName ) : string
     {
         $internalName = strtolower( $propName );
-        if( str_contains( $internalName, Util::$MINUS )) {
-            $internalName = implode( explode( Util::$MINUS, $internalName ));
+        if( str_contains( $internalName, StringFactory::$MINUS )) {
+            $internalName = implode( explode( StringFactory::$MINUS, $internalName ));
         }
         return $internalName;
     }
@@ -494,7 +560,7 @@ class StringFactory
      */
     public static function commaSplitCount( string $string, array & $output ) : void
     {
-        $content = explode( Util::$COMMA, $string );
+        $content = explode( StringFactory::$COMMA, $string );
         foreach( $content as $contentPart ) {
             self::stringCount( $contentPart, $output );
         }

@@ -298,3 +298,11 @@ v3.39   3.4 release candidate
 
 2.41.82   DateInterval bug, github #109
 2.41.83   DateTime timezone bug, github #114
+
+2.41.84   composer.json upd
+2.41.85   major upd class Pc (+Traits/*)
+2.41.86   upd DateIntervalFactory
+2.41.87   upd tests
+2.41.88   code rewrites, Xml\Formatter+Parser, Formatter/* etc
+2.41.89   ParameterFactory deprecated
+2.41.90   upd StringFactory

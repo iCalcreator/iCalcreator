@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -35,6 +35,7 @@ use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
 use Kigkonsult\Icalcreator\Util\SortFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Vcalendar;
 
 use function count;
@@ -45,7 +46,7 @@ use function usort;
  * Format RDATE
  *
  * 1
- * @since 2.41.68 2022-10-26
+ * @since 2.41.88 2024-01-17
  */
 final class Rdate extends PropertyBase
 {
@@ -56,6 +57,7 @@ final class Rdate extends PropertyBase
      * @param null|string $compType
      * @return string
      * @throws Exception
+     * @since 2.41.88 2024-01-17
      */
     public static function format(
         string $propName,
@@ -67,13 +69,14 @@ final class Rdate extends PropertyBase
         static $SORTER1 = [ SortFactory::class, 'sortRdate1' ];
         static $SORTER2 = [ SortFactory::class, 'sortRdate2' ];
         if( empty( $values )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
         $utcTime      = Vcalendar::isTzComp( $compType );
-        $output       = self::$SP0;
+        $output       = StringFactory::$SP0;
         $rDates       = [];
         foreach( $values as $theRdate ) { // Pc
-            if( empty( $theRdate->value )) {
+            $theRdateValue = $theRdate->getValue();
+            if( empty( $theRdateValue )) {
                 if( $allowEmpty ) {
                     $output .= self::renderProperty( $propName );
                 }
@@ -82,8 +85,9 @@ final class Rdate extends PropertyBase
             if( $utcTime ) {
                 $theRdate->removeParam( self::TZID );
             }
-            if( 1 < count( $theRdate->value )) {
-                usort( $theRdate->value, $SORTER1 );
+            if( 1 < count( $theRdateValue )) {
+                usort( $theRdateValue, $SORTER1 );
+                $theRdate->setValue( $theRdateValue );
             }
             $rDates[] = $theRdate;
         } // end foreach
@@ -91,24 +95,38 @@ final class Rdate extends PropertyBase
             usort( $rDates, $SORTER2 );
         }
         foreach( $rDates as $theRdate ) { // Pc
-            $isPeriod    = $theRdate->hasParamValue( self::PERIOD );
-            $isValueDate = $theRdate->hasParamValue( self::DATE ); // i.e. NOT datetime
-            $isLocalTime = $theRdate->hasParamKey( self::ISLOCALTIME );
-            $cnt         = count( $theRdate->value );
-            $content     = self::$SP0;
-            $rno         = 1;
-            foreach( $theRdate->value as $rdatePart ) {
-                $content .= ( is_array( $rdatePart ) && $isPeriod )
-                    ? self::getPeriod( $rdatePart, $isValueDate, $isLocalTime ) // is period
-                    : DateTimeFactory::dateTime2Str( $rdatePart, $isValueDate, $isLocalTime ); // is date[time]
-                if( $rno < $cnt ) {
-                    $content .= self::$COMMA;
-                }
-                $rno++;
-            } // end foreach( $rDates as $theRdate )
-            $output .= self::renderProperty( $propName, $theRdate->params, $content );
-        } // end foreach(( array_keys( $rDates ))...
+            $output .= self::formatPart( $theRdate, $propName );
+        }
         return $output;
+    }
+
+    /**
+     * Format a Rdate row
+     *
+     * @param Pc     $theRdate
+     * @param string $propName
+     * @return string
+     * @throws Exception
+     */
+    private static function formatPart( Pc $theRdate, string $propName ) : string
+    {
+        $isPeriod    = $theRdate->hasParamValue( self::PERIOD );
+        $isValueDate = $theRdate->hasParamValue( self::DATE ); // i.e. NOT datetime
+        $isLocalTime = $theRdate->hasParamIsLocalTime();
+        $rdateValue  = $theRdate->getValue();
+        $cnt         = count( $rdateValue );
+        $content     = StringFactory::$SP0;
+        $rno         = 1;
+        foreach( $rdateValue as $rdatePart ) {
+            $content .= ( is_array( $rdatePart ) && $isPeriod )
+                ? self::getPeriod( $rdatePart, $isValueDate, $isLocalTime ) // is period
+                : DateTimeFactory::dateTime2Str( $rdatePart, $isValueDate, $isLocalTime ); // is date[time]
+            if( $rno < $cnt ) {
+                $content .= StringFactory::$COMMA;
+            }
+            $rno++;
+        } // end foreach( $rDates as $theRdate )
+        return self::renderProperty( $propName, (array) $theRdate->getParams(), $content );
     }
 
     /**

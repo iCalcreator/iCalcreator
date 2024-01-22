@@ -5,7 +5,7 @@
  This file is a part of iCalcreator.
 
  author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  link      https://kigkonsult.se
  license   Subject matter of licence is the software iCalcreator.
            The above copyright, link, package and version notices,
@@ -27,14 +27,11 @@
            along with iCalcreator. If not, see <https://www.gnu.org/licenses/>.
 -->
 <phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="true"
          bootstrap="test/autoload.php"
->
+         cacheResult="false"
+         executionOrder="default"
+         processIsolation="true"
+         resolveDependencies="false">
     <testsuites>
         <testsuite name="Vcalendar Tests">
             <file>test/PcTest.php</file>
@@ -91,28 +88,28 @@
             <file>test/IcalvCardFactoryTest.php</file>
         </testsuite>
     </testsuites>
-    <coverage
-            includeUncoveredFiles="true"
-            processUncoveredFiles="true"
-            pathCoverage="false"
-            ignoreDeprecatedCodeUnits="false"
-            disableCodeCoverageIgnore="true">
+    <source>
         <include>
-            <directory>./src</directory>
+            <directory suffix=".php">src</directory>
         </include>
         <exclude>
             <file>./src/Util/IcalXMLFactory.php</file>
+            <file>./src/Util/ParameterFactory.php</file>
             <file>./src/Util/RegulateTimezoneFactory.php</file>
         </exclude>
+    </source>
+    <coverage
+            includeUncoveredFiles="false"
+            disableCodeCoverageIgnore="true">
         <!-- Require the PHP Xdebug (2.7.0 or later) and tokenizer extensions-->
         <!-- Remove or comment after your own choice-->
         <!-- Note, all output in report/logging will be saved in 'testDocs' folder -->
         <report>
             <!-- clover outputFile="testDocs/clover.xml"/ -->
             <!-- crap4j outputFile="testDocs/crap4j.xml" threshold="50"/ -->
-            <html outputDirectory="testDocs/PHPUnitCoverage" lowUpperBound="60" highLowerBound="80"/>
-            <php outputFile="testDocs/coverage.php"/>
-            <text outputFile="testDocs/coverage.txt" showUncoveredFiles="false" showOnlySummary="false"/>
+            <!-- html outputDirectory="testDocs/PHPUnitCoverage" lowUpperBound="60" highLowerBound="80"/ -->
+            <!-- php outputFile="testDocs/coverage.php"/ -->
+            <!-- text outputFile="testDocs/coverage.txt" showUncoveredFiles="false" showOnlySummary="false"/ -->
             <!-- xml outputDirectory="testDocs/xml-coverage"/ -->
         </report>
     </coverage>
@@ -125,7 +122,6 @@
         <!-- testdoxHtml outputFile="testDocs/testdox.html"/ -->
         <!-- testdoxText outputFile="testDocs/testdox.txt"/ -->
         <!-- testdoxXml outputFile="testDocs/testdox.xml"/ -->
-        <text outputFile="testDocs/logfile.txt"/>
     </logging>
     <php>
         <!-- define the (YmdTHis) dateTime -->

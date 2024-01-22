@@ -54,7 +54,7 @@ class IntegerTest extends DtBase
      *
      * @return mixed[]
      */
-    public function integerTestProvider() : array
+    public static function integerTestProvider() : array
     {
         $dataArr = [];
 
@@ -193,7 +193,10 @@ class IntegerTest extends DtBase
                     elseif(( IcalInterface::PERCENT_COMPLETE === $propName ) && ( $value > 100 )) {
                         $ok = true;
                     }
-                    $this->assertTrue( $ok );
+                    $this->assertTrue(
+                        $ok,
+                        __FUNCTION__ . ' case:' . $case . ' setMethod: ' . $setMethod
+                    );
                     return;
                 } // end catch
                 $this->assertSame(
@@ -201,10 +204,11 @@ class IntegerTest extends DtBase
                         ( ! empty( $value ) || (( null !== $value ) && ( 0 === $value ))))),
                     $comp->{$isMethod}(),
                     self::getErrMsg(  '2 ', $case, __FUNCTION__, $theComp, $isMethod, $value )
+                     . PHP_EOL . 'value IN ' . var_export( $value, true )
                 );
                 $getValue = $comp->{$getMethod}( true );
                 if(( empty( $getValue->value ) && IcalInterface::SEQUENCE === $propName )) {
-                    $expectedGet->value  = 0;
+                    $expectedGet->setValue( 0 );
                     $expectedGet->params = self::$STCPAR;
                 }
                 $this->assertEquals(

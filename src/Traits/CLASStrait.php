@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
@@ -42,7 +41,7 @@ use function strtoupper;
 /**
  * CLASS property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait CLASStrait
 {
@@ -87,35 +86,35 @@ trait CLASStrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getClass( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->{self::$KLASS} )) {
             return false;
         }
-        return $inclParam ? clone $this->{self::$KLASS} : $this->{self::$KLASS}->value;
+        return $inclParam ? clone $this->{self::$KLASS} : $this->{self::$KLASS}->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-19
      */
     public function isClassSet() : bool
     {
-        return ! empty( $this->{self::$KLASS}->value );
+        return self::isPropSet( $this->{self::$KLASS} );
     }
 
     /**
      * Set calendar component property class
      *
      * @param null|string|Pc   $value  "PUBLIC" / "PRIVATE" / "CONFIDENTIAL" / iana-token / x-name
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setClass( null|string|Pc $value = null, ? array $params = [] ) : static
     {
@@ -124,19 +123,18 @@ trait CLASStrait
             self::P_IVATE,
             self::CONFIDENTIAL
         ];
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::KLASS );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::KLASS );
+            $pc->setEmpty();
         }
-        elseif( ! in_array( $value->value, $STDVALUES, true )) {
-            $value->value = Util::assertString( $value->value, self::KLASS );
-            $value->value = StringFactory::trimTrailNL( $value->value );
-            $value->value = strtoupper( $value->value );
+        elseif( ! in_array( $pcValue, $STDVALUES, true )) {
+            $pcValue = Util::assertString( $pcValue, self::KLASS );
+            $pcValue = StringFactory::trimTrailNL( $pcValue );
+            $pc->setValue( strtoupper( $pcValue ));
         }
-        $this->{self::$KLASS} = $value;
+        $this->{self::$KLASS} = $pc;
         return $this;
     }
 }

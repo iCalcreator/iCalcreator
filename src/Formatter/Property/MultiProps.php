@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function in_array;
 
 /**
@@ -41,7 +42,7 @@ use function in_array;
  * Format ATTACH, IMAGE
  *
  * 15
- * @ince 2.41.63 - 2022-09-02
+ * @since 2.41.88 - 2024-01-17
  */
 final class MultiProps extends PropertyBase
 {
@@ -51,6 +52,7 @@ final class MultiProps extends PropertyBase
      * @param null|bool $allowEmpty
      * @param null|bool|string $lang
      * @return string
+     * @since 2.41.88 - 2024-01-17
      */
     public static function format(
         string $propName,
@@ -61,12 +63,13 @@ final class MultiProps extends PropertyBase
     {
         static $ATTCONFIMG = [ self::ATTACH, self::CONFERENCE, self::IMAGE ]; // URI
         if( empty( $values )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
         [ $specKeys, $lang ] = self::getSpeckeys1Lang1( $propName, $lang );
-        $output = self::$SP0;
+        $output = StringFactory::$SP0;
         foreach( $values as $pc ) {
-            if( ! empty( $pc->value )) {
+            $pcValue = $pc->getValue();
+            if( ! empty( $pcValue )) {
                 [ $specKeys2, $lang2 ] = self::getSpeckeys2Lang2(
                     $propName,
                     $pc->getValueParam(),
@@ -75,10 +78,10 @@ final class MultiProps extends PropertyBase
                 );
                 $output .= self::renderProperty(
                     $propName,
-                    self::formatParams( $pc->params, $specKeys2, $lang2 ),
+                    self::formatParams( $pc->getParams(), $specKeys2, $lang2 ),
                     ( in_array( $propName, $ATTCONFIMG, true )
-                        ? $pc->value
-                        : self::strrep( $pc->value ))
+                        ? $pcValue
+                        : self::strrep( $pcValue ))
                 );
             } // end if
             elseif( $allowEmpty ) {
@@ -95,7 +98,7 @@ final class MultiProps extends PropertyBase
      *
      * @param string $propName
      * @param null|bool|string $lang
-     * @return array
+     * @return string[]|string[][]
      */
     private static function getSpeckeys1Lang1( string $propName, null|bool|string $lang ) : array
     {
@@ -152,10 +155,10 @@ final class MultiProps extends PropertyBase
      *
      * @param string $propName
      * @param null|string $paramValue
-     * @param array $specKeys
+     * @param string[] $specKeys
      * @param null|bool|string $lang
-     * @return array
-     * @ince 2.41.63 - 2022-09-03
+     * @return string[]|string[][]
+     * @since 2.41.63 - 2022-09-03
      */
     private static function getSpeckeys2Lang2(
         string $propName,
@@ -170,12 +173,13 @@ final class MultiProps extends PropertyBase
         static $STYDESCR1    = [ self::VALUE, self::ALTREP, self::LANGUAGE, self::FMTTYPE, self::DERIVED ];
         static $STYDESCR2    = [ self::VALUE, self::ALTREP, self::FMTTYPE, self::DERIVED ];
         $hasValueText        = ( self::TEXT === $paramValue );
+        $isStyledDescription = ( self::STYLED_DESCRIPTION === $propName );
         switch( true ) {
-            case (( self::STYLED_DESCRIPTION === $propName ) && $hasValueText ) :
+            case ( $isStyledDescription && $hasValueText ) :
                 $specKeys2 = $STYDESCR1;
                 $lang2     = $lang;
                 break;
-            case (( self::STYLED_DESCRIPTION === $propName ) && ! $hasValueText ) :
+            case ( $isStyledDescription && ! $hasValueText ) :
                 $specKeys2 = $STYDESCR2;
                 $lang2     = null;
                 break;

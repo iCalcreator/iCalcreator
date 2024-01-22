@@ -47,7 +47,7 @@ class RecurWeekTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recur2dateTest3WeeklyProvider() : array
+    public static function recur2dateTest3WeeklyProvider() : array
     {
 
         $dataArr = [];

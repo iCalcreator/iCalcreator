@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,7 +31,6 @@ namespace Kigkonsult\Icalcreator\Traits;
 
 use Kigkonsult\Icalcreator\IcalBase;
 use Kigkonsult\Icalcreator\Pc;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 use function array_slice;
 use function is_int;
@@ -40,6 +39,7 @@ use function ksort;
 
 /**
  * Vcalendar/CalendarComponent multi-properties help methods
+ * @since 2.41.85 2024-01-18
  */
 trait MvalTrait
 {
@@ -125,7 +125,7 @@ trait MvalTrait
      * @param null|array $multiProp component (multi-)property
      * @param bool     $inclParam
      * @return array
-     * @since  2.41.51 - 2022-08-09
+     * @since 2.41.85 2024-01-18
      */
     protected static function getMvalProperties(
         ? array $multiProp = [],
@@ -140,7 +140,7 @@ trait MvalTrait
         }
         $output = [];
         foreach( $multiProp as $property ) {
-            $output[] = $property->value;
+            $output[] = $property->getValue();
         }
         return $output;
     }
@@ -154,7 +154,7 @@ trait MvalTrait
      * @param null|int $propIx    specific property in case of multiply occurrence
      * @param bool     $inclParam
      * @return bool|string|array|Pc
-     * @since  2.41.36 - 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     protected static function getMvalProperty(
         array $multiProp,
@@ -180,7 +180,7 @@ trait MvalTrait
         }
         return ( $inclParam )
             ? clone $multiProp[$propIx]
-            : $multiProp[$propIx]->value;
+            : $multiProp[$propIx]->getValue();
     }
 
     /**
@@ -188,7 +188,7 @@ trait MvalTrait
      *
      * @param null|Pc[] $valueArr
      * @return bool
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.88 2024-01-19
      */
     protected static function isMvalSet( ? array $valueArr = [] ) : bool
     {
@@ -196,12 +196,11 @@ trait MvalTrait
             return false;
         }
         foreach( $valueArr as $value ) {
-            if( ! empty( $value->value )) {
+            if( self::isPropSet( $value )) {
                 return true;
             }
         }
         return false;
-
     }
 
     /**
@@ -216,15 +215,15 @@ trait MvalTrait
     protected static function marshallInputMval( mixed $value, null|int|array $params, ? int & $index) : Pc
     {
         if( $value instanceof Pc ) {
-            $value = clone $value;
+            $pc = clone $value;
             if( is_int( $params )) {
                 $index = $params;
             }
         }
         else {
-            $value = Pc::factory( $value, ParameterFactory::setParams( $params ));
+            $pc = Pc::factory( $value, $params );
         }
-        return $value;
+        return $pc;
     }
 
     /**

@@ -46,7 +46,7 @@ class Exception8Test extends TestCase
      *
      * @return mixed[]
      */
-    public function rruleExceptionsTestProvider() : array
+    public static function rruleExceptionsTestProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -192,6 +192,6 @@ class Exception8Test extends TestCase
         catch ( InvalidArgumentException $e ) {
             $ok = true;
         }
-        $this->assertTrue( $ok, 'error in case #' . $case );
+        $this->assertTrue( $ok, 'error in case #' . $case . ', value IN ' . var_export( $rrule, true ));
     }
 }

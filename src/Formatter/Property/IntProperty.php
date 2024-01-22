@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,13 +31,14 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
 
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use function is_numeric;
 
 /**
  * Format PERCENT_COMPLETE, PRIORITY, REPEAT, SEQUENCE
  *
  * 4
- * @since 2.41.55 - 2022-08-12
+ * @since 2.41.88 - 2024-01-18
  */
 final class IntProperty extends PropertyBase
 {
@@ -46,6 +47,7 @@ final class IntProperty extends PropertyBase
      * @param null|bool|Pc $pc
      * @param bool|null $allowEmpty
      * @return string
+     * @since 2.41.88 - 2024-01-18
      */
     public static function format(
         string $propName,
@@ -53,13 +55,13 @@ final class IntProperty extends PropertyBase
         ? bool $allowEmpty = true
     ) : string
     {
-        if( empty( $pc )) {
-            return self::$SP0;
+        if( empty( $pc ) || ! $pc->isset()) {
+            return StringFactory::$SP0;
         }
-        if(( ! isset( $pc->value ) || ( empty( $pc->value ) && ! is_numeric( $pc->value ))) &&
-            (( self::SEQUENCE !== $propName ) || ( 0 !== $pc->value ))) {
-            return self::renderSinglePropEmpty( $propName, $allowEmpty );
-        }
-        return self::renderProperty( $propName, $pc->params, (string) $pc->value );
+        $value = $pc->getValue();
+        return (( empty( $value ) && ! is_numeric( $value )) &&
+            (( self::SEQUENCE !== $propName ) || ( 0 !== $value )))
+            ? self::renderSinglePropEmpty( $propName, $allowEmpty )
+            : self::renderProperty( $propName, $pc->getParams(), (string) $value );
     }
 }

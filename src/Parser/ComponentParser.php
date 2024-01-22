@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -49,7 +49,7 @@ use function substr;
 use function trim;
 
 /**
- * @since 2.41.68 2022-10-23
+ * @since 2.41.88 2024-01-17
  */
 final class ComponentParser extends ParserBase
 {
@@ -209,7 +209,7 @@ final class ComponentParser extends ParserBase
      * Parse this properties
      *
      * @return void
-     * @since 2.41.68 2022-10-23
+     * @since 2.41.88 2024-01-17
      * @todo report invalid properties ??
      */
     private function parse3thisProperties() : void
@@ -249,40 +249,26 @@ final class ComponentParser extends ParserBase
             if( in_array( $propName, $STRUNREPPROPS, true )) {
                 $propName = $STRUNREPPROP;
             }
-            switch( $propName ) {
-                case self::ATTENDEE :
-                    $this->subject->{$method}( $value, self::processAttendeeParams( $propAttr ));
-                    break;
-                case $STRUNREPPROP :
-                    $this->subject->{$method}( StringFactory::strunrep( $value ), $propAttr );
-                    break;
-                case self::REQUEST_STATUS :
-                    $values = self::parseRequestStatus( $value );
-                    $this->subject->{$method}( $values[0], $values[1], $values[2], $propAttr );
-                    break;
-                case self::FREEBUSY :
-                    [ $fbtype, $values, $propAttr ] = self::parseFreebusy( $value, $propAttr );
-                    $this->subject->{$method}( $fbtype, $values, $propAttr );
-                    break;
-                case self::GEO :
-                    $values = self::parseGeo( $value );
-                    $this->subject->{$method}( $values[0], $values[1], $propAttr );
-                    break;
-                case self::EXDATE :
-                    $this->subject->{$method}( self::parseExdate( $value ), $propAttr );
-                    break;
-                case self::RDATE :
-                    [ $values, $propAttr ] = self::parseRexdate( $value, $propAttr );
-                    $this->subject->{$method}( $values, $propAttr );
-                    break;
-                case self::EXRULE :     // fall through
-                case self::RRULE :
-                    $this->subject->{$method}( self::parseRexrule( $value ), $propAttr );
-                    break;
-                default:
-                    $this->subject->{$method}( $value, $propAttr );
-                    break;
-            } // end  switch( $propName.. .
+            match( $propName ) {
+                self::ATTENDEE =>
+                    $this->subject->{$method}( $value, self::processAttendeeParams( $propAttr )),
+                $STRUNREPPROP =>
+                    $this->subject->{$method}( StringFactory::strunrep( $value ), $propAttr ),
+                self::REQUEST_STATUS =>
+                    $this->parseRequestStatus( $method, $value, $propAttr ),
+                self::FREEBUSY =>
+                    $this->parseFreebusy( $method, $value, $propAttr ),
+                self::GEO =>
+                    $this->parseGeo( $method, $value, $propAttr ),
+                self::EXDATE =>
+                    $this->subject->{$method}( self::parseExdate( $value ), $propAttr ),
+                self::RDATE =>
+                    $this->parseRdate( $method, $value, $propAttr ),
+                self::EXRULE, self::RRULE =>
+                    $this->subject->{$method}( self::parseRexrule( $value ), $propAttr ),
+                default =>
+                    $this->subject->{$method}( $value, $propAttr )
+            }; // end  match( $propName.. .
         } // end foreach( $this->unparsed as $lix => $row )
         $this->unparsed = [];
     }
@@ -312,31 +298,37 @@ final class ComponentParser extends ParserBase
     /**
      * Return Request-Status value array
      *
+     * @param string $method
      * @param string $value
-     * @return string[]
-     * @since  2.41.68 - 2022-19-24
+     * @param string[] $propAttr
+     * @return void
+     * @since 2.41.88 2024-01-17
      */
-    private static function parseRequestStatus( string $value ) : array
+    private function parseRequestStatus( string $method, string $value, array $propAttr ) : void
     {
-        $values    = explode( self::$SEMIC, $value, 3 );
-        $values[1] = ( isset( $values[1] ))
-            ? StringFactory::strunrep( $values[1] )
-            : null;
-        $values[2] = ( isset( $values[2] ))
-            ? StringFactory::strunrep( $values[2] )
-            : null;
-        return $values;
+        $input = $this->subject::extractRequeststatus( $value );
+        if( isset( $input[1] )) {
+            $input[1] = StringFactory::strunrep( $input[1] );
+        }
+        else {
+            $propAttr = [];
+        }
+        if( isset( $input[2] )) {
+            $input[2] = StringFactory::strunrep( $input[2] );
+        }
+        $this->subject->{$method}( $input[0], $input[1], $input[2], $propAttr );
     }
 
     /**
      * Return type, value and parameters from parsed (Freebusy) row and propAttr
      *
+     * @param string  $method
      * @param string  $row
      * @param string[] $propAttr
-     * @return string[]|string[][]
-     * @since  2.41.54 - 2022-08-09
+     * @return void
+     * @since 2.41.88 2024-01-17
      */
-    private static function parseFreebusy( string $row, array $propAttr ) : array
+    private function parseFreebusy( string $method, string $row, array $propAttr ) : void
     {
         static $SS = '/';
         $fbtype = $values = null;
@@ -358,23 +350,25 @@ final class ComponentParser extends ParserBase
                 }
             } // end foreach
         } // end if
-        return [ $fbtype, $values, $propAttr, ];
+        $this->subject->{$method}( $fbtype, $values, $propAttr );
     }
 
     /**
      * Return Geo value array
      *
+     * @param string $method
      * @param string $value
-     * @return string[]
-     * @since  2.41.68 - 2022-19-24
+     * @param string[] $propAttr
+     * @return void
+     * @since 2.41.88 2024-01-17
      */
-    private static function parseGeo( string $value ) : array
+    private function parseGeo( string $method, string $value, array $propAttr ) : void
     {
-        $values = explode( self::$SEMIC, $value, 2 );
-        if( 2 > count( $values )) {
-            $values[0] = $values[1] = null;
+        $input = $this->subject::extractGeoLatLong( $value );
+        if( ! isset( $input[0] )) {
+            $propAttr = [];
         }
-        return $values;
+        $this->subject->{$method}( $input[0], $input[1], $propAttr );
     }
 
     /**
@@ -392,16 +386,18 @@ final class ComponentParser extends ParserBase
     /**
      * Return value and parameters from parsed row and propAttr
      *
+     * @param string  $method
      * @param string  $row
      * @param string[] $propAttr
-     * @return string[]
-     * @since  2.27.11 - 2019-01-04
+     * @return void
+     * @since  2.41.88 - 2024-01-17
      */
-    private static function parseRexdate( string $row, array $propAttr ) : array
+    private function parseRdate( string $method, string $row, array $propAttr ) : void
     {
         static $SS = '/';
         if( empty( $row )) {
-            return [ null, $propAttr ];
+            $this->subject->{$method}( null, $propAttr );
+            return;
         }
         $values = explode( self::$COMMA, $row );
         foreach( $values as $vix => $value ) {
@@ -413,7 +409,7 @@ final class ComponentParser extends ParserBase
                 $values[$vix] = $value2;
             }
         } // end foreach
-        return [ $values, $propAttr ];
+        $this->subject->{$method}( $values, $propAttr );
     }
 
     /**

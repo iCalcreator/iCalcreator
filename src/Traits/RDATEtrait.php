@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -45,7 +45,7 @@ use function reset;
 /**
  * RDATE property functions
  *
- * @since 2.41.68 2022-10-03
+ * @since 2.41.85 2024-01-18
  */
 trait RDATEtrait
 {
@@ -149,7 +149,7 @@ trait RDATEtrait
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     public function setRdate(
         null|string|array|DateTimeInterface|Pc $value = null,
@@ -157,21 +157,19 @@ trait RDATEtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value ) ||
-            ( is_array( $value->value ) && ( 1 === count( $value->value )) && empty( reset( $value->value )))) {
-            $this->assertEmptyValue( $value->value, self::RDATE );
-            self::setMval( $this->rdate, $value->setEmpty(), $index );
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue ) ||
+            ( is_array( $pcValue ) && ( 1 === count( $pcValue )) && empty( reset( $pcValue )))) {
+            $this->assertEmptyValue( $pcValue, self::RDATE );
+            self::setMval( $this->rdate, $pc->setEmpty(), $index );
             return $this;
         }
-        $value->value = self::checkSingleRdates(
-            $value->value,
-            $value->hasParamValue( self::PERIOD )
-        );
+        $pc->setValue( self::checkSingleRdates( $pcValue, $pc->hasParamValue( self::PERIOD )));
         if( Vcalendar::isTzComp( $this->getCompType() )) {
-            $value->addParam( self::ISLOCALTIME, true );
+            $pc->addParam( self::ISLOCALTIME, true );
         }
-        self::setMval( $this->rdate, RexdateFactory::prepInputRdate( $value ), $index );
+        self::setMval( $this->rdate, RexdateFactory::prepInputRdate( $pc ), $index );
         return $this;
     }
 

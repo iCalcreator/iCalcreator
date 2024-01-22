@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -32,7 +32,7 @@ namespace Kigkonsult\Icalcreator\Formatter\Property;
 use Exception;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 use function count;
 use function ctype_digit;
@@ -47,7 +47,7 @@ use function usort;
  * Format EXRULE, RRULE
  *
  * 2
- * @since 2.41.71 2022-11-28
+ * @since 2.41.88 2024-01-18
  */
 final class Recur extends PropertyBase
 {
@@ -57,6 +57,7 @@ final class Recur extends PropertyBase
      * @param bool|null $allowEmpty
      * @return string
      * @throws Exception
+     * @since 2.41.88 2024-01-18
      */
     public static function format(
         string $propName,
@@ -65,14 +66,15 @@ final class Recur extends PropertyBase
     ) : string
     {
         if( empty( $pc )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        if( empty( $pc->value )) {
-            return $allowEmpty ? self::renderProperty( $propName ) : self::$SP0;
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            return $allowEmpty ? self::renderProperty( $propName ) : StringFactory::$SP0;
         }
-        $content1 = $content2 = self::$SP0;
+        $content1 = $content2 = StringFactory::$SP0;
         $first    = true;
-        foreach( $pc->value as $ruleLabel => $ruleValue ) {
+        foreach( $pcValue as $ruleLabel => $ruleValue ) {
             $ruleLabel = strtoupper( $ruleLabel );
             switch( $ruleLabel ) {
                 case self::RSCALE : // fall through
@@ -94,7 +96,7 @@ final class Recur extends PropertyBase
                     break;
             } // end switch( $ruleLabel )
         } // end foreach( $pc->value as $ruleLabel => $ruleValue )
-        return self::renderProperty( $propName, $pc->params,$content1 . $content2 );
+        return self::renderProperty( $propName, (array) $pc->getParams(),$content1 . $content2 );
     }
 
     /**
@@ -120,8 +122,13 @@ final class Recur extends PropertyBase
     private static function renderFirst( string $ruleLabel, string $ruleValue, bool & $first ) : string
     {
         static $FMT = '%s%s=%s';
-        $output = sprintf( $FMT, ( $first ? Util::$SP0 : Util::$SEMIC ), $ruleLabel, $ruleValue );
-        $first  = false;
+        $output     = sprintf(
+            $FMT,
+            ( $first ? StringFactory::$SP0 : StringFactory::$SEMIC ),
+            $ruleLabel,
+            $ruleValue
+        );
+        $first      = false;
         return $output;
     }
 
@@ -143,12 +150,12 @@ final class Recur extends PropertyBase
     private static function renderByday( array $ruleValue ) : string
     {
         static $RECURBYDAYSORTER = [ __CLASS__, 'recurBydaySort' ];
-        $byday = [ self::$SP0 ];
+        $byday = [ StringFactory::$SP0 ];
         $bx    = 0;
         foreach( $ruleValue as $bydayPart ) {
             if( ! empty( $byday[$bx] ) &&   // new day
                 ! ctype_digit( substr( $byday[$bx], -1 ))) {
-                $byday[++$bx] = self::$SP0;
+                $byday[++$bx] = StringFactory::$SP0;
             }
             if( ! is_array( $bydayPart )) {  // day without rel pos number
                 $byday[$bx] .= $bydayPart;
@@ -162,7 +169,7 @@ final class Recur extends PropertyBase
         if( 1 < count( $byday )) {
             usort( $byday, $RECURBYDAYSORTER );
         }
-        return self::renderString( self::BYDAY, implode( self::$COMMA, $byday ));
+        return self::renderString( self::BYDAY, implode( StringFactory::$COMMA, $byday ));
     }
 
     /**
@@ -197,7 +204,7 @@ final class Recur extends PropertyBase
     {
         return self::renderString(
             $ruleLabel,
-            ( is_array( $ruleValue ) ? implode( self::$COMMA, $ruleValue ) : ( string) $ruleValue )
+            ( is_array( $ruleValue ) ? implode( StringFactory::$COMMA, $ruleValue ) : ( string) $ruleValue )
         );
     }
 }

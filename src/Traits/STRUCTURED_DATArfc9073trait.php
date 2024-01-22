@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * STRUCTURED-DATA property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait STRUCTURED_DATArfc9073trait
 {
@@ -138,6 +138,7 @@ trait STRUCTURED_DATArfc9073trait
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
+     * @since 2.41.85 2024-01-18
      */
     public function setStructureddata(
         null|string|Pc $value = null,
@@ -145,20 +146,21 @@ trait STRUCTURED_DATArfc9073trait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::STRUCTURED_DATA );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::STRUCTURED_DATA );
+            $pc->setEmpty();
         }
         else {
-            $value->value  = Util::assertString( $value->value, self::STRUCTURED_DATA );
-            $value->addParamValue( self::TEXT, false ); // must have VALUE
-            if( $value->hasParamValue( self::BINARY ) &&
-                ! $value->hasParamKey( self::ENCODING )) {
-                $value->addParam( self::ENCODING, self::BASE64 );
+            $pc->setValue( Util::assertString( $pcValue, self::STRUCTURED_DATA ));
+            $pc->addParamValue( self::TEXT, false ); // must have VALUE
+            if( $pc->hasParamValue( self::BINARY ) &&
+                ! $pc->hasParamKey( self::ENCODING )) {
+                $pc->addParam( self::ENCODING, self::BASE64 );
             }
         }
-        self::setMval( $this->structureddata, $value, $index );
+        self::setMval( $this->structureddata, $pc, $index );
         return $this;
     }
 }

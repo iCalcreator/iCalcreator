@@ -34,7 +34,7 @@ use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Util\CalAddressFactory;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\Util;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * class ValarmTest, testing Integers in
@@ -58,7 +58,7 @@ class ValarmTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function valarmTestProvider() : array
+    public static function valarmTestProvider() : array
     {
         $dataArr = [];
 
@@ -114,7 +114,7 @@ class ValarmTest extends DtBase
                 self::$STCPAR
             ),
             Property::formatParams( self::$STCPAR ) .
-                $this->getDateTimeAsCreateLongString( $value, IcalInterface::UTC )
+                self::getDateTimeAsCreateLongString( $value, IcalInterface::UTC )
         ];
 
         // ACTION
@@ -438,7 +438,7 @@ class ValarmTest extends DtBase
             $params
         );
         $expectedString = trim( Attendee::format( IcalInterface::ATTENDEE, [ $getValue ], true ));
-        $expectedString = str_replace( Util::$CRLF . ' ' , null, $expectedString);
+        $expectedString = str_replace( StringFactory::$CRLF . ' ' , '', $expectedString);
         $expectedString = str_replace( '\,', ',', $expectedString );
         $expectedString = substr( $expectedString, 8 );
         $dataArr[] = [
@@ -570,13 +570,13 @@ class ValarmTest extends DtBase
             $getValue = ( in_array( $propName, $MULTIPROPS, true ))
                 ? $a1->{$getMethod}( null, true )
                 : $a1->{$getMethod}( true );
-            if( $expectedGet->value instanceof \DateInterval ) {
-                $exp3 = DateIntervalFactory::dateInterval2String( $expectedGet->value );
-                $act3 = DateIntervalFactory::dateInterval2String( $getValue->value );
+            if( $expectedGet->getValue() instanceof \DateInterval ) {
+                $exp3 = DateIntervalFactory::dateInterval2String( $expectedGet->getValue() );
+                $act3 = DateIntervalFactory::dateInterval2String( $getValue->getValue() );
             }
             else {
-                $exp3 = $expectedGet->value;
-                $act3 = $getValue->value;
+                $exp3 = $expectedGet->getValue();
+                $act3 = $getValue->getValue();
             }
             $this->assertEquals(
                 $exp3,
@@ -584,7 +584,7 @@ class ValarmTest extends DtBase
                 self::getErrMsg(  null, $case . '-3', __FUNCTION__, IcalInterface::VALARM, $getMethod )
             );
             $actualString = $a1->{$createMethod}();
-            $actualString = str_replace( [ Util::$CRLF . ' ', Util::$CRLF ], '', $actualString );
+            $actualString = str_replace( [ StringFactory::$CRLF . ' ', StringFactory::$CRLF ], '', $actualString );
             $actualString = str_replace( '\,', ',', $actualString );
             $this->assertEquals(
                 strtoupper( $propName ) . $expectedString,

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -37,7 +37,7 @@ use InvalidArgumentException;
 /**
  * CATEGORIES property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait CATEGORIEStrait
 {
@@ -111,7 +111,7 @@ trait CATEGORIEStrait
      *
      * @param null|bool   $inclParam
      * @return Pc[]
-     * @since 2.41.58 2022-08-24
+     * @since 2.41.85 2024-01-18
      */
     public function getAllCategories( ? bool $inclParam = false ) : array
     {
@@ -122,7 +122,7 @@ trait CATEGORIEStrait
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.85 2024-01-18
      */
     public function isCategoriesSet() : bool
     {
@@ -137,7 +137,7 @@ trait CATEGORIEStrait
      * @param null|int      $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-09
+     * @since 2.41.85 2024-01-18
      */
     public function setCategories(
         null|string|Pc $value = null,
@@ -145,15 +145,16 @@ trait CATEGORIEStrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::CATEGORIES );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::CATEGORIES );
+            $pc->setEmpty();
         }
         else {
-            $value->value = Util::assertString( $value->value, self::CATEGORIES );
+            $pc->setValue( Util::assertString( $pcValue, self::CATEGORIES ));
         }
-        self::setMval( $this->categories, $value, $index );
+        self::setMval( $this->categories, $pc, $index );
         return $this;
     }
 }

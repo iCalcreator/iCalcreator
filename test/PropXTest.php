@@ -30,6 +30,7 @@ namespace Kigkonsult\Icalcreator;
 
 use Exception;
 use Kigkonsult\Icalcreator\Formatter\Property\Property;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 class PropXTest extends DtBase
@@ -49,7 +50,7 @@ class PropXTest extends DtBase
      *
      * @return mixed[]
      */
-    public function misc3Provider() : array
+    public static function misc3Provider() : array
     {
 
         $dataArr = [];
@@ -256,7 +257,7 @@ class PropXTest extends DtBase
             sprintf( self::$ERRFMT, null, $Number . 1, __FUNCTION__, $compName, 'getXprop' )
         );
 
-        $createString   = str_replace( Util::$CRLF . ' ', null, $comp->createXprop());
+        $createString   = str_replace( StringFactory::$CRLF . ' ', null, $comp->createXprop());
         $createString   = str_replace( '\,', ',', $createString );
         $this->assertNotFalse(
             strpos( $createString, $expectedString ),

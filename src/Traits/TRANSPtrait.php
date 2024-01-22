@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,7 +33,6 @@ use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 use function strtoupper;
@@ -41,7 +40,7 @@ use function strtoupper;
 /**
  * TRANSP property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait TRANSPtrait
 {
@@ -81,35 +80,35 @@ trait TRANSPtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getTransp( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->transp )) {
             return false;
         }
-        return $inclParam ? clone $this->transp : $this->transp->value;
+        return $inclParam ? clone $this->transp : $this->transp->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isTranspSet() : bool
     {
-        return ! empty( $this->transp->value );
+        return self::isPropSet( $this->transp );
     }
 
     /**
      * Set calendar component property transp
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setTransp( null|string|Pc $value = null, ? array $params = [] ) : static
     {
@@ -117,19 +116,19 @@ trait TRANSPtrait
             self::OPAQUE,
             self::TRANSPARENT
         ];
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::TRANSP );
-            $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::TRANSP );
+            $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::TRANSP );
-            $value->value = strtoupper( StringFactory::trimTrailNL( $value->value ));
-            Util::assertInEnumeration( $value->value, $ALLOWED, self::TRANSP );
+            Util::assertString( $pcValue, self::TRANSP );
+            $pcValue = strtoupper( StringFactory::trimTrailNL( $pcValue ));
+            Util::assertInEnumeration( $pcValue, $ALLOWED, self::TRANSP );
+            $pc->setValue( $pcValue );
         }
-        $this->transp = $value;
+        $this->transp = $pc;
         return $this;
     }
 }

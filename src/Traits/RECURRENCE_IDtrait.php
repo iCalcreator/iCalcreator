@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,12 +36,11 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\Dt1Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * RECURRENCE-ID property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait RECURRENCE_IDtrait
 {
@@ -86,52 +85,51 @@ trait RECURRENCE_IDtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|DateTime|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getRecurrenceid( ? bool $inclParam = false ) : bool | string | DateTime | Pc
     {
         if( empty( $this->recurrenceid )) {
             return false;
         }
-        return $inclParam ? clone $this->recurrenceid : $this->recurrenceid->value;
+        return $inclParam ? clone $this->recurrenceid : $this->recurrenceid->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isRecurrenceidSet() : bool
     {
-        return ! empty( $this->recurrenceid->value );
+        return self::isPropSet( $this->recurrenceid );
     }
 
     /**
      * Set calendar component property recurrence-id
      *
      * @param null|string|Pc|DateTimeInterface $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function setRecurrenceid(
         null|string|DateTimeInterface|Pc $value = null,
         ? array $params = []
     ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::RECURRENCE_ID );
-            $this->recurrenceid = $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::RECURRENCE_ID );
+            $this->recurrenceid = $pc->setEmpty();
         }
         else {
-            $value->addParamValue( self::DATE_TIME, false ); // default
-            $this->recurrenceid = DateTimeFactory::setDate( $value );
+            $pc->addParamValue( self::DATE_TIME, false ); // default
+            $this->recurrenceid = DateTimeFactory::setDate( $pc );
         }
         return $this;
     }

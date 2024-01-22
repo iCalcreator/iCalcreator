@@ -98,7 +98,7 @@ class VcalendarTest extends TestCase
     /**
      * vcalendarTest10 provider
      */
-    public function vcalendarTest10Provider() : array
+    public static function vcalendarTest10Provider() : array
     {
         $dataArr = [];
 

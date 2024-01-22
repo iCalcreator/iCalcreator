@@ -49,7 +49,7 @@ class Exception6Test extends TestCase
      *
      * @return mixed[]
      */
-    public function AllowEmptyTest1Provider() : array
+    public static function AllowEmptyTest1Provider() : array
     {
         $dataArr = [];
 

@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -30,12 +30,14 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Formatter\Property;
 
 use Kigkonsult\Icalcreator\Pc;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 
 /**
  * Format ORGANIZER, SOURCE
  * Format SUMMARY, TZID
  *
  * 4
+ * @since 2.41.88 - 2024-01-18
  */
 final class SingleProps extends PropertyBase
 {
@@ -45,6 +47,7 @@ final class SingleProps extends PropertyBase
      * @param null|bool $allowEmpty
      * @param null|bool|string $lang
      * @return string
+     * @since 2.41.88 - 2024-01-18
      */
     public static function format(
         string $propName,
@@ -56,9 +59,10 @@ final class SingleProps extends PropertyBase
         static $ORGPKEYS  = [ self::CN, self::DIR, self::SENT_BY, self::LANGUAGE ];
         static $STRRPROPS = [ self::SUMMARY, self::TZID ];
         if( empty( $pc )) {
-            return self::$SP0;
+            return StringFactory::$SP0;
         }
-        if( empty( $pc->value )) {
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
             return self::renderSinglePropEmpty( $propName, $allowEmpty );
         }
         switch( $propName ) {
@@ -75,10 +79,8 @@ final class SingleProps extends PropertyBase
         }
         return self::renderProperty(
             $propName,
-            self::formatParams( $pc->getParams(), $specKeys, $lang ),
-            ( in_array( $propName, $STRRPROPS, true )
-                ? self::strrep( $pc->getValue())
-                : $pc->getValue())
+            self::formatParams((array) $pc->getParams(), $specKeys, $lang ),
+            ( in_array( $propName, $STRRPROPS, true ) ? self::strrep( $pcValue) : $pcValue )
         );
     }
 }

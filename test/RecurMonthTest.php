@@ -47,7 +47,7 @@ class RecurMonthTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurMonthly1aProvider() : array
+    public static function recurMonthly1aProvider() : array
     {
         $dataArr = [];
         $dataSetNo = 0;
@@ -595,7 +595,7 @@ class RecurMonthTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurMonthly1bProvider() : array
+    public static function recurMonthly1bProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;
@@ -836,7 +836,7 @@ class RecurMonthTest extends RecurBaseTest
      *
      * @return mixed[]
      */
-    public function getRecurByDaysInMonthProvider() : array
+    public static function getRecurByDaysInMonthProvider() : array
     {
         $dataArr = [];
 
@@ -974,7 +974,7 @@ class RecurMonthTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurMonthly2Provider() : array
+    public static function recurMonthly2Provider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;

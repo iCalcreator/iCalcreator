@@ -57,8 +57,9 @@
         "issues": "https://github.com/iCalcreator/iCalcreator/issues"
     },
     "autoload": {
+        "classmap": ["src/"],
         "files": ["autoload.php"],
-        "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/", "src/Util/", "src/Traits/"] }
+        "psr-4": { "Kigkonsult\\Icalcreator\\": ["src/"] }
     },
     "require": {
         "php": ">=8.0",
@@ -77,6 +78,10 @@
         "phpunit/phpunit": ">=6.5.13",
         "squizlabs/php_codesniffer": ">=3.5.5",
         "vimeo/psalm": "*"
+    },
+    "config": {
+        "classmap-authoritative": true,
+        "sort-packages": true
     },
     "scripts": {
         "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",

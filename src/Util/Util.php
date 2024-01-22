@@ -30,6 +30,7 @@ declare( strict_types = 1 );
 namespace Kigkonsult\Icalcreator\Util;
 
 use InvalidArgumentException;
+
 use function array_key_exists;
 use function in_array;
 use function is_array;
@@ -38,7 +39,7 @@ use function strtoupper;
 /**
  * iCalcreator utility/support class
  *
- * @since  2.41.36 - 2022-04-03
+ * @since  2.41.90 - 2024-01-20
  */
 class Util
 {
@@ -56,58 +57,69 @@ class Util
 
     /**
      * @var string
+     * @deprecated
      */
     public static string $CRLF          = "\r\n";
 
     /**
      * @var string
+     * @deprecated
      */
     public static string $COMMA         = ',';
 
     /**
      * @var string
+     * @deprecated
      */
     public static string $COLON         = ':';
 
     /**
      * @var string
-     */
-    public static string $SEMIC         = ';';
-
-    /**
-     * @var string
-     */
-    public static string $MINUS         = '-';
-
-    /**
-     * @var string
-     */
-    public static string $PLUS          = '+';
-
-    /**
-     * @var string
-     */
-    public static string $SP0           = '';
-
-    /**
-     * @var string
-     */
-    public static string $SP1           = ' ';
-
-    /**
-     * @var string
-     */
-    public static string $ZERO          = '0';
-
-    /**
-     * @var string
+     * @deprecated
      */
     public static string $DOT           = '.';
 
     /**
      * @var string
+     * @deprecated
+     */
+    public static string $MINUS         = '-';
+
+    /**
+     * @var string
+     * @deprecated
+     */
+    public static string $PLUS          = '+';
+
+    /**
+     * @var string
+     * @deprecated
+     */
+    public static string $SEMIC         = ';';
+
+    /**
+     * @var string
+     * @deprecated
      */
     public static string $SLASH         = '/';
+
+    /**
+     * @var string
+     * @deprecated
+     */
+    public static string $SP0           = '';
+
+    /**
+     * @var string
+     * @deprecated
+     */
+    public static string $SP1           = ' ';
+
+    /**
+     * @var string
+     * @deprecated
+     */
+    public static string $ZERO          = '0';
 
     /**
      * Return bool true if array key is isset and not empty

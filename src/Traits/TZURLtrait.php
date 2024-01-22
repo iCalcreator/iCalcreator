@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,12 +33,11 @@ use Kigkonsult\Icalcreator\Formatter\Property\Property;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * TZURL property functions
  *
- * @since 2.41.81 2023-08-14
+ * @since 2.41.85 2024-01-18
  */
 trait TZURLtrait
 {
@@ -78,25 +77,25 @@ trait TZURLtrait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.85 2024-01-18
      */
     public function getTzurl( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzurl )) {
             return false;
         }
-        return $inclParam ? clone $this->tzurl : $this->tzurl->value;
+        return $inclParam ? clone $this->tzurl : $this->tzurl->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isTzurlSet() : bool
     {
-        return ! empty( $this->tzurl->value );
+        return self::isPropSet( $this->tzurl );
     }
 
     /**
@@ -107,23 +106,21 @@ trait TZURLtrait
      * in the Internet.
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
-     * @since 2.41.81 2023-08-14
+     * @since 2.41.85 2024-01-18
      */
     public function setTzurl( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->value = rtrim((string) $value->value );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::TZURL );
-            $this->tzurl = $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = rtrim((string) $pc->getValue());
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::TZURL );
+            $this->tzurl = $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::TZURL );
-            HttpFactory::urlSet( $this->tzurl, $value );
+            $pcValue = Util::assertString( $pcValue, self::TZURL );
+            HttpFactory::urlSet( $this->tzurl, $pc->setValue( $pcValue ));
         }
         return $this;
     }

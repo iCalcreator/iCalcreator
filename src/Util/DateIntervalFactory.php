@@ -43,7 +43,7 @@ use function trim;
  * iCalcreator DateInterval utility/support class
  *
  * @see https://en.wikipedia.org/wiki/Iso8601
- * @since  2.41.82 - 2023-09-01
+ * @since  2.41.86 - 2024-01-15
  */
 class DateIntervalFactory
 {
@@ -238,7 +238,7 @@ class DateIntervalFactory
             $result .= (int) floor( $dateIntervalArr[self::$d] / 7 ) .
                 self::$W;
             return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
-                ? Util::$MINUS . $result : $result;
+                ? StringFactory::$MINUS . $result : $result;
         }
         if( 0 < $dateIntervalArr[self::$y] ) {
             $result .= $dateIntervalArr[self::$y] . self::$Y;
@@ -257,7 +257,7 @@ class DateIntervalFactory
                 $result = self::$PT0H0M0S;
             }
             return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
-                ? Util::$MINUS . $result : $result;
+                ? StringFactory::$MINUS . $result : $result;
         }
         $result .= self::$T;
         if( $hourIsSet ) {
@@ -270,7 +270,7 @@ class DateIntervalFactory
             $result .= $dateIntervalArr[self::$s] . self::$S;
         }
         return ( $showOptSign && ( 0 < $dateIntervalArr[self::$invert] ))
-            ? Util::$MINUS . $result : $result;
+            ? StringFactory::$MINUS . $result : $result;
     }
 
     /**
@@ -323,8 +323,8 @@ class DateIntervalFactory
         }
         $dateIntervalArr = (array) $dateInterval;
         $operator        = ( 0 < $dateIntervalArr[self::$invert] )
-            ? Util::$MINUS
-            : Util::$PLUS;
+            ? StringFactory::$MINUS
+            : StringFactory::$PLUS;
         foreach( $KEYS as $diKey => $dtKey ) {
             if( 0 < $dateIntervalArr[$diKey] ) {
                 $dateTime->modify(
@@ -344,7 +344,7 @@ class DateIntervalFactory
     {
         static $MONTH = 'month';
         $suffix = ( $MONTH !== $unit ) ? self::getOptPluralSuffix( $number ) : null;
-        return $operator . $number . Util::$SP1 . $unit . $suffix;
+        return $operator . $number . StringFactory::$SP1 . $unit . $suffix;
     }
 
     /**
@@ -354,7 +354,7 @@ class DateIntervalFactory
     private static function getOptPluralSuffix ( int|string $number ) : string
     {
         static $PLS = 's';
-        return ( 1 < $number ) ? $PLS : Util::$SP0;
+        return ( 1 < $number ) ? $PLS : StringFactory::$SP0;
     }
 
     /**
@@ -363,14 +363,17 @@ class DateIntervalFactory
      * @param array $dateIntervalArr
      * @return DateInterval
      * @throws Exception  on DateInterval create error
-     * @since  2.27.2 - 2018-12-21
+     * @since  2.41.86 - 2024-01-15
      */
     public static function DateIntervalArr2DateInterval( array $dateIntervalArr ) : DateInterval
     {
-        static $P0D = 'P0D';
+        static $DEPR  = [ 'date_string', 'days', 'from_string' ];
+        static $P0D   = 'P0D';
         $dateInterval = new DateInterval( $P0D );
         foreach( $dateIntervalArr as $key => $value ) {
-            $dateInterval->{$key} = $value;
+            if( ! in_array( $key, $DEPR, true )) {
+                $dateInterval->{$key} = $value;
+            }
         }
         return $dateInterval;
     }

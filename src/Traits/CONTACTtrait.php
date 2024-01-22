@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -38,7 +38,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * CONTACT property functions
  *
- * @since 2.41.55 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait CONTACTtrait
 {
@@ -163,7 +163,7 @@ trait CONTACTtrait
      * @param null|int         $index
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.36 2022-04-11
+     * @since 2.41.85 2024-01-18
      */
     public function setContact(
         null|string|Pc $value = null,
@@ -171,19 +171,20 @@ trait CONTACTtrait
         ? int $index = null
     ) : static
     {
-        $value = self::marshallInputMval( $value, $params, $index );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::CONTACT );
-            $value->setEmpty();
+        $pc      = self::marshallInputMval( $value, $params, $index );
+        $pcValue = $pc->getValue();
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::CONTACT );
+            $pc->setEmpty();
         }
         else {
-            $value->value = Util::assertString( $value->value, self::CONTACT );
-            $value->value = StringFactory::trimTrailNL( $value->value );
+            $pcValue = Util::assertString( $pcValue, self::CONTACT );
+            $pc->setValue( StringFactory::trimTrailNL( $pcValue ));
         }
         if( self::isContactSingleProp( $this->getCompType())) {
             $index = 1;
         }
-        self::setMval( $this->contact, $value, $index );
+        self::setMval( $this->contact, $pc, $index );
         return $this;
     }
 }

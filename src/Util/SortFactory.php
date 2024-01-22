@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -46,7 +46,7 @@ use function strcmp;
 /**
  * iCalcreator SortFactory class
  *
- * @since 2.41.68 2022-10-03
+ * @since 2.41.88 - 2024-01-18
  */
 class SortFactory
 {
@@ -152,7 +152,7 @@ class SortFactory
      * Set default (date-related/uid) sort arguments/parameters in component
      *
      * @param CalendarComponent $c valendar component
-     * @since 2.41.53 2022-08-11
+     * @since 2.41.88 2024-01-17
      */
     private static function setSortDefaultArgs( CalendarComponent $c ) : void
     {
@@ -171,23 +171,19 @@ class SortFactory
         elseif( false !== ( $d = $c->getDtstart())) {
                 $c->srtk[0] = $d->getTimestamp();
         }
-        switch( true ) { // sortkey 1 : dtend/due(/duration)
-            case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTEND ))) :
-                $c->srtk[1] = $d[1];
-                break;
-            case( in_array( $compType, $DTENDCOMPS, true ) ) && ( false !== ( $d = $c->getDtend())) :
-                $c->srtk[1] = $d->getTimestamp();
-                break;
-            case ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DUE ))) :
-                $c->srtk[1] = $d[1];
-                break;
-            case (( IcalInterface::VTODO === $compType  ) && ( false !== ( $d = $c->getDue()))) :
-                $c->srtk[1] = $d->getTimestamp();
-                break;
-            case ( in_array( $compType, $DURCOMPS, true ) && ( false !== ( $d = $c->getDuration( null, true )))) :
-                $c->srtk[1] = $d->getTimestamp();
-                break;
-        } // end switch
+        match( true ) { // sortkey 1 : dtend/due(/duration)
+            ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DTEND ))) =>
+                $c->srtk[1] = $d[1],
+            ( in_array( $compType, $DTENDCOMPS, true ) ) && ( false !== ( $d = $c->getDtend())) =>
+                $c->srtk[1] = $d->getTimestamp(),
+            ( false !== ( $d = $c->getXprop( IcalInterface::X_CURRENT_DUE ))) =>
+                $c->srtk[1] = $d[1],
+            (( IcalInterface::VTODO === $compType  ) && ( false !== ( $d = $c->getDue()))) =>
+                $c->srtk[1] = $d->getTimestamp(),
+            ( in_array( $compType, $DURCOMPS, true ) && ( false !== ( $d = $c->getDuration( null, true )))) =>
+                $c->srtk[1] = $d->getTimestamp(),
+            default => null
+        }; // end match
         // sortkey 2 : created/dtstamp
         $c->srtk[2] = (( IcalInterface::VFREEBUSY !== $compType  ) &&
             ( false !== ( $d = $c->getCreated())))
@@ -229,13 +225,13 @@ class SortFactory
      * @param Pc $a
      * @param Pc $b
      * @return int
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 - 2024-01-18
      */
     public static function sortRdate2( Pc $a, Pc $b ) : int
     {
         return strcmp(
-            self::sortRdate2GetValue( $a->value ),
-            self::sortRdate2GetValue( $b->value )
+            self::sortRdate2GetValue( $a->getValue()),
+            self::sortRdate2GetValue( $b->getValue())
         );
     }
 
@@ -244,19 +240,16 @@ class SortFactory
      *
      * @param DateTime|DateTime[] $v
      * @return string
-     * @since 2.29.2 2019-06-23
+     * @since 2.41.88 2024-01-20
      */
     private static function sortRdate2GetValue( array | DateTime $v ) : string
     {
-        if( $v instanceof DateTime ) {
-            return $v->format( DateTimeFactory::$YmdTHis);
-        }
-        if( ( $v[0] instanceof DateTime ) ) {
-            return $v[0]->format( DateTimeFactory::$YmdTHis);
-        }
-        if( is_array( $v[0] ) && ( $v[0][0] instanceof DateTime )) {
-            return $v[0][0]->format( DateTimeFactory::$YmdTHis);
-        }
-        return Util::$SP0;
+        return match( true) {
+            ( $v instanceof DateTime )    => $v->format( DateTimeFactory::$YmdTHis ),
+            ( $v[0] instanceof DateTime ) => $v[0]->format( DateTimeFactory::$YmdTHis ),
+            ( is_array( $v[0] ) && ( $v[0][0] instanceof DateTime )) =>
+                $v[0][0]->format( DateTimeFactory::$YmdTHis ),
+            default                       => StringFactory::$SP0
+        };
     }
 }

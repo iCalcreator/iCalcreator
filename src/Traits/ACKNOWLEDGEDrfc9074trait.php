@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -36,12 +36,11 @@ use InvalidArgumentException;
 use Kigkonsult\Icalcreator\Formatter\Property\DtxProperty;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\DateTimeFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 
 /**
  * ACKNOWLEDGED property functions
  *
- * @since 2.41.55 - 2022-08-13
+ * @since 2.41.85 2024-01-18
  */
 trait ACKNOWLEDGEDrfc9074trait
 {
@@ -88,42 +87,41 @@ trait ACKNOWLEDGEDrfc9074trait
         if( empty( $this->acknowledged )) {
             return false;
         }
-        return $inclParam ? clone $this->acknowledged : $this->acknowledged->value;
+        return $inclParam ? clone $this->acknowledged : $this->acknowledged->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.35 2022-03-28
+     * @since 2.41.88 2024-01-17
      */
     public function isAcknowledgedSet() : bool
     {
-        return ! empty( $this->acknowledged->value );
+        return self::isPropSet( $this->acknowledged );
     }
 
     /**
      * Set calendar component property acknowledged, if empty: 'now'
      *
      * @param null|string|Pc|DateTimeInterface  $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws Exception
      * @throws InvalidArgumentException
+     * @since 2.41.85 2024-01-18
      */
     public function setAcknowledged(
         null | string | Pc | DateTimeInterface $value = null,
         ? array $params = []
     ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->addParamValue( self::DATE_TIME ); // req
-        $this->acknowledged = empty( $value->value )
-            ? $value->setValue( DateTimeFactory::factory( null, self::UTC ))
-                ->removeParam( self::VALUE )
-            : DateTimeFactory::setDate( $value, true );
+        $pc = Pc::factory( $value, $params );
+        $pc->addParamValue( self::DATE_TIME ); // req
+        $this->acknowledged = $pc->isset()
+            ? DateTimeFactory::setDate( $pc, true )
+            : $pc->setValue( DateTimeFactory::factory( null, self::UTC ))
+                ->removeParam( self::VALUE );
         return $this;
     }
 }

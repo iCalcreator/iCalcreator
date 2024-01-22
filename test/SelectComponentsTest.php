@@ -376,7 +376,7 @@ class SelectComponentsTest extends TestCase
      * @throws Exception
      * @since  2.41.83 - 2023-09-03
      */
-    public function SelectCompTestProvider() : array
+    public static function SelectCompTestProvider() : array
     {
         $dataArr = [];
 

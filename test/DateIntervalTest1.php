@@ -34,6 +34,7 @@ namespace Kigkonsult\Icalcreator;
 use Exception;
 use Kigkonsult\Icalcreator\Util\DateIntervalFactory;
 use Kigkonsult\Icalcreator\Util\RecurFactory;
+use Kigkonsult\Icalcreator\Util\StringFactory;
 use Kigkonsult\Icalcreator\Util\Util;
 
 /**
@@ -118,7 +119,7 @@ class DateIntervalTest1 extends DtBase
             ! isset( $duration[RecurFactory::$LCHOUR] ) &&
             ! isset( $duration[RecurFactory::$LCMIN] ) &&
             ! isset( $duration[RecurFactory::$LCSEC] ) ) {
-            return Util::$SP0;
+            return StringFactory::$SP0;
         }
         if( Util::issetAndNotEmpty( $duration, RecurFactory::$LCWEEK ) ) {
             return DateIntervalFactory::$P . $duration[RecurFactory::$LCWEEK] . $W;
@@ -218,7 +219,7 @@ class DateIntervalTest1 extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function dateInterval123TestProvider() : array
+    public static function dateInterval123TestProvider() : array
     {
         $zeroInput = [
             RecurFactory::$LCHOUR => 0,
@@ -306,7 +307,7 @@ class DateIntervalTest1 extends DtBase
 
                 $getValue = $comp->{$getMethod}( true );
                 // error_log( __FUNCTION__ . ' #' . $case . ' get ' . var_export( $getValue, true )); // test ###
-                $comp3Exp = DateIntervalFactory::dateInterval2String( $expectedGet->value, true ) .
+                $comp3Exp = DateIntervalFactory::dateInterval2String( $expectedGet->getValue(), true ) .
                     ' ' . var_export( $expectedGet->params, true );
                 $comp3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
                     ' ' . var_export( $getValue->params, true );
@@ -381,7 +382,7 @@ class DateIntervalTest1 extends DtBase
         }
         $expGet     = clone $expectedGet;
         $expGet->params += [ IcalInterface::VALUE => IcalInterface::DURATION ];
-        $cal_rf3exp = DateIntervalFactory::dateInterval2String( $expGet->value, true ) .
+        $cal_rf3exp = DateIntervalFactory::dateInterval2String( $expGet->getValue(), true ) .
             ' ' . var_export( $expGet->params, true );
         $cal_rf3act = DateIntervalFactory::dateInterval2String( $getValue->value, true ) .
             ' ' . var_export( $getValue->params, true );

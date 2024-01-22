@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -33,13 +33,12 @@ use Kigkonsult\Icalcreator\Formatter\Property\SingleProps;
 use Kigkonsult\Icalcreator\Pc;
 use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\HttpFactory;
-use Kigkonsult\Icalcreator\Util\ParameterFactory;
 use InvalidArgumentException;
 
 /**
  * SOURCE property functions
  *
- * @since 2.41.81 2023-08-14
+ * @since 2.41.85 2024-01-18
  */
 trait SOURCErfc7986trait
 {
@@ -78,48 +77,47 @@ trait SOURCErfc7986trait
      *
      * @param null|bool   $inclParam
      * @return bool|string|Pc
+     * @since 2.41.85 2024-01-18
      */
     public function getSource( ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->source )) {
             return false;
         }
-        return $inclParam ? clone $this->source : $this->source->value;
+        return $inclParam ? clone $this->source : $this->source->getValue();
     }
 
     /**
      * Return bool true if set (and ignore empty property)
      *
      * @return bool
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.88 2024-01-19
      */
     public function isSourceSet() : bool
     {
-        return ! empty( $this->source->value );
+        return self::isPropSet( $this->source->getValue());
     }
 
     /**
      * Set calendar component property source
      *
      * @param null|string|Pc   $value
-     * @param null|array $params
+     * @param null|mixed[] $params
      * @return static
      * @throws InvalidArgumentException
-     * @since 2.41.81 2023-08-14
+     * @since 2.41.85 2024-01-18
      */
     public function setSource( null|string|Pc $value = null, ? array $params = [] ) : static
     {
-        $value = ( $value instanceof Pc )
-            ? clone $value
-            : Pc::factory( $value, ParameterFactory::setParams( $params ));
-        $value->value = rtrim((string) $value->value );
-        if( empty( $value->value )) {
-            $this->assertEmptyValue( $value->value, self::SOURCE );
-            $this->source = $value->setEmpty();
+        $pc      = Pc::factory( $value, $params );
+        $pcValue = rtrim((string) $pc->getValue());
+        if( empty( $pcValue )) {
+            $this->assertEmptyValue( $pcValue, self::SOURCE );
+            $this->source = $pc->setEmpty();
         }
         else {
-            Util::assertString( $value->value, self::SOURCE );
-            HttpFactory::urlSet( $this->source, $value );
+            $pc->setValue( Util::assertString( $pcValue, self::SOURCE ));
+            HttpFactory::urlSet( $this->source, $pc );
         }
         return $this;
     }

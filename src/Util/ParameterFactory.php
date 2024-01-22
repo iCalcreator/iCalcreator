@@ -43,6 +43,7 @@ use function trim;
  * iCalcreator iCal parameters support class
  *
  * @since 2.41.68 2022-10-02
+ * @deprecated
  */
 class ParameterFactory
 {
@@ -53,14 +54,13 @@ class ParameterFactory
      * Non-string values set to string
      *
      * @param null|array $params
-     * @param null|string[] $defaults
      * @return string[]
-     * @since 2.41.68 2022-10-02
+     * @since 2.41.85 2024-01-19
      */
-    public static function setParams( ? array $params = [], ? array $defaults = [] ) : array
+    public static function setParams( ? array $params = [] ) : array
     {
         static $TRUEFALSEARR = [ IcalInterface::TRUE,  IcalInterface::FALSE ];
-        if( empty( $params ) && empty( $defaults )) {
+        if( empty( $params )) {
             return [];
         }
         $output = [];
@@ -116,9 +116,9 @@ class ParameterFactory
         static $ONE = '1';
         return match ( true ) {
             is_string( $value ) => trim( $value, StringFactory::$QQ ),
-            is_bool( $value ) => $value ? $ONE : Util::$ZERO,
+            is_bool( $value ) => $value ? $ONE : StringFactory::$ZERO,
             default => (string)$value,
-        }; // end switch
+        }; // end match
     }
 
     private static string $CIRCUMFLEX = '^';
@@ -145,7 +145,7 @@ class ParameterFactory
      * @return mixed
      * @since 2022-01-31 2.41.15
      */
-    public static function circumflexQuoteParse( mixed $value ) : mixed
+    private static function circumflexQuoteParse( mixed $value ) : mixed
     {
         static $SQUOTE = "'";
         if( ! is_string( $value )) {

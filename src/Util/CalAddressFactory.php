@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -47,7 +47,7 @@ use function trim;
 /**
  * iCalcreator attendee support class
  *
- * @since  2.41.80 - 2023-06-27
+ * @since 2.41.85 2024-01-18
  */
 class CalAddressFactory
 {
@@ -189,18 +189,19 @@ class CalAddressFactory
     /**
      * Return bool true if parameter EMAIL equals ATTENDEE/ORGANIZER value
      *
-     * @param Pc   $contents
+     * @param Pc $pc
      * @return void
-     * @since  2.41.36 - 2022-03-31
+     * @since 2.41.88 - 2024-10-18
      */
-    public static function sameValueAndEMAILparam( Pc $contents ) : void
+    public static function sameValueAndEMAILparam( Pc $pc ) : void
     {
-        if( $contents->hasParamKey( IcalInterface::EMAIL ) &&
-            ( 0 === strcasecmp(
-                self::removeMailtoPrefix( $contents->value ),
-                self::removeMailtoPrefix( $contents->getParams( IcalInterface::EMAIL ))
-            ))) {
-            $contents->removeParam( IcalInterface::EMAIL );
+        if( ! $pc->hasParamKey( IcalInterface::EMAIL )) {
+            return;
+        }
+        $vEmail = self::removeMailtoPrefix( $pc->getValue());
+        $pEmail = self::removeMailtoPrefix( $pc->getParams( IcalInterface::EMAIL ));
+        if( 0 === strcasecmp( $vEmail, $pEmail )) {
+            $pc->removeParam( IcalInterface::EMAIL );
         } // end if
     }
 
@@ -278,8 +279,8 @@ class CalAddressFactory
         $output = [];
         foreach((array) $propValues as $propValue => $counts ) {
             $propValue = self::removeMailtoPrefix( $propValue );
-            if( str_contains( $propValue, Util::$COMMA )) {
-                $propValue = strstr( $propValue, Util::$COMMA, true );
+            if( str_contains( $propValue, StringFactory::$COMMA )) {
+                $propValue = strstr( $propValue, StringFactory::$COMMA, true );
             }
             try {
                 self::assertCalAddress( $propValue );
@@ -355,7 +356,7 @@ class CalAddressFactory
      *
      * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
-     * @since  2.41.76 - 2023-04-29
+     * @since 2.41.85 2024-01-18
      */
     public static function getCalAdressesAllFromAttendee( CalendarComponent|Vevent $component ) : array
     {
@@ -364,7 +365,7 @@ class CalAddressFactory
             if( empty( $propValue )) {
                continue;
             }
-            $value = self::removeMailtoPrefix( $propValue->value );
+            $value = self::removeMailtoPrefix( $propValue->getValue());
             if( !in_array( $value, $output, true )) {
                 $output[] = $value;
             }
@@ -409,7 +410,7 @@ class CalAddressFactory
             return [];
         }
         $output = [];
-        $value  = self::removeMailtoPrefix( $propValue->value );
+        $value  = self::removeMailtoPrefix( $propValue->getValue());
         if( ! in_array( $value, $output, true )) {
             $output[] = $value;
         }
@@ -429,7 +430,7 @@ class CalAddressFactory
      *
      * @param CalendarComponent|Vevent $component  iCalcreator Vcalendar component instance
      * @return string[]
-     * @since  2.29 - 2021-06-19
+     * @since 2.41.85 2024-01-18
      */
     public static function getCalAdressesAllFromContact( CalendarComponent|Vevent $component ) : array
     {
@@ -438,10 +439,11 @@ class CalAddressFactory
             if( empty( $propValue )) {
                 continue;
             }
+            $pcValue = $propValue->getValue();
             $value =
-                str_contains( $propValue->value, Util::$COMMA )
-                    ? strstr( $propValue->value, Util::$COMMA, true )
-                    : $propValue->value;
+                str_contains( $pcValue, StringFactory::$COMMA )
+                    ? strstr( $pcValue, StringFactory::$COMMA, true )
+                    : $pcValue;
             try {
                 self::assertCalAddress( $value );
             }
@@ -458,59 +460,54 @@ class CalAddressFactory
     /**
      * Return formatted output for calendar component property attendee
      *
-     * @param string[]  $params
+     * @param Pc $pc
      * @param string $compType
      * @param bool|string $lang  bool false if not config lang found
-     * @return string[]
+     * @return void
      * @throws InvalidArgumentException
-     * @since  2022-09-05 - 2.41.63
+     * @since  2.41.85 2024-01-19
      */
     public static function inputPrepAttendeeParams(
-        array $params,
+        Pc $pc,
         string $compType,
         bool | string $lang
-    ) : array
+    ) : void
     {
         static $NoParamComps = [ IcalInterface::VFREEBUSY, IcalInterface::VALARM ];
-        $params2 = [];
-        foreach( $params as $pLabel => $pValue ) {
+        static $DEFAULTSTOREMOVE     = [
+            IcalInterface::CUTYPE   => IcalInterface::INDIVIDUAL,
+            IcalInterface::PARTSTAT => IcalInterface::NEEDS_ACTION,
+            IcalInterface::ROLE     => IcalInterface::REQ_PARTICIPANT,
+            IcalInterface::RSVP     => IcalInterface::FALSE
+        ];
+        foreach( $pc->getParams() as $pLabel => $pValue ) {
             if( ! StringFactory::isXprefixed( $pLabel ) &&
                 in_array( $compType, $NoParamComps, true )) { // skip
+                $pc->removeParam( $pLabel );
                 continue;
             }
-            $params2[$pLabel] = match( $pLabel ) {
-                IcalInterface::EMAIL   => self::prepEmail( $pValue ),
+            match( $pLabel ) {
+                IcalInterface::EMAIL   => $pc->addParam( $pLabel, self::prepEmail( $pValue )),
                 IcalInterface::MEMBER, IcalInterface::DELEGATED_TO, IcalInterface::DELEGATED_FROM
-                                       => self::prepInputMDtDf((array) $pValue ),
-                IcalInterface::ORDER   => $pValue,
-                IcalInterface::SENT_BY => self::prepSentBy( $pValue ),
-                default                => trim( $pValue, StringFactory::$QQ ),
+                                       => $pc->addParam( $pLabel, self::prepInputMDtDf((array) $pValue )),
+                IcalInterface::ORDER   => $pc->addParam( $pLabel, $pValue ),
+                IcalInterface::SENT_BY => $pc->addParam( $pLabel, self::prepSentBy( $pValue )),
+                default                => $pc->addParam( $pLabel, trim( $pValue, StringFactory::$QQ )),
             }; // end match( $pLabel.. .
-        } // end foreach( $params as $pLabel => $optParamValue )
+        } // end foreach
         // remove defaults
-        if( isset( $params2[IcalInterface::CUTYPE] ) &&
-            ( IcalInterface::INDIVIDUAL === $params2[IcalInterface::CUTYPE] )) {
-            unset( $params2[IcalInterface::CUTYPE] );
-        }
-        if( isset( $params2[IcalInterface::PARTSTAT] ) &&
-            ( IcalInterface::NEEDS_ACTION === $params2[IcalInterface::PARTSTAT] )) {
-            unset( $params2[IcalInterface::PARTSTAT] );
-        }
-        if( isset( $params2[IcalInterface::ROLE] ) &&
-            ( IcalInterface::REQ_PARTICIPANT === $params2[IcalInterface::ROLE] )) {
-            unset( $params2[IcalInterface::ROLE] );
-        }
-        if( isset( $params2[IcalInterface::RSVP] ) &&
-            ( IcalInterface::FALSE === $params2[IcalInterface::RSVP] )) {
-            unset( $params2[IcalInterface::RSVP] );
+        foreach( $DEFAULTSTOREMOVE as $pLabel => $pValue ) {
+            if( $pc->hasParamKey( $pLabel ) &&
+                ( 0 === strcasecmp( $pValue, $pc->getParams( $pLabel )))) {
+                $pc->removeParam( $pLabel );
+            }
         }
         // check language setting
-        if( isset( $params2[IcalInterface::CN] ) &&
+        if( $pc->hasParamKey( IcalInterface::CN ) &&
             ! isset( $params2[IcalInterface::LANGUAGE] ) &&
             ! empty( $lang )) {
-            $params2[IcalInterface::LANGUAGE] = $lang;
+            $pc->addParam( IcalInterface::LANGUAGE, $lang );
         }
-        return $params2;
     }
 
     /**

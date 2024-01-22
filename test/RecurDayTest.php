@@ -47,7 +47,7 @@ class RecurDayTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurDaily1TestProvider() : array
+    public static function recurDaily1TestProvider() : array
     {
 
         $dataArr   = [];
@@ -539,7 +539,7 @@ class RecurDayTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurDaily11TestProvider() : array
+    public static function recurDaily11TestProvider() : array
     {
         $dataArr = [];
         $dataSetNo = 0;
@@ -651,7 +651,7 @@ class RecurDayTest extends RecurBaseTest
      * @return mixed[]
      * @throws Exception
      */
-    public function recurDaily2TestProvider() : array
+    public static function recurDaily2TestProvider() : array
     {
         $dataArr   = [];
         $dataSetNo = 0;

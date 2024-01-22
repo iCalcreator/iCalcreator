@@ -123,7 +123,7 @@ class VtimezonePopulateFactoryTest extends DtBase
      * @return mixed[]
      * @throws Exception
      */
-    public function processTest3Provider() : array
+    public static function processTest3Provider() : array
     {
         $dataArr = [];
 
@@ -504,13 +504,13 @@ class VtimezonePopulateFactoryTest extends DtBase
 
         $vCalendar = new Vcalendar();
 
-        // set two timezones into calendar 
+        // set two timezones into calendar
         $vCalendar = VtimezonePopulateFactory::process(
             $vCalendar,
             [ $timezone1, $timezone2 ]
         );
 
-        // check first 
+        // check first
         $this->assertNotFalse(
             $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 1 ),
             __METHOD__ . ' 11 Vtimezone not found'
@@ -525,7 +525,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             __METHOD__ . ' 13 expected ' . $timezone1 . ' got ' . $tzId
         );
 
-        // check second 
+        // check second
         $this->assertNotFalse(
             $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 2 ),
             __METHOD__ . ' 21 Vtimezone not found'
@@ -546,7 +546,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             [ $timezone3, $timezone4 ]
         );
 
-        // check first 
+        // check first
         $this->assertNotFalse(
             $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 1 ),
             __METHOD__ . ' 31 Vtimezone not found'
@@ -561,7 +561,7 @@ class VtimezonePopulateFactoryTest extends DtBase
             __METHOD__ . ' 33 expected ' . $timezone3 . ' got ' . $tzId
         );
 
-        // check second 
+        // check second
         $this->assertNotFalse(
             $vTimezone = $vCalendar->getComponent( Vcalendar::VTIMEZONE, 2 ),
             __METHOD__ . ' 41 Vtimezone not found'

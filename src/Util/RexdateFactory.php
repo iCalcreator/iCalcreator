@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2023 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -31,6 +31,7 @@ namespace Kigkonsult\Icalcreator\Util;
 
 use DateTimeInterface;
 use DateInterval;
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Kigkonsult\Icalcreator\IcalInterface;
@@ -45,7 +46,7 @@ use function var_export;
 /**
  * iCalcreator EXDATE/RDATE support class
  *
- * @since 2.41.44 2022-04-27
+ * @since 2.41.88 - 2024-01-18
  */
 class RexdateFactory
 {
@@ -61,15 +62,15 @@ class RexdateFactory
      * @return Pc
      * @throws Exception
      * @throws InvalidArgumentException
-     * @since 2.41.57 2022-08-18
+     * @since 2.41.88 - 2024-01-18
      */
     public static function prepInputExdate( Pc $pc ) : Pc
     {
-        $exdates     = $pc->value;
+        $exdates     = $pc->getValue();
         $output      = ( clone $pc )->setValue( [] );
         $output->addParam( IcalInterface::VALUE, IcalInterface::DATE_TIME, false );
         $isValueDate = $output->hasParamValue( IcalInterface::DATE );
-        $paramTZid   = $output->getParams( IcalInterface::TZID ) ?? Util::$SP0;
+        $paramTZid   = $output->getParams( IcalInterface::TZID ) ?? StringFactory::$SP0;
         $forceUTC    = ( IcalInterface::UTC === $paramTZid );
         $isLocalTime = false;
         if( ! empty( $paramTZid )) {
@@ -80,6 +81,7 @@ class RexdateFactory
                 DateTimeZoneFactory::assertDateTimeZone( $paramTZid );
             }
         }
+        $output2 = [];
         foreach( $exdates as $eix => $theExdate ) {
             $wDate     = match( true ) {
                 $theExdate instanceof DateTimeInterface => DateTimeFactory::conformDateTime(
@@ -104,10 +106,11 @@ class RexdateFactory
                         var_export( $theExdate, true )
                     )
                 ),
-            }; // end switch
-            $output->value[] = $wDate;
+            }; // end match
+            $output2[] = $wDate;
         } // end foreach(( array_keys( $exdates...
-        if( 0 < count( $output->value )) {
+        $output->setValue( $output2 );
+        if( 0 < count( $output2 )) {
             DateTimeFactory::conformDateTimeParams( $output, $isValueDate, $isLocalTime, $paramTZid );
         }
         return $output;
@@ -120,16 +123,16 @@ class RexdateFactory
      * @return Pc
      * @throws InvalidArgumentException
      * @throws Exception
-     * @since 2.41.57 2022-08-18
+     * @since 2.41.88 - 2024-01-18
      */
     public static function prepInputRdate( Pc $input ) : Pc
     {
-        $rDates = $input->value;
+        $rDates = $input->getValue();
         $output = $input->setValue( [] );
         $output->addParam( IcalInterface::VALUE, IcalInterface::DATE_TIME, false );
         $isValuePeriod = $output->hasParamValue( IcalInterface::PERIOD );
         $isValueDate   = $output->hasParamValue( IcalInterface::DATE );
-        $isLocalTime   = $output->hasParamKey( IcalInterface::ISLOCALTIME );
+        $isLocalTime   = $output->hasParamIsLocalTime();
         if( $isLocalTime ) {
             $isValuePeriod = $isValueDate = false;
             $paramTZid = IcalInterface::UTC;
@@ -146,6 +149,7 @@ class RexdateFactory
             }
         }
         $forceUTC = ( IcalInterface::UTC === $paramTZid );
+        $output2  = [];
         foreach( $rDates as $rpix => $theRdate ) {
             switch( true ) {
                 case $isValuePeriod : // PERIOD
@@ -156,10 +160,10 @@ class RexdateFactory
                         $paramTZid,
                         $isLocalTime
                     );
-                    $output->value[] = $wDate;
+                    $output2[] = $wDate;
                     break;
                 case ( $theRdate instanceof DateTimeInterface ) : // SINGLE DateTime
-                    $output->value[] = DateTimeFactory::conformDateTime(
+                    $output2[] = DateTimeFactory::conformDateTime(
                         DateTimeFactory::toDateTime( $theRdate ),
                         $isValueDate,
                         $forceUTC,
@@ -167,7 +171,7 @@ class RexdateFactory
                     );
                     break;
                 case DateTimeFactory::isStringAndDate( $theRdate ) : // SINGLE string date(time)
-                    $output->value[] = DateTimeFactory::conformStringDate(
+                    $output2[] = DateTimeFactory::conformStringDate(
                         $theRdate,
                         $isValueDate,
                         $forceUTC,
@@ -185,12 +189,13 @@ class RexdateFactory
                     );
             } // end switch
         } // end foreach( $rDates as $rpix => $theRdate )
+        $output->setValue( $output2 );
         DateTimeFactory::conformDateTimeParams( $output, $isValueDate, $isLocalTime, $paramTZid );
         return $output;
     }
 
     /**
-     * Return managed period (dateTime/dateTime or dateTime/dateInterval)
+     * Return processed period (dateTime/dateTime or dateTime/dateInterval)
      *
      * @param array  $period
      * @param int    $rpix
@@ -224,47 +229,73 @@ class RexdateFactory
                 DateTimeFactory::isStringAndDate( reset( $rPeriod ))) { // text date ex. 2006-08-03 10:12:18
                 $rPeriod = reset( $rPeriod );
             }
-            switch( true ) {
-                case ( $rPeriod instanceof DateTimeInterface ) :
-                    $wDate[$perX] = DateTimeFactory::conformDateTime(
-                        DateTimeFactory::toDateTime( $rPeriod ),
-                        $isValueDate,
-                        $forceUTC,
-                        $paramTZid
-                    );
-                    if( empty( $paramTZid ) && ! $isLocalTime ) {
-                        $paramTZid = $wDate[$perX]->getTimezone()->getName();
-                    }
-                    break;
-                case DateIntervalFactory::isStringAndDuration( $rPeriod ) :  // string format duration
-                    if( DateIntervalFactory::$P !== $rPeriod[0] ) {
-                        $rPeriod = substr( $rPeriod, 1 );
-                    }
-                    $wDate[$perX] =
-                        DateIntervalFactory::conformDateInterval(
-                            new DateInterval( $rPeriod )
-                        );
-                    continue 2;
-                case DateTimeFactory::isStringAndDate( $rPeriod ) : // text date ex. 2006-08-03 10:12:18
-                    $wDate[$perX] = DateTimeFactory::conformStringDate(
+            $wDate[$perX] = match( true ) {
+                ( $rPeriod instanceof DateTimeInterface ) =>
+                    self::getPeriodDateTime(
                         $rPeriod,
                         $isValueDate,
                         $forceUTC,
                         $isLocalTime,
                         $paramTZid
-                    );
-                    break;
-                default :
+                    ),
+                DateIntervalFactory::isStringAndDuration( $rPeriod ) =>  // string format duration
+                    self::getPeriodStringDuration( $rPeriod ),
+                DateTimeFactory::isStringAndDate( $rPeriod ) => // text date ex. 2006-08-03 10:12:18
+                    DateTimeFactory::conformStringDate(
+                        $rPeriod,
+                        $isValueDate,
+                        $forceUTC,
+                        $isLocalTime,
+                        $paramTZid
+                    ),
+                default =>
                     throw new InvalidArgumentException(
-                        sprintf(
-                            self::$REXDATEERR,
-                            IcalInterface::RDATE,
-                            $rpix,
-                            var_export( $rPeriod, true )
-                        )
-                    );
-            } // end switch
+                        sprintf( self::$REXDATEERR, IcalInterface::RDATE, $rpix, var_export( $rPeriod, true ))
+                    )
+            }; // end match
         } // end foreach( $theRdate as $rix => $rPeriod )
         return [ $wDate, $paramTZid ];
+    }
+
+    /**
+     * @param DateTimeInterface $rPeriod
+     * @param bool     $isValueDate
+     * @param bool     $forceUTC
+     * @param bool     $isLocalTime
+     * @param string   $paramTZid
+     * @return DateTimeInterface
+     * @throws Exception
+     */
+    private static function getPeriodDateTime(
+        DateTimeInterface $rPeriod,
+        bool $isValueDate,
+        bool $forceUTC,
+        bool $isLocalTime,
+        string & $paramTZid
+    ) : DateTimeInterface
+    {
+        $output = DateTimeFactory::conformDateTime(
+            DateTimeFactory::toDateTime( $rPeriod ),
+            $isValueDate,
+            $forceUTC,
+            $paramTZid
+        );
+        if( empty( $paramTZid ) && ! $isLocalTime ) {
+            $paramTZid = $output->getTimezone()->getName();
+        }
+        return $output;
+    }
+
+    /**
+     * @param string $rPeriod
+     * @return DateInterval
+     * @throws Exception
+     */
+    private static function getPeriodStringDuration( string $rPeriod ) : DateInterval
+    {
+        if( DateIntervalFactory::$P !== $rPeriod[0] ) {
+            $rPeriod = substr( $rPeriod, 1 );
+        }
+        return DateIntervalFactory::conformDateInterval( new DateInterval( $rPeriod ));
     }
 }

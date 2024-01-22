@@ -42,7 +42,6 @@ use Kigkonsult\Icalcreator\Util\HttpFactory;
 use Kigkonsult\Icalcreator\Util\SelectFactory;
 use Kigkonsult\Icalcreator\Util\SortFactory;
 use Kigkonsult\Icalcreator\Util\StringFactory;
-use Kigkonsult\Icalcreator\Util\Util;
 use Kigkonsult\Icalcreator\Util\VtimezonePopulateFactory;
 use UnexpectedValueException;
 
@@ -172,7 +171,7 @@ final class Vcalendar extends IcalBase
         return trim(
             substr(
                 ICALCREATOR_VERSION,
-                strpos( ICALCREATOR_VERSION, Util::$SP1 )
+                strpos( ICALCREATOR_VERSION, StringFactory::$SP1 )
             )
         );
     }
@@ -188,7 +187,7 @@ final class Vcalendar extends IcalBase
      *
      * @param string $propName
      * @return array|bool   false on not found propName
-     * @since 2.41.68 2022-10-03
+     * @since 2.41.88 2024-01-17
      */
     public function getProperty( string $propName ) : bool | array
     {
@@ -247,22 +246,11 @@ final class Vcalendar extends IcalBase
             }
             switch( true ) {
                 case ( $content instanceof DateTime ) :
-                    $key = $content->format( DateTimeFactory::$Ymd );
-                    if( ! isset( $output[$key] )) {
-                        $output[$key] = 1;
-                    }
-                    else {
-                        ++$output[$key];
-                    }
+                    self::cntUpp( $content->format( DateTimeFactory::$Ymd ), 1, $output );
                     break;
                 case ( is_array( $content )) :
                     foreach( $content as $partKey => $partValue ) {
-                        if( ! isset( $output[$partKey] )) {
-                            $output[$partKey] = $partValue;
-                        }
-                        else {
-                            $output[$partKey] += $partValue;
-                        }
+                        self::cntUpp( $partKey, $partValue, $output );
                     } // end foreach
                     break;
                 case ( ! isset( $output[$content] )) :
@@ -277,6 +265,22 @@ final class Vcalendar extends IcalBase
             ksort( $output );
         }
         return $output;
+    }
+
+    /**
+     * @param string $key
+     * @param int    $value
+     * @param array  $output
+     * @return void
+     */
+    protected static function cntUpp( string $key, int $value, array & $output ) : void
+    {
+        if( ! isset( $output[$key] )) {
+            $output[$key] = $value;
+        }
+        else {
+            $output[$key] += $value;
+        }
     }
 
     /**
@@ -447,7 +451,7 @@ final class Vcalendar extends IcalBase
      * @param CalendarComponent $component
      * @return self
      * @throws InvalidArgumentException
-     * @since  2.47.68 - 2022-10-03
+     * @since  2.41.68 - 2022-10-03
      */
     public function replaceComponent( CalendarComponent $component ) : self
     {
@@ -479,7 +483,7 @@ final class Vcalendar extends IcalBase
             sprintf(
                 $ERRMSG2,
                 $component->getCompType(),
-                implode( Util::$COMMA, $found )
+                implode( StringFactory::$COMMA, $found )
             )
         );
     }
@@ -540,7 +544,7 @@ final class Vcalendar extends IcalBase
      *
      * @param string|null $sortArg
      * @return self
-     * @since  2.47.68 - 2022-10-03
+     * @since  2.41.68 - 2022-10-03
      */
     public function sort( ? string $sortArg = null ) : self
     {
@@ -567,7 +571,7 @@ final class Vcalendar extends IcalBase
      * @param string $propName
      * @return bool
      * @usedby IcalBase::isFoundInCompsProps(), self::sort(), SelectFactory::selectComponents2()
-     * @since  2.47.68 - 2022-10-03
+     * @since  2.41.68 - 2022-10-03
      */
     public static function isSelectSortProp( string $propName ) : bool
     {
