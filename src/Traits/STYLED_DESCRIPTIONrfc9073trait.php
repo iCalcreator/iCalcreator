@@ -88,7 +88,7 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * @param bool $inclParam
      * @return bool|string|Pc
      */
-    public function getStyleddescription( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
+    public function getStyleddescription( ?int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->styleddescription )) {
             unset( $this->propIx[self::STYLED_DESCRIPTION] );

@@ -87,7 +87,7 @@ trait STRUCTURED_DATArfc9073trait
      * @param bool $inclParam
      * @return bool|string|Pc
      */
-    public function getStructureddata( int $propIx = null, bool $inclParam = false ) : bool | string |Pc
+    public function getStructureddata( ?int $propIx = null, bool $inclParam = false ) : bool | string |Pc
     {
         if( empty( $this->structureddata )) {
             unset( $this->propIx[self::STRUCTURED_DATA] );

@@ -89,7 +89,7 @@ trait TZID_ALIAS_OFrfc7808trait
      * @return bool|string|Pc
      * @since 2.41.36 2022-04-03
      */
-    public function getTzidaliasof( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
+    public function getTzidaliasof( ?int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->tzidaliasof )) {
             unset( $this->propIx[self::TZID_ALIAS_OF] );

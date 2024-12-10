@@ -91,7 +91,7 @@ trait COMMENTtrait
      * @return bool|string|Pc
      * @since 2.41.36 2022-04-03
      */
-    public function getComment( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
+    public function getComment( ?int $propIx = null, bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->comment )) {
             unset( $this->propIx[self::COMMENT] );
