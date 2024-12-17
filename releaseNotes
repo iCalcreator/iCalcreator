@@ -306,3 +306,5 @@ v3.39   3.4 release candidate
 2.41.88   code rewrites, Xml\Formatter+Parser, Formatter/* etc
 2.41.89   ParameterFactory deprecated
 2.41.90   upd StringFactory
+
+2.41.91 PHP 8.4, github issue #117

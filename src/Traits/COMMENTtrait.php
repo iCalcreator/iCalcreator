@@ -38,7 +38,7 @@ use InvalidArgumentException;
 /**
  * COMMENT property functions
  *
- * @since 2.41.85 2024-01-18
+ * @since 2.41.91 2024-12-17
  */
 trait COMMENTtrait
 {
@@ -89,9 +89,9 @@ trait COMMENTtrait
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
      * @return bool|string|Pc
-     * @since 2.41.36 2022-04-03
+     * @since 2.41.91 2024-12-17
      */
-    public function getComment( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
+    public function getComment( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->comment )) {
             unset( $this->propIx[self::COMMENT] );

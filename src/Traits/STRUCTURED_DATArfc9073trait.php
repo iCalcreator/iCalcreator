@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * STRUCTURED-DATA property functions
  *
- * @since 2.41.85 2024-01-18
+ * @since 2.41.91 2024-12-17
  */
 trait STRUCTURED_DATArfc9073trait
 {
@@ -86,8 +86,9 @@ trait STRUCTURED_DATArfc9073trait
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
      * @return bool|string|Pc
+     * @since 2.41.91 2024-12-17
      */
-    public function getStructureddata( int $propIx = null, bool $inclParam = false ) : bool | string |Pc
+    public function getStructureddata( ? int $propIx = null, ? bool $inclParam = false ) : bool | string |Pc
     {
         if( empty( $this->structureddata )) {
             unset( $this->propIx[self::STRUCTURED_DATA] );

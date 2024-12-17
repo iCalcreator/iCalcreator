@@ -37,7 +37,7 @@ use Kigkonsult\Icalcreator\Util\Util;
 /**
  * STYLED-DESCRIPTION property functions
  *
- * @since 2.41.85 2024-01-18
+ * 2.41.91 2024-12-17
  */
 trait STYLED_DESCRIPTIONrfc9073trait
 {
@@ -87,8 +87,9 @@ trait STYLED_DESCRIPTIONrfc9073trait
      * @param null|int $propIx specific property in case of multiply occurrence
      * @param bool $inclParam
      * @return bool|string|Pc
+     * @since 2.41.91 2024-12-17
      */
-    public function getStyleddescription( int $propIx = null, bool $inclParam = false ) : bool | string | Pc
+    public function getStyleddescription( ? int $propIx = null, ? bool $inclParam = false ) : bool | string | Pc
     {
         if( empty( $this->styleddescription )) {
             unset( $this->propIx[self::STYLED_DESCRIPTION] );
