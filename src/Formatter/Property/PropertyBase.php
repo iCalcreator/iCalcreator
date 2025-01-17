@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2025 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -45,7 +45,7 @@ use function str_replace;
 use function strlen;
 
 /**
- * @since 2.41.68 - 2022-10-03
+ * @since  2.41.92 - 2025-01-15
  */
 abstract class PropertyBase implements IcalInterface
 {
@@ -391,7 +391,7 @@ abstract class PropertyBase implements IcalInterface
      * @param string $string
      * @return string
      * @link   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-     * @since  2.40 - 2021-10-04
+     * @since  2.41.92 - 2025-01-15
      */
     public static function size75( string $string ) : string
     {
@@ -410,9 +410,10 @@ abstract class PropertyBase implements IcalInterface
                 break;
             }
             if(( 74 <= $outLen ) &&
-                ( SF::$BS2 === $tmp[$x]) && // '\\'
-                (( $LCN === $tmp[$x1]) ||
-                    ( $UCN === $tmp[$x1]))) {
+                ( SF::$BS2 === $tmp[$x] ) && // '\\'
+                isset( $tmp[$x1] ) &&
+                (( $LCN === $tmp[$x1] ) ||
+                    ( $UCN === $tmp[$x1] ))) {
                 $string .= SF::$CRLF . $SPBSLCN; // don't break lines inside '\n'
                 $x      += 2;
                 if( $inLen < $x ) {
@@ -420,7 +421,7 @@ abstract class PropertyBase implements IcalInterface
                     break; // or here...
                 }
                 $outLen = 3;
-            }
+            } // end if
             elseif( 75 <= $outLen ) {
                 $string .= SF::$CRLF;
                 if( $inLen === $x ) {
@@ -429,6 +430,10 @@ abstract class PropertyBase implements IcalInterface
                 $string .= $SP1;
                 $outLen  = 1;
             }
+            if( ! isset( $tmp[$x] )) {
+                $string .= SF::$CRLF;
+                break; // or here?
+            } // end if
             $str1    = $tmp[$x];
             $byte    = ord( $str1 );
             $string .= $str1;

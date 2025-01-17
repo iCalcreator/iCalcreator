@@ -5,7 +5,7 @@
  * This file is a part of iCalcreator.
  *
  * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
- * @copyright 2007-2024 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
+ * @copyright 2007-2025 Kjell-Inge Gustafsson, kigkonsult AB, All rights reserved
  * @link      https://kigkonsult.se
  * @license   Subject matter of licence is the software iCalcreator.
  *            The above copyright, link, package and version notices,
@@ -59,7 +59,7 @@ use function ucfirst;
  *         Do NOT alter or remove the constant!!
  */
 if( ! defined( 'ICALCREATOR_VERSION' )) {
-    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.91' );
+    define( 'ICALCREATOR_VERSION', 'iCalcreator 2.41.92' );
 }
 
 /**
